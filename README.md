@@ -1,6 +1,8 @@
 # SupaCompose
 A framework for building android & desktop apps with Supabase
 
+https://user-images.githubusercontent.com/26686035/169712245-e090e33b-8472-49c8-a512-947d5ed889d5.mp4
+
 # Features
 
 SupaCompose currently supports:
@@ -14,11 +16,7 @@ SupaCompose currently supports:
 
 # Example code
 <details><summary>Authentication</summary>
-<video>
- <source src="https://cdn.discordapp.com/attachments/867347909741248532/977898229633015839/firefox_2022-05-22_13-33-54.mp4" type="video/mp4">
-</video>
 <p>
-
 ```kotlin
 suspend fun main() {
     val client = createSupabaseClient {
