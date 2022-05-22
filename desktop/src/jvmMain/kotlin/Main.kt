@@ -55,7 +55,7 @@ suspend fun main() {
                             )
                             Button(onClick = {
                                 scope.launch {
-                                    client.auth.signUpWith(Email) {
+                                    client.auth.loginWith(Email) {
                                         this.email = email
                                         this.password = password
                                     }

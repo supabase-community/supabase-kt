@@ -49,16 +49,7 @@ actual abstract class OAuthProvider : AuthProvider<ExternalAuthConfig, Unit> {
         onSuccess: suspend (UserSession) -> Unit,
         onFail: (AuthFail) -> Unit,
         credentials: (ExternalAuthConfig.() -> Unit)?
-    ) {
-        withContext(Dispatchers.IO) {
-            launch {
-                val config = ExternalAuthConfig().apply {
-                    credentials?.invoke(this)
-                }
-                createServer(config, supabaseClient, onSuccess, onFail)
-            }
-        }
-    }
+    ) = login(supabaseClient, onSuccess, onFail, credentials)
 
     private suspend fun createServer(config: ExternalAuthConfig, supabaseClient: SupabaseClient, onSuccess: suspend (UserSession) -> Unit, onFail: (AuthFail) -> Unit) {
         coroutineScope {
