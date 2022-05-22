@@ -17,6 +17,7 @@ SupaCompose currently supports:
 # Example code
 <details><summary>Authentication</summary>
 <p>
+
 ```kotlin
 suspend fun main() {
     val client = createSupabaseClient {
