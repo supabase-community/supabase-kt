@@ -1,0 +1,12 @@
+# Project exclude paths
+/.gradle/
+/android/build/
+/android/build/intermediates/javac/debug/classes/
+/Auth/build/
+/Auth/build/classes/kotlin/jvm/main/
+/build/
+/build/classes/kotlin/desktop/main/
+/buildSrc/.gradle/
+/buildSrc/build/
+/desktop/build/
+.idea
