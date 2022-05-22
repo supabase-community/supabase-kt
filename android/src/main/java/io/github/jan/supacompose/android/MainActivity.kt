@@ -17,7 +17,7 @@ class MainActivity : AppCompatActivity() {
                     createSupabaseClient {
                         supabaseUrl = System.getenv("SUPABASE_URL")
                         supabaseKey = System.getenv("SUPABASE_KEY")
-                        
+
                         install(Auth)
                     }
                 }
