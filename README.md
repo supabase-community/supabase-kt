@@ -87,7 +87,7 @@ suspend fun main() {
         }
     }
 
-})
+}
 ```
 
 </p>

@@ -10,3 +10,4 @@
 /buildSrc/build/
 /desktop/build/
 .idea
+local.properties

@@ -1,6 +1,7 @@
 package io.github.jan.supacompose.auth.providers
 
 import io.github.jan.supacompose.auth.user.UserSession
+import io.github.jan.supacompose.SupabaseClient
 
 actual abstract class OAuthProvider : AuthProvider<ExternalAuthConfig, Unit> {
 

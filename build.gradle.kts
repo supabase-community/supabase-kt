@@ -26,6 +26,10 @@ kotlin {
     jvm("desktop") {
         compilations.all {
             kotlinOptions.jvmTarget = "1.8"
+            kotlinOptions.freeCompilerArgs = listOf(
+                "-Xjvm-default=all",  // use default methods in interfaces,
+                "-Xlambdas=indy"      // use invokedynamic lambdas instead of synthetic classes
+            )
         }
     }
     android()
@@ -49,7 +53,7 @@ kotlin {
         val desktopTest by getting
         val androidMain by getting {
             dependencies {
-                implementation("com.google.android.material:material:1.6.0")
+                api("com.google.android.material:material:1.6.0")
                 api("androidx.core:core-ktx:${Versions.ANDROID_CORE}")
                 api("androidx.activity:activity-compose:${Versions.ACTIVITY}")
                 api("androidx.appcompat:appcompat:${Versions.ANDROID_COMPAT}")

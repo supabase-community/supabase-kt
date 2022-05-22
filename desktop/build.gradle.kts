@@ -10,7 +10,7 @@ repositories {
     mavenCentral()
 }
 
-group = "io.github.jan-tennert.supacompose"
+group = "io.github.jan-tennert.supacompose.desktop"
 version = Versions.SUPABASE
 
 kotlin {
