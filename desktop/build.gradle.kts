@@ -6,6 +6,10 @@ plugins {
     id("org.jetbrains.compose")
 }
 
+repositories {
+    mavenCentral()
+}
+
 group = "io.github.jan-tennert.supacompose"
 version = Versions.SUPABASE
 

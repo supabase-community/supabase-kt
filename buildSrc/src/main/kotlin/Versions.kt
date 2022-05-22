@@ -10,7 +10,7 @@ object Versions {
     const val DOKKA = "1.6.21"
     const val NEXUS_STAGING = "0.30.0"
     const val SUPABASE = "0.1"
-    const val KORLIBS = "3.0.0-Beta2"
+    const val KORLIBS = "2.7.0"
     const val ANDROID_COMPAT = "1.4.1"
     const val COMPOSE = "1.1.0"
     const val ACTIVITY = "1.4.0"

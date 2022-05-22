@@ -9,6 +9,7 @@ version = Versions.SUPABASE
 
 repositories {
     jcenter()
+    mavenCentral()
 }
 
 dependencies {
