@@ -11,7 +11,7 @@ SupaCompose currently supports:
 
 |         | Login                           | Signup                          | Verifying (Signup, Password Reset, Invite)  | Logout | Otp     |
 |---------|---------------------------------|---------------------------------|---------------------------------------------|--------|---------|
-| Desktop | phone, password, oauth2         | phone, password, oauth2 planned | only with token                             | yes    | no      |
+| Desktop | phone, password, oauth2         | phone, password, oauth2         | only with token                             | yes    | no      |
 | Android | phone, password, oauth2 planned | phone, password, oauth2 planned | only with token, url authentication planned | yes    | planned |
 
 # Example code

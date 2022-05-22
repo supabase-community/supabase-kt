@@ -22,7 +22,7 @@ import io.github.jan.supacompose.auth.auth
 import io.github.jan.supacompose.auth.compose.ProviderButton
 import io.github.jan.supacompose.auth.providers.Discord
 import io.github.jan.supacompose.auth.providers.Email
-import io.github.jan.supacompose.auth.providers.OAuthFail
+import io.github.jan.supacompose.auth.providers.AuthFail
 import io.github.jan.supacompose.createSupabaseClient
 import kotlinx.coroutines.launch
 
@@ -75,10 +75,10 @@ suspend fun main() {
                                 scope.launch {
                                     client.auth.loginWith(Discord, onFail = {
                                         when (it) {
-                                            is OAuthFail.Timeout -> {
+                                            is AuthFail.Timeout -> {
                                                 println("Timeout")
                                             }
-                                            is OAuthFail.Error -> {
+                                            is AuthFail.Error -> {
                                                 //log error
                                             }
                                         }

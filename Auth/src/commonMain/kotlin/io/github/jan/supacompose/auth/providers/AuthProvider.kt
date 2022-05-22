@@ -2,14 +2,25 @@ package io.github.jan.supacompose.auth.providers
 
 import io.github.jan.supacompose.SupabaseClient
 import io.github.jan.supacompose.auth.user.UserSession
+import io.github.jan.supacompose.exceptions.RestException
 import io.ktor.client.call.body
 import io.ktor.http.HttpMethod
 
 interface AuthProvider<C, R> {
 
-    suspend fun login(supabaseClient: SupabaseClient, onSuccess: suspend (UserSession) -> Unit, onFail: (OAuthFail) -> Unit, credentials: (C.() -> Unit)? = null)
+    suspend fun login(
+        supabaseClient: SupabaseClient,
+        onSuccess: suspend (UserSession) -> Unit,
+        onFail: (AuthFail) -> Unit,
+        credentials: (C.() -> Unit)? = null
+    )
 
-    suspend fun signUp(supabaseClient: SupabaseClient, credentials: C.() -> Unit): R
+    suspend fun signUp(
+        supabaseClient: SupabaseClient,
+        onSuccess: suspend (UserSession) -> Unit,
+        onFail: (AuthFail) -> Unit = {},
+        credentials: (C.() -> Unit)? = null
+    ): R
 
 }
 
@@ -18,7 +29,7 @@ interface DefaultAuthProvider<C, R> : AuthProvider<C, R> {
     override suspend fun login(
         supabaseClient: SupabaseClient,
         onSuccess: suspend (UserSession) -> Unit,
-        onFail: (OAuthFail) -> Unit,
+        onFail: (AuthFail) -> Unit,
         credentials: (C.() -> Unit)?
     ) {
         kotlin.runCatching {
@@ -29,14 +40,32 @@ interface DefaultAuthProvider<C, R> : AuthProvider<C, R> {
         }.onSuccess {
             onSuccess(it)
         }.onFailure {
-            onFail(OAuthFail.Error(it))
+            val error = when(it) {
+                is RestException -> AuthFail.InvalidCredentials
+                else -> AuthFail.Error(it)
+            }
+            onFail(error)
         }
     }
 
-    override suspend fun signUp(supabaseClient: SupabaseClient, credentials: C.() -> Unit): R {
-        val body = encodeCredentials(credentials)
-        val response = supabaseClient.makeRequest(HttpMethod.Post, "/auth/v1/signup", body = body)
-        return decodeResult(response.body())
+    override suspend fun signUp(
+        supabaseClient: SupabaseClient,
+        onSuccess: suspend (UserSession) -> Unit,
+        onFail: (AuthFail) -> Unit,
+        credentials: (C.() -> Unit)?
+    ): R {
+        return kotlin.runCatching {
+            if(credentials == null) throw IllegalArgumentException("Credentials are required")
+            val body = encodeCredentials(credentials)
+            val response = supabaseClient.makeRequest(HttpMethod.Post, "/auth/v1/signup", body = body)
+            decodeResult(response.body())
+        }.onFailure {
+            val error = when(it) {
+                is RestException -> AuthFail.InvalidCredentials
+                else -> AuthFail.Error(it)
+            }
+            onFail(error)
+        }.getOrThrow()
     }
 
     fun decodeResult(body: String): R

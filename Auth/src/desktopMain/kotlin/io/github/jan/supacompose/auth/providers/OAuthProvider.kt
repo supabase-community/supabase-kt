@@ -31,7 +31,7 @@ actual abstract class OAuthProvider : AuthProvider<ExternalAuthConfig, Unit> {
     actual override suspend fun login(
         supabaseClient: SupabaseClient,
         onSuccess: suspend (UserSession) -> Unit,
-        onFail: (OAuthFail) -> Unit,
+        onFail: (AuthFail) -> Unit,
         credentials: (ExternalAuthConfig.() -> Unit)?
     ) {
         withContext(Dispatchers.IO) {
@@ -44,11 +44,23 @@ actual abstract class OAuthProvider : AuthProvider<ExternalAuthConfig, Unit> {
         }
     }
 
-    actual override suspend fun signUp(supabaseClient: SupabaseClient, credentials: ExternalAuthConfig.() -> Unit) {
-        TODO("Not yet implemented")
+    actual override suspend fun signUp(
+        supabaseClient: SupabaseClient,
+        onSuccess: suspend (UserSession) -> Unit,
+        onFail: (AuthFail) -> Unit,
+        credentials: (ExternalAuthConfig.() -> Unit)?
+    ) {
+        withContext(Dispatchers.IO) {
+            launch {
+                val config = ExternalAuthConfig().apply {
+                    credentials?.invoke(this)
+                }
+                createServer(config, supabaseClient, onSuccess, onFail)
+            }
+        }
     }
 
-    private suspend fun createServer(config: ExternalAuthConfig, supabaseClient: SupabaseClient, onSuccess: suspend (UserSession) -> Unit, onFail: (OAuthFail) -> Unit) {
+    private suspend fun createServer(config: ExternalAuthConfig, supabaseClient: SupabaseClient, onSuccess: suspend (UserSession) -> Unit, onFail: (AuthFail) -> Unit) {
         coroutineScope {
             launch {
                 var done = false
@@ -102,7 +114,7 @@ actual abstract class OAuthProvider : AuthProvider<ExternalAuthConfig, Unit> {
                     delay(config.timeout)
                     it.stop()
                     if(!done) {
-                        onFail(OAuthFail.Timeout)
+                        onFail(AuthFail.Timeout)
                     }
                 }
             }

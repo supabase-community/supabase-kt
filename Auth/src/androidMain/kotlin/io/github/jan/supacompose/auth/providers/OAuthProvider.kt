@@ -10,13 +10,19 @@ actual abstract class OAuthProvider : AuthProvider<ExternalAuthConfig, Unit> {
     actual override suspend fun login(
         supabaseClient: SupabaseClient,
         onSuccess: suspend (UserSession) -> Unit,
-        onFail: (OAuthFail) -> Unit,
+        onFail: (AuthFail) -> Unit,
         credentials: (ExternalAuthConfig.() -> Unit)?
     ) {
         TODO()
     }
 
-    actual override suspend fun signUp(supabaseClient: SupabaseClient, credentials: ExternalAuthConfig.() -> Unit) {
+    actual override suspend fun signUp(
+        supabaseClient: SupabaseClient,
+        onSuccess: suspend (UserSession) -> Unit,
+        onFail: (AuthFail) -> Unit,
+        credentials: (ExternalAuthConfig.() -> Unit)?
+    ) {
         TODO("Not yet implemented")
     }
+
 }

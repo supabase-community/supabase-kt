@@ -10,20 +10,26 @@ expect abstract class OAuthProvider() : AuthProvider<ExternalAuthConfig, Unit> {
     override suspend fun login(
         supabaseClient: SupabaseClient,
         onSuccess: suspend (UserSession) -> Unit,
-        onFail: (OAuthFail) -> Unit,
+        onFail: (AuthFail) -> Unit,
         credentials: (ExternalAuthConfig.() -> Unit)?
     )
 
-    override suspend fun signUp(supabaseClient: SupabaseClient, credentials: ExternalAuthConfig.() -> Unit)
+    override suspend fun signUp(
+        supabaseClient: SupabaseClient,
+        onSuccess: suspend (UserSession) -> Unit,
+        onFail: (AuthFail) -> Unit,
+        credentials: (ExternalAuthConfig.() -> Unit)?
+    )
 
 }
 
 
 
-sealed interface OAuthFail {
+sealed interface AuthFail {
 
-    object Timeout: OAuthFail
-    class Error(val throwable: Throwable) : OAuthFail
+    object Timeout: AuthFail
+    class Error(val throwable: Throwable) : AuthFail
+    object InvalidCredentials : AuthFail
 
 }
 

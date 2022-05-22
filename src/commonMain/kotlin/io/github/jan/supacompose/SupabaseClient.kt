@@ -15,6 +15,8 @@ import io.ktor.http.HttpMethod
 import io.ktor.http.takeFrom
 import kotlinx.serialization.json.Json
 import io.ktor.serialization.kotlinx.json.json
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.jsonPrimitive
 
 sealed interface SupabaseClient {
 
@@ -59,7 +61,8 @@ internal class SupabaseClientImpl(
         setBody(body)
     }.also {
         if(it.status.value !in 200..299) {
-            throw RestException(it.status.value, it.body())
+            val error = it.body<JsonObject>()
+            throw RestException(it.status.value, error["error"]?.jsonPrimitive?.content ?: "null", error["error_description"]?.jsonPrimitive?.content ?: "null")
         }
     }
 

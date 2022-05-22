@@ -1,3 +1,3 @@
 package io.github.jan.supacompose.exceptions
 
-class RestException(status: Int, message: String): Exception("$message (HTTP status $status)")
+class RestException(status: Int, val error: String, val description: String) : Exception("$description (HTTP status $status)")

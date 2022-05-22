@@ -8,7 +8,7 @@ import io.github.jan.supacompose.auth.gotrue.GoTrueClient
 import io.github.jan.supacompose.auth.gotrue.VerifyType
 import io.github.jan.supacompose.auth.providers.AuthProvider
 import io.github.jan.supacompose.auth.providers.DefaultAuthProvider
-import io.github.jan.supacompose.auth.providers.OAuthFail
+import io.github.jan.supacompose.auth.providers.AuthFail
 import io.github.jan.supacompose.auth.user.UserInfo
 import io.github.jan.supacompose.auth.user.UserSession
 import kotlinx.coroutines.Job
@@ -34,7 +34,7 @@ internal class AuthImpl(supabaseClient: SupabaseClient, private val config: Auth
 
     override suspend fun <C, R, Provider : AuthProvider<C, R>> loginWith(
         provider: Provider,
-        onFail: (OAuthFail) -> Unit,
+        onFail: (AuthFail) -> Unit,
         config: (C.() -> Unit)?
     ) = goTrueClient.loginWith(provider, {
         startJob(it)
@@ -42,8 +42,11 @@ internal class AuthImpl(supabaseClient: SupabaseClient, private val config: Auth
 
     override suspend fun <C, R, Provider : AuthProvider<C, R>> signUpWith(
         provider: Provider,
-        config: C.() -> Unit
-    ) = goTrueClient.signUpWith(provider, config)
+        onFail: (AuthFail) -> Unit,
+        config: (C.() -> Unit)?
+    ) = goTrueClient.signUpWith(provider, {
+        startJob(it)
+    }, onFail, config)
 
     override suspend fun <C, R, Provider : DefaultAuthProvider<C, R>> modifyUser(
         provider: Provider,

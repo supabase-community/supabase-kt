@@ -3,7 +3,7 @@ package io.github.jan.supacompose.auth.gotrue
 import io.github.jan.supacompose.SupabaseClient
 import io.github.jan.supacompose.auth.providers.AuthProvider
 import io.github.jan.supacompose.auth.providers.DefaultAuthProvider
-import io.github.jan.supacompose.auth.providers.OAuthFail
+import io.github.jan.supacompose.auth.providers.AuthFail
 import io.github.jan.supacompose.auth.settings.Settings
 import io.github.jan.supacompose.auth.user.UserInfo
 import io.github.jan.supacompose.auth.user.UserSession
@@ -24,7 +24,12 @@ sealed interface GoTrueClient {
     /**
      * Signs up a new user with the specified [provider]
      */
-    suspend fun <C, R, Provider : AuthProvider<C, R>> signUpWith(provider: Provider, config: C.() -> Unit) : R
+    suspend fun <C, R, Provider : AuthProvider<C, R>> signUpWith(
+        provider: Provider,
+        onSuccess: suspend (UserSession) -> Unit,
+        onFail: (AuthFail) -> Unit = {},
+        config: (C.() -> Unit)? = null
+    ): R
 
     /**
      * Logins the user with the specified [provider]
@@ -32,7 +37,7 @@ sealed interface GoTrueClient {
     suspend fun <C, R, Provider : AuthProvider<C, R>> loginWith(
         provider: Provider,
         onSuccess: suspend (UserSession) -> Unit,
-        onFail: (OAuthFail) -> Unit,
+        onFail: (AuthFail) -> Unit,
         config: (C.() -> Unit)?
     )
 
@@ -101,12 +106,17 @@ internal class GoTrueClientImpl(val supabaseClient: SupabaseClient): GoTrueClien
 
     override suspend fun settings(): Settings = supabaseJson.decodeFromString(supabaseClient.makeRequest(HttpMethod.Get, "/auth/v1/settings").body())
 
-    override suspend fun <C, R, Provider : AuthProvider<C, R>> signUpWith(provider: Provider, config: C.() -> Unit): R = provider.signUp(supabaseClient, config)
+    override suspend fun <C, R, Provider : AuthProvider<C, R>> signUpWith(
+        provider: Provider,
+        onSuccess: suspend (UserSession) -> Unit,
+        onFail: (AuthFail) -> Unit,
+        config: (C.() -> Unit)?
+    ): R = provider.signUp(supabaseClient, onSuccess, onFail, config)
 
     override suspend fun <C, R, Provider : AuthProvider<C, R>> loginWith(
         provider: Provider,
         onSuccess: suspend (UserSession) -> Unit,
-        onFail: (OAuthFail) -> Unit,
+        onFail: (AuthFail) -> Unit,
         config: (C.() -> Unit)?
     ) = provider.login(supabaseClient, onSuccess, onFail, config)
 

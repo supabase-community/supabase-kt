@@ -1,7 +1,6 @@
 plugins {
     kotlin("multiplatform") version Versions.KOTLIN
     id("com.android.library")
-    id("kotlin-android-extensions")
     id("maven-publish")
     signing
     id("org.jetbrains.dokka") version Versions.DOKKA
