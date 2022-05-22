@@ -33,14 +33,3 @@ sealed interface AuthFail {
 
 }
 
-object Google : OAuthProvider() {
-
-    override fun provider() = "google"
-
-}
-
-object Discord : OAuthProvider() {
-
-    override fun provider() = "discord"
-
-}
