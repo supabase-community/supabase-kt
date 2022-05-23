@@ -1,4 +1,5 @@
 # SupaCompose
+
 A framework for building android & desktop apps with Supabase
 
 https://user-images.githubusercontent.com/26686035/169712245-e090e33b-8472-49c8-a512-947d5ed889d5.mp4
@@ -16,6 +17,7 @@ SupaCompose currently supports:
 | Web     | planned                 | planned                 | planned                                     | planned | planned |
 
 # Example code
+
 <details><summary>Authentication with Desktop</summary>
 <p>
 
@@ -31,7 +33,7 @@ suspend fun main() {
         Window(::exitApplication) {
             val session by client.auth.currentSession.collectAsState()
             val scope = rememberCoroutineScope()
-            if(session != null) {
+            if (session != null) {
                 Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
                     Text("Logged in as ${session?.user?.email}")
                 }
@@ -117,10 +119,10 @@ suspend fun main() {
 class MainActivity : AppCompatActivity() {
 
     val supabaseClient = createSupabaseClient {
-    
+
         supabaseUrl = "your supabase url"
         supabaseKey = "your supabase key"
-        
+
         install(Auth)
         install(DeepLinks) {
             scheme = "supacompose"
@@ -130,13 +132,13 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        handleDeepLinks(supabaseClient)
+        handleDeepLinks(supabaseClient) //if you don't call this function the library will throw an error when trying to authenticate with oauth
         setContent {
             MaterialTheme {
                 val session by supabaseClient.auth.currentSession.collectAsState()
                 println(session)
                 val scope = rememberCoroutineScope()
-                if(session != null) {
+                if (session != null) {
                     Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
                         Text("Logged in as ${session?.user?.email}")
                     }
@@ -185,8 +187,8 @@ class MainActivity : AppCompatActivity() {
                                 }
                             }
                         }
-                        }
                     }
+                }
             }
         }
     }
@@ -204,7 +206,7 @@ class MainActivity : AppCompatActivity() {
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android" package="io.github.jan.supacompose.android">
 
-    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.INTERNET"/>
 
     <application
             android:allowBackup="false"
@@ -214,12 +216,12 @@ class MainActivity : AppCompatActivity() {
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
-                <action android:name="android.intent.action.VIEW" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
                 <!-- This is important for deeplinks. -->
                 <data android:scheme="supacompose"
-                      android:host="login" />
+                      android:host="login"/>
             </intent-filter>
         </activity>
     </application>
