@@ -99,7 +99,7 @@ suspend fun main() {
 <details><summary>Authentication with Android</summary>
 
 <p>
-When you set the deep link scheme and host in the supabase deeplink plugin and in the android manifest you have to remember to set the additional redirect url in the subabase auth settings. E.g. if you have supacompose as your scheme and login as your host set this to the additional redirect url:
+ <b> When you set the deep link scheme and host in the supabase deeplink plugin and in the android manifest you have to remember to set the additional redirect url in the subabase auth settings. E.g. if you have supacompose as your scheme and login as your host set this to the additional redirect url: </b>
 
 ![img.png](.github/images/img.png)
 </p>
@@ -108,7 +108,7 @@ When you set the deep link scheme and host in the supabase deeplink plugin and i
 
 <details><summary>MainActivity</summary>
 <p>
-Note you should probably use a viewmodel for suspending functions from the SupaCompose library
+<b> Note: you should probably use a viewmodel for suspending functions from the SupaCompose library </b>
 </p>
 
 <p>
