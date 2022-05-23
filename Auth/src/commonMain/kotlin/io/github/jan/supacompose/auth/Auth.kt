@@ -9,6 +9,7 @@ import io.github.jan.supacompose.auth.providers.AuthFail
 import io.github.jan.supacompose.auth.user.UserInfo
 import io.github.jan.supacompose.auth.user.UserSession
 import io.github.jan.supacompose.plugins.SupabasePlugin
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.StateFlow
 
 sealed interface Auth {

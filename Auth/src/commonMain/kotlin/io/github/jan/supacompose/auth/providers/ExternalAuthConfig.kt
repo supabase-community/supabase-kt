@@ -8,5 +8,5 @@ data class ExternalAuthConfig(
     var timeout: TimeSpan = 60.seconds,
     var htmlText: String = "Logged in. You may continue in your app!",
     var htmlTitle: String = "SupaCompose",
-    var htmlIconUrl: String = "https://supabase.com/brand-assets/supabase-logo-icon.png"
+    var htmlIconUrl: String = "https://supabase.com/brand-assets/supabase-logo-icon.png",
 )

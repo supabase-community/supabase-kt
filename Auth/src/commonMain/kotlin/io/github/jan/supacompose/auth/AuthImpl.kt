@@ -11,11 +11,13 @@ import io.github.jan.supacompose.auth.providers.DefaultAuthProvider
 import io.github.jan.supacompose.auth.providers.AuthFail
 import io.github.jan.supacompose.auth.user.UserInfo
 import io.github.jan.supacompose.auth.user.UserSession
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlin.coroutines.CoroutineContext
 
 @PublishedApi
 internal class AuthImpl(supabaseClient: SupabaseClient, private val config: Auth.Config) : Auth {
@@ -76,7 +78,7 @@ internal class AuthImpl(supabaseClient: SupabaseClient, private val config: Auth
         startJob(newSession)
     }
 
-    private suspend fun startJob(session: UserSession) {
+    internal suspend fun startJob(session: UserSession) {
         _currentSession.value = session
         coroutineScope {
             sessionJob = launch {

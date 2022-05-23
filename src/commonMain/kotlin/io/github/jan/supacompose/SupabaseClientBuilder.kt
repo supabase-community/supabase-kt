@@ -1,10 +1,9 @@
 package io.github.jan.supacompose
 
-import io.github.jan.supacompose.annotiations.SupabaseDsl
-import io.github.jan.supacompose.SupabaseClientImpl
+import io.github.jan.supacompose.annotiations.SupaComposeDsl
 import io.github.jan.supacompose.plugins.SupabasePlugin
 
-@SupabaseDsl
+@SupaComposeDsl
 class SupabaseClientBuilder {
 
     lateinit var supabaseUrl: String

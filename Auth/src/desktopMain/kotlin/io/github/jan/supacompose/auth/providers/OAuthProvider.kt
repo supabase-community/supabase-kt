@@ -65,7 +65,7 @@ actual abstract class OAuthProvider : AuthProvider<ExternalAuthConfig, Unit> {
                         get("/callback") {
                             val accessToken = call.request.queryParameters["access_token"] ?: return@get call.respondText("No access token")
                             val refreshToken = call.request.queryParameters["refresh_token"] ?: return@get call.respondText("No refresh token")
-                            val expiresIn = call.request.queryParameters["expires_in"]?.toInt() ?: return@get call.respondText("No expires in")
+                            val expiresIn = call.request.queryParameters["expires_in"]?.toLong() ?: return@get call.respondText("No expires in")
                             launch {
                                 val user = supabaseClient.auth.goTrueClient.getUser(accessToken)
                                 onSuccess(UserSession(accessToken, refreshToken, expiresIn, "", user))

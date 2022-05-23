@@ -31,7 +31,7 @@ sealed interface SupabaseClient {
 internal class SupabaseClientImpl(
     override val supabaseUrl: String,
     override val supabaseKey: String,
-    plugins: Map<String, (SupabaseClient) -> Any>
+    plugins: Map<String, (SupabaseClient) -> Any>,
 ) : SupabaseClient {
 
     private val httpClient = HttpClient {
@@ -65,7 +65,6 @@ internal class SupabaseClientImpl(
             throw RestException(it.status.value, error["error"]?.jsonPrimitive?.content ?: "null", error["error_description"]?.jsonPrimitive?.content ?: "null")
         }
     }
-
 
 }
 

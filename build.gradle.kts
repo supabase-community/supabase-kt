@@ -33,6 +33,9 @@ kotlin {
     }
     android()
     sourceSets {
+        all {
+            languageSettings.optIn("kotlin.RequiresOptIn")
+        }
         val commonMain by getting {
             dependencies {
                 api("io.ktor:ktor-client-core:${Versions.KTOR}")

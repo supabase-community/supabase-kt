@@ -15,6 +15,7 @@ kotlin {
     /* Targets configuration omitted. 
     *  To find out how to configure the targets, please follow the link:
     *  https://kotlinlang.org/docs/reference/building-mpp-with-gradle.html#setting-up-targets */
+
     jvm("desktop") {
         compilations.all {
             kotlinOptions.jvmTarget = "1.8"
@@ -26,6 +27,9 @@ kotlin {
     }
     android()
     sourceSets {
+        all {
+            languageSettings.optIn("kotlin.RequiresOptIn")
+        }
         val commonMain by getting {
             dependencies {
                 api(project(":"))
@@ -43,6 +47,7 @@ kotlin {
             dependencies {
                 api("com.google.android.gms:play-services-base:18.0.1")
                 api("com.google.android.gms:play-services-auth:20.2.0")
+
             }
         }
     }
