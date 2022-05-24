@@ -17,15 +17,15 @@ SupaCompose currently supports:
 | Web     | planned                 | planned                 | planned                                     | planned | planned |
 
 
-### Database
+#### Database
 
 Soon
 
-### Storage
+#### Storage
 
 Soon
 
-### Realtime
+#### Realtime
 
 Soon
 
