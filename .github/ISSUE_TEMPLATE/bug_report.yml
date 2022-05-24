@@ -16,7 +16,7 @@ body:
       options:
         - label: I installed the latest version of SupaCompose
           required: true
-        - label: I checked for similar feature requests
+        - label: I check for similar bug report
           required: true
   - type: textarea
     id: code
@@ -38,11 +38,6 @@ body:
         - Web
     validations:
       required: true
-  - type: input
-    id: version
-    attributes:
-      label: Version
-      description: Which version of SupaCompose did you use?
   - type: textarea
     id: logs
     attributes:
