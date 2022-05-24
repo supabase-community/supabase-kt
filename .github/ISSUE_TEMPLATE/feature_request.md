@@ -1,20 +1,32 @@
----
 name: Feature request
-about: Suggest an idea for this project
-title: ''
-labels: 'enhancement'
-assignees: ''
-
----
-
-**Is your feature request related to a problem? Please describe.**
-A clear and concise description of what the problem is. Ex. I'm always frustrated when [...]
-
-**Describe the solution you'd like**
-A clear and concise description of what you want to happen.
-
-**Describe alternatives you've considered**
-A clear and concise description of any alternative solutions or features you've considered.
-
-**Additional context**
-Add any other context or screenshots about the feature request here.
+description: Template for feature request
+title: '[Feature request]: '
+body:
+  - type: checkboxes
+    id: latest-version
+    attributes:
+      label: General Info
+      options:
+        - label: I installed the latest version of SupaCompose
+          required: true
+        - label: I checked for similar feature requests
+          required: true
+  - type: textarea
+    id: feature-request
+    attributes:
+      label: Feature request
+      description: Please describe what you think should be added to SupaCompose
+    validations:
+      required: true
+  - type: textarea
+    id: usecase
+    attributes:
+      label: Usecase
+      description: 'Please provide an usecase for your feature request '
+    validations:
+      required: true
+  - type: markdown
+    attributes:
+      value: >-
+        This template was generated with [Issue Forms
+        Creator](https://www.issue-forms-creator.app/)
