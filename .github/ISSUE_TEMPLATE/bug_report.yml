@@ -9,6 +9,15 @@ body:
     attributes:
       value: |
         Thanks for taking the time to fill out this bug report!
+  - type: checkboxes
+    id: latest-version
+    attributes:
+      label: General Info
+      options:
+        - label: I installed the latest version of SupaCompose
+          required: true
+        - label: I checked for similar feature requests
+          required: true
   - type: textarea
     id: code
     attributes:
