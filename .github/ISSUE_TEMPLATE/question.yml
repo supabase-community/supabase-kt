@@ -1,0 +1,11 @@
+name: Question
+description: Template for questions
+title: '[Question]: '
+body:
+  - type: textarea
+    id: question
+    attributes:
+      label: What is your question?
+      description: Please ask your question
+    validations:
+      required: true
