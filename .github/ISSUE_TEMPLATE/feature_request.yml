@@ -1,6 +1,8 @@
 name: Feature request
 description: Template for feature request
 title: '[Feature request]: '
+labels: enhancement
+assignees: jan-tennert
 body:
   - type: checkboxes
     id: latest-version
