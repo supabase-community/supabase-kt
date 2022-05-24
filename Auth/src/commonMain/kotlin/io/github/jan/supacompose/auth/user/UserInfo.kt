@@ -1,11 +1,8 @@
-@file:UseSerializers(DateTimeSerializer::class)
 package io.github.jan.supacompose.auth.user
 
-import io.github.jan.supacompose.auth.serializers.DateTimeSerializer
-import com.soywiz.klock.DateTimeTz
+import kotlinx.datetime.Instant
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.UseSerializers
 import kotlinx.serialization.json.JsonPrimitive
 
 @Serializable
@@ -15,43 +12,43 @@ data class UserInfo(
     @SerialName("aud")
     val aud: String,
     @SerialName("confirmation_sent_at")
-    val confirmationSentAt: DateTimeTz? = null,
+    val confirmationSentAt: Instant? = null,
     @SerialName("confirmed_at")
-    val confirmedAt: DateTimeTz? = null,
+    val confirmedAt: Instant? = null,
     @SerialName("created_at")
-    val createdAt: DateTimeTz? = null,
+    val createdAt: Instant? = null,
     @SerialName("email")
     val email: String? = null,
     @SerialName("email_confirmed_at")
-    val emailConfirmedAt: DateTimeTz? = null,
+    val emailConfirmedAt: Instant? = null,
     @SerialName("id")
     val id: String,
     @SerialName("identities")
     val identities: List<Identity> = emptyList(),
     @SerialName("last_sign_in_at")
-    val lastSignInAt: DateTimeTz? = null,
+    val lastSignInAt: Instant? = null,
     @SerialName("phone")
     val phone: String? = null,
     @SerialName("role")
     val role: String? = null,
     @SerialName("updated_at")
-    val updatedAt: DateTimeTz? = null,
+    val updatedAt: Instant? = null,
     @SerialName("user_metadata")
     val userMetadata: Map<String, JsonPrimitive> = emptyMap(),
     @SerialName("phone_change_sent_at")
-    val phoneChangeSentAt: DateTimeTz? = null,
+    val phoneChangeSentAt: Instant? = null,
     @SerialName("new_phone")
     val newPhone: String? = null,
     @SerialName("email_change_sent_at")
-    val emailChangeSentAt: DateTimeTz? = null,
+    val emailChangeSentAt: Instant? = null,
     @SerialName("new_email")
     val newEmail: String? = null,
     @SerialName("invited_at")
-    val invitedAt: DateTimeTz? = null,
+    val invitedAt: Instant? = null,
     @SerialName("recovery_sent_at")
-    val recoverySentAt: DateTimeTz? = null,
+    val recoverySentAt: Instant? = null,
     @SerialName("phone_confirmed_at")
-    val phoneConfirmedAt: DateTimeTz? = null,
+    val phoneConfirmedAt: Instant? = null,
     @SerialName("action_link")
     val actionLink: String? = null,
 )

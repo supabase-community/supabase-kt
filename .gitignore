@@ -1,13 +1,15 @@
 # Project exclude paths
 /.gradle/
-/android/build/
-/android/build/intermediates/javac/debug/classes/
+/androidDemo/build/
+/androidDemo/build/intermediates/javac/debug/classes/
 /Auth/build/
 /Auth/build/classes/kotlin/jvm/main/
+/webDemo/build/
+/webDemo/build/intermediates/javac/debug/classes/
 /build/
 /build/classes/kotlin/desktop/main/
 /buildSrc/.gradle/
 /buildSrc/build/
-/desktop/build/
+/desktopDemo/build/
 .idea
 local.properties

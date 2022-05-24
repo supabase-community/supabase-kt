@@ -6,7 +6,7 @@ plugins {
     id("org.jetbrains.dokka") version Versions.DOKKA
     id("io.codearte.nexus-staging") version Versions.NEXUS_STAGING
     kotlin("plugin.serialization") version Versions.KOTLIN
-    id("org.jetbrains.compose") version "1.1.0"
+    id("org.jetbrains.compose") version Versions.COMPOSE
 }
 
 subprojects {
@@ -32,12 +32,16 @@ kotlin {
         }
     }
     android()
+    js("web", IR) {
+        browser()
+    }
     sourceSets {
         all {
             languageSettings.optIn("kotlin.RequiresOptIn")
         }
         val commonMain by getting {
             dependencies {
+                api("org.jetbrains.kotlinx:kotlinx-datetime:${Versions.DATETIME}")
                 api("io.ktor:ktor-client-core:${Versions.KTOR}")
                 api("io.ktor:ktor-client-content-negotiation:${Versions.KTOR}")
                 api("org.jetbrains.kotlinx:kotlinx-coroutines-core:${Versions.COROUTINES}")
@@ -45,15 +49,25 @@ kotlin {
                // api("org.jetbrains.kotlinx:kotlinx-serialization-json:${Versions.SERIALIZATION}")
                 //install klock
                 api(compose.runtime)
+           //     api(compose.foundation)
+            //    api(compose.material)
+               // api("com.soywiz.korlibs.korio:korio:${Versions.KORLIBS}")
+            }
+        }
+        val defaultMain by creating {
+            dependsOn(commonMain)
+            dependencies {
                 api(compose.foundation)
                 api(compose.material)
-                api("com.soywiz.korlibs.korio:korio:${Versions.KORLIBS}")
             }
         }
         val commonTest by getting
-        val desktopMain by getting
+        val desktopMain by getting {
+            dependsOn(defaultMain)
+        }
         val desktopTest by getting
         val androidMain by getting {
+            dependsOn(defaultMain)
             dependencies {
                 api("com.google.android.material:material:1.6.0")
                 api("androidx.core:core-ktx:${Versions.ANDROID_CORE}")
@@ -66,12 +80,18 @@ kotlin {
                 implementation("junit:junit:4.13")
             }
         }
+        val webMain by getting {
+            dependencies {
+                api(compose.web.core)
+            }
+        }
     }
 }
 
 allprojects {
     repositories {
         google()
+        maven("https://maven.pkg.jetbrains.space/public/p/compose/dev/")
         mavenCentral()
     }
 }

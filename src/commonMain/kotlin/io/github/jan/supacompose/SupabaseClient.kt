@@ -13,7 +13,6 @@ import io.ktor.client.statement.HttpResponse
 import io.ktor.http.Headers
 import io.ktor.http.HttpMethod
 import io.ktor.http.takeFrom
-import kotlinx.serialization.json.Json
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.jsonPrimitive
@@ -42,7 +41,7 @@ internal class SupabaseClientImpl(
             port = 443
         }
         install(ContentNegotiation) {
-            json()
+            json(supabaseJson)
         }
     }
     override val plugins = plugins.toList().associate { (key, value) ->

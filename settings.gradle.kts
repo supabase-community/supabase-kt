@@ -15,8 +15,9 @@ pluginManagement {
 }
 
 include("Auth")
-include(":desktop")
-include(":android")
+include(":desktopDemo")
+include(":androidDemo")
+include(":webDemo")
 project(":Auth").name = "Supacompose-Auth"
 rootProject.name = "Supacompose"
 

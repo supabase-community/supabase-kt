@@ -1,6 +1,5 @@
 package io.github.jan.supacompose.auth.providers
 
-import com.soywiz.korio.async.delay
 import io.github.jan.supacompose.SupabaseClient
 import io.github.jan.supacompose.auth.auth
 import io.github.jan.supacompose.auth.user.UserSession
@@ -16,6 +15,7 @@ import io.ktor.server.routing.get
 import io.ktor.server.routing.routing
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -23,6 +23,8 @@ import kotlinx.coroutines.withContext
 import java.awt.Desktop
 import java.io.File
 import java.net.URI
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.minutes
 
 actual abstract class OAuthProvider : AuthProvider<ExternalAuthConfig, Unit> {
 
@@ -32,14 +34,14 @@ actual abstract class OAuthProvider : AuthProvider<ExternalAuthConfig, Unit> {
         supabaseClient: SupabaseClient,
         onSuccess: suspend (UserSession) -> Unit,
         onFail: (AuthFail) -> Unit,
-        credentials: (ExternalAuthConfig.() -> Unit)?
+        config: (ExternalAuthConfig.() -> Unit)?
     ) {
         withContext(Dispatchers.IO) {
             launch {
-                val config = ExternalAuthConfig().apply {
-                    credentials?.invoke(this)
+                val authConfig = ExternalAuthConfig().apply {
+                    config?.invoke(this)
                 }
-                createServer(config, supabaseClient, onSuccess, onFail)
+                createServer(authConfig, supabaseClient, onSuccess, onFail)
             }
         }
     }
@@ -48,8 +50,8 @@ actual abstract class OAuthProvider : AuthProvider<ExternalAuthConfig, Unit> {
         supabaseClient: SupabaseClient,
         onSuccess: suspend (UserSession) -> Unit,
         onFail: (AuthFail) -> Unit,
-        credentials: (ExternalAuthConfig.() -> Unit)?
-    ) = login(supabaseClient, onSuccess, onFail, credentials)
+        config: (ExternalAuthConfig.() -> Unit)?
+    ) = login(supabaseClient, onSuccess, onFail, config)
 
     private suspend fun createServer(config: ExternalAuthConfig, supabaseClient: SupabaseClient, onSuccess: suspend (UserSession) -> Unit, onFail: (AuthFail) -> Unit) {
         coroutineScope {
@@ -68,7 +70,7 @@ actual abstract class OAuthProvider : AuthProvider<ExternalAuthConfig, Unit> {
                             val expiresIn = call.request.queryParameters["expires_in"]?.toLong() ?: return@get call.respondText("No expires in")
                             launch {
                                 val user = supabaseClient.auth.goTrueClient.getUser(accessToken)
-                                onSuccess(UserSession(accessToken, refreshToken, expiresIn, "", user))
+                                onSuccess(UserSession(accessToken, refreshToken, expiresIn, "", user).also(::println))
                             }
                             mutex.withLock {
                                 done = true
@@ -102,7 +104,7 @@ actual abstract class OAuthProvider : AuthProvider<ExternalAuthConfig, Unit> {
                 }.start(wait = false).also {
                     val port = it.resolvedConnectors().first().port
                     Desktop.getDesktop().browse(URI(supabaseClient.supabaseUrl + "/auth/v1/authorize?provider=${provider()}&redirect_to=http://localhost:${port}/index.html"))
-                    delay(config.timeout)
+                    delay(config.timeout.inWholeMilliseconds)
                     it.stop()
                     if(!done) {
                         onFail(AuthFail.Timeout)
@@ -113,3 +115,33 @@ actual abstract class OAuthProvider : AuthProvider<ExternalAuthConfig, Unit> {
     }
 
 }
+
+var ExternalAuthConfig.httpPort: Int
+    get() = params["httpPort"] as? Int ?: 0
+    set(value) {
+        params["httpPort"] = value
+    }
+
+var ExternalAuthConfig.timeout: Duration
+    get() = params["timeout"] as? Duration ?: 1.minutes
+    set(value) {
+        params["timeout"] = value
+    }
+
+var ExternalAuthConfig.htmlTitle: String
+    get() = params["htmlTitle"] as? String ?: "SupaCompose"
+    set(value) {
+        params["htmlTitle"] = value
+    }
+
+var ExternalAuthConfig.htmlText: String
+    get() = params["htmlText"] as? String ?: "Logged in. You may continue in your app."
+    set(value) {
+        params["htmlText"] = value
+    }
+
+var ExternalAuthConfig.htmlIconUrl: String
+    get() = params["htmlIconUrl"] as? String ?: "https://supabase.com/brand-assets/supabase-logo-icon.png"
+    set(value) {
+        params["htmlIconUrl"] = value
+    }

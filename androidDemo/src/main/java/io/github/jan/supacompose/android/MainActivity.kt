@@ -19,14 +19,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.PasswordVisualTransformation
-import com.soywiz.klock.seconds
-import io.github.jan.supacompose.auth.DeepLinks
 import io.github.jan.supacompose.auth.Auth
+import io.github.jan.supacompose.auth.DeepLinks
 import io.github.jan.supacompose.auth.auth
-import io.github.jan.supacompose.auth.compose.ProviderButton
 import io.github.jan.supacompose.auth.handleDeepLinks
-import io.github.jan.supacompose.auth.providers.AuthFail
-import io.github.jan.supacompose.auth.providers.Discord
 import io.github.jan.supacompose.auth.providers.Email
 import io.github.jan.supacompose.createSupabaseClient
 import kotlinx.coroutines.launch
@@ -79,28 +75,7 @@ class MainActivity : AppCompatActivity() {
                             }, modifier = Modifier.align(Alignment.CenterHorizontally)) {
                                 Text("Login")
                             }
-                            ProviderButton(
-                                icon = {
-                                    //  Icon(painterResource("discord_icon.svg"), "", modifier = Modifier.size(25.dp))
-                                },
-                                text = {
-                                    Text("Log in with Discord")
-                                },
-                                modifier = Modifier.align(Alignment.CenterHorizontally)
-                            ) {
-                                scope.launch {
-                                    supabaseClient.auth.loginWith(Discord, onFail = {
-                                        when (it) {
-                                            is AuthFail.Timeout -> {
-                                                println("Timeout")
-                                            }
-                                            is AuthFail.Error -> {
-                                                //log error
-                                            }
-                                        }
-                                    })
-                                }
-                            }
+                            //
                         }
                         }
                     }

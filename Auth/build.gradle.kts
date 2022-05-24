@@ -26,6 +26,9 @@ kotlin {
         }
     }
     android()
+    js("web", IR) {
+        browser()
+    }
     sourceSets {
         all {
             languageSettings.optIn("kotlin.RequiresOptIn")
@@ -48,6 +51,11 @@ kotlin {
                 api("com.google.android.gms:play-services-base:18.0.1")
                 api("com.google.android.gms:play-services-auth:20.2.0")
 
+            }
+        }
+        val webMain by getting {
+            dependencies {
+                api(compose.web.core)
             }
         }
     }

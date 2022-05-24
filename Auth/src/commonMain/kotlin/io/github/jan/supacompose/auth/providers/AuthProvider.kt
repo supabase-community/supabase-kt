@@ -12,14 +12,14 @@ interface AuthProvider<C, R> {
         supabaseClient: SupabaseClient,
         onSuccess: suspend (UserSession) -> Unit,
         onFail: (AuthFail) -> Unit,
-        credentials: (C.() -> Unit)? = null
+        config: (C.() -> Unit)? = null
     )
 
     suspend fun signUp(
         supabaseClient: SupabaseClient,
         onSuccess: suspend (UserSession) -> Unit,
         onFail: (AuthFail) -> Unit = {},
-        credentials: (C.() -> Unit)? = null
+        config: (C.() -> Unit)? = null
     ): R
 
 }
@@ -30,11 +30,11 @@ interface DefaultAuthProvider<C, R> : AuthProvider<C, R> {
         supabaseClient: SupabaseClient,
         onSuccess: suspend (UserSession) -> Unit,
         onFail: (AuthFail) -> Unit,
-        credentials: (C.() -> Unit)?
+        config: (C.() -> Unit)?
     ) {
         kotlin.runCatching {
-            if(credentials == null) throw IllegalArgumentException("Credentials are required")
-            val encodedCredentials = encodeCredentials(credentials)
+            if(config == null) throw IllegalArgumentException("Credentials are required")
+            val encodedCredentials = encodeCredentials(config)
             val response = supabaseClient.makeRequest(HttpMethod.Post, "/auth/v1/token?grant_type=password", body = encodedCredentials)
             response.body<UserSession>()
         }.onSuccess {
@@ -52,11 +52,11 @@ interface DefaultAuthProvider<C, R> : AuthProvider<C, R> {
         supabaseClient: SupabaseClient,
         onSuccess: suspend (UserSession) -> Unit,
         onFail: (AuthFail) -> Unit,
-        credentials: (C.() -> Unit)?
+        config: (C.() -> Unit)?
     ): R {
         return kotlin.runCatching {
-            if(credentials == null) throw IllegalArgumentException("Credentials are required")
-            val body = encodeCredentials(credentials)
+            if(config == null) throw IllegalArgumentException("Credentials are required")
+            val body = encodeCredentials(config)
             val response = supabaseClient.makeRequest(HttpMethod.Post, "/auth/v1/signup", body = body)
             decodeResult(response.body())
         }.onFailure {

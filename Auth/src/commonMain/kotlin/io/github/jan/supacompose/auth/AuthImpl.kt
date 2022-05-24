@@ -1,23 +1,21 @@
 package io.github.jan.supacompose.auth
 
-import com.soywiz.klock.seconds
-import com.soywiz.korio.async.delay
-import com.soywiz.korio.async.launch
 import io.github.jan.supacompose.SupabaseClient
 import io.github.jan.supacompose.auth.gotrue.GoTrueClient
 import io.github.jan.supacompose.auth.gotrue.VerifyType
+import io.github.jan.supacompose.auth.providers.AuthFail
 import io.github.jan.supacompose.auth.providers.AuthProvider
 import io.github.jan.supacompose.auth.providers.DefaultAuthProvider
-import io.github.jan.supacompose.auth.providers.AuthFail
 import io.github.jan.supacompose.auth.user.UserInfo
 import io.github.jan.supacompose.auth.user.UserSession
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlin.coroutines.CoroutineContext
+import kotlinx.coroutines.launch
+import kotlin.time.Duration.Companion.seconds
 
 @PublishedApi
 internal class AuthImpl(supabaseClient: SupabaseClient, private val config: Auth.Config) : Auth {
@@ -82,7 +80,7 @@ internal class AuthImpl(supabaseClient: SupabaseClient, private val config: Auth
         _currentSession.value = session
         coroutineScope {
             sessionJob = launch {
-                delay(session.expiresIn.seconds)
+                delay(session.expiresIn.seconds.inWholeMilliseconds)
                 launch {
                     refreshSession()
                 }

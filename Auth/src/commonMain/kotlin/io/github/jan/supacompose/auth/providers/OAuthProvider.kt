@@ -11,14 +11,14 @@ expect abstract class OAuthProvider() : AuthProvider<ExternalAuthConfig, Unit> {
         supabaseClient: SupabaseClient,
         onSuccess: suspend (UserSession) -> Unit,
         onFail: (AuthFail) -> Unit,
-        credentials: (ExternalAuthConfig.() -> Unit)?
+        config: (ExternalAuthConfig.() -> Unit)?
     )
 
     override suspend fun signUp(
         supabaseClient: SupabaseClient,
         onSuccess: suspend (UserSession) -> Unit,
         onFail: (AuthFail) -> Unit,
-        credentials: (ExternalAuthConfig.() -> Unit)?
+        config: (ExternalAuthConfig.() -> Unit)?
     )
 
 }

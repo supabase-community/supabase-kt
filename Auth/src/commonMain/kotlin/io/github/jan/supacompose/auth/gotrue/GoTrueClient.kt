@@ -1,9 +1,10 @@
 package io.github.jan.supacompose.auth.gotrue
 
 import io.github.jan.supacompose.SupabaseClient
+import io.github.jan.supacompose.auth.Auth
+import io.github.jan.supacompose.auth.providers.AuthFail
 import io.github.jan.supacompose.auth.providers.AuthProvider
 import io.github.jan.supacompose.auth.providers.DefaultAuthProvider
-import io.github.jan.supacompose.auth.providers.AuthFail
 import io.github.jan.supacompose.auth.settings.Settings
 import io.github.jan.supacompose.auth.user.UserInfo
 import io.github.jan.supacompose.auth.user.UserSession
@@ -13,7 +14,6 @@ import io.github.jan.supacompose.toJsonObject
 import io.ktor.client.call.body
 import io.ktor.http.Headers
 import io.ktor.http.HttpMethod
-import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.JsonNull
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.encodeToJsonElement
@@ -104,7 +104,7 @@ sealed interface GoTrueClient {
 @PublishedApi
 internal class GoTrueClientImpl(val supabaseClient: SupabaseClient): GoTrueClient {
 
-    override suspend fun settings(): Settings = supabaseJson.decodeFromString(supabaseClient.makeRequest(HttpMethod.Get, "/auth/v1/settings").body())
+    override suspend fun settings(): Settings = supabaseClient.makeRequest(HttpMethod.Get, "/auth/v${Auth.API_VERSION}/settings").body()
 
     override suspend fun <C, R, Provider : AuthProvider<C, R>> signUpWith(
         provider: Provider,
@@ -129,24 +129,24 @@ internal class GoTrueClientImpl(val supabaseClient: SupabaseClient): GoTrueClien
             putJsonObject(provider.encodeCredentials(config).toJsonObject())
             put("create_user", createUser)
         }.toString()
-        supabaseClient.makeRequest(HttpMethod.Post, "/auth/v1/otp", body = body)
+        supabaseClient.makeRequest(HttpMethod.Post, "/auth/v${Auth.API_VERSION}/otp", body = body)
     }
 
     override suspend fun sendRecoveryEmail(email: String) {
         val body = buildJsonObject {
             put("email", email)
         }.toString()
-        supabaseClient.makeRequest(HttpMethod.Post, "/auth/v1/recovery", body = body)
+        supabaseClient.makeRequest(HttpMethod.Post, "/auth/v${Auth.API_VERSION}/recovery", body = body)
     }
 
     override suspend fun logout(jwt: String) {
-        supabaseClient.makeRequest(HttpMethod.Post, "/auth/v1/logout", Headers.build {
+        supabaseClient.makeRequest(HttpMethod.Post, "/auth/v${Auth.API_VERSION}/logout", Headers.build {
             append("Authorization", "Bearer $jwt")
         })
     }
 
     override suspend fun reauthenticate(jwt: String) {
-        supabaseClient.makeRequest(HttpMethod.Get, "/auth/v1/reauthenticate", Headers.build {
+        supabaseClient.makeRequest(HttpMethod.Get, "/auth/v${Auth.API_VERSION}/reauthenticate", Headers.build {
             append("Authorization", "Bearer $jwt")
         })
     }
@@ -157,8 +157,8 @@ internal class GoTrueClientImpl(val supabaseClient: SupabaseClient): GoTrueClien
               "refresh_token": "$refreshToken"
             }
         """.trimIndent()
-        val response = supabaseClient.makeRequest(HttpMethod.Post, "/auth/v1/token?grant_type=refresh_token", body = body)
-        return supabaseJson.decodeFromString(response.body())
+        val response = supabaseClient.makeRequest(HttpMethod.Post, "/auth/v${Auth.API_VERSION}/token?grant_type=refresh_token", body = body)
+        return response.body()
     }
 
     override suspend fun verify(type: VerifyType, token: String): UserSession {
@@ -168,15 +168,15 @@ internal class GoTrueClientImpl(val supabaseClient: SupabaseClient): GoTrueClien
               "token": "$token"
             }
         """.trimIndent()
-        val response = supabaseClient.makeRequest(HttpMethod.Post, "/auth/v1/verify", body = body)
-        return supabaseJson.decodeFromString(response.body())
+        val response = supabaseClient.makeRequest(HttpMethod.Post, "/auth/v${Auth.API_VERSION}/verify", body = body)
+        return response.body()
     }
 
     override suspend fun getUser(jwt: String): UserInfo {
-        val response = supabaseClient.makeRequest(HttpMethod.Get, "/auth/v1/user", Headers.build {
+        val response = supabaseClient.makeRequest(HttpMethod.Get, "/auth/v${Auth.API_VERSION}/user", Headers.build {
             append("Authorization", "Bearer $jwt")
         })
-        return supabaseJson.decodeFromString(response.body())
+        return response.body()
     }
 
 }
@@ -202,8 +202,8 @@ suspend inline fun <C, R, reified D, Provider : DefaultAuthProvider<C, R>> GoTru
     } else {
         provider.encodeCredentials(config)
     }
-    val response = (this as GoTrueClientImpl).supabaseClient.makeRequest(HttpMethod.Put, "/auth/v1/user", Headers.build {
+    val response = (this as GoTrueClientImpl).supabaseClient.makeRequest(HttpMethod.Put, "/auth/v${Auth.API_VERSION}/user", Headers.build {
         append("Authorization", "Bearer $jwt")
     }, body)
-    return supabaseJson.decodeFromString(response.body<String>().also(::println))
+    return response.body()
 }

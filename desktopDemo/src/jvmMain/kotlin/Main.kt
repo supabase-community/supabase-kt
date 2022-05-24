@@ -16,15 +16,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
-import com.soywiz.klock.seconds
 import io.github.jan.supacompose.auth.Auth
 import io.github.jan.supacompose.auth.auth
-import io.github.jan.supacompose.auth.compose.ProviderButton
+import io.github.jan.supacompose.auth.providers.AuthFail
 import io.github.jan.supacompose.auth.providers.Discord
 import io.github.jan.supacompose.auth.providers.Email
-import io.github.jan.supacompose.auth.providers.AuthFail
+import io.github.jan.supacompose.auth.user.UserInfo
 import io.github.jan.supacompose.createSupabaseClient
 import kotlinx.coroutines.launch
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.json.Json
 
 suspend fun main() {
     val client = createSupabaseClient {
@@ -36,6 +37,7 @@ suspend fun main() {
     application {
         Window(::exitApplication) {
             val session by client.auth.currentSession.collectAsState()
+            println(session)
             val scope = rememberCoroutineScope()
                 if(session != null) {
                     Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
@@ -55,40 +57,16 @@ suspend fun main() {
                             )
                             Button(onClick = {
                                 scope.launch {
-                                    client.auth.loginWith(Email) {
-                                        this.email = email
-                                        this.password = password
+                                    client.auth.loginWith(Discord, onFail = {
+                                        if(it is AuthFail.Error) it.throwable.printStackTrace()
+                                    }) {
+
                                     }
                                 }
                             }, modifier = Modifier.align(Alignment.CenterHorizontally)) {
                                 Text("Login")
                             }
-                            ProviderButton(
-                                icon = {
-                                  //  Icon(painterResource("discord_icon.svg"), "", modifier = Modifier.size(25.dp))
-                                },
-                                text = {
-                                    Text("Log in with Discord")
-                                },
-                                modifier = Modifier.align(Alignment.CenterHorizontally)
-                            ) {
-                                scope.launch {
-                                    client.auth.loginWith(Discord, onFail = {
-                                        when (it) {
-                                            is AuthFail.Timeout -> {
-                                                println("Timeout")
-                                            }
-                                            is AuthFail.Error -> {
-                                                //log error
-                                            }
-                                        }
-                                    }) {
-                                        timeout = 50.seconds
-                                        htmlTitle = "SupaCompose"
-                                        htmlText = "Logged in. You may continue in the app."
-                                    }
-                                }
-                            }
+                            //
                         }
                     }
 

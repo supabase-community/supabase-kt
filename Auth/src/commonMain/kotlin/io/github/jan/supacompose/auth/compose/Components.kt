@@ -1,6 +1,6 @@
 package io.github.jan.supacompose.auth.compose
 
-import androidx.compose.foundation.layout.Spacer
+/*import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.OutlinedButton
 import androidx.compose.runtime.Composable
@@ -14,4 +14,4 @@ fun ProviderButton(icon: @Composable () -> Unit, text: @Composable () -> Unit, m
         Spacer(modifier = Modifier.width(7.dp))
         text()
     }
-}
+}*/

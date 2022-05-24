@@ -13,7 +13,7 @@ actual abstract class OAuthProvider : AuthProvider<ExternalAuthConfig, Unit> {
         supabaseClient: SupabaseClient,
         onSuccess: suspend (UserSession) -> Unit,
         onFail: (AuthFail) -> Unit,
-        credentials: (ExternalAuthConfig.() -> Unit)?
+        config: (ExternalAuthConfig.() -> Unit)?
     ) {
         (supabaseClient.plugins["deeplinks"] as? DeepLinks ?: throw IllegalStateException("You need to install the android plugin on supabase client, call the initial method and call the handleDeepLink method on the supabase client")).openOAuth(provider())
     }
@@ -22,7 +22,7 @@ actual abstract class OAuthProvider : AuthProvider<ExternalAuthConfig, Unit> {
         supabaseClient: SupabaseClient,
         onSuccess: suspend (UserSession) -> Unit,
         onFail: (AuthFail) -> Unit,
-        credentials: (ExternalAuthConfig.() -> Unit)?
+        config: (ExternalAuthConfig.() -> Unit)?
     ) {
         TODO("Not yet implemented")
     }

@@ -3,13 +3,12 @@ package io.github.jan.supacompose.auth
 import io.github.jan.supacompose.SupabaseClient
 import io.github.jan.supacompose.auth.gotrue.GoTrueClient
 import io.github.jan.supacompose.auth.gotrue.VerifyType
+import io.github.jan.supacompose.auth.providers.AuthFail
 import io.github.jan.supacompose.auth.providers.AuthProvider
 import io.github.jan.supacompose.auth.providers.DefaultAuthProvider
-import io.github.jan.supacompose.auth.providers.AuthFail
 import io.github.jan.supacompose.auth.user.UserInfo
 import io.github.jan.supacompose.auth.user.UserSession
 import io.github.jan.supacompose.plugins.SupabasePlugin
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.StateFlow
 
 sealed interface Auth {
@@ -80,6 +79,7 @@ sealed interface Auth {
     companion object : SupabasePlugin<Config, Auth> {
 
         override val key = "auth"
+        const val API_VERSION = 1
 
         override fun create(supabaseClient: SupabaseClient, config: Config.() -> Unit): Auth = AuthImpl(supabaseClient, Config().apply(config))
 

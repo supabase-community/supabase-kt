@@ -3,6 +3,7 @@ package io.github.jan.supacompose.auth.user
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonElement
 
 @Serializable
 data class Identity(
@@ -11,7 +12,7 @@ data class Identity(
     @SerialName("id")
     val id: String,
     @SerialName("identity_data")
-    val identityData: IdentityData,
+    val identityData: Map<String, JsonElement>,
     @SerialName("last_sign_in_at")
     val lastSignInAt: String,
     @SerialName("provider")
