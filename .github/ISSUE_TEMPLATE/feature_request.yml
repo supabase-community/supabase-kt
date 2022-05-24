@@ -25,8 +25,3 @@ body:
       description: 'Please provide an usecase for your feature request '
     validations:
       required: true
-  - type: markdown
-    attributes:
-      value: >-
-        This template was generated with [Issue Forms
-        Creator](https://www.issue-forms-creator.app/)
