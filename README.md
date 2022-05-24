@@ -16,6 +16,19 @@ SupaCompose currently supports:
 | Android | phone, password, oauth2 | phone, password, oauth2 | only with token, url authentication planned | yes     | planned |
 | Web     | planned                 | planned                 | planned                                     | planned | planned |
 
+
+### Database
+
+Soon
+
+### Storage
+
+Soon
+
+# Installation
+
+The library will be on maven central after Authentication is implemented.
+
 # Example code
 
 <details><summary>Authentication with Desktop</summary>
