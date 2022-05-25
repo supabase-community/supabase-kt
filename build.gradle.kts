@@ -46,6 +46,7 @@ kotlin {
                 api("io.ktor:ktor-client-content-negotiation:${Versions.KTOR}")
                 api("org.jetbrains.kotlinx:kotlinx-coroutines-core:${Versions.COROUTINES}")
                 api("io.ktor:ktor-serialization-kotlinx-json:${Versions.KTOR}")
+                api("io.github.aakira:napier:${Versions.NAPIER}")
                // api("org.jetbrains.kotlinx:kotlinx-serialization-json:${Versions.SERIALIZATION}")
                 //install klock
                 api(compose.runtime)

@@ -1,7 +1,9 @@
 package io.github.jan.supacompose.auth.providers
 
+import io.github.jan.supacompose.auth.AuthImpl
+import io.github.jan.supacompose.auth.auth
 import io.github.jan.supacompose.SupabaseClient
-import io.github.jan.supacompose.auth.DeepLinks
+import io.github.jan.supacompose.auth.openOAuth
 import io.github.jan.supacompose.auth.user.UserSession
 
 
@@ -12,16 +14,17 @@ actual abstract class OAuthProvider : AuthProvider<ExternalAuthConfig, Unit> {
     actual override suspend fun login(
         supabaseClient: SupabaseClient,
         onSuccess: suspend (UserSession) -> Unit,
-        onFail: (AuthFail) -> Unit,
+        redirectUrl: String?,
         config: (ExternalAuthConfig.() -> Unit)?
     ) {
-        (supabaseClient.plugins["deeplinks"] as? DeepLinks ?: throw IllegalStateException("You need to install the android plugin on supabase client, call the initial method and call the handleDeepLink method on the supabase client")).openOAuth(provider())
+        val auth = supabaseClient.auth as AuthImpl
+        auth.openOAuth(provider())
     }
 
     actual override suspend fun signUp(
-        supabaseClient: SupabaseClient,
+        supabaseClient: io.github.jan.supacompose.SupabaseClient,
         onSuccess: suspend (UserSession) -> Unit,
-        onFail: (AuthFail) -> Unit,
+        redirectUrl: String?,
         config: (ExternalAuthConfig.() -> Unit)?
     ) {
         TODO("Not yet implemented")

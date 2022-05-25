@@ -1,43 +1,37 @@
 package io.github.jan.supacompose.auth
 
-import io.github.jan.supacompose.SupabaseClient
 import io.github.jan.supacompose.auth.user.UserSession
-import io.github.jan.supacompose.plugins.SupabasePlugin
 import kotlinx.browser.window
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
+fun Auth.initializeWeb() {
+    this as AuthImpl
 
-class Web {
-
-    class Config
-
-    companion object : SupabasePlugin<Config, Web> {
-
-        override val key = "web"
-
-        override fun create(supabaseClient: SupabaseClient, config: Config.() -> Unit): Web {
-            val authPlugin = supabaseClient.plugins["auth"] as? AuthImpl ?: throw IllegalStateException("Auth plugin is not installed")
-            window.addEventListener("hashchange", {
-                val map = window.location.hash.split("&").associate {
-                    it.split("=").let { pair ->
-                        pair[0] to pair[1]
-                    }
-                }
-                val accessToken = map["access_token"] ?: return@addEventListener
-                val refreshToken = map["refresh_token"] ?: return@addEventListener
-                val expiresIn = map["expires_in"]?.toLong() ?: return@addEventListener
-                val tokenType = map["token_type"] ?: return@addEventListener
-                val scope = CoroutineScope(Dispatchers.Default)
-                scope.launch {
-                    val user = authPlugin.goTrueClient.getUser(accessToken)
-                    authPlugin.startJob(UserSession(accessToken, refreshToken, expiresIn, tokenType, user))
-                }
-            })
-            return Web()
+    fun checkForHash() {
+        val map = window.location.hash.split("&").associate {
+            it.split("=").let { pair ->
+                pair[0] to pair[1]
+            }
         }
-
+        val accessToken = map["access_token"]
+        val refreshToken = map["refresh_token"]
+        val expiresIn = map["expires_in"]?.toLong()
+        val tokenType = map["token_type"]
+        val scope = CoroutineScope(Dispatchers.Default)
+        if(accessToken != null && refreshToken != null && expiresIn != null && tokenType != null) {
+            scope.launch {
+                val user = getUser(accessToken)
+                startJob(UserSession(accessToken, refreshToken, expiresIn, tokenType, user))
+            }
+        }
     }
 
+    window.onhashchange = {
+        checkForHash()
+    }
+    window.onload = {
+        checkForHash()
+    }
 }

@@ -14,10 +14,14 @@ import io.ktor.http.Headers
 import io.ktor.http.HttpMethod
 import io.ktor.http.takeFrom
 import io.ktor.serialization.kotlinx.json.json
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.jsonPrimitive
+import kotlin.coroutines.CoroutineContext
 
-sealed interface SupabaseClient {
+sealed interface SupabaseClient: CoroutineScope {
 
     val supabaseUrl: String
     val supabaseKey: String
@@ -33,6 +37,8 @@ internal class SupabaseClientImpl(
     plugins: Map<String, (SupabaseClient) -> Any>,
 ) : SupabaseClient {
 
+    override val coroutineContext = Dispatchers.Default + Job()
+
     private val httpClient = HttpClient {
         install(DefaultRequest) {
             headers {
@@ -44,13 +50,14 @@ internal class SupabaseClientImpl(
             json(supabaseJson)
         }
     }
+
     override val plugins = plugins.toList().associate { (key, value) ->
         key to value(this)
     }
 
     override suspend fun makeRequest(method: HttpMethod, path: String, headers: Headers, body: Any?) = httpClient.request {
         this.method = method
-        url.takeFrom(supabaseUrl + path)
+        url.takeFrom((supabaseUrl + path))
         headers {
             header("apikey", supabaseKey)
             headers.forEach { s, strings ->

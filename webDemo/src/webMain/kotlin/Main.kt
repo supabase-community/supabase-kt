@@ -5,10 +5,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import io.github.jan.supacompose.auth.Auth
-import io.github.jan.supacompose.auth.Web
 import io.github.jan.supacompose.auth.auth
+import io.github.jan.supacompose.auth.initializeWeb
+import io.github.jan.supacompose.auth.providers.Discord
 import io.github.jan.supacompose.auth.providers.Email
 import io.github.jan.supacompose.createSupabaseClient
+import kotlinx.browser.window
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.web.css.padding
 import org.jetbrains.compose.web.css.px
@@ -25,8 +27,8 @@ fun main() {
         supabaseKey = ""
 
         install(Auth)
-        install(Web)
     }
+    client.auth.initializeWeb()
 
     renderComposable(rootElementId = "root") {
         val session by client.auth.currentSession.collectAsState()
@@ -59,6 +61,15 @@ fun main() {
                 }
             }) {
                 Text("Login")
+            }
+            Button({
+                onClick {
+                    scope.launch {
+                        client.auth.loginWith(Discord)
+                    }
+                }
+            }) {
+                Text("Login with Discord")
             }
         }
     }

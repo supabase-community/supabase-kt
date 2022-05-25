@@ -10,12 +10,13 @@ SupaCompose currently supports:
 
 #### Authentication
 
-|         | Login                   | Signup                  | Verifying (Signup, Password Reset, Invite)  | Logout  | Otp     |
-|---------|-------------------------|-------------------------|---------------------------------------------|---------|---------|
-| Desktop | phone, password, oauth2 | phone, password, oauth2 | only with token                             | yes     | no      |
-| Android | phone, password, oauth2 | phone, password, oauth2 | only with token, url authentication planned | yes     | planned |
-| Web     | planned                 | planned                 | planned                                     | planned | planned |
+|         | Login                   | Signup                  | Verifying (Signup, Password Reset, Invite)  | Logout | Otp |
+|---------|-------------------------|-------------------------|---------------------------------------------|--------|-----|
+| Desktop | phone, password, oauth2 | phone, password, oauth2 | only with token                             | ✅      | ❌   |
+| Android | phone, password, oauth2 | phone, password, oauth2 | only with token, url authentication planned | ✅      | ✅   |
+| Web     | phone, password, oauth2 | phone, password, oauth2 | token, url                                  | ✅      | ✅   |
 
+Session saving: ✅
 
 #### Database
 
@@ -37,6 +38,10 @@ The library will be on maven central after Authentication is implemented.
 
 <details><summary>Authentication with Desktop</summary>
 <p>
+
+<b> To add OAuth support, add this link to the redirect urls in supabase </b>
+
+![img.png](.github/images/desktop_supabase.png)
 
 ```kotlin
 suspend fun main() {
@@ -76,31 +81,30 @@ suspend fun main() {
                         }, modifier = Modifier.align(Alignment.CenterHorizontally)) {
                             Text("Login")
                         }
-                        ProviderButton(
-                            icon = {
-                                Icon(painterResource("discord_icon.svg"), "", modifier = Modifier.size(25.dp))
-                            },
-                            text = {
-                                Text("Log in with Discord")
+                        Button(
+                            {
+                                scope.launch {
+                                    client.auth.loginWith(Discord) {
+                                        onFail = {
+                                            when (it) {
+                                                is OAuthFail.Timeout -> {
+                                                    println("Timeout")
+                                                }
+                                                is OAuthFail.Error -> {
+                                                    //log error
+                                                }
+                                            }
+                                        }
+                                        timeout = 50.seconds
+                                        htmlTitle = "SupaCompose"
+                                        htmlText = "Logged in. You may continue in the app."
+                                    }
+                                }
                             },
                             modifier = Modifier.align(Alignment.CenterHorizontally)
                         ) {
-                            scope.launch {
-                                client.auth.loginWith(Discord, onFail = {
-                                    when (it) {
-                                        is OAuthFail.Timeout -> {
-                                            println("Timeout")
-                                        }
-                                        is OAuthFail.Error -> {
-                                            //log error
-                                        }
-                                    }
-                                }) {
-                                    timeout = 50.seconds
-                                    htmlTitle = "SupaCompose"
-                                    htmlText = "Logged in. You may continue in the app."
-                                }
-                            }
+                            Icon(painterResource("discord_icon.svg"), "", modifier = Modifier.size(25.dp))
+                            Text("Log in with Discord")
                         }
                     }
                 }
@@ -140,8 +144,7 @@ class MainActivity : AppCompatActivity() {
         supabaseUrl = "your supabase url"
         supabaseKey = "your supabase key"
 
-        install(Auth)
-        install(DeepLinks) {
+        install(Auth) {
             scheme = "supacompose"
             host = "login"
         }
@@ -149,7 +152,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        handleDeepLinks(supabaseClient) //if you don't call this function the library will throw an error when trying to authenticate with oauth
+        initializeAndroid(supabaseClient) //if you don't call this function the library will throw an error when trying to authenticate with oauth
         setContent {
             MaterialTheme {
                 val session by supabaseClient.auth.currentSession.collectAsState()
@@ -181,27 +184,30 @@ class MainActivity : AppCompatActivity() {
                             }, modifier = Modifier.align(Alignment.CenterHorizontally)) {
                                 Text("Login")
                             }
-                            ProviderButton(
-                                icon = {
-                                    //  Icon(painterResource("discord_icon.svg"), "", modifier = Modifier.size(25.dp))
-                                },
-                                text = {
-                                    Text("Log in with Discord")
+                            Button(
+                                {
+                                    scope.launch {
+                                        client.auth.loginWith(Discord) {
+                                            onFail = {
+                                                when (it) {
+                                                    is OAuthFail.Timeout -> {
+                                                        println("Timeout")
+                                                    }
+                                                    is OAuthFail.Error -> {
+                                                        //log error
+                                                    }
+                                                }
+                                            }
+                                            timeout = 50.seconds
+                                            htmlTitle = "SupaCompose"
+                                            htmlText = "Logged in. You may continue in the app."
+                                        }
+                                    }
                                 },
                                 modifier = Modifier.align(Alignment.CenterHorizontally)
                             ) {
-                                scope.launch {
-                                    supabaseClient.auth.loginWith(Discord, onFail = {
-                                        when (it) {
-                                            is AuthFail.Timeout -> {
-                                                println("Timeout")
-                                            }
-                                            is AuthFail.Error -> {
-                                                //log error
-                                            }
-                                        }
-                                    })
-                                }
+                                Icon(painterResource("discord_icon.svg"), "", modifier = Modifier.size(25.dp))
+                                Text("Log in with Discord")
                             }
                         }
                     }
@@ -249,5 +255,67 @@ class MainActivity : AppCompatActivity() {
 </details>
 
 </blockquote>
+
+</details>
+
+<details><summary>Authentication with Web</summary>
+
+<p>
+
+```kotlin
+val client = createSupabaseClient {
+        supabaseUrl = ""
+        supabaseKey = ""
+
+        install(Auth)
+    }
+    client.auth.initializeWeb()
+
+    renderComposable(rootElementId = "root") {
+        val session by client.auth.currentSession.collectAsState()
+        var email by remember { mutableStateOf("") }
+        var password by remember { mutableStateOf("") }
+        val scope = rememberCoroutineScope()
+        if(session != null) {
+            Span({ style { padding(15.px) } }) {
+                Text("Logged in as ${session!!.user?.email}")
+            }
+        } else {
+            EmailInput(email) {
+                onInput {
+                    email = it.value
+                }
+            }
+            PasswordInput(password) {
+                onInput {
+                    password = it.value
+                }
+            }
+            Button({
+                onClick {
+                    scope.launch {
+                        client.auth.loginWith(Email) {
+                            this.email = email
+                            this.password = password
+                        }
+                    }
+                }
+            }) {
+                Text("Login")
+            }
+            Button({
+                onClick {
+                    scope.launch {
+                        client.auth.loginWith(Discord)
+                    }
+                }
+            }) {
+                Text("Login with Discord")
+            }
+        }
+    }
+```
+
+</p>
 
 </details>

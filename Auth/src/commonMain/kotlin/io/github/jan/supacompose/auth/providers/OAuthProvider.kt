@@ -10,14 +10,14 @@ expect abstract class OAuthProvider() : AuthProvider<ExternalAuthConfig, Unit> {
     override suspend fun login(
         supabaseClient: SupabaseClient,
         onSuccess: suspend (UserSession) -> Unit,
-        onFail: (AuthFail) -> Unit,
+        redirectUrl: String?,
         config: (ExternalAuthConfig.() -> Unit)?
     )
 
     override suspend fun signUp(
         supabaseClient: SupabaseClient,
         onSuccess: suspend (UserSession) -> Unit,
-        onFail: (AuthFail) -> Unit,
+        redirectUrl: String?,
         config: (ExternalAuthConfig.() -> Unit)?
     )
 
@@ -29,7 +29,7 @@ sealed interface AuthFail {
 
     object Timeout: AuthFail
     class Error(val throwable: Throwable) : AuthFail
-    object InvalidCredentials : AuthFail
+    class RedirectError(val errorCode: Int, val description: String?) : AuthFail
 
 }
 

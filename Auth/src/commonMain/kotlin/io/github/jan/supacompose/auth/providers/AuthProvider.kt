@@ -1,8 +1,9 @@
 package io.github.jan.supacompose.auth.providers
 
 import io.github.jan.supacompose.SupabaseClient
+import io.github.jan.supacompose.auth.auth
+import io.github.jan.supacompose.auth.generateRedirectUrl
 import io.github.jan.supacompose.auth.user.UserSession
-import io.github.jan.supacompose.exceptions.RestException
 import io.ktor.client.call.body
 import io.ktor.http.HttpMethod
 
@@ -11,14 +12,14 @@ interface AuthProvider<C, R> {
     suspend fun login(
         supabaseClient: SupabaseClient,
         onSuccess: suspend (UserSession) -> Unit,
-        onFail: (AuthFail) -> Unit,
+        redirectUrl: String? = null,
         config: (C.() -> Unit)? = null
     )
 
     suspend fun signUp(
         supabaseClient: SupabaseClient,
         onSuccess: suspend (UserSession) -> Unit,
-        onFail: (AuthFail) -> Unit = {},
+        redirectUrl: String? = null,
         config: (C.() -> Unit)? = null
     ): R
 
@@ -29,43 +30,35 @@ interface DefaultAuthProvider<C, R> : AuthProvider<C, R> {
     override suspend fun login(
         supabaseClient: SupabaseClient,
         onSuccess: suspend (UserSession) -> Unit,
-        onFail: (AuthFail) -> Unit,
+        redirectUrl: String?,
         config: (C.() -> Unit)?
     ) {
-        kotlin.runCatching {
-            if(config == null) throw IllegalArgumentException("Credentials are required")
-            val encodedCredentials = encodeCredentials(config)
-            val response = supabaseClient.makeRequest(HttpMethod.Post, "/auth/v1/token?grant_type=password", body = encodedCredentials)
-            response.body<UserSession>()
-        }.onSuccess {
+        if(config == null) throw IllegalArgumentException("Credentials are required")
+        val finalRedirectUrl = supabaseClient.auth.generateRedirectUrl(redirectUrl)
+        val redirect = finalRedirectUrl?.let {
+            "?redirect_to=$finalRedirectUrl"
+        } ?: ""
+        val encodedCredentials = encodeCredentials(config)
+        val response = supabaseClient.makeRequest(HttpMethod.Post, "/auth/v1/token?grant_type=password$redirect", body = encodedCredentials)
+        response.body<UserSession>().also {
             onSuccess(it)
-        }.onFailure {
-            val error = when(it) {
-                is RestException -> AuthFail.InvalidCredentials
-                else -> AuthFail.Error(it)
-            }
-            onFail(error)
         }
     }
 
     override suspend fun signUp(
         supabaseClient: SupabaseClient,
         onSuccess: suspend (UserSession) -> Unit,
-        onFail: (AuthFail) -> Unit,
+        redirectUrl: String?,
         config: (C.() -> Unit)?
     ): R {
-        return kotlin.runCatching {
-            if(config == null) throw IllegalArgumentException("Credentials are required")
-            val body = encodeCredentials(config)
-            val response = supabaseClient.makeRequest(HttpMethod.Post, "/auth/v1/signup", body = body)
-            decodeResult(response.body())
-        }.onFailure {
-            val error = when(it) {
-                is RestException -> AuthFail.InvalidCredentials
-                else -> AuthFail.Error(it)
-            }
-            onFail(error)
-        }.getOrThrow()
+        if (config == null) throw IllegalArgumentException("Credentials are required")
+        val finalRedirectUrl = supabaseClient.auth.generateRedirectUrl(redirectUrl)
+        val redirect = finalRedirectUrl?.let {
+            "?redirect_to=$finalRedirectUrl"
+        } ?: ""
+        val body = encodeCredentials(config)
+        val response = supabaseClient.makeRequest(HttpMethod.Post, "/auth/v1/signup$redirect", body = body)
+        return decodeResult(response.body())
     }
 
     fun decodeResult(body: String): R

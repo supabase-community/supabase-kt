@@ -33,7 +33,7 @@ actual abstract class OAuthProvider : AuthProvider<ExternalAuthConfig, Unit> {
     actual override suspend fun login(
         supabaseClient: SupabaseClient,
         onSuccess: suspend (UserSession) -> Unit,
-        onFail: (AuthFail) -> Unit,
+        redirectUrl: String?,
         config: (ExternalAuthConfig.() -> Unit)?
     ) {
         withContext(Dispatchers.IO) {
@@ -41,7 +41,7 @@ actual abstract class OAuthProvider : AuthProvider<ExternalAuthConfig, Unit> {
                 val authConfig = ExternalAuthConfig().apply {
                     config?.invoke(this)
                 }
-                createServer(authConfig, supabaseClient, onSuccess, onFail)
+                createServer(authConfig, supabaseClient, redirectUrl, onSuccess, authConfig.onFail)
             }
         }
     }
@@ -49,11 +49,15 @@ actual abstract class OAuthProvider : AuthProvider<ExternalAuthConfig, Unit> {
     actual override suspend fun signUp(
         supabaseClient: SupabaseClient,
         onSuccess: suspend (UserSession) -> Unit,
-        onFail: (AuthFail) -> Unit,
+        redirectUrl: String?,
         config: (ExternalAuthConfig.() -> Unit)?
-    ) = login(supabaseClient, onSuccess, onFail, config)
+    ) = login(supabaseClient, onSuccess, redirectUrl, config = config)
 
-    private suspend fun createServer(config: ExternalAuthConfig, supabaseClient: SupabaseClient, onSuccess: suspend (UserSession) -> Unit, onFail: (AuthFail) -> Unit) {
+    private suspend fun createServer(config: ExternalAuthConfig, supabaseClient: SupabaseClient, redirectUrl: String?, onSuccess: suspend (UserSession) -> Unit, onFail: (AuthFail) -> Unit) {
+        if(redirectUrl != null) {
+            Desktop.getDesktop().browse(URI(supabaseClient.supabaseUrl + "/auth/v1/authorize?provider=${provider()}&redirect_to=$redirectUrl"))
+            return
+        }
         coroutineScope {
             launch {
                 var done = false
@@ -68,9 +72,10 @@ actual abstract class OAuthProvider : AuthProvider<ExternalAuthConfig, Unit> {
                             val accessToken = call.request.queryParameters["access_token"] ?: return@get call.respondText("No access token")
                             val refreshToken = call.request.queryParameters["refresh_token"] ?: return@get call.respondText("No refresh token")
                             val expiresIn = call.request.queryParameters["expires_in"]?.toLong() ?: return@get call.respondText("No expires in")
+                            val tokenType = call.request.queryParameters["token_type"] ?: return@get call.respondText("No token type")
                             launch {
-                                val user = supabaseClient.auth.goTrueClient.getUser(accessToken)
-                                onSuccess(UserSession(accessToken, refreshToken, expiresIn, "", user).also(::println))
+                                val user = supabaseClient.auth.getUser(accessToken)
+                                onSuccess(UserSession(accessToken, refreshToken, expiresIn, tokenType, user).also(::println))
                             }
                             mutex.withLock {
                                 done = true
@@ -145,3 +150,10 @@ var ExternalAuthConfig.htmlIconUrl: String
     set(value) {
         params["htmlIconUrl"] = value
     }
+
+internal val ExternalAuthConfig.onFail
+    get() = params["onFail"] as? ((AuthFail) -> Unit) ?: {}
+
+fun ExternalAuthConfig.onFail(onFail: (AuthFail) -> Unit) {
+    params["onFail"] = onFail
+}

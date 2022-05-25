@@ -17,22 +17,25 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import io.github.jan.supacompose.auth.Auth
+import io.github.jan.supacompose.auth.VerifyType
 import io.github.jan.supacompose.auth.auth
 import io.github.jan.supacompose.auth.providers.AuthFail
 import io.github.jan.supacompose.auth.providers.Discord
 import io.github.jan.supacompose.auth.providers.Email
-import io.github.jan.supacompose.auth.user.UserInfo
+import io.github.jan.supacompose.auth.providers.onFail
+import io.github.jan.supacompose.auth.sessionFile
 import io.github.jan.supacompose.createSupabaseClient
 import kotlinx.coroutines.launch
-import kotlinx.serialization.decodeFromString
-import kotlinx.serialization.json.Json
+import java.io.File
 
 suspend fun main() {
     val client = createSupabaseClient {
         supabaseUrl = System.getenv("SUPABASE_URL")
         supabaseKey = System.getenv("SUPABASE_KEY")
 
-        install(Auth)
+        install(Auth) {
+            sessionFile = File("C:\\Users\\jan\\AppData\\Local\\SupaCompose\\usersession.json")
+        }
     }
     application {
         Window(::exitApplication) {
@@ -57,14 +60,20 @@ suspend fun main() {
                             )
                             Button(onClick = {
                                 scope.launch {
-                                    client.auth.loginWith(Discord, onFail = {
-                                        if(it is AuthFail.Error) it.throwable.printStackTrace()
-                                    }) {
-
+                                    client.auth.signUpWith(Email) {
+                                        this.email = email
+                                        this.password = password
                                     }
                                 }
                             }, modifier = Modifier.align(Alignment.CenterHorizontally)) {
                                 Text("Login")
+                            }
+                            Button(onClick = {
+                                scope.launch {
+                                    client.auth.loginWith(Discord)
+                                }
+                            }, modifier = Modifier.align(Alignment.CenterHorizontally)) {
+                                Text("Login with Discord")
                             }
                             //
                         }

@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material.AlertDialog
 import androidx.compose.material.Button
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
@@ -20,10 +21,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import io.github.jan.supacompose.auth.Auth
-import io.github.jan.supacompose.auth.DeepLinks
 import io.github.jan.supacompose.auth.auth
-import io.github.jan.supacompose.auth.handleDeepLinks
+import io.github.jan.supacompose.auth.host
+import io.github.jan.supacompose.auth.initializeAndroid
+import io.github.jan.supacompose.auth.providers.Discord
 import io.github.jan.supacompose.auth.providers.Email
+import io.github.jan.supacompose.auth.scheme
 import io.github.jan.supacompose.createSupabaseClient
 import kotlinx.coroutines.launch
 
@@ -31,19 +34,21 @@ class MainActivity : AppCompatActivity() {
 
     val supabaseClient = createSupabaseClient {
 
-        supabaseUrl = "your supabase url"
-        supabaseKey = "your supabase key"
+        supabaseUrl = ""
+        supabaseKey = ""
 
-        install(Auth)
-        install(DeepLinks) {
+        install(Auth) {
             scheme = "supacompose"
             host = "login"
         }
     }
+    var tokenType by mutableStateOf<String?>(null)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        handleDeepLinks(supabaseClient)
+        initializeAndroid(supabaseClient) {
+            tokenType = it.tokenType
+        }
         setContent {
             MaterialTheme {
                 val session by supabaseClient.auth.currentSession.collectAsState()
@@ -75,10 +80,26 @@ class MainActivity : AppCompatActivity() {
                             }, modifier = Modifier.align(Alignment.CenterHorizontally)) {
                                 Text("Login")
                             }
+                            Button(onClick = {
+                                scope.launch {
+                                    supabaseClient.auth.loginWith(Discord)
+                                }
+                            }, modifier = Modifier.align(Alignment.CenterHorizontally)) {
+                                Text("Login with Discord")
+                            }
                             //
                         }
                         }
                     }
+                if(tokenType != null) {
+                    AlertDialog({ tokenType = null}, {
+                        Button({ tokenType = null}) {
+                            Text("Ok")
+                        }
+                    }, title = {
+                        Text("Successfully logged in with Discord!")
+                    })
+                }
             }
         }
     }
