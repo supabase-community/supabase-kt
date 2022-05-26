@@ -267,56 +267,56 @@ class MainActivity : AppCompatActivity() {
 
 ```kotlin
 val client = createSupabaseClient {
-        supabaseUrl = ""
-        supabaseKey = ""
+    supabaseUrl = ""
+    supabaseKey = ""
 
-        install(Auth)
-    }
-    client.auth.initializeWeb()
+    install(Auth)
+}
+client.auth.initializeWeb()
 
-    renderComposable(rootElementId = "root") {
-        val session by client.auth.currentSession.collectAsState()
-        var email by remember { mutableStateOf("") }
-        var password by remember { mutableStateOf("") }
-        val scope = rememberCoroutineScope()
-        if(session != null) {
-            Span({ style { padding(15.px) } }) {
-                Text("Logged in as ${session!!.user?.email}")
-            }
-        } else {
-            EmailInput(email) {
-                onInput {
-                    email = it.value
-                }
-            }
-            PasswordInput(password) {
-                onInput {
-                    password = it.value
-                }
-            }
-            Button({
-                onClick {
-                    scope.launch {
-                        client.auth.loginWith(Email) {
-                            this.email = email
-                            this.password = password
-                        }
-                    }
-                }
-            }) {
-                Text("Login")
-            }
-            Button({
-                onClick {
-                    scope.launch {
-                        client.auth.loginWith(Discord)
-                    }
-                }
-            }) {
-                Text("Login with Discord")
+renderComposable(rootElementId = "root") {
+    val session by client.auth.currentSession.collectAsState()
+    var email by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
+    val scope = rememberCoroutineScope()
+    if(session != null) {
+        Span({ style { padding(15.px) } }) {
+            Text("Logged in as ${session!!.user?.email}")
+        }
+    } else {
+        EmailInput(email) {
+            onInput {
+                email = it.value
             }
         }
+        PasswordInput(password) {
+            onInput {
+                password = it.value
+            }
+        }
+        Button({
+            onClick {
+                scope.launch {
+                    client.auth.loginWith(Email) {
+                        this.email = email
+                        this.password = password
+                    }
+                }
+            }
+        }) {
+            Text("Login")
+        }
+        Button({
+            onClick {
+                scope.launch {
+                    client.auth.loginWith(Discord)
+                }
+            }
+        }) {
+            Text("Login with Discord")
+        }
     }
+}
 ```
 
 </p>
