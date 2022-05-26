@@ -42,13 +42,10 @@ class MainActivity : AppCompatActivity() {
             host = "login"
         }
     }
-    var tokenType by mutableStateOf<String?>(null)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        initializeAndroid(supabaseClient) {
-            tokenType = it.tokenType
-        }
+        initializeAndroid(supabaseClient)
         setContent {
             MaterialTheme {
                 val session by supabaseClient.auth.currentSession.collectAsState()
@@ -72,7 +69,7 @@ class MainActivity : AppCompatActivity() {
                             )
                             Button(onClick = {
                                 scope.launch {
-                                    supabaseClient.auth.loginWith(Email) {
+                                    supabaseClient.auth.signUpWith(Email) {
                                         this.email = email
                                         this.password = password
                                     }
@@ -91,15 +88,6 @@ class MainActivity : AppCompatActivity() {
                         }
                         }
                     }
-                if(tokenType != null) {
-                    AlertDialog({ tokenType = null}, {
-                        Button({ tokenType = null}) {
-                            Text("Ok")
-                        }
-                    }, title = {
-                        Text("Successfully logged in with Discord!")
-                    })
-                }
             }
         }
     }

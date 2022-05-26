@@ -10,11 +10,14 @@ SupaCompose currently supports:
 
 #### Authentication
 
-|         | Login                   | Signup                  | Verifying (Signup, Password Reset, Invite)  | Logout | Otp |
-|---------|-------------------------|-------------------------|---------------------------------------------|--------|-----|
-| Desktop | phone, password, oauth2 | phone, password, oauth2 | only with token                             | ✅      | ❌   |
-| Android | phone, password, oauth2 | phone, password, oauth2 | only with token, url authentication planned | ✅      | ✅   |
-| Web     | phone, password, oauth2 | phone, password, oauth2 | token, url                                  | ✅      | ✅   |
+|         | Login                   | Signup                  | Verifying (Signup, Password Reset, Invite) | Logout | Otp |
+|---------|-------------------------|-------------------------|--------------------------------------------|--------|-----|
+| Desktop | phone, password, oauth2 | phone, password, oauth2 | only with token                            | ✅      | ❌   |
+| Android | phone, password, oauth2 | phone, password, oauth2 | token, url                                 | ✅      | ✅   |
+| Web     | phone, password, oauth2 | phone, password, oauth2 | token, url                                 | ✅      | ✅   |
+
+❌ = will not be implemented
+✅ = implemented
 
 Session saving: ✅
 

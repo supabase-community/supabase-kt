@@ -17,12 +17,9 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import io.github.jan.supacompose.auth.Auth
-import io.github.jan.supacompose.auth.VerifyType
 import io.github.jan.supacompose.auth.auth
-import io.github.jan.supacompose.auth.providers.AuthFail
 import io.github.jan.supacompose.auth.providers.Discord
 import io.github.jan.supacompose.auth.providers.Email
-import io.github.jan.supacompose.auth.providers.onFail
 import io.github.jan.supacompose.auth.sessionFile
 import io.github.jan.supacompose.createSupabaseClient
 import kotlinx.coroutines.launch
