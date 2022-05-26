@@ -16,7 +16,7 @@ SupaCompose currently supports:
 | Android | phone, password, oauth2 | phone, password, oauth2 | token, url                                 | ✅      | ✅   |
 | Web     | phone, password, oauth2 | phone, password, oauth2 | token, url                                 | ✅      | ✅   |
 
-❌ = will not be implemented
+❌ = will not be implemented \
 ✅ = implemented
 
 Session saving: ✅
