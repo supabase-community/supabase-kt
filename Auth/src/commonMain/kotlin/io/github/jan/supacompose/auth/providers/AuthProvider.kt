@@ -34,12 +34,8 @@ interface DefaultAuthProvider<C, R> : AuthProvider<C, R> {
         config: (C.() -> Unit)?
     ) {
         if(config == null) throw IllegalArgumentException("Credentials are required")
-        val finalRedirectUrl = supabaseClient.auth.generateRedirectUrl(redirectUrl)
-        val redirect = finalRedirectUrl?.let {
-            "?redirect_to=$finalRedirectUrl"
-        } ?: ""
         val encodedCredentials = encodeCredentials(config)
-        val response = supabaseClient.makeRequest(HttpMethod.Post, "/auth/v1/token?grant_type=password$redirect", body = encodedCredentials)
+        val response = supabaseClient.makeRequest(HttpMethod.Post, "/auth/v1/token?grant_type=password", body = encodedCredentials)
         response.body<UserSession>().also {
             onSuccess(it)
         }
@@ -52,12 +48,8 @@ interface DefaultAuthProvider<C, R> : AuthProvider<C, R> {
         config: (C.() -> Unit)?
     ): R {
         if (config == null) throw IllegalArgumentException("Credentials are required")
-        val finalRedirectUrl = supabaseClient.auth.generateRedirectUrl(redirectUrl)
-        val redirect = finalRedirectUrl?.let {
-            "?redirect_to=$finalRedirectUrl"
-        } ?: ""
         val body = encodeCredentials(config)
-        val response = supabaseClient.makeRequest(HttpMethod.Post, "/auth/v1/signup$redirect", body = body)
+        val response = supabaseClient.makeRequest(HttpMethod.Post, "/auth/v1/signup", body = body)
         return decodeResult(response.body())
     }
 

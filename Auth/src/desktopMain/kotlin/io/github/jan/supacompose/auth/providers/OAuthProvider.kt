@@ -73,9 +73,10 @@ actual abstract class OAuthProvider : AuthProvider<ExternalAuthConfig, Unit> {
                             val refreshToken = call.request.queryParameters["refresh_token"] ?: return@get call.respondText("No refresh token")
                             val expiresIn = call.request.queryParameters["expires_in"]?.toLong() ?: return@get call.respondText("No expires in")
                             val tokenType = call.request.queryParameters["token_type"] ?: return@get call.respondText("No token type")
+                            val type = call.request.queryParameters["type"] ?: ""
                             launch {
                                 val user = supabaseClient.auth.getUser(accessToken)
-                                onSuccess(UserSession(accessToken, refreshToken, expiresIn, tokenType, user).also(::println))
+                                onSuccess(UserSession(accessToken, refreshToken, expiresIn, tokenType, user, type))
                             }
                             mutex.withLock {
                                 done = true

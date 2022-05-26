@@ -15,9 +15,14 @@ import io.ktor.client.call.body
 import io.ktor.http.Headers
 import io.ktor.http.HttpMethod
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonNull
+import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.encodeToJsonElement
+import kotlinx.serialization.json.jsonObject
+import kotlin.js.JsName
+import kotlin.jvm.JvmName
 
 sealed interface Auth {
 
@@ -50,6 +55,7 @@ sealed interface Auth {
      */
     suspend fun <C, R, Provider : DefaultAuthProvider<C, R>> modifyUser(
         provider: Provider,
+        extraData: JsonObject? = null,
         config: C.() -> Unit = {}
     ): UserInfo
 
@@ -101,27 +107,12 @@ sealed interface Auth {
  * @param provider The provider to use
  * @param config The configuration to use
  * @param extraData The extra data to use
- * @param jwt The JWT to use
  */
 suspend inline fun <C, R, reified D, Provider : DefaultAuthProvider<C, R>> Auth.modifyUser(
     provider: Provider,
-    jwt: String,
-    extraData: D?,
+    extraData: D? = null,
     noinline config: C.() -> Unit = {}
-): UserInfo {
-    val body = if(extraData != JsonNull) {
-        buildJsonObject {
-            putJsonObject(provider.encodeCredentials(config).toJsonObject())
-            put("data", supabaseJson.encodeToJsonElement(extraData))
-        }.toString()
-    } else {
-        provider.encodeCredentials(config)
-    }
-    val response = supabaseClient.makeRequest(HttpMethod.Put, "/auth/v${Auth.API_VERSION}/user", Headers.build {
-        append("Authorization", "Bearer $jwt")
-    }, body)
-    return response.body()
-}
+): UserInfo = modifyUser(provider, extraData?.let { Json.encodeToJsonElement(extraData) }?.jsonObject, config)
 
 enum class VerifyType {
     SIGNUP,

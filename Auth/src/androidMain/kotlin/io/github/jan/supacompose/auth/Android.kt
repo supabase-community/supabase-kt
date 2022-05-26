@@ -16,7 +16,7 @@ import java.io.File
 fun Auth.openOAuth(provider: String) {
     this as AuthImpl
     val deepLink = "${config.scheme}://${config.host}"
-    val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(supabaseClient.supabaseUrl + "/auth/v1/authorize?provider=${provider}&redirect_to=$deepLink").also(::println))
+    val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(supabaseClient.supabaseUrl + "/auth/v1/authorize?provider=${provider}&redirect_to=$deepLink"))
     config.activity.startActivity(browserIntent)
 }
 
@@ -75,10 +75,11 @@ fun Activity.initializeAndroid(supabaseClient: SupabaseClient, onSessionSuccess:
         val refreshToken = map["refresh_token"] ?: return
         val expiresIn = map["expires_in"]?.toLong() ?: return
         val tokenType = map["token_type"] ?: return
+        val type = map["type"] ?: ""
         val scope = CoroutineScope(Dispatchers.IO)
         scope.launch {
             val user = authPlugin.getUser(accessToken)
-            val session = UserSession(accessToken, refreshToken, expiresIn, tokenType, user)
+            val session = UserSession(accessToken, refreshToken, expiresIn, tokenType, user, type)
             onSessionSuccess(session)
             authPlugin.startJob(session)
         }

@@ -9,6 +9,7 @@ import io.github.jan.supacompose.auth.providers.DefaultAuthProvider
 import io.github.jan.supacompose.auth.user.UserInfo
 import io.github.jan.supacompose.auth.user.UserSession
 import io.github.jan.supacompose.putJsonObject
+import io.github.jan.supacompose.supabaseJson
 import io.github.jan.supacompose.toJsonObject
 import io.ktor.client.call.body
 import io.ktor.http.Headers
@@ -23,7 +24,10 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
+import kotlinx.serialization.json.JsonNull
+import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.encodeToJsonElement
 import kotlinx.serialization.json.put
 import kotlin.time.Duration.Companion.seconds
 
@@ -74,8 +78,20 @@ internal class AuthImpl(override val supabaseClient: SupabaseClient, val config:
 
     override suspend fun <C, R, Provider : DefaultAuthProvider<C, R>> modifyUser(
         provider: Provider,
+        extraData: JsonObject?,
         config: C.() -> Unit
-    ) = modifyUser(provider, (!currentSession.value).accessToken, config)
+    ): UserInfo {
+        val body = buildJsonObject {
+            putJsonObject(provider.encodeCredentials(config).toJsonObject())
+            extraData?.let {
+                put("data", supabaseJson.encodeToJsonElement(it))
+            }
+        }.toString()
+        val response = supabaseClient.makeRequest(HttpMethod.Put, "/auth/v${Auth.API_VERSION}/user", Headers.build {
+            append("Authorization", "Bearer ${(!currentSession.value).accessToken}")
+        }, body)
+        return response.body()
+    }
 
     override suspend fun <C, R, Provider : DefaultAuthProvider<C, R>> sendOtpTo(
         provider: Provider,
@@ -142,10 +158,8 @@ internal class AuthImpl(override val supabaseClient: SupabaseClient, val config:
     }
 
     internal suspend fun startJob(session: UserSession) {
-        println(session)
         _currentSession.value = session
         if(session.expiresAt < Clock.System.now()) {
-            println("refreshing session")
             refreshSession()
         } else {
             sessionManager.saveSession(supabaseClient, session)
