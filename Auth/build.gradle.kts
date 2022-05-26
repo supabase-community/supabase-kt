@@ -4,7 +4,7 @@ plugins {
 }
 
 group = "io.github.jan-tennert.supacompose.auth"
-version = Versions.SUPABASE
+version = Versions.SUPACOMPOSE
 description = "Extends Supabase with a Auth Client"
 
 repositories {

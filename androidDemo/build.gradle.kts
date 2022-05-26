@@ -5,7 +5,7 @@ plugins {
 }
 
 group = "io.github.jan-tennert.supacompose.android"
-version = Versions.SUPABASE
+version = Versions.SUPACOMPOSE
 
 repositories {
     jcenter()
@@ -26,7 +26,7 @@ android {
         minSdk = 24
         targetSdk = 31
         versionCode = 1
-        versionName = Versions.SUPABASE
+        versionName = Versions.SUPACOMPOSE
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8

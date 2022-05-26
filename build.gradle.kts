@@ -124,7 +124,7 @@ configure(allprojects.filter { it.name in modules }) {
 }
 
 group = "io.github.jan-tennert.supacompose"
-version = Versions.SUPABASE
+version = Versions.SUPACOMPOSE
 
 kotlin {
     jvm("desktop") {

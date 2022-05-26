@@ -9,7 +9,7 @@ repositories {
 }
 
 group = "io.github.jan-tennert.supacompose.web"
-version = Versions.SUPABASE
+version = Versions.SUPACOMPOSE
 
 kotlin {
     js("web", IR) {

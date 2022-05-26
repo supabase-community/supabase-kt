@@ -14,7 +14,7 @@ jobs:
   publishLinuxJVMJS:
     runs-on: ubuntu-latest
     steps:
-      - run: echo "Will start a Maven Central upload with version ${{ github.event.inputs.releaseversion }}"
+      - run: echo "Will start a Maven Central upload"
 
       - uses: actions/checkout@v2
 

@@ -11,7 +11,7 @@ repositories {
 }
 
 group = "io.github.jan-tennert.supacompose.desktop"
-version = Versions.SUPABASE
+version = Versions.SUPACOMPOSE
 
 kotlin {
     jvm {
