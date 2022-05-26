@@ -13,7 +13,7 @@ import kotlinx.coroutines.launch
 import java.io.File
 
 @OptIn(SupaComposeInternal::class)
-fun Auth.openOAuth(provider: String) {
+internal fun Auth.openOAuth(provider: String) {
     this as AuthImpl
     val deepLink = "${config.scheme}://${config.host}"
     val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(supabaseClient.supabaseUrl + "/auth/v1/authorize?provider=${provider}&redirect_to=$deepLink"))
