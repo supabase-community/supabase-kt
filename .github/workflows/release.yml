@@ -11,7 +11,7 @@ env:
    SONATYPE_PROFILE_ID: ${{ secrets.SONATYPE_PROFILE_ID }}
 
 jobs:
-  publishLinuxJVMJS:
+  publish:
     runs-on: ubuntu-latest
     steps:
       - run: echo "Will start a Maven Central upload"
@@ -21,7 +21,7 @@ jobs:
       - name: Set up Maven Central Repository
         uses: actions/setup-java@v1
         with:
-          java-version: 8
+          java-version: 11
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
       - name: Publish package
