@@ -3,6 +3,8 @@ package io.github.jan.supacompose.auth
 import android.app.Activity
 import android.content.Intent
 import android.net.Uri
+import io.github.aakira.napier.DebugAntilog
+import io.github.aakira.napier.Napier
 import io.github.jan.supacompose.SupabaseClient
 import io.github.jan.supacompose.plugins.SupabasePlugin
 import io.github.jan.supacompose.annotiations.SupaComposeInternal
@@ -53,11 +55,20 @@ internal var Auth.Config.sessionFile: File?
 //add a contextual receiver later in kotlin 1.7 and remove the supabaseClient parameter
 @OptIn(SupaComposeInternal::class)
 fun Activity.initializeAndroid(supabaseClient: SupabaseClient, onSessionSuccess: (UserSession) -> Unit = {}) {
+    Napier.base(DebugAntilog())
     val authPlugin = supabaseClient.plugins["auth"] as? AuthImpl ?: throw IllegalStateException("You need to install the Auth plugin on the supabase client to handle deep links")
     authPlugin.config.activity = this
     authPlugin.config.sessionFile = File(filesDir, "session.json")
     supabaseClient.launch {
-        authPlugin.sessionManager.loadSession(supabaseClient)?.let { authPlugin.startJob(it) }
+        Napier.d {
+            "Trying to load the latest session"
+        }
+        authPlugin.sessionManager.loadSession(supabaseClient)?.let {
+            Napier.d {
+                "Successfully loaded session from storage"
+            }
+            authPlugin.startJob(it)
+        }
     }
     val data = intent?.data ?: return
     val scheme = data.scheme ?: return
@@ -77,6 +88,9 @@ fun Activity.initializeAndroid(supabaseClient: SupabaseClient, onSessionSuccess:
         val tokenType = map["token_type"] ?: return
         val type = map["type"] ?: ""
         val scope = CoroutineScope(Dispatchers.IO)
+        Napier.d {
+            "Received session deeplink"
+        }
         scope.launch {
             val user = authPlugin.getUser(accessToken)
             val session = UserSession(accessToken, refreshToken, expiresIn, tokenType, user, type)

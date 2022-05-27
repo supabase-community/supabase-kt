@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -22,8 +23,16 @@ import io.github.jan.supacompose.auth.providers.Discord
 import io.github.jan.supacompose.auth.providers.Email
 import io.github.jan.supacompose.auth.sessionFile
 import io.github.jan.supacompose.createSupabaseClient
+import io.github.jan.supacompose.postgrest.PostgrestClient
+import io.github.jan.supacompose.postgrest.postgrest
 import kotlinx.coroutines.launch
+import kotlinx.datetime.Instant
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 import java.io.File
+
+@Serializable
+data class Product(val content: String, @SerialName("user_id") val userId: String, val id: Int, @SerialName("created_at") val createdAt: Instant)
 
 suspend fun main() {
     val client = createSupabaseClient {
@@ -33,48 +42,57 @@ suspend fun main() {
         install(Auth) {
             sessionFile = File("C:\\Users\\jan\\AppData\\Local\\SupaCompose\\usersession.json")
         }
+        install(PostgrestClient)
     }
     application {
         Window(::exitApplication) {
             val session by client.auth.currentSession.collectAsState()
-            println(session)
+            println(session?.accessToken)
             val scope = rememberCoroutineScope()
-                if(session != null) {
-                    Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
-                        Text("Logged in as ${session?.user?.email}")
-                    }
-                } else {
-                    Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
-                        var email by remember { mutableStateOf("") }
-                        var password by remember { mutableStateOf("") }
-                        Column {
-                            TextField(email, { email = it }, placeholder = { Text("Email") })
-                            TextField(
-                                password,
-                                { password = it },
-                                placeholder = { Text("Password") },
-                                visualTransformation = PasswordVisualTransformation()
-                            )
-                            Button(onClick = {
-                                scope.launch {
-                                    client.auth.loginWith(Email) {
-                                        this.email = email
-                                        this.password = password
-                                    }
+            if (session != null) {
+                LaunchedEffect(Unit) {
+                    val products = client.postgrest
+                        .from("products")
+                        .select<List<Product>>()
+                        .decodeAs<List<Product>>()
+                    println(products)
+
+                }
+                Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
+                    Text("Logged in as ${session?.user?.email}")
+                }
+            } else {
+                Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
+                    var email by remember { mutableStateOf("") }
+                    var password by remember { mutableStateOf("") }
+                    Column {
+                        TextField(email, { email = it }, placeholder = { Text("Email") })
+                        TextField(
+                            password,
+                            { password = it },
+                            placeholder = { Text("Password") },
+                            visualTransformation = PasswordVisualTransformation()
+                        )
+                        Button(onClick = {
+                            scope.launch {
+                                client.auth.loginWith(Email) {
+                                    this.email = email
+                                    this.password = password
                                 }
-                            }, modifier = Modifier.align(Alignment.CenterHorizontally)) {
-                                Text("Login")
                             }
-                            Button(onClick = {
-                                scope.launch {
-                                    client.auth.loginWith(Discord)
-                                }
-                            }, modifier = Modifier.align(Alignment.CenterHorizontally)) {
-                                Text("Login with Discord")
-                            }
-                            //
+                        }, modifier = Modifier.align(Alignment.CenterHorizontally)) {
+                            Text("Login")
                         }
+                        Button(onClick = {
+                            scope.launch {
+                                client.auth.loginWith(Discord)
+                            }
+                        }, modifier = Modifier.align(Alignment.CenterHorizontally)) {
+                            Text("Login with Discord")
+                        }
+                        //
                     }
+                }
 
             }
         }

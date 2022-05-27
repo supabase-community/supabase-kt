@@ -21,24 +21,6 @@ SupaCompose currently supports:
 
 Session saving: ✅
 
-#### Database
-
-Soon
-
-#### Storage
-
-Soon
-
-#### Realtime
-
-Soon
-
-# Installation
-
-The library will be on maven central after Authentication is implemented.
-
-# Example code
-
 <details><summary>Authentication with Desktop</summary>
 <p>
 
@@ -322,3 +304,71 @@ renderComposable(rootElementId = "root") {
 </p>
 
 </details>
+
+
+#### Database/Postgres
+
+<details><summary>Select</summary>
+
+<b>If you use the first syntax as shown below the client will automatically look for @SerialName annotiations on your class property and if it has one it will use the value as the column name. (Only JVM)</b>
+
+<p>
+
+```kotlin
+//a data class for a message
+
+data class Message(val text: String, @SerialName("author_id") val authorId: String, val id: Int)
+
+//select:
+client.postgrest
+    .from("messages")
+    .select<Message> {
+        //you can use that syntax
+        Message::authorId eq "someid"
+        Message::text neq "This is a text!"
+        Message::authorId isIn listOf("test", "test2")
+
+        //or this. But they are the same
+        eq("author_id", "someid")
+        neq("text", "This is a text!")
+        isIn("author_id", listOf("test", "test2"))
+    }
+
+//insert
+client.postgrest
+    .from("messages")
+    .insert<Message>(Message("This is a text!", "someid", 1))
+
+//update:
+client.postgrest
+    .from("messages")
+    .update<Message>(
+        {
+            Message::text setTo "This is the edited text!"
+        }
+    ) {
+        Message::id eq 2
+    }
+
+
+```
+
+</p>
+
+</details>
+
+#### Storage
+
+Soon
+
+#### Realtime
+
+Soon
+
+# Installation
+
+The library will be on maven central after Authentication is implemented.
+
+# Credits 
+
+- Postgres Syntax inspired by https://github.com/supabase-community/postgrest-kt

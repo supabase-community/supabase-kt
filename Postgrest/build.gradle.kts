@@ -5,7 +5,7 @@ plugins {
 
 group = "io.github.jan-tennert.supacompose"
 version = Versions.SUPACOMPOSE
-description = "Extends Supabase with a Auth Client"
+description = "Extends Supabase with a Postgrest Client"
 
 repositories {
     mavenCentral()
@@ -35,29 +35,15 @@ kotlin {
         }
         val commonMain by getting {
             dependencies {
-                api(project(":"))
+                api(project(":Supacompose-Auth"))
+                //add kotlin reflect
+                api("org.jetbrains.kotlin:kotlin-reflect:${Versions.KOTLIN}")
                 // https://mvnrepository.com/artifact/io.ktor/ktor-server-core
             }
         }
-        val desktopMain by getting {
-            dependencies {
-                api("io.ktor:ktor-server-core:${Versions.KTOR}")
-                // https://mvnrepository.com/artifact/io.ktor/ktor-server-core
-                api("io.ktor:ktor-server-cio:${Versions.KTOR}")
-            }
-        }
-        val androidMain by getting {
-            dependencies {
-                api("com.google.android.gms:play-services-base:18.0.1")
-                api("com.google.android.gms:play-services-auth:20.2.0")
-
-            }
-        }
-        val webMain by getting {
-            dependencies {
-                api(compose.web.core)
-            }
-        }
+        val desktopMain by getting
+        val androidMain by getting
+        val webMain by getting
     }
 }
 

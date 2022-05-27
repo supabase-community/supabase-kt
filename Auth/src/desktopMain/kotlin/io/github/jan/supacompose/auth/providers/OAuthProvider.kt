@@ -1,5 +1,6 @@
 package io.github.jan.supacompose.auth.providers
 
+import io.github.aakira.napier.Napier
 import io.github.jan.supacompose.SupabaseClient
 import io.github.jan.supacompose.auth.auth
 import io.github.jan.supacompose.auth.user.UserSession
@@ -69,6 +70,9 @@ actual abstract class OAuthProvider : AuthProvider<ExternalAuthConfig, Unit> {
                             file("index.html")
                         }
                         get("/callback") {
+                            Napier.d {
+                                "Received callback on oauth callback"
+                            }
                             val accessToken = call.request.queryParameters["access_token"] ?: return@get call.respondText("No access token")
                             val refreshToken = call.request.queryParameters["refresh_token"] ?: return@get call.respondText("No refresh token")
                             val expiresIn = call.request.queryParameters["expires_in"]?.toLong() ?: return@get call.respondText("No expires in")
@@ -77,6 +81,9 @@ actual abstract class OAuthProvider : AuthProvider<ExternalAuthConfig, Unit> {
                             launch {
                                 val user = supabaseClient.auth.getUser(accessToken)
                                 onSuccess(UserSession(accessToken, refreshToken, expiresIn, tokenType, user, type))
+                            }
+                            Napier.d {
+                                "Successfully received callback on oauth callback"
                             }
                             mutex.withLock {
                                 done = true

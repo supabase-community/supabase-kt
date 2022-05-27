@@ -11,5 +11,6 @@
 /buildSrc/.gradle/
 /buildSrc/build/
 /desktopDemo/build/
+/Postgrest/build/
 .idea
 local.properties

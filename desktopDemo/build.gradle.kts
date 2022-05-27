@@ -23,7 +23,7 @@ kotlin {
     sourceSets {
         val jvmMain by getting {
             dependencies {
-                implementation(project(":Supacompose-Auth"))
+                implementation(project(":Supacompose-Postgrest"))
                 api("org.jetbrains.kotlinx:kotlinx-coroutines-core:${Versions.COROUTINES}")
 
                 implementation(compose.desktop.currentOs)

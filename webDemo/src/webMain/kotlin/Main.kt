@@ -10,7 +10,6 @@ import io.github.jan.supacompose.auth.initializeWeb
 import io.github.jan.supacompose.auth.providers.Discord
 import io.github.jan.supacompose.auth.providers.Email
 import io.github.jan.supacompose.createSupabaseClient
-import kotlinx.browser.window
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.web.css.padding
 import org.jetbrains.compose.web.css.px

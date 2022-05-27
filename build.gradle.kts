@@ -129,7 +129,7 @@ version = Versions.SUPACOMPOSE
 kotlin {
     jvm("desktop") {
         compilations.all {
-            kotlinOptions.jvmTarget = "1.8"
+            kotlinOptions.jvmTarget = "11"
             kotlinOptions.freeCompilerArgs = listOf(
                 "-Xjvm-default=all",  // use default methods in interfaces,
                 "-Xlambdas=indy"      // use invokedynamic lambdas instead of synthetic classes

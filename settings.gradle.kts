@@ -15,9 +15,11 @@ pluginManagement {
 }
 
 include("Auth")
+include("Postgrest")
 include(":desktopDemo")
 include(":androidDemo")
 include(":webDemo")
 project(":Auth").name = "Supacompose-Auth"
+project(":Postgrest").name = "Supacompose-Postgrest"
 rootProject.name = "Supacompose"
 

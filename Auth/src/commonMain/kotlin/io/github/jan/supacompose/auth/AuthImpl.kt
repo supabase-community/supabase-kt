@@ -1,35 +1,39 @@
 package io.github.jan.supacompose.auth
 
-import io.github.jan.supacompose.CurrentPlatformTarget
-import io.github.jan.supacompose.PlatformTarget
-import io.github.jan.supacompose.SupabaseClient
-import io.github.jan.supacompose.auth.providers.AuthFail
-import io.github.jan.supacompose.auth.providers.AuthProvider
-import io.github.jan.supacompose.auth.providers.DefaultAuthProvider
-import io.github.jan.supacompose.auth.user.UserInfo
-import io.github.jan.supacompose.auth.user.UserSession
-import io.github.jan.supacompose.putJsonObject
-import io.github.jan.supacompose.supabaseJson
-import io.github.jan.supacompose.toJsonObject
-import io.ktor.client.call.body
-import io.ktor.http.Headers
-import io.ktor.http.HttpMethod
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.launch
-import kotlinx.datetime.Clock
-import kotlinx.serialization.json.JsonNull
-import kotlinx.serialization.json.JsonObject
-import kotlinx.serialization.json.buildJsonObject
-import kotlinx.serialization.json.encodeToJsonElement
-import kotlinx.serialization.json.put
-import kotlin.time.Duration.Companion.seconds
+ import io.github.aakira.napier.DebugAntilog
+ import io.github.aakira.napier.Napier
+ import io.github.jan.supacompose.CurrentPlatformTarget
+ import io.github.jan.supacompose.PlatformTarget
+ import io.github.jan.supacompose.SupabaseClient
+ import io.github.jan.supacompose.auth.providers.AuthProvider
+ import io.github.jan.supacompose.auth.providers.DefaultAuthProvider
+ import io.github.jan.supacompose.auth.user.UserInfo
+ import io.github.jan.supacompose.auth.user.UserSession
+ import io.github.jan.supacompose.putJsonObject
+ import io.github.jan.supacompose.supabaseJson
+ import io.github.jan.supacompose.toJsonObject
+ import io.ktor.client.call.body
+ import io.ktor.client.request.HttpRequestBuilder
+ import io.ktor.client.request.get
+ import io.ktor.client.request.header
+ import io.ktor.client.request.headers
+ import io.ktor.client.request.post
+ import io.ktor.client.request.put
+ import io.ktor.client.request.setBody
+ import io.ktor.http.HttpHeaders
+ import kotlinx.coroutines.Job
+ import kotlinx.coroutines.coroutineScope
+ import kotlinx.coroutines.delay
+ import kotlinx.coroutines.flow.MutableStateFlow
+ import kotlinx.coroutines.flow.StateFlow
+ import kotlinx.coroutines.flow.asStateFlow
+ import kotlinx.coroutines.launch
+ import kotlinx.datetime.Clock
+ import kotlinx.serialization.json.JsonObject
+ import kotlinx.serialization.json.buildJsonObject
+ import kotlinx.serialization.json.encodeToJsonElement
+ import kotlinx.serialization.json.put
+ import kotlin.time.Duration.Companion.seconds
 
 @PublishedApi
 internal class AuthImpl(override val supabaseClient: SupabaseClient, val config: Auth.Config) : Auth {
@@ -40,10 +44,17 @@ internal class AuthImpl(override val supabaseClient: SupabaseClient, val config:
     private var sessionJob: Job? = null
 
     init {
+        Napier.base(DebugAntilog())
         if (CurrentPlatformTarget == PlatformTarget.WEB || CurrentPlatformTarget == PlatformTarget.DESKTOP) {
             supabaseClient.launch {
+                Napier.d {
+                    "Trying to load latest session"
+                }
                 val session = sessionManager.loadSession(supabaseClient)
                 if (session != null) {
+                    Napier.d {
+                        "Successfully loaded session from storage"
+                    }
                     startJob(session)
                 }
             }
@@ -51,13 +62,10 @@ internal class AuthImpl(override val supabaseClient: SupabaseClient, val config:
     }
 
     override suspend fun logout() {
-        supabaseClient.makeRequest(HttpMethod.Post, "/auth/v${Auth.API_VERSION}/logout", Headers.build {
-            append("Authorization", "Bearer $${(!currentSession.value).accessToken}")
-        })
-        sessionManager.deleteSession(supabaseClient)
-        sessionJob?.cancel()
-        _currentSession.value = null
-        sessionJob = null
+        supabaseClient.httpClient.post(path("logout")) {
+            addAuthorization()
+        }
+        invalidateSession()
     }
 
     override suspend fun <C, R, Provider : AuthProvider<C, R>> loginWith(
@@ -87,9 +95,10 @@ internal class AuthImpl(override val supabaseClient: SupabaseClient, val config:
                 put("data", supabaseJson.encodeToJsonElement(it))
             }
         }.toString()
-        val response = supabaseClient.makeRequest(HttpMethod.Put, "/auth/v${Auth.API_VERSION}/user", Headers.build {
-            append("Authorization", "Bearer ${(!currentSession.value).accessToken}")
-        }, body)
+        val response = supabaseClient.httpClient.put(path("user")) {
+            addAuthorization()
+            setBody(body)
+        }
         return response.body()
     }
 
@@ -107,7 +116,9 @@ internal class AuthImpl(override val supabaseClient: SupabaseClient, val config:
         val redirect = finalRedirectUrl?.let {
             "?redirect_to=$finalRedirectUrl"
         } ?: ""
-        supabaseClient.makeRequest(HttpMethod.Post, "/auth/v${Auth.API_VERSION}/otp$redirect", body = body)
+        supabaseClient.httpClient.post(path("otp$redirect")) {
+            setBody(body)
+        }
     }
 
     override suspend fun sendRecoveryEmail(email: String, redirectUrl: String?) {
@@ -118,13 +129,15 @@ internal class AuthImpl(override val supabaseClient: SupabaseClient, val config:
         val redirect = finalRedirectUrl?.let {
             "?redirect_to=$finalRedirectUrl"
         } ?: ""
-        supabaseClient.makeRequest(HttpMethod.Post, "/auth/v${Auth.API_VERSION}/recover$redirect", body = body)
+        supabaseClient.httpClient.post(path("recover$redirect")) {
+            setBody(body)
+        }
     }
 
     override suspend fun reauthenticate() {
-        supabaseClient.makeRequest(HttpMethod.Get, "/auth/v${Auth.API_VERSION}/reauthenticate", Headers.build {
-            append("Authorization", "Bearer ${(!currentSession.value).accessToken}")
-        })
+        supabaseClient.httpClient.get(path("reauthenticate")) {
+            addAuthorization()
+        }
     }
 
     override suspend fun verify(type: VerifyType, token: String) {
@@ -134,45 +147,81 @@ internal class AuthImpl(override val supabaseClient: SupabaseClient, val config:
               "token": "$token"
             }
         """.trimIndent()
-        val response = supabaseClient.makeRequest(HttpMethod.Post, "/auth/v${Auth.API_VERSION}/verify", body = body)
+        val response = supabaseClient.httpClient.post(path("verify")) {
+            setBody(body)
+            addAuthorization()
+        }
         val session =  response.body<UserSession>()
         startJob(session)
     }
 
     override suspend fun getUser(jwt: String): UserInfo {
-        val response = supabaseClient.makeRequest(HttpMethod.Get, "/auth/v${Auth.API_VERSION}/user", Headers.build {
-            append("Authorization", "Bearer $jwt")
-        })
+        val response = supabaseClient.httpClient.get(path("user")) {
+            header(HttpHeaders.Authorization, "Bearer $jwt")
+        }
         return response.body()
     }
 
-    private suspend fun refreshSession() {
+    private suspend fun invalidateSession() {
+        sessionManager.deleteSession(supabaseClient)
+        sessionJob?.cancel()
+        _currentSession.value = null
+        sessionJob = null
+    }
+
+    private suspend fun refreshSession(refreshToken: String) {
+        Napier.d {
+            "Refreshing session"
+        }
         val body = """
             {
-              "refresh_token": "${(!currentSession.value).refreshToken}"
+              "refresh_token": "$refreshToken"
             }
         """.trimIndent()
-        val response = supabaseClient.makeRequest(HttpMethod.Post, "/auth/v${Auth.API_VERSION}/token?grant_type=refresh_token", body = body)
+        val response = supabaseClient.httpClient.post(path("token?grant_type=refresh_token")) {
+            setBody(body)
+        }
         val newSession =  response.body<UserSession>()
         startJob(newSession)
     }
 
     internal suspend fun startJob(session: UserSession) {
-        _currentSession.value = session
+        Napier.d {
+            "(Re)starting session job"
+        }
         if(session.expiresAt < Clock.System.now()) {
-            refreshSession()
+            try {
+                refreshSession(session.refreshToken)
+            } catch(e: Exception) {
+                invalidateSession()
+                Napier.e(e) { "Couldn't refresh session. The refresh token may have been revoked." }
+            }
         } else {
+            _currentSession.value = session
             sessionManager.saveSession(supabaseClient, session)
             coroutineScope {
                 sessionJob = launch {
                     delay(session.expiresIn.seconds.inWholeMilliseconds)
                     launch {
-                        refreshSession()
+                        try {
+                            refreshSession(session.refreshToken)
+                        } catch(e: Exception) {
+                            invalidateSession()
+                            Napier.e { "Couldn't refresh session. The refresh token may have been revoked" }
+                        }
                     }
                 }
             }
         }
     }
+
+    private fun HttpRequestBuilder.addAuthorization() {
+        headers {
+            append(HttpHeaders.Authorization, "Bearer ${(!currentSession.value).accessToken}")
+        }
+    }
+
+    override fun path(path: String) = supabaseClient.path("/auth/v${Auth.API_VERSION}/$path")
 
     private operator fun UserSession?.not(): UserSession {
         return this ?: throw IllegalStateException("No user session available")

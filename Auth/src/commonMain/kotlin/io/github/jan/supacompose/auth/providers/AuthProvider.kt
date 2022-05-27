@@ -4,13 +4,9 @@ import io.github.jan.supacompose.SupabaseClient
 import io.github.jan.supacompose.auth.auth
 import io.github.jan.supacompose.auth.generateRedirectUrl
 import io.github.jan.supacompose.auth.user.UserSession
-import io.github.jan.supacompose.putJsonObject
-import io.github.jan.supacompose.toJsonObject
 import io.ktor.client.call.body
-import io.ktor.http.HttpMethod
-import kotlinx.serialization.json.buildJsonObject
-import kotlinx.serialization.json.put
-import io.github.jan.supacompose.auth.generateRedirectUrl
+import io.ktor.client.request.post
+import io.ktor.client.request.setBody
 
 interface AuthProvider<C, R> {
 
@@ -40,7 +36,9 @@ interface DefaultAuthProvider<C, R> : AuthProvider<C, R> {
     ) {
         if(config == null) throw IllegalArgumentException("Credentials are required")
         val encodedCredentials = encodeCredentials(config)
-        val response = supabaseClient.makeRequest(HttpMethod.Post, "/auth/v1/token?grant_type=password", body = encodedCredentials)
+        val response = supabaseClient.httpClient.post(supabaseClient.auth.path("token?grant_type=password")) {
+            setBody(encodedCredentials)
+        }
         response.body<UserSession>().also {
             onSuccess(it)
         }
@@ -58,7 +56,9 @@ interface DefaultAuthProvider<C, R> : AuthProvider<C, R> {
             "?redirect_to=$finalRedirectUrl"
         } ?: ""
         val body = encodeCredentials(config)
-        val response = supabaseClient.makeRequest(HttpMethod.Post, "/auth/v1/signup$redirect", body = body)
+        val response = supabaseClient.httpClient.post(supabaseClient.auth.path("signup$redirect")) {
+            setBody(body)
+        }
         return decodeResult(response.body())
     }
 
