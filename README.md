@@ -308,18 +308,20 @@ renderComposable(rootElementId = "root") {
 
 #### Database/Postgres
 
-<details><summary>Select</summary>
-
-<b>If you use the first syntax as shown below the client will automatically look for @SerialName annotiations on your class property and if it has one it will use the value as the column name. (Only JVM)</b>
-
-<p>
+<details><summary>Make database calls</summary>
 
 ```kotlin
 //a data class for a message
 
 data class Message(val text: String, @SerialName("author_id") val authorId: String, val id: Int)
 
-//select:
+```
+
+<blockquote>
+
+<details><summary>Select</summary>
+
+```kotlin
 client.postgrest
     .from("messages")
     .select<Message> {
@@ -333,13 +335,23 @@ client.postgrest
         neq("text", "This is a text!")
         isIn("author_id", listOf("test", "test2"))
     }
+````
 
-//insert
+</details>
+
+<details><summary>Insert</summary>
+
+```kotlin
 client.postgrest
     .from("messages")
     .insert<Message>(Message("This is a text!", "someid", 1))
+````
 
-//update:
+</details>
+
+<details><summary>Update</summary>
+
+```kotlin
 client.postgrest
     .from("messages")
     .update<Message>(
@@ -349,11 +361,23 @@ client.postgrest
     ) {
         Message::id eq 2
     }
+````
 
+</details>
 
-```
+<details><summary>Delete</summary>
 
-</p>
+```kotlin
+client.postgrest
+    .from("messages")
+    .delete<Message> {
+        Message::id eq 2
+    }
+````
+
+</details>
+
+</blockquote>
 
 </details>
 
