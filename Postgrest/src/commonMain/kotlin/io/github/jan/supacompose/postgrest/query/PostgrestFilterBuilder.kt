@@ -56,10 +56,12 @@ class PostgrestFilterBuilder <T : Any> {
         _params["or"] = "($filters)"
     }
 
-    //text search
+    fun textSearch(column: String, query: String, textSearchType: TextSearchType, config: String? = null): PostgrestFilterBuilder<T> {
+        val configPart = if (config === null) "" else "(${config})"
+        _params[column] = "${textSearchType.identifier}${configPart}.${query}"
+        return this
+    }
 
-
-    
     infix fun <V> KProperty1<T, V>.eq(value: V) = filter(FilterOperation(getColumnName(this), FilterOperator.EQ, value.toString()))
 
     infix fun <V> KProperty1<T, V>.neq(value: V) = filter(FilterOperation(getColumnName(this), FilterOperator.NEQ, value.toString()))

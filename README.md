@@ -393,7 +393,7 @@ Soon
 
 # Installation
 
-The library will be on maven central after Authentication is implemented.
+The library will be on maven central soon.
 
 # Credits 
 
