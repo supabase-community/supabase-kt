@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -24,15 +23,8 @@ import io.github.jan.supacompose.auth.providers.Email
 import io.github.jan.supacompose.auth.sessionFile
 import io.github.jan.supacompose.createSupabaseClient
 import io.github.jan.supacompose.postgrest.PostgrestClient
-import io.github.jan.supacompose.postgrest.postgrest
 import kotlinx.coroutines.launch
-import kotlinx.datetime.Instant
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
 import java.io.File
-
-@Serializable
-data class Product(val content: String, @SerialName("user_id") val userId: String, val id: Int, @SerialName("created_at") val createdAt: Instant)
 
 suspend fun main() {
     val client = createSupabaseClient {
@@ -50,14 +42,6 @@ suspend fun main() {
             println(session?.accessToken)
             val scope = rememberCoroutineScope()
             if (session != null) {
-                LaunchedEffect(Unit) {
-                    val products = client.postgrest
-                        .from("products")
-                        .select<List<Product>>()
-                        .decodeAs<List<Product>>()
-                    println(products)
-
-                }
                 Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
                     Text("Logged in as ${session?.user?.email}")
                 }
