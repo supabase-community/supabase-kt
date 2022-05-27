@@ -317,6 +317,8 @@ data class Message(val text: String, @SerialName("author_id") val authorId: Stri
 
 ```
 
+<b>If you use the syntax with property references the client will automatically look for @SerialName annotiations on your class property and if it has one it will use the value as the column name. (Only JVM)</b>
+
 <blockquote>
 
 <details><summary>Select</summary>
