@@ -19,7 +19,7 @@ val client = createSupabaseClient {
 
     install(Auth) {
         //on desktop you have to set the session file. On jvm and web it's managed by the plugin
-        sessionFile = File("C:\\Users\\jan\\AppData\\Local\\SupaCompose\\usersession.json")
+        sessionFile = File("C:\\Users\\user\\AppData\\Local\\SupaCompose\\usersession.json")
     }
     //install other plugins
     install(Postgrest)
