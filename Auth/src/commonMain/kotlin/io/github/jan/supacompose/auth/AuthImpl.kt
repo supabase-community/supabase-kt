@@ -36,7 +36,7 @@ package io.github.jan.supacompose.auth
  import kotlin.time.Duration.Companion.seconds
 
 @PublishedApi
-internal class AuthImpl(override val supabaseClient: SupabaseClient, val config: Auth.Config) : Auth {
+internal class AuthImpl(override val supabaseClient: SupabaseClient, override val config: Auth.Config) : Auth {
 
     private val _currentSession = MutableStateFlow<UserSession?>(null)
     override val currentSession: StateFlow<UserSession?> = _currentSession.asStateFlow()
@@ -207,7 +207,7 @@ internal class AuthImpl(override val supabaseClient: SupabaseClient, val config:
                             refreshSession(session.refreshToken)
                         } catch(e: Exception) {
                             invalidateSession()
-                            Napier.e { "Couldn't refresh session. The refresh token may have been revoked" }
+                            Napier.e(e) { "Couldn't refresh session. The refresh token may have been revoked" }
                         }
                     }
                 }

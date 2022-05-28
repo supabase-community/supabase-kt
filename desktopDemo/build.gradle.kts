@@ -24,6 +24,7 @@ kotlin {
         val jvmMain by getting {
             dependencies {
                 implementation(project(":Supacompose-Postgrest"))
+                implementation(project(":Supacompose-Storage"))
                 api("org.jetbrains.kotlinx:kotlinx-coroutines-core:${Versions.COROUTINES}")
 
                 implementation(compose.desktop.currentOs)

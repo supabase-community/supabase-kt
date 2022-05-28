@@ -18,6 +18,7 @@ sealed interface Auth {
     val currentSession: StateFlow<UserSession?>
     val supabaseClient: SupabaseClient
     val sessionManager: SessionManager
+    val config: Config
 
     /**
      * Signs up a new user with the specified [provider]

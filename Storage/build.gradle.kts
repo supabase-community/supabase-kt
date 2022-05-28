@@ -5,7 +5,7 @@ plugins {
 
 group = "io.github.jan-tennert.supacompose"
 version = Versions.SUPACOMPOSE
-description = "Extends Supacompose with a Postgrest Client"
+description = "Extends Supacompose with a Storage Client"
 
 repositories {
     mavenCentral()
@@ -41,8 +41,15 @@ kotlin {
                 // https://mvnrepository.com/artifact/io.ktor/ktor-server-core
             }
         }
-        val desktopMain by getting
-        val androidMain by getting
+        val jvmMain by creating {
+            dependsOn(commonMain)
+        }
+        val desktopMain by getting {
+            dependsOn(jvmMain)
+        }
+        val androidMain by getting {
+            dependsOn(jvmMain)
+        }
         val webMain by getting
     }
 }

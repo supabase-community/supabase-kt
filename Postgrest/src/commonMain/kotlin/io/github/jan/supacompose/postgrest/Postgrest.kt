@@ -4,33 +4,35 @@ import io.github.jan.supacompose.SupabaseClient
 import io.github.jan.supacompose.plugins.SupabasePlugin
 import io.github.jan.supacompose.postgrest.query.PostgrestBuilder
 
-sealed interface PostgrestClient {
+sealed interface Postgrest {
 
-    suspend fun from(table: String): PostgrestBuilder
+    fun from(table: String): PostgrestBuilder
+
+    operator fun get(table: String): PostgrestBuilder = from(table)
 
     class Config
 
-    companion object : SupabasePlugin<Config, PostgrestClient> {
+    companion object : SupabasePlugin<Config, Postgrest> {
 
         override val key = "postgrest"
 
-        override fun create(supabaseClient: SupabaseClient, config: Config.() -> Unit): PostgrestClient {
-            return PostgrestClientImpl(supabaseClient)
+        override fun create(supabaseClient: SupabaseClient, config: Config.() -> Unit): Postgrest {
+            return PostgrestImpl(supabaseClient)
         }
 
     }
 
 }
 
-internal class PostgrestClientImpl(private val supabaseClient: SupabaseClient) : PostgrestClient {
+internal class PostgrestImpl(private val supabaseClient: SupabaseClient) : Postgrest {
 
-    override suspend fun from(table: String): PostgrestBuilder {
+    override fun from(table: String): PostgrestBuilder {
         return PostgrestBuilder(supabaseClient, table)
     }
 
 }
 
-val SupabaseClient.postgrest: PostgrestClient
+val SupabaseClient.postgrest: Postgrest
     get() = plugins.getOrElse("postgrest") {
         throw IllegalStateException("Postgres plugin not installed")
-    } as? PostgrestClient ?: throw IllegalStateException("Postgres plugin not installed")
+    } as? Postgrest ?: throw IllegalStateException("Postgres plugin not installed")

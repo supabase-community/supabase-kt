@@ -19,7 +19,9 @@ include("Postgrest")
 include(":desktopDemo")
 include(":androidDemo")
 include(":webDemo")
+include("Storage")
 project(":Auth").name = "Supacompose-Auth"
 project(":Postgrest").name = "Supacompose-Postgrest"
+project(":Storage").name = "Supacompose-Storage"
 rootProject.name = "Supacompose"
 

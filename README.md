@@ -4,11 +4,35 @@ A framework for building android & desktop apps with Supabase
 
 https://user-images.githubusercontent.com/26686035/169712245-e090e33b-8472-49c8-a512-947d5ed889d5.mp4
 
+# Installation
+
+The library will be on maven central soon.
+
+# Creating a client
+
+To create a client simply call the createClient top level function:
+
+```kotlin
+val client = createSupabaseClient {
+    supabaseUrl = System.getenv("SUPABASE_URL")
+    supabaseKey = System.getenv("SUPABASE_KEY")
+
+    install(Auth) {
+        //on desktop you have to set the session file. On jvm and web it's managed by the plugin
+        sessionFile = File("C:\\Users\\jan\\AppData\\Local\\SupaCompose\\usersession.json")
+    }
+    //install other plugins
+    install(Postgrest)
+    install(Storage)
+}
+```
+
 # Features
 
-SupaCompose currently supports:
-
 #### Authentication
+
+<details><summary>Feature table</summary>
+
 
 |         | Login                   | Signup                  | Verifying (Signup, Password Reset, Invite) | Logout | Otp |
 |---------|-------------------------|-------------------------|--------------------------------------------|--------|-----|
@@ -20,6 +44,8 @@ SupaCompose currently supports:
 ✅ = implemented
 
 Session saving: ✅
+
+</details>
 
 <details><summary>Authentication with Desktop</summary>
 <p>
@@ -324,8 +350,7 @@ data class Message(val text: String, @SerialName("author_id") val authorId: Stri
 <details><summary>Select</summary>
 
 ```kotlin
-client.postgrest
-    .from("messages")
+client.postgrest["messages"]
     .select<Message> {
         //you can use that syntax
         Message::authorId eq "someid"
@@ -344,8 +369,7 @@ client.postgrest
 <details><summary>Insert</summary>
 
 ```kotlin
-client.postgrest
-    .from("messages")
+client.postgrest["messages"]
     .insert<Message>(Message("This is a text!", "someid", 1))
 ````
 
@@ -354,8 +378,7 @@ client.postgrest
 <details><summary>Update</summary>
 
 ```kotlin
-client.postgrest
-    .from("messages")
+client.postgrest["messages"]
     .update<Message>(
         {
             Message::text setTo "This is the edited text!"
@@ -370,8 +393,7 @@ client.postgrest
 <details><summary>Delete</summary>
 
 ```kotlin
-client.postgrest
-    .from("messages")
+client.postgrest["messages"]
     .delete<Message> {
         Message::id eq 2
     }
@@ -385,15 +407,43 @@ client.postgrest
 
 #### Storage
 
-Soon
+<details><summary>Managing buckets</summary>
+
+```kotlin
+//create a bucket
+client.storage.createBucket(name = "images", id = "images", public = false)
+
+//empty bucket
+client.storage.emptyBucket(id = "images")
+
+//and so on
+```
+
+</details>
+
+<details><summary>Uploading files</summary>
+
+```kotlin
+val bucket = client.storage["images"]
+
+//upload a file (jvm)
+bucket.upload("landscape.png", File("landscape.png"))
+
+//download a file (jvm)
+bucket.downloadTo("landscape.png", File("landscape.png"))
+
+//copy a file
+
+bucket.copy("landscape.png", "landscape2.png")
+
+//and so on
+```
+
+</details>
 
 #### Realtime
 
 Soon
-
-# Installation
-
-The library will be on maven central soon.
 
 # Credits 
 

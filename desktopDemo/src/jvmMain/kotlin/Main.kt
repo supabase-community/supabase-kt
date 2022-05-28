@@ -22,7 +22,8 @@ import io.github.jan.supacompose.auth.providers.Discord
 import io.github.jan.supacompose.auth.providers.Email
 import io.github.jan.supacompose.auth.sessionFile
 import io.github.jan.supacompose.createSupabaseClient
-import io.github.jan.supacompose.postgrest.PostgrestClient
+import io.github.jan.supacompose.postgrest.Postgrest
+import io.github.jan.supacompose.storage.Storage
 import kotlinx.coroutines.launch
 import java.io.File
 
@@ -34,7 +35,8 @@ suspend fun main() {
         install(Auth) {
             sessionFile = File("C:\\Users\\jan\\AppData\\Local\\SupaCompose\\usersession.json")
         }
-        install(PostgrestClient)
+        install(Postgrest)
+        install(Storage)
     }
     application {
         Window(::exitApplication) {
