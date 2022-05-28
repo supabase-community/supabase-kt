@@ -34,11 +34,11 @@ val client = createSupabaseClient {
 <details><summary>Feature table</summary>
 
 
-|         | Login                   | Signup                  | Verifying (Signup, Password Reset, Invite) | Logout | Otp |
-|---------|-------------------------|-------------------------|--------------------------------------------|--------|-----|
-| Desktop | phone, password, oauth2 | phone, password, oauth2 | only with token                            | ✅      | ❌   |
-| Android | phone, password, oauth2 | phone, password, oauth2 | token, url                                 | ✅      | ✅   |
-| Web     | phone, password, oauth2 | phone, password, oauth2 | token, url                                 | ✅      | ✅   |
+|         | Login                                            | Signup                                           | Verifying (Signup, Password Reset, Invite) | Logout | Otp |
+|---------|--------------------------------------------------|--------------------------------------------------|--------------------------------------------|--------|-----|
+| Desktop | phone, password, oauth2 via callback http server | phone, password, oauth2 via callback http server | only with token                            | ✅      | ❌   |
+| Android | phone, password, oauth2 via deeplinks            | phone, password, oauth2 via deeplinks            | token, url via deeplinks                   | ✅      | ✅   |
+| Web     | phone, password, oauth2                          | phone, password, oauth2                          | token, url                                 | ✅      | ✅   |
 
 ❌ = will not be implemented \
 ✅ = implemented
