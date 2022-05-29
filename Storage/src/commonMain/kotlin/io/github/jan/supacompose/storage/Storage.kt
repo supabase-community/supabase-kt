@@ -3,7 +3,7 @@ package io.github.jan.supacompose.storage
 import io.github.jan.supacompose.SupabaseClient
 import io.github.jan.supacompose.auth.auth
 import io.github.jan.supacompose.exceptions.RestException
-import io.github.jan.supacompose.plugins.SupabasePlugin
+import io.github.jan.supacompose.plugins.SupacomposePlugin
 import io.ktor.client.call.body
 import io.ktor.client.request.HttpRequestBuilder
 import io.ktor.client.request.headers
@@ -39,7 +39,7 @@ sealed interface Storage {
 
     class Config
 
-    companion object : SupabasePlugin<Config, Storage> {
+    companion object : SupacomposePlugin<Config, Storage> {
 
         override val key: String = "storage"
 
@@ -85,7 +85,7 @@ internal class StorageImpl(val supabaseClient: SupabaseClient) : Storage {
 
     override fun get(bucketId: String): BucketApi = BucketApiImpl(bucketId, this)
 
-    fun path(path: String) = "${supabaseClient.supabaseUrl}/storage/v1/$path"
+    fun path(path: String) = "${supabaseClient.supabaseHttpUrl}/storage/v1/$path"
 
     suspend inline fun makeRequest(method: HttpMethod, path: String, body: HttpRequestBuilder.() -> Unit = {}) = supabaseClient.httpClient.request(path(path)) {
         this.method = method

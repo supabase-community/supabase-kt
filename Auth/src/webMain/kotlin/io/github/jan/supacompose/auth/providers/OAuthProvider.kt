@@ -17,7 +17,7 @@ actual abstract class OAuthProvider actual constructor() : AuthProvider<External
         val authConfig = ExternalAuthConfig().apply {
             config?.invoke(this)
         }
-        window.location.href = supabaseClient.supabaseUrl + "/auth/v1/authorize?provider=${provider()}&redirect_to=${authConfig.redirectUrl}"
+        window.location.href = supabaseClient.supabaseHttpUrl + "/auth/v1/authorize?provider=${provider()}&redirect_to=${authConfig.redirectUrl}"
     }
 
     actual override suspend fun signUp(
@@ -29,7 +29,7 @@ actual abstract class OAuthProvider actual constructor() : AuthProvider<External
         val authConfig = ExternalAuthConfig().apply {
             config?.invoke(this)
         }
-        window.location.href = supabaseClient.supabaseUrl + "/auth/v1/auth/v1/authorize?provider=${provider()}&redirect_to=${authConfig.redirectUrl}"
+        window.location.href = supabaseClient.supabaseHttpUrl + "/auth/v1/auth/v1/authorize?provider=${provider()}&redirect_to=${authConfig.redirectUrl}"
     }
 
 }

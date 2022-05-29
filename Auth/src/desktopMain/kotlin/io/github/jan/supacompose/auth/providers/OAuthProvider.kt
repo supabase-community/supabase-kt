@@ -56,7 +56,7 @@ actual abstract class OAuthProvider : AuthProvider<ExternalAuthConfig, Unit> {
 
     private suspend fun createServer(config: ExternalAuthConfig, supabaseClient: SupabaseClient, redirectUrl: String?, onSuccess: suspend (UserSession) -> Unit, onFail: (AuthFail) -> Unit) {
         if(redirectUrl != null) {
-            Desktop.getDesktop().browse(URI(supabaseClient.supabaseUrl + "/auth/v1/authorize?provider=${provider()}&redirect_to=$redirectUrl"))
+            Desktop.getDesktop().browse(URI(supabaseClient.supabaseHttpUrl + "/auth/v1/authorize?provider=${provider()}&redirect_to=$redirectUrl"))
             return
         }
         coroutineScope {
@@ -116,7 +116,7 @@ actual abstract class OAuthProvider : AuthProvider<ExternalAuthConfig, Unit> {
                     }
                 }.start(wait = false).also {
                     val port = it.resolvedConnectors().first().port
-                    Desktop.getDesktop().browse(URI(supabaseClient.supabaseUrl + "/auth/v1/authorize?provider=${provider()}&redirect_to=http://localhost:${port}/index.html"))
+                    Desktop.getDesktop().browse(URI(supabaseClient.supabaseHttpUrl + "/auth/v1/authorize?provider=${provider()}&redirect_to=http://localhost:${port}/index.html"))
                     delay(config.timeout.inWholeMilliseconds)
                     it.stop()
                     if(!done) {

@@ -6,7 +6,6 @@ import android.net.Uri
 import io.github.aakira.napier.DebugAntilog
 import io.github.aakira.napier.Napier
 import io.github.jan.supacompose.SupabaseClient
-import io.github.jan.supacompose.plugins.SupabasePlugin
 import io.github.jan.supacompose.annotiations.SupaComposeInternal
 import io.github.jan.supacompose.auth.user.UserSession
 import kotlinx.coroutines.CoroutineScope
@@ -63,7 +62,7 @@ fun Activity.initializeAndroid(supabaseClient: SupabaseClient, onSessionSuccess:
         Napier.d {
             "Trying to load the latest session"
         }
-        authPlugin.sessionManager.loadSession(supabaseClient)?.let {
+        authPlugin.sessionManager.loadSession(supabaseClient, authPlugin)?.let {
             Napier.d {
                 "Successfully loaded session from storage"
             }

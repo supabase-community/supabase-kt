@@ -10,8 +10,7 @@ import kotlinx.serialization.encodeToString
 
 actual class SessionManager {
 
-    actual suspend fun saveSession(supabaseClient: SupabaseClient, session: UserSession) {
-        val auth = supabaseClient.auth as AuthImpl
+    actual suspend fun saveSession(supabaseClient: SupabaseClient, auth: Auth, session: UserSession) {
         val sessionFile = auth.config.sessionFile ?: return
         withContext(Dispatchers.IO) {
             if(!sessionFile.exists()) sessionFile.createNewFile()
@@ -19,15 +18,13 @@ actual class SessionManager {
         }
     }
 
-    actual suspend fun loadSession(supabaseClient: SupabaseClient): UserSession? {
-        val auth = supabaseClient.auth as AuthImpl
+    actual suspend fun loadSession(supabaseClient: SupabaseClient, auth: Auth): UserSession? {
         val sessionFile = auth.config.sessionFile ?: return null
         if(!sessionFile.exists()) return null
         return supabaseJson.decodeFromString(sessionFile.readText())
     }
 
-    actual suspend fun deleteSession(supabaseClient: SupabaseClient) {
-        val auth = supabaseClient.auth as AuthImpl
+    actual suspend fun deleteSession(supabaseClient: SupabaseClient, auth: Auth) {
         val sessionFile = auth.config.sessionFile ?: return
         if(!sessionFile.exists()) return
         sessionFile.delete()

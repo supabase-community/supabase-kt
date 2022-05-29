@@ -6,7 +6,7 @@ import io.github.jan.supacompose.auth.providers.DefaultAuthProvider
 import io.github.jan.supacompose.auth.user.UserInfo
 import io.github.jan.supacompose.auth.user.UserSession
 import io.github.jan.supacompose.exceptions.RestException
-import io.github.jan.supacompose.plugins.SupabasePlugin
+import io.github.jan.supacompose.plugins.SupacomposePlugin
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
@@ -96,11 +96,16 @@ sealed interface Auth {
      */
     suspend fun getUser(jwt: String): UserInfo
 
+    /**
+     * Registers a callback to be called when the user session changes
+     */
+    fun onSessionChange(callback: (new: UserSession?, old: UserSession?) -> Unit)
+
     fun path(path: String): String
 
     class Config(val params: MutableMap<String, Any> = mutableMapOf(), var sessionSaving: Boolean = true)
 
-    companion object : SupabasePlugin<Config, Auth> {
+    companion object : SupacomposePlugin<Config, Auth> {
 
         override val key = "auth"
         const val API_VERSION = 1

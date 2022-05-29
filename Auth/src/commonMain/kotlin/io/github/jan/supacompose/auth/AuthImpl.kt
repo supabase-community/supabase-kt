@@ -40,6 +40,7 @@ internal class AuthImpl(override val supabaseClient: SupabaseClient, override va
 
     private val _currentSession = MutableStateFlow<UserSession?>(null)
     override val currentSession: StateFlow<UserSession?> = _currentSession.asStateFlow()
+    private val callbacks = mutableListOf<(new: UserSession?, old: UserSession?) -> Unit>()
     override val sessionManager = SessionManager()
     private var sessionJob: Job? = null
 
@@ -50,7 +51,7 @@ internal class AuthImpl(override val supabaseClient: SupabaseClient, override va
                 Napier.d {
                     "Trying to load latest session"
                 }
-                val session = sessionManager.loadSession(supabaseClient)
+                val session = sessionManager.loadSession(supabaseClient, this@AuthImpl)
                 if (session != null) {
                     Napier.d {
                         "Successfully loaded session from storage"
@@ -163,7 +164,7 @@ internal class AuthImpl(override val supabaseClient: SupabaseClient, override va
     }
 
     private suspend fun invalidateSession() {
-        sessionManager.deleteSession(supabaseClient)
+        sessionManager.deleteSession(supabaseClient, this)
         sessionJob?.cancel()
         _currentSession.value = null
         sessionJob = null
@@ -197,8 +198,9 @@ internal class AuthImpl(override val supabaseClient: SupabaseClient, override va
                 Napier.e(e) { "Couldn't refresh session. The refresh token may have been revoked." }
             }
         } else {
+            callbacks.forEach { it.invoke(currentSession.value, session)}
             _currentSession.value = session
-            sessionManager.saveSession(supabaseClient, session)
+            sessionManager.saveSession(supabaseClient, this, session)
             coroutineScope {
                 sessionJob = launch {
                     delay(session.expiresIn.seconds.inWholeMilliseconds)
@@ -215,13 +217,17 @@ internal class AuthImpl(override val supabaseClient: SupabaseClient, override va
         }
     }
 
+    override fun onSessionChange(callback: (new: UserSession?, old: UserSession?) -> Unit) {
+        callbacks += callback
+    }
+
     private fun HttpRequestBuilder.addAuthorization() {
         headers {
             append(HttpHeaders.Authorization, "Bearer ${(!currentSession.value).accessToken}")
         }
     }
 
-    override fun path(path: String) = supabaseClient.path("/auth/v${Auth.API_VERSION}/$path")
+    override fun path(path: String) = supabaseClient.path("auth/v${Auth.API_VERSION}/$path")
 
     private operator fun UserSession?.not(): UserSession {
         return this ?: throw IllegalStateException("No user session available")

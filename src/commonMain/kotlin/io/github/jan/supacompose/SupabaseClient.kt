@@ -2,6 +2,7 @@ package io.github.jan.supacompose
 
 import io.github.aakira.napier.Napier
 import io.ktor.client.HttpClient
+import io.ktor.client.HttpClientConfig
 import io.ktor.client.plugins.DefaultRequest
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.request.headers
@@ -12,12 +13,13 @@ import kotlinx.coroutines.Job
 
 sealed interface SupabaseClient: CoroutineScope {
 
+    val supabaseHttpUrl: String
     val supabaseUrl: String
     val supabaseKey: String
     val plugins: Map<String, Any>
     val httpClient: HttpClient
 
-    fun path(path: String): String = "$supabaseUrl/$path"
+    fun path(path: String): String = "$supabaseHttpUrl/$path"
 
 }
 
@@ -25,7 +27,15 @@ internal class SupabaseClientImpl(
     override val supabaseUrl: String,
     override val supabaseKey: String,
     plugins: Map<String, (SupabaseClient) -> Any>,
+    httpConfigOverrides: MutableList<HttpClientConfig<*>.() -> Unit>,
+    useHTTPS: Boolean,
 ) : SupabaseClient {
+
+    override val supabaseHttpUrl: String = if (useHTTPS) {
+        "https://$supabaseUrl"
+    } else {
+        "http://$supabaseUrl"
+    }
 
     init {
         Napier.w {
@@ -45,6 +55,7 @@ internal class SupabaseClientImpl(
         install(ContentNegotiation) {
             json(supabaseJson)
         }
+        httpConfigOverrides.forEach { it.invoke(this) }
     }
 
     override val plugins = plugins.toList().associate { (key, value) ->

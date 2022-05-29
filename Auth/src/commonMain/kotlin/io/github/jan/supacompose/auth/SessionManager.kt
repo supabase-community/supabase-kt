@@ -5,10 +5,10 @@ import io.github.jan.supacompose.auth.user.UserSession
 
 expect class SessionManager() {
 
-    suspend fun saveSession(supabaseClient: SupabaseClient, session: UserSession)
+    suspend fun saveSession(supabaseClient: SupabaseClient, auth: Auth, session: UserSession)
 
-    suspend fun loadSession(supabaseClient: SupabaseClient): UserSession?
+    suspend fun loadSession(supabaseClient: SupabaseClient, auth: Auth): UserSession?
 
-    suspend fun deleteSession(supabaseClient: SupabaseClient)
+    suspend fun deleteSession(supabaseClient: SupabaseClient, auth: Auth)
 
 }

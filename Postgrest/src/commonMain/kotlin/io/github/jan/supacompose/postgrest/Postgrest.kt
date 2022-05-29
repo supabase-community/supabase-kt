@@ -1,7 +1,7 @@
 package io.github.jan.supacompose.postgrest
 
 import io.github.jan.supacompose.SupabaseClient
-import io.github.jan.supacompose.plugins.SupabasePlugin
+import io.github.jan.supacompose.plugins.SupacomposePlugin
 import io.github.jan.supacompose.postgrest.query.PostgrestBuilder
 
 sealed interface Postgrest {
@@ -12,7 +12,7 @@ sealed interface Postgrest {
 
     class Config
 
-    companion object : SupabasePlugin<Config, Postgrest> {
+    companion object : SupacomposePlugin<Config, Postgrest> {
 
         override val key = "postgrest"
 

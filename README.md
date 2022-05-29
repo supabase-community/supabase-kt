@@ -14,7 +14,7 @@ To create a client simply call the createClient top level function:
 
 ```kotlin
 val client = createSupabaseClient {
-    supabaseUrl = System.getenv("SUPABASE_URL")
+    supabaseUrl = System.getenv("SUPABASE_URL") //without https:// !
     supabaseKey = System.getenv("SUPABASE_KEY")
 
     install(Auth) {
@@ -443,7 +443,30 @@ bucket.copy("landscape.png", "landscape2.png")
 
 #### Realtime
 
-Soon
+<details><summary>Listening for database changes (not final syntax)</summary>
+
+```kotlin
+val session by client.auth.currentSession.collectAsState()
+val status by client.realtime.status.collectAsState()
+
+if (session != null) {
+    LaunchedEffect(Unit) {
+        client.realtime.connect()
+    }
+}
+if (status == Realtime.Status.CONNECTED) {
+    LaunchedEffect(Unit) {
+        client.realtime.createChannel("public", "products")
+            .on(RealtimeChannel.Action.INSERT) {
+                println(it.record<Message>())
+            }
+            .join()
+    }
+}
+
+```
+
+</details>
 
 # Credits 
 

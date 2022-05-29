@@ -114,7 +114,7 @@ suspend inline fun <T : Any> SupabaseClient.buildPostgrestRequest(
     prefer: List<String> = emptyList(),
     filter: PostgrestFilterBuilder<T>.() -> Unit
 ) = httpClient.request(
-    "$supabaseUrl/rest/v1/$table"
+    "$supabaseHttpUrl/rest/v1/$table"
 ) {
     this.method = method
     contentType(ContentType.Application.Json)

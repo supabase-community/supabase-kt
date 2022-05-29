@@ -13,5 +13,6 @@
 /desktopDemo/build/
 /Postgrest/build/
 /Storage/build/
+/Realtime/build/
 .idea
 local.properties

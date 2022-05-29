@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -22,10 +23,17 @@ import io.github.jan.supacompose.auth.providers.Discord
 import io.github.jan.supacompose.auth.providers.Email
 import io.github.jan.supacompose.auth.sessionFile
 import io.github.jan.supacompose.createSupabaseClient
+import io.github.jan.supacompose.postgrest.Autogenerate
 import io.github.jan.supacompose.postgrest.Postgrest
-import io.github.jan.supacompose.storage.Storage
+import io.github.jan.supacompose.realtime.Realtime
+import io.github.jan.supacompose.realtime.RealtimeChannel
+import io.github.jan.supacompose.realtime.realtime
 import kotlinx.coroutines.launch
+import kotlinx.serialization.Serializable
 import java.io.File
+
+@Serializable
+data class User(@Autogenerate val id: Int = 0)
 
 suspend fun main() {
     val client = createSupabaseClient {
@@ -36,13 +44,29 @@ suspend fun main() {
             sessionFile = File("C:\\Users\\jan\\AppData\\Local\\SupaCompose\\usersession.json")
         }
         install(Postgrest)
-        install(Storage)
+        install(Realtime)
     }
+    println(client.supabaseHttpUrl)
     application {
         Window(::exitApplication) {
             val session by client.auth.currentSession.collectAsState()
-            println(session?.accessToken)
+            val status by client.realtime.status.collectAsState()
             val scope = rememberCoroutineScope()
+            println(session?.accessToken)
+            if(session != null) {
+                LaunchedEffect(Unit) {
+                    client.realtime.connect()
+                }
+            }
+            if(status == Realtime.Status.CONNECTED) {
+                LaunchedEffect(Unit) {
+                    client.realtime.createChannel("public", "products")
+                        .on(RealtimeChannel.Action.ALL) {
+                            println(it)
+                        }
+                        .join()
+                }
+            }
             if (session != null) {
                 Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
                     Text("Logged in as ${session?.user?.email}")
