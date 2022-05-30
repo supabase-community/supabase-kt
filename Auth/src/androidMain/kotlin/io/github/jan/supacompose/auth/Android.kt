@@ -3,6 +3,9 @@ package io.github.jan.supacompose.auth
 import android.app.Activity
 import android.content.Intent
 import android.net.Uri
+import androidx.lifecycle.DefaultLifecycleObserver
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.ProcessLifecycleOwner
 import io.github.aakira.napier.DebugAntilog
 import io.github.aakira.napier.Napier
 import io.github.jan.supacompose.SupabaseClient
@@ -17,7 +20,7 @@ import java.io.File
 internal fun Auth.openOAuth(provider: String) {
     this as AuthImpl
     val deepLink = "${config.scheme}://${config.host}"
-    val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(supabaseClient.supabaseUrl + "/auth/v1/authorize?provider=${provider}&redirect_to=$deepLink"))
+    val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(supabaseClient.supabaseHttpUrl + "/auth/v1/authorize?provider=${provider}&redirect_to=$deepLink"))
     config.activity.startActivity(browserIntent)
 }
 
@@ -54,21 +57,13 @@ internal var Auth.Config.sessionFile: File?
 //add a contextual receiver later in kotlin 1.7 and remove the supabaseClient parameter
 @OptIn(SupaComposeInternal::class)
 fun Activity.initializeAndroid(supabaseClient: SupabaseClient, onSessionSuccess: (UserSession) -> Unit = {}) {
-    Napier.base(DebugAntilog())
+
     val authPlugin = supabaseClient.plugins["auth"] as? AuthImpl ?: throw IllegalStateException("You need to install the Auth plugin on the supabase client to handle deep links")
     authPlugin.config.activity = this
     authPlugin.config.sessionFile = File(filesDir, "session.json")
-    supabaseClient.launch {
-        Napier.d {
-            "Trying to load the latest session"
-        }
-        authPlugin.sessionManager.loadSession(supabaseClient, authPlugin)?.let {
-            Napier.d {
-                "Successfully loaded session from storage"
-            }
-            authPlugin.startJob(it)
-        }
-    }
+    addLifecycleCallbacks(supabaseClient, authPlugin)
+
+    Napier.base(DebugAntilog())
     val data = intent?.data ?: return
     val scheme = data.scheme ?: return
     val host = data.host ?: return
@@ -108,4 +103,30 @@ fun Activity.initializeAndroid(supabaseClient: SupabaseClient, onSessionSuccess:
        // "error_code" in map -> handleErrorDeeplink()
         "access_token" in map -> handleSessionDeeplink()
     }
+}
+
+private fun addLifecycleCallbacks(supabaseClient: SupabaseClient, authPlugin: AuthImpl) {
+    val lifecycle = ProcessLifecycleOwner.get().lifecycle
+    lifecycle.addObserver(
+        object : DefaultLifecycleObserver {
+
+            override fun onStart(owner: LifecycleOwner) {
+                supabaseClient.launch {
+                    Napier.d {
+                        "Trying to load the latest session"
+                    }
+                    authPlugin.sessionManager.loadSession(supabaseClient, authPlugin)?.let {
+                        Napier.d {
+                            "Successfully loaded session from storage"
+                        }
+                        authPlugin.startJob(it)
+                    }
+                }
+            }
+            override fun onStop(owner: LifecycleOwner) {
+                Napier.d { "Cancelling session job because app is switching to the background" }
+                authPlugin.sessionJob?.cancel()
+            }
+        }
+    )
 }

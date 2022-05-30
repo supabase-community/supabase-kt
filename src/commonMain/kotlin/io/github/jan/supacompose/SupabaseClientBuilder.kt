@@ -17,7 +17,7 @@ class SupabaseClientBuilder {
     internal fun build(): SupabaseClient {
         if(!::supabaseKey.isInitialized || supabaseKey.isBlank()) throw IllegalArgumentException("Supabase key is not set")
         if(!::supabaseUrl.isInitialized || supabaseUrl.isBlank()) throw IllegalArgumentException("Supabase url is not set")
-        return SupabaseClientImpl(supabaseUrl, supabaseKey, plugins, httpConfigOverrides, useHTTPS)
+        return SupabaseClientImpl(supabaseUrl.split("//").last(), supabaseKey, plugins, httpConfigOverrides, useHTTPS)
     }
 
     fun httpConfig(block: HttpClientConfig<*>.() -> Unit) {

@@ -42,7 +42,7 @@ internal class AuthImpl(override val supabaseClient: SupabaseClient, override va
     override val currentSession: StateFlow<UserSession?> = _currentSession.asStateFlow()
     private val callbacks = mutableListOf<(new: UserSession?, old: UserSession?) -> Unit>()
     override val sessionManager = SessionManager()
-    private var sessionJob: Job? = null
+    var sessionJob: Job? = null
 
     init {
         Napier.base(DebugAntilog())
@@ -157,7 +157,7 @@ internal class AuthImpl(override val supabaseClient: SupabaseClient, override va
     }
 
     override suspend fun getUser(jwt: String): UserInfo {
-        val response = supabaseClient.httpClient.get(path("user")) {
+        val response = supabaseClient.httpClient.get(path("user").also(::println)) {
             header(HttpHeaders.Authorization, "Bearer $jwt")
         }
         return response.body()
