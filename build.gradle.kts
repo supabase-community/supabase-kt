@@ -136,7 +136,9 @@ kotlin {
             )
         }
     }
-    android()
+    android {
+        publishLibraryVariants("release", "debug")
+    }
     js("web", IR) {
         browser()
     }
