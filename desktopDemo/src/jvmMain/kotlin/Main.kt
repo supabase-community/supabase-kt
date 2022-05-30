@@ -23,7 +23,6 @@ import io.github.jan.supacompose.auth.providers.Discord
 import io.github.jan.supacompose.auth.providers.Email
 import io.github.jan.supacompose.auth.sessionFile
 import io.github.jan.supacompose.createSupabaseClient
-import io.github.jan.supacompose.postgrest.Autogenerate
 import io.github.jan.supacompose.postgrest.Postgrest
 import io.github.jan.supacompose.realtime.Realtime
 import io.github.jan.supacompose.realtime.RealtimeChannel
@@ -33,7 +32,7 @@ import kotlinx.serialization.Serializable
 import java.io.File
 
 @Serializable
-data class User(@Autogenerate val id: Int = 0)
+data class User(val id: Int = 0)
 
 suspend fun main() {
     val client = createSupabaseClient {
