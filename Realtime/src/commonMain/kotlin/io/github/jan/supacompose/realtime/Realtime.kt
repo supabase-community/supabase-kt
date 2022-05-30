@@ -37,7 +37,7 @@ sealed interface Realtime {
 
     fun disconnect()
 
-    fun createChannel(schema: String? = null, table: String? = null, column: String? = null, value: String? = null): RealtimeChannel
+    fun createChannel(schema: String, table: String? = null, column: String? = null, value: String? = null): RealtimeChannel
 
     class Config(var websocketConfig: WebSockets.Config.() -> Unit = {}, var secure: Boolean = true, var heartbeatInterval: Duration = 30000.milliseconds)
 
@@ -119,7 +119,7 @@ internal class RealtimeImpl(private val supabaseClient: SupabaseClient, private 
         _status.value = Realtime.Status.DISCONNECTED
     }
 
-    override fun createChannel(schema: String?, table: String?, column: String?, value: String?): RealtimeChannel {
+    override fun createChannel(schema: String, table: String?, column: String?, value: String?): RealtimeChannel {
         val key = generateKey(schema, table, column, value)
         val channel = RealtimeChannelImpl(this, key, schema, table, column, value, supabaseClient.auth.currentSession.value?.accessToken ?: throw IllegalStateException("You can't join a channel without an user session"))
         _subscriptions[key] = channel
@@ -137,12 +137,16 @@ internal class RealtimeImpl(private val supabaseClient: SupabaseClient, private 
 
     }
 
-    private fun generateKey(schema: String?, table: String?, column: String?, value: String?) = buildString {
-        append(listOfNotNull("realtime", schema, table).joinToString(":").trim())
-        column?.let {
-            append(it)
-            value?.let {
-                append("=eq.$value")
+    private fun generateKey(schema: String, table: String?, column: String?, value: String?): String {
+        if(value != null && (column == null || table == null)) throw IllegalStateException("When using a value, you need to specify a table and a column")
+        if(column != null && table == null) throw IllegalStateException("When using a column, you need to specify a table")
+        return buildString {
+            append(listOfNotNull("realtime", schema, table).joinToString(":").trim())
+            column?.let {
+                append(it)
+                value?.let {
+                    append("=eq.$value")
+                }
             }
         }
     }

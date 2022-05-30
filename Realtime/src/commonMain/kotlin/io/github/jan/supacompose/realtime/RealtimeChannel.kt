@@ -16,7 +16,7 @@ sealed interface RealtimeChannel {
 
     val status: StateFlow<Status>
     val topic: String
-    val schema: String?
+    val schema: String
     val table: String?
     val column: String?
     val value: String?
@@ -49,7 +49,7 @@ sealed interface RealtimeChannel {
 internal class RealtimeChannelImpl(
     private val realtimeImpl: RealtimeImpl,
     override val topic: String,
-    override val schema: String?,
+    override val schema: String,
     override val table: String?,
     override val column: String?,
     override val value: String?,
