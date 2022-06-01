@@ -57,11 +57,7 @@ suspend fun main() {
                 }
                 Button({
                     scope.launch {
-                        client.postgrest["profiles"].select {
-                            User::id eq "6d0a8dd0-9026-4124-b35c-6fc09be08874"
-                        }.also {
-                            println(it.body)
-                        }
+                        client.postgrest["profiles"].insert(User("6d0a8dd0-9026-4124-b35c-6fc09be08874", "Jan"))
                     }
                 }) {
                     Text("Test")

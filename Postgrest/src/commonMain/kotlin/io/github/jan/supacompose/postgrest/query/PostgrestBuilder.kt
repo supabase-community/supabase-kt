@@ -12,9 +12,9 @@ import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
 import io.ktor.http.contentType
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.encodeToJsonElement
 import kotlinx.serialization.json.jsonPrimitive
 import kotlin.experimental.ExperimentalTypeInference
 
@@ -42,7 +42,7 @@ class PostgrestBuilder (val supabaseClient: SupabaseClient, val table: String) {
         returning: Returning = Returning.REPRESENTATION,
         count: Count? = null,
         filter: PostgrestFilterBuilder<T>.() -> Unit = {}
-    ): PostgrestResult = supabaseClient.buildPostgrestRequest<T>(table, HttpMethod.Post, supabaseJson.encodeToString(values), buildList {
+    ): PostgrestResult = supabaseClient.buildPostgrestRequest<T>(table, HttpMethod.Post, supabaseJson.encodeToJsonElement(values), buildList {
         add("return=${returning.identifier}")
         if(upsert) add("resolution=merge-duplicates")
         if(count != null) add("count=${count.identifier}")
@@ -69,7 +69,7 @@ class PostgrestBuilder (val supabaseClient: SupabaseClient, val table: String) {
     ): PostgrestResult = supabaseClient.buildPostgrestRequest<T>(
         table,
         HttpMethod.Patch,
-        supabaseJson.encodeToString(PostgrestUpdate<T>().apply(update).map),
+        JsonObject(PostgrestUpdate<T>().apply(update).map),
         buildList {
             add("return=${returning.identifier}")
             if (count != null) add("count=${count.identifier}")
@@ -111,10 +111,10 @@ class PostgrestBuilder (val supabaseClient: SupabaseClient, val table: String) {
 
 }
 
-suspend inline fun <T : Any> SupabaseClient.buildPostgrestRequest(
+suspend inline fun <reified T : Any> SupabaseClient.buildPostgrestRequest(
     table: String,
     method: HttpMethod,
-    body: String? = null,
+    body: JsonElement? = null,
     prefer: List<String> = emptyList(),
     filter: PostgrestFilterBuilder<T>.() -> Unit
 ) = httpClient.request(
