@@ -121,7 +121,7 @@ private fun addLifecycleCallbacks(supabaseClient: SupabaseClient, authPlugin: Au
                         Napier.d {
                             "Successfully loaded session from storage"
                         }
-                        authPlugin.startJob(it)
+                        authPlugin.startJob(userSession)
                     } else {
                         authPlugin._status.value = Auth.Status.NOT_AUTHENTICATED
                     }
