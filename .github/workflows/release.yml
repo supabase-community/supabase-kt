@@ -28,7 +28,7 @@ jobs:
         run: ./gradlew publishAllPublicationsToOssRepository Supacompose-Auth:publishAllPublicationsToOssRepository Supacompose-Postgrest:publishAllPublicationsToOssRepository Supacompose-Storage:publishAllPublicationsToOssRepository
 
   closeAndRelease:
-    needs: [publishLinuxJVMJS, publishWindows, publishMacOS]
+    needs: [publish]
     runs-on: ubuntu-latest
     steps:
       - run: echo "Closing and releasing package"
