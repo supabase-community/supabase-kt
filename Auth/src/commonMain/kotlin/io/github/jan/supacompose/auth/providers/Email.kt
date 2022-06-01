@@ -4,8 +4,9 @@ import io.github.jan.supacompose.supabaseJson
 import kotlinx.datetime.Instant
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.decodeFromJsonElement
 
 object Email : DefaultAuthProvider<Email.Config, Email.Result> {
 
@@ -20,7 +21,7 @@ object Email : DefaultAuthProvider<Email.Config, Email.Result> {
         @SerialName("updated_at") val updatedAt: Instant,
     )
 
-    override fun decodeResult(body: String): Result = supabaseJson.decodeFromString(body)
+    override fun decodeResult(json: JsonObject): Result = supabaseJson.decodeFromJsonElement(json)
 
     override fun encodeCredentials(credentials: Config.() -> Unit): String = supabaseJson.encodeToString(Config().apply(credentials))
 

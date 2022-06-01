@@ -29,8 +29,6 @@ import io.github.jan.supacompose.realtime.RealtimeChannel
 import io.github.jan.supacompose.realtime.realtime
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.decodeFromString
-import kotlinx.serialization.json.Json
 import java.io.File
 
 @Serializable
@@ -38,13 +36,6 @@ data class User(val id: Int)
 
 
 suspend fun main() {
-    println(
-        Json { ignoreUnknownKeys = true }.decodeFromString<User?>("""
-        {
-            "bla": "bla"
-        }
-    """.trimIndent()))
-    return
     val client = createSupabaseClient {
         supabaseUrl = System.getenv("SUPABASE_URL")
         supabaseKey = System.getenv("SUPABASE_KEY")
@@ -55,6 +46,11 @@ suspend fun main() {
         install(Postgrest)
         install(Realtime)
     }
+    client.auth.signUpWith(Email) {
+        email = "jan.m.tennert@gmail.com"
+        password = "janjan"
+    }
+    return
     println(client.supabaseHttpUrl)
     application {
         Window(::exitApplication) {

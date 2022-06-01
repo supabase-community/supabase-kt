@@ -7,6 +7,7 @@ import io.github.jan.supacompose.auth.user.UserSession
 import io.ktor.client.call.body
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
+import kotlinx.serialization.json.JsonObject
 
 interface AuthProvider<C, R> {
 
@@ -59,10 +60,11 @@ interface DefaultAuthProvider<C, R> : AuthProvider<C, R> {
         val response = supabaseClient.httpClient.post(supabaseClient.auth.path("signup$redirect")) {
             setBody(body)
         }
-        return decodeResult(response.body())
+        val json = response.body<JsonObject>()
+        return decodeResult(json)
     }
 
-    fun decodeResult(body: String): R
+    fun decodeResult(json: JsonObject): R
 
     fun encodeCredentials(credentials: C.() -> Unit): String
 
