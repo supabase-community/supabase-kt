@@ -2,6 +2,7 @@ package io.github.jan.supacompose.postgrest.query
 
 import io.github.jan.supacompose.SupabaseClient
 import io.github.jan.supacompose.auth.auth
+import io.github.jan.supacompose.exceptions.RestException
 import io.github.jan.supacompose.supabaseJson
 import io.ktor.client.call.body
 import io.ktor.client.request.parameter
@@ -12,6 +13,8 @@ import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
 import io.ktor.http.contentType
 import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.jsonPrimitive
 import kotlin.experimental.ExperimentalTypeInference
 
 class PostgrestBuilder (val supabaseClient: SupabaseClient, val table: String) {
@@ -125,6 +128,10 @@ suspend inline fun <T : Any> SupabaseClient.buildPostgrestRequest(
         parameter(it.key, it.value)
     }
 }.let {
+    if(it.status.value !in 200..299) {
+        val error = it.body<JsonObject>()
+        throw RestException(it.status.value, error["error"]?.jsonPrimitive?.content ?: "Unknown error", error["message"]?.jsonPrimitive?.content ?: "")
+    }
     PostgrestResult(it.body(), it.status.value)
 }
 
