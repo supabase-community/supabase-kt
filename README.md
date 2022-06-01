@@ -4,9 +4,15 @@ A framework for building android & desktop apps with Supabase
 
 https://user-images.githubusercontent.com/26686035/169712245-e090e33b-8472-49c8-a512-947d5ed889d5.mp4
 
+Newest version: Version: [![Maven Central](https://img.shields.io/maven-central/v/io.github.jan-tennert.supacompose/Supacompose)](https://search.maven.org/artifact/io.github.jan-tennert.supacompose/Supacompose)
+
 # Installation
 
-The library will be on maven central soon.
+```kotlin
+dependencies {
+    implementation("io.github.jan-tennert.supacompose:Supacompose-[module]:VERSION")
+}
+```
 
 # Creating a client
 
