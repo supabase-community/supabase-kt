@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -24,15 +23,15 @@ import io.github.jan.supacompose.auth.providers.Email
 import io.github.jan.supacompose.auth.sessionFile
 import io.github.jan.supacompose.createSupabaseClient
 import io.github.jan.supacompose.postgrest.Postgrest
+import io.github.jan.supacompose.postgrest.postgrest
 import io.github.jan.supacompose.realtime.Realtime
-import io.github.jan.supacompose.realtime.RealtimeChannel
 import io.github.jan.supacompose.realtime.realtime
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import java.io.File
 
 @Serializable
-data class User(val id: Int)
+data class User(val id: String, val username: String)
 
 
 suspend fun main() {
@@ -46,35 +45,26 @@ suspend fun main() {
         install(Postgrest)
         install(Realtime)
     }
-    client.auth.signUpWith(Email) {
-        email = "jan.m.tennert@gmail.com"
-        password = "janjan"
-    }
-    return
     println(client.supabaseHttpUrl)
     application {
         Window(::exitApplication) {
             val session by client.auth.currentSession.collectAsState()
             val status by client.realtime.status.collectAsState()
             val scope = rememberCoroutineScope()
-            println(session?.accessToken)
-            if(session != null) {
-                LaunchedEffect(Unit) {
-                    client.realtime.connect()
-                }
-            }
-            if(status == Realtime.Status.CONNECTED) {
-                LaunchedEffect(Unit) {
-                    client.realtime.createChannel("public", "products")
-                        .on(RealtimeChannel.Action.ALL) {
-                            println(it)
-                        }
-                        .join()
-                }
-            }
             if (session != null) {
                 Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
                     Text("Logged in as ${session?.user?.email}")
+                }
+                Button({
+                    scope.launch {
+                        client.postgrest["profiles"].select {
+                            User::id eq "6d0a8dd0-9026-4124-b35c-6fc09be08874"
+                        }.also {
+                            println(it.body)
+                        }
+                    }
+                }) {
+                    Text("Test")
                 }
             } else {
                 Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {

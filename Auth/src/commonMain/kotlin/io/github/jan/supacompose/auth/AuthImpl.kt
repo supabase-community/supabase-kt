@@ -42,6 +42,8 @@ internal class AuthImpl(override val supabaseClient: SupabaseClient, override va
     override val currentSession: StateFlow<UserSession?> = _currentSession.asStateFlow()
     private val callbacks = mutableListOf<(new: UserSession?, old: UserSession?) -> Unit>()
     override val sessionManager = SessionManager()
+    val _status = MutableStateFlow(Auth.Status.NOT_AUTHENTICATED)
+    override val status = _status.asStateFlow()
     var sessionJob: Job? = null
 
     init {
@@ -51,12 +53,15 @@ internal class AuthImpl(override val supabaseClient: SupabaseClient, override va
                 Napier.d {
                     "Trying to load latest session"
                 }
+                _status.value = Auth.Status.LOADING_FROM_STORAGE
                 val session = sessionManager.loadSession(supabaseClient, this@AuthImpl)
                 if (session != null) {
                     Napier.d {
                         "Successfully loaded session from storage"
                     }
                     startJob(session)
+                } else {
+                    _status.value = Auth.Status.NOT_AUTHENTICATED
                 }
             }
         }
@@ -198,6 +203,7 @@ internal class AuthImpl(override val supabaseClient: SupabaseClient, override va
                 Napier.e(e) { "Couldn't refresh session. The refresh token may have been revoked." }
             }
         } else {
+            _status.value = Auth.Status.AUTHENTICATED
             callbacks.forEach { it.invoke(currentSession.value, session)}
             _currentSession.value = session
             sessionManager.saveSession(supabaseClient, this, session)

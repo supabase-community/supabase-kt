@@ -13,6 +13,7 @@ import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
 import io.ktor.http.contentType
 import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import kotlin.experimental.ExperimentalTypeInference
@@ -132,7 +133,7 @@ suspend inline fun <T : Any> SupabaseClient.buildPostgrestRequest(
         val error = it.body<JsonObject>()
         throw RestException(it.status.value, error["error"]?.jsonPrimitive?.content ?: "Unknown error", error["message"]?.jsonPrimitive?.content ?: "")
     }
-    PostgrestResult(it.body(), it.status.value)
+    PostgrestResult(it.body<JsonElement>(), it.status.value)
 }
 
 enum class Count(val identifier: String) {

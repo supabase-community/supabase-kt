@@ -15,10 +15,30 @@ import kotlinx.serialization.json.jsonObject
 
 sealed interface Auth {
 
+    /**
+     * Returns the current user session as a [StateFlow]
+     */
     val currentSession: StateFlow<UserSession?>
+
+    /**
+     * Returns the supabase client instance
+     */
     val supabaseClient: SupabaseClient
+
+    /**
+     * Returns the session manager instance
+     */
     val sessionManager: SessionManager
+
+    /**
+     * Returns the auth's config
+     */
     val config: Config
+
+    /**
+     * Returns the auth's status to distinguish between [Status.LOADING_FROM_STORAGE] in and [Status.NOT_AUTHENTICATED] when dealing with [currentSession] being null
+     */
+    val status: StateFlow<Status>
 
     /**
      * Signs up a new user with the specified [provider]
@@ -104,6 +124,12 @@ sealed interface Auth {
     fun path(path: String): String
 
     class Config(val params: MutableMap<String, Any> = mutableMapOf(), var sessionSaving: Boolean = true)
+
+    enum class Status {
+        LOADING_FROM_STORAGE,
+        AUTHENTICATED,
+        NOT_AUTHENTICATED
+    }
 
     companion object : SupacomposePlugin<Config, Auth> {
 

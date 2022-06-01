@@ -115,11 +115,15 @@ private fun addLifecycleCallbacks(supabaseClient: SupabaseClient, authPlugin: Au
                     Napier.d {
                         "Trying to load the latest session"
                     }
-                    authPlugin.sessionManager.loadSession(supabaseClient, authPlugin)?.let {
+                    authPlugin._status.value = Auth.Status.LOADING_FROM_STORAGE
+                    val userSession = authPlugin.sessionManager.loadSession(supabaseClient, authPlugin)
+                    if(userSession != null) {
                         Napier.d {
                             "Successfully loaded session from storage"
                         }
                         authPlugin.startJob(it)
+                    } else {
+                        authPlugin._status.value = Auth.Status.NOT_AUTHENTICATED
                     }
                 }
             }
