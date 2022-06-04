@@ -16,6 +16,13 @@ class PostgrestUpdate<T> {
         map[getColumnName(this)] = supabaseJson.encodeToJsonElement(value)
     }
 
+    inline infix fun KProperty1<T, String>.setTo(value: String) = set(getColumnName(this), value)
+    inline infix fun KProperty1<T, Int>.setTo(value: Int) = set(getColumnName(this), value)
+    inline infix fun KProperty1<T, Long>.setTo(value: Long) = set(getColumnName(this), value)
+    inline infix fun KProperty1<T, Float>.setTo(value: Float) = set(getColumnName(this), value)
+    inline infix fun KProperty1<T, Double>.setTo(value: Double) = set(getColumnName(this), value)
+    inline infix fun KProperty1<T, Boolean>.setTo(value: Boolean) = set(getColumnName(this), value)
+
     operator fun set(column: String, value: String) {
         map[column] = JsonPrimitive(value)
     }

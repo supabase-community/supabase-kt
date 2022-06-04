@@ -130,10 +130,14 @@ suspend inline fun <reified T : Any> SupabaseClient.buildPostgrestRequest(
     }
 }.let {
     if(it.status.value !in 200..299) {
-        val error = it.body<JsonObject>()
-        throw RestException(it.status.value, error["error"]?.jsonPrimitive?.content ?: "Unknown error", error["message"]?.jsonPrimitive?.content ?: "")
+        try {
+            val error = it.body<JsonObject>()
+            throw RestException(it.status.value, error["error"]?.jsonPrimitive?.content ?: "Unknown error", error["message"]?.jsonPrimitive?.content ?: "")
+        } catch(_: Exception) {
+            throw RestException(it.status.value, "Unknown error", "")
+        }
     }
-    PostgrestResult(it.body<JsonElement>(), it.status.value)
+    PostgrestResult(it.body(), it.status.value)
 }
 
 enum class Count(val identifier: String) {

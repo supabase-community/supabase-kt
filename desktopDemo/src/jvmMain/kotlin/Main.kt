@@ -27,7 +27,10 @@ import io.github.jan.supacompose.postgrest.postgrest
 import io.github.jan.supacompose.realtime.Realtime
 import io.github.jan.supacompose.realtime.realtime
 import kotlinx.coroutines.launch
+import kotlinx.datetime.Clock
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import java.io.File
 
 @Serializable
@@ -51,16 +54,24 @@ suspend fun main() {
             val session by client.auth.currentSession.collectAsState()
             val status by client.realtime.status.collectAsState()
             val scope = rememberCoroutineScope()
+            println(session?.accessToken)
             if (session != null) {
                 Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
                     Text("Logged in as ${session?.user?.email}")
                 }
-                Button({
-                    scope.launch {
-                        client.postgrest["profiles"].insert(User("6d0a8dd0-9026-4124-b35c-6fc09be08874", "Jan"))
+                Box(contentAlignment = Alignment.TopCenter, modifier = Modifier.fillMaxSize()) {
+                    Button(onClick = {
+                        scope.launch {
+                            client.postgrest["products"].update<Any>({
+                                set("done_by", "f15b693b-233e-4229-a446-f19dc6c41c0e")
+                                set("done_since", Json.encodeToString(Clock.System.now()))
+                            }) {
+                                eq("id", 13)
+                            }
+                        }
+                    }) {
+                        Text("Test")
                     }
-                }) {
-                    Text("Test")
                 }
             } else {
                 Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
