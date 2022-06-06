@@ -87,9 +87,9 @@ internal class StorageImpl(val supabaseClient: SupabaseClient) : Storage {
 
     fun path(path: String) = "${supabaseClient.supabaseHttpUrl}/storage/v1/$path"
 
-    suspend inline fun makeRequest(method: HttpMethod, path: String, body: HttpRequestBuilder.() -> Unit = {}) = supabaseClient.httpClient.request(path(path)) {
+    suspend inline fun makeRequest(method: HttpMethod, path: String, json: Boolean = true, body: HttpRequestBuilder.() -> Unit = {}) = supabaseClient.httpClient.request(path(path)) {
         this.method = method
-        contentType(ContentType.Application.Json)
+        if(json) contentType(ContentType.Application.Json)
         addAuthorization()
         body()
     }.also { 

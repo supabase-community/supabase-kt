@@ -157,7 +157,7 @@ internal class BucketApiImpl(override val bucketId: String, val storage: Storage
     }
 
     private suspend fun uploadOrUpdate(method: HttpMethod, bucket: String, path: String, body: ByteArray): String {
-        return storage.makeRequest(method, "object/$bucket/$path") {
+        return storage.makeRequest(method, "object/$bucket/$path", false) {
             setBody(body)
         }.body<JsonObject>()["Key"]?.jsonPrimitive?.content ?: throw IllegalStateException("Expected a key in a upload response")
     }

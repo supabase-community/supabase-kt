@@ -23,14 +23,13 @@ import io.github.jan.supacompose.auth.providers.Email
 import io.github.jan.supacompose.auth.sessionFile
 import io.github.jan.supacompose.createSupabaseClient
 import io.github.jan.supacompose.postgrest.Postgrest
-import io.github.jan.supacompose.postgrest.postgrest
 import io.github.jan.supacompose.realtime.Realtime
 import io.github.jan.supacompose.realtime.realtime
+import io.github.jan.supacompose.storage.Storage
+import io.github.jan.supacompose.storage.storage
+import io.github.jan.supacompose.storage.upload
 import kotlinx.coroutines.launch
-import kotlinx.datetime.Clock
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
 import java.io.File
 
 @Serializable
@@ -47,6 +46,7 @@ suspend fun main() {
         }
         install(Postgrest)
         install(Realtime)
+        install(Storage)
     }
     println(client.supabaseHttpUrl)
     application {
@@ -62,12 +62,7 @@ suspend fun main() {
                 Box(contentAlignment = Alignment.TopCenter, modifier = Modifier.fillMaxSize()) {
                     Button(onClick = {
                         scope.launch {
-                            client.postgrest["products"].update<Any>({
-                                set("done_by", "f15b693b-233e-4229-a446-f19dc6c41c0e")
-                                set("done_since", Json.encodeToString(Clock.System.now()))
-                            }) {
-                                eq("id", 13)
-                            }
+                            client.storage["icons"].upload("icon.png", File("C:\\Users\\jan\\Pictures\\engel.png"))
                         }
                     }) {
                         Text("Test")
