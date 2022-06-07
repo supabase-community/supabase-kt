@@ -60,7 +60,7 @@ sealed interface BucketApi {
      * Creates signed urls for all specified paths. The urls will expire after [expiresIn]
      * @param expiresIn The duration the urls are valid
      * @param paths The paths to create urls for
-     * @return A map of paths to urls
+     * @return A list of [SignedUrl]s
      */
     suspend fun createSignedUrls(expiresIn: Duration, paths: Collection<String>): List<SignedUrl>
 
@@ -68,7 +68,7 @@ sealed interface BucketApi {
      * Creates signed urls for all specified paths. The urls will expire after [expiresIn]
      * @param expiresIn The duration the urls are valid
      * @param paths The paths to create urls for
-     * @return A map of paths to urls
+     * @return A list of [SignedUrl]s
      */
     suspend fun createSignedUrls(expiresIn: Duration, vararg paths: String) = createSignedUrls(expiresIn, paths.toList())
 
@@ -79,7 +79,16 @@ sealed interface BucketApi {
      */
     suspend fun download(path: String): ByteArray
 
+    /**
+     * Searches for buckets with the given [prefix] and [filter]
+     * @return The filtered buckets
+     */
     suspend fun list(prefix: String, filter: BucketListFilter.() -> Unit = {}): List<BucketItem>
+
+    /**
+     * Changes the bucket's public status to [public]
+     */
+    suspend fun changePublicStatusTo(public: Boolean)
 
 }
 
@@ -161,5 +170,7 @@ internal class BucketApiImpl(override val bucketId: String, val storage: Storage
             setBody(body)
         }.body<JsonObject>()["Key"]?.jsonPrimitive?.content ?: throw IllegalStateException("Expected a key in a upload response")
     }
+
+    override suspend fun changePublicStatusTo(public: Boolean) = storage.changePublicStatus(bucketId, public)
 
 }

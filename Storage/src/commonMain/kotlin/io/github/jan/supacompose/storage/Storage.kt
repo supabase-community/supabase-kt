@@ -21,12 +21,27 @@ import kotlinx.serialization.json.put
 
 sealed interface Storage {
 
+    /**
+     * Creates a new bucket in the storage
+     * @param name the name of the bucket
+     * @param id the id of the bucket
+     * @param public whether the bucket should be public or not
+     */
     suspend fun createBucket(name: String, id: String, public: Boolean)
 
+    /**
+     * Returns all buckets in the storage
+     */
     suspend fun getAllBuckets(): List<Bucket>
 
+    /**
+     * Retrieves a bucket by its [id]
+     */
     suspend fun getBucket(id: String): Bucket?
 
+    /**
+     * Changes a bucket's public status to [public]
+     */
     suspend fun changePublicStatus(bucketId: String, public: Boolean)
 
     suspend fun emptyBucket(bucketId: String)

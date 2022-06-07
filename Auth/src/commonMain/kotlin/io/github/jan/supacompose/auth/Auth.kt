@@ -12,6 +12,8 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.encodeToJsonElement
 import kotlinx.serialization.json.jsonObject
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
 
 sealed interface Auth {
 
@@ -123,10 +125,12 @@ sealed interface Auth {
 
     fun path(path: String): String
 
-    class Config(val params: MutableMap<String, Any> = mutableMapOf(), var sessionSaving: Boolean = true)
+    class Config(val params: MutableMap<String, Any> = mutableMapOf(), var retryDelay: Duration = 10.seconds)
 
     enum class Status {
         LOADING_FROM_STORAGE,
+        TIMEOUT,
+        NETWORK_ERROR,
         AUTHENTICATED,
         NOT_AUTHENTICATED
     }

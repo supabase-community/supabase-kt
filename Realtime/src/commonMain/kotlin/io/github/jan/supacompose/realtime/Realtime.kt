@@ -34,12 +34,21 @@ sealed interface Realtime {
     val subscriptions: Map<String, RealtimeChannel>
 
     suspend fun connect()
-
     fun disconnect()
+    fun createChannel(
+        schema: String,
+        table: String? = null,
+        column: String? = null,
+        value: String? = null
+    ): RealtimeChannel
 
-    fun createChannel(schema: String, table: String? = null, column: String? = null, value: String? = null): RealtimeChannel
+    fun onStatusChange(callback: (Status) -> Unit)
 
-    class Config(var websocketConfig: WebSockets.Config.() -> Unit = {}, var secure: Boolean = true, var heartbeatInterval: Duration = 30000.milliseconds)
+    class Config(
+        var websocketConfig: WebSockets.Config.() -> Unit = {},
+        var secure: Boolean = true,
+        var heartbeatInterval: Duration = 30000.milliseconds
+    )
 
     companion object : SupacomposePlugin<Config, Realtime> {
 
@@ -70,7 +79,8 @@ sealed interface Realtime {
 
 }
 
-internal class RealtimeImpl(private val supabaseClient: SupabaseClient, private val realtimeConfig: Realtime.Config) : Realtime {
+internal class RealtimeImpl(private val supabaseClient: SupabaseClient, private val realtimeConfig: Realtime.Config) :
+    Realtime {
 
     lateinit var ws: DefaultClientWebSocketSession
     private val _status = MutableStateFlow(Realtime.Status.DISCONNECTED)
@@ -79,23 +89,31 @@ internal class RealtimeImpl(private val supabaseClient: SupabaseClient, private 
     override val subscriptions: Map<String, RealtimeChannel>
         get() = _subscriptions.toMap()
     private val scope = CoroutineScope(Dispatchers.Default + Job())
+    private val statusListeners = mutableListOf<(Realtime.Status) -> Unit>()
     private var ref = 0
+
+    override fun onStatusChange(callback: (Realtime.Status) -> Unit) {
+        statusListeners.add(callback)
+    }
 
     override suspend fun connect() {
         supabaseClient.auth.onSessionChange { new, old ->
-            if(status.value == Realtime.Status.CONNECTED) {
-                if(new == null) {
+            if (status.value == Realtime.Status.CONNECTED) {
+                if (new == null) {
                     disconnect()
                 } else {
                     updateJwt(new.accessToken)
                 }
             }
         }
-        if(status.value == Realtime.Status.CONNECTED) throw IllegalStateException("Websocket already connected")
+        if (status.value == Realtime.Status.CONNECTED) throw IllegalStateException("Websocket already connected")
         val prefix = if (realtimeConfig.secure) "wss://" else "ws://"
+        statusListeners.forEach { it(Realtime.Status.CONNECTING) }
         _status.value = Realtime.Status.CONNECTING
-        ws = supabaseClient.httpClient.webSocketSession(prefix + supabaseClient.supabaseUrl + ("/realtime/v1/websocket?apikey=${supabaseClient.supabaseKey}"))
+        ws =
+            supabaseClient.httpClient.webSocketSession(prefix + supabaseClient.supabaseUrl + ("/realtime/v1/websocket?apikey=${supabaseClient.supabaseKey}"))
         _status.value = Realtime.Status.CONNECTED
+        statusListeners.forEach { it(Realtime.Status.CONNECTED) }
         Napier.i { "Connected to realtime websocket!" }
         scope.launch {
             for (frame in ws.incoming) {
@@ -106,7 +124,7 @@ internal class RealtimeImpl(private val supabaseClient: SupabaseClient, private 
             Napier.i { "Disconnected from realtime websocket!" }
         }
         scope.launch {
-            while(isActive) {
+            while (isActive) {
                 delay(realtimeConfig.heartbeatInterval)
                 sendHeartbeat()
             }
@@ -116,12 +134,22 @@ internal class RealtimeImpl(private val supabaseClient: SupabaseClient, private 
     override fun disconnect() {
         ws.cancel()
         scope.cancel()
+        statusListeners.forEach { it(Realtime.Status.DISCONNECTED) }
         _status.value = Realtime.Status.DISCONNECTED
     }
 
     override fun createChannel(schema: String, table: String?, column: String?, value: String?): RealtimeChannel {
         val key = generateKey(schema, table, column, value)
-        val channel = RealtimeChannelImpl(this, key, schema, table, column, value, supabaseClient.auth.currentSession.value?.accessToken ?: throw IllegalStateException("You can't join a channel without an user session"))
+        val channel = RealtimeChannelImpl(
+            this,
+            key,
+            schema,
+            table,
+            column,
+            value,
+            supabaseClient.auth.currentSession.value?.accessToken
+                ?: throw IllegalStateException("You can't join a channel without an user session")
+        )
         _subscriptions[key] = channel
         return channel
     }
@@ -138,8 +166,8 @@ internal class RealtimeImpl(private val supabaseClient: SupabaseClient, private 
     }
 
     private fun generateKey(schema: String, table: String?, column: String?, value: String?): String {
-        if(value != null && (column == null || table == null)) throw IllegalStateException("When using a value, you need to specify a table and a column")
-        if(column != null && table == null) throw IllegalStateException("When using a column, you need to specify a table")
+        if (value != null && (column == null || table == null)) throw IllegalStateException("When using a value, you need to specify a table and a column")
+        if (column != null && table == null) throw IllegalStateException("When using a column, you need to specify a table")
         return buildString {
             append(listOfNotNull("realtime", schema, table).joinToString(":").trim())
             column?.let {
@@ -152,7 +180,7 @@ internal class RealtimeImpl(private val supabaseClient: SupabaseClient, private 
     }
 
     private suspend fun sendHeartbeat() {
-        if(ref != 0) {
+        if (ref != 0) {
             ref = 0
             Napier.w { "Heartbeat timeout. Trying to reconnect" }
             disconnect()
@@ -162,7 +190,7 @@ internal class RealtimeImpl(private val supabaseClient: SupabaseClient, private 
             return
         }
         Napier.d { "Sending heartbeat" }
-        ws.sendSerialized(RealtimeMessage("phoenix", "heartbeat", buildJsonObject {  }, (++ref).toString()))
+        ws.sendSerialized(RealtimeMessage("phoenix", "heartbeat", buildJsonObject { }, (++ref).toString()))
     }
 
 }

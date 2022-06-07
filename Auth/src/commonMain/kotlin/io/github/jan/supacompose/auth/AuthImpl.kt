@@ -13,6 +13,7 @@ package io.github.jan.supacompose.auth
  import io.github.jan.supacompose.supabaseJson
  import io.github.jan.supacompose.toJsonObject
  import io.ktor.client.call.body
+ import io.ktor.client.plugins.HttpRequestTimeoutException
  import io.ktor.client.request.HttpRequestBuilder
  import io.ktor.client.request.get
  import io.ktor.client.request.header
@@ -21,6 +22,7 @@ package io.github.jan.supacompose.auth
  import io.ktor.client.request.put
  import io.ktor.client.request.setBody
  import io.ktor.http.HttpHeaders
+ import io.ktor.util.network.UnresolvedAddressException
  import kotlinx.coroutines.Job
  import kotlinx.coroutines.coroutineScope
  import kotlinx.coroutines.delay
@@ -198,6 +200,24 @@ internal class AuthImpl(override val supabaseClient: SupabaseClient, override va
         if(session.expiresAt < Clock.System.now()) {
             try {
                 refreshSession(session.refreshToken)
+            } catch(e: HttpRequestTimeoutException) {
+                Napier.e(e) { "Refresh session timeout. Trying again in ${config.retryDelay}" }
+                _status.value = Auth.Status.TIMEOUT
+                coroutineScope {
+                    launch {
+                        delay(config.retryDelay)
+                        startJob(session)
+                    }
+                }
+            } catch(e: UnresolvedAddressException) {
+                Napier.e(e) { "Couldn't reach supabase. Either the address doesn't exist or the network might not be on. Retrying in ${config.retryDelay}" }
+                _status.value = Auth.Status.NETWORK_ERROR
+                coroutineScope {
+                    launch {
+                        delay(config.retryDelay)
+                        startJob(session)
+                    }
+                }
             } catch(e: Exception) {
                 invalidateSession()
                 Napier.e(e) { "Couldn't refresh session. The refresh token may have been revoked." }
