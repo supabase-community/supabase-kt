@@ -129,7 +129,6 @@ sealed interface Auth {
 
     enum class Status {
         LOADING_FROM_STORAGE,
-        TIMEOUT,
         NETWORK_ERROR,
         AUTHENTICATED,
         NOT_AUTHENTICATED
