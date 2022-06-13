@@ -2,6 +2,7 @@ package io.github.jan.supacompose.auth.providers
 
 import io.github.jan.supacompose.SupabaseClient
 import io.github.jan.supacompose.auth.auth
+import io.github.jan.supacompose.auth.checkErrors
 import io.github.jan.supacompose.auth.generateRedirectUrl
 import io.github.jan.supacompose.auth.user.UserSession
 import io.ktor.client.call.body
@@ -40,6 +41,7 @@ interface DefaultAuthProvider<C, R> : AuthProvider<C, R> {
         val response = supabaseClient.httpClient.post(supabaseClient.auth.path("token?grant_type=password")) {
             setBody(encodedCredentials)
         }
+        response.checkErrors()
         response.body<UserSession>().also {
             onSuccess(it)
         }
@@ -60,6 +62,7 @@ interface DefaultAuthProvider<C, R> : AuthProvider<C, R> {
         val response = supabaseClient.httpClient.post(supabaseClient.auth.path("signup$redirect")) {
             setBody(body)
         }
+        response.checkErrors()
         val json = response.body<JsonObject>()
         return decodeResult(json)
     }

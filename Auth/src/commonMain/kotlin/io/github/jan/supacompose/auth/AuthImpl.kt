@@ -207,12 +207,8 @@ internal class AuthImpl(override val supabaseClient: SupabaseClient, override va
             } catch (e: Exception) {
                 Napier.e(e) { "Couldn't reach supabase. Either the address doesn't exist or the network might not be on. Retrying in ${config.retryDelay}" }
                 _status.value = Auth.Status.NETWORK_ERROR
-                coroutineScope {
-                    launch {
-                        delay(config.retryDelay)
-                        startJob(session)
-                    }
-                }
+                delay(config.retryDelay)
+                startJob(session)
             }
         } else {
             _status.value = Auth.Status.AUTHENTICATED
@@ -225,9 +221,18 @@ internal class AuthImpl(override val supabaseClient: SupabaseClient, override va
                     launch {
                         try {
                             refreshSession(session.refreshToken)
-                        } catch(e: Exception) {
+                        } catch(e: RestException) {
                             invalidateSession()
-                            Napier.e(e) { "Couldn't refresh session. The refresh token may have been revoked" }
+                            Napier.e(e) { "Couldn't refresh session. The refresh token may have been revoked." }
+                        } catch (e: Exception) {
+                            Napier.e(e) { "Couldn't reach supabase. Either the address doesn't exist or the network might not be on. Retrying in ${config.retryDelay}" }
+                            _status.value = Auth.Status.NETWORK_ERROR
+                            coroutineScope {
+                                launch {
+                                    delay(config.retryDelay)
+                                    startJob(session)
+                                }
+                            }
                         }
                     }
                 }
