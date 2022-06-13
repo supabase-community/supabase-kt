@@ -123,6 +123,11 @@ sealed interface Auth {
      */
     fun onSessionChange(callback: (new: UserSession?, old: UserSession?) -> Unit)
 
+    /**
+     * Invalidates the current session, which means [currentSession] will be null
+     */
+    suspend fun invalidateSession()
+
     fun path(path: String): String
 
     class Config(val params: MutableMap<String, Any> = mutableMapOf(), var retryDelay: Duration = 10.seconds)

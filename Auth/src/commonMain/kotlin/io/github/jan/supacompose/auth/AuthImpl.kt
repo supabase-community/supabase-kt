@@ -50,7 +50,7 @@ internal class AuthImpl(override val supabaseClient: SupabaseClient, override va
 
     init {
         Napier.base(DebugAntilog())
-        if (CurrentPlatformTarget == PlatformTarget.WEB || CurrentPlatformTarget == PlatformTarget.DESKTOP) {
+        if (CurrentPlatformTarget == PlatformTarget.WEB || CurrentPlatformTarget == PlatformTarget.DESKTOP) { //for android see Android.kt
             supabaseClient.launch {
                 Napier.d {
                     "Trying to load latest session"
@@ -170,7 +170,7 @@ internal class AuthImpl(override val supabaseClient: SupabaseClient, override va
         return response.body()
     }
 
-    private suspend fun invalidateSession() {
+    override suspend fun invalidateSession() {
         sessionManager.deleteSession(supabaseClient, this)
         sessionJob?.cancel()
         _currentSession.value = null
