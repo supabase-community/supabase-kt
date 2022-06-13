@@ -69,7 +69,7 @@ internal class AuthImpl(override val supabaseClient: SupabaseClient, override va
         }
     }
 
-    override suspend fun logout() {
+    override suspend fun invalidateAllRefreshTokens() {
         supabaseClient.httpClient.post(path("logout")) {
             addAuthorization()
         }
@@ -173,6 +173,7 @@ internal class AuthImpl(override val supabaseClient: SupabaseClient, override va
     override suspend fun invalidateSession() {
         sessionManager.deleteSession(supabaseClient, this)
         sessionJob?.cancel()
+        _status.value = Auth.Status.NOT_AUTHENTICATED
         _currentSession.value = null
         sessionJob = null
     }

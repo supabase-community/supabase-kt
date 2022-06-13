@@ -104,7 +104,7 @@ sealed interface Auth {
     /**
      * Revokes all refresh tokens for the user, and invalidates the session
      */
-    suspend fun logout()
+    suspend fun invalidateAllRefreshTokens()
 
     /**
      * Verifies a registration, invite or password recovery
