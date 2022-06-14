@@ -47,4 +47,8 @@ class PostgrestUpdate<T> {
         map[column] = JsonPrimitive(value)
     }
 
+    operator fun set(column: String, value: JsonElement) {
+        map[column] = value
+    }
+
 }
