@@ -174,6 +174,7 @@ internal class AuthImpl(override val supabaseClient: SupabaseClient, override va
         sessionManager.deleteSession(supabaseClient, this)
         sessionJob?.cancel()
         _status.value = Auth.Status.NOT_AUTHENTICATED
+        callbacks.forEach { it.invoke(null, currentSession.value)}
         _currentSession.value = null
         sessionJob = null
     }

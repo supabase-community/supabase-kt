@@ -80,7 +80,7 @@ class PostgrestFilterBuilder <T : Any> {
 
     infix fun <V> KProperty1<T, V>.isExact(value: Boolean?) = filter(FilterOperation(getColumnName(this), FilterOperator.IS, value.toString()))
 
-    infix fun <V> KProperty1<T, V>.isIn(list: List<V>) = filter(FilterOperation(getColumnName(this), FilterOperator.IN, list.joinToString(",")))
+    infix fun <V> KProperty1<T, V>.isIn(list: List<V>) = filter(FilterOperation(getColumnName(this), FilterOperator.IN, "(${list.joinToString(",")})"))
 
     infix fun <V> KProperty1<T, V>.rangeLt(range: String) = filter(FilterOperation(getColumnName(this), FilterOperator.SL, range))
 
