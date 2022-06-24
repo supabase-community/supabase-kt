@@ -11,7 +11,6 @@ import kotlinx.serialization.json.decodeFromJsonElement
 import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.put
 
-
 sealed interface RealtimeChannel {
 
     val status: StateFlow<Status>
@@ -23,21 +22,11 @@ sealed interface RealtimeChannel {
 
     suspend fun join()
 
-    fun on(action: Action, callback: (RealtimeChannelMessage) -> Unit): RealtimeChannel
-
     enum class Status {
         CLOSED,
         JOINING,
         JOINED,
         LEAVING,
-    }
-
-    enum class Action {
-        UPDATE,
-        DELETE,
-        SELECT,
-        INSERT,
-        ALL
     }
 
     companion object {
@@ -53,12 +42,12 @@ internal class RealtimeChannelImpl(
     override val table: String?,
     override val column: String?,
     override val value: String?,
-    private val jwt: String
+    private val jwt: String,
+    private val listeners: List<Pair<ChannelAction, (RealtimeChannelMessage) -> Unit>>
 ) : RealtimeChannel {
 
     private val _status = MutableStateFlow(RealtimeChannel.Status.CLOSED)
     override val status = _status.asStateFlow()
-    private val callbacks = mutableListOf<Pair<RealtimeChannel.Action, (RealtimeChannelMessage) -> Unit>>()
 
     override suspend fun join() {
         _status.value = RealtimeChannel.Status.JOINING
@@ -68,11 +57,6 @@ internal class RealtimeChannelImpl(
         }, "null"))
     }
 
-    override fun on(action: RealtimeChannel.Action, callback: (RealtimeChannelMessage) -> Unit): RealtimeChannel {
-        callbacks.add(action to callback)
-        return this
-    }
-
     fun onMessage(message: RealtimeMessage) {
         when {
             message.payload["status"]?.jsonPrimitive?.content == "ok" -> {
@@ -80,7 +64,7 @@ internal class RealtimeChannelImpl(
                 _status.value = RealtimeChannel.Status.JOINED
             }
             message.event in listOf("UPDATE", "DELETE", "INSERT", "SELECT") -> {
-                callbacks.filter { it.first.name == message.event || it.first == RealtimeChannel.Action.ALL }.forEach {
+                listeners.filter { it.first.name == message.event || it.first == ChannelAction.ALL }.forEach {
                     it.second(supabaseJson.decodeFromJsonElement(message.payload))
                 }
             }

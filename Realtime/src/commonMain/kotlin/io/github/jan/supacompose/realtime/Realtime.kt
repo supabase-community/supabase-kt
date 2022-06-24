@@ -35,12 +35,6 @@ sealed interface Realtime {
 
     suspend fun connect()
     fun disconnect()
-    fun createChannel(
-        schema: String,
-        table: String? = null,
-        column: String? = null,
-        value: String? = null
-    ): RealtimeChannel
 
     fun onStatusChange(callback: (Status) -> Unit)
 
@@ -79,7 +73,7 @@ sealed interface Realtime {
 
 }
 
-internal class RealtimeImpl(private val supabaseClient: SupabaseClient, private val realtimeConfig: Realtime.Config) :
+internal class RealtimeImpl(val supabaseClient: SupabaseClient, private val realtimeConfig: Realtime.Config) :
     Realtime {
 
     lateinit var ws: DefaultClientWebSocketSession
@@ -138,22 +132,6 @@ internal class RealtimeImpl(private val supabaseClient: SupabaseClient, private 
         _status.value = Realtime.Status.DISCONNECTED
     }
 
-    override fun createChannel(schema: String, table: String?, column: String?, value: String?): RealtimeChannel {
-        val key = generateKey(schema, table, column, value)
-        val channel = RealtimeChannelImpl(
-            this,
-            key,
-            schema,
-            table,
-            column,
-            value,
-            supabaseClient.auth.currentSession.value?.accessToken
-                ?: throw IllegalStateException("You can't join a channel without an user session")
-        )
-        _subscriptions[key] = channel
-        return channel
-    }
-
     private fun onMessage(stringMessage: String) {
         val message = supabaseJson.decodeFromString<RealtimeMessage>(stringMessage)
         println(message)
@@ -163,20 +141,6 @@ internal class RealtimeImpl(private val supabaseClient: SupabaseClient, private 
 
     private fun updateJwt(jwt: String) {
 
-    }
-
-    private fun generateKey(schema: String, table: String?, column: String?, value: String?): String {
-        if (value != null && (column == null || table == null)) throw IllegalStateException("When using a value, you need to specify a table and a column")
-        if (column != null && table == null) throw IllegalStateException("When using a column, you need to specify a table")
-        return buildString {
-            append(listOfNotNull("realtime", schema, table).joinToString(":").trim())
-            column?.let {
-                append(it)
-                value?.let {
-                    append("=eq.$value")
-                }
-            }
-        }
     }
 
     private suspend fun sendHeartbeat() {
@@ -193,6 +157,10 @@ internal class RealtimeImpl(private val supabaseClient: SupabaseClient, private 
         ws.sendSerialized(RealtimeMessage("phoenix", "heartbeat", buildJsonObject { }, (++ref).toString()))
     }
 
+}
+
+inline fun Realtime.createChannel(builder: RealtimeChannelBuilder.() -> Unit): RealtimeChannel {
+    return RealtimeChannelBuilder(this as RealtimeImpl).apply(builder).build()
 }
 
 val SupabaseClient.realtime: Realtime

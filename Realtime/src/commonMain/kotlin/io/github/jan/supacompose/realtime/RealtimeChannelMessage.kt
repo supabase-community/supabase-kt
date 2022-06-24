@@ -25,7 +25,7 @@ data class RealtimeChannelMessage(
     val schema: String,
     val table: String,
     @SerialName("type")
-    val action: RealtimeChannel.Action
+    val action: ChannelAction
 ) {
 
     inline fun <reified T> record() = supabaseJson.decodeFromJsonElement<T>(record)

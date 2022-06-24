@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -23,11 +24,11 @@ import io.github.jan.supacompose.auth.providers.Email
 import io.github.jan.supacompose.auth.sessionFile
 import io.github.jan.supacompose.createSupabaseClient
 import io.github.jan.supacompose.postgrest.Postgrest
+import io.github.jan.supacompose.realtime.ChannelAction
 import io.github.jan.supacompose.realtime.Realtime
+import io.github.jan.supacompose.realtime.createChannel
 import io.github.jan.supacompose.realtime.realtime
 import io.github.jan.supacompose.storage.Storage
-import io.github.jan.supacompose.storage.storage
-import io.github.jan.supacompose.storage.upload
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import java.io.File
@@ -38,8 +39,8 @@ data class User(val id: String, val username: String)
 
 suspend fun main() {
     val client = createSupabaseClient {
-        supabaseUrl = System.getenv("SUPABASE_URL")
-        supabaseKey = System.getenv("SUPABASE_KEY")
+        supabaseUrl = "https://arnyfaeuskyqfxkvotgj.supabase.co"
+        supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFybnlmYWV1c2t5cWZ4a3ZvdGdqIiwicm9sZSI6ImFub24iLCJpYXQiOjE2NTMwMzkxMTEsImV4cCI6MTk2ODYxNTExMX0.ItmL8lfnOL9oy7CEX9N6TnYt10VVhk-KTlwley4aq1M"
 
         install(Auth) {
             sessionFile = File("C:\\Users\\jan\\AppData\\Local\\SupaCompose\\usersession.json")
@@ -59,13 +60,21 @@ suspend fun main() {
                 Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
                     Text("Logged in as ${session?.user?.email}")
                 }
-                Box(contentAlignment = Alignment.TopCenter, modifier = Modifier.fillMaxSize()) {
-                    Button(onClick = {
-                        scope.launch {
-                            client.storage["icons"].upload("icon.png", File("C:\\Users\\jan\\Pictures\\engel.png"))
+                LaunchedEffect(Unit) {
+                    scope.launch {
+                        client.realtime.connect()
+                    }
+                }
+                if(status == Realtime.Status.CONNECTED) {
+                    LaunchedEffect(Unit) {
+                        client.realtime.createChannel {
+                            table = "products"
+                            schema = "public"
+
+                            on(ChannelAction.UPDATE) {
+                                println(it.record)
+                            }
                         }
-                    }) {
-                        Text("Test")
                     }
                 }
             } else {

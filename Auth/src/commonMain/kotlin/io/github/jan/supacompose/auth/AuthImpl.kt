@@ -191,7 +191,7 @@ internal class AuthImpl(override val supabaseClient: SupabaseClient, override va
         val response = supabaseClient.httpClient.post(path("token?grant_type=refresh_token")) {
             setBody(body)
         }
-        if(response.status == Unauthorized) throw RestException(401, "Unauthorized", "Refresh token is invalid")
+        if(response.status.value !in 200..299) throw RestException(401, "Unauthorized", "Refresh token is invalid")
         val newSession =  response.body<UserSession>()
         startJob(newSession)
     }

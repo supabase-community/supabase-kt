@@ -90,6 +90,16 @@ sealed interface BucketApi {
      */
     suspend fun changePublicStatusTo(public: Boolean)
 
+    /**
+     * Returns the public url of [path]
+     */
+    fun publicUrl(path: String): String
+
+    /**
+     * Returns the authenticated url of [path]. Requires bearer token authentication using the user's access token
+     */
+    fun authenticatedUrl(path: String): String
+    
 }
 
 internal class BucketApiImpl(override val bucketId: String, val storage: StorageImpl) : BucketApi {
@@ -172,5 +182,9 @@ internal class BucketApiImpl(override val bucketId: String, val storage: Storage
     }
 
     override suspend fun changePublicStatusTo(public: Boolean) = storage.changePublicStatus(bucketId, public)
+
+    override fun authenticatedUrl(path: String) = storage.path("object/authenticated/$bucketId/$path")
+
+    override fun publicUrl(path: String) = storage.path("object/public/$bucketId/$path")
 
 }
