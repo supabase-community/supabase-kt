@@ -1,6 +1,6 @@
 object Versions {
 
-    const val KOTLIN = "1.6.21"
+    const val KOTLIN = "1.7.0"
     const val MATERIAL = "1.6.0"
     const val SERIALIZATION = "1.3.2"
     const val KTOR = "2.0.2"

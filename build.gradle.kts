@@ -11,6 +11,18 @@ plugins {
 
 val modules = listOf("Supacompose", "Supacompose-Auth", "Supacompose-Postgrest", "Supacompose-Storage"/*, "Supacompose-Realtime"*/)
 
+allprojects {
+    repositories {
+        google()
+        maven("https://maven.pkg.jetbrains.space/public/p/compose/dev/")
+        mavenCentral()
+        maven {
+            url = uri("https://maven.pkg.jetbrains.space/public/p/ktor/eap")
+            name = "ktor-eap"
+        }
+    }
+}
+
 subprojects {
     apply(plugin = "signing")
     apply(plugin = "maven-publish")
@@ -29,14 +41,6 @@ nexusStaging {
 }
 
 configure(allprojects.filter { it.name in modules }) {
-    repositories {
-        mavenCentral()
-        maven {
-            url = uri("https://maven.pkg.jetbrains.space/public/p/ktor/eap")
-            name = "ktor-eap"
-        }
-    }
-
     signing {
         val signingKey = providers
             .environmentVariable("GPG_SIGNING_KEY")
@@ -193,14 +197,6 @@ kotlin {
                 api(compose.web.core)
             }
         }
-    }
-}
-
-allprojects {
-    repositories {
-        google()
-        maven("https://maven.pkg.jetbrains.space/public/p/compose/dev/")
-        mavenCentral()
     }
 }
 

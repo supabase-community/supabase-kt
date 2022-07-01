@@ -132,7 +132,7 @@ suspend inline fun <reified T : Any> SupabaseClient.buildPostgrestRequest(
     if(it.status.value !in 200..299) {
         try {
             val error = it.body<JsonObject>()
-            throw RestException(it.status.value, error["error"]?.jsonPrimitive?.content ?: "Unknown error", error["message"]?.jsonPrimitive?.content ?: "")
+            throw RestException(it.status.value, error["error"]?.jsonPrimitive?.content ?: "Unknown error", error.toString())
         } catch(_: Exception) {
             throw RestException(it.status.value, "Unknown error", "")
         }
