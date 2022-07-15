@@ -21,6 +21,7 @@ import io.github.jan.supacompose.auth.Auth
 import io.github.jan.supacompose.auth.auth
 import io.github.jan.supacompose.auth.providers.Discord
 import io.github.jan.supacompose.auth.providers.Email
+import io.github.jan.supacompose.auth.providers.Google
 import io.github.jan.supacompose.auth.sessionFile
 import io.github.jan.supacompose.createSupabaseClient
 import io.github.jan.supacompose.postgrest.Postgrest
@@ -39,6 +40,8 @@ data class User(val id: String, val username: String)
 
 suspend fun main() {
     val client = createSupabaseClient {
+
+
 
         install(Auth) {
             sessionFile = File("C:\\Users\\jan\\AppData\\Local\\SupaCompose\\usersession.json")
@@ -99,7 +102,7 @@ suspend fun main() {
                         }
                         Button(onClick = {
                             scope.launch {
-                                client.auth.loginWith(Discord)
+                                client.auth.loginWith(Google)
                             }
                         }, modifier = Modifier.align(Alignment.CenterHorizontally)) {
                             Text("Login with Discord")

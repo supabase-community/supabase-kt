@@ -65,9 +65,28 @@ actual abstract class OAuthProvider : AuthProvider<ExternalAuthConfig, Unit> {
                 val mutex = Mutex()
                 embeddedServer(CIO, port = config.httpPort, parentCoroutineContext = coroutineContext) {
                     routing {
-                        static("/") {
-                            staticRootFolder = File(this::class.java.classLoader.getResource("templates").path)
-                            file("index.html")
+                        get("/") {
+                            call.respondText(ContentType.Text.Html) {
+                                """
+                                    <!DOCTYPE html>
+                                    <html lang="en">
+                                    <head>
+                                        <title>Supabase In App Authentication</title>
+                                    </head>
+
+                                    <body>
+                                    <script>
+                                        const pairs = location.hash.substring(1).split("&").map(pair => pair.split("="))
+                                        const accessToken = pairs.find(pair => pair[0] === "access_token")[1]
+                                        const refreshToken = pairs.find(pair => pair[0] === "refresh_token")[1]
+                                        const expiresIn = pairs.find(pair => pair[0] === "expires_in")[1]
+                                        const tokenType = pairs.find(pair => pair[0] === "token_type")[1]
+                                        location.href = "/callback?access_token=" + accessToken + "&refresh_token=" + refreshToken + "&expires_in=" + expiresIn + "&token_type=" + tokenType
+                                    </script>
+                                    </body>
+                                    </html>
+                                """.trimIndent()
+                            }
                         }
                         get("/callback") {
                             Napier.d {
@@ -116,7 +135,7 @@ actual abstract class OAuthProvider : AuthProvider<ExternalAuthConfig, Unit> {
                     }
                 }.start(wait = false).also {
                     val port = it.resolvedConnectors().first().port
-                    Desktop.getDesktop().browse(URI(supabaseClient.supabaseHttpUrl + "/auth/v1/authorize?provider=${provider()}&redirect_to=http://localhost:${port}/index.html"))
+                    Desktop.getDesktop().browse(URI(supabaseClient.supabaseHttpUrl + "/auth/v1/authorize?provider=${provider()}&redirect_to=http://localhost:${port}"))
                     delay(config.timeout.inWholeMilliseconds)
                     it.stop()
                     if(!done) {

@@ -33,4 +33,4 @@ class SupabaseClientBuilder {
 
 }
 
-inline fun createSupabaseClient(builder: SupabaseClientBuilder.() -> Unit) = SupabaseClientBuilder().also(builder).build()
+inline fun createSupabaseClient(builder: SupabaseClientBuilder.() -> Unit) = SupabaseClientBuilder().apply(builder).build()
