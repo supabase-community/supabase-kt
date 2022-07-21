@@ -3,6 +3,7 @@ package io.github.jan.supacompose
 import io.github.aakira.napier.Napier
 import io.ktor.client.HttpClient
 import io.ktor.client.HttpClientConfig
+import io.ktor.client.engine.HttpClientEngine
 import io.ktor.client.plugins.DefaultRequest
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.request.headers
@@ -29,6 +30,7 @@ internal class SupabaseClientImpl(
     plugins: Map<String, (SupabaseClient) -> Any>,
     httpConfigOverrides: MutableList<HttpClientConfig<*>.() -> Unit>,
     useHTTPS: Boolean,
+    httpEngine: HttpClientEngine?,
 ) : SupabaseClient {
 
     override val supabaseHttpUrl: String = if (useHTTPS) {
@@ -45,17 +47,32 @@ internal class SupabaseClientImpl(
     
     override val coroutineContext = Dispatchers.Default + Job()
 
-    override val httpClient = HttpClient {
-        install(DefaultRequest) {
-            headers {
-                append("apikey", supabaseKey)
+    override val httpClient = if(httpEngine != null) {
+        HttpClient(httpEngine) {
+            install(DefaultRequest) {
+                headers {
+                    append("apikey", supabaseKey)
+                }
+                port = 443
             }
-            port = 443
+            install(ContentNegotiation) {
+                json(supabaseJson)
+            }
+            httpConfigOverrides.forEach { it.invoke(this) }
         }
-        install(ContentNegotiation) {
-            json(supabaseJson)
+    } else {
+        HttpClient {
+            install(DefaultRequest) {
+                headers {
+                    append("apikey", supabaseKey)
+                }
+                port = 443
+            }
+            install(ContentNegotiation) {
+                json(supabaseJson)
+            }
+            httpConfigOverrides.forEach { it.invoke(this) }
         }
-        httpConfigOverrides.forEach { it.invoke(this) }
     }
 
     override val plugins = plugins.toList().associate { (key, value) ->

@@ -3,11 +3,12 @@ package io.github.jan.supacompose.plugins
 import io.github.jan.supacompose.SupabaseClient
 import io.github.jan.supacompose.SupabaseClientBuilder
 
-interface SupacomposePlugin<C, O> {
+interface SupacomposePlugin<Config, PluginInstance> {
 
     val key: String
 
-    fun setup(builder: SupabaseClientBuilder, config: C.() -> Unit) {}
-    fun create(supabaseClient: SupabaseClient, config: C.() -> Unit) : O
+    fun createConfig(init: Config.() -> Unit): Config
+    fun setup(builder: SupabaseClientBuilder, config: Config) {}
+    fun create(supabaseClient: SupabaseClient, config: Config) : PluginInstance
 
 }

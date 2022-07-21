@@ -48,20 +48,17 @@ sealed interface Realtime {
 
         override val key = "realtime"
 
-        override fun setup(builder: SupabaseClientBuilder, config: Config.() -> Unit) {
-            val realtimeConfig = Config().apply(config)
+        override fun createConfig(init: Config.() -> Unit) = Config().apply(init)
+        override fun setup(builder: SupabaseClientBuilder, config: Config) {
             builder.httpConfig {
                 install(WebSockets) {
                     contentConverter = KotlinxWebsocketSerializationConverter(supabaseJson)
-                    realtimeConfig.websocketConfig(this)
+                    config.websocketConfig(this)
                 }
             }
         }
 
-        override fun create(supabaseClient: SupabaseClient, config: Config.() -> Unit): Realtime {
-            val realtimeConfig = Config().apply(config)
-            return RealtimeImpl(supabaseClient, realtimeConfig)
-        }
+        override fun create(supabaseClient: SupabaseClient, config: Config): Realtime = RealtimeImpl(supabaseClient, config)
 
     }
 

@@ -16,7 +16,8 @@ sealed interface Postgrest {
 
         override val key = "postgrest"
 
-        override fun create(supabaseClient: SupabaseClient, config: Config.() -> Unit): Postgrest {
+        override fun createConfig(init: Config.() -> Unit) = Config().apply(init)
+        override fun create(supabaseClient: SupabaseClient, config: Config): Postgrest {
             return PostgrestImpl(supabaseClient)
         }
 

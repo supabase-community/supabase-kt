@@ -58,7 +58,8 @@ sealed interface Storage {
 
         override val key: String = "storage"
 
-        override fun create(supabaseClient: SupabaseClient, config: Config.() -> Unit): Storage {
+        override fun createConfig(init: Config.() -> Unit) = Config().apply(init)
+        override fun create(supabaseClient: SupabaseClient, config: Config): Storage {
             return StorageImpl(supabaseClient)
         }
 

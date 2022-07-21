@@ -144,7 +144,8 @@ sealed interface Auth {
         override val key = "auth"
         const val API_VERSION = 1
 
-        override fun create(supabaseClient: SupabaseClient, config: Config.() -> Unit): Auth = AuthImpl(supabaseClient, Config().apply(config))
+        override fun createConfig(init: Config.() -> Unit) = Config().apply(init)
+        override fun create(supabaseClient: SupabaseClient, config: Config): Auth = AuthImpl(supabaseClient, config)
 
     }
 

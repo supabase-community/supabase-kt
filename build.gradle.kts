@@ -144,7 +144,13 @@ kotlin {
         publishLibraryVariants("release", "debug")
     }
     js("web", IR) {
-        browser()
+        browser {
+            testTask {
+                useKarma {
+                    useFirefox()
+                }
+            }
+        }
     }
     sourceSets {
         all {
@@ -173,7 +179,12 @@ kotlin {
                 api(compose.material)
             }
         }
-        val commonTest by getting
+        val commonTest by getting {
+            dependencies {
+                implementation(kotlin("test"))
+                implementation("io.ktor:ktor-client-mock:${Versions.KTOR}")
+            }
+        }
         val desktopMain by getting {
             dependsOn(defaultMain)
         }
