@@ -40,10 +40,9 @@ class SupabaseClientTest {
 
     @Test
     fun testClientBuilderParametersWithHttpsUrl() {
-        val client = createSupabaseClient {
+        val client = createMockedSupabaseClient {
             supabaseUrl = "https://example.supabase.co"
             supabaseKey = "somekey"
-            httpEngine = mockEngine
         }
         assertEquals("example.supabase.co", client.supabaseUrl, "Supabase url should not contain https://")
         assertEquals("somekey", client.supabaseKey, "Supabase key should be set to somekey")
@@ -52,10 +51,9 @@ class SupabaseClientTest {
 
     @Test
     fun testClientBuilderPlugins() {
-        val client = createSupabaseClient {
+        val client = createMockedSupabaseClient {
             supabaseUrl = "example.supabase.co"
             supabaseKey = "somekey"
-            httpEngine = mockEngine
 
             install(TestPlugin) {
                 testValue = true
@@ -70,12 +68,18 @@ class SupabaseClientTest {
 
     @Test
     fun testClientPath() {
-        val client = createSupabaseClient {
+        val client = createMockedSupabaseClient {
             supabaseUrl = "example.supabase.co"
             supabaseKey = "somekey"
-            httpEngine = mockEngine
         }
         assertEquals("https://example.supabase.co/testpath", client.path("testpath"), "Path should be https://example.supabase.co/testpath")
+    }
+
+    private fun createMockedSupabaseClient(init: SupabaseClientBuilder.() -> Unit): SupabaseClient {
+        return createSupabaseClient {
+            httpEngine = mockEngine
+            init()
+        }
     }
 
 }

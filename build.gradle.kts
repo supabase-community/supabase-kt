@@ -1,3 +1,5 @@
+import com.android.build.api.dsl.LintOptions
+
 plugins {
     kotlin("multiplatform") version Versions.KOTLIN
     id("com.android.library")
@@ -221,5 +223,8 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
+    }
+    lint {
+        isAbortOnError = false
     }
 }
