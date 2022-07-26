@@ -34,7 +34,7 @@ class TestPlugin(private val config: Config) {
 
 class SupabaseClientTest {
 
-    private val mockEngine = MockEngine { request ->
+    private val mockEngine = MockEngine { _ ->
         respond("") //ignore for this test
     }
 
