@@ -148,9 +148,10 @@ kotlin {
     js("web", IR) {
         browser {
             testTask {
-                useKarma {
+                enabled = false
+                /*useKarma {
                     useFirefox()
-                }
+                }*/
             }
         }
     }

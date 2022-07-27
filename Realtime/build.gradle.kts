@@ -29,7 +29,14 @@ kotlin {
         publishLibraryVariants("release", "debug")
     }
     js("web", IR) {
-        browser()
+        browser {
+            testTask {
+                enabled = false
+                /*useKarma {
+                    useFirefox()
+                }*/
+            }
+        }
     }
     sourceSets {
         all {
