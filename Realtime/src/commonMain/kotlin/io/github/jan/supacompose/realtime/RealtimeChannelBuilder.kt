@@ -1,6 +1,8 @@
 package io.github.jan.supacompose.realtime
 
 import io.github.jan.supacompose.auth.auth
+import io.github.jan.supacompose.realtime.events.ChannelAction
+import io.github.jan.supacompose.realtime.events.EventListener
 
 @ChannelDsl
 class RealtimeChannelBuilder @PublishedApi internal constructor(private val realtimeImpl: RealtimeImpl) {
@@ -9,11 +11,22 @@ class RealtimeChannelBuilder @PublishedApi internal constructor(private val real
     var table = ""
     var column: String? = null
     var value: String? = null
-    private val listeners = mutableListOf<Pair<ChannelAction, (RealtimeChannelMessage) -> Unit>>()
+    val eventListener = mutableListOf<EventListener>()
 
     @ChannelDsl
-    fun on(action: ChannelAction, listener: (RealtimeChannelMessage) -> Unit) {
-        listeners.add(action to listener)
+    inline fun <reified Action: ChannelAction> on(crossinline listener: (@ChannelDsl Action).() -> Unit) {
+       eventListener.add {
+           if(it is Action) {
+               listener(it)
+           }
+       }
+    }
+
+    @ChannelDsl
+    inline fun onAll(crossinline listener: (@ChannelDsl ChannelAction).() -> Unit) {
+        eventListener.add {
+            listener(it)
+        }
     }
 
     fun build(): RealtimeChannel {
@@ -27,7 +40,7 @@ class RealtimeChannelBuilder @PublishedApi internal constructor(private val real
             value,
             realtimeImpl.supabaseClient.auth.currentSession.value?.accessToken
                 ?: throw IllegalStateException("You can't join a channel without an user session"),
-            listeners
+            eventListener
         )
     }
 

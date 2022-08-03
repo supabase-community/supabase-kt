@@ -1,9 +1,11 @@
 package io.github.jan.supacompose.postgrest.query
 
 import io.github.jan.supacompose.postgrest.getColumnName
+import io.ktor.client.request.HttpRequestBuilder
+import io.ktor.http.parametersOf
 import kotlin.reflect.KProperty1
 
-class PostgrestFilterBuilder <T : Any> {
+class PostgrestFilterBuilder {
 
     @PublishedApi
     internal val _params = mutableMapOf<String, String>()
@@ -56,42 +58,48 @@ class PostgrestFilterBuilder <T : Any> {
         _params["or"] = "($filters)"
     }
 
-    fun textSearch(column: String, query: String, textSearchType: TextSearchType, config: String? = null): PostgrestFilterBuilder<T> {
+    fun textSearch(column: String, query: String, textSearchType: TextSearchType, config: String? = null): PostgrestFilterBuilder {
         val configPart = if (config === null) "" else "(${config})"
         _params[column] = "${textSearchType.identifier}${configPart}.${query}"
         return this
     }
 
-    infix fun <V> KProperty1<T, V>.eq(value: V) = filter(FilterOperation(getColumnName(this), FilterOperator.EQ, value.toString()))
+    infix fun <T, V> KProperty1<T, V>.eq(value: V) = filter(FilterOperation(getColumnName(this), FilterOperator.EQ, value.toString()))
 
-    infix fun <V> KProperty1<T, V>.neq(value: V) = filter(FilterOperation(getColumnName(this), FilterOperator.NEQ, value.toString()))
+    infix fun <T, V> KProperty1<T, V>.neq(value: V) = filter(FilterOperation(getColumnName(this), FilterOperator.NEQ, value.toString()))
 
-    infix fun <V> KProperty1<T, V>.gt(value: V) = filter(FilterOperation(getColumnName(this), FilterOperator.GT, value.toString()))
+    infix fun <T, V> KProperty1<T, V>.gt(value: V) = filter(FilterOperation(getColumnName(this), FilterOperator.GT, value.toString()))
 
-    infix fun <V> KProperty1<T, V>.gte(value: V) = filter(FilterOperation(getColumnName(this), FilterOperator.GTE, value.toString()))
+    infix fun <T, V> KProperty1<T, V>.gte(value: V) = filter(FilterOperation(getColumnName(this), FilterOperator.GTE, value.toString()))
 
-    infix fun <V> KProperty1<T, V>.lt(value: V) = filter(FilterOperation(getColumnName(this), FilterOperator.LT, value.toString()))
+    infix fun <T, V> KProperty1<T, V>.lt(value: V) = filter(FilterOperation(getColumnName(this), FilterOperator.LT, value.toString()))
 
-    infix fun <V> KProperty1<T, V>.lte(value: V) = filter(FilterOperation(getColumnName(this), FilterOperator.LTE, value.toString()))
+    infix fun <T, V> KProperty1<T, V>.lte(value: V) = filter(FilterOperation(getColumnName(this), FilterOperator.LTE, value.toString()))
 
-    infix fun <V> KProperty1<T, V>.like(pattern: String) = filter(FilterOperation(getColumnName(this), FilterOperator.LIKE, pattern))
+    infix fun <T, V> KProperty1<T, V>.like(pattern: String) = filter(FilterOperation(getColumnName(this), FilterOperator.LIKE, pattern))
 
-    infix fun <V> KProperty1<T, V>.ilike(pattern: String) = filter(FilterOperation(getColumnName(this), FilterOperator.ILIKE, pattern))
+    infix fun <T, V> KProperty1<T, V>.ilike(pattern: String) = filter(FilterOperation(getColumnName(this), FilterOperator.ILIKE, pattern))
 
-    infix fun <V> KProperty1<T, V>.isExact(value: Boolean?) = filter(FilterOperation(getColumnName(this), FilterOperator.IS, value.toString()))
+    infix fun <T, V> KProperty1<T, V>.isExact(value: Boolean?) = filter(FilterOperation(getColumnName(this), FilterOperator.IS, value.toString()))
 
-    infix fun <V> KProperty1<T, V>.isIn(list: List<V>) = filter(FilterOperation(getColumnName(this), FilterOperator.IN, "(${list.joinToString(",")})"))
+    infix fun <T, V> KProperty1<T, V>.isIn(list: List<V>) = filter(FilterOperation(getColumnName(this), FilterOperator.IN, "(${list.joinToString(",")})"))
 
-    infix fun <V> KProperty1<T, V>.rangeLt(range: String) = filter(FilterOperation(getColumnName(this), FilterOperator.SL, range))
+    infix fun <T, V> KProperty1<T, V>.rangeLt(range: String) = filter(FilterOperation(getColumnName(this), FilterOperator.SL, range))
 
-    infix fun <V> KProperty1<T, V>.rangeLte(range: String) = filter(FilterOperation(getColumnName(this), FilterOperator.NXR, range))
+    infix fun <T, V> KProperty1<T, V>.rangeLte(range: String) = filter(FilterOperation(getColumnName(this), FilterOperator.NXR, range))
 
-    infix fun <V> KProperty1<T, V>.rangeGt(range: String) = filter(FilterOperation(getColumnName(this), FilterOperator.SR, range))
+    infix fun <T, V> KProperty1<T, V>.rangeGt(range: String) = filter(FilterOperation(getColumnName(this), FilterOperator.SR, range))
 
-    infix fun <V> KProperty1<T, V>.rangeGte(range: String) = filter(FilterOperation(getColumnName(this), FilterOperator.NXL, range))
+    infix fun <T, V> KProperty1<T, V>.rangeGte(range: String) = filter(FilterOperation(getColumnName(this), FilterOperator.NXL, range))
 
-    infix fun <V> KProperty1<T, V>.adjacent(range: String) = filter(FilterOperation(getColumnName(this), FilterOperator.ADJ, range))
+    infix fun <T, V> KProperty1<T, V>.adjacent(range: String) = filter(FilterOperation(getColumnName(this), FilterOperator.ADJ, range))
 
+}
+
+inline fun HttpRequestBuilder.addPostgresFilter(block: PostgrestFilterBuilder.() -> Unit) {
+    val filter = PostgrestFilterBuilder()
+    filter.block()
+    parametersOf(filter.params.mapValues { (_, value) -> listOf(value) })
 }
 
 data class FilterOperation(val column: String, val operator: FilterOperator, val value: String)

@@ -1,11 +1,14 @@
 package io.github.jan.supacompose.realtime
 
 import io.github.aakira.napier.Napier
+import io.github.jan.supacompose.realtime.events.ChannelAction
+import io.github.jan.supacompose.realtime.events.EventListener
 import io.github.jan.supacompose.supabaseJson
 import io.ktor.client.plugins.websocket.sendSerialized
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.decodeFromJsonElement
 import kotlinx.serialization.json.jsonPrimitive
@@ -43,7 +46,7 @@ internal class RealtimeChannelImpl(
     override val column: String?,
     override val value: String?,
     private val jwt: String,
-    private val listeners: List<Pair<ChannelAction, (RealtimeChannelMessage) -> Unit>>
+    private val listeners: MutableList<EventListener>
 ) : RealtimeChannel {
 
     private val _status = MutableStateFlow(RealtimeChannel.Status.CLOSED)
@@ -54,7 +57,7 @@ internal class RealtimeChannelImpl(
         Napier.d { "Joining channel $topic" }
         realtimeImpl.ws.sendSerialized(RealtimeMessage(topic, RealtimeChannel.CHANNEL_EVENT_JOIN, buildJsonObject {
             put("user_token", jwt)
-        }, "null"))
+        }, null))
     }
 
     fun onMessage(message: RealtimeMessage) {
@@ -64,9 +67,14 @@ internal class RealtimeChannelImpl(
                 _status.value = RealtimeChannel.Status.JOINED
             }
             message.event in listOf("UPDATE", "DELETE", "INSERT", "SELECT") -> {
-                listeners.filter { it.first.name == message.event || it.first == ChannelAction.ALL }.forEach {
-                    it.second(supabaseJson.decodeFromJsonElement(message.payload))
+                val action = when(message.event) {
+                    "UPDATE" -> supabaseJson.decodeFromJsonElement<ChannelAction.Update>(message.payload)
+                    "DELETE" -> supabaseJson.decodeFromJsonElement<ChannelAction.Delete>(message.payload)
+                    "INSERT" -> supabaseJson.decodeFromJsonElement<ChannelAction.Insert>(message.payload)
+                    "SELECT" -> supabaseJson.decodeFromJsonElement<ChannelAction.Select>(message.payload)
+                    else -> throw IllegalStateException("Unknown event type ${message.event}")
                 }
+                listeners.forEach { it.onEvent(action) }
             }
         }
     }

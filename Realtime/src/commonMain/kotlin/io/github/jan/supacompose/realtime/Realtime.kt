@@ -16,6 +16,7 @@ import io.ktor.websocket.readText
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -27,6 +28,7 @@ import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.buildJsonObject
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
 
 sealed interface Realtime {
 
@@ -38,10 +40,15 @@ sealed interface Realtime {
 
     fun onStatusChange(callback: (Status) -> Unit)
 
+    fun addChannel(channel: RealtimeChannel)
+
+    fun removeChannel(topic: String)
+
     class Config(
         var websocketConfig: WebSockets.Config.() -> Unit = {},
         var secure: Boolean = true,
-        var heartbeatInterval: Duration = 30000.milliseconds
+        var heartbeatInterval: Duration = 10.seconds,
+        var customRealtimeURL: String? = null
     )
 
     companion object : SupacomposePlugin<Config, Realtime> {
@@ -79,9 +86,10 @@ internal class RealtimeImpl(val supabaseClient: SupabaseClient, private val real
     private val _subscriptions = mutableMapOf<String, RealtimeChannel>()
     override val subscriptions: Map<String, RealtimeChannel>
         get() = _subscriptions.toMap()
-    private val scope = CoroutineScope(Dispatchers.Default + Job())
+    private val scope = CoroutineScope(Dispatchers.Default + SupervisorJob())
     private val statusListeners = mutableListOf<(Realtime.Status) -> Unit>()
-    private var ref = 0
+    var ref = 0
+    var heartbeatRef = 0
 
     override fun onStatusChange(callback: (Realtime.Status) -> Unit) {
         statusListeners.add(callback)
@@ -101,8 +109,8 @@ internal class RealtimeImpl(val supabaseClient: SupabaseClient, private val real
         val prefix = if (realtimeConfig.secure) "wss://" else "ws://"
         statusListeners.forEach { it(Realtime.Status.CONNECTING) }
         _status.value = Realtime.Status.CONNECTING
-        ws =
-            supabaseClient.httpClient.webSocketSession(prefix + supabaseClient.supabaseUrl + ("/realtime/v1/websocket?apikey=${supabaseClient.supabaseKey}"))
+        val realtimeUrl = realtimeConfig.customRealtimeURL ?: (prefix + supabaseClient.supabaseUrl + ("/realtime/v1/websocket?apikey=${supabaseClient.supabaseKey}"))
+        ws = supabaseClient.httpClient.webSocketSession(realtimeUrl)
         _status.value = Realtime.Status.CONNECTED
         statusListeners.forEach { it(Realtime.Status.CONNECTED) }
         Napier.i { "Connected to realtime websocket!" }
@@ -118,6 +126,7 @@ internal class RealtimeImpl(val supabaseClient: SupabaseClient, private val real
             while (isActive) {
                 delay(realtimeConfig.heartbeatInterval)
                 sendHeartbeat()
+                println("hi")
             }
         }
     }
@@ -131,9 +140,15 @@ internal class RealtimeImpl(val supabaseClient: SupabaseClient, private val real
 
     private fun onMessage(stringMessage: String) {
         val message = supabaseJson.decodeFromString<RealtimeMessage>(stringMessage)
-        println(message)
+        println(stringMessage)
         val channel = subscriptions[message.topic] as? RealtimeChannelImpl
-        channel?.onMessage(message)
+        if(message.ref?.toIntOrNull() == heartbeatRef) {
+            Napier.i { "Heartbeat received" }
+            heartbeatRef = 0
+        } else {
+            println(channel)
+            channel?.onMessage(message)
+        }
     }
 
     private fun updateJwt(jwt: String) {
@@ -141,7 +156,8 @@ internal class RealtimeImpl(val supabaseClient: SupabaseClient, private val real
     }
 
     private suspend fun sendHeartbeat() {
-        if (ref != 0) {
+        if (heartbeatRef != 0) {
+            heartbeatRef = 0
             ref = 0
             Napier.w { "Heartbeat timeout. Trying to reconnect" }
             disconnect()
@@ -151,13 +167,26 @@ internal class RealtimeImpl(val supabaseClient: SupabaseClient, private val real
             return
         }
         Napier.d { "Sending heartbeat" }
-        ws.sendSerialized(RealtimeMessage("phoenix", "heartbeat", buildJsonObject { }, (++ref).toString()))
+        heartbeatRef = ++ref
+        ws.sendSerialized(RealtimeMessage("phoenix", "heartbeat", buildJsonObject { }, heartbeatRef.toString()))
+    }
+
+    override fun removeChannel(topic: String) {
+        TODO("Not yet implemented")
+    }
+
+    override fun addChannel(channel: RealtimeChannel) {
+        _subscriptions[channel.topic] = channel
     }
 
 }
 
 inline fun Realtime.createChannel(builder: RealtimeChannelBuilder.() -> Unit): RealtimeChannel {
-    return RealtimeChannelBuilder(this as RealtimeImpl).apply(builder).build()
+    return RealtimeChannelBuilder(this as RealtimeImpl).apply(builder).build().also(::addChannel)
+}
+
+suspend inline fun Realtime.createAndJoinChannel(builder: RealtimeChannelBuilder.() -> Unit): RealtimeChannel {
+    return RealtimeChannelBuilder(this as RealtimeImpl).apply(builder).build().also(::addChannel).also { it.join() }
 }
 
 val SupabaseClient.realtime: Realtime

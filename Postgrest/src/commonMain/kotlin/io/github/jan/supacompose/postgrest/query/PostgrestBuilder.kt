@@ -8,10 +8,12 @@ import io.ktor.client.call.body
 import io.ktor.client.request.parameter
 import io.ktor.client.request.request
 import io.ktor.client.request.setBody
+import io.ktor.client.statement.HttpResponse
 import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
 import io.ktor.http.contentType
+import io.ktor.http.parametersOf
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.encodeToJsonElement
@@ -25,8 +27,8 @@ class PostgrestBuilder (val supabaseClient: SupabaseClient, val table: String) {
         columns: String = "*",
         head: Boolean = false,
         count: Count? = null,
-        @BuilderInference filter: PostgrestFilterBuilder<T>.() -> Unit = {}
-    ): PostgrestResult = supabaseClient.buildPostgrestRequest<T>(table, if(head) HttpMethod.Head else HttpMethod.Get, prefer = buildList {
+        @BuilderInference filter: PostgrestFilterBuilder.() -> Unit = {}
+    ): PostgrestResult = supabaseClient.buildPostgrestRequest(table, if(head) HttpMethod.Head else HttpMethod.Get, prefer = buildList {
         if (count != null) {
             add("count=${count.identifier}")
         }
@@ -41,8 +43,8 @@ class PostgrestBuilder (val supabaseClient: SupabaseClient, val table: String) {
         onConflict: String? = null,
         returning: Returning = Returning.REPRESENTATION,
         count: Count? = null,
-        filter: PostgrestFilterBuilder<T>.() -> Unit = {}
-    ): PostgrestResult = supabaseClient.buildPostgrestRequest<T>(table, HttpMethod.Post, supabaseJson.encodeToJsonElement(values), buildList {
+        filter: PostgrestFilterBuilder.() -> Unit = {}
+    ): PostgrestResult = supabaseClient.buildPostgrestRequest(table, HttpMethod.Post, supabaseJson.encodeToJsonElement(values), buildList {
         add("return=${returning.identifier}")
         if(upsert) add("resolution=merge-duplicates")
         if(count != null) add("count=${count.identifier}")
@@ -57,19 +59,19 @@ class PostgrestBuilder (val supabaseClient: SupabaseClient, val table: String) {
         onConflict: String? = null,
         returning: Returning = Returning.REPRESENTATION,
         count: Count? = null,
-        filter: PostgrestFilterBuilder<T>.() -> Unit = {}
+        filter: PostgrestFilterBuilder.() -> Unit = {}
     ) = insert(listOf(value), upsert, onConflict, returning, count, filter)
 
     @OptIn(ExperimentalTypeInference::class)
-    suspend inline fun <reified T : Any> update(
-        crossinline update: PostgrestUpdate<T>.() -> Unit = {},
+    suspend inline fun update(
+        crossinline update: PostgrestUpdate.() -> Unit = {},
         returning: Returning = Returning.REPRESENTATION,
         count: Count? = null,
-        @BuilderInference filter: PostgrestFilterBuilder<T>.() -> Unit = {}
-    ): PostgrestResult = supabaseClient.buildPostgrestRequest<T>(
+        @BuilderInference filter: PostgrestFilterBuilder.() -> Unit = {}
+    ): PostgrestResult = supabaseClient.buildPostgrestRequest(
         table,
         HttpMethod.Patch,
-        JsonObject(PostgrestUpdate<T>().apply(update).map),
+        JsonObject(PostgrestUpdate().apply(update).map),
         buildList {
             add("return=${returning.identifier}")
             if (count != null) add("count=${count.identifier}")
@@ -78,18 +80,14 @@ class PostgrestBuilder (val supabaseClient: SupabaseClient, val table: String) {
     )
 
     @OptIn(ExperimentalTypeInference::class)
-    suspend inline fun <reified T : Any> delete(
+    suspend inline fun delete(
         returning: Returning = Returning.REPRESENTATION,
         count: Count? = null,
-        @BuilderInference filter: PostgrestFilterBuilder<T>.() -> Unit = {}
+        @BuilderInference filter: PostgrestFilterBuilder.() -> Unit = {}
     ): PostgrestResult = supabaseClient.buildPostgrestRequest(table, HttpMethod.Delete, prefer = buildList {
         add("return=${returning.identifier}")
         if (count != null) add("count=${count.identifier}")
     }, filter = filter)
-
-    companion object {
-        const val HEADER_PREFER = "Prefer"
-    }
 
     @PublishedApi
     internal fun String.cleanColumns(): String {
@@ -109,14 +107,18 @@ class PostgrestBuilder (val supabaseClient: SupabaseClient, val table: String) {
             }.joinToString("")
     }
 
+    companion object {
+        const val HEADER_PREFER = "Prefer"
+    }
+
 }
 
-suspend inline fun <reified T : Any> SupabaseClient.buildPostgrestRequest(
+suspend inline fun SupabaseClient.buildPostgrestRequest(
     table: String,
     method: HttpMethod,
     body: JsonElement? = null,
     prefer: List<String> = emptyList(),
-    filter: PostgrestFilterBuilder<T>.() -> Unit
+    filter: PostgrestFilterBuilder.() -> Unit
 ) = httpClient.request(
     "$supabaseHttpUrl/rest/v1/$table"
 ) {
@@ -125,19 +127,20 @@ suspend inline fun <reified T : Any> SupabaseClient.buildPostgrestRequest(
     headers[HttpHeaders.Authorization] = "Bearer ${auth.currentSession.value?.accessToken ?: throw IllegalStateException("Trying to access database without a user session")}"
     headers[PostgrestBuilder.HEADER_PREFER] = prefer.joinToString(",")
     setBody(body)
-    PostgrestFilterBuilder<T>().apply(filter).params.forEach {
-        parameter(it.key, it.value)
-    }
-}.let {
-    if(it.status.value !in 200..299) {
+    addPostgresFilter(filter)
+}.checkForErrorCodes()
+
+@PublishedApi
+internal suspend fun HttpResponse.checkForErrorCodes(): PostgrestResult {
+    if(status.value !in 200..299) {
         try {
-            val error = it.body<JsonObject>()
-            throw RestException(it.status.value, error["error"]?.jsonPrimitive?.content ?: "Unknown error", error.toString())
+            val error = body<JsonObject>()
+            throw RestException(status.value, error["error"]?.jsonPrimitive?.content ?: "Unknown error", error.toString())
         } catch(_: Exception) {
-            throw RestException(it.status.value, "Unknown error", "")
+            throw RestException(status.value, "Unknown error", "")
         }
     }
-    PostgrestResult(it.body(), it.status.value)
+    return PostgrestResult(body(), status.value)
 }
 
 enum class Count(val identifier: String) {

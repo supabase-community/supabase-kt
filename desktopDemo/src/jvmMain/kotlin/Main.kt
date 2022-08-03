@@ -10,7 +10,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -19,17 +18,19 @@ import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import io.github.jan.supacompose.auth.Auth
 import io.github.jan.supacompose.auth.auth
-import io.github.jan.supacompose.auth.providers.Discord
 import io.github.jan.supacompose.auth.providers.Email
 import io.github.jan.supacompose.auth.providers.Google
 import io.github.jan.supacompose.auth.sessionFile
 import io.github.jan.supacompose.createSupabaseClient
 import io.github.jan.supacompose.postgrest.Postgrest
-import io.github.jan.supacompose.realtime.ChannelAction
+import io.github.jan.supacompose.realtime.events.ChannelAction
 import io.github.jan.supacompose.realtime.Realtime
+import io.github.jan.supacompose.realtime.createAndJoinChannel
 import io.github.jan.supacompose.realtime.createChannel
 import io.github.jan.supacompose.realtime.realtime
 import io.github.jan.supacompose.storage.Storage
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import java.io.File
@@ -41,8 +42,6 @@ data class User(val id: String, val username: String)
 suspend fun main() {
     val client = createSupabaseClient {
 
-        supabaseUrl = "https://arnyfaeuskyqfxkvotgj.supabase.co"
-        supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFybnlmYWV1c2t5cWZ4a3ZvdGdqIiwicm9sZSI6ImFub24iLCJpYXQiOjE2NTMwMzkxMTEsImV4cCI6MTk2ODYxNTExMX0.ItmL8lfnOL9oy7CEX9N6TnYt10VVhk-KTlwley4aq1M"
 
 
         install(Auth) {
@@ -52,12 +51,12 @@ suspend fun main() {
         install(Realtime)
         install(Storage)
     }
+    val scope = CoroutineScope(Dispatchers.IO)
     println(client.supabaseHttpUrl)
     application {
         Window(::exitApplication) {
             val session by client.auth.currentSession.collectAsState()
             val status by client.realtime.status.collectAsState()
-            val scope = rememberCoroutineScope()
             println(session?.accessToken)
             if (session != null) {
                 Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
@@ -70,12 +69,18 @@ suspend fun main() {
                 }
                 if(status == Realtime.Status.CONNECTED) {
                     LaunchedEffect(Unit) {
-                        client.realtime.createChannel {
-                            table = "products"
-                            schema = "public"
+                        scope.launch {
+                            client.realtime.createAndJoinChannel {
+                                table = "test"
+                                schema = "public"
 
-                            on(ChannelAction.UPDATE) {
-                                println(it.record)
+                                on<ChannelAction.Insert> {
+                                    println(record)
+                                }
+
+                                onAll {
+                                    println(oldRecord)
+                                }
                             }
                         }
                     }

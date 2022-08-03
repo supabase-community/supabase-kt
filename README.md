@@ -2,8 +2,6 @@
 
 A framework for building android & desktop apps with Supabase
 
-https://user-images.githubusercontent.com/26686035/169712245-e090e33b-8472-49c8-a512-947d5ed889d5.mp4
-
 Newest version: [![Maven Central](https://img.shields.io/maven-central/v/io.github.jan-tennert.supacompose/Supacompose)](https://search.maven.org/artifact/io.github.jan-tennert.supacompose/Supacompose)
 
 # Installation
@@ -24,7 +22,7 @@ val client = createSupabaseClient {
     supabaseKey = System.getenv("SUPABASE_KEY")
 
     install(Auth) {
-        //on desktop you have to set the session file. On android and web it's managed by the plugin
+        //on desktop, you have to set the session file. On android and web it's managed by the plugin
         sessionFile = File("C:\\Users\\user\\AppData\\Local\\SupaCompose\\usersession.json")
     }
     //install other plugins
@@ -457,16 +455,21 @@ val status by client.realtime.status.collectAsState()
 
 if (session != null) {
     LaunchedEffect(Unit) {
-        client.realtime.connect()
-    }
-}
-if (status == Realtime.Status.CONNECTED) {
-    LaunchedEffect(Unit) {
-        client.realtime.createChannel("public", "products")
-            .on(RealtimeChannel.Action.INSERT) {
-                println(it.record<Message>())
+        scope.launch {
+            client.realtime.connect()
+            client.realtime.createAndJoinChannel {
+                table = "test"
+                schema = "public"
+
+                on<ChannelAction.Insert> {
+                    println(record)
+                }
+
+                onAll {
+                    println(oldRecord)
+                }
             }
-            .join()
+        }
     }
 }
 
