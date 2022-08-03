@@ -450,26 +450,18 @@ bucket.copy("landscape.png", "landscape2.png")
 <details><summary>Listening for database changes (not final syntax)</summary>
 
 ```kotlin
-val session by client.auth.currentSession.collectAsState()
-val status by client.realtime.status.collectAsState()
+//in some suspending function
+client.realtime.connect()
+client.realtime.createAndJoinChannel {
+    table = "test"
+    schema = "public"
 
-if (session != null) {
-    LaunchedEffect(Unit) {
-        scope.launch {
-            client.realtime.connect()
-            client.realtime.createAndJoinChannel {
-                table = "test"
-                schema = "public"
+    on<ChannelAction.Insert> {
+        println(record)
+    }
 
-                on<ChannelAction.Insert> {
-                    println(record)
-                }
-
-                onAll {
-                    println(oldRecord)
-                }
-            }
-        }
+    onAll {
+        println(oldRecord)
     }
 }
 
