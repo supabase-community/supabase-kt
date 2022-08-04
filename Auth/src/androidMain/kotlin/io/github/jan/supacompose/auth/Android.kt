@@ -57,8 +57,7 @@ internal var Auth.Config.sessionFile: File?
 //add a contextual receiver later in kotlin 1.7 and remove the supabaseClient parameter
 @OptIn(SupaComposeInternal::class)
 fun Activity.initializeAndroid(supabaseClient: SupabaseClient, onSessionSuccess: (UserSession) -> Unit = {}) {
-
-    val authPlugin = supabaseClient.plugins["auth"] as? AuthImpl ?: throw IllegalStateException("You need to install the Auth plugin on the supabase client to handle deep links")
+    val authPlugin = supabaseClient.pluginManager.getPlugin<AuthImpl>("auth")
     authPlugin.config.activity = this
     authPlugin.config.sessionFile = File(filesDir, "session.json")
     addLifecycleCallbacks(supabaseClient, authPlugin)
