@@ -2,9 +2,10 @@ package io.github.jan.supacompose.postgrest
 
 import io.github.jan.supacompose.SupabaseClient
 import io.github.jan.supacompose.plugins.SupacomposePlugin
+import io.github.jan.supacompose.plugins.SupacomposePluginProvider
 import io.github.jan.supacompose.postgrest.query.PostgrestBuilder
 
-sealed interface Postgrest {
+sealed interface Postgrest : SupacomposePlugin {
 
     fun from(table: String): PostgrestBuilder
 
@@ -12,10 +13,9 @@ sealed interface Postgrest {
 
     class Config
 
-    companion object : SupacomposePlugin<Config, Postgrest> {
+    companion object : SupacomposePluginProvider<Config, Postgrest> {
 
         override val key = "postgrest"
-
         override fun createConfig(init: Config.() -> Unit) = Config().apply(init)
         override fun create(supabaseClient: SupabaseClient, config: Config): Postgrest {
             return PostgrestImpl(supabaseClient)
@@ -34,6 +34,4 @@ internal class PostgrestImpl(private val supabaseClient: SupabaseClient) : Postg
 }
 
 val SupabaseClient.postgrest: Postgrest
-    get() = plugins.getOrElse("postgrest") {
-        throw IllegalStateException("Postgres plugin not installed")
-    } as? Postgrest ?: throw IllegalStateException("Postgres plugin not installed")
+    get() = pluginManager.getPlugin(Postgrest.key)

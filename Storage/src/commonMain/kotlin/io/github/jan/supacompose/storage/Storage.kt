@@ -4,6 +4,7 @@ import io.github.jan.supacompose.SupabaseClient
 import io.github.jan.supacompose.auth.auth
 import io.github.jan.supacompose.exceptions.RestException
 import io.github.jan.supacompose.plugins.SupacomposePlugin
+import io.github.jan.supacompose.plugins.SupacomposePluginProvider
 import io.ktor.client.call.body
 import io.ktor.client.request.HttpRequestBuilder
 import io.ktor.client.request.headers
@@ -19,7 +20,7 @@ import kotlinx.serialization.json.int
 import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.put
 
-sealed interface Storage {
+sealed interface Storage : SupacomposePlugin {
 
     /**
      * Creates a new bucket in the storage
@@ -54,7 +55,7 @@ sealed interface Storage {
 
     class Config
 
-    companion object : SupacomposePlugin<Config, Storage> {
+    companion object : SupacomposePluginProvider<Config, Storage> {
 
         override val key: String = "storage"
 
@@ -124,6 +125,4 @@ internal class StorageImpl(val supabaseClient: SupabaseClient) : Storage {
 }
 
 val SupabaseClient.storage: Storage
-    get() = plugins.getOrElse("storage") {
-        throw IllegalStateException("Storage plugin not installed")
-    } as? Storage ?: throw IllegalStateException("Storage plugin not installed")
+    get() = pluginManager.getPlugin(Storage.key)

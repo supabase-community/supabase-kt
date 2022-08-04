@@ -1,6 +1,7 @@
 package io.github.jan.supacompose.realtime
 
 import io.github.aakira.napier.Napier
+import io.github.jan.supacompose.annotiations.SupaComposeInternal
 import io.github.jan.supacompose.realtime.events.ChannelAction
 import io.github.jan.supacompose.realtime.events.EventListener
 import io.github.jan.supacompose.supabaseJson
@@ -25,6 +26,10 @@ sealed interface RealtimeChannel {
 
     suspend fun join()
 
+    suspend fun updateAuth(jwt: String)
+
+    suspend fun leave()
+
     enum class Status {
         CLOSED,
         JOINING,
@@ -34,6 +39,7 @@ sealed interface RealtimeChannel {
 
     companion object {
         const val CHANNEL_EVENT_JOIN = "phx_join"
+        const val CHANNEL_EVENT_LEAVE = "phx_leave"
     }
 
 }
@@ -52,7 +58,9 @@ internal class RealtimeChannelImpl(
     private val _status = MutableStateFlow(RealtimeChannel.Status.CLOSED)
     override val status = _status.asStateFlow()
 
+    @OptIn(SupaComposeInternal::class)
     override suspend fun join() {
+        realtimeImpl.addChannel(this)
         _status.value = RealtimeChannel.Status.JOINING
         Napier.d { "Joining channel $topic" }
         realtimeImpl.ws.sendSerialized(RealtimeMessage(topic, RealtimeChannel.CHANNEL_EVENT_JOIN, buildJsonObject {
@@ -77,6 +85,18 @@ internal class RealtimeChannelImpl(
                 listeners.forEach { it.onEvent(action) }
             }
         }
+    }
+
+    @OptIn(SupaComposeInternal::class)
+    override suspend fun leave() {
+        realtimeImpl.removeChannel(topic)
+        _status.value = RealtimeChannel.Status.LEAVING
+        Napier.d { "Leaving channel $topic" }
+        realtimeImpl.ws.sendSerialized(RealtimeMessage(topic, RealtimeChannel.CHANNEL_EVENT_LEAVE, buildJsonObject {}, null))
+    }
+
+    override suspend fun updateAuth(jwt: String) {
+        TODO("Not yet implemented")
     }
 
 }

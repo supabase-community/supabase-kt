@@ -2,6 +2,7 @@ package io.github.jan.supacompose
 
 import io.github.jan.supacompose.annotiations.SupaComposeDsl
 import io.github.jan.supacompose.plugins.SupacomposePlugin
+import io.github.jan.supacompose.plugins.SupacomposePluginProvider
 import io.ktor.client.HttpClientConfig
 import io.ktor.client.engine.HttpClientEngine
 
@@ -13,7 +14,7 @@ class SupabaseClientBuilder {
     var useHTTPS = true
     var httpEngine: HttpClientEngine? = null
     private val httpConfigOverrides = mutableListOf<HttpClientConfig<*>.() -> Unit>()
-    private val plugins = mutableMapOf<String, ((SupabaseClient) -> Any)>()
+    private val plugins = mutableMapOf<String, ((SupabaseClient) -> SupacomposePlugin)>()
 
     @PublishedApi
     internal fun build(): SupabaseClient {
@@ -26,7 +27,7 @@ class SupabaseClientBuilder {
         httpConfigOverrides.add(block)
     }
 
-    fun <C, O : Any, P : SupacomposePlugin<C, O>> install(plugin: P, init: C.() -> Unit = {}) {
+    fun <Config, PluginInstance : SupacomposePlugin, Provider : SupacomposePluginProvider<Config, PluginInstance>> install(plugin: Provider, init: Config.() -> Unit = {}) {
         val config = plugin.createConfig(init)
         plugin.setup(this, config)
         plugins[plugin.key] = {

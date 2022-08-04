@@ -7,6 +7,7 @@ import io.github.jan.supacompose.auth.user.UserInfo
 import io.github.jan.supacompose.auth.user.UserSession
 import io.github.jan.supacompose.exceptions.RestException
 import io.github.jan.supacompose.plugins.SupacomposePlugin
+import io.github.jan.supacompose.plugins.SupacomposePluginProvider
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
@@ -15,7 +16,7 @@ import kotlinx.serialization.json.jsonObject
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
-sealed interface Auth {
+sealed interface Auth : SupacomposePlugin {
 
     /**
      * Returns the current user session as a [StateFlow]
@@ -139,7 +140,7 @@ sealed interface Auth {
         NOT_AUTHENTICATED
     }
 
-    companion object : SupacomposePlugin<Config, Auth> {
+    companion object : SupacomposePluginProvider<Config, Auth> {
 
         override val key = "auth"
         const val API_VERSION = 1
@@ -171,6 +172,4 @@ enum class VerifyType {
 }
 
 val SupabaseClient.auth: Auth
-    get() = plugins.getOrElse("auth") {
-        throw IllegalStateException("Auth plugin not installed")
-    } as? Auth ?: throw IllegalStateException("Auth plugin not installed")
+    get() = pluginManager.getPlugin(Auth.key)

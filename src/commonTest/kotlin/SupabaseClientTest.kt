@@ -2,17 +2,18 @@ import io.github.jan.supacompose.SupabaseClient
 import io.github.jan.supacompose.SupabaseClientBuilder
 import io.github.jan.supacompose.createSupabaseClient
 import io.github.jan.supacompose.plugins.SupacomposePlugin
+import io.github.jan.supacompose.plugins.SupacomposePluginProvider
 import io.ktor.client.engine.mock.MockEngine
 import io.ktor.client.engine.mock.respond
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertIs
 
-class TestPlugin(private val config: Config) {
+class TestPlugin(private val config: Config) : SupacomposePlugin {
 
     data class Config(var testValue: Boolean = false)
 
-    companion object : SupacomposePlugin<Config, TestPlugin> {
+    companion object : SupacomposePluginProvider<Config, TestPlugin> {
 
         override val key = "test"
 
@@ -59,7 +60,7 @@ class SupabaseClientTest {
                 testValue = true
             }
         }
-        val plugin = client.plugins["test"]
+        val plugin = client.pluginManager.getPlugin<Any?>("test")
         //test if the plugin was correctly installed
         assertIs<TestPlugin>(plugin, "Plugin 'test' should be of type TestPlugin")
         //test if the plugin correctly modified the 'useHTTPS' parameter

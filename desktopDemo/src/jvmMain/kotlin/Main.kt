@@ -31,6 +31,7 @@ import io.github.jan.supacompose.realtime.realtime
 import io.github.jan.supacompose.storage.Storage
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import java.io.File
@@ -47,8 +48,8 @@ suspend fun main() {
         install(Auth) {
             sessionFile = File("C:\\Users\\jan\\AppData\\Local\\SupaCompose\\usersession.json")
         }
-        install(Postgrest)
         install(Realtime)
+        install(Postgrest)
         install(Storage)
     }
     val scope = CoroutineScope(Dispatchers.IO)
@@ -65,24 +66,20 @@ suspend fun main() {
                 LaunchedEffect(Unit) {
                     scope.launch {
                         client.realtime.connect()
-                    }
-                }
-                if(status == Realtime.Status.CONNECTED) {
-                    LaunchedEffect(Unit) {
-                        scope.launch {
-                            client.realtime.createAndJoinChannel {
-                                table = "test"
-                                schema = "public"
+                        val channel = client.realtime.createAndJoinChannel {
+                            table = "test"
+                            schema = "public"
 
-                                on<ChannelAction.Insert> {
-                                    println(record)
-                                }
+                            on<ChannelAction.Insert> {
 
-                                onAll {
-                                    println(oldRecord)
-                                }
+                            }
+
+                            onAll {
+                                println(oldRecord)
                             }
                         }
+                        delay(10000)
+                        channel.leave()
                     }
                 }
             } else {

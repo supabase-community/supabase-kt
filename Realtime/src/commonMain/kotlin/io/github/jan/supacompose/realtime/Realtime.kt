@@ -3,19 +3,22 @@ package io.github.jan.supacompose.realtime
 import io.github.aakira.napier.Napier
 import io.github.jan.supacompose.SupabaseClient
 import io.github.jan.supacompose.SupabaseClientBuilder
+import io.github.jan.supacompose.annotiations.SupaComposeInternal
 import io.github.jan.supacompose.auth.auth
 import io.github.jan.supacompose.plugins.SupacomposePlugin
+import io.github.jan.supacompose.plugins.SupacomposePluginProvider
 import io.github.jan.supacompose.supabaseJson
 import io.ktor.client.plugins.websocket.DefaultClientWebSocketSession
 import io.ktor.client.plugins.websocket.WebSockets
 import io.ktor.client.plugins.websocket.sendSerialized
 import io.ktor.client.plugins.websocket.webSocketSession
 import io.ktor.serialization.kotlinx.KotlinxWebsocketSerializationConverter
+import io.ktor.websocket.CloseReason
 import io.ktor.websocket.Frame
+import io.ktor.websocket.close
 import io.ktor.websocket.readText
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
@@ -27,21 +30,39 @@ import kotlinx.coroutines.launch
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.buildJsonObject
 import kotlin.time.Duration
-import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
-sealed interface Realtime {
+sealed interface Realtime : SupacomposePlugin {
 
+    /**
+     * The current status of the realtime connection
+     */
     val status: StateFlow<Status>
+
+    /**
+     * A map of all active the subscriptions
+     */
     val subscriptions: Map<String, RealtimeChannel>
 
+    /**
+     * Connects to the realtime websocket. The url will be taken from the custom provided [Realtime.Config.customRealtimeURL] or [SupabaseClient]
+     */
     suspend fun connect()
+
+    /**
+     * Disconnects from the realtime websocket
+     */
     fun disconnect()
 
+    /**
+     * Calls [callback] whenever [status] changes
+     */
     fun onStatusChange(callback: (Status) -> Unit)
 
+    @SupaComposeInternal
     fun addChannel(channel: RealtimeChannel)
 
+    @SupaComposeInternal
     fun removeChannel(topic: String)
 
     class Config(
@@ -51,7 +72,7 @@ sealed interface Realtime {
         var customRealtimeURL: String? = null
     )
 
-    companion object : SupacomposePlugin<Config, Realtime> {
+    companion object : SupacomposePluginProvider<Config, Realtime> {
 
         override val key = "realtime"
 
@@ -126,7 +147,6 @@ internal class RealtimeImpl(val supabaseClient: SupabaseClient, private val real
             while (isActive) {
                 delay(realtimeConfig.heartbeatInterval)
                 sendHeartbeat()
-                println("hi")
             }
         }
     }
@@ -171,25 +191,38 @@ internal class RealtimeImpl(val supabaseClient: SupabaseClient, private val real
         ws.sendSerialized(RealtimeMessage("phoenix", "heartbeat", buildJsonObject { }, heartbeatRef.toString()))
     }
 
+    @SupaComposeInternal
     override fun removeChannel(topic: String) {
-        TODO("Not yet implemented")
+        _subscriptions.remove(topic)
     }
 
+    @SupaComposeInternal
     override fun addChannel(channel: RealtimeChannel) {
         _subscriptions[channel.topic] = channel
     }
 
+    override suspend fun close() {
+        ws.close(CloseReason(CloseReason.Codes.NORMAL, "Connection closed by library"))
+    }
+
 }
 
+/**
+ * Creates a new [RealtimeChannel]
+ */
 inline fun Realtime.createChannel(builder: RealtimeChannelBuilder.() -> Unit): RealtimeChannel {
-    return RealtimeChannelBuilder(this as RealtimeImpl).apply(builder).build().also(::addChannel)
+    return RealtimeChannelBuilder(this as RealtimeImpl).apply(builder).build()
 }
 
+/**
+ * Creates a new [RealtimeChannel] and joins it after creation
+ */
 suspend inline fun Realtime.createAndJoinChannel(builder: RealtimeChannelBuilder.() -> Unit): RealtimeChannel {
-    return RealtimeChannelBuilder(this as RealtimeImpl).apply(builder).build().also(::addChannel).also { it.join() }
+    return RealtimeChannelBuilder(this as RealtimeImpl).apply(builder).build().also { it.join() }
 }
 
+/**
+ * Supabase Realtime is a way to listen to changes in the PostgreSQL database via websockets
+ */
 val SupabaseClient.realtime: Realtime
-    get() = plugins.getOrElse("realtime") {
-        throw IllegalStateException("Realtime plugin not installed")
-    } as? Realtime ?: throw IllegalStateException("Realtime plugin not installed")
+    get() = pluginManager.getPlugin(Realtime.key)

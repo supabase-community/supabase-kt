@@ -1,6 +1,8 @@
 package io.github.jan.supacompose
 
 import io.github.aakira.napier.Napier
+import io.github.jan.supacompose.plugins.PluginManager
+import io.github.jan.supacompose.plugins.SupacomposePlugin
 import io.ktor.client.HttpClient
 import io.ktor.client.HttpClientConfig
 import io.ktor.client.engine.HttpClientEngine
@@ -17,9 +19,8 @@ sealed interface SupabaseClient: CoroutineScope {
     val supabaseHttpUrl: String
     val supabaseUrl: String
     val supabaseKey: String
-    val plugins: Map<String, Any>
+    val pluginManager: PluginManager
     val httpClient: HttpClient
-
     fun path(path: String): String = "$supabaseHttpUrl/$path"
 
 }
@@ -27,7 +28,7 @@ sealed interface SupabaseClient: CoroutineScope {
 internal class SupabaseClientImpl(
     override val supabaseUrl: String,
     override val supabaseKey: String,
-    plugins: Map<String, (SupabaseClient) -> Any>,
+    plugins: Map<String, (SupabaseClient) -> SupacomposePlugin>,
     httpConfigOverrides: MutableList<HttpClientConfig<*>.() -> Unit>,
     useHTTPS: Boolean,
     httpEngine: HttpClientEngine?,
@@ -38,6 +39,10 @@ internal class SupabaseClientImpl(
     } else {
         "http://$supabaseUrl"
     }
+
+    override val pluginManager = PluginManager(plugins.toList().associate { (key, value) ->
+        key to value(this)
+    })
 
     init {
         Napier.w {
@@ -73,10 +78,6 @@ internal class SupabaseClientImpl(
             }
             httpConfigOverrides.forEach { it.invoke(this) }
         }
-    }
-
-    override val plugins = plugins.toList().associate { (key, value) ->
-        key to value(this)
     }
 
 }
