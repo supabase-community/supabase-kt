@@ -11,7 +11,7 @@ sealed interface Postgrest : SupacomposePlugin {
 
     operator fun get(table: String): PostgrestBuilder = from(table)
 
-    class Config
+    data class Config(val customPostgrestUrl: String? = null)
 
     companion object : SupacomposePluginProvider<Config, Postgrest> {
 
@@ -33,5 +33,8 @@ internal class PostgrestImpl(private val supabaseClient: SupabaseClient) : Postg
 
 }
 
+/**
+ * With the postgrest plugin you can directly interact with your database via an api
+ */
 val SupabaseClient.postgrest: Postgrest
     get() = pluginManager.getPlugin(Postgrest.key)

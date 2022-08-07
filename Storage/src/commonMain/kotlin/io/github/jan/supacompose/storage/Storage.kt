@@ -124,5 +124,8 @@ internal class StorageImpl(val supabaseClient: SupabaseClient) : Storage {
 
 }
 
+/**
+ * Supabase Storage is a simple way to store large files for various purposes
+ */
 val SupabaseClient.storage: Storage
     get() = pluginManager.getPlugin(Storage.key)

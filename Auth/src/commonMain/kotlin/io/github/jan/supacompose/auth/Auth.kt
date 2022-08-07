@@ -129,9 +129,20 @@ sealed interface Auth : SupacomposePlugin {
      */
     suspend fun invalidateSession()
 
+    /**
+     * Imports a user session and starts auto-refreshing if [autoRefresh] is true
+     */
+    suspend fun importSession(session: UserSession, autoRefresh: Boolean = true)
+
+    /**
+     * Imports the jwt token and retrieves the user profile.
+     * Be aware auto-refreshing is not available when importing **only** a jwt token.
+     */
+    suspend fun importAuthToken(jwt: String) = importSession(UserSession(jwt, "", 0L, "", getUser(jwt)), false)
+
     fun path(path: String): String
 
-    class Config(val params: MutableMap<String, Any> = mutableMapOf(), var retryDelay: Duration = 10.seconds)
+    class Config(val params: MutableMap<String, Any> = mutableMapOf(), var retryDelay: Duration = 10.seconds, var alwaysAutoRefresh: Boolean = true)
 
     enum class Status {
         LOADING_FROM_STORAGE,
@@ -171,5 +182,8 @@ enum class VerifyType {
     INVITE
 }
 
+/**
+ * The Auth plugin handles everything related to supabase's authentication system
+ */
 val SupabaseClient.auth: Auth
     get() = pluginManager.getPlugin(Auth.key)

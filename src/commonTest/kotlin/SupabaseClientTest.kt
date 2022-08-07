@@ -1,5 +1,6 @@
 import io.github.jan.supacompose.SupabaseClient
 import io.github.jan.supacompose.SupabaseClientBuilder
+import io.github.jan.supacompose.annotiations.SupaComposeInternal
 import io.github.jan.supacompose.createSupabaseClient
 import io.github.jan.supacompose.plugins.SupacomposePlugin
 import io.github.jan.supacompose.plugins.SupacomposePluginProvider
@@ -67,6 +68,7 @@ class SupabaseClientTest {
         assertEquals("https://example.supabase.co", client.supabaseHttpUrl, "Supabase http url should be https://example.supabase.co because the plugin modifies it")
     }
 
+    @OptIn(SupaComposeInternal::class)
     @Test
     fun testClientPath() {
         val client = createMockedSupabaseClient {

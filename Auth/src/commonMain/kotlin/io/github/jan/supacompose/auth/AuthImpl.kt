@@ -5,6 +5,7 @@ package io.github.jan.supacompose.auth
  import io.github.jan.supacompose.CurrentPlatformTarget
  import io.github.jan.supacompose.PlatformTarget
  import io.github.jan.supacompose.SupabaseClient
+ import io.github.jan.supacompose.annotiations.SupaComposeInternal
  import io.github.jan.supacompose.auth.providers.AuthProvider
  import io.github.jan.supacompose.auth.providers.DefaultAuthProvider
  import io.github.jan.supacompose.auth.user.UserInfo
@@ -23,7 +24,10 @@ package io.github.jan.supacompose.auth
  import io.ktor.client.request.setBody
  import io.ktor.http.HttpHeaders
  import io.ktor.http.HttpStatusCode.Companion.Unauthorized
+ import kotlinx.coroutines.CoroutineScope
+ import kotlinx.coroutines.Dispatchers
  import kotlinx.coroutines.Job
+ import kotlinx.coroutines.cancel
  import kotlinx.coroutines.coroutineScope
  import kotlinx.coroutines.delay
  import kotlinx.coroutines.flow.MutableStateFlow
@@ -43,6 +47,7 @@ internal class AuthImpl(override val supabaseClient: SupabaseClient, override va
     private val _currentSession = MutableStateFlow<UserSession?>(null)
     override val currentSession: StateFlow<UserSession?> = _currentSession.asStateFlow()
     private val callbacks = mutableListOf<(new: UserSession?, old: UserSession?) -> Unit>()
+    private val authScope = CoroutineScope(Dispatchers.Default + Job())
     override val sessionManager = SessionManager()
     val _status = MutableStateFlow(Auth.Status.NOT_AUTHENTICATED)
     override val status = _status.asStateFlow()
@@ -51,7 +56,7 @@ internal class AuthImpl(override val supabaseClient: SupabaseClient, override va
     init {
         Napier.base(DebugAntilog())
         if (CurrentPlatformTarget == PlatformTarget.WEB || CurrentPlatformTarget == PlatformTarget.DESKTOP) { //for android see Android.kt
-            supabaseClient.launch {
+            authScope.launch {
                 Napier.d {
                     "Trying to load latest session"
                 }
@@ -76,26 +81,26 @@ internal class AuthImpl(override val supabaseClient: SupabaseClient, override va
         invalidateSession()
     }
 
-    override suspend fun <C, R, Provider : AuthProvider<C, R>> loginWith(
+    override suspend fun <Config, Result, Provider : AuthProvider<Config, Result>> loginWith(
         provider: Provider,
         redirectUrl: String?,
-        config: (C.() -> Unit)?
+        config: (Config.() -> Unit)?
     ) = provider.login(supabaseClient, {
         startJob(it)
     }, redirectUrl, config)
 
-    override suspend fun <C, R, Provider : AuthProvider<C, R>> signUpWith(
+    override suspend fun <Config, Result, Provider : AuthProvider<Config, Result>> signUpWith(
         provider: Provider,
         redirectUrl: String?,
-        config: (C.() -> Unit)?
+        config: (Config.() -> Unit)?
     ) = provider.signUp(supabaseClient, {
         startJob(it)
     }, redirectUrl, config)
 
-    override suspend fun <C, R, Provider : DefaultAuthProvider<C, R>> modifyUser(
+    override suspend fun <Config, Result, Provider : DefaultAuthProvider<Config, Result>> modifyUser(
         provider: Provider,
         extraData: JsonObject?,
-        config: C.() -> Unit
+        config: Config.() -> Unit
     ): UserInfo {
         val body = buildJsonObject {
             putJsonObject(provider.encodeCredentials(config).toJsonObject())
@@ -110,11 +115,11 @@ internal class AuthImpl(override val supabaseClient: SupabaseClient, override va
         return response.body()
     }
 
-    override suspend fun <C, R, Provider : DefaultAuthProvider<C, R>> sendOtpTo(
+    override suspend fun <Config, Result, Provider : DefaultAuthProvider<Config, Result>> sendOtpTo(
         provider: Provider,
         createUser: Boolean,
         redirectUrl: String?,
-        config: C.() -> Unit
+        config: Config.() -> Unit
     ) {
         val finalRedirectUrl = generateRedirectUrl(redirectUrl)
         val body = buildJsonObject {
@@ -164,7 +169,7 @@ internal class AuthImpl(override val supabaseClient: SupabaseClient, override va
     }
 
     override suspend fun getUser(jwt: String): UserInfo {
-        val response = supabaseClient.httpClient.get(path("user").also(::println)) {
+        val response = supabaseClient.httpClient.get(path("user")) {
             header(HttpHeaders.Authorization, "Bearer $jwt")
         }
         return response.body()
@@ -173,9 +178,7 @@ internal class AuthImpl(override val supabaseClient: SupabaseClient, override va
     override suspend fun invalidateSession() {
         sessionManager.deleteSession(supabaseClient, this)
         sessionJob?.cancel()
-        _status.value = Auth.Status.NOT_AUTHENTICATED
-        callbacks.forEach { it.invoke(null, currentSession.value)}
-        _currentSession.value = null
+        updateSession(Auth.Status.NOT_AUTHENTICATED, null)
         sessionJob = null
     }
 
@@ -196,9 +199,16 @@ internal class AuthImpl(override val supabaseClient: SupabaseClient, override va
         startJob(newSession)
     }
 
-    internal suspend fun startJob(session: UserSession) {
+    internal suspend fun startJob(session: UserSession, autoRefresh: Boolean = config.alwaysAutoRefresh) {
         Napier.d {
             "(Re)starting session job"
+        }
+        if(!autoRefresh) {
+            updateSession(Auth.Status.AUTHENTICATED, session)
+            if(session.refreshToken.isNotBlank() && session.expiresIn != 0L) {
+                sessionManager.saveSession(supabaseClient, this, session)
+            }
+            return
         }
         if(session.expiresAt < Clock.System.now()) {
             try {
@@ -213,9 +223,7 @@ internal class AuthImpl(override val supabaseClient: SupabaseClient, override va
                 startJob(session)
             }
         } else {
-            _status.value = Auth.Status.AUTHENTICATED
-            callbacks.forEach { it.invoke(currentSession.value, session)}
-            _currentSession.value = session
+            updateSession(Auth.Status.AUTHENTICATED, session)
             sessionManager.saveSession(supabaseClient, this, session)
             coroutineScope {
                 sessionJob = launch {
@@ -242,6 +250,8 @@ internal class AuthImpl(override val supabaseClient: SupabaseClient, override va
         }
     }
 
+    override suspend fun importSession(session: UserSession, autoRefresh: Boolean) = startJob(session, autoRefresh)
+
     override fun onSessionChange(callback: (new: UserSession?, old: UserSession?) -> Unit) {
         callbacks += callback
     }
@@ -252,7 +262,19 @@ internal class AuthImpl(override val supabaseClient: SupabaseClient, override va
         }
     }
 
+    private fun updateSession(status: Auth.Status, newSession: UserSession?) {
+        _status.value = status
+        val oldSession = currentSession.value
+        _currentSession.value = newSession
+        callbacks.forEach { it.invoke(newSession, oldSession) }
+    }
+
+    @OptIn(SupaComposeInternal::class)
     override fun path(path: String) = supabaseClient.path("auth/v${Auth.API_VERSION}/$path")
+
+    override suspend fun close() {
+        authScope.cancel()
+    }
 
     private operator fun UserSession?.not(): UserSession {
         return this ?: throw IllegalStateException("No user session available")

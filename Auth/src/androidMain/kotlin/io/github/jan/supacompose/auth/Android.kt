@@ -106,11 +106,12 @@ fun Activity.initializeAndroid(supabaseClient: SupabaseClient, onSessionSuccess:
 
 private fun addLifecycleCallbacks(supabaseClient: SupabaseClient, authPlugin: AuthImpl) {
     val lifecycle = ProcessLifecycleOwner.get().lifecycle
+    val scope = CoroutineScope(Dispatchers.IO)
     lifecycle.addObserver(
         object : DefaultLifecycleObserver {
 
             override fun onStart(owner: LifecycleOwner) {
-                supabaseClient.launch {
+                scope.launch {
                     Napier.d {
                         "Trying to load the latest session"
                     }

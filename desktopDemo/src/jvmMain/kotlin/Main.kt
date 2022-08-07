@@ -42,8 +42,8 @@ data class User(val id: String, val username: String)
 
 suspend fun main() {
     val client = createSupabaseClient {
-
-
+        supabaseUrl = System.getenv("SUPABASE_URL")
+        supabaseKey = System.getenv("SUPABASE_KEY")
 
         install(Auth) {
             sessionFile = File("C:\\Users\\jan\\AppData\\Local\\SupaCompose\\usersession.json")
@@ -67,7 +67,7 @@ suspend fun main() {
                     scope.launch {
                         client.realtime.connect()
                         val channel = client.realtime.createAndJoinChannel {
-                            table = "test"
+                            table = "products"
                             schema = "public"
 
                             on<ChannelAction.Insert> {
@@ -78,8 +78,6 @@ suspend fun main() {
                                 println(oldRecord)
                             }
                         }
-                        delay(10000)
-                        channel.leave()
                     }
                 }
             } else {
