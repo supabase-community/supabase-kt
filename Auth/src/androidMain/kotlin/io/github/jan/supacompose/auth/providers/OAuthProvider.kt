@@ -22,12 +22,13 @@ actual abstract class OAuthProvider : AuthProvider<ExternalAuthConfig, Unit> {
     }
 
     actual override suspend fun signUp(
-        supabaseClient: io.github.jan.supacompose.SupabaseClient,
+        supabaseClient: SupabaseClient,
         onSuccess: suspend (UserSession) -> Unit,
         redirectUrl: String?,
         config: (ExternalAuthConfig.() -> Unit)?
     ) {
-        TODO("Not yet implemented")
+        val auth = supabaseClient.auth as AuthImpl
+        auth.openOAuth(provider())
     }
 
 

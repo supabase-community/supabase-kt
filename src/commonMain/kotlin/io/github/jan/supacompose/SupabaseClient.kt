@@ -48,9 +48,6 @@ sealed interface SupabaseClient {
      */
     suspend fun close()
 
-    @SupaComposeInternal
-    fun path(path: String): String = "$supabaseHttpUrl/$path"
-
 }
 
 internal class SupabaseClientImpl(

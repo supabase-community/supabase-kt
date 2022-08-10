@@ -3,6 +3,8 @@ package io.github.jan.supacompose.storage
 import io.github.jan.supacompose.SupabaseClient
 import io.github.jan.supacompose.auth.auth
 import io.github.jan.supacompose.exceptions.RestException
+import io.github.jan.supacompose.plugins.MainConfig
+import io.github.jan.supacompose.plugins.MainPlugin
 import io.github.jan.supacompose.plugins.SupacomposePlugin
 import io.github.jan.supacompose.plugins.SupacomposePluginProvider
 import io.ktor.client.call.body
@@ -20,7 +22,7 @@ import kotlinx.serialization.json.int
 import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.put
 
-sealed interface Storage : SupacomposePlugin {
+sealed interface Storage : MainPlugin<Storage.Config> {
 
     /**
      * Creates a new bucket in the storage
@@ -53,22 +55,29 @@ sealed interface Storage : SupacomposePlugin {
 
     fun from(id: String): BucketApi = get(id)
 
-    class Config
+    data class Config(override var customUrl: String? = null): MainConfig
 
     companion object : SupacomposePluginProvider<Config, Storage> {
 
         override val key: String = "storage"
+        const val API_VERSION = 1
 
         override fun createConfig(init: Config.() -> Unit) = Config().apply(init)
         override fun create(supabaseClient: SupabaseClient, config: Config): Storage {
-            return StorageImpl(supabaseClient)
+            return StorageImpl(supabaseClient, config)
         }
 
     }
 
 }
 
-internal class StorageImpl(val supabaseClient: SupabaseClient) : Storage {
+internal class StorageImpl(override val supabaseClient: SupabaseClient, override val config: Storage.Config) : Storage {
+
+    override val PLUGIN_KEY: String
+        get() = Storage.key
+
+    override val API_VERSION: Int
+        get() = Storage.API_VERSION
 
     override suspend fun getAllBuckets(): List<Bucket> = makeRequest(HttpMethod.Get, "bucket").body()
 

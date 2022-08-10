@@ -6,6 +6,8 @@ import io.github.jan.supacompose.auth.providers.DefaultAuthProvider
 import io.github.jan.supacompose.auth.user.UserInfo
 import io.github.jan.supacompose.auth.user.UserSession
 import io.github.jan.supacompose.exceptions.RestException
+import io.github.jan.supacompose.plugins.MainConfig
+import io.github.jan.supacompose.plugins.MainPlugin
 import io.github.jan.supacompose.plugins.SupacomposePlugin
 import io.github.jan.supacompose.plugins.SupacomposePluginProvider
 import kotlinx.coroutines.flow.StateFlow
@@ -16,7 +18,7 @@ import kotlinx.serialization.json.jsonObject
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
-sealed interface Auth : SupacomposePlugin {
+sealed interface Auth : MainPlugin<Auth.Config> {
 
     /**
      * Returns the current user session as a [StateFlow]
@@ -24,19 +26,9 @@ sealed interface Auth : SupacomposePlugin {
     val currentSession: StateFlow<UserSession?>
 
     /**
-     * Returns the supabase client instance
-     */
-    val supabaseClient: SupabaseClient
-
-    /**
      * Returns the session manager instance
      */
     val sessionManager: SessionManager
-
-    /**
-     * Returns the auth's config
-     */
-    val config: Config
 
     /**
      * Returns the auth's status to distinguish between [Status.LOADING_FROM_STORAGE] in and [Status.NOT_AUTHENTICATED] when dealing with [currentSession] being null
@@ -140,9 +132,7 @@ sealed interface Auth : SupacomposePlugin {
      */
     suspend fun importAuthToken(jwt: String) = importSession(UserSession(jwt, "", 0L, "", getUser(jwt)), false)
 
-    fun path(path: String): String
-
-    class Config(val params: MutableMap<String, Any> = mutableMapOf(), var retryDelay: Duration = 10.seconds, var alwaysAutoRefresh: Boolean = true)
+    data class Config(val params: MutableMap<String, Any> = mutableMapOf(), var retryDelay: Duration = 10.seconds, var alwaysAutoRefresh: Boolean = true, override var customUrl: String? = null): MainConfig
 
     enum class Status {
         LOADING_FROM_STORAGE,

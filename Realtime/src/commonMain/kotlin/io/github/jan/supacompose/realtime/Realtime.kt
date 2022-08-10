@@ -5,6 +5,8 @@ import io.github.jan.supacompose.SupabaseClient
 import io.github.jan.supacompose.SupabaseClientBuilder
 import io.github.jan.supacompose.annotiations.SupaComposeInternal
 import io.github.jan.supacompose.auth.auth
+import io.github.jan.supacompose.plugins.MainConfig
+import io.github.jan.supacompose.plugins.MainPlugin
 import io.github.jan.supacompose.plugins.SupacomposePlugin
 import io.github.jan.supacompose.plugins.SupacomposePluginProvider
 import io.github.jan.supacompose.supabaseJson
@@ -34,7 +36,7 @@ import kotlinx.serialization.json.buildJsonObject
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
-sealed interface Realtime : SupacomposePlugin {
+sealed interface Realtime : MainPlugin<Realtime.Config> {
 
     /**
      * The current status of the realtime connection
@@ -67,17 +69,19 @@ sealed interface Realtime : SupacomposePlugin {
     @SupaComposeInternal
     fun removeChannel(topic: String)
 
-    class Config(
+    data class Config(
         var websocketConfig: WebSockets.Config.() -> Unit = {},
         var secure: Boolean = true,
         var heartbeatInterval: Duration = 15.seconds,
         var customRealtimeURL: String? = null,
         var reconnectDelay: Duration = 7.seconds,
-    )
+        override var customUrl: String? = null,
+    ): MainConfig
 
     companion object : SupacomposePluginProvider<Config, Realtime> {
 
         override val key = "realtime"
+        const val API_VERSION = 1
 
         override fun createConfig(init: Config.() -> Unit) = Config().apply(init)
         override fun setup(builder: SupabaseClientBuilder, config: Config) {
@@ -101,7 +105,7 @@ sealed interface Realtime : SupacomposePlugin {
 
 }
 
-internal class RealtimeImpl(val supabaseClient: SupabaseClient, private val realtimeConfig: Realtime.Config) :
+internal class RealtimeImpl(override val supabaseClient: SupabaseClient, override val config: Realtime.Config) :
     Realtime {
 
     lateinit var ws: DefaultClientWebSocketSession
@@ -115,6 +119,11 @@ internal class RealtimeImpl(val supabaseClient: SupabaseClient, private val real
     lateinit var heartbeatJob: Job
     var ref = 0
     var heartbeatRef = 0
+    override val API_VERSION: Int
+        get() = Realtime.API_VERSION
+
+    override val PLUGIN_KEY: String
+        get() = Realtime.key
 
     override fun onStatusChange(callback: (Realtime.Status) -> Unit) {
         statusListeners.add(callback)
@@ -124,10 +133,10 @@ internal class RealtimeImpl(val supabaseClient: SupabaseClient, private val real
 
     suspend fun connect(reconnect: Boolean) {
         if (reconnect) {
-            delay(realtimeConfig.reconnectDelay)
+            delay(config.reconnectDelay)
             Napier.d { "Reconnecting..." }
         } else {
-            supabaseClient.auth.onSessionChange { new, old ->
+            supabaseClient.auth.onSessionChange { new, _ ->
                 if (status.value == Realtime.Status.CONNECTED) {
                     if (new == null) {
                         Napier.w { "No auth session found, disconnecting from realtime websocket"}
@@ -139,9 +148,9 @@ internal class RealtimeImpl(val supabaseClient: SupabaseClient, private val real
             }
         }
         if (status.value == Realtime.Status.CONNECTED) throw IllegalStateException("Websocket already connected")
-        val prefix = if (realtimeConfig.secure) "wss://" else "ws://"
+        val prefix = if (config.secure) "wss://" else "ws://"
         updateStatus(Realtime.Status.CONNECTING)
-        val realtimeUrl = realtimeConfig.customRealtimeURL ?: (prefix + supabaseClient.supabaseUrl + ("/realtime/v1/websocket?apikey=${supabaseClient.supabaseKey}"))
+        val realtimeUrl = config.customRealtimeURL ?: (prefix + supabaseClient.supabaseUrl + ("/realtime/v${Realtime.API_VERSION}/websocket?apikey=${supabaseClient.supabaseKey}"))
          try {
             ws = supabaseClient.httpClient.webSocketSession(realtimeUrl)
             updateStatus(Realtime.Status.CONNECTED)
@@ -152,7 +161,7 @@ internal class RealtimeImpl(val supabaseClient: SupabaseClient, private val real
                  rejoinChannels()
              }
         } catch(e: Exception) {
-            Napier.e(e) { "Error while trying to connect to realtime websocket. Trying again in ${realtimeConfig.reconnectDelay}" }
+            Napier.e(e) { "Error while trying to connect to realtime websocket. Trying again in ${config.reconnectDelay}" }
             updateStatus(Realtime.Status.DISCONNECTED)
             connect(true)
         }
@@ -178,7 +187,7 @@ internal class RealtimeImpl(val supabaseClient: SupabaseClient, private val real
     private fun startHeartbeating() {
         heartbeatJob = scope.launch {
             while (isActive) {
-                delay(realtimeConfig.heartbeatInterval)
+                delay(config.heartbeatInterval)
                 if(!isActive) break
                 sendHeartbeat()
             }
@@ -221,7 +230,7 @@ internal class RealtimeImpl(val supabaseClient: SupabaseClient, private val real
         if (heartbeatRef != 0) {
             heartbeatRef = 0
             ref = 0
-            Napier.e { "Heartbeat timeout. Trying to reconnect in ${realtimeConfig.reconnectDelay}" }
+            Napier.e { "Heartbeat timeout. Trying to reconnect in ${config.reconnectDelay}" }
             scope.launch {
                 disconnect()
                 connect(true)

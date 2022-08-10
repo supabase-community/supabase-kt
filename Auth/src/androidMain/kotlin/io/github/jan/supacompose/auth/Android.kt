@@ -92,7 +92,7 @@ fun Activity.initializeAndroid(supabaseClient: SupabaseClient, onSessionSuccess:
         }
     }
 
-    /*fun handleErrorDeeplink() {
+    /**fun handleErrorDeeplink() {
         val errorCode = map["error_code"]?.toInt() ?: return
         val description = map["error_description"] ?: ""
         onAuthFail(AuthFail.RedirectError(errorCode, description))

@@ -3,6 +3,7 @@ package io.github.jan.supacompose.postgrest.query
 import io.github.jan.supacompose.SupabaseClient
 import io.github.jan.supacompose.auth.auth
 import io.github.jan.supacompose.exceptions.RestException
+import io.github.jan.supacompose.postgrest.Postgrest
 import io.github.jan.supacompose.supabaseJson
 import io.ktor.client.call.body
 import io.ktor.client.request.parameter
@@ -20,7 +21,7 @@ import kotlinx.serialization.json.encodeToJsonElement
 import kotlinx.serialization.json.jsonPrimitive
 import kotlin.experimental.ExperimentalTypeInference
 
-class PostgrestBuilder (val supabaseClient: SupabaseClient, val table: String) {
+class PostgrestBuilder (val postgrest: Postgrest, val table: String) {
 
     @OptIn(ExperimentalTypeInference::class)
     suspend inline fun <reified T : Any> select(
@@ -28,7 +29,7 @@ class PostgrestBuilder (val supabaseClient: SupabaseClient, val table: String) {
         head: Boolean = false,
         count: Count? = null,
         @BuilderInference filter: PostgrestFilterBuilder.() -> Unit = {}
-    ): PostgrestResult = supabaseClient.buildPostgrestRequest(table, if(head) HttpMethod.Head else HttpMethod.Get, prefer = buildList {
+    ): PostgrestResult = postgrest.buildPostgrestRequest(table, if(head) HttpMethod.Head else HttpMethod.Get, prefer = buildList {
         if (count != null) {
             add("count=${count.identifier}")
         }
@@ -44,7 +45,7 @@ class PostgrestBuilder (val supabaseClient: SupabaseClient, val table: String) {
         returning: Returning = Returning.REPRESENTATION,
         count: Count? = null,
         filter: PostgrestFilterBuilder.() -> Unit = {}
-    ): PostgrestResult = supabaseClient.buildPostgrestRequest(table, HttpMethod.Post, supabaseJson.encodeToJsonElement(values), buildList {
+    ): PostgrestResult = postgrest.buildPostgrestRequest(table, HttpMethod.Post, supabaseJson.encodeToJsonElement(values), buildList {
         add("return=${returning.identifier}")
         if(upsert) add("resolution=merge-duplicates")
         if(count != null) add("count=${count.identifier}")
@@ -68,7 +69,7 @@ class PostgrestBuilder (val supabaseClient: SupabaseClient, val table: String) {
         returning: Returning = Returning.REPRESENTATION,
         count: Count? = null,
         @BuilderInference filter: PostgrestFilterBuilder.() -> Unit = {}
-    ): PostgrestResult = supabaseClient.buildPostgrestRequest(
+    ): PostgrestResult = postgrest.buildPostgrestRequest(
         table,
         HttpMethod.Patch,
         JsonObject(PostgrestUpdate().apply(update).map),
@@ -84,7 +85,7 @@ class PostgrestBuilder (val supabaseClient: SupabaseClient, val table: String) {
         returning: Returning = Returning.REPRESENTATION,
         count: Count? = null,
         @BuilderInference filter: PostgrestFilterBuilder.() -> Unit = {}
-    ): PostgrestResult = supabaseClient.buildPostgrestRequest(table, HttpMethod.Delete, prefer = buildList {
+    ): PostgrestResult = postgrest.buildPostgrestRequest(table, HttpMethod.Delete, prefer = buildList {
         add("return=${returning.identifier}")
         if (count != null) add("count=${count.identifier}")
     }, filter = filter)
@@ -113,18 +114,18 @@ class PostgrestBuilder (val supabaseClient: SupabaseClient, val table: String) {
 
 }
 
-suspend inline fun SupabaseClient.buildPostgrestRequest(
+suspend inline fun Postgrest.buildPostgrestRequest(
     table: String,
     method: HttpMethod,
     body: JsonElement? = null,
     prefer: List<String> = emptyList(),
     filter: PostgrestFilterBuilder.() -> Unit
-) = httpClient.request(
-    "$supabaseHttpUrl/rest/v1/$table"
+) = supabaseClient.httpClient.request(
+    resolveUrl(table)
 ) {
     this.method = method
     contentType(ContentType.Application.Json)
-    headers[HttpHeaders.Authorization] = "Bearer ${auth.currentSession.value?.accessToken ?: throw IllegalStateException("Trying to access database without a user session")}"
+    headers[HttpHeaders.Authorization] = "Bearer ${supabaseClient.auth.currentSession.value?.accessToken ?: throw IllegalStateException("Trying to access database without a user session")}"
     headers[PostgrestBuilder.HEADER_PREFER] = prefer.joinToString(",")
     setBody(body)
     addPostgresFilter(filter)

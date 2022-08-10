@@ -44,6 +44,7 @@ class RealtimeChannelBuilder @PublishedApi internal constructor(private val real
         )
     }
 
+    @Suppress("NOTHING_TO_INLINE")
     private inline fun generateKey(schema: String, table: String?, column: String?, value: String?): String {
         if (value != null && (column == null || table == null)) throw IllegalStateException("When using a value, you need to specify a table and a column")
         if (column != null && table == null) throw IllegalStateException("When using a column, you need to specify a table")

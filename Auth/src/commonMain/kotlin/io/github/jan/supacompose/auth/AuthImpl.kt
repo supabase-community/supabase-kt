@@ -10,6 +10,7 @@ package io.github.jan.supacompose.auth
  import io.github.jan.supacompose.auth.providers.DefaultAuthProvider
  import io.github.jan.supacompose.auth.user.UserInfo
  import io.github.jan.supacompose.auth.user.UserSession
+ import io.github.jan.supacompose.buildUrl
  import io.github.jan.supacompose.exceptions.RestException
  import io.github.jan.supacompose.putJsonObject
  import io.github.jan.supacompose.supabaseJson
@@ -24,6 +25,10 @@ package io.github.jan.supacompose.auth
  import io.ktor.client.request.setBody
  import io.ktor.http.HttpHeaders
  import io.ktor.http.HttpStatusCode.Companion.Unauthorized
+ import io.ktor.http.URLBuilder
+ import io.ktor.http.Url
+ import io.ktor.http.appendEncodedPathSegments
+ import io.ktor.http.path
  import kotlinx.coroutines.CoroutineScope
  import kotlinx.coroutines.Dispatchers
  import kotlinx.coroutines.Job
@@ -74,8 +79,14 @@ internal class AuthImpl(override val supabaseClient: SupabaseClient, override va
         }
     }
 
+    override val API_VERSION: Int
+        get() = Auth.API_VERSION
+
+    override val PLUGIN_KEY: String
+        get() = Auth.key
+
     override suspend fun invalidateAllRefreshTokens() {
-        supabaseClient.httpClient.post(path("logout")) {
+        supabaseClient.httpClient.post(resolveUrl("logout")) {
             addAuthorization()
         }
         invalidateSession()
@@ -108,7 +119,7 @@ internal class AuthImpl(override val supabaseClient: SupabaseClient, override va
                 put("data", supabaseJson.encodeToJsonElement(it))
             }
         }.toString()
-        val response = supabaseClient.httpClient.put(path("user")) {
+        val response = supabaseClient.httpClient.put(resolveUrl("user")) {
             addAuthorization()
             setBody(body)
         }
@@ -129,7 +140,7 @@ internal class AuthImpl(override val supabaseClient: SupabaseClient, override va
         val redirect = finalRedirectUrl?.let {
             "?redirect_to=$finalRedirectUrl"
         } ?: ""
-        supabaseClient.httpClient.post(path("otp$redirect")) {
+        supabaseClient.httpClient.post(resolveUrl("otp$redirect")) {
             setBody(body)
         }
     }
@@ -142,13 +153,13 @@ internal class AuthImpl(override val supabaseClient: SupabaseClient, override va
         val redirect = finalRedirectUrl?.let {
             "?redirect_to=$finalRedirectUrl"
         } ?: ""
-        supabaseClient.httpClient.post(path("recover$redirect")) {
+        supabaseClient.httpClient.post(resolveUrl("recover$redirect")) {
             setBody(body)
         }
     }
 
     override suspend fun reauthenticate() {
-        supabaseClient.httpClient.get(path("reauthenticate")) {
+        supabaseClient.httpClient.get(resolveUrl("reauthenticate")) {
             addAuthorization()
         }
     }
@@ -160,7 +171,7 @@ internal class AuthImpl(override val supabaseClient: SupabaseClient, override va
               "token": "$token"
             }
         """.trimIndent()
-        val response = supabaseClient.httpClient.post(path("verify")) {
+        val response = supabaseClient.httpClient.post(resolveUrl("verify")) {
             setBody(body)
             addAuthorization()
         }
@@ -169,7 +180,7 @@ internal class AuthImpl(override val supabaseClient: SupabaseClient, override va
     }
 
     override suspend fun getUser(jwt: String): UserInfo {
-        val response = supabaseClient.httpClient.get(path("user")) {
+        val response = supabaseClient.httpClient.get(resolveUrl("user")) {
             header(HttpHeaders.Authorization, "Bearer $jwt")
         }
         return response.body()
@@ -191,7 +202,7 @@ internal class AuthImpl(override val supabaseClient: SupabaseClient, override va
               "refresh_token": "$refreshToken"
             }
         """.trimIndent()
-        val response = supabaseClient.httpClient.post(path("token?grant_type=refresh_token")) {
+        val response = supabaseClient.httpClient.post(resolveUrl("token?grant_type=refresh_token")) {
             setBody(body)
         }
         if(response.status.value !in 200..299) throw RestException(401, "Unauthorized", "Refresh token is invalid")
@@ -269,8 +280,8 @@ internal class AuthImpl(override val supabaseClient: SupabaseClient, override va
         callbacks.forEach { it.invoke(newSession, oldSession) }
     }
 
-    @OptIn(SupaComposeInternal::class)
-    override fun path(path: String) = supabaseClient.path("auth/v${Auth.API_VERSION}/$path")
+   // @OptIn(SupaComposeInternal::class)
+ //   override fun path(path: String) = supabaseClient.path("auth/v${Auth.API_VERSION}/$path")
 
     override suspend fun close() {
         authScope.cancel()

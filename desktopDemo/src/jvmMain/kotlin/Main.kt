@@ -23,12 +23,14 @@ import io.github.jan.supacompose.auth.providers.Google
 import io.github.jan.supacompose.auth.sessionFile
 import io.github.jan.supacompose.createSupabaseClient
 import io.github.jan.supacompose.postgrest.Postgrest
+import io.github.jan.supacompose.postgrest.postgrest
 import io.github.jan.supacompose.realtime.events.ChannelAction
 import io.github.jan.supacompose.realtime.Realtime
 import io.github.jan.supacompose.realtime.createAndJoinChannel
 import io.github.jan.supacompose.realtime.createChannel
 import io.github.jan.supacompose.realtime.realtime
 import io.github.jan.supacompose.storage.Storage
+import io.github.jan.supacompose.storage.storage
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -53,7 +55,6 @@ suspend fun main() {
         install(Storage)
     }
     val scope = CoroutineScope(Dispatchers.IO)
-    println(client.supabaseHttpUrl)
     application {
         Window(::exitApplication) {
             val session by client.auth.currentSession.collectAsState()
@@ -119,7 +120,7 @@ suspend fun main() {
 
 }
 
-/*fun main() = application {
+/**fun main() = application {
     Window(onCloseRequest = ::exitApplication) {
         App()
     }

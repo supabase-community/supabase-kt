@@ -38,7 +38,7 @@ interface DefaultAuthProvider<C, R> : AuthProvider<C, R> {
     ) {
         if(config == null) throw IllegalArgumentException("Credentials are required")
         val encodedCredentials = encodeCredentials(config)
-        val response = supabaseClient.httpClient.post(supabaseClient.auth.path("token?grant_type=password")) {
+        val response = supabaseClient.httpClient.post(supabaseClient.auth.resolveUrl("token?grant_type=password")) {
             setBody(encodedCredentials)
         }
         response.checkErrors()
@@ -59,7 +59,7 @@ interface DefaultAuthProvider<C, R> : AuthProvider<C, R> {
             "?redirect_to=$finalRedirectUrl"
         } ?: ""
         val body = encodeCredentials(config)
-        val response = supabaseClient.httpClient.post(supabaseClient.auth.path("signup$redirect")) {
+        val response = supabaseClient.httpClient.post(supabaseClient.auth.resolveUrl("signup$redirect")) {
             setBody(body)
         }
         response.checkErrors()
