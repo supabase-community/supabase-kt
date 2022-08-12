@@ -78,13 +78,11 @@ sealed interface ChannelAction {
  * Decodes [ChannelAction.record] as [T] and returns it or null when either [ChannelAction.record] is null or it cannot be decoded as [T]
  */
 inline fun <reified T> ChannelAction.decodeRecordOrNull(json: Json = Json): T? {
-    return if(record != null) {
-        try {
-            json.decodeFromJsonElement<T>(record!!)
-        } catch (e: Exception) {
-            null
-        }
-    } else null
+    return try {
+        record?.let { json.decodeFromJsonElement<T>(it) }
+    } catch (e: Exception) {
+        null
+    }
 }
 
 /**
