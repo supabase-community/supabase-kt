@@ -6,8 +6,6 @@ import io.github.jan.supacompose.plugins.SupacomposePlugin
 import io.github.jan.supacompose.plugins.SupacomposePluginProvider
 import io.ktor.client.engine.mock.MockEngine
 import io.ktor.client.engine.mock.respond
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertIs
@@ -42,39 +40,32 @@ class SupabaseClientTest {
         respond("") //ignore for this test
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun testClientBuilderParametersWithHttpsUrl() {
-        runTest {
-            val client = createMockedSupabaseClient {
-                supabaseUrl = "https://example.supabase.co"
-                supabaseKey = "somekey"
-            }
-            assertEquals("example.supabase.co", client.supabaseUrl, "Supabase url should not contain https://")
-            assertEquals("somekey", client.supabaseKey, "Supabase key should be set to somekey")
-            assertEquals("https://example.supabase.co", client.supabaseHttpUrl, "Supabase http url should be https://example.supabase.co")
-            client.close()
+        val client = createMockedSupabaseClient {
+            supabaseUrl = "https://example.supabase.co"
+            supabaseKey = "somekey"
         }
+        assertEquals("example.supabase.co", client.supabaseUrl, "Supabase url should not contain https://")
+        assertEquals("somekey", client.supabaseKey, "Supabase key should be set to somekey")
+        assertEquals("https://example.supabase.co", client.supabaseHttpUrl, "Supabase http url should be https://example.supabase.co")
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun testClientBuilderPlugins() {
-        runTest {
-            val client = createMockedSupabaseClient {
-                supabaseUrl = "example.supabase.co"
-                supabaseKey = "somekey"
+        val client = createMockedSupabaseClient {
+            supabaseUrl = "example.supabase.co"
+            supabaseKey = "somekey"
 
-                install(TestPlugin) {
-                    testValue = true
-                }
+            install(TestPlugin) {
+                testValue = true
             }
-            val plugin = client.pluginManager.getPlugin<Any?>("test")
-            //test if the plugin was correctly installed
-            assertIs<TestPlugin>(plugin, "Plugin 'test' should be of type TestPlugin")
-            //test if the plugin correctly modified the 'useHTTPS' parameter
-            assertEquals("https://example.supabase.co", client.supabaseHttpUrl, "Supabase http url should be https://example.supabase.co because the plugin modifies it")
         }
+        val plugin = client.pluginManager.getPlugin<Any?>("test")
+        //test if the plugin was correctly installed
+        assertIs<TestPlugin>(plugin, "Plugin 'test' should be of type TestPlugin")
+        //test if the plugin correctly modified the 'useHTTPS' parameter
+        assertEquals("https://example.supabase.co", client.supabaseHttpUrl, "Supabase http url should be https://example.supabase.co because the plugin modifies it")
     }
 
     private fun createMockedSupabaseClient(init: SupabaseClientBuilder.() -> Unit): SupabaseClient {
