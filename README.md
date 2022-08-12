@@ -447,7 +447,7 @@ bucket.copy("landscape.png", "landscape2.png")
 
 #### Realtime
 
-<details><summary>Listening for database changes (not final syntax)</summary>
+<details><summary>Listening for database changes</summary>
 
 ```kotlin
 //in some suspending function
