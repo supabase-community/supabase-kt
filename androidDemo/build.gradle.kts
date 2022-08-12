@@ -16,6 +16,10 @@ dependencies {
     implementation(project(":"))
     implementation(project(":Supacompose-Auth"))
     implementation(project(":Supacompose-Storage"))
+    implementation(compose.runtime)
+    implementation(compose.ui)
+    implementation(compose.foundation)
+    implementation(compose.material)
     implementation("io.ktor:ktor-client-cio:${Versions.KTOR}")
     implementation("androidx.activity:activity-compose:${Versions.ACTIVITY}")
 }

@@ -181,8 +181,8 @@ kotlin {
         val androidMain by getting {
             dependencies {
                 //add android lifecycle
-                api("androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.0-alpha01")
-                api("androidx.lifecycle:lifecycle-process:2.6.0-alpha01")
+                api("androidx.lifecycle:lifecycle-viewmodel-ktx:2.5.1")
+                api("androidx.lifecycle:lifecycle-process:2.5.1")
                 api("androidx.core:core-ktx:${Versions.ANDROID_CORE}")
                 api("androidx.appcompat:appcompat:${Versions.ANDROID_COMPAT}")
             }

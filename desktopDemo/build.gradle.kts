@@ -27,7 +27,10 @@ kotlin {
                 implementation(project(":Supacompose-Realtime"))
                 implementation(project(":Supacompose-Storage"))
                 api("org.jetbrains.kotlinx:kotlinx-coroutines-core:${Versions.COROUTINES}")
-
+                implementation(compose.runtime)
+                implementation(compose.ui)
+                implementation(compose.foundation)
+                implementation(compose.material)
                 implementation(compose.desktop.currentOs)
                 implementation("io.ktor:ktor-client-cio:${Versions.KTOR}")
                 //implement logcat-classic

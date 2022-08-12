@@ -20,6 +20,8 @@ kotlin {
         val webMain by getting {
             dependencies {
                 api(project(":Supacompose-Auth"))
+                api(compose.web.core)
+                api(compose.runtime)
             }
         }
     }
