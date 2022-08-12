@@ -26,6 +26,11 @@ sealed interface Auth : MainPlugin<Auth.Config> {
     val currentSession: StateFlow<UserSession?>
 
     /**
+     * Whether the [currentSession] session is getting refreshed automatically
+     */
+    val isAutoRefreshRunning: Boolean
+
+    /**
      * Returns the session manager instance
      */
     val sessionManager: SessionManager

@@ -1,6 +1,7 @@
 package io.github.jan.supacompose.realtime
 
 import io.github.jan.supacompose.auth.auth
+import io.github.jan.supacompose.realtime.annotiations.ChannelDsl
 import io.github.jan.supacompose.realtime.events.ChannelAction
 import io.github.jan.supacompose.realtime.events.EventListener
 

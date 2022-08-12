@@ -57,6 +57,8 @@ internal class AuthImpl(override val supabaseClient: SupabaseClient, override va
     val _status = MutableStateFlow(Auth.Status.NOT_AUTHENTICATED)
     override val status = _status.asStateFlow()
     var sessionJob: Job? = null
+    override val isAutoRefreshRunning: Boolean
+        get() = sessionJob?.isActive == true
 
     init {
         Napier.base(DebugAntilog())

@@ -48,6 +48,13 @@ kotlin {
                 // https://mvnrepository.com/artifact/io.ktor/ktor-server-core
             }
         }
+        val commonTest by getting {
+            dependencies {
+                implementation("io.ktor:ktor-client-mock:${Versions.KTOR}")
+                implementation(kotlin("test"))
+                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:${Versions.COROUTINES}")
+            }
+        }
         val desktopMain by getting {
             dependencies {
                 api("io.ktor:ktor-server-core:${Versions.KTOR}")

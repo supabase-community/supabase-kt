@@ -171,6 +171,8 @@ kotlin {
             dependencies {
                 implementation(kotlin("test"))
                 implementation("io.ktor:ktor-client-mock:${Versions.KTOR}")
+                // https://mvnrepository.com/artifact/org.jetbrains.kotlinx/kotlinx-coroutines-test
+                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:${Versions.COROUTINES}")
             }
         }
         val desktopMain by getting {

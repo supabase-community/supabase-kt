@@ -47,8 +47,14 @@ sealed interface Storage : MainPlugin<Storage.Config> {
      */
     suspend fun changePublicStatus(bucketId: String, public: Boolean)
 
+    /**
+     * Empties a bucket by its [bucketId]
+     */
     suspend fun emptyBucket(bucketId: String)
 
+    /**
+     * Deletes a bucket by its [id]
+     */
     suspend fun deleteBucket(id: String)
 
     operator fun get(bucketId: String): BucketApi
