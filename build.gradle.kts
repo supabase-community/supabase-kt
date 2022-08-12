@@ -1,5 +1,3 @@
-import com.android.build.api.dsl.LintOptions
-
 plugins {
     kotlin("multiplatform") version Versions.KOTLIN
     id("com.android.library")
@@ -8,7 +6,7 @@ plugins {
     id("org.jetbrains.dokka") version Versions.DOKKA
     id("io.codearte.nexus-staging") version Versions.NEXUS_STAGING
     kotlin("plugin.serialization") version Versions.KOTLIN
-    id("org.jetbrains.compose") version Versions.COMPOSE
+ //   id("org.jetbrains.compose") version Versions.COMPOSE
 }
 
 val modules = listOf("Supacompose", "Supacompose-Auth", "Supacompose-Postgrest", "Supacompose-Storage", "Supacompose-Realtime")
@@ -31,7 +29,7 @@ subprojects {
     apply(plugin = "org.jetbrains.dokka")
     apply(plugin = "org.jetbrains.kotlin.plugin.serialization")
     //apply(plugin = "com.android.library")
-    apply(plugin = "org.jetbrains.compose")
+  //  apply(plugin = "org.jetbrains.compose")
 }
 
 nexusStaging {
@@ -167,19 +165,6 @@ kotlin {
                 api("org.jetbrains.kotlinx:kotlinx-coroutines-core:${Versions.COROUTINES}")
                 api("io.ktor:ktor-serialization-kotlinx-json:${Versions.KTOR}")
                 api("io.github.aakira:napier:${Versions.NAPIER}")
-               // api("org.jetbrains.kotlinx:kotlinx-serialization-json:${Versions.SERIALIZATION}")
-                //install klock
-                api(compose.runtime)
-           //     api(compose.foundation)
-            //    api(compose.material)
-               // api("com.soywiz.korlibs.korio:korio:${Versions.KORLIBS}")
-            }
-        }
-        val defaultMain by creating {
-            dependsOn(commonMain)
-            dependencies {
-                api(compose.foundation)
-                api(compose.material)
             }
         }
         val commonTest by getting {
@@ -189,15 +174,14 @@ kotlin {
             }
         }
         val desktopMain by getting {
-            dependsOn(defaultMain)
         }
         val desktopTest by getting
         val androidMain by getting {
-            dependsOn(defaultMain)
             dependencies {
-                api("com.google.android.material:material:1.6.0")
+                //add android lifecycle
+                api("androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.0-alpha01")
+                api("androidx.lifecycle:lifecycle-process:2.6.0-alpha01")
                 api("androidx.core:core-ktx:${Versions.ANDROID_CORE}")
-                api("androidx.activity:activity-compose:${Versions.ACTIVITY}")
                 api("androidx.appcompat:appcompat:${Versions.ANDROID_COMPAT}")
             }
         }
@@ -208,7 +192,7 @@ kotlin {
         }
         val webMain by getting {
             dependencies {
-                api(compose.web.core)
+              //  api(compose.web.core)
             }
         }
     }

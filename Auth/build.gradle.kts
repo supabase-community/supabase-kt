@@ -57,14 +57,11 @@ kotlin {
         }
         val androidMain by getting {
             dependencies {
-                api("com.google.android.gms:play-services-base:18.0.1")
-                api("com.google.android.gms:play-services-auth:20.2.0")
-                api("androidx.lifecycle:lifecycle-process:2.4.1")
+
             }
         }
         val webMain by getting {
             dependencies {
-                api(compose.web.core)
             }
         }
     }
