@@ -2,7 +2,7 @@
 
 A framework for building android & desktop apps with Supabase
 
-Newest version: [![Maven Central](https://img.shields.io/maven-central/v/io.github.jan-tennert.supacompose/Supacompose)](https://search.maven.org/artifact/io.github.jan-tennert.supacompose/Supacompose)
+Newest version: [![Maven Central](https://img.shields.io/maven-central/v/io.github.jan-tennert.supacompose/Supacompose)](https://search.maven.org/artifact/io.github.jan-tennert.supacompose)
 
 # Installation
 
