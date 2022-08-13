@@ -25,7 +25,7 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
       - name: Publish package
-        run: ./gradlew publishAllPublicationsToOssRepository Supacompose-Auth:publishAllPublicationsToOssRepository Supacompose-Postgrest:publishAllPublicationsToOssRepository Supacompose-Storage:publishAllPublicationsToOssRepository
+        run: ./gradlew publishAllPublicationsToOssRepository Supacompose-Auth:publishAllPublicationsToOssRepository Supacompose-Postgrest:publishAllPublicationsToOssRepository Supacompose-Storage:publishAllPublicationsToOssRepository Supacompose-Realtime:publishAllPublicationsToOssRepository
 
   closeAndRelease:
     needs: [publish]
