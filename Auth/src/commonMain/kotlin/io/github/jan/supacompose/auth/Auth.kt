@@ -137,7 +137,13 @@ sealed interface Auth : MainPlugin<Auth.Config> {
      */
     suspend fun importAuthToken(jwt: String) = importSession(UserSession(jwt, "", 0L, "", getUser(jwt)), false)
 
-    data class Config(val params: MutableMap<String, Any> = mutableMapOf(), var retryDelay: Duration = 10.seconds, var alwaysAutoRefresh: Boolean = true, override var customUrl: String? = null): MainConfig
+    /**
+     * Retrieves the latest session from storage and starts auto-refreshing if [autoRefresh] is true or [Auth.Config.alwaysAutoRefresh] as the default parameter
+     * @return true, if a session was found, false otherwise
+     */
+    suspend fun loadFromStorage(autoRefresh: Boolean = config.alwaysAutoRefresh): Boolean
+
+    data class Config(val params: MutableMap<String, Any> = mutableMapOf(), var retryDelay: Duration = 10.seconds, var alwaysAutoRefresh: Boolean = true, var autoLoadFromStorage: Boolean = true, override var customUrl: String? = null): MainConfig
 
     enum class Status {
         LOADING_FROM_STORAGE,

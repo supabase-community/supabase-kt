@@ -105,6 +105,7 @@ fun Activity.initializeAndroid(supabaseClient: SupabaseClient, onSessionSuccess:
 }
 
 private fun addLifecycleCallbacks(supabaseClient: SupabaseClient, authPlugin: AuthImpl) {
+    if(!authPlugin.config.autoLoadFromStorage) return
     val lifecycle = ProcessLifecycleOwner.get().lifecycle
     val scope = CoroutineScope(Dispatchers.IO)
     lifecycle.addObserver(

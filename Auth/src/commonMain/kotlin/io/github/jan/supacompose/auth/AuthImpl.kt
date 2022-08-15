@@ -62,7 +62,7 @@ internal class AuthImpl(override val supabaseClient: SupabaseClient, override va
 
     init {
         Napier.base(DebugAntilog())
-        if (CurrentPlatformTarget == PlatformTarget.WEB || CurrentPlatformTarget == PlatformTarget.DESKTOP) { //for android see Android.kt
+        if (CurrentPlatformTarget == PlatformTarget.WEB || CurrentPlatformTarget == PlatformTarget.DESKTOP && config.autoLoadFromStorage) { //for android see Android.kt
             authScope.launch {
                 Napier.d {
                     "Trying to load latest session"
@@ -267,6 +267,13 @@ internal class AuthImpl(override val supabaseClient: SupabaseClient, override va
 
     override fun onSessionChange(callback: (new: UserSession?, old: UserSession?) -> Unit) {
         callbacks += callback
+    }
+
+    override suspend fun loadFromStorage(autoRefresh: Boolean): Boolean {
+        val session = sessionManager.loadSession(supabaseClient, this)
+        val wasSuccessful = session != null
+        if(wasSuccessful) startJob(session!!, autoRefresh)
+        return wasSuccessful
     }
 
     private fun HttpRequestBuilder.addAuthorization() {

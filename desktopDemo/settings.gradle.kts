@@ -13,17 +13,3 @@ pluginManagement {
         }
     }
 }
-
-include("Auth")
-include("Postgrest")
-//include(":desktopDemo")
-//include(":androidDemo")
-//include(":webDemo")
-include("Storage")
-include("Realtime")
-project(":Auth").name = "Supacompose-Auth"
-project(":Postgrest").name = "Supacompose-Postgrest"
-project(":Storage").name = "Supacompose-Storage"
-project(":Realtime").name = "Supacompose-Realtime"
-rootProject.name = "Supacompose"
-

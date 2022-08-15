@@ -66,3 +66,9 @@ class PostgrestUpdate {
     fun toJson() = JsonObject(map)
 
 }
+
+inline fun buildPostgrestUpdate(block: PostgrestUpdate.() -> Unit): JsonObject {
+    val update = PostgrestUpdate()
+    update.block()
+    return update.toJson()
+}

@@ -96,10 +96,10 @@ class PostgrestFilterBuilder {
 
 }
 
-inline fun HttpRequestBuilder.addPostgresFilter(block: PostgrestFilterBuilder.() -> Unit) {
+inline fun buildPostgrestFilter(block: PostgrestFilterBuilder.() -> Unit): Map<String, String> {
     val filter = PostgrestFilterBuilder()
     filter.block()
-    parametersOf(filter.params.mapValues { (_, value) -> listOf(value) })
+    return filter.params
 }
 
 data class FilterOperation(val column: String, val operator: FilterOperator, val value: String)

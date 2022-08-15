@@ -41,7 +41,6 @@ import java.io.File
 @Serializable
 data class User(val id: String, val username: String)
 
-
 suspend fun main() {
     val client = createSupabaseClient {
         supabaseUrl = System.getenv("SUPABASE_URL")
