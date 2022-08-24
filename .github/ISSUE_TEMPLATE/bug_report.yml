@@ -16,7 +16,7 @@ body:
       options:
         - label: I installed the latest version of SupaCompose
           required: true
-        - label: I check for similar bug report
+        - label: I checked for similar bug report
           required: true
   - type: textarea
     id: code

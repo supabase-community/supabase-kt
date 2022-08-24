@@ -1,7 +1,7 @@
 name: Question
 description: Template for questions
 title: '[Question]: '
-labels: question
+labels: ["question"]
 assignees: jan-tennert
 body:
   - type: textarea
