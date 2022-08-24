@@ -355,7 +355,7 @@ data class Message(val text: String, @SerialName("author_id") val authorId: Stri
 
 ```kotlin
 client.postgrest["messages"]
-    .select<Message> {
+    .select {
         //you can use that syntax
         Message::authorId eq "someid"
         Message::text neq "This is a text!"
@@ -374,7 +374,7 @@ client.postgrest["messages"]
 
 ```kotlin
 client.postgrest["messages"]
-    .insert<Message>(Message("This is a text!", "someid", 1))
+    .insert(Message("This is a text!", "someid", 1))
 ````
 
 </details>
@@ -383,7 +383,7 @@ client.postgrest["messages"]
 
 ```kotlin
 client.postgrest["messages"]
-    .update<Message>(
+    .update(
         {
             Message::text setTo "This is the edited text!"
         }
@@ -398,7 +398,7 @@ client.postgrest["messages"]
 
 ```kotlin
 client.postgrest["messages"]
-    .delete<Message> {
+    .delete {
         Message::id eq 2
     }
 ````
