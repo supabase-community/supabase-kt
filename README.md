@@ -1,6 +1,6 @@
 # SupaCompose
 
-A framework for building android & desktop apps with Supabase
+A framework for building android & desktop apps with Supabase (can be used for other purposes)
 
 Newest version: [![Maven Central](https://img.shields.io/maven-central/v/io.github.jan-tennert.supacompose/Supacompose)](https://search.maven.org/search?q=g%3Aio.github.jan-tennert.supacompose)
 
@@ -467,6 +467,10 @@ client.realtime.createAndJoinChannel {
 
 ```
 
+</details>
+<details><summary>Broadcast API (soon)</summary>
+</details>
+<details><summary>Presence API (soon)</summary>
 </details>
 
 # Credits 
