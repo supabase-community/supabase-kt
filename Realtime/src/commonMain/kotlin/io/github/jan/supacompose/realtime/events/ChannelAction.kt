@@ -15,6 +15,23 @@ import kotlinx.serialization.json.decodeFromJsonElement
 @Serializable
 data class Column(val name: String, val type: String)
 
+interface HasRecord {
+
+    /**
+     * The new record, if the action has one
+     */
+    val record: JsonObject
+}
+
+interface HasOldRecord {
+
+    /**
+     * The old record, if the action has one
+     */
+    val oldRecord: JsonObject
+}
+
+
 sealed interface ChannelAction {
 
     /**
@@ -27,23 +44,13 @@ sealed interface ChannelAction {
      */
     val commitTimestamp: Instant
 
-    /**
-     * The old record, if the action has one
-     */
-    val oldRecord: JsonObject? get() = null
-
-    /**
-     * The new record, if the action has one
-     */
-    val record: JsonObject? get() = null
-
     @Serializable
     data class Insert(
         override val record: JsonObject,
         override val columns: List<Column>,
         @SerialName("commit_timestamp")
-        override val commitTimestamp: Instant
-    ): ChannelAction
+        override val commitTimestamp: Instant,
+    ) : ChannelAction, HasRecord
 
     @Serializable
     data class Update(
@@ -53,7 +60,7 @@ sealed interface ChannelAction {
         override val columns: List<Column>,
         @SerialName("commit_timestamp")
         override val commitTimestamp: Instant,
-    ): ChannelAction
+    ) : ChannelAction, HasRecord, HasOldRecord
 
     @Serializable
     data class Delete(
@@ -62,7 +69,7 @@ sealed interface ChannelAction {
         override val columns: List<Column>,
         @SerialName("commit_timestamp")
         override val commitTimestamp: Instant,
-    ): ChannelAction
+    ) : ChannelAction, HasOldRecord
 
     @Serializable
     data class Select(
@@ -70,22 +77,38 @@ sealed interface ChannelAction {
         override val columns: List<Column>,
         @SerialName("commit_timestamp")
         override val commitTimestamp: Instant,
-    ): ChannelAction
+    ) : ChannelAction, HasRecord
 
 }
 
 /**
- * Decodes [ChannelAction.record] as [T] and returns it or null when either [ChannelAction.record] is null or it cannot be decoded as [T]
+ * Decodes [HasRecord.record] as [T] and returns it or null when either [HasRecord.record] is null or it cannot be decoded as [T]
  */
-inline fun <reified T> ChannelAction.decodeRecordOrNull(json: Json = Json): T? {
+inline fun <reified T> HasRecord.decodeRecordOrNull(json: Json = Json): T? {
     return try {
-        record?.let { json.decodeFromJsonElement<T>(it) }
+        record.let { json.decodeFromJsonElement<T>(it) }
     } catch (e: Exception) {
         null
     }
 }
 
 /**
- * Decodes [ChannelAction.oldRecord] as [T] and returns it
+ * Decodes [HasOldRecord.oldRecord] as [T] and returns it or null when either [HasOldRecord.oldRecord] is null or it cannot be decoded as [T]
  */
-inline fun <reified T> ChannelAction.decodeRecord(json: Json = Json) = json.decodeFromJsonElement<T>(record!!)
+inline fun <reified T> HasOldRecord.decodeOldRecordOrNull(json: Json = Json): T? {
+    return try {
+        oldRecord.let { json.decodeFromJsonElement<T>(it) }
+    } catch (e: Exception) {
+        null
+    }
+}
+
+/**
+ * Decodes [HasRecord.record] as [T] and returns it
+ */
+inline fun <reified T> HasRecord.decodeRecord(json: Json = Json) = json.decodeFromJsonElement<T>(record)
+
+/**
+ * Decodes [HasOldRecord.oldRecord] as [T] and returns it
+ */
+inline fun <reified T> HasOldRecord.decodeOldRecord(json: Json = Json) = json.decodeFromJsonElement<T>(oldRecord)
