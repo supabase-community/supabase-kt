@@ -82,7 +82,7 @@ sealed interface ChannelAction {
 }
 
 /**
- * Decodes [HasRecord.record] as [T] and returns it or null when either [HasRecord.record] is null or it cannot be decoded as [T]
+ * Decodes [HasRecord.record] as [T] and returns it or returns null when it cannot be decoded as [T]
  */
 inline fun <reified T> HasRecord.decodeRecordOrNull(json: Json = Json): T? {
     return try {
@@ -93,7 +93,7 @@ inline fun <reified T> HasRecord.decodeRecordOrNull(json: Json = Json): T? {
 }
 
 /**
- * Decodes [HasOldRecord.oldRecord] as [T] and returns it or null when either [HasOldRecord.oldRecord] is null or it cannot be decoded as [T]
+ * Decodes [HasOldRecord.oldRecord] as [T] and returns it or returns null when it cannot be decoded as [T]
  */
 inline fun <reified T> HasOldRecord.decodeOldRecordOrNull(json: Json = Json): T? {
     return try {
