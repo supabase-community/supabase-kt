@@ -30,8 +30,9 @@ body:
   - type: dropdown
     id: platform
     attributes:
-      label: Platform
+      label: Platform(s)
       description: Which Platform did you use?
+      multiple: true
       options:
         - Desktop
         - Android
