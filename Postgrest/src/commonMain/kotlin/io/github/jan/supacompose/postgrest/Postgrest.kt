@@ -17,7 +17,7 @@ sealed interface Postgrest : MainPlugin<Postgrest.Config> {
 
     companion object : SupacomposePluginProvider<Config, Postgrest> {
 
-        override val key = "postgrest"
+        override val key = "rest"
         const val API_VERSION = 1
 
         override fun createConfig(init: Config.() -> Unit) = Config().apply(init)
