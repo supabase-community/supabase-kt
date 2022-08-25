@@ -26,8 +26,8 @@ class RealtimeChannelBuilder @PublishedApi internal constructor(private val topi
     //presence config
 
     inline fun onPostgrestChange(builder: PostgresChangeBuilder.() -> Unit) {
-        val receiver = PostgresChangeBuilder().apply(builder)
-        bindings["postgres_changes"] = bindings.getOrElse("postgres_changes") { emptyList() } + receiver.toBinding()
+        val postgrestBuilder = PostgresChangeBuilder().apply(builder)
+        bindings["postgres_changes"] = bindings.getOrElse("postgres_changes") { emptyList() } + postgrestBuilder.toBinding()
     }
 
     inline fun <reified T> onBroadcast(event: String, json: Json = Json, crossinline handler: T.() -> Unit) {

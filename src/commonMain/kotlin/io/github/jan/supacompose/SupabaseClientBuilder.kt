@@ -1,5 +1,7 @@
 package io.github.jan.supacompose
 
+import io.github.aakira.napier.DebugAntilog
+import io.github.aakira.napier.Napier
 import io.github.jan.supacompose.annotiations.SupaComposeDsl
 import io.github.jan.supacompose.plugins.SupacomposePlugin
 import io.github.jan.supacompose.plugins.SupacomposePluginProvider
@@ -13,11 +15,13 @@ class SupabaseClientBuilder {
     lateinit var supabaseKey: String
     var useHTTPS = true
     var httpEngine: HttpClientEngine? = null
+    var antiLog = DebugAntilog()
     private val httpConfigOverrides = mutableListOf<HttpClientConfig<*>.() -> Unit>()
     private val plugins = mutableMapOf<String, ((SupabaseClient) -> SupacomposePlugin)>()
 
     @PublishedApi
     internal fun build(): SupabaseClient {
+        Napier.base(antiLog)
         if(!::supabaseKey.isInitialized || supabaseKey.isBlank()) throw IllegalArgumentException("Supabase key is not set")
         if(!::supabaseUrl.isInitialized || supabaseUrl.isBlank()) throw IllegalArgumentException("Supabase url is not set")
         return SupabaseClientImpl(supabaseUrl.split("//").last(), supabaseKey, plugins, httpConfigOverrides, useHTTPS, httpEngine)

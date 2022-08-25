@@ -62,7 +62,6 @@ fun Activity.initializeAndroid(supabaseClient: SupabaseClient, onSessionSuccess:
     authPlugin.config.sessionFile = File(filesDir, "session.json")
     addLifecycleCallbacks(supabaseClient, authPlugin)
 
-    Napier.base(DebugAntilog())
     val data = intent?.data ?: return
     val scheme = data.scheme ?: return
     val host = data.host ?: return

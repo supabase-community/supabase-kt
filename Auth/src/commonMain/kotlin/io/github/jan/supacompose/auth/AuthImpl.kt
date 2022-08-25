@@ -61,7 +61,6 @@ internal class AuthImpl(override val supabaseClient: SupabaseClient, override va
         get() = sessionJob?.isActive == true
 
     init {
-        Napier.base(DebugAntilog())
         if (CurrentPlatformTarget == PlatformTarget.WEB || CurrentPlatformTarget == PlatformTarget.DESKTOP && config.autoLoadFromStorage) { //for android see Android.kt
             authScope.launch {
                 Napier.d {
