@@ -1,8 +1,5 @@
-package io.github.jan.supacompose.realtime.events.actions
+package io.github.jan.supacompose.realtime
 
-import io.github.jan.supacompose.realtime.RealtimeChannelBuilder
-import io.github.jan.supacompose.realtime.annotiations.ChannelDsl
-import io.github.jan.supacompose.realtime.events.EventListener
 import kotlinx.datetime.Instant
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -34,7 +31,7 @@ interface HasOldRecord {
     val oldRecord: JsonObject
 }
 
-sealed interface PostgresAction: ChannelAction {
+sealed interface PostgresAction {
 
     /**
      * Contains data of the row's columns

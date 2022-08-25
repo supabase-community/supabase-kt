@@ -2,8 +2,6 @@ package io.github.jan.supacompose.realtime
 
 import io.github.aakira.napier.Napier
 import io.github.jan.supacompose.annotiations.SupaComposeInternal
-import io.github.jan.supacompose.realtime.events.EventListener
-import io.github.jan.supacompose.realtime.events.actions.PostgresAction
 import io.github.jan.supacompose.supabaseJson
 import io.ktor.client.plugins.websocket.sendSerialized
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -69,8 +67,7 @@ internal class RealtimeChannelImpl(
     private val realtimeImpl: RealtimeImpl,
     override val topic: String,
     private val bindings: MutableMap<String, List<RealtimeBinding>>,
-    private var jwt: String,
-    private val listeners: MutableList<EventListener>
+    private var jwt: String
 ) : RealtimeChannel {
 
     private val _status = MutableStateFlow(RealtimeChannel.Status.CLOSED)

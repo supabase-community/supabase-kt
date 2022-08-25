@@ -2,7 +2,6 @@ package io.github.jan.supacompose.realtime
 
 import io.github.aakira.napier.Napier
 import io.github.jan.supacompose.realtime.annotiations.ChannelDsl
-import io.github.jan.supacompose.realtime.events.receiver.PostgresReceiver
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 
@@ -22,8 +21,8 @@ class RealtimeChannelBuilder @PublishedApi internal constructor(private val topi
 
     val bindings = mutableMapOf<String, List<RealtimeBinding>>()
 
-    inline fun onPostgrestChange(builder: PostgresReceiver.() -> Unit) {
-        val receiver = PostgresReceiver().apply(builder)
+    inline fun onPostgrestChange(builder: PostgresChangeBuilder.() -> Unit) {
+        val receiver = PostgresChangeBuilder().apply(builder)
         bindings["postgres_changes"] = bindings.getOrElse("postgres_changes") { emptyList() } + receiver.toBinding()
     }
 
@@ -50,8 +49,7 @@ class RealtimeChannelBuilder @PublishedApi internal constructor(private val topi
             realtimeImpl,
             topic,
             bindings,
-            "",
-            mutableListOf()
+            ""
         )
     }
 

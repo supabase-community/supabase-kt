@@ -1,10 +1,6 @@
-package io.github.jan.supacompose.realtime.events.receiver
+package io.github.jan.supacompose.realtime
 
-import io.github.jan.supacompose.realtime.PostgresJoinConfig
-import io.github.jan.supacompose.realtime.RealtimeBinding
-import io.github.jan.supacompose.realtime.events.actions.PostgresAction
-
-class PostgresReceiver {
+class PostgresChangeBuilder {
 
     var schema: String = ""
     var table: String? = null
@@ -37,6 +33,12 @@ class PostgresReceiver {
         event = "SELECT"
         this.handler = {
             handler(this as? PostgresAction.Select ?: throw IllegalStateException("Not a PostgresAction.Select"))
+        }
+    }
+    fun all(handler: PostgresAction.() -> Unit) {
+        event = "*"
+        this.handler = {
+            handler(this as? PostgresAction ?: throw IllegalStateException("Not a PostgresAction.All"))
         }
     }
 
