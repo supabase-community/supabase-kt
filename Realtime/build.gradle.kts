@@ -52,7 +52,6 @@ kotlin {
             dependencies {
                 //logback-classic
                 // https://mvnrepository.com/artifact/ch.qos.logback/logback-classic
-
             }
         }
         val androidMain by getting

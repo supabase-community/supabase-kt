@@ -2,6 +2,7 @@ package io.github.jan.supacompose.realtime
 
 import io.github.aakira.napier.Napier
 import io.github.jan.supacompose.annotiations.SupaComposeInternal
+import io.github.jan.supacompose.putJsonObject
 import io.github.jan.supacompose.supabaseJson
 import io.ktor.client.plugins.websocket.sendSerialized
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -80,7 +81,11 @@ internal class RealtimeChannelImpl(
         Napier.d { "Joining channel $topic" }
         val postgrestChanges = bindings.getOrElse("postgres_changes") { listOf() }.map { (it as RealtimeBinding.PostgrestRealtimeBinding).filter }
         val joinConfig = RealtimeJoinPayload(RealtimeJoinConfig(BroadcastJoinConfig(false, false), PresenceJoinConfig(""), postgrestChanges))
-        realtimeImpl.ws.sendSerialized(RealtimeMessage(topic, RealtimeChannel.CHANNEL_EVENT_JOIN, Json.encodeToJsonElement(joinConfig).jsonObject, null))
+        val joinConfigObject = buildJsonObject {
+            putJsonObject(Json.encodeToJsonElement(joinConfig).jsonObject)
+            if(jwt.isNotBlank()) put("access_token", jwt)
+        }
+        realtimeImpl.ws.sendSerialized(RealtimeMessage(topic, RealtimeChannel.CHANNEL_EVENT_JOIN, joinConfigObject, null))
     }
 
     @OptIn(SupaComposeInternal::class)
