@@ -95,9 +95,9 @@ internal class RealtimeChannelImpl(
                 Napier.d { "Joined channel ${message.topic}" }
                 _status.value = RealtimeChannel.Status.JOINED
             }
-            message.event == RealtimeChannel.CHANNEL_EVENT_REPLY && message.payload["response"]?.jsonObject?.containsKey("postgres_changes") ?: false -> {
-                val serverPostgresChanges = message.payload["response"]?.jsonObject?.get("postgres_changes")?.jsonArray?.let { Json.decodeFromJsonElement<List<PostgresJoinConfig>>(it) } ?: listOf()
-                val currentPostgresChanges = bindings.getOrElse("postgres_changes") { listOf() }.map { (it as RealtimeBinding.PostgrestRealtimeBinding) }
+            message.event == RealtimeChannel.CHANNEL_EVENT_REPLY && message.payload["response"]?.jsonObject?.containsKey("postgres_changes") ?: false -> { //check if the server postgres_changes match with the client's and add the given id to the postgres change objects (to identify them later in the events)
+                val serverPostgresChanges = message.payload["response"]?.jsonObject?.get("postgres_changes")?.jsonArray?.let { Json.decodeFromJsonElement<List<PostgresJoinConfig>>(it) } ?: listOf() //server postgres changes
+                val currentPostgresChanges = bindings.getOrElse("postgres_changes") { listOf() }.map { (it as RealtimeBinding.PostgrestRealtimeBinding) } //client postgres changes
                 val newPostgresChanges = mutableListOf<RealtimeBinding.PostgrestRealtimeBinding>()
                 for ((index, binding) in currentPostgresChanges.withIndex()) {
                     val serverPostgresChange = serverPostgresChanges[index]
@@ -109,15 +109,15 @@ internal class RealtimeChannelImpl(
                         newPostgresChanges.add(binding.copy(filter = binding.filter.copy(id = serverPostgresChange.id)))
                     }
                 }
-                bindings["postgres_changes"] = newPostgresChanges
+                if(newPostgresChanges.isNotEmpty()) bindings["postgres_changes"] = newPostgresChanges
             }
             message.event == "postgres_changes" -> {
                 val data = message.payload["data"]?.jsonObject ?: return
-                val ids = message.payload["ids"]?.jsonArray?.map { it.jsonPrimitive.content } ?: emptyList()
+                val ids = message.payload["ids"]?.jsonArray?.map { it.jsonPrimitive.content } ?: emptyList() //the ids of the matching postgres changes
                 val event = data["type"]?.jsonPrimitive?.content ?: ""
                 val callbacks = bindings.getOrElse("postgres_changes") { listOf() }.map { (it as RealtimeBinding.PostgrestRealtimeBinding) }.filter {
                     it.filter.id in ids
-                }
+                } //check which local postgres changes match with the given ids
                 val action = when(event) {
                     "UPDATE" -> supabaseJson.decodeFromJsonElement<PostgresAction.Update>(data)
                     "DELETE" -> supabaseJson.decodeFromJsonElement<PostgresAction.Delete>(data)

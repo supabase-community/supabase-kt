@@ -21,6 +21,10 @@ class RealtimeChannelBuilder @PublishedApi internal constructor(private val topi
 
     val bindings = mutableMapOf<String, List<RealtimeBinding>>()
 
+    //broadcast config
+
+    //presence config
+
     inline fun onPostgrestChange(builder: PostgresChangeBuilder.() -> Unit) {
         val receiver = PostgresChangeBuilder().apply(builder)
         bindings["postgres_changes"] = bindings.getOrElse("postgres_changes") { emptyList() } + receiver.toBinding()
@@ -38,11 +42,7 @@ class RealtimeChannelBuilder @PublishedApi internal constructor(private val topi
         }
     }
 
-    private fun buildJoinPayload(): RealtimeJoinPayload {
-        return RealtimeJoinPayload(
-            RealtimeJoinConfig(BroadcastJoinConfig(false, false), PresenceJoinConfig(""), listOf()),
-        )
-    }
+    //other presence related stuff
 
     fun build(): RealtimeChannel {
         return RealtimeChannelImpl(
