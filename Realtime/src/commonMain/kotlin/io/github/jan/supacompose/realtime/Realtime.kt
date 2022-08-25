@@ -31,6 +31,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import kotlinx.datetime.Clock
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.buildJsonObject
 import kotlin.time.Duration
@@ -150,7 +151,7 @@ internal class RealtimeImpl(override val supabaseClient: SupabaseClient, overrid
         if (status.value == Realtime.Status.CONNECTED) throw IllegalStateException("Websocket already connected")
         val prefix = if (config.secure) "wss://" else "ws://"
         updateStatus(Realtime.Status.CONNECTING)
-        val realtimeUrl = config.customRealtimeURL ?: (prefix + supabaseClient.supabaseUrl + ("/realtime/v${Realtime.API_VERSION}/websocket?apikey=${supabaseClient.supabaseKey}"))
+        val realtimeUrl = config.customRealtimeURL ?: (prefix + supabaseClient.supabaseUrl + ("/realtime/v${Realtime.API_VERSION}/websocket?apikey=${supabaseClient.supabaseKey}&vsn=1.0.0"))
          try {
             ws = supabaseClient.httpClient.webSocketSession(realtimeUrl)
             updateStatus(Realtime.Status.CONNECTED)
@@ -209,6 +210,7 @@ internal class RealtimeImpl(override val supabaseClient: SupabaseClient, overrid
     }
 
     private fun onMessage(stringMessage: String) {
+        println(stringMessage)
         val message = supabaseJson.decodeFromString<RealtimeMessage>(stringMessage)
         val channel = subscriptions[message.topic] as? RealtimeChannelImpl
         if(message.ref?.toIntOrNull() == heartbeatRef) {
@@ -261,15 +263,15 @@ internal class RealtimeImpl(override val supabaseClient: SupabaseClient, overrid
 /**
  * Creates a new [RealtimeChannel]
  */
-inline fun Realtime.createChannel(builder: RealtimeChannelBuilder.() -> Unit): RealtimeChannel {
-    return RealtimeChannelBuilder(this as RealtimeImpl).apply(builder).build()
+inline fun Realtime.createChannel(channelId: String, builder: RealtimeChannelBuilder.() -> Unit): RealtimeChannel {
+    return RealtimeChannelBuilder("realtime:$channelId", this as RealtimeImpl).apply(builder).build()
 }
 
 /**
  * Creates a new [RealtimeChannel] and joins it after creation
  */
-suspend inline fun Realtime.createAndJoinChannel(builder: RealtimeChannelBuilder.() -> Unit): RealtimeChannel {
-    return RealtimeChannelBuilder(this as RealtimeImpl).apply(builder).build().also { it.join() }
+suspend inline fun Realtime.createAndJoinChannel(channelId: String, builder: RealtimeChannelBuilder.() -> Unit): RealtimeChannel {
+    return RealtimeChannelBuilder("realtime:$channelId", this as RealtimeImpl).apply(builder).build().also { it.join() }
 }
 
 /**
