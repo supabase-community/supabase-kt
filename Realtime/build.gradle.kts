@@ -48,7 +48,12 @@ kotlin {
                 api("io.ktor:ktor-client-websockets:${Versions.KTOR}")
             }
         }
-        val desktopMain by getting
+        val desktopMain by getting {
+            dependencies {
+                //logback-classic
+                // https://mvnrepository.com/artifact/ch.qos.logback/logback-classic
+            }
+        }
         val androidMain by getting
         val webMain by getting
     }

@@ -71,11 +71,10 @@ suspend fun main() {
                             schema = "public"
 
                             on<ChannelAction.Insert> {
-
+                                println(record)
                             }
 
                             onAll {
-                                println(oldRecord)
                             }
                         }
                     }

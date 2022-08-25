@@ -1,47 +1,57 @@
 package io.github.jan.supacompose.realtime
 
-import io.github.jan.supacompose.auth.auth
+import io.github.aakira.napier.Napier
 import io.github.jan.supacompose.realtime.annotiations.ChannelDsl
-import io.github.jan.supacompose.realtime.events.ChannelAction
-import io.github.jan.supacompose.realtime.events.EventListener
+import io.github.jan.supacompose.realtime.events.receiver.PostgresReceiver
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.json.Json
+
+sealed interface RealtimeBinding {
+
+    val filter: Any
+    val callback: Any.() -> Unit
+
+    data class PostgrestRealtimeBinding(override val filter: PostgresJoinConfig, override val callback: Any.() -> Unit) : RealtimeBinding
+
+    data class DefaultRealtimeBinding(override val filter: String, override val callback: Any.() -> Unit) : RealtimeBinding
+
+}
 
 @ChannelDsl
-class RealtimeChannelBuilder @PublishedApi internal constructor(private val realtimeImpl: RealtimeImpl) {
+class RealtimeChannelBuilder @PublishedApi internal constructor(private val topic: String, private val realtimeImpl: RealtimeImpl) {
 
-    var schema = ""
-    var table = ""
-    var column: String? = null
-    var value: String? = null
-    val eventListener = mutableListOf<EventListener>()
+    val bindings = mutableMapOf<String, List<RealtimeBinding>>()
 
-    @ChannelDsl
-    inline fun <reified Action: ChannelAction> on(crossinline listener: (@ChannelDsl Action).() -> Unit) {
-       eventListener.add {
-           if(it is Action) {
-               listener(it)
-           }
-       }
+    inline fun onPostgrestChange(builder: PostgresReceiver.() -> Unit) {
+        val receiver = PostgresReceiver().apply(builder)
+        bindings["postgres_changes"] = bindings.getOrElse("postgres_changes") { emptyList() } + receiver.toBinding()
     }
 
-    @ChannelDsl
-    inline fun onAll(crossinline listener: (@ChannelDsl ChannelAction).() -> Unit) {
-        eventListener.add {
-            listener(it)
+    inline fun <reified T> onBroadcast(event: String, json: Json = Json, crossinline handler: T.() -> Unit) {
+        bindings["broadcast"] = bindings.getOrElse("broadcast") { emptyList() } + RealtimeBinding.DefaultRealtimeBinding(event) {
+            val decodedValue = try {
+                json.decodeFromString<T>(this.toString())
+            } catch(e: Exception) {
+                Napier.e(e) { "Couldn't decode $this as ${T::class.simpleName}. The corresponding handler wasn't called" }
+                null
+            }
+            decodedValue?.let { handler(it) }
         }
     }
 
+    private fun buildJoinPayload(): RealtimeJoinPayload {
+        return RealtimeJoinPayload(
+            RealtimeJoinConfig(BroadcastJoinConfig(false, false), PresenceJoinConfig(""), listOf()),
+        )
+    }
+
     fun build(): RealtimeChannel {
-        val key = generateKey(schema, table, column, value)
         return RealtimeChannelImpl(
             realtimeImpl,
-            key,
-            schema,
-            table,
-            column,
-            value,
-            realtimeImpl.supabaseClient.auth.currentSession.value?.accessToken
-                ?: throw IllegalStateException("You can't join a channel without an user session"),
-            eventListener
+            topic,
+            bindings,
+            "",
+            mutableListOf()
         )
     }
 

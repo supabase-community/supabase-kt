@@ -1,5 +1,8 @@
-package io.github.jan.supacompose.realtime.events
+package io.github.jan.supacompose.realtime.events.actions
 
+import io.github.jan.supacompose.realtime.RealtimeChannelBuilder
+import io.github.jan.supacompose.realtime.annotiations.ChannelDsl
+import io.github.jan.supacompose.realtime.events.EventListener
 import kotlinx.datetime.Instant
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -31,8 +34,7 @@ interface HasOldRecord {
     val oldRecord: JsonObject
 }
 
-
-sealed interface ChannelAction {
+sealed interface PostgresAction: ChannelAction {
 
     /**
      * Contains data of the row's columns
@@ -50,7 +52,7 @@ sealed interface ChannelAction {
         override val columns: List<Column>,
         @SerialName("commit_timestamp")
         override val commitTimestamp: Instant,
-    ) : ChannelAction, HasRecord
+    ) : PostgresAction, HasRecord
 
     @Serializable
     data class Update(
@@ -60,7 +62,7 @@ sealed interface ChannelAction {
         override val columns: List<Column>,
         @SerialName("commit_timestamp")
         override val commitTimestamp: Instant,
-    ) : ChannelAction, HasRecord, HasOldRecord
+    ) : PostgresAction, HasRecord, HasOldRecord
 
     @Serializable
     data class Delete(
@@ -69,7 +71,7 @@ sealed interface ChannelAction {
         override val columns: List<Column>,
         @SerialName("commit_timestamp")
         override val commitTimestamp: Instant,
-    ) : ChannelAction, HasOldRecord
+    ) : PostgresAction, HasOldRecord
 
     @Serializable
     data class Select(
@@ -77,7 +79,7 @@ sealed interface ChannelAction {
         override val columns: List<Column>,
         @SerialName("commit_timestamp")
         override val commitTimestamp: Instant,
-    ) : ChannelAction, HasRecord
+    ) : PostgresAction, HasRecord
 
 }
 
@@ -86,7 +88,7 @@ sealed interface ChannelAction {
  */
 inline fun <reified T> HasRecord.decodeRecordOrNull(json: Json = Json): T? {
     return try {
-        record.let { json.decodeFromJsonElement<T>(it) }
+        json.decodeFromJsonElement<T>(record)
     } catch (e: Exception) {
         null
     }
@@ -97,7 +99,7 @@ inline fun <reified T> HasRecord.decodeRecordOrNull(json: Json = Json): T? {
  */
 inline fun <reified T> HasOldRecord.decodeOldRecordOrNull(json: Json = Json): T? {
     return try {
-        oldRecord.let { json.decodeFromJsonElement<T>(it) }
+        json.decodeFromJsonElement<T>(oldRecord)
     } catch (e: Exception) {
         null
     }
