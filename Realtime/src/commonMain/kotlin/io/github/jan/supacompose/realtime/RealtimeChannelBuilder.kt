@@ -25,23 +25,6 @@ class RealtimeChannelBuilder @PublishedApi internal constructor(private val topi
 
     //presence config
 
-    inline fun onPostgrestChange(builder: PostgresChangeBuilder.() -> Unit) {
-        val postgrestBuilder = PostgresChangeBuilder().apply(builder)
-        bindings["postgres_changes"] = bindings.getOrElse("postgres_changes") { emptyList() } + postgrestBuilder.toBinding()
-    }
-
-    inline fun <reified T> onBroadcast(event: String, json: Json = Json, crossinline handler: T.() -> Unit) {
-        bindings["broadcast"] = bindings.getOrElse("broadcast") { emptyList() } + RealtimeBinding.DefaultRealtimeBinding(event) {
-            val decodedValue = try {
-                json.decodeFromString<T>(this.toString())
-            } catch(e: Exception) {
-                Napier.e(e) { "Couldn't decode $this as ${T::class.simpleName}. The corresponding handler wasn't called" }
-                null
-            }
-            decodedValue?.let { handler(it) }
-        }
-    }
-
     //other presence related stuff
 
     fun build(): RealtimeChannel {

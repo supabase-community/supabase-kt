@@ -255,7 +255,7 @@ internal class RealtimeImpl(override val supabaseClient: SupabaseClient, overrid
     }
 
     override suspend fun close() {
-        ws.close(CloseReason(CloseReason.Codes.NORMAL, "Connection closed by library"))
+        ws.cancel()
     }
 
 }
@@ -270,6 +270,7 @@ inline fun Realtime.createChannel(channelId: String, builder: RealtimeChannelBui
 /**
  * Creates a new [RealtimeChannel] and joins it after creation
  */
+@Deprecated("Use createChannel and then RealtimeChannel.join() instead", ReplaceWith("createChannel(channelId, builder)"))
 suspend inline fun Realtime.createAndJoinChannel(channelId: String, builder: RealtimeChannelBuilder.() -> Unit): RealtimeChannel {
     return RealtimeChannelBuilder("realtime:$channelId", this as RealtimeImpl).apply(builder).build().also { it.join() }
 }

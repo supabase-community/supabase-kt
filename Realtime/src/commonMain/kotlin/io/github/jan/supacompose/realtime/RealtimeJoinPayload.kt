@@ -25,4 +25,4 @@ data class BroadcastJoinConfig(val ack: Boolean, val self: Boolean)
 data class PresenceJoinConfig(val key: String)
 
 @Serializable
-data class PostgresJoinConfig(val schema: String, val table: String? = null, val filter: String? = null, val event: String, val id: String = "")
+data class PostgresJoinConfig(val schema: String, val table: String? = null, val filter: String? = null, val event: String, val id: Long = 0L)
