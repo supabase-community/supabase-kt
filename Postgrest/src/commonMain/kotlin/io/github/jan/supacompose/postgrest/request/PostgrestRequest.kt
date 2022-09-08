@@ -36,7 +36,7 @@ sealed interface PostgrestRequest {
             contentType(ContentType.Application.Json)
             headers[HttpHeaders.Authorization] = "Bearer ${postgrest.supabaseClient.auth.currentSession.value?.accessToken ?: throw IllegalStateException("Trying to access database without a user session")}"
             headers[PostgrestBuilder.HEADER_PREFER] = prefer.joinToString(",")
-            setBody(this@PostgrestRequest)
+            setBody(this@PostgrestRequest.body)
             parametersOf(filter.mapValues { (_, value) -> listOf(value) })
         }.checkForErrorCodes()
     }
