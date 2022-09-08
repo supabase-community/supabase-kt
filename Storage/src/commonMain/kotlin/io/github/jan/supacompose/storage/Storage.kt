@@ -132,8 +132,10 @@ internal class StorageImpl(override val supabaseClient: SupabaseClient, override
     }
 
     private fun HttpRequestBuilder.addAuthorization() {
-        headers {
-            append(HttpHeaders.Authorization, "Bearer ${(supabaseClient.auth.currentSession.value)?.accessToken ?: throw IllegalStateException("Can't use buckets without a user session")}")
+        supabaseClient.auth.currentSession.value?.accessToken?.let {
+            headers {
+                append(HttpHeaders.Authorization, "Bearer $it")
+            }
         }
     }
 
