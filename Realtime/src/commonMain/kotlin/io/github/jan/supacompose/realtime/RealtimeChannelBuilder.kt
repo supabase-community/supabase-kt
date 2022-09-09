@@ -5,25 +5,18 @@ import io.github.jan.supacompose.realtime.annotiations.ChannelDsl
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 
-sealed interface RealtimeBinding {
-
-    val filter: Any
-    val callback: Any.() -> Unit
-
-    data class PostgrestRealtimeBinding(override val filter: PostgresJoinConfig, override val callback: Any.() -> Unit) : RealtimeBinding
-
-    data class DefaultRealtimeBinding(override val filter: String, override val callback: Any.() -> Unit) : RealtimeBinding
-
-}
-
 @ChannelDsl
 class RealtimeChannelBuilder @PublishedApi internal constructor(private val topic: String, private val realtimeImpl: RealtimeImpl) {
+    private var broadcastJoinConfig = BroadcastJoinConfig(false, false)
+    private var presenceJoinConfig = PresenceJoinConfig("")
 
-    val bindings = mutableMapOf<String, List<RealtimeBinding>>()
+    fun broadcast(block: BroadcastJoinConfig.() -> Unit) {
+        broadcastJoinConfig = BroadcastJoinConfig().apply(block)
+    }
 
-    //broadcast config
-
-    //presence config
+    fun presence(block: PresenceJoinConfig.() -> Unit) {
+        presenceJoinConfig = PresenceJoinConfig().apply(block)
+    }
 
     //other presence related stuff
 
@@ -31,24 +24,10 @@ class RealtimeChannelBuilder @PublishedApi internal constructor(private val topi
         return RealtimeChannelImpl(
             realtimeImpl,
             topic,
-            bindings,
+            broadcastJoinConfig,
+            presenceJoinConfig,
             ""
         )
-    }
-
-    @Suppress("NOTHING_TO_INLINE")
-    private inline fun generateKey(schema: String, table: String?, column: String?, value: String?): String {
-        if (value != null && (column == null || table == null)) throw IllegalStateException("When using a value, you need to specify a table and a column")
-        if (column != null && table == null) throw IllegalStateException("When using a column, you need to specify a table")
-        return buildString {
-            append(listOfNotNull("realtime", schema, table).joinToString(":").trim())
-            column?.let {
-                append(it)
-                value?.let {
-                    append("=eq.$value")
-                }
-            }
-        }
     }
 
 }

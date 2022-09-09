@@ -5,9 +5,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class RealtimeJoinPayload(
-    val config: RealtimeJoinConfig,
-    @SerialName("access_token")
-    val accessToken: String = ""
+    val config: RealtimeJoinConfig
 )
 
 @Serializable
@@ -18,11 +16,18 @@ data class RealtimeJoinConfig(
     val postgrestChanges: List<PostgresJoinConfig>
 )
 
+/**
+ * @param acknowledgeBroadcasts Whether the server should send an acknowledgment message for each broadcast message
+ * @param receiveOwnBroadcasts Whether you should receive your own broadcasts
+ */
 @Serializable
-data class BroadcastJoinConfig(val ack: Boolean, val self: Boolean)
+data class BroadcastJoinConfig(@SerialName("ack") var acknowledgeBroadcasts: Boolean = false, @SerialName("self") var receiveOwnBroadcasts: Boolean = false)
 
+/**
+ * @param key Used to track presence payloads
+ */
 @Serializable
-data class PresenceJoinConfig(val key: String)
+data class PresenceJoinConfig(var key: String = "")
 
 @Serializable
 data class PostgresJoinConfig(val schema: String, val table: String? = null, val filter: String? = null, val event: String, val id: Long = 0L)

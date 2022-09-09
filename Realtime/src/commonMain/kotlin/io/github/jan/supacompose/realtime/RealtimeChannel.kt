@@ -26,6 +26,8 @@ import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.longOrNull
 import kotlinx.serialization.json.put
 
+private val json = Json { encodeDefaults = true }
+
 sealed interface RealtimeChannel {
 
     val status: StateFlow<Status>
@@ -79,10 +81,12 @@ sealed interface RealtimeChannel {
 internal class RealtimeChannelImpl(
     private val realtimeImpl: RealtimeImpl,
     override val topic: String,
-    private val bindings: MutableMap<String, List<RealtimeBinding>>,
+    private val broadcastJoinConfig: BroadcastJoinConfig,
+    private val presenceJoinConfig: PresenceJoinConfig,
     private var jwt: String
 ) : RealtimeChannel {
 
+    private val bindings: MutableMap<String, List<RealtimeBinding>> = mutableMapOf()
     private val _status = MutableStateFlow(RealtimeChannel.Status.CLOSED)
     override val status = _status.asStateFlow()
 
@@ -95,9 +99,9 @@ internal class RealtimeChannelImpl(
         Napier.d { "Joining channel $topic" }
         val postgrestChanges = bindings.getOrElse("postgres_changes") { listOf() }.map { (it as RealtimeBinding.PostgrestRealtimeBinding).filter }
         println(postgrestChanges.size)
-        val joinConfig = RealtimeJoinPayload(RealtimeJoinConfig(BroadcastJoinConfig(false, false), PresenceJoinConfig(""), postgrestChanges))
+        val joinConfig = RealtimeJoinPayload(RealtimeJoinConfig(broadcastJoinConfig, presenceJoinConfig, postgrestChanges))
         val joinConfigObject = buildJsonObject {
-            putJsonObject(Json.encodeToJsonElement(joinConfig).jsonObject)
+            putJsonObject(json.encodeToJsonElement(joinConfig).jsonObject)
             if(jwt.isNotBlank()) put("access_token", jwt)
         }
         realtimeImpl.ws.sendSerialized(RealtimeMessage(topic, RealtimeChannel.CHANNEL_EVENT_JOIN, joinConfigObject, null))
