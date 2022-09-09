@@ -6,13 +6,13 @@ import io.github.jan.supacompose.annotiations.SupaComposeInternal
 import io.github.jan.supacompose.putJsonObject
 import io.github.jan.supacompose.supabaseJson
 import io.ktor.client.plugins.websocket.sendSerialized
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.datetime.Clock
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -33,6 +33,7 @@ sealed interface RealtimeChannel {
     val status: StateFlow<Status>
     val topic: String
     val supabaseClient: SupabaseClient
+    val callbackManager: CallbackManager
 
     /**
      * Joins the channel
@@ -56,8 +57,12 @@ sealed interface RealtimeChannel {
      */
     suspend fun broadcast(event: String, message: JsonObject)
 
+    suspend fun track(data: JsonObject)
+
+    suspend fun untrack()
+
     @SupaComposeInternal
-    fun addBinding(key: String, binding: RealtimeBinding)
+    fun addPostgresChange(data: PostgresJoinConfig)
 
     enum class Status {
         CLOSED,
@@ -74,6 +79,7 @@ sealed interface RealtimeChannel {
         const val CHANNEL_EVENT_REPLY = "phx_reply"
         const val CHANNEL_EVENT_BROADCAST = "broadcast"
         const val CHANNEL_EVENT_ACCESS_TOKEN = "access_token"
+        const val CHANNEL_EVENT_PRESENCE = "presence"
     }
 
 }
@@ -86,7 +92,8 @@ internal class RealtimeChannelImpl(
     private var jwt: String
 ) : RealtimeChannel {
 
-    private val bindings: MutableMap<String, List<RealtimeBinding>> = mutableMapOf()
+    private val clientChanges = mutableListOf<PostgresJoinConfig>()
+    override val callbackManager = CallbackManagerImpl()
     private val _status = MutableStateFlow(RealtimeChannel.Status.CLOSED)
     override val status = _status.asStateFlow()
 
@@ -97,13 +104,14 @@ internal class RealtimeChannelImpl(
         realtimeImpl.addChannel(this)
         _status.value = RealtimeChannel.Status.JOINING
         Napier.d { "Joining channel $topic" }
-        val postgrestChanges = bindings.getOrElse("postgres_changes") { listOf() }.map { (it as RealtimeBinding.PostgrestRealtimeBinding).filter }
+        val postgrestChanges = clientChanges.toList()
         println(postgrestChanges.size)
         val joinConfig = RealtimeJoinPayload(RealtimeJoinConfig(broadcastJoinConfig, presenceJoinConfig, postgrestChanges))
         val joinConfigObject = buildJsonObject {
-            putJsonObject(json.encodeToJsonElement(joinConfig).jsonObject)
+            putJsonObject(Json.encodeToJsonElement(joinConfig).jsonObject)
             if(jwt.isNotBlank()) put("access_token", jwt)
         }
+        println(Json.encodeToString(RealtimeMessage(topic, RealtimeChannel.CHANNEL_EVENT_JOIN, joinConfigObject, null)))
         realtimeImpl.ws.sendSerialized(RealtimeMessage(topic, RealtimeChannel.CHANNEL_EVENT_JOIN, joinConfigObject, null))
     }
 
@@ -116,42 +124,24 @@ internal class RealtimeChannelImpl(
             }
             message.event == RealtimeChannel.CHANNEL_EVENT_REPLY && message.payload["response"]?.jsonObject?.containsKey("postgres_changes") ?: false -> { //check if the server postgres_changes match with the client's and add the given id to the postgres change objects (to identify them later in the events)
                 val serverPostgresChanges = message.payload["response"]?.jsonObject?.get("postgres_changes")?.jsonArray?.let { Json.decodeFromJsonElement<List<PostgresJoinConfig>>(it) } ?: listOf() //server postgres changes
-                val currentPostgresChanges = bindings.getOrElse("postgres_changes") { listOf() }.map { (it as RealtimeBinding.PostgrestRealtimeBinding) } //client postgres changes
-                val newPostgresChanges = mutableListOf<RealtimeBinding.PostgrestRealtimeBinding>()
-                for ((index, binding) in currentPostgresChanges.withIndex()) {
-                    val serverPostgresChange = serverPostgresChanges[index]
-                    if(serverPostgresChange.event != binding.filter.event || serverPostgresChange.schema != binding.filter.schema || serverPostgresChange.table != binding.filter.table) {
-                        Napier.e { "Postgres change biding mismatch between server and client" }
-                        //leave channel
-                        break
-                    } else {
-                        newPostgresChanges.add(binding.copy(filter = binding.filter.copy(id = serverPostgresChange.id)))
-                    }
-                }
-                if(newPostgresChanges.isNotEmpty()) bindings["postgres_changes"] = newPostgresChanges
+                callbackManager.serverChanges = serverPostgresChanges
             }
             message.event == "postgres_changes" -> {
                 val data = message.payload["data"]?.jsonObject ?: return
-                val ids = message.payload["ids"]?.jsonArray?.map { it.jsonPrimitive.longOrNull } ?: emptyList() //the ids of the matching postgres changes
-                val event = data["type"]?.jsonPrimitive?.content ?: ""
-                val callbacks = bindings.getOrElse("postgres_changes") { listOf() }.map { (it as RealtimeBinding.PostgrestRealtimeBinding) }.filter {
-                    it.filter.id in ids && (event == it.filter.event || it.filter.event == "*")
-                } //check which local postgres changes match with the given ids
-                val action = when(event) {
+                val ids = message.payload["ids"]?.jsonArray?.mapNotNull { it.jsonPrimitive.longOrNull } ?: emptyList() //the ids of the matching postgres changes
+                val action = when(data["type"]?.jsonPrimitive?.content ?: "") {
                     "UPDATE" -> supabaseJson.decodeFromJsonElement<PostgresAction.Update>(data)
                     "DELETE" -> supabaseJson.decodeFromJsonElement<PostgresAction.Delete>(data)
                     "INSERT" -> supabaseJson.decodeFromJsonElement<PostgresAction.Insert>(data)
                     "SELECT" -> supabaseJson.decodeFromJsonElement<PostgresAction.Select>(data)
                     else -> throw IllegalStateException("Unknown event type ${message.event}")
                 }
-                callbacks.forEach {
-                    it.callback(action)
-                }
+                callbackManager.triggerPostgresChange(ids, action)
             }
             message.event == RealtimeChannel.CHANNEL_EVENT_BROADCAST -> {
+                println(Clock.System.now().toEpochMilliseconds())
                 val event = message.payload["event"]?.jsonPrimitive?.content ?: ""
-                val callbacks = bindings.getOrElse("broadcast") { listOf() }.filter { (it as RealtimeBinding.DefaultRealtimeBinding).filter == event }
-                callbacks.forEach { it.callback(Json.encodeToString(message.payload["payload"]?.jsonObject)) }
+                callbackManager.triggerBroadcast(event, message.payload["payload"]?.jsonObject ?: JsonObject(mutableMapOf()))
             }
             message.event == RealtimeChannel.CHANNEL_EVENT_CLOSE -> {
                 realtimeImpl.removeChannel(topic)
@@ -186,9 +176,24 @@ internal class RealtimeChannelImpl(
     }
 
     @SupaComposeInternal
-    override fun addBinding(key: String, binding: RealtimeBinding) {
-        bindings[key] = bindings.getOrElse(key) { listOf() } + binding
-        println(bindings["postgres_changes"]?.size)
+    override fun addPostgresChange(data: PostgresJoinConfig) {
+        clientChanges.add(data)
+    }
+
+    override suspend fun track(data: JsonObject) {
+        val payload = buildJsonObject {
+            put("type", "presence")
+            put("event", "track")
+            putJsonObject(data)
+        }
+        realtimeImpl.ws.sendSerialized(RealtimeMessage(topic, RealtimeChannel.CHANNEL_EVENT_PRESENCE, payload, (++realtimeImpl.ref).toString()))
+    }
+
+    override suspend fun untrack() {
+        realtimeImpl.ws.sendSerialized(RealtimeMessage(topic, RealtimeChannel.CHANNEL_EVENT_PRESENCE, buildJsonObject {
+            put("type", "presence")
+            put("event", "untrack")
+        }, (++realtimeImpl.ref).toString()))
     }
 
 }
@@ -196,45 +201,54 @@ internal class RealtimeChannelImpl(
 @OptIn(SupaComposeInternal::class)
 inline fun RealtimeChannel.onPostgrestChange(builder: PostgresChangeBuilder.CallbackBasedBuilder.() -> Unit) {
     val postgrestBuilder = PostgresChangeBuilder.CallbackBasedBuilder().apply(builder)
-    addBinding("postgres_changes", postgrestBuilder.toBinding())
+    val config = postgrestBuilder.buildConfig()
+    addPostgresChange(config)
+    callbackManager.addPostgresCallback(config, postgrestBuilder.handler)
 }
 
 @OptIn(SupaComposeInternal::class)
-inline fun <reified T> RealtimeChannel.postgrestChangeFlow(json: Json = Json, crossinline builder: PostgresChangeBuilder.FlowBasedBuilder.() -> Unit): Flow<T> = callbackFlow {
-    val callback: (Any) -> Unit = {
-        if(it is T) {
-            trySend(it)
-        } else {
-            when(it) {
-                is PostgresAction.Insert -> {
-                    trySend(it.decodeRecord(json))
-                }
-                is PostgresAction.Update -> {
-                    trySend(it.decodeRecord(json))
-                }
-                is PostgresAction.Select -> {
-                    trySend(it.decodeRecord(json))
+inline fun <reified T> RealtimeChannel.postgrestChangeFlow(json: Json = Json, crossinline builder: PostgresChangeBuilder.FlowBasedBuilder.() -> Unit): Flow<T> {
+    val postgrestBuilder = PostgresChangeBuilder.FlowBasedBuilder().apply(builder)
+    val config = postgrestBuilder.buildConfig()
+    addPostgresChange(config)
+    return callbackFlow {
+        val callback: (PostgresAction) -> Unit = {
+            if (it is T) {
+                trySend(it)
+            } else {
+                when (it) {
+                    is PostgresAction.Insert -> {
+                        trySend(it.decodeRecord(json))
+                    }
+
+                    is PostgresAction.Update -> {
+                        trySend(it.decodeRecord(json))
+                    }
+
+                    is PostgresAction.Select -> {
+                        trySend(it.decodeRecord(json))
+                    }
+
+                    else -> throw IllegalStateException("PostgresAction Delete not supported for custom types")
                 }
             }
         }
-    }
 
-    val postgrestBuilder = PostgresChangeBuilder.FlowBasedBuilder(callback).apply(builder)
-    addBinding("postgres_changes", postgrestBuilder.toBinding())
-    awaitClose() //remove binding
+        callbackManager.addPostgresCallback(config, callback)
+        awaitClose() //remove binding
+    }
 }
 
-@OptIn(SupaComposeInternal::class)
 inline fun <reified T> RealtimeChannel.onBroadcast(event: String, json: Json = Json, crossinline handler: T.() -> Unit) {
-    addBinding("broadcast", RealtimeBinding.DefaultRealtimeBinding(event) {
+    callbackManager.addBroadcastCallback(event) {
         val decodedValue = try {
-            json.decodeFromString<T>(this.toString())
+            json.decodeFromJsonElement<T>(it)
         } catch(e: Exception) {
             Napier.e(e) { "Couldn't decode $this as ${T::class.simpleName}. The corresponding handler wasn't called" }
             null
         }
         decodedValue?.let { handler(it) }
-    })
+    }
 }
 
 inline fun <reified T> RealtimeChannel.broadcastFlow(event: String, json: Json = Json): Flow<T> = callbackFlow {

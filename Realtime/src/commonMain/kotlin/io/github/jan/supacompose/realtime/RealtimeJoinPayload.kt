@@ -21,13 +21,28 @@ data class RealtimeJoinConfig(
  * @param receiveOwnBroadcasts Whether you should receive your own broadcasts
  */
 @Serializable
-data class BroadcastJoinConfig(@SerialName("ack") var acknowledgeBroadcasts: Boolean = false, @SerialName("self") var receiveOwnBroadcasts: Boolean = false)
+data class BroadcastJoinConfig(@SerialName("ack") var acknowledgeBroadcasts: Boolean, @SerialName("self") var receiveOwnBroadcasts: Boolean)
 
 /**
- * @param key Used to track presence payloads
+ * @param key Used to track presence payloads. Can be e.g. a user id
  */
 @Serializable
-data class PresenceJoinConfig(var key: String = "")
+data class PresenceJoinConfig(var key: String)
 
 @Serializable
-data class PostgresJoinConfig(val schema: String, val table: String? = null, val filter: String? = null, val event: String, val id: Long = 0L)
+data class PostgresJoinConfig(val schema: String, val table: String? = null, val filter: String? = null, val event: String, val id: Long = 0L) {
+
+    override fun equals(other: Any?): Boolean {
+        if(other !is PostgresJoinConfig) return false
+        return other.schema == schema && other.table == table && other.filter == filter && (other.event == event || other.event == "*")
+    }
+
+    override fun hashCode(): Int {
+        var result = schema.hashCode()
+        result = 31 * result + (table?.hashCode() ?: 0)
+        result = 31 * result + (filter?.hashCode() ?: 0)
+        result = 31 * result + event.hashCode()
+        return result
+    }
+
+}

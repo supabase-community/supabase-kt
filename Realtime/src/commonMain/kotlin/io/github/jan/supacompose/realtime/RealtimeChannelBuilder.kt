@@ -11,11 +11,11 @@ class RealtimeChannelBuilder @PublishedApi internal constructor(private val topi
     private var presenceJoinConfig = PresenceJoinConfig("")
 
     fun broadcast(block: BroadcastJoinConfig.() -> Unit) {
-        broadcastJoinConfig = BroadcastJoinConfig().apply(block)
+        broadcastJoinConfig = BroadcastJoinConfig(acknowledgeBroadcasts = false, receiveOwnBroadcasts = false).apply(block)
     }
 
     fun presence(block: PresenceJoinConfig.() -> Unit) {
-        presenceJoinConfig = PresenceJoinConfig().apply(block)
+        presenceJoinConfig = PresenceJoinConfig("").apply(block)
     }
 
     //other presence related stuff

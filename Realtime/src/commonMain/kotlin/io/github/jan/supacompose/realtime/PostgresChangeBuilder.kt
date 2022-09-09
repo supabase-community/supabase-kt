@@ -13,7 +13,7 @@ sealed interface PostgresChangeBuilder {
         override var filter: String? = null
         override var event: String = ""
 
-        private var handler: Any.() -> Unit = {}
+        @PublishedApi internal var handler: PostgresAction.() -> Unit = {}
 
         fun update(handler: PostgresAction.Update.() -> Unit) {
             event = "UPDATE"
@@ -49,24 +49,15 @@ sealed interface PostgresChangeBuilder {
             }
         }
 
-        override fun toBinding() = RealtimeBinding.PostgrestRealtimeBinding(
-            PostgresJoinConfig(schema, table, filter, event),
-            handler
-        )
-
     }
 
-    class FlowBasedBuilder(private val callback: Any.() -> Unit) : PostgresChangeBuilder {
+    class FlowBasedBuilder : PostgresChangeBuilder {
         override var schema: String = ""
         override var table: String? = null
         override var filter: String? = null
         override var event: String = ""
-
-        override fun toBinding(): RealtimeBinding.PostgrestRealtimeBinding {
-            return RealtimeBinding.PostgrestRealtimeBinding(PostgresJoinConfig(schema, table, filter, event), callback)
-        }
     }
 
-    fun toBinding(): RealtimeBinding.PostgrestRealtimeBinding
+    fun buildConfig() = PostgresJoinConfig(schema, table, filter, event)
 
 }
