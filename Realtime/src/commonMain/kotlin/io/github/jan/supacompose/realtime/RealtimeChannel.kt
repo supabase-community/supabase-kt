@@ -25,6 +25,8 @@ import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.longOrNull
 import kotlinx.serialization.json.put
+import kotlin.experimental.ExperimentalTypeInference
+
 sealed interface RealtimeChannel {
 
     val status: StateFlow<Status>
@@ -199,38 +201,22 @@ internal class RealtimeChannelImpl(
 }
 
 @OptIn(SupaComposeInternal::class)
-inline fun RealtimeChannel.onPostgrestChange(builder: PostgresChangeBuilder.CallbackBasedBuilder.() -> Unit) {
-    val postgrestBuilder = PostgresChangeBuilder.CallbackBasedBuilder().apply(builder)
-    val config = postgrestBuilder.buildConfig()
-    addPostgresChange(config)
-    callbackManager.addPostgresCallback(config, postgrestBuilder.handler)
-}
-
-@OptIn(SupaComposeInternal::class)
-inline fun <reified T> RealtimeChannel.postgrestChangeFlow(json: Json = Json, crossinline builder: PostgresChangeBuilder.FlowBasedBuilder.() -> Unit): Flow<T> {
-    val postgrestBuilder = PostgresChangeBuilder.FlowBasedBuilder().apply(builder)
+inline fun <reified T : PostgresAction> RealtimeChannel.postgrestChangeFlow(builder: PostgresChangeBuilder.() -> Unit): Flow<T> {
+    val event = when(T::class) {
+        PostgresAction.Insert::class -> "INSERT"
+        PostgresAction.Update::class -> "UPDATE"
+        PostgresAction.Delete::class -> "DELETE"
+        PostgresAction.Select::class -> "SELECT"
+        PostgresAction::class -> "*"
+        else -> throw IllegalStateException("Unknown event type ${T::class}")
+    }
+    val postgrestBuilder = PostgresChangeBuilder(event).apply(builder)
     val config = postgrestBuilder.buildConfig()
     addPostgresChange(config)
     return callbackFlow {
         val callback: (PostgresAction) -> Unit = {
             if (it is T) {
                 trySend(it)
-            } else {
-                when (it) {
-                    is PostgresAction.Insert -> {
-                        trySend(it.decodeRecord(json))
-                    }
-
-                    is PostgresAction.Update -> {
-                        trySend(it.decodeRecord(json))
-                    }
-
-                    is PostgresAction.Select -> {
-                        trySend(it.decodeRecord(json))
-                    }
-
-                    else -> throw IllegalStateException("PostgresAction Delete not supported for custom types")
-                }
             }
         }
 
@@ -272,3 +258,5 @@ inline fun <reified T> RealtimeChannel.broadcastFlow(event: String, json: Json =
  * @param message the message to send as [T]
  */
 suspend inline fun <reified T> RealtimeChannel.broadcast(event: String, message: T) = broadcast(event, Json.encodeToJsonElement(message).jsonObject)
+
+suspend inline fun <reified T> RealtimeChannel.track(data: T) = track(Json.encodeToJsonElement(data).jsonObject)
