@@ -11,5 +11,6 @@ object Versions {
     const val COMPOSE = "1.2.0-alpha01-dev686"
     const val NAPIER = "2.6.1"
     const val DATETIME = "0.4.0"
+    const val ATOMICFU = "0.18.3"
 
 }

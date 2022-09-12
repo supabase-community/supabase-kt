@@ -25,14 +25,13 @@ import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.longOrNull
 import kotlinx.serialization.json.put
-
-private val json = Json { encodeDefaults = true }
-
 sealed interface RealtimeChannel {
 
     val status: StateFlow<Status>
     val topic: String
     val supabaseClient: SupabaseClient
+
+    @SupaComposeInternal
     val callbackManager: CallbackManager
 
     /**
@@ -62,7 +61,7 @@ sealed interface RealtimeChannel {
     suspend fun untrack()
 
     @SupaComposeInternal
-    fun addPostgresChange(data: PostgresJoinConfig)
+    fun RealtimeChannel.addPostgresChange(data: PostgresJoinConfig)
 
     enum class Status {
         CLOSED,
@@ -93,6 +92,7 @@ internal class RealtimeChannelImpl(
 ) : RealtimeChannel {
 
     private val clientChanges = mutableListOf<PostgresJoinConfig>()
+    @SupaComposeInternal
     override val callbackManager = CallbackManagerImpl()
     private val _status = MutableStateFlow(RealtimeChannel.Status.CLOSED)
     override val status = _status.asStateFlow()
@@ -176,7 +176,7 @@ internal class RealtimeChannelImpl(
     }
 
     @SupaComposeInternal
-    override fun addPostgresChange(data: PostgresJoinConfig) {
+    override fun RealtimeChannel.addPostgresChange(data: PostgresJoinConfig) {
         clientChanges.add(data)
     }
 
@@ -234,11 +234,12 @@ inline fun <reified T> RealtimeChannel.postgrestChangeFlow(json: Json = Json, cr
             }
         }
 
-        callbackManager.addPostgresCallback(config, callback)
-        awaitClose() //remove binding
+        val id = callbackManager.addPostgresCallback(config, callback)
+        awaitClose { callbackManager.removePostgresCallbackById(id) }
     }
 }
 
+@OptIn(SupaComposeInternal::class)
 inline fun <reified T> RealtimeChannel.onBroadcast(event: String, json: Json = Json, crossinline handler: T.() -> Unit) {
     callbackManager.addBroadcastCallback(event) {
         val decodedValue = try {
@@ -251,11 +252,18 @@ inline fun <reified T> RealtimeChannel.onBroadcast(event: String, json: Json = J
     }
 }
 
+@OptIn(SupaComposeInternal::class)
 inline fun <reified T> RealtimeChannel.broadcastFlow(event: String, json: Json = Json): Flow<T> = callbackFlow {
-    onBroadcast<T>(event, json) {
-        trySend(this)
+    val id = callbackManager.addBroadcastCallback(event) {
+        val decodedValue = try {
+            json.decodeFromJsonElement<T>(it)
+        } catch(e: Exception) {
+            Napier.e(e) { "Couldn't decode $this as ${T::class.simpleName}. The corresponding handler wasn't called" }
+            null
+        }
+        decodedValue?.let { value -> trySend(value) }
     }
-    awaitClose() //remove binding
+    awaitClose { callbackManager.removeBroadcastCallbackById(id) }
 }
 
 /**

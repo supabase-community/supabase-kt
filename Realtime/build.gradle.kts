@@ -1,3 +1,10 @@
+buildscript {
+    dependencies {
+        classpath("org.jetbrains.kotlinx:atomicfu-gradle-plugin:${Versions.ATOMICFU}")
+    }
+}
+apply(plugin = "kotlinx-atomicfu")
+
 plugins {
     kotlin("multiplatform")
     id("com.android.library")
@@ -46,9 +53,15 @@ kotlin {
             dependencies {
                 api(project(":Supacompose-Auth"))
                 api("io.ktor:ktor-client-websockets:${Versions.KTOR}")
+                api("org.jetbrains.kotlinx:atomicfu:${Versions.ATOMICFU}")
             }
         }
-        val desktopMain by getting
+        val desktopMain by getting {
+            dependencies {
+                implementation("ch.qos.logback:logback-classic:1.3.0-beta0")
+                api("io.ktor:ktor-client-cio:${Versions.KTOR}")
+            }
+        }
         val androidMain by getting
         val webMain by getting
     }
