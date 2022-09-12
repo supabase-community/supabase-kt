@@ -1,3 +1,9 @@
+buildscript {
+    dependencies {
+        classpath("org.jetbrains.kotlinx:atomicfu-gradle-plugin:${Versions.ATOMICFU}")
+    }
+}
+
 plugins {
     kotlin("multiplatform") version Versions.KOTLIN
     id("com.android.library")
@@ -28,6 +34,7 @@ subprojects {
     apply(plugin = "maven-publish")
     apply(plugin = "org.jetbrains.dokka")
     apply(plugin = "org.jetbrains.kotlin.plugin.serialization")
+    apply(plugin = "kotlinx-atomicfu")
     //apply(plugin = "com.android.library")
   //  apply(plugin = "org.jetbrains.compose")
 }
@@ -165,6 +172,7 @@ kotlin {
                 api("org.jetbrains.kotlinx:kotlinx-coroutines-core:${Versions.COROUTINES}")
                 api("io.ktor:ktor-serialization-kotlinx-json:${Versions.KTOR}")
                 api("io.github.aakira:napier:${Versions.NAPIER}")
+                api("org.jetbrains.kotlinx:atomicfu:${Versions.ATOMICFU}")
             }
         }
         val commonTest by getting {

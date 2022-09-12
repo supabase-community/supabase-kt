@@ -1,10 +1,3 @@
-buildscript {
-    dependencies {
-        classpath("org.jetbrains.kotlinx:atomicfu-gradle-plugin:${Versions.ATOMICFU}")
-    }
-}
-apply(plugin = "kotlinx-atomicfu")
-
 plugins {
     kotlin("multiplatform")
     id("com.android.library")
@@ -53,7 +46,6 @@ kotlin {
             dependencies {
                 api(project(":Supacompose-Auth"))
                 api("io.ktor:ktor-client-websockets:${Versions.KTOR}")
-                api("org.jetbrains.kotlinx:atomicfu:${Versions.ATOMICFU}")
             }
         }
         val desktopMain by getting {
