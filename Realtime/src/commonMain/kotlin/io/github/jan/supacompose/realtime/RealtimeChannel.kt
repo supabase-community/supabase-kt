@@ -3,6 +3,7 @@ package io.github.jan.supacompose.realtime
 import io.github.aakira.napier.Napier
 import io.github.jan.supacompose.SupabaseClient
 import io.github.jan.supacompose.annotiations.SupaComposeInternal
+import io.github.jan.supacompose.decodeIfNotEmptyOrDefault
 import io.github.jan.supacompose.putJsonObject
 import io.github.jan.supacompose.supabaseJson
 import io.ktor.client.plugins.websocket.sendSerialized
@@ -13,7 +14,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.datetime.Clock
-import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
@@ -25,7 +25,6 @@ import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.longOrNull
 import kotlinx.serialization.json.put
-import kotlin.experimental.ExperimentalTypeInference
 
 sealed interface RealtimeChannel {
 
@@ -58,8 +57,16 @@ sealed interface RealtimeChannel {
      */
     suspend fun broadcast(event: String, message: JsonObject)
 
-    suspend fun track(data: JsonObject)
+    /**
+     * Store an object in your presence's state. Other clients can get this data when you either join or leave the channel.
+     * Use this method again to update the state.
+     * @param state the data to store
+     */
+    suspend fun track(state: JsonObject)
 
+    /**
+     * Removes the object from your presence's state
+     */
     suspend fun untrack()
 
     @SupaComposeInternal
@@ -81,6 +88,8 @@ sealed interface RealtimeChannel {
         const val CHANNEL_EVENT_BROADCAST = "broadcast"
         const val CHANNEL_EVENT_ACCESS_TOKEN = "access_token"
         const val CHANNEL_EVENT_PRESENCE = "presence"
+        const val CHANNEL_EVENT_PRESENCE_DIFF = "presence_diff"
+        const val CHANNEL_EVENT_PRESENCE_STATE = "presence_state"
     }
 
 }
@@ -152,6 +161,11 @@ internal class RealtimeChannelImpl(
             message.event == RealtimeChannel.CHANNEL_EVENT_ERROR -> {
                 Napier.e { "Received an error in channel ${message.topic}. That could be as a result of an invalid access token" }
             }
+            message.event in listOf(RealtimeChannel.CHANNEL_EVENT_PRESENCE_DIFF, RealtimeChannel.CHANNEL_EVENT_PRESENCE_STATE) -> {
+                val joins = message.payload["joins"]?.jsonObject?.decodeIfNotEmptyOrDefault(mapOf<String, Presence>()) ?: emptyMap()
+                val leaves = message.payload["leaves"]?.jsonObject?.decodeIfNotEmptyOrDefault(mapOf<String, Presence>()) ?: emptyMap()
+                callbackManager.triggerPresenceDiff(joins, leaves)
+            }
         }
     }
 
@@ -182,11 +196,11 @@ internal class RealtimeChannelImpl(
         clientChanges.add(data)
     }
 
-    override suspend fun track(data: JsonObject) {
+    override suspend fun track(state: JsonObject) {
         val payload = buildJsonObject {
             put("type", "presence")
             put("event", "track")
-            putJsonObject(data)
+            putJsonObject(state)
         }
         realtimeImpl.ws.sendSerialized(RealtimeMessage(topic, RealtimeChannel.CHANNEL_EVENT_PRESENCE, payload, (++realtimeImpl.ref).toString()))
     }
@@ -198,6 +212,18 @@ internal class RealtimeChannelImpl(
         }, (++realtimeImpl.ref).toString()))
     }
 
+}
+
+@OptIn(SupaComposeInternal::class)
+fun RealtimeChannel.presenceChangeFlow(): Flow<PresenceAction> {
+    return callbackFlow {
+        val callback: (PresenceAction) -> Unit = { action ->
+            trySend(action)
+        }
+
+        val id = callbackManager.addPresenceCallback(callback)
+        awaitClose { callbackManager.removeCallbackById(id) }
+    }
 }
 
 @OptIn(SupaComposeInternal::class)
@@ -221,7 +247,7 @@ inline fun <reified T : PostgresAction> RealtimeChannel.postgrestChangeFlow(buil
         }
 
         val id = callbackManager.addPostgresCallback(config, callback)
-        awaitClose { callbackManager.removePostgresCallbackById(id) }
+        awaitClose { callbackManager.removeCallbackById(id) }
     }
 }
 
@@ -249,7 +275,7 @@ inline fun <reified T> RealtimeChannel.broadcastFlow(event: String, json: Json =
         }
         decodedValue?.let { value -> trySend(value) }
     }
-    awaitClose { callbackManager.removeBroadcastCallbackById(id) }
+    awaitClose { callbackManager.removeCallbackById(id) }
 }
 
 /**

@@ -2,22 +2,26 @@ package io.github.jan.supacompose.realtime
 
 import kotlinx.serialization.json.JsonObject
 
-sealed interface RealtimeCallback <T, F> {
+sealed interface RealtimeCallback <T> {
 
     val callback: (T) -> Unit
-    val filter: F
     val id: Long
 
     class PostgresCallback(
         override val callback: (PostgresAction) -> Unit,
-        override val filter: PostgresJoinConfig,
+        val filter: PostgresJoinConfig,
         override val id: Long
-    ): RealtimeCallback<PostgresAction, PostgresJoinConfig>
+    ): RealtimeCallback<PostgresAction>
 
     class BroadcastCallback(
         override val callback: (JsonObject) -> Unit,
-        override val filter: String,
+        val event: String,
         override val id: Long
-    ): RealtimeCallback<JsonObject, String>
+    ): RealtimeCallback<JsonObject>
+
+    class PresenceCallback(
+        override val callback: (PresenceAction) -> Unit,
+        override val id: Long
+    ): RealtimeCallback<PresenceAction>
 
 }

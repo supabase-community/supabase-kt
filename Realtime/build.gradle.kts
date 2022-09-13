@@ -46,6 +46,7 @@ kotlin {
             dependencies {
                 api(project(":Supacompose-Auth"))
                 api("io.ktor:ktor-client-websockets:${Versions.KTOR}")
+             //   api("co.touchlab:stately-iso-collections:${Versions.STATELY}")
             }
         }
         val desktopMain by getting {
