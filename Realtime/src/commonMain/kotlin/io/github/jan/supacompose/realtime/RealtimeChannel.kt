@@ -214,6 +214,9 @@ internal class RealtimeChannelImpl(
 
 }
 
+/**
+ * Listen for clients joining / leaving the channel using presences
+ */
 @OptIn(SupaComposeInternal::class)
 fun RealtimeChannel.presenceChangeFlow(): Flow<PresenceAction> {
     return callbackFlow {
@@ -226,8 +229,12 @@ fun RealtimeChannel.presenceChangeFlow(): Flow<PresenceAction> {
     }
 }
 
+/**
+ * You can listen for postgres changes in a channel.
+ * @param T The event type you want to listen to (e.g. [PostgresAction.Update] for updates or only [PostgresAction] for all)
+ */
 @OptIn(SupaComposeInternal::class)
-inline fun <reified T : PostgresAction> RealtimeChannel.postgrestChangeFlow(builder: PostgresChangeBuilder.() -> Unit): Flow<T> {
+inline fun <reified T : PostgresAction> RealtimeChannel.postgresChangeFlow(filter: PostgresChangeFilter.() -> Unit): Flow<T> {
     val event = when(T::class) {
         PostgresAction.Insert::class -> "INSERT"
         PostgresAction.Update::class -> "UPDATE"
@@ -236,7 +243,7 @@ inline fun <reified T : PostgresAction> RealtimeChannel.postgrestChangeFlow(buil
         PostgresAction::class -> "*"
         else -> throw IllegalStateException("Unknown event type ${T::class}")
     }
-    val postgrestBuilder = PostgresChangeBuilder(event).apply(builder)
+    val postgrestBuilder = PostgresChangeFilter(event).apply(filter)
     val config = postgrestBuilder.buildConfig()
     addPostgresChange(config)
     return callbackFlow {
@@ -251,19 +258,10 @@ inline fun <reified T : PostgresAction> RealtimeChannel.postgrestChangeFlow(buil
     }
 }
 
-@OptIn(SupaComposeInternal::class)
-inline fun <reified T> RealtimeChannel.onBroadcast(event: String, json: Json = Json, crossinline handler: T.() -> Unit) {
-    callbackManager.addBroadcastCallback(event) {
-        val decodedValue = try {
-            json.decodeFromJsonElement<T>(it)
-        } catch(e: Exception) {
-            Napier.e(e) { "Couldn't decode $this as ${T::class.simpleName}. The corresponding handler wasn't called" }
-            null
-        }
-        decodedValue?.let { handler(it) }
-    }
-}
-
+/**
+ * Broadcasts can be messages sent by other clients within the same channel under a specific [event].
+ * @param event When a message is sent by another client, it will be sent under a specific event. This is the event that you want to listen to
+ */
 @OptIn(SupaComposeInternal::class)
 inline fun <reified T> RealtimeChannel.broadcastFlow(event: String, json: Json = Json): Flow<T> = callbackFlow {
     val id = callbackManager.addBroadcastCallback(event) {
@@ -281,8 +279,13 @@ inline fun <reified T> RealtimeChannel.broadcastFlow(event: String, json: Json =
 /**
  * Sends a message to everyone who joined the channel
  * @param event the broadcast event. Example: mouse_cursor
- * @param message the message to send as [T]
+ * @param message the message to send as [T] (can only be something that can be encoded as a json object)
  */
-suspend inline fun <reified T> RealtimeChannel.broadcast(event: String, message: T) = broadcast(event, Json.encodeToJsonElement(message).jsonObject)
+suspend inline fun <reified T> RealtimeChannel.broadcast(event: String, message: T, json: Json = Json) = broadcast(event, json.encodeToJsonElement(message).jsonObject)
 
-suspend inline fun <reified T> RealtimeChannel.track(data: T) = track(Json.encodeToJsonElement(data).jsonObject)
+/**
+ * Store an object in your presence's state. Other clients can get this data when you either join or leave the channel.
+ * Use this method again to update the state.
+ * @param state the data to store (can only be something that can be encoded as a json object)
+ */
+suspend inline fun <reified T> RealtimeChannel.track(state: T, json: Json = Json) = track(json.encodeToJsonElement(state).jsonObject)

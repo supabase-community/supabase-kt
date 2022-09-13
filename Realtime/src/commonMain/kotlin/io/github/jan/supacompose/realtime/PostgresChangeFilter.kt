@@ -1,6 +1,6 @@
 package io.github.jan.supacompose.realtime
 
-class PostgresChangeBuilder(private val event: String) {
+class PostgresChangeFilter(private val event: String) {
 
     var schema: String = ""
     var table: String? = null
