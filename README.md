@@ -81,6 +81,14 @@ val client = createSupabaseClient {
 
 </details>
 
+<details><summary>Initialize the logger</summary>
+If you want so see logs for supacompose you have to initialize the logger:
+
+```kotlin
+Napier.base(DebugAntilog())
+```
+</details>
+
 #### Authentication
 
 <details><summary>Feature table</summary>
