@@ -540,7 +540,7 @@ val changeFlow: Flow<PostgresAction.Insert> = channel.postgresChangeFlow<Postgre
 ```kotlin
 val broadcastFlow: Flow<Position> = channel.broadcastFlow("position") //under the event "position"
 
-channel.broadcast("position", Position(20, 30)) //broadcast your positon to other clients (in the event "position")
+channel.broadcast("position", Position(20, 30)) //broadcast your position to other clients (in the event "position")
 ```
 
 </details>
