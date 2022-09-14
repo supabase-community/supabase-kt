@@ -1,9 +1,6 @@
 package io.github.jan.supacompose.realtime
 
-import io.github.aakira.napier.Napier
 import io.github.jan.supacompose.realtime.annotiations.ChannelDsl
-import kotlinx.serialization.decodeFromString
-import kotlinx.serialization.json.Json
 
 @ChannelDsl
 class RealtimeChannelBuilder @PublishedApi internal constructor(private val topic: String, private val realtimeImpl: RealtimeImpl) {

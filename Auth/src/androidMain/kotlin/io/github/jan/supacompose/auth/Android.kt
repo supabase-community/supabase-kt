@@ -6,7 +6,6 @@ import android.net.Uri
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ProcessLifecycleOwner
-import io.github.aakira.napier.DebugAntilog
 import io.github.aakira.napier.Napier
 import io.github.jan.supacompose.SupabaseClient
 import io.github.jan.supacompose.annotiations.SupaComposeInternal

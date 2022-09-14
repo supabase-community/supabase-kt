@@ -1,7 +1,6 @@
 package io.github.jan.supacompose
 
 import io.github.aakira.napier.Napier
-import io.github.jan.supacompose.annotiations.SupaComposeInternal
 import io.github.jan.supacompose.plugins.PluginManager
 import io.github.jan.supacompose.plugins.SupacomposePlugin
 import io.ktor.client.HttpClient
@@ -11,10 +10,6 @@ import io.ktor.client.plugins.DefaultRequest
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.request.headers
 import io.ktor.serialization.kotlinx.json.json
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.SupervisorJob
 
 sealed interface SupabaseClient {
 

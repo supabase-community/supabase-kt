@@ -8,9 +8,6 @@ import io.ktor.http.ContentType
 import io.ktor.server.application.call
 import io.ktor.server.cio.CIO
 import io.ktor.server.engine.embeddedServer
-import io.ktor.server.http.content.file
-import io.ktor.server.http.content.static
-import io.ktor.server.http.content.staticRootFolder
 import io.ktor.server.response.respondText
 import io.ktor.server.routing.get
 import io.ktor.server.routing.routing
@@ -22,7 +19,6 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import java.awt.Desktop
-import java.io.File
 import java.net.URI
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes

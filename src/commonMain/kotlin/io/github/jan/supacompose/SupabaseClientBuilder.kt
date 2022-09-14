@@ -1,7 +1,5 @@
 package io.github.jan.supacompose
 
-import io.github.aakira.napier.DebugAntilog
-import io.github.aakira.napier.Napier
 import io.github.jan.supacompose.annotiations.SupaComposeDsl
 import io.github.jan.supacompose.plugins.SupacomposePlugin
 import io.github.jan.supacompose.plugins.SupacomposePluginProvider

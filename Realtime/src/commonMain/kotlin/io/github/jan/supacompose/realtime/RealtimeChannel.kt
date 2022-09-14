@@ -13,8 +13,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.callbackFlow
-import kotlinx.datetime.Clock
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.buildJsonObject
@@ -112,17 +110,17 @@ internal class RealtimeChannelImpl(
 
     @OptIn(SupaComposeInternal::class)
     override suspend fun join() {
-        realtimeImpl.addChannel(this)
+        realtimeImpl.run {
+            addChannel(this@RealtimeChannelImpl)
+        }
         _status.value = RealtimeChannel.Status.JOINING
         Napier.d { "Joining channel $topic" }
         val postgrestChanges = clientChanges.toList()
-        println(postgrestChanges.size)
         val joinConfig = RealtimeJoinPayload(RealtimeJoinConfig(broadcastJoinConfig, presenceJoinConfig, postgrestChanges))
         val joinConfigObject = buildJsonObject {
             putJsonObject(Json.encodeToJsonElement(joinConfig).jsonObject)
             if(jwt.isNotBlank()) put("access_token", jwt)
         }
-        println(Json.encodeToString(RealtimeMessage(topic, RealtimeChannel.CHANNEL_EVENT_JOIN, joinConfigObject, null)))
         realtimeImpl.ws.sendSerialized(RealtimeMessage(topic, RealtimeChannel.CHANNEL_EVENT_JOIN, joinConfigObject, null))
     }
 
@@ -150,21 +148,26 @@ internal class RealtimeChannelImpl(
                 callbackManager.triggerPostgresChange(ids, action)
             }
             message.event == RealtimeChannel.CHANNEL_EVENT_BROADCAST -> {
-                println(Clock.System.now().toEpochMilliseconds())
                 val event = message.payload["event"]?.jsonPrimitive?.content ?: ""
                 callbackManager.triggerBroadcast(event, message.payload["payload"]?.jsonObject ?: JsonObject(mutableMapOf()))
             }
             message.event == RealtimeChannel.CHANNEL_EVENT_CLOSE -> {
-                realtimeImpl.removeChannel(topic)
+                realtimeImpl.run {
+                    removeChannel(topic)
+                }
                 Napier.d { "Left channel ${message.topic}" }
             }
             message.event == RealtimeChannel.CHANNEL_EVENT_ERROR -> {
                 Napier.e { "Received an error in channel ${message.topic}. That could be as a result of an invalid access token" }
             }
-            message.event in listOf(RealtimeChannel.CHANNEL_EVENT_PRESENCE_DIFF, RealtimeChannel.CHANNEL_EVENT_PRESENCE_STATE) -> {
+            message.event == RealtimeChannel.CHANNEL_EVENT_PRESENCE_DIFF -> {
                 val joins = message.payload["joins"]?.jsonObject?.decodeIfNotEmptyOrDefault(mapOf<String, Presence>()) ?: emptyMap()
                 val leaves = message.payload["leaves"]?.jsonObject?.decodeIfNotEmptyOrDefault(mapOf<String, Presence>()) ?: emptyMap()
                 callbackManager.triggerPresenceDiff(joins, leaves)
+            }
+            message.event == RealtimeChannel.CHANNEL_EVENT_PRESENCE_STATE -> {
+                val joins = message.payload.decodeIfNotEmptyOrDefault(mapOf<String, Presence>())
+                callbackManager.triggerPresenceDiff(joins, mapOf())
             }
         }
     }
@@ -184,6 +187,7 @@ internal class RealtimeChannelImpl(
     }
 
     override suspend fun broadcast(event: String, message: JsonObject) {
+        if(status.value != RealtimeChannel.Status.JOINED) throw IllegalStateException("Cannot broadcast to a channel you didn't join. Did you forget to call join()?")
         realtimeImpl.ws.sendSerialized(RealtimeMessage(topic, "broadcast", buildJsonObject {
             put("type", "broadcast")
             put("event", event)
@@ -235,6 +239,7 @@ fun RealtimeChannel.presenceChangeFlow(): Flow<PresenceAction> {
  */
 @OptIn(SupaComposeInternal::class)
 inline fun <reified T : PostgresAction> RealtimeChannel.postgresChangeFlow(filter: PostgresChangeFilter.() -> Unit): Flow<T> {
+    if(status.value == RealtimeChannel.Status.JOINED) throw IllegalStateException("You cannot call postgresChangeFlow after joining the channel")
     val event = when(T::class) {
         PostgresAction.Insert::class -> "INSERT"
         PostgresAction.Update::class -> "UPDATE"

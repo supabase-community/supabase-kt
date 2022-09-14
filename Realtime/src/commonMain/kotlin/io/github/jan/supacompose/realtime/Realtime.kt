@@ -7,7 +7,6 @@ import io.github.jan.supacompose.annotiations.SupaComposeInternal
 import io.github.jan.supacompose.auth.auth
 import io.github.jan.supacompose.plugins.MainConfig
 import io.github.jan.supacompose.plugins.MainPlugin
-import io.github.jan.supacompose.plugins.SupacomposePlugin
 import io.github.jan.supacompose.plugins.SupacomposePluginProvider
 import io.github.jan.supacompose.supabaseJson
 import io.ktor.client.plugins.websocket.DefaultClientWebSocketSession
@@ -15,23 +14,20 @@ import io.ktor.client.plugins.websocket.WebSockets
 import io.ktor.client.plugins.websocket.sendSerialized
 import io.ktor.client.plugins.websocket.webSocketSession
 import io.ktor.serialization.kotlinx.KotlinxWebsocketSerializationConverter
-import io.ktor.websocket.CloseReason
 import io.ktor.websocket.Frame
-import io.ktor.websocket.close
 import io.ktor.websocket.readText
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
-import kotlinx.coroutines.cancelChildren
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.isActive
+import kotlinx.coroutines.job
 import kotlinx.coroutines.launch
-import kotlinx.datetime.Clock
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.buildJsonObject
 import kotlin.time.Duration
@@ -65,10 +61,15 @@ sealed interface Realtime : MainPlugin<Realtime.Config> {
     fun onStatusChange(callback: (Status) -> Unit)
 
     @SupaComposeInternal
-    fun addChannel(channel: RealtimeChannel)
+    fun RealtimeChannel.addChannel(channel: RealtimeChannel)
 
     @SupaComposeInternal
-    fun removeChannel(topic: String)
+    fun RealtimeChannel.removeChannel(topic: String)
+
+    /**
+     * Blocks your current coroutine until the websocket connection is closed
+     */
+    suspend fun block()
 
     data class Config(
         var websocketConfig: WebSockets.Config.() -> Unit = {},
@@ -210,7 +211,6 @@ internal class RealtimeImpl(override val supabaseClient: SupabaseClient, overrid
     }
 
     private fun onMessage(stringMessage: String) {
-        println(stringMessage)
         val message = supabaseJson.decodeFromString<RealtimeMessage>(stringMessage)
         val channel = subscriptions[message.topic] as? RealtimeChannelImpl
         if(message.ref?.toIntOrNull() == heartbeatRef) {
@@ -245,17 +245,21 @@ internal class RealtimeImpl(override val supabaseClient: SupabaseClient, overrid
     }
 
     @SupaComposeInternal
-    override fun removeChannel(topic: String) {
+    override fun RealtimeChannel.removeChannel(topic: String) {
         _subscriptions.remove(topic)
     }
 
     @SupaComposeInternal
-    override fun addChannel(channel: RealtimeChannel) {
+    override fun RealtimeChannel.addChannel(channel: RealtimeChannel) {
         _subscriptions[channel.topic] = channel
     }
 
     override suspend fun close() {
         ws.cancel()
+    }
+
+    override suspend fun block() {
+        ws.coroutineContext.job.join()
     }
 
 }

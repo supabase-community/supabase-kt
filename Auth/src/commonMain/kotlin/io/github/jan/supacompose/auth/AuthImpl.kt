@@ -1,16 +1,13 @@
 package io.github.jan.supacompose.auth
 
- import io.github.aakira.napier.DebugAntilog
  import io.github.aakira.napier.Napier
  import io.github.jan.supacompose.CurrentPlatformTarget
  import io.github.jan.supacompose.PlatformTarget
  import io.github.jan.supacompose.SupabaseClient
- import io.github.jan.supacompose.annotiations.SupaComposeInternal
  import io.github.jan.supacompose.auth.providers.AuthProvider
  import io.github.jan.supacompose.auth.providers.DefaultAuthProvider
  import io.github.jan.supacompose.auth.user.UserInfo
  import io.github.jan.supacompose.auth.user.UserSession
- import io.github.jan.supacompose.buildUrl
  import io.github.jan.supacompose.exceptions.RestException
  import io.github.jan.supacompose.putJsonObject
  import io.github.jan.supacompose.supabaseJson
@@ -24,11 +21,6 @@ package io.github.jan.supacompose.auth
  import io.ktor.client.request.put
  import io.ktor.client.request.setBody
  import io.ktor.http.HttpHeaders
- import io.ktor.http.HttpStatusCode.Companion.Unauthorized
- import io.ktor.http.URLBuilder
- import io.ktor.http.Url
- import io.ktor.http.appendEncodedPathSegments
- import io.ktor.http.path
  import kotlinx.coroutines.CoroutineScope
  import kotlinx.coroutines.Dispatchers
  import kotlinx.coroutines.Job

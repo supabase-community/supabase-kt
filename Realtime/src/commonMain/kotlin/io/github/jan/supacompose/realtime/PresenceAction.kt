@@ -97,3 +97,29 @@ internal class PresenceActionImpl(
     override val joins: Map<String, Presence>,
     override val leaves: Map<String, Presence>
 ) : PresenceAction
+
+/**
+ * Decodes all [PresenceAction.joins] values as [T]
+ * @param json The [Json] instance to use for decoding
+ * @param ignoreOtherTypes Whether to ignore presences which cannot be decoded as [T]
+ */
+inline fun <reified T> PresenceAction.decodeJoinsAs(json: Json = Json, ignoreOtherTypes: Boolean = true): List<T> = joins.values.mapNotNull {
+    if (ignoreOtherTypes) {
+        it.stateAsOrNull<T>(json)
+    } else {
+        it.stateAs<T>(json)
+    }
+}
+
+/**
+ * Decodes all [PresenceAction.leaves] values as [T]
+ * @param json The [Json] instance to use for decoding
+ * @param ignoreOtherTypes Whether to ignore presences which cannot be decoded as [T]
+ */
+inline fun <reified T> PresenceAction.decodeLeavesAs(json: Json = Json, ignoreOtherTypes: Boolean = true): List<T> = leaves.values.mapNotNull {
+    if (ignoreOtherTypes) {
+        it.stateAsOrNull<T>(json)
+    } else {
+        it.stateAs<T>(json)
+    }
+}
