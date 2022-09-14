@@ -6,7 +6,6 @@ import android.net.Uri
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ProcessLifecycleOwner
-import io.github.aakira.napier.DebugAntilog
 import io.github.aakira.napier.Napier
 import io.github.jan.supacompose.SupabaseClient
 import io.github.jan.supacompose.annotiations.SupaComposeInternal
@@ -62,7 +61,6 @@ fun Activity.initializeAndroid(supabaseClient: SupabaseClient, onSessionSuccess:
     authPlugin.config.sessionFile = File(filesDir, "session.json")
     addLifecycleCallbacks(supabaseClient, authPlugin)
 
-    Napier.base(DebugAntilog())
     val data = intent?.data ?: return
     val scheme = data.scheme ?: return
     val host = data.host ?: return

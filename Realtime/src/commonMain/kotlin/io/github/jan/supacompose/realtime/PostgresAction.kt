@@ -1,4 +1,4 @@
-package io.github.jan.supacompose.realtime.events
+package io.github.jan.supacompose.realtime
 
 import kotlinx.datetime.Instant
 import kotlinx.serialization.SerialName
@@ -31,8 +31,7 @@ interface HasOldRecord {
     val oldRecord: JsonObject
 }
 
-
-sealed interface ChannelAction {
+sealed interface PostgresAction {
 
     /**
      * Contains data of the row's columns
@@ -50,7 +49,7 @@ sealed interface ChannelAction {
         override val columns: List<Column>,
         @SerialName("commit_timestamp")
         override val commitTimestamp: Instant,
-    ) : ChannelAction, HasRecord
+    ) : PostgresAction, HasRecord
 
     @Serializable
     data class Update(
@@ -60,7 +59,7 @@ sealed interface ChannelAction {
         override val columns: List<Column>,
         @SerialName("commit_timestamp")
         override val commitTimestamp: Instant,
-    ) : ChannelAction, HasRecord, HasOldRecord
+    ) : PostgresAction, HasRecord, HasOldRecord
 
     @Serializable
     data class Delete(
@@ -69,7 +68,7 @@ sealed interface ChannelAction {
         override val columns: List<Column>,
         @SerialName("commit_timestamp")
         override val commitTimestamp: Instant,
-    ) : ChannelAction, HasOldRecord
+    ) : PostgresAction, HasOldRecord
 
     @Serializable
     data class Select(
@@ -77,7 +76,7 @@ sealed interface ChannelAction {
         override val columns: List<Column>,
         @SerialName("commit_timestamp")
         override val commitTimestamp: Instant,
-    ) : ChannelAction, HasRecord
+    ) : PostgresAction, HasRecord
 
 }
 
@@ -86,7 +85,7 @@ sealed interface ChannelAction {
  */
 inline fun <reified T> HasRecord.decodeRecordOrNull(json: Json = Json): T? {
     return try {
-        record.let { json.decodeFromJsonElement<T>(it) }
+        json.decodeFromJsonElement<T>(record)
     } catch (e: Exception) {
         null
     }
@@ -97,7 +96,7 @@ inline fun <reified T> HasRecord.decodeRecordOrNull(json: Json = Json): T? {
  */
 inline fun <reified T> HasOldRecord.decodeOldRecordOrNull(json: Json = Json): T? {
     return try {
-        oldRecord.let { json.decodeFromJsonElement<T>(it) }
+        json.decodeFromJsonElement<T>(oldRecord)
     } catch (e: Exception) {
         null
     }

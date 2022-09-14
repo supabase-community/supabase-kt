@@ -46,9 +46,15 @@ kotlin {
             dependencies {
                 api(project(":Supacompose-Auth"))
                 api("io.ktor:ktor-client-websockets:${Versions.KTOR}")
+             //   api("co.touchlab:stately-iso-collections:${Versions.STATELY}")
             }
         }
-        val desktopMain by getting
+        val desktopMain by getting {
+            dependencies {
+                implementation("ch.qos.logback:logback-classic:1.3.0-beta0")
+                api("io.ktor:ktor-client-cio:${Versions.KTOR}")
+            }
+        }
         val androidMain by getting
         val webMain by getting
     }

@@ -1,6 +1,5 @@
 package io.github.jan.supacompose.auth
 
-import io.github.jan.supacompose.SupabaseClient
 import io.github.jan.supacompose.auth.user.UserSession
 import io.github.jan.supacompose.supabaseJson
 import kotlinx.coroutines.Dispatchers

@@ -8,7 +8,6 @@ import io.github.jan.supacompose.auth.user.UserSession
 import io.github.jan.supacompose.exceptions.RestException
 import io.github.jan.supacompose.plugins.MainConfig
 import io.github.jan.supacompose.plugins.MainPlugin
-import io.github.jan.supacompose.plugins.SupacomposePlugin
 import io.github.jan.supacompose.plugins.SupacomposePluginProvider
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.serialization.json.Json

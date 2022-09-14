@@ -1,11 +1,8 @@
 package io.github.jan.supacompose.auth.user
 
-import io.github.jan.supacompose.auth.providers.ExternalAuthConfig
 import kotlinx.datetime.Clock
-import kotlinx.datetime.Instant
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.Transient
 import kotlin.time.Duration.Companion.seconds
 
 @Serializable

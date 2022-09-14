@@ -7,7 +7,6 @@ import io.github.jan.supacompose.annotiations.SupaComposeInternal
 import io.github.jan.supacompose.auth.auth
 import io.github.jan.supacompose.plugins.MainConfig
 import io.github.jan.supacompose.plugins.MainPlugin
-import io.github.jan.supacompose.plugins.SupacomposePlugin
 import io.github.jan.supacompose.plugins.SupacomposePluginProvider
 import io.github.jan.supacompose.supabaseJson
 import io.ktor.client.plugins.websocket.DefaultClientWebSocketSession
@@ -15,21 +14,19 @@ import io.ktor.client.plugins.websocket.WebSockets
 import io.ktor.client.plugins.websocket.sendSerialized
 import io.ktor.client.plugins.websocket.webSocketSession
 import io.ktor.serialization.kotlinx.KotlinxWebsocketSerializationConverter
-import io.ktor.websocket.CloseReason
 import io.ktor.websocket.Frame
-import io.ktor.websocket.close
 import io.ktor.websocket.readText
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
-import kotlinx.coroutines.cancelChildren
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.isActive
+import kotlinx.coroutines.job
 import kotlinx.coroutines.launch
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.buildJsonObject
@@ -64,10 +61,15 @@ sealed interface Realtime : MainPlugin<Realtime.Config> {
     fun onStatusChange(callback: (Status) -> Unit)
 
     @SupaComposeInternal
-    fun addChannel(channel: RealtimeChannel)
+    fun RealtimeChannel.addChannel(channel: RealtimeChannel)
 
     @SupaComposeInternal
-    fun removeChannel(topic: String)
+    fun RealtimeChannel.removeChannel(topic: String)
+
+    /**
+     * Blocks your current coroutine until the websocket connection is closed
+     */
+    suspend fun block()
 
     data class Config(
         var websocketConfig: WebSockets.Config.() -> Unit = {},
@@ -150,7 +152,7 @@ internal class RealtimeImpl(override val supabaseClient: SupabaseClient, overrid
         if (status.value == Realtime.Status.CONNECTED) throw IllegalStateException("Websocket already connected")
         val prefix = if (config.secure) "wss://" else "ws://"
         updateStatus(Realtime.Status.CONNECTING)
-        val realtimeUrl = config.customRealtimeURL ?: (prefix + supabaseClient.supabaseUrl + ("/realtime/v${Realtime.API_VERSION}/websocket?apikey=${supabaseClient.supabaseKey}"))
+        val realtimeUrl = config.customRealtimeURL ?: (prefix + supabaseClient.supabaseUrl + ("/realtime/v${Realtime.API_VERSION}/websocket?apikey=${supabaseClient.supabaseKey}&vsn=1.0.0"))
          try {
             ws = supabaseClient.httpClient.webSocketSession(realtimeUrl)
             updateStatus(Realtime.Status.CONNECTED)
@@ -243,17 +245,21 @@ internal class RealtimeImpl(override val supabaseClient: SupabaseClient, overrid
     }
 
     @SupaComposeInternal
-    override fun removeChannel(topic: String) {
+    override fun RealtimeChannel.removeChannel(topic: String) {
         _subscriptions.remove(topic)
     }
 
     @SupaComposeInternal
-    override fun addChannel(channel: RealtimeChannel) {
+    override fun RealtimeChannel.addChannel(channel: RealtimeChannel) {
         _subscriptions[channel.topic] = channel
     }
 
     override suspend fun close() {
-        ws.close(CloseReason(CloseReason.Codes.NORMAL, "Connection closed by library"))
+        ws.cancel()
+    }
+
+    override suspend fun block() {
+        ws.coroutineContext.job.join()
     }
 
 }
@@ -261,15 +267,16 @@ internal class RealtimeImpl(override val supabaseClient: SupabaseClient, overrid
 /**
  * Creates a new [RealtimeChannel]
  */
-inline fun Realtime.createChannel(builder: RealtimeChannelBuilder.() -> Unit): RealtimeChannel {
-    return RealtimeChannelBuilder(this as RealtimeImpl).apply(builder).build()
+inline fun Realtime.createChannel(channelId: String, builder: RealtimeChannelBuilder.() -> Unit): RealtimeChannel {
+    return RealtimeChannelBuilder("realtime:$channelId", this as RealtimeImpl).apply(builder).build()
 }
 
 /**
  * Creates a new [RealtimeChannel] and joins it after creation
  */
-suspend inline fun Realtime.createAndJoinChannel(builder: RealtimeChannelBuilder.() -> Unit): RealtimeChannel {
-    return RealtimeChannelBuilder(this as RealtimeImpl).apply(builder).build().also { it.join() }
+@Deprecated("Use createChannel and then RealtimeChannel.join() instead", ReplaceWith("createChannel(channelId, builder)"))
+suspend inline fun Realtime.createAndJoinChannel(channelId: String, builder: RealtimeChannelBuilder.() -> Unit): RealtimeChannel {
+    return RealtimeChannelBuilder("realtime:$channelId", this as RealtimeImpl).apply(builder).build().also { it.join() }
 }
 
 /**

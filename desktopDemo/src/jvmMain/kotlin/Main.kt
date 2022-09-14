@@ -65,19 +65,7 @@ suspend fun main() {
                 }
                 LaunchedEffect(Unit) {
                     scope.launch {
-                        client.realtime.connect()
-                        val channel = client.realtime.createAndJoinChannel {
-                            table = "products"
-                            schema = "public"
 
-                            on<ChannelAction.Insert> {
-
-                            }
-
-                            onAll {
-                                println(oldRecord)
-                            }
-                        }
                     }
                 }
             } else {

@@ -5,7 +5,6 @@ import io.github.jan.supacompose.auth.auth
 import io.github.jan.supacompose.exceptions.RestException
 import io.github.jan.supacompose.plugins.MainConfig
 import io.github.jan.supacompose.plugins.MainPlugin
-import io.github.jan.supacompose.plugins.SupacomposePlugin
 import io.github.jan.supacompose.plugins.SupacomposePluginProvider
 import io.ktor.client.call.body
 import io.ktor.client.request.HttpRequestBuilder
