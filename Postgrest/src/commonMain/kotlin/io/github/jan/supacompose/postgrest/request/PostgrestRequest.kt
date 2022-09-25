@@ -1,6 +1,5 @@
 package io.github.jan.supacompose.postgrest.request
 
-import io.github.jan.supacompose.SupabaseClient
 import io.github.jan.supacompose.auth.auth
 import io.github.jan.supacompose.exceptions.RestException
 import io.github.jan.supacompose.postgrest.Postgrest
@@ -8,7 +7,6 @@ import io.github.jan.supacompose.postgrest.query.Count
 import io.github.jan.supacompose.postgrest.query.PostgrestBuilder
 import io.github.jan.supacompose.postgrest.query.PostgrestResult
 import io.github.jan.supacompose.postgrest.query.Returning
-import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.request
 import io.ktor.client.request.setBody
@@ -39,7 +37,7 @@ sealed interface PostgrestRequest {
             }
             headers[PostgrestBuilder.HEADER_PREFER] = prefer.joinToString(",")
             setBody(this@PostgrestRequest.body)
-            parametersOf(filter.mapValues { (_, value) -> listOf(value) })
+            url.parameters.appendAll(parametersOf(filter.mapValues { (_, value) -> listOf(value) }))
         }.checkForErrorCodes()
     }
 
