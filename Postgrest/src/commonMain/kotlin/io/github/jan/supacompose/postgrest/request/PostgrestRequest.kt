@@ -45,7 +45,7 @@ sealed interface PostgrestRequest {
         if(status.value !in 200..299) {
             try {
                 val error = body<JsonObject>()
-                throw RestException(status.value, error["error"]?.jsonPrimitive?.content ?: "Unknown error", error.toString())
+                throw RestException(status.value, error["error"]?.jsonPrimitive?.content ?: "Unknown error", error.toString(), headers.entries().flatMap { (key, value) -> listOf(key) + value })
             } catch(_: Exception) {
                 throw RestException(status.value, "Unknown error", "")
             }

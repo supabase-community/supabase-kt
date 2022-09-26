@@ -116,9 +116,7 @@ internal class StorageImpl(override val supabaseClient: SupabaseClient, override
 
     override fun get(bucketId: String): BucketApi = BucketApiImpl(bucketId, this)
 
-    fun path(path: String) = "${supabaseClient.supabaseHttpUrl}/storage/v1/$path"
-
-    suspend inline fun makeRequest(method: HttpMethod, path: String, json: Boolean = true, body: HttpRequestBuilder.() -> Unit = {}) = supabaseClient.httpClient.request(path(path)) {
+    suspend inline fun makeRequest(method: HttpMethod, path: String, json: Boolean = true, body: HttpRequestBuilder.() -> Unit = {}) = supabaseClient.httpClient.request(resolveUrl(path)) {
         this.method = method
         if(json) contentType(ContentType.Application.Json)
         addAuthorization()

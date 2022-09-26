@@ -139,7 +139,7 @@ internal class BucketApiImpl(override val bucketId: String, val storage: Storage
     }
 
     override suspend fun createSignedUrl(path: String, expiresIn: Duration): String {
-        return storage.path(
+        return storage.resolveUrl(
             storage.makeRequest(HttpMethod.Post, "object/sign/$bucketId/$path") {
                 setBody(buildJsonObject {
                     put("expiresIn", expiresIn.inWholeSeconds)
@@ -158,7 +158,7 @@ internal class BucketApiImpl(override val bucketId: String, val storage: Storage
                 put("expiresIn", expiresIn.inWholeSeconds)
             })
         }.body<List<SignedUrl>>().map {
-            it.copy(signedURL = storage.path(it.signedURL.substring(1)))
+            it.copy(signedURL = storage.resolveUrl(it.signedURL.substring(1)))
         }
     }
 
@@ -183,8 +183,8 @@ internal class BucketApiImpl(override val bucketId: String, val storage: Storage
 
     override suspend fun changePublicStatusTo(public: Boolean) = storage.changePublicStatus(bucketId, public)
 
-    override fun authenticatedUrl(path: String) = storage.path("object/authenticated/$bucketId/$path")
+    override fun authenticatedUrl(path: String) = storage.resolveUrl("object/authenticated/$bucketId/$path")
 
-    override fun publicUrl(path: String) = storage.path("object/public/$bucketId/$path")
+    override fun publicUrl(path: String) = storage.resolveUrl("object/public/$bucketId/$path")
 
 }
