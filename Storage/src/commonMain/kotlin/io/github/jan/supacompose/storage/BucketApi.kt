@@ -1,8 +1,13 @@
 package io.github.jan.supacompose.storage
 
+import io.github.jan.supacompose.SupabaseClient
+import io.github.jan.supacompose.auth.auth
+import io.github.jan.supacompose.auth.currentAccessToken
 import io.github.jan.supacompose.putJsonObject
 import io.ktor.client.call.body
+import io.ktor.client.request.HttpRequestBuilder
 import io.ktor.client.request.setBody
+import io.ktor.client.statement.HttpResponse
 import io.ktor.http.HttpMethod
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.add
@@ -15,6 +20,7 @@ import kotlin.time.Duration
 sealed interface BucketApi {
 
     val bucketId: String
+    val supabaseClient: SupabaseClient
 
     /**
      * Uploads a file in [bucketId] under [path]
@@ -77,7 +83,7 @@ sealed interface BucketApi {
      * @param path The path to download
      * @return The file as a byte array
      */
-    suspend fun download(path: String): ByteArray
+    suspend fun downloadAuthenticated(path: String): ByteArray
 
     /**
      * Searches for buckets with the given [prefix] and [filter]
@@ -103,6 +109,8 @@ sealed interface BucketApi {
 }
 
 internal class BucketApiImpl(override val bucketId: String, val storage: StorageImpl) : BucketApi {
+
+    override val supabaseClient = storage.supabaseClient
 
     override suspend fun update(path: String, data: ByteArray): String = uploadOrUpdate(HttpMethod.Put, bucketId, path, data)
 
@@ -162,7 +170,7 @@ internal class BucketApiImpl(override val bucketId: String, val storage: Storage
         }
     }
 
-    override suspend fun download(path: String): ByteArray {
+    override suspend fun downloadAuthenticated(path: String): ByteArray {
         return storage.makeRequest(HttpMethod.Get, "object/authenticated/$bucketId/$path").body()
     }
 
@@ -187,4 +195,20 @@ internal class BucketApiImpl(override val bucketId: String, val storage: Storage
 
     override fun publicUrl(path: String) = storage.resolveUrl("object/public/$bucketId/$path")
 
+}
+
+/**
+ * Can be used if you want to quickly access a file under an **url** with your **auth_token** using a custom download method.
+ *
+ *
+ * To interact with files which require authentication use the provided access token and add it to the Authorization header:
+ *
+ * **Authentication: Bearer <your_access_token>**
+ * @param path The path to download
+ * @param data The callback including the auth token and the resolved url.
+ */
+inline fun BucketApi.buildAuthenticatedRequest(path: String, data: (token: String?, url: String) -> Unit) {
+    val url = authenticatedUrl(path)
+    val token = supabaseClient.auth.currentAccessToken()
+    data(token, url)
 }

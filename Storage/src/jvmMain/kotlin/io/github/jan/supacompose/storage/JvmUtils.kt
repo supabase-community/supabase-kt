@@ -10,11 +10,11 @@ suspend fun BucketApi.upload(path: String, file: File) = upload(path, file.readB
 suspend fun BucketApi.upload(path: String, file: Path) = upload(path, file.readBytes())
 
 suspend fun BucketApi.downloadTo(path: String, file: File) {
-    val bytes = download(path)
+    val bytes = downloadAuthenticated(path)
     file.writeBytes(bytes)
 }
 
 suspend fun BucketApi.downloadTo(path: String, file: Path) {
-    val bytes = download(path)
+    val bytes = downloadAuthenticated(path)
     file.writeBytes(bytes)
 }

@@ -45,8 +45,6 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 api(project(":Supacompose-Auth"))
-                //add kotlin reflect
-                api("org.jetbrains.kotlin:kotlin-reflect:${Versions.KOTLIN}")
                 // https://mvnrepository.com/artifact/io.ktor/ktor-server-core
             }
         }

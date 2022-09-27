@@ -164,6 +164,11 @@ sealed interface Auth : MainPlugin<Auth.Config> {
 }
 
 /**
+ * Returns the current access token, or null if no session is available
+ */
+fun Auth.currentAccessToken() = currentSession.value?.accessToken
+
+/**
  * Modifies a user with the specified [provider]. Extra data can be supplied
  * @param provider The provider to use
  * @param config The configuration to use

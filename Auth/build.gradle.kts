@@ -62,15 +62,8 @@ kotlin {
                 api("io.ktor:ktor-server-cio:${Versions.KTOR}")
             }
         }
-        val androidMain by getting {
-            dependencies {
-
-            }
-        }
-        val webMain by getting {
-            dependencies {
-            }
-        }
+        val androidMain by getting
+        val webMain by getting
     }
 }
 
