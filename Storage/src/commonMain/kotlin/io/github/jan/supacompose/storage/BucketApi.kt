@@ -205,10 +205,9 @@ internal class BucketApiImpl(override val bucketId: String, val storage: Storage
  *
  * **Authentication: Bearer <your_access_token>**
  * @param path The path to download
- * @param data The callback including the auth token and the resolved url.
  */
-inline fun BucketApi.buildAuthenticatedRequest(path: String, data: (token: String?, url: String) -> Unit) {
+fun BucketApi.authenticatedRequest(path: String): Pair<String?, String> {
     val url = authenticatedUrl(path)
     val token = supabaseClient.auth.currentAccessToken()
-    data(token, url)
+    return token to url
 }
