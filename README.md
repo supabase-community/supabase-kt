@@ -258,21 +258,7 @@ class MainActivity : AppCompatActivity() {
                             Button(
                                 {
                                     scope.launch {
-                                        client.auth.loginWith(Discord) {
-                                            onFail = {
-                                                when (it) {
-                                                    is OAuthFail.Timeout -> {
-                                                        println("Timeout")
-                                                    }
-                                                    is OAuthFail.Error -> {
-                                                        //log error
-                                                    }
-                                                }
-                                            }
-                                            timeout = 50.seconds
-                                            htmlTitle = "SupaCompose"
-                                            htmlText = "Logged in. You may continue in the app."
-                                        }
+                                        client.auth.loginWith(Discord)
                                     }
                                 },
                                 modifier = Modifier.align(Alignment.CenterHorizontally)
