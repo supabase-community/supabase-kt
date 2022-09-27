@@ -8,7 +8,7 @@ import io.github.jan.supacompose.auth.activity
 import io.github.jan.supacompose.auth.auth
 
 @OptIn(SupaComposeInternal::class)
-fun BucketApi.downloadWithManager(path: String, config: DownloadManager.Request.() -> Unit) {
+fun BucketApi.downloadAuthenticatedWithManager(path: String, config: DownloadManager.Request.() -> Unit) {
     val request = DownloadManager.Request((this as BucketApiImpl).storage.resolveUrl("object/authenticated/$bucketId/$path").toUri())
         .apply(config)
         .addRequestHeader("Authorization", "Bearer ${storage.supabaseClient.auth.currentSession.value?.accessToken ?: throw IllegalStateException("Can't download from storage without a user session")}")
