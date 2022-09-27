@@ -267,7 +267,7 @@ internal class RealtimeImpl(override val supabaseClient: SupabaseClient, overrid
 /**
  * Creates a new [RealtimeChannel]
  */
-inline fun Realtime.createChannel(channelId: String, builder: RealtimeChannelBuilder.() -> Unit): RealtimeChannel {
+inline fun Realtime.createChannel(channelId: String, builder: RealtimeChannelBuilder.() -> Unit = {}): RealtimeChannel {
     return RealtimeChannelBuilder("realtime:$channelId", this as RealtimeImpl).apply(builder).build()
 }
 
