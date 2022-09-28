@@ -9,7 +9,6 @@ import io.github.jan.supacompose.decodeIfNotEmptyOrDefault
 import io.github.jan.supacompose.putJsonObject
 import io.github.jan.supacompose.supabaseJson
 import io.ktor.client.plugins.websocket.sendSerialized
-import kotlinx.atomicfu.atomic
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -117,12 +116,14 @@ internal class RealtimeChannelImpl(
         }
         _status.value = RealtimeChannel.Status.JOINING
         Napier.d { "Joining channel $topic" }
-        val currentJwt = realtimeImpl.supabaseClient.auth.currentAccessToken() ?: ""
+        val currentJwt = realtimeImpl.supabaseClient.auth.currentAccessToken()
         val postgrestChanges = clientChanges.toList()
         val joinConfig = RealtimeJoinPayload(RealtimeJoinConfig(broadcastJoinConfig, presenceJoinConfig, postgrestChanges))
         val joinConfigObject = buildJsonObject {
             putJsonObject(Json.encodeToJsonElement(joinConfig).jsonObject)
-            if(currentJwt.isNotBlank()) put("access_token", currentJwt)
+            currentJwt?.let {
+                put("access_token", currentJwt)
+            }
         }
         realtimeImpl.ws.sendSerialized(RealtimeMessage(topic, RealtimeChannel.CHANNEL_EVENT_JOIN, joinConfigObject, null))
     }
