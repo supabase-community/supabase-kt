@@ -3,10 +3,13 @@ package io.github.jan.supacompose.realtime
 import io.github.aakira.napier.Napier
 import io.github.jan.supacompose.SupabaseClient
 import io.github.jan.supacompose.annotiations.SupaComposeInternal
+import io.github.jan.supacompose.auth.auth
+import io.github.jan.supacompose.auth.currentAccessToken
 import io.github.jan.supacompose.decodeIfNotEmptyOrDefault
 import io.github.jan.supacompose.putJsonObject
 import io.github.jan.supacompose.supabaseJson
 import io.ktor.client.plugins.websocket.sendSerialized
+import kotlinx.atomicfu.atomic
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -97,7 +100,6 @@ internal class RealtimeChannelImpl(
     override val topic: String,
     private val broadcastJoinConfig: BroadcastJoinConfig,
     private val presenceJoinConfig: PresenceJoinConfig,
-    private var jwt: String
 ) : RealtimeChannel {
 
     private val clientChanges = mutableListOf<PostgresJoinConfig>()
@@ -115,11 +117,12 @@ internal class RealtimeChannelImpl(
         }
         _status.value = RealtimeChannel.Status.JOINING
         Napier.d { "Joining channel $topic" }
+        val currentJwt = realtimeImpl.supabaseClient.auth.currentAccessToken() ?: ""
         val postgrestChanges = clientChanges.toList()
         val joinConfig = RealtimeJoinPayload(RealtimeJoinConfig(broadcastJoinConfig, presenceJoinConfig, postgrestChanges))
         val joinConfigObject = buildJsonObject {
             putJsonObject(Json.encodeToJsonElement(joinConfig).jsonObject)
-            if(jwt.isNotBlank()) put("access_token", jwt)
+            if(currentJwt.isNotBlank()) put("access_token", currentJwt)
         }
         realtimeImpl.ws.sendSerialized(RealtimeMessage(topic, RealtimeChannel.CHANNEL_EVENT_JOIN, joinConfigObject, null))
     }
@@ -179,7 +182,6 @@ internal class RealtimeChannelImpl(
     }
 
     override suspend fun updateAuth(jwt: String) {
-        this.jwt = jwt
         Napier.d { "Updating auth token for channel $topic" }
         realtimeImpl.ws.sendSerialized(RealtimeMessage(topic, RealtimeChannel.CHANNEL_EVENT_ACCESS_TOKEN, buildJsonObject {
             put("access_token", "test")

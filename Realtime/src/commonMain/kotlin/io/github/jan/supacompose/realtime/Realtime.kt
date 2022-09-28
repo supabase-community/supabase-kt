@@ -205,7 +205,7 @@ internal class RealtimeImpl(override val supabaseClient: SupabaseClient, overrid
 
     override fun disconnect() {
         Napier.d { "Closing websocket connection" }
-        ws.cancel()
+        if(::ws.isInitialized) ws.cancel()
         heartbeatJob.cancel()
         updateStatus(Realtime.Status.DISCONNECTED)
     }
@@ -255,11 +255,11 @@ internal class RealtimeImpl(override val supabaseClient: SupabaseClient, overrid
     }
 
     override suspend fun close() {
-        ws.cancel()
+        if(::ws.isInitialized) ws.cancel()
     }
 
     override suspend fun block() {
-        ws.coroutineContext.job.join()
+        if(::ws.isInitialized) ws.coroutineContext.job.join() else throw IllegalStateException("No connection available")
     }
 
 }

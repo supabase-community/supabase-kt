@@ -22,8 +22,7 @@ class RealtimeChannelBuilder @PublishedApi internal constructor(private val topi
             realtimeImpl,
             topic,
             broadcastJoinConfig,
-            presenceJoinConfig,
-            ""
+            presenceJoinConfig
         )
     }
 
