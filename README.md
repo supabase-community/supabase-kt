@@ -553,3 +553,4 @@ channel.track(PresenceData(2, "Example")) //send your "state"/presence to other 
 # Credits 
 
 - Postgres Syntax inspired by https://github.com/supabase-community/postgrest-kt
+- Plugin system inspired by ktor
