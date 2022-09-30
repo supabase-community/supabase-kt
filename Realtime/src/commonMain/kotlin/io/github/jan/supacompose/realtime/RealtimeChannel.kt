@@ -125,7 +125,7 @@ internal class RealtimeChannelImpl(
                 put("access_token", currentJwt)
             }
         }
-        realtimeImpl.ws.sendSerialized(RealtimeMessage(topic, RealtimeChannel.CHANNEL_EVENT_JOIN, joinConfigObject, null))
+        realtimeImpl.ws?.sendSerialized(RealtimeMessage(topic, RealtimeChannel.CHANNEL_EVENT_JOIN, joinConfigObject, null))
     }
 
     @OptIn(SupaComposeInternal::class)
@@ -179,19 +179,19 @@ internal class RealtimeChannelImpl(
     override suspend fun leave() {
         _status.value = RealtimeChannel.Status.LEAVING
         Napier.d { "Leaving channel $topic" }
-        realtimeImpl.ws.sendSerialized(RealtimeMessage(topic, RealtimeChannel.CHANNEL_EVENT_LEAVE, buildJsonObject {}, null))
+        realtimeImpl.ws?.sendSerialized(RealtimeMessage(topic, RealtimeChannel.CHANNEL_EVENT_LEAVE, buildJsonObject {}, null))
     }
 
     override suspend fun updateAuth(jwt: String) {
         Napier.d { "Updating auth token for channel $topic" }
-        realtimeImpl.ws.sendSerialized(RealtimeMessage(topic, RealtimeChannel.CHANNEL_EVENT_ACCESS_TOKEN, buildJsonObject {
+        realtimeImpl.ws?.sendSerialized(RealtimeMessage(topic, RealtimeChannel.CHANNEL_EVENT_ACCESS_TOKEN, buildJsonObject {
             put("access_token", "test")
         }, (++realtimeImpl.ref).toString()))
     }
 
     override suspend fun broadcast(event: String, message: JsonObject) {
         if(status.value != RealtimeChannel.Status.JOINED) throw IllegalStateException("Cannot broadcast to a channel you didn't join. Did you forget to call join()?")
-        realtimeImpl.ws.sendSerialized(RealtimeMessage(topic, "broadcast", buildJsonObject {
+        realtimeImpl.ws?.sendSerialized(RealtimeMessage(topic, "broadcast", buildJsonObject {
             put("type", "broadcast")
             put("event", event)
             put("payload", message)
@@ -209,11 +209,11 @@ internal class RealtimeChannelImpl(
             put("event", "track")
             putJsonObject(state)
         }
-        realtimeImpl.ws.sendSerialized(RealtimeMessage(topic, RealtimeChannel.CHANNEL_EVENT_PRESENCE, payload, (++realtimeImpl.ref).toString()))
+        realtimeImpl.ws?.sendSerialized(RealtimeMessage(topic, RealtimeChannel.CHANNEL_EVENT_PRESENCE, payload, (++realtimeImpl.ref).toString()))
     }
 
     override suspend fun untrack() {
-        realtimeImpl.ws.sendSerialized(RealtimeMessage(topic, RealtimeChannel.CHANNEL_EVENT_PRESENCE, buildJsonObject {
+        realtimeImpl.ws?.sendSerialized(RealtimeMessage(topic, RealtimeChannel.CHANNEL_EVENT_PRESENCE, buildJsonObject {
             put("type", "presence")
             put("event", "untrack")
         }, (++realtimeImpl.ref).toString()))

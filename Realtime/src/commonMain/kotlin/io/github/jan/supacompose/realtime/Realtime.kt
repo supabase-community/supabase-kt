@@ -110,7 +110,7 @@ sealed interface Realtime : MainPlugin<Realtime.Config> {
 internal class RealtimeImpl(override val supabaseClient: SupabaseClient, override val config: Realtime.Config) :
     Realtime {
 
-    lateinit var ws: DefaultClientWebSocketSession
+    var ws: DefaultClientWebSocketSession? = null
     private val _status = MutableStateFlow(Realtime.Status.DISCONNECTED)
     override val status: StateFlow<Realtime.Status> = _status.asStateFlow()
     private val _subscriptions = mutableMapOf<String, RealtimeChannel>()
@@ -163,9 +163,10 @@ internal class RealtimeImpl(override val supabaseClient: SupabaseClient, overrid
                  rejoinChannels()
              }
         } catch(e: Exception) {
-            Napier.e(e) { "Error while trying to connect to realtime websocket. Trying again in ${config.reconnectDelay}" }
-            updateStatus(Realtime.Status.DISCONNECTED)
-            connect(true)
+             Napier.e(e) { "Error while trying to connect to realtime websocket. Trying again in ${config.reconnectDelay}" }
+             updateStatus(Realtime.Status.DISCONNECTED)
+             disconnect()
+             connect(true)
         }
     }
 
@@ -179,9 +180,18 @@ internal class RealtimeImpl(override val supabaseClient: SupabaseClient, overrid
 
     private fun listenForMessages() {
         scope.launch {
-            for (frame in ws.incoming) {
-                val message = frame as? Frame.Text ?: continue
-                onMessage(message.readText())
+            try {
+                ws?.let {
+                    for (frame in it.incoming) {
+                        val message = frame as? Frame.Text ?: continue
+                        onMessage(message.readText())
+                    }
+                }
+            } catch(e: Exception) {
+                Napier.e(e) { "Error while listening for messages. Trying again in ${config.reconnectDelay}" }
+                updateStatus(Realtime.Status.DISCONNECTED)
+                disconnect()
+                connect(true)
             }
         }
     }
@@ -205,7 +215,8 @@ internal class RealtimeImpl(override val supabaseClient: SupabaseClient, overrid
 
     override fun disconnect() {
         Napier.d { "Closing websocket connection" }
-        if(::ws.isInitialized) ws.cancel()
+        ws?.cancel()
+        ws = null
         heartbeatJob.cancel()
         updateStatus(Realtime.Status.DISCONNECTED)
     }
@@ -241,7 +252,7 @@ internal class RealtimeImpl(override val supabaseClient: SupabaseClient, overrid
         }
         Napier.d { "Sending heartbeat" }
         heartbeatRef = ++ref
-        ws.sendSerialized(RealtimeMessage("phoenix", "heartbeat", buildJsonObject { }, heartbeatRef.toString()))
+        ws?.sendSerialized(RealtimeMessage("phoenix", "heartbeat", buildJsonObject { }, heartbeatRef.toString()))
     }
 
     @SupaComposeInternal
@@ -255,11 +266,11 @@ internal class RealtimeImpl(override val supabaseClient: SupabaseClient, overrid
     }
 
     override suspend fun close() {
-        if(::ws.isInitialized) ws.cancel()
+        ws?.cancel()
     }
 
     override suspend fun block() {
-        if(::ws.isInitialized) ws.coroutineContext.job.join() else throw IllegalStateException("No connection available")
+        ws?.coroutineContext?.job?.join() ?: throw IllegalStateException("No connection available")
     }
 
 }
