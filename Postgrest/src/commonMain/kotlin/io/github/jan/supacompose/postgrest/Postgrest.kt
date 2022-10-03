@@ -3,7 +3,6 @@ package io.github.jan.supacompose.postgrest
 import io.github.jan.supacompose.SupabaseClient
 import io.github.jan.supacompose.plugins.MainConfig
 import io.github.jan.supacompose.plugins.MainPlugin
-import io.github.jan.supacompose.plugins.SupacomposePlugin
 import io.github.jan.supacompose.plugins.SupacomposePluginProvider
 import io.github.jan.supacompose.postgrest.query.Count
 import io.github.jan.supacompose.postgrest.query.PostgrestBuilder
@@ -11,7 +10,6 @@ import io.github.jan.supacompose.postgrest.query.PostgrestFilterBuilder
 import io.github.jan.supacompose.postgrest.request.PostgrestRequest
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
-import kotlinx.serialization.json.JsonEncoder
 import kotlinx.serialization.json.encodeToJsonElement
 
 sealed interface Postgrest : MainPlugin<Postgrest.Config> {

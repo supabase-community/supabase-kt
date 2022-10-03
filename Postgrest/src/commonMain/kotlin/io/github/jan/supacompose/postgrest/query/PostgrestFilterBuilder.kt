@@ -1,8 +1,6 @@
 package io.github.jan.supacompose.postgrest.query
 
 import io.github.jan.supacompose.postgrest.getColumnName
-import io.ktor.client.request.HttpRequestBuilder
-import io.ktor.http.parametersOf
 import kotlin.reflect.KProperty1
 
 class PostgrestFilterBuilder {
