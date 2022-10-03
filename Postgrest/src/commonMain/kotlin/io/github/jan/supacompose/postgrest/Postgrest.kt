@@ -82,7 +82,7 @@ suspend inline fun <reified T> Postgrest.rpc(
  * @param count Count algorithm to use to count rows in a table.
  * @param filter Filter the result
  */
-suspend inline fun <reified T> Postgrest.rpc(
+suspend inline fun Postgrest.rpc(
     function: String,
     head: Boolean = false,
     count: Count? = null,
