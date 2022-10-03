@@ -1,6 +1,7 @@
 package io.github.jan.supacompose.postgrest.request
 
 import io.github.jan.supacompose.auth.auth
+import io.github.jan.supacompose.auth.currentAccessToken
 import io.github.jan.supacompose.exceptions.RestException
 import io.github.jan.supacompose.postgrest.Postgrest
 import io.github.jan.supacompose.postgrest.query.Count
@@ -32,7 +33,7 @@ sealed interface PostgrestRequest {
         return postgrest.supabaseClient.httpClient.request(postgrest.resolveUrl(path)) {
             method = this@PostgrestRequest.method
             contentType(ContentType.Application.Json)
-            postgrest.supabaseClient.auth.currentSession.value?.accessToken?.let {
+            postgrest.supabaseClient.auth.currentAccessToken()?.let {
                 headers[HttpHeaders.Authorization] = "Bearer $it"
             }
             headers[PostgrestBuilder.HEADER_PREFER] = prefer.joinToString(",")
@@ -43,12 +44,8 @@ sealed interface PostgrestRequest {
 
     private suspend fun HttpResponse.checkForErrorCodes(): PostgrestResult {
         if(status.value !in 200..299) {
-            try {
-                val error = body<JsonObject>()
-                throw RestException(status.value, error["error"]?.jsonPrimitive?.content ?: "Unknown error", error.toString(), headers.entries().flatMap { (key, value) -> listOf(key) + value })
-            } catch(_: Exception) {
-                throw RestException(status.value, "Unknown error", "")
-            }
+            val error = body<JsonElement>()
+            throw RestException(status.value, "Unknown error", error.toString(), headers = headers.entries().flatMap { (key, value) -> listOf(key) + value })
         }
         return PostgrestResult(body(), status.value)
     }
