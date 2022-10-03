@@ -28,8 +28,8 @@ sealed interface PostgrestRequest {
     val filter: Map<String, String>
     val prefer: List<String>
 
-    suspend fun execute(table: String, postgrest: Postgrest): PostgrestResult {
-        return postgrest.supabaseClient.httpClient.request(postgrest.resolveUrl(table)) {
+    suspend fun execute(path: String, postgrest: Postgrest): PostgrestResult {
+        return postgrest.supabaseClient.httpClient.request(postgrest.resolveUrl(path)) {
             method = this@PostgrestRequest.method
             contentType(ContentType.Application.Json)
             postgrest.supabaseClient.auth.currentSession.value?.accessToken?.let {
@@ -51,6 +51,18 @@ sealed interface PostgrestRequest {
             }
         }
         return PostgrestResult(body(), status.value)
+    }
+
+    data class RPC(
+        private val head: Boolean = false,
+        private val count: Count? = null,
+        override val filter: Map<String, String>,
+        override val body: JsonElement? = null,
+        ): PostgrestRequest {
+
+        override val method = if(head) HttpMethod.Head else HttpMethod.Get
+        override val prefer = if (count != null) listOf("count=${count.identifier}") else listOf()
+
     }
 
     data class Select(
