@@ -1,6 +1,7 @@
 package io.github.jan.supacompose.postgrest.request
 
 import io.github.jan.supacompose.auth.auth
+import io.github.jan.supacompose.auth.currentAccessToken
 import io.github.jan.supacompose.exceptions.RestException
 import io.github.jan.supacompose.postgrest.Postgrest
 import io.github.jan.supacompose.postgrest.query.Count
@@ -18,8 +19,6 @@ import io.ktor.http.contentType
 import io.ktor.http.parametersOf
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonElement
-import kotlinx.serialization.json.JsonObject
-import kotlinx.serialization.json.jsonPrimitive
 
 sealed interface PostgrestRequest {
 
@@ -28,11 +27,11 @@ sealed interface PostgrestRequest {
     val filter: Map<String, String>
     val prefer: List<String>
 
-    suspend fun execute(table: String, postgrest: Postgrest): PostgrestResult {
-        return postgrest.supabaseClient.httpClient.request(postgrest.resolveUrl(table)) {
+    suspend fun execute(path: String, postgrest: Postgrest): PostgrestResult {
+        return postgrest.supabaseClient.httpClient.request(postgrest.resolveUrl(path)) {
             method = this@PostgrestRequest.method
             contentType(ContentType.Application.Json)
-            postgrest.supabaseClient.auth.currentSession.value?.accessToken?.let {
+            postgrest.supabaseClient.auth.currentAccessToken()?.let {
                 headers[HttpHeaders.Authorization] = "Bearer $it"
             }
             headers[PostgrestBuilder.HEADER_PREFER] = prefer.joinToString(",")
@@ -43,14 +42,22 @@ sealed interface PostgrestRequest {
 
     private suspend fun HttpResponse.checkForErrorCodes(): PostgrestResult {
         if(status.value !in 200..299) {
-            try {
-                val error = body<JsonObject>()
-                throw RestException(status.value, error["error"]?.jsonPrimitive?.content ?: "Unknown error", error.toString(), headers.entries().flatMap { (key, value) -> listOf(key) + value })
-            } catch(_: Exception) {
-                throw RestException(status.value, "Unknown error", "")
-            }
+            val error = body<JsonElement>()
+            throw RestException(status.value, "Unknown error", error.toString(), headers = headers.entries().flatMap { (key, value) -> listOf(key) + value })
         }
         return PostgrestResult(body(), status.value)
+    }
+
+    data class RPC(
+        private val head: Boolean = false,
+        private val count: Count? = null,
+        override val filter: Map<String, String>,
+        override val body: JsonElement? = null,
+        ): PostgrestRequest {
+
+        override val method = if(head) HttpMethod.Head else HttpMethod.Get
+        override val prefer = if (count != null) listOf("count=${count.identifier}") else listOf()
+
     }
 
     data class Select(
