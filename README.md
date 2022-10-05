@@ -398,7 +398,7 @@ client.auth.importAuthToken("service role secret")
 ```
 **Get all users**
 ```kotlin
-val users: List<UserInfo> = client.auth.retrieveUsers()
+val users: List<UserInfo> = client.auth.admin.retrieveUsers()
 ```
 **Register new users**
 ```kotlin
