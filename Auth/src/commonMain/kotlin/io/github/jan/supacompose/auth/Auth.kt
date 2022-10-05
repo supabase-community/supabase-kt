@@ -1,5 +1,6 @@
 package io.github.jan.supacompose.auth
 
+import io.github.aakira.napier.Napier
 import io.github.jan.supacompose.SupabaseClient
 import io.github.jan.supacompose.auth.providers.AuthProvider
 import io.github.jan.supacompose.auth.providers.DefaultAuthProvider
@@ -134,7 +135,7 @@ sealed interface Auth : MainPlugin<Auth.Config> {
      * Imports the jwt token and retrieves the user profile.
      * Be aware auto-refreshing is not available when importing **only** a jwt token.
      */
-    suspend fun importAuthToken(jwt: String) = importSession(UserSession(jwt, "", 0L, "", getUser(jwt)), false)
+    suspend fun importAuthToken(jwt: String) = importSession(UserSession(jwt, "", 0L, "", tryToGetUser(jwt)), false)
 
     /**
      * Retrieves the latest session from storage and starts auto-refreshing if [autoRefresh] is true or [Auth.Config.alwaysAutoRefresh] as the default parameter
@@ -192,3 +193,10 @@ enum class VerifyType {
  */
 val SupabaseClient.auth: Auth
     get() = pluginManager.getPlugin(Auth.key)
+
+private suspend fun Auth.tryToGetUser(jwt: String) = try {
+    getUser(jwt)
+} catch (e: Exception) {
+    Napier.e(e) { "Couldn't retrieve user using your custom jwt token. If you use the project secret ignore this message" }
+    null
+}

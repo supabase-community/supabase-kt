@@ -549,6 +549,41 @@ channel.track(PresenceData(2, "Example")) //send your "state"/presence to other 
 
 </details>
 
+#### Functions (Edge Functions)
+<details><summary>Execute edge functions directly</summary>
+
+```kotlin
+@Serializable
+data class SomeData(val name: String)
+
+val response: HttpResponse = client.functions("test")
+//with body
+val response: HttpResponse = client.functions(
+    function = "test",
+    body = SomeData("Name")
+    headers = Headers.build {
+        append(HttpHeaders.ContentType, "application/json")
+    }
+)
+```
+</details>
+<details><summary>Store your edge function in a variable</summary>
+
+```kotlin
+@Serializable
+data class SomeData(val name: String)
+
+val testFunction: EdgeFunction = client.functions.buildEdgeFunction {
+    functionName = "test"
+    headers.append(HttpHeaders.ContentType, "application/json")
+}
+
+val response: HttpResponse = testFunction()
+//with body
+val response: HttpResponse = testFunction(SomeData("Name"))
+```
+</details>
+
 
 # Credits 
 

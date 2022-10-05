@@ -15,5 +15,6 @@
 /Storage/build/
 /Realtime/build/
 /Realtime/src/desktopMain/kotlin/Test.kt
+/Functions/src/desktopMain/kotlin/Test.kt
 .idea
 local.properties
