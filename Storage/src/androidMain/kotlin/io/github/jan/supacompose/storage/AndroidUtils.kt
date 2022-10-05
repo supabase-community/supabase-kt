@@ -15,3 +15,11 @@ fun BucketApi.downloadAuthenticatedWithManager(path: String, config: DownloadMan
     val dm = storage.supabaseClient.auth.config.activity.getSystemService(DOWNLOAD_SERVICE) as DownloadManager
     dm.enqueue(request)
 }
+
+@OptIn(SupaComposeInternal::class)
+fun BucketApi.downloadPublicWithManager(path: String, config: DownloadManager.Request.() -> Unit) {
+    val request = DownloadManager.Request((this as BucketApiImpl).storage.resolveUrl(publicUrl(path)).toUri())
+        .apply(config)
+    val dm = storage.supabaseClient.auth.config.activity.getSystemService(DOWNLOAD_SERVICE) as DownloadManager
+    dm.enqueue(request)
+}

@@ -24,6 +24,7 @@ sealed interface BucketApi {
 
     /**
      * Uploads a file in [bucketId] under [path]
+     * @param path The path to upload the file to
      * @return the key to the uploaded file
      */
     suspend fun upload(path: String, data: ByteArray): String
@@ -84,6 +85,13 @@ sealed interface BucketApi {
      * @return The file as a byte array
      */
     suspend fun downloadAuthenticated(path: String): ByteArray
+
+    /**
+     * Downloads a file from [bucketId] under [path] using the public url
+     * @param path The path to download
+     * @return The file as a byte array
+     */
+    suspend fun downloadPublic(path: String): ByteArray
 
     /**
      * Searches for buckets with the given [prefix] and [filter]
@@ -172,6 +180,10 @@ internal class BucketApiImpl(override val bucketId: String, val storage: Storage
 
     override suspend fun downloadAuthenticated(path: String): ByteArray {
         return storage.makeRequest(HttpMethod.Get, "object/authenticated/$bucketId/$path").body()
+    }
+
+    override suspend fun downloadPublic(path: String): ByteArray {
+        return storage.makeRequest(HttpMethod.Get, publicUrl(path)).body()
     }
 
     override suspend fun list(prefix: String, filter: BucketListFilter.() -> Unit): List<BucketItem> {
