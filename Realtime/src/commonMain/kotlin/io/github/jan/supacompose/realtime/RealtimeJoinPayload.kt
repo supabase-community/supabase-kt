@@ -3,11 +3,13 @@ package io.github.jan.supacompose.realtime
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
+/**
+ * Represents the payload sent when joining a channel
+ */
 @Serializable
 data class RealtimeJoinPayload(
     val config: RealtimeJoinConfig
 )
-
 @Serializable
 data class RealtimeJoinConfig(
     val broadcast: BroadcastJoinConfig,

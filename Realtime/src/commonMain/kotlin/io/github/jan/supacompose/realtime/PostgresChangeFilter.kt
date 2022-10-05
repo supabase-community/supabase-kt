@@ -5,7 +5,6 @@ class PostgresChangeFilter(private val event: String) {
     /**
      * The schema name of the table that is being monitored. For normal supabase tables that might be "public".
      */
-
     var schema: String = ""
 
     /**

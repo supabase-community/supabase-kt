@@ -4,12 +4,18 @@ import io.github.jan.supacompose.SupabaseClient
 import io.github.jan.supacompose.buildUrl
 import io.ktor.http.appendEncodedPathSegments
 
+/**
+ * Config for [MainPlugin]s
+ */
 interface MainConfig {
 
     val customUrl: String?
 
 }
 
+/**
+ * Represents main plugins like Auth or Functions
+ */
 interface MainPlugin <Config : MainConfig> : SupacomposePlugin {
 
     /**

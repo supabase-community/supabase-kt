@@ -26,6 +26,9 @@ import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.longOrNull
 import kotlinx.serialization.json.put
 
+/**
+ * Represents a realtime channel
+ */
 sealed interface RealtimeChannel {
 
     val status: StateFlow<Status>

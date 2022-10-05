@@ -1,13 +1,20 @@
 package io.github.jan.supacompose
 
 import io.github.jan.supacompose.annotiations.SupaComposeDsl
+import io.github.jan.supacompose.annotiations.SupaComposeInternal
+import io.github.jan.supacompose.plugins.PluginManager
 import io.github.jan.supacompose.plugins.SupacomposePlugin
 import io.github.jan.supacompose.plugins.SupacomposePluginProvider
 import io.ktor.client.HttpClientConfig
 import io.ktor.client.engine.HttpClientEngine
 
+/**
+ * Creates a new [SupabaseClient] with the given options.
+ *
+ * Use [createSupabaseClient] to create a new instance of [SupabaseClient].
+ */
 @SupaComposeDsl
-class SupabaseClientBuilder {
+class SupabaseClientBuilder @PublishedApi internal constructor() {
 
     lateinit var supabaseUrl: String
     lateinit var supabaseKey: String
@@ -23,10 +30,18 @@ class SupabaseClientBuilder {
         return SupabaseClientImpl(supabaseUrl.split("//").last(), supabaseKey, plugins, httpConfigOverrides, useHTTPS, httpEngine)
     }
 
+    /**
+     * Add your own http configuration to [SupabaseClient.httpClient]
+     */
     fun httpConfig(block: HttpClientConfig<*>.() -> Unit) {
         httpConfigOverrides.add(block)
     }
 
+    /**
+     * Installs a plugin to the [SupabaseClient]
+     *
+     * Plugins can be either retrieved by calling [PluginManager.getPlugin] within your [SupabaseClient] instance or by using the corresponding **SupabaseClient.plugin** function.
+     */
     fun <Config, PluginInstance : SupacomposePlugin, Provider : SupacomposePluginProvider<Config, PluginInstance>> install(plugin: Provider, init: Config.() -> Unit = {}) {
         val config = plugin.createConfig(init)
         plugin.setup(this, config)
@@ -37,4 +52,7 @@ class SupabaseClientBuilder {
 
 }
 
+/**
+ * Creates a new [SupabaseClient] instance using [builder]
+ */
 inline fun createSupabaseClient(builder: SupabaseClientBuilder.() -> Unit) = SupabaseClientBuilder().apply(builder).build()

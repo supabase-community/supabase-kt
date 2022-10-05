@@ -11,6 +11,11 @@ import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.request.headers
 import io.ktor.serialization.kotlinx.json.json
 
+/**
+ * The main class to interact with Supabase.
+ *
+ * To add functionality, add plugins like **Auth** or **Functions** within the [SupabaseClientBuilder]
+ */
 sealed interface SupabaseClient {
 
     /**

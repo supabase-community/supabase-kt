@@ -33,6 +33,9 @@ import kotlinx.serialization.json.buildJsonObject
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
+/**
+ * Plugin for interacting with the supabase realtime api
+ */
 sealed interface Realtime : MainPlugin<Realtime.Config> {
 
     /**
