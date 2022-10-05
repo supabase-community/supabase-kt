@@ -507,6 +507,18 @@ client.postgrest["messages"]
 
 </details>
 
+<details><summary>Execute database functions</summary>
+
+```kotlin
+client.postgrest.rpc("do_something")
+//with parameters and filter
+client.postgrest.rpc("do_something", mapOf("param1" to "value1")) {
+    eq("id", 1) 
+}
+```
+
+</details>
+
 #### Storage
 
 <details><summary>Managing buckets</summary>
