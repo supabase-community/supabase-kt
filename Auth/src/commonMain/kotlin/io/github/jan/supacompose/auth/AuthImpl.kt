@@ -204,9 +204,6 @@ internal class AuthImpl(override val supabaseClient: SupabaseClient, override va
     }
 
     internal suspend fun startJob(session: UserSession, autoRefresh: Boolean = config.alwaysAutoRefresh) {
-        Napier.d {
-            "(Re)starting session job"
-        }
         if(!autoRefresh) {
             updateSession(Auth.Status.AUTHENTICATED, session)
             if(session.refreshToken.isNotBlank() && session.expiresIn != 0L) {
@@ -215,6 +212,9 @@ internal class AuthImpl(override val supabaseClient: SupabaseClient, override va
             return
         }
         if(session.expiresAt < Clock.System.now()) {
+            Napier.d {
+                "(Re)starting session job"
+            }
             try {
                 refreshSession(session.refreshToken)
             } catch(e: RestException) {
@@ -279,9 +279,6 @@ internal class AuthImpl(override val supabaseClient: SupabaseClient, override va
         _currentSession.value = newSession
         callbacks.forEach { it.invoke(newSession, oldSession) }
     }
-
-   // @OptIn(SupaComposeInternal::class)
- //   override fun path(path: String) = supabaseClient.path("auth/v${Auth.API_VERSION}/$path")
 
     override suspend fun close() {
         authScope.cancel()
