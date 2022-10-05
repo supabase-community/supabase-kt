@@ -8,6 +8,9 @@ import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.encodeToJsonElement
 import kotlin.reflect.KProperty1
 
+/**
+ * Represents a postgrest update query
+ */
 class PostgrestUpdate {
 
     @PublishedApi

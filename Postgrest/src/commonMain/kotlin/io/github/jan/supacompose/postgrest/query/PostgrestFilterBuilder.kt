@@ -3,6 +3,9 @@ package io.github.jan.supacompose.postgrest.query
 import io.github.jan.supacompose.postgrest.getColumnName
 import kotlin.reflect.KProperty1
 
+/**
+ * A filter builder for a postgrest query
+ */
 class PostgrestFilterBuilder {
 
     @PublishedApi

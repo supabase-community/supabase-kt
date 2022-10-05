@@ -18,6 +18,9 @@ import kotlinx.serialization.json.jsonObject
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
+/**
+ * Plugin to interact with the supabase Auth API
+ */
 sealed interface Auth : MainPlugin<Auth.Config> {
 
     /**

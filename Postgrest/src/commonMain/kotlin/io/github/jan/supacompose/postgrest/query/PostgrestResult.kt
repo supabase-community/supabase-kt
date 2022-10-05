@@ -5,6 +5,10 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.decodeFromJsonElement
 
+/**
+ * Represents the result from a postgrest request
+ * @param body The body of the response. Can be decoded using [decodeAs] or [decodeAsOrNull]
+ */
 data class PostgrestResult(val body: JsonElement, val statusCode: Int) {
 
     /**

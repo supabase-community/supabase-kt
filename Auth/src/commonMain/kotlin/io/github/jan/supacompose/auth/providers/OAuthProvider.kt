@@ -28,8 +28,6 @@ expect abstract class OAuthProvider() : AuthProvider<ExternalAuthConfig, Unit> {
 sealed interface AuthFail {
 
     object Timeout: AuthFail
-    class Error(val throwable: Throwable) : AuthFail
-    class RedirectError(val errorCode: Int, val description: String?) : AuthFail
 
 }
 

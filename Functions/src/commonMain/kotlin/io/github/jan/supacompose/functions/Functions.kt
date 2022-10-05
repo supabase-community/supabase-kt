@@ -17,6 +17,9 @@ import io.ktor.http.HttpHeaders
 import io.ktor.http.appendEncodedPathSegments
 import io.ktor.util.appendAll
 
+/**
+ * Plugin to interact with the supabase Edge Functions API
+ */
 class Functions(override val config: Config, override val supabaseClient: SupabaseClient) : MainPlugin<Functions.Config> {
 
     override val API_VERSION: Int

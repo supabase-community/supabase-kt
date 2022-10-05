@@ -1,4 +1,4 @@
-package io.github.jan.supacompose.auth.providers
+package io.github.jan.supacompose.auth.providers.builtin
 
 import io.github.jan.supacompose.supabaseJson
 import kotlinx.datetime.Instant
@@ -8,10 +8,13 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.decodeFromJsonElement
 
-object Email : DefaultAuthProvider<Email.Config, Email.Result> {
+/**
+ * Authentication method with phone numbers and password
+ */
+object Phone : DefaultAuthProvider<Phone.Config, Phone.Result> {
 
     @Serializable
-    data class Config(var email: String = "", var password: String = "")
+    data class Config(@SerialName("phone") var phoneNumber: String = "", var password: String = "")
     @Serializable
     data class Result(
         val id: String,

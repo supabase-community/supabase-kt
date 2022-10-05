@@ -12,6 +12,9 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.encodeToJsonElement
 
+/**
+ * Plugin to interact with the supabase Postgrest API
+ */
 sealed interface Postgrest : MainPlugin<Postgrest.Config> {
 
     fun from(table: String): PostgrestBuilder

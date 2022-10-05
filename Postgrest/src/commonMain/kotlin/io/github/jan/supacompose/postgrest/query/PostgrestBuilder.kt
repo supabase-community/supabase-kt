@@ -7,7 +7,10 @@ import kotlinx.serialization.json.encodeToJsonElement
 import kotlinx.serialization.json.jsonArray
 import kotlin.experimental.ExperimentalTypeInference
 
-class PostgrestBuilder (val postgrest: Postgrest, val table: String) {
+/**
+ * The main class to build a postgrest request
+ */
+class PostgrestBuilder(val postgrest: Postgrest, val table: String) {
 
     /**
      * Executes vertical filtering with select on [table]
