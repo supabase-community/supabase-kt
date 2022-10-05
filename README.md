@@ -385,7 +385,7 @@ renderComposable(rootElementId = "root") {
 
 ```kotlin
 val client = createSupabaseClient {
-    [..]
+    [...]
     
     install(Auth) {
         alwaysAutoRefresh = false
@@ -395,9 +395,13 @@ val client = createSupabaseClient {
 }
 
 client.auth.importAuthToken("service role secret") 
-
-client.auth.retrieveUsers() //get all signed in users
-//register users
+```
+**Get all users**
+```kotlin
+val users: List<UserInfo> = client.auth.retrieveUsers()
+```
+**Register new users**
+```kotlin
 client.auth.admin.createUserWithEmail {
     email = "example@foo.bar"
     password = "12345678"
@@ -407,12 +411,16 @@ client.auth.admin.createUserWithPhone {
     phoneNumber = "123456789"
     password = "12345678"
 }
-//update user
+```
+**Update users**
+```kotlin
 client.auth.admin.updateUserById("uid") {
     phone = "12345679"
     phoneConfirm = true
 }
-//generate link
+```
+**Generate links**
+```kotlin
 val (link, user) = client.auth.admin.generateLinkFor(LinkType.MagicLink) {
     email = "example@foo.bar"
 }
