@@ -384,7 +384,17 @@ renderComposable(rootElementId = "root") {
 <p>
 
 ```kotlin
-client.auth.importAuthToken("service role secret") //also disable both autoLoadFromStorage and autoRefresh in the auth config
+val client = createSupabaseClient {
+    [..]
+    
+    install(Auth) {
+        alwaysAutoRefresh = false
+        autoLoadFromStorage = false
+    }
+    
+}
+
+client.auth.importAuthToken("service role secret") 
 
 client.auth.retrieveUsers() //get all signed in users
 //register users
