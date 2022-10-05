@@ -394,7 +394,7 @@ client.auth.admin.createUserWithEmail {
     autoConfirm = true //automatically confirm this email address
 }
 client.auth.admin.createUserWithPhone {
-    phoneNumber = "+79123456789"
+    phoneNumber = "123456789"
     password = "12345678"
 }
 //update user
