@@ -2,8 +2,12 @@ package io.github.jan.supacompose.auth
 
 import io.github.aakira.napier.Napier
 import io.github.jan.supacompose.SupabaseClient
+import io.github.jan.supacompose.auth.admin.AdminApi
 import io.github.jan.supacompose.auth.providers.AuthProvider
-import io.github.jan.supacompose.auth.providers.DefaultAuthProvider
+import io.github.jan.supacompose.auth.providers.Google
+import io.github.jan.supacompose.auth.providers.builtin.DefaultAuthProvider
+import io.github.jan.supacompose.auth.providers.builtin.Email
+import io.github.jan.supacompose.auth.providers.builtin.Phone
 import io.github.jan.supacompose.auth.user.UserInfo
 import io.github.jan.supacompose.auth.user.UserSession
 import io.github.jan.supacompose.exceptions.RestException
@@ -44,8 +48,13 @@ sealed interface Auth : MainPlugin<Auth.Config> {
     val status: StateFlow<Status>
 
     /**
+     * Access to the auth admin api where you can manage users. Service role access token is required. Import it via [importAuthToken]. Never share it publicly
+     */
+    val admin: AdminApi
+
+    /**
      * Signs up a new user with the specified [provider]
-     * @param provider the provider to use for signing up
+     * @param provider the provider to use for signing up. E.g. [Email], [Phone] or [Google]
      * @param redirectUrl The redirect url to use. If you don't specify this, the platform specific will be use, like deeplinks on android.
      * @param config The configuration to use for the sign-up.
      * @throws RestException If the credentials are invalid
@@ -58,7 +67,7 @@ sealed interface Auth : MainPlugin<Auth.Config> {
 
     /**
      * Logins the user with the specified [provider]
-     * @param provider the provider to use for signing up
+     * @param provider the provider to use for signing up. E.g. [Email], [Phone] or [Google]
      * @param redirectUrl The redirect url to use. If you don't specify this, the platform specific will be use, like deeplinks on android.
      * @param config The configuration to use for the sign-up.
      * @throws RestException If the credentials are invalid
@@ -71,7 +80,7 @@ sealed interface Auth : MainPlugin<Auth.Config> {
 
     /**
      * Modifies a user with the specified [provider]. Extra data can be supplied
-     * @param provider The provider to use
+     * @param provider The provider to use. Either [Email] or [Phone]
      * @param extraData Extra data to store
      * @param config The configuration to use
      * @throws RestException If the current session is invalid
@@ -84,7 +93,7 @@ sealed interface Auth : MainPlugin<Auth.Config> {
 
     /**
      * Sends a one time password to the specified [provider]
-     * @param provider The provider to use
+     * @param provider The provider to use. Either [Email] or [Phone]
      * @param createUser Whether to create a user when a user with the given credentials doesn't exist
      * @param redirectUrl The redirect url to use. If you don't specify this, the platform specific will be use, like deeplinks on android.
      */

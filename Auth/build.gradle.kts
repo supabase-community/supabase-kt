@@ -12,9 +12,9 @@ repositories {
 }
 
 kotlin {
-    /** Targets configuration omitted. 
-    *  To find out how to configure the targets, please follow the link:
-    *  https://kotlinlang.org/docs/reference/building-mpp-with-gradle.html#setting-up-targets */
+    /** Targets configuration omitted.
+     *  To find out how to configure the targets, please follow the link:
+     *  https://kotlinlang.org/docs/reference/building-mpp-with-gradle.html#setting-up-targets */
 
     jvm("desktop") {
         compilations.all {
@@ -33,7 +33,7 @@ kotlin {
             testTask {
                 enabled = false
                 /**useKarma {
-                    useFirefox()
+                useFirefox()
                 }*/
             }
         }
@@ -60,6 +60,7 @@ kotlin {
                 api("io.ktor:ktor-server-core:${Versions.KTOR}")
                 // https://mvnrepository.com/artifact/io.ktor/ktor-server-core
                 api("io.ktor:ktor-server-cio:${Versions.KTOR}")
+                api("io.ktor:ktor-client-cio:2.1.1")
             }
         }
         val androidMain by getting

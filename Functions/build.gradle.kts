@@ -50,12 +50,7 @@ kotlin {
             }
         }
         val commonTest by getting
-        val desktopMain by getting {
-            dependencies {
-                // add cio ktor client
-                api("io.ktor:ktor-client-cio:2.1.1")
-            }
-        }
+        val desktopMain by getting
         val androidMain by getting
         val webMain by getting
     }
