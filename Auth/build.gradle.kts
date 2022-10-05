@@ -60,7 +60,6 @@ kotlin {
                 api("io.ktor:ktor-server-core:${Versions.KTOR}")
                 // https://mvnrepository.com/artifact/io.ktor/ktor-server-core
                 api("io.ktor:ktor-server-cio:${Versions.KTOR}")
-                api("io.ktor:ktor-client-cio:2.1.1")
             }
         }
         val androidMain by getting
