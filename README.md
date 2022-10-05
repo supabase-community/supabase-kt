@@ -8,7 +8,7 @@ Newest version: [![Maven Central](https://img.shields.io/maven-central/v/io.gith
 
 ```kotlin
 dependencies {
-    implementation("io.github.jan-tennert.supacompose:Supacompose-[module]:VERSION")
+    implementation("io.github.jan-tennert.supacompose:Supacompose-[module e.g. Auth or Functions]:VERSION")
 }
 ```
 
