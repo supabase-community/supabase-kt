@@ -4,8 +4,10 @@ package io.github.jan.supacompose.auth
  import io.github.jan.supacompose.CurrentPlatformTarget
  import io.github.jan.supacompose.PlatformTarget
  import io.github.jan.supacompose.SupabaseClient
+ import io.github.jan.supacompose.auth.admin.AdminApi
+ import io.github.jan.supacompose.auth.admin.AdminApiImpl
  import io.github.jan.supacompose.auth.providers.AuthProvider
- import io.github.jan.supacompose.auth.providers.DefaultAuthProvider
+ import io.github.jan.supacompose.auth.providers.builtin.DefaultAuthProvider
  import io.github.jan.supacompose.auth.user.UserInfo
  import io.github.jan.supacompose.auth.user.UserSession
  import io.github.jan.supacompose.exceptions.RestException
@@ -46,6 +48,7 @@ internal class AuthImpl(override val supabaseClient: SupabaseClient, override va
     private val callbacks = mutableListOf<(new: UserSession?, old: UserSession?) -> Unit>()
     private val authScope = CoroutineScope(Dispatchers.Default + Job())
     override val sessionManager = SessionManager()
+    override val admin: AdminApi = AdminApiImpl(this)
     val _status = MutableStateFlow(Auth.Status.NOT_AUTHENTICATED)
     override val status = _status.asStateFlow()
     var sessionJob: Job? = null

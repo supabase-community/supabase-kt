@@ -377,6 +377,44 @@ renderComposable(rootElementId = "root") {
 
 </details>
 
+<details><summary>Manage Users (Server Only)</summary>
+
+**For admin methods you need the service role secret which you should never share with anyone nor include it with your app.**
+
+<p>
+
+```kotlin
+client.auth.importAuthToken("service role secret") //also disable both autoLoadFromStorage and autoRefresh in the auth config
+
+client.auth.retrieveUsers() //get all signed in users
+//register users
+client.auth.admin.createUserWithEmail {
+    email = "example@foo.bar"
+    password = "12345678"
+    autoConfirm = true //automatically confirm this email address
+}
+client.auth.admin.createUserWithPhone {
+    phoneNumber = "+79123456789"
+    password = "12345678"
+}
+//update user
+client.auth.admin.updateUserById("uid") {
+    phone = "12345679"
+    phoneConfirm = true
+}
+//generate link
+val (link, user) = client.auth.admin.generateLinkFor(LinkType.MagicLink) {
+    email = "example@foo.bar"
+}
+val (link, user) = client.auth.admin.generateLinkFor(LinkType.Signup) {
+    email = "example@foo.bar"
+    password = "12345678"
+}
+```
+
+</p>
+
+</details>
 
 #### Database/Postgres
 

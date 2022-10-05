@@ -24,7 +24,7 @@ data class UserInfo(
     @SerialName("id")
     val id: String,
     @SerialName("identities")
-    val identities: List<Identity> = emptyList(),
+    val identities: List<Identity>? = null,
     @SerialName("last_sign_in_at")
     val lastSignInAt: Instant? = null,
     @SerialName("phone")
