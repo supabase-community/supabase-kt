@@ -326,7 +326,6 @@ val client = createSupabaseClient {
 
     install(Auth)
 }
-client.auth.initializeWeb()
 
 renderComposable(rootElementId = "root") {
     val session by client.auth.currentSession.collectAsState()
@@ -370,6 +369,26 @@ renderComposable(rootElementId = "root") {
             Text("Login with Discord")
         }
     }
+}
+```
+
+</p>
+
+</details>
+
+<details><summary>Session saving</summary>
+
+<p>
+
+By default, supacompose uses [multiplatform-settings](https://github.com/russhwolf/multiplatform-settings) for session saving and uses their default settings location e.g. on Android **PreferenceManager.getDefaultSharedPreferences()**
+
+You can change how and where the sessions get saved by providing a custom Settings implementation in the Auth config. See [multiplatform-settings](https://github.com/russhwolf/multiplatform-settings) for implementations.
+
+Example on desktop:
+
+```kotlin
+install(Auth) {
+    settings = PreferencesSettings(Preferences.userRoot().node("custom_name"))
 }
 ```
 

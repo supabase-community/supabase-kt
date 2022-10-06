@@ -15,6 +15,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
+import com.russhwolf.settings.PreferencesSettings
+import com.russhwolf.settings.PropertiesSettings
 import io.github.jan.supacompose.auth.Auth
 import io.github.jan.supacompose.auth.auth
 import io.github.jan.supacompose.auth.providers.Google
@@ -24,6 +26,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
+import java.util.Properties
+import java.util.prefs.Preferences
 
 @Serializable
 data class User(val id: String, val username: String)
@@ -33,7 +37,9 @@ suspend fun main() {
         supabaseUrl = System.getenv("SUPABASE_URL")
         supabaseKey = System.getenv("SUPABASE_KEY")
 
-        install(Auth)
+        install(Auth) {
+            settings = PreferencesSettings(Preferences.userRoot().node("custom_name"))
+        }
     }
     val scope = CoroutineScope(Dispatchers.IO)
     application {
