@@ -19,6 +19,6 @@ jobs:
         java-version: '11'
         distribution: 'adopt'
     - name: Grant execute permission for gradlew
-      run: chmod +x gradlew && chmod +x ./androidDemo/gradlew && chmod +x ./desktopDemo/gradlew && chmod +x ./webDemo/gradlew
+      run: chmod +x gradlew
     - name: Build with Gradle
-      run: ./gradlew build test --stacktrace && ./androidDemo/gradlew build && ./desktopDemo/gradlew build && ./webDemo/gradlew build
+      run: ./gradlew build test --stacktrace
