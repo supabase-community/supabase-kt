@@ -6,9 +6,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-fun Auth.initializeWeb() {
+actual fun Auth.setupPlatform() {
     this as AuthImpl
-
     fun checkForHash() {
         if(window.location.hash.isBlank()) return
         val map = window.location.hash.substring(1).split("&").associate {

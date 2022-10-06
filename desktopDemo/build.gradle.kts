@@ -2,8 +2,8 @@ import org.jetbrains.compose.compose
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 
 plugins {
-    kotlin("multiplatform") version "1.6.21"
-    id("org.jetbrains.compose") version "1.2.0-alpha01-dev686"
+    kotlin("multiplatform")
+    id("org.jetbrains.compose") version Versions.COMPOSE
 }
 
 repositories {
@@ -29,11 +29,7 @@ kotlin {
     sourceSets {
         val jvmMain by getting {
             dependencies {
-                val supacompose = "0.1.0"
-                implementation("io.github.jan-tennert.supacompose:Supacompose-Storage:$supacompose")
-                implementation("io.github.jan-tennert.supacompose:Supacompose-Postgrest:$supacompose")
-                implementation("io.github.jan-tennert.supacompose:Supacompose-Realtime:$supacompose")
-                api("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.1")
+                api(project(":Supacompose-Auth"))
                 implementation(compose.runtime)
                 implementation(compose.ui)
                 implementation(compose.foundation)

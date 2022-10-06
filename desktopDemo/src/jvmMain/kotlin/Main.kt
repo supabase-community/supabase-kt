@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -18,25 +17,13 @@ import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import io.github.jan.supacompose.auth.Auth
 import io.github.jan.supacompose.auth.auth
-import io.github.jan.supacompose.auth.providers.Email
 import io.github.jan.supacompose.auth.providers.Google
-import io.github.jan.supacompose.auth.sessionFile
+import io.github.jan.supacompose.auth.providers.builtin.Email
 import io.github.jan.supacompose.createSupabaseClient
-import io.github.jan.supacompose.postgrest.Postgrest
-import io.github.jan.supacompose.postgrest.postgrest
-import io.github.jan.supacompose.realtime.events.ChannelAction
-import io.github.jan.supacompose.realtime.Realtime
-import io.github.jan.supacompose.realtime.createAndJoinChannel
-import io.github.jan.supacompose.realtime.createChannel
-import io.github.jan.supacompose.realtime.realtime
-import io.github.jan.supacompose.storage.Storage
-import io.github.jan.supacompose.storage.storage
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
-import java.io.File
 
 @Serializable
 data class User(val id: String, val username: String)
@@ -46,27 +33,17 @@ suspend fun main() {
         supabaseUrl = System.getenv("SUPABASE_URL")
         supabaseKey = System.getenv("SUPABASE_KEY")
 
-        install(Auth) {
-            sessionFile = File("C:\\Users\\jan\\AppData\\Local\\SupaCompose\\usersession.json")
-        }
-        install(Realtime)
-        install(Postgrest)
-        install(Storage)
+        install(Auth)
     }
     val scope = CoroutineScope(Dispatchers.IO)
     application {
         Window(::exitApplication) {
             val session by client.auth.currentSession.collectAsState()
-            val status by client.realtime.status.collectAsState()
+            //val status by client.realtime.status.collectAsState()
             println(session?.accessToken)
             if (session != null) {
                 Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
                     Text("Logged in as ${session?.user?.email}")
-                }
-                LaunchedEffect(Unit) {
-                    scope.launch {
-
-                    }
                 }
             } else {
                 Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
@@ -106,9 +83,3 @@ suspend fun main() {
     }
 
 }
-
-/**fun main() = application {
-    Window(onCloseRequest = ::exitApplication) {
-        App()
-    }
-}*/

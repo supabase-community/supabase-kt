@@ -24,7 +24,7 @@ import io.github.jan.supacompose.auth.auth
 import io.github.jan.supacompose.auth.host
 import io.github.jan.supacompose.auth.initializeAndroid
 import io.github.jan.supacompose.auth.providers.Discord
-import io.github.jan.supacompose.auth.providers.Email
+import io.github.jan.supacompose.auth.providers.builtin.Email
 import io.github.jan.supacompose.auth.scheme
 import io.github.jan.supacompose.createSupabaseClient
 import kotlinx.coroutines.launch
@@ -33,8 +33,8 @@ class MainActivity : AppCompatActivity() {
 
     val supabaseClient = createSupabaseClient {
 
-        supabaseUrl = ""
-        supabaseKey = ""
+        supabaseUrl = "https://arnyfaeuskyqfxkvotgj.supabase.co"
+        supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFybnlmYWV1c2t5cWZ4a3ZvdGdqIiwicm9sZSI6ImFub24iLCJpYXQiOjE2NTMwMzkxMTEsImV4cCI6MTk2ODYxNTExMX0.ItmL8lfnOL9oy7CEX9N6TnYt10VVhk-KTlwley4aq1M"
 
         install(Auth) {
             scheme = "supacompose"
@@ -48,7 +48,6 @@ class MainActivity : AppCompatActivity() {
         setContent {
             MaterialTheme {
                 val session by supabaseClient.auth.currentSession.collectAsState()
-                println(session)
                 val scope = rememberCoroutineScope()
                 if(session != null) {
                     Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
@@ -68,7 +67,7 @@ class MainActivity : AppCompatActivity() {
                             )
                             Button(onClick = {
                                 scope.launch {
-                                    supabaseClient.auth.signUpWith(Email) {
+                                    supabaseClient.auth.loginWith(Email) {
                                         this.email = email
                                         this.password = password
                                     }

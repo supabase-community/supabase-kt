@@ -6,9 +6,8 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import io.github.jan.supacompose.auth.Auth
 import io.github.jan.supacompose.auth.auth
-import io.github.jan.supacompose.auth.initializeWeb
 import io.github.jan.supacompose.auth.providers.Discord
-import io.github.jan.supacompose.auth.providers.Email
+import io.github.jan.supacompose.auth.providers.builtin.Email
 import io.github.jan.supacompose.createSupabaseClient
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.web.css.padding
@@ -22,12 +21,11 @@ import org.jetbrains.compose.web.renderComposable
 
 fun main() {
     val client = createSupabaseClient {
-        supabaseUrl = ""
-        supabaseKey = ""
+        supabaseUrl = "https://arnyfaeuskyqfxkvotgj.supabase.co"
+        supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFybnlmYWV1c2t5cWZ4a3ZvdGdqIiwicm9sZSI6ImFub24iLCJpYXQiOjE2NTMwMzkxMTEsImV4cCI6MTk2ODYxNTExMX0.ItmL8lfnOL9oy7CEX9N6TnYt10VVhk-KTlwley4aq1M"
 
         install(Auth)
     }
-    client.auth.initializeWeb()
 
     renderComposable(rootElementId = "root") {
         val session by client.auth.currentSession.collectAsState()
