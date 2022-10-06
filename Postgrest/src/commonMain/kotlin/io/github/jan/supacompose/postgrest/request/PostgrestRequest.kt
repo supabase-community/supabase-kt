@@ -55,7 +55,7 @@ sealed interface PostgrestRequest {
         override val body: JsonElement? = null,
         ): PostgrestRequest {
 
-        override val method = if(head) HttpMethod.Head else HttpMethod.Get
+        override val method = HttpMethod.Post
         override val prefer = if (count != null) listOf("count=${count.identifier}") else listOf()
 
     }
