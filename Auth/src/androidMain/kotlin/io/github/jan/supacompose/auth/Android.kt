@@ -13,7 +13,6 @@ import io.github.jan.supacompose.auth.user.UserSession
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import java.io.File
 
 @OptIn(SupaComposeInternal::class)
 internal fun Auth.openOAuth(provider: String) {
@@ -42,24 +41,12 @@ var Auth.Config.host: String
         params["host"] = value
     }
 
-internal var Auth.Config.sessionFile: File?
-    get() = (params["sessionFile"] as? File)
-    set(value) {
-        if(value == null) {
-            params.remove("sessionFile")
-            return
-        }
-        params["sessionFile"] = value
-    }
-
-
 //add a contextual receiver later in kotlin 1.7 and remove the supabaseClient parameter
 @OptIn(SupaComposeInternal::class)
 fun Activity.initializeAndroid(supabaseClient: SupabaseClient, onSessionSuccess: (UserSession) -> Unit = {}) {
     val authPlugin = supabaseClient.pluginManager.getPlugin<AuthImpl>("auth")
     authPlugin.config.activity = this
-    authPlugin.config.sessionFile = File(filesDir, "session.json")
-    addLifecycleCallbacks(supabaseClient, authPlugin)
+    addLifecycleCallbacks(authPlugin)
 
     val data = intent?.data ?: return
     val scheme = data.scheme ?: return
@@ -102,7 +89,7 @@ fun Activity.initializeAndroid(supabaseClient: SupabaseClient, onSessionSuccess:
     }
 }
 
-private fun addLifecycleCallbacks(supabaseClient: SupabaseClient, authPlugin: AuthImpl) {
+private fun addLifecycleCallbacks(authPlugin: AuthImpl) {
     if(!authPlugin.config.autoLoadFromStorage) return
     val lifecycle = ProcessLifecycleOwner.get().lifecycle
     val scope = CoroutineScope(Dispatchers.IO)
@@ -115,7 +102,7 @@ private fun addLifecycleCallbacks(supabaseClient: SupabaseClient, authPlugin: Au
                         "Trying to load the latest session"
                     }
                     authPlugin._status.value = Auth.Status.LOADING_FROM_STORAGE
-                    val userSession = authPlugin.sessionManager.loadSession(supabaseClient, authPlugin)
+                    val userSession = authPlugin.sessionManager.loadSession()
                     if(userSession != null) {
                         Napier.d {
                             "Successfully loaded session from storage"

@@ -6,12 +6,13 @@ object Versions {
     const val COROUTINES = "1.6.4"
     const val DOKKA = "1.7.10"
     const val NEXUS_STAGING = "0.30.0"
-    const val SUPACOMPOSE = "0.4.0"
+    const val SUPACOMPOSE = "0.4.0-local2"
     const val ANDROID_COMPAT = "1.5.1"
     const val COMPOSE = "1.2.0-alpha01-dev686"
     const val NAPIER = "2.6.1"
     const val DATETIME = "0.4.0"
     const val STATELY = "1.2.2"
     const val ATOMICFU = "0.18.3"
+    const val SETTINGS = "1.0.0-RC"
 
 }

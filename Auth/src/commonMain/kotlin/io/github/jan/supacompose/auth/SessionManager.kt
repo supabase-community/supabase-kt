@@ -1,17 +1,38 @@
+@file:OptIn(ExperimentalSettingsApi::class)
 package io.github.jan.supacompose.auth
 
-import io.github.jan.supacompose.SupabaseClient
+import com.russhwolf.settings.ExperimentalSettingsApi
+import com.russhwolf.settings.coroutines.SuspendSettings
+import io.github.aakira.napier.Napier
 import io.github.jan.supacompose.auth.user.UserSession
+import io.github.jan.supacompose.supabaseJson
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.encodeToString
 
 /**
  * Represents the session manager. Used for saving and restoring the session from storage
  */
-expect class SessionManager() {
+class SessionManager(private val settings: SuspendSettings) {
 
-    suspend fun saveSession(supabaseClient: SupabaseClient, auth: Auth, session: UserSession)
+    @OptIn(ExperimentalSettingsApi::class)
+    suspend fun saveSession(session: UserSession) {
+        settings.putString("session", supabaseJson.encodeToString(session))
+    }
 
-    suspend fun loadSession(supabaseClient: SupabaseClient, auth: Auth): UserSession?
+    @OptIn(ExperimentalSettingsApi::class)
+    suspend fun loadSession(): UserSession? {
+        val session = settings.getStringOrNull("session") ?: return null
+        return try {
+            supabaseJson.decodeFromString(session)
+        } catch(e: Exception) {
+            Napier.e(e) { "Failed to load session" }
+            null
+        }
+    }
 
-    suspend fun deleteSession(supabaseClient: SupabaseClient, auth: Auth)
+    @OptIn(ExperimentalSettingsApi::class)
+    suspend fun deleteSession() {
+        settings.remove("session")
+    }
 
 }

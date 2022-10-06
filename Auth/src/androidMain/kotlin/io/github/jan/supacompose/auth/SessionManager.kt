@@ -1,5 +1,8 @@
 package io.github.jan.supacompose.auth
 
+import android.content.SharedPreferences
+import io.github.aakira.napier.Napier
+import io.github.jan.supacompose.SupabaseClient
 import io.github.jan.supacompose.auth.user.UserSession
 import io.github.jan.supacompose.supabaseJson
 import kotlinx.coroutines.Dispatchers
@@ -7,30 +10,16 @@ import kotlinx.coroutines.withContext
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 
-actual class SessionManager {
+private fun SharedPreferences.Editor.saveSession(session: UserSession) {
+    putString("session", supabaseJson.encodeToString(session))
+}
 
-    actual suspend fun saveSession(
-        supabaseClient: io.github.jan.supacompose.SupabaseClient,
-        auth: Auth,
-        session: UserSession
-    ) {
-        val sessionFile = auth.config.sessionFile ?: return
-        withContext(Dispatchers.IO) {
-            if(!sessionFile.exists()) sessionFile.createNewFile()
-            sessionFile.writeText(supabaseJson.encodeToString(session))
-        }
+private fun SharedPreferences.loadSession(): UserSession? {
+    val session = getString("session", null) ?: return null
+    return try {
+        supabaseJson.decodeFromString(session)
+    } catch (e: Exception) {
+        Napier.e(e) { "Couldn't load session from shared preferences" }
+        null
     }
-
-    actual suspend fun loadSession(supabaseClient: io.github.jan.supacompose.SupabaseClient, auth: Auth): UserSession? {
-        val sessionFile = auth.config.sessionFile ?: return null
-        if(!sessionFile.exists()) return null
-        return supabaseJson.decodeFromString<UserSession>(sessionFile.readText())
-    }
-
-    actual suspend fun deleteSession(supabaseClient: io.github.jan.supacompose.SupabaseClient, auth: Auth) {
-        val sessionFile = auth.config.sessionFile ?: return
-        if(!sessionFile.exists()) return
-        sessionFile.delete()
-    }
-
 }

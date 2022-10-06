@@ -1,5 +1,6 @@
 package io.github.jan.supacompose.auth
 
+import com.russhwolf.settings.Settings
 import io.github.aakira.napier.Napier
 import io.github.jan.supacompose.SupabaseClient
 import io.github.jan.supacompose.auth.admin.AdminApi
@@ -150,7 +151,7 @@ sealed interface Auth : MainPlugin<Auth.Config> {
      */
     suspend fun loadFromStorage(autoRefresh: Boolean = config.alwaysAutoRefresh): Boolean
 
-    data class Config(val params: MutableMap<String, Any> = mutableMapOf(), var retryDelay: Duration = 10.seconds, var alwaysAutoRefresh: Boolean = true, var autoLoadFromStorage: Boolean = true, override var customUrl: String? = null): MainConfig
+    data class Config(val params: MutableMap<String, Any> = mutableMapOf(), var retryDelay: Duration = 10.seconds, var alwaysAutoRefresh: Boolean = true, var autoLoadFromStorage: Boolean = true, override var customUrl: String? = null, var settings: Settings = Settings()): MainConfig
 
     enum class Status {
         LOADING_FROM_STORAGE,

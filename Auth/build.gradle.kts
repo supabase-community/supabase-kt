@@ -45,6 +45,9 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 api(project(":"))
+                implementation("com.russhwolf:multiplatform-settings-no-arg:${Versions.SETTINGS}")
+                //implementation("com.russhwolf:multiplatform-settings-serialization:${Versions.SETTINGS}") (no support for coroutines)
+                implementation("com.russhwolf:multiplatform-settings-coroutines:${Versions.SETTINGS}")
                 // https://mvnrepository.com/artifact/io.ktor/ktor-server-core
             }
         }

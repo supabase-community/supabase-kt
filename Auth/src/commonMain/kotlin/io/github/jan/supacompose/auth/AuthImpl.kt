@@ -1,5 +1,7 @@
 package io.github.jan.supacompose.auth
 
+ import com.russhwolf.settings.ExperimentalSettingsApi
+ import com.russhwolf.settings.coroutines.toSuspendSettings
  import io.github.aakira.napier.Napier
  import io.github.jan.supacompose.CurrentPlatformTarget
  import io.github.jan.supacompose.PlatformTarget
@@ -46,7 +48,8 @@ internal class AuthImpl(override val supabaseClient: SupabaseClient, override va
     private val _currentSession = MutableStateFlow<UserSession?>(null)
     override val currentSession: StateFlow<UserSession?> = _currentSession.asStateFlow()
     private val authScope = CoroutineScope(Dispatchers.Default + Job())
-    override val sessionManager = SessionManager()
+    @OptIn(ExperimentalSettingsApi::class)
+    override val sessionManager = SessionManager(config.settings.toSuspendSettings())
     override val admin: AdminApi = AdminApiImpl(this)
     val _status = MutableStateFlow(Auth.Status.NOT_AUTHENTICATED)
     override val status = _status.asStateFlow()
@@ -61,7 +64,7 @@ internal class AuthImpl(override val supabaseClient: SupabaseClient, override va
                     "Trying to load latest session"
                 }
                 _status.value = Auth.Status.LOADING_FROM_STORAGE
-                val session = sessionManager.loadSession(supabaseClient, this@AuthImpl)
+                val session = sessionManager.loadSession()
                 if (session != null) {
                     Napier.d {
                         "Successfully loaded session from storage"
@@ -182,7 +185,7 @@ internal class AuthImpl(override val supabaseClient: SupabaseClient, override va
     }
 
     override suspend fun invalidateSession() {
-        sessionManager.deleteSession(supabaseClient, this)
+        sessionManager.deleteSession()
         sessionJob?.cancel()
         updateSession(Auth.Status.NOT_AUTHENTICATED, null)
         sessionJob = null
@@ -209,7 +212,7 @@ internal class AuthImpl(override val supabaseClient: SupabaseClient, override va
         if(!autoRefresh) {
             updateSession(Auth.Status.AUTHENTICATED, session)
             if(session.refreshToken.isNotBlank() && session.expiresIn != 0L) {
-                sessionManager.saveSession(supabaseClient, this, session)
+                sessionManager.saveSession(session)
             }
             return
         }
@@ -230,7 +233,7 @@ internal class AuthImpl(override val supabaseClient: SupabaseClient, override va
             }
         } else {
             updateSession(Auth.Status.AUTHENTICATED, session)
-            sessionManager.saveSession(supabaseClient, this, session)
+            sessionManager.saveSession(session)
             coroutineScope {
                 sessionJob = launch {
                     delay(session.expiresIn.seconds.inWholeMilliseconds)
@@ -259,7 +262,7 @@ internal class AuthImpl(override val supabaseClient: SupabaseClient, override va
     override suspend fun importSession(session: UserSession, autoRefresh: Boolean) = startJob(session, autoRefresh)
 
     override suspend fun loadFromStorage(autoRefresh: Boolean): Boolean {
-        val session = sessionManager.loadSession(supabaseClient, this)
+        val session = sessionManager.loadSession()
         val wasSuccessful = session != null
         if(wasSuccessful) startJob(session!!, autoRefresh)
         return wasSuccessful
