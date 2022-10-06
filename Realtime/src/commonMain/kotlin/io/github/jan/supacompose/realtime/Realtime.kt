@@ -25,6 +25,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.job
 import kotlinx.coroutines.launch
@@ -141,13 +142,15 @@ internal class RealtimeImpl(override val supabaseClient: SupabaseClient, overrid
             delay(config.reconnectDelay)
             Napier.d { "Reconnecting..." }
         } else {
-            supabaseClient.auth.onSessionChange { new, _ ->
-                if (status.value == Realtime.Status.CONNECTED) {
-                    if (new == null) {
-                        Napier.w { "No auth session found, disconnecting from realtime websocket"}
-                        disconnect()
-                    } else {
-                        updateJwt(new.accessToken)
+            scope.launch {
+                supabaseClient.auth.currentSession.collect {
+                    if (status.value == Realtime.Status.CONNECTED) {
+                        if (it == null) {
+                            Napier.w { "No auth session found, disconnecting from realtime websocket"}
+                            disconnect()
+                        } else {
+                            updateJwt(it.accessToken)
+                        }
                     }
                 }
             }

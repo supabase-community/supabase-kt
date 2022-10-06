@@ -45,7 +45,6 @@ internal class AuthImpl(override val supabaseClient: SupabaseClient, override va
 
     private val _currentSession = MutableStateFlow<UserSession?>(null)
     override val currentSession: StateFlow<UserSession?> = _currentSession.asStateFlow()
-    private val callbacks = mutableListOf<(new: UserSession?, old: UserSession?) -> Unit>()
     private val authScope = CoroutineScope(Dispatchers.Default + Job())
     override val sessionManager = SessionManager()
     override val admin: AdminApi = AdminApiImpl(this)
@@ -259,10 +258,6 @@ internal class AuthImpl(override val supabaseClient: SupabaseClient, override va
 
     override suspend fun importSession(session: UserSession, autoRefresh: Boolean) = startJob(session, autoRefresh)
 
-    override fun onSessionChange(callback: (new: UserSession?, old: UserSession?) -> Unit) {
-        callbacks += callback
-    }
-
     override suspend fun loadFromStorage(autoRefresh: Boolean): Boolean {
         val session = sessionManager.loadSession(supabaseClient, this)
         val wasSuccessful = session != null
@@ -278,9 +273,7 @@ internal class AuthImpl(override val supabaseClient: SupabaseClient, override va
 
     private fun updateSession(status: Auth.Status, newSession: UserSession?) {
         _status.value = status
-        val oldSession = currentSession.value
         _currentSession.value = newSession
-        callbacks.forEach { it.invoke(newSession, oldSession) }
     }
 
     override suspend fun close() {

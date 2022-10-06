@@ -129,11 +129,6 @@ sealed interface Auth : MainPlugin<Auth.Config> {
     suspend fun getUser(jwt: String): UserInfo
 
     /**
-     * Registers a callback to be called when the user session changes
-     */
-    fun onSessionChange(callback: (new: UserSession?, old: UserSession?) -> Unit)
-
-    /**
      * Invalidates the current session, which means [currentSession] will be null
      */
     suspend fun invalidateSession()
