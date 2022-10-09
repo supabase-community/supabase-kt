@@ -21,10 +21,7 @@ val client = createSupabaseClient {
     supabaseUrl = System.getenv("SUPABASE_URL") //without https:// !
     supabaseKey = System.getenv("SUPABASE_KEY")
 
-    install(Auth) {
-        //on desktop, you have to set the session file. On android and web it's managed by the plugin
-        sessionFile = File("C:\\Users\\user\\AppData\\Local\\SupaCompose\\usersession.json")
-    }
+    install(Auth)
     //install other plugins
     install(Postgrest)
     install(Storage)
