@@ -44,7 +44,7 @@ Session saving: ✅
 
 </details>
 
-<details><summary>Authentication with Desktop</summary>
+<details><summary>Authentication with Desktop (Example with Compose)</summary>
 <p>
 
 <b> To add OAuth support, add this link to the redirect urls in supabase </b>
@@ -127,7 +127,7 @@ suspend fun main() {
 </p>
 </details>
 
-<details><summary>Authentication with Android</summary>
+<details><summary>Authentication with Android (Example with Compose)</summary>
 
 <p>
  <b> When you set the deep link scheme and host in the supabase deeplink plugin and in the android manifest you have to remember to set the additional redirect url in the subabase auth settings. E.g. if you have supabase as your scheme and login as your host set this to the additional redirect url: </b>
@@ -252,7 +252,7 @@ class MainActivity : AppCompatActivity() {
 
 </details>
 
-<details><summary>Authentication with Web</summary>
+<details><summary>Authentication with Web (Example with Compose)</summary>
 
 <p>
 
