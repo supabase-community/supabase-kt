@@ -1,6 +1,11 @@
 # Supabase-kt
 
-A framework for building android & desktop apps with Supabase (can be used for other purposes)
+A Kotlin Multiplatform Client for Supabase.
+Supported targets:
+- JVM
+- Android
+- JS (Browser)
+- _iOS (planned)_
 
 Newest version: [![Maven Central](https://img.shields.io/maven-central/v/io.github.jan.supabase/supabase-kt)](https://search.maven.org/search?q=g%3Aio.supabase)
 
