@@ -13,7 +13,7 @@ Newest version: [![Maven Central](https://img.shields.io/maven-central/v/io.gith
 
 ```kotlin
 dependencies {
-    implementation("io.github.jan.supabase:[module e.g. functions-kt or gotrue-kt]:VERSION")
+    implementation("io.github.jan-tennert.supabase:[module e.g. functions-kt or gotrue-kt]:VERSION")
 }
 ```
 

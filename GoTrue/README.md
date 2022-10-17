@@ -2,13 +2,13 @@
 
 Extends Supabase-kt with a multiplatform GoTrue client.
 
-Newest version: [![Maven Central](https://img.shields.io/maven-central/v/io.github.jan.supabase/supabase-kt)](https://search.maven.org/search?q=g%3Aio.supabase)
+Newest version: [![Maven Central](https://img.shields.io/maven-central/v/io.github.jan-tennert.supabase/supabase-kt)](https://search.maven.org/search?q=g%3Aio.supabase)
 
 # Installation
 
 ```kotlin
 dependencies {
-    implementation("io.github.jan.supabase:gotrue-kt:VERSION")
+    implementation("io.github.jan-tennert.supabase:gotrue-kt:VERSION")
 }
 ```
 
