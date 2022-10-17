@@ -65,7 +65,11 @@ kotlin {
                 api("io.ktor:ktor-server-cio:${Versions.KTOR}")
             }
         }
-        val androidMain by getting
+        val androidMain by getting {
+            dependencies {
+                api("androidx.startup:startup-runtime:1.1.1")
+            }
+        }
         val jsMain by getting
     }
 }

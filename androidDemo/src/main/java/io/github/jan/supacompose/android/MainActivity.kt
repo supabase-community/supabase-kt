@@ -21,6 +21,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import io.github.jan.supabase.auth.GoTrue
 import io.github.jan.supabase.auth.auth
+import io.github.jan.supabase.auth.handleDeeplinks
 import io.github.jan.supabase.auth.host
 import io.github.jan.supabase.auth.initializeAndroid
 import io.github.jan.supabase.auth.providers.Discord
@@ -33,8 +34,8 @@ class MainActivity : AppCompatActivity() {
 
     val supabaseClient = createSupabaseClient {
 
-        supabaseUrl = ""
-        supabaseKey = ""
+        supabaseUrl = "https://arnyfaeuskyqfxkvotgj.supabase.co"
+        supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFybnlmYWV1c2t5cWZ4a3ZvdGdqIiwicm9sZSI6ImFub24iLCJpYXQiOjE2NTMwMzkxMTEsImV4cCI6MTk2ODYxNTExMX0.ItmL8lfnOL9oy7CEX9N6TnYt10VVhk-KTlwley4aq1M"
 
         install(GoTrue) {
             scheme = "supabase"
@@ -44,7 +45,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        initializeAndroid(supabaseClient)
+        supabaseClient.handleDeeplinks(intent)
         setContent {
             MaterialTheme {
                 val session by supabaseClient.auth.currentSession.collectAsState()
