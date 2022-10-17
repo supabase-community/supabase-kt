@@ -321,6 +321,7 @@ By default, supabase-kt uses [multiplatform-settings](https://github.com/russhwo
 saving and uses their default settings location e.g. on Android **PreferenceManager.getDefaultSharedPreferences()**
 
 You can either change the Settings implementation (see example below) or **implement the interface SessionManager yourself** and pass it in the config
+
 See [multiplatform-settings](https://github.com/russhwolf/multiplatform-settings) for settings implementations.
 
 Example on desktop:
