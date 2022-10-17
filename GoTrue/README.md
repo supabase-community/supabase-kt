@@ -49,7 +49,7 @@ Session saving: ✅
 
 <b> To add OAuth support, add this link to the redirect urls in supabase </b>
 
-![img.png](.github/images/desktop_supabase.png)
+![img.png](../.github/images/desktop_supabase.png)
 
 ```kotlin
 suspend fun main() {
@@ -132,7 +132,7 @@ suspend fun main() {
 <p>
  <b> When you set the deep link scheme and host in the supabase deeplink plugin and in the android manifest you have to remember to set the additional redirect url in the subabase auth settings. E.g. if you have supabase as your scheme and login as your host set this to the additional redirect url: </b>
 
-![img.png](.github/images/img.png)
+![img.png](../.github/images/img.png)
 </p>
 
 <blockquote>
