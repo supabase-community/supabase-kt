@@ -1,4 +1,4 @@
-package io.github.jan.supacompose.android
+package io.github.jan.supabase.android
 
 import android.os.Bundle
 import androidx.activity.compose.setContent
@@ -19,14 +19,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.PasswordVisualTransformation
-import io.github.jan.supacompose.auth.Auth
-import io.github.jan.supacompose.auth.auth
-import io.github.jan.supacompose.auth.host
-import io.github.jan.supacompose.auth.initializeAndroid
-import io.github.jan.supacompose.auth.providers.Discord
-import io.github.jan.supacompose.auth.providers.builtin.Email
-import io.github.jan.supacompose.auth.scheme
-import io.github.jan.supacompose.createSupabaseClient
+import io.github.jan.supabase.auth.GoTrue
+import io.github.jan.supabase.auth.auth
+import io.github.jan.supabase.auth.host
+import io.github.jan.supabase.auth.initializeAndroid
+import io.github.jan.supabase.auth.providers.Discord
+import io.github.jan.supabase.auth.providers.builtin.Email
+import io.github.jan.supabase.auth.scheme
+import io.github.jan.supabase.createSupabaseClient
 import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
@@ -36,7 +36,7 @@ class MainActivity : AppCompatActivity() {
         supabaseUrl = ""
         supabaseKey = ""
 
-        install(Auth) {
+        install(GoTrue) {
             scheme = "supacompose"
             host = "login"
         }

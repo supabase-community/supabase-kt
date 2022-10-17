@@ -17,7 +17,7 @@ repositories {
     }
 }
 dependencies {
-    api(project(":Supacompose-Auth"))
+    api(project(":gotrue-kt"))
     //api(project(":Supacompose"))
     implementation(compose.runtime)
     implementation(compose.ui)
@@ -30,7 +30,7 @@ dependencies {
 android {
     compileSdk = 33
     defaultConfig {
-        applicationId = "io.github.jan.supacompose.android"
+        applicationId = "io.github.jan.supabase.android"
         minSdk = 24
         targetSdk = 33
         versionCode = 1

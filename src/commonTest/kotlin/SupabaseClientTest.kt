@@ -1,19 +1,19 @@
-import io.github.jan.supacompose.SupabaseClient
-import io.github.jan.supacompose.SupabaseClientBuilder
-import io.github.jan.supacompose.createSupabaseClient
-import io.github.jan.supacompose.plugins.SupacomposePlugin
-import io.github.jan.supacompose.plugins.SupacomposePluginProvider
+import io.github.jan.supabase.SupabaseClient
+import io.github.jan.supabase.SupabaseClientBuilder
+import io.github.jan.supabase.createSupabaseClient
+import io.github.jan.supabase.plugins.SupabasePlugin
+import io.github.jan.supabase.plugins.SupabasePluginProvider
 import io.ktor.client.engine.mock.MockEngine
 import io.ktor.client.engine.mock.respond
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertIs
 
-class TestPlugin(private val config: Config) : SupacomposePlugin {
+class TestPlugin(private val config: Config) : SupabasePlugin {
 
     data class Config(var testValue: Boolean = false)
 
-    companion object : SupacomposePluginProvider<Config, TestPlugin> {
+    companion object : SupabasePluginProvider<Config, TestPlugin> {
 
         override val key = "test"
 

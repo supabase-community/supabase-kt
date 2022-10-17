@@ -24,7 +24,7 @@ kotlin {
     sourceSets {
         val webMain by getting {
             dependencies {
-                implementation(project(":Supacompose-Auth"))
+                implementation(project(":gotrue-kt"))
                 api(compose.web.core)
                 api(compose.runtime)
             }

@@ -44,7 +44,7 @@ kotlin {
         }
         val commonMain by getting {
             dependencies {
-                api(project(":Supacompose-Auth"))
+                api(project(":gotrue-kt"))
                 api("io.ktor:ktor-client-websockets:${Versions.KTOR}")
             }
         }

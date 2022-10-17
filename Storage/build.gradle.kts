@@ -44,7 +44,7 @@ kotlin {
         }
         val commonMain by getting {
             dependencies {
-                api(project(":Supacompose-Auth"))
+                api(project(":gotrue-kt"))
                 // https://mvnrepository.com/artifact/io.ktor/ktor-server-core
             }
         }

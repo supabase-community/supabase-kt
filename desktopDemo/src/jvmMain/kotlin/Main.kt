@@ -16,17 +16,15 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import com.russhwolf.settings.PreferencesSettings
-import com.russhwolf.settings.PropertiesSettings
-import io.github.jan.supacompose.auth.Auth
-import io.github.jan.supacompose.auth.auth
-import io.github.jan.supacompose.auth.providers.Google
-import io.github.jan.supacompose.auth.providers.builtin.Email
-import io.github.jan.supacompose.createSupabaseClient
+import io.github.jan.supabase.auth.GoTrue
+import io.github.jan.supabase.auth.auth
+import io.github.jan.supabase.auth.providers.Google
+import io.github.jan.supabase.auth.providers.builtin.Email
+import io.github.jan.supabase.createSupabaseClient
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
-import java.util.Properties
 import java.util.prefs.Preferences
 
 @Serializable
@@ -37,7 +35,7 @@ suspend fun main() {
         supabaseUrl = System.getenv("SUPABASE_URL")
         supabaseKey = System.getenv("SUPABASE_KEY")
 
-        install(Auth) {
+        install(GoTrue) {
             settings = PreferencesSettings(Preferences.userRoot().node("custom_name"))
         }
     }

@@ -15,7 +15,7 @@ plugins {
  //   id("org.jetbrains.compose") version Versions.COMPOSE
 }
 
-val modules = listOf("Supacompose", "Supacompose-Auth", "Supacompose-Postgrest", "Supacompose-Storage", "Supacompose-Realtime", "Supacompose-Functions")
+val modules = listOf("supabase-kt", "gotrue-kt", "postgrest-kt", "storage-kt", "realtime-kt", "functions-kt")
 
 allprojects {
     repositories {

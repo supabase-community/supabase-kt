@@ -5,7 +5,7 @@ plugins {
 
 group = "io.github.jan-tennert.supacompose"
 version = Versions.SUPACOMPOSE
-description = "Extends Supabase with a Edge Functions Client"
+description = "Extends Supabase-ktwith a Edge Functions Client"
 
 repositories {
     mavenCentral()
@@ -45,7 +45,7 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 api(project(":"))
-                api(project(":Supacompose-Auth"))
+                api(project(":gotrue-kt"))
                 // https://mvnrepository.com/artifact/io.ktor/ktor-server-core
             }
         }

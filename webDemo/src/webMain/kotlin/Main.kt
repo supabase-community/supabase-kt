@@ -4,11 +4,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-import io.github.jan.supacompose.auth.Auth
-import io.github.jan.supacompose.auth.auth
-import io.github.jan.supacompose.auth.providers.Discord
-import io.github.jan.supacompose.auth.providers.builtin.Email
-import io.github.jan.supacompose.createSupabaseClient
+import io.github.jan.supabase.auth.GoTrue
+import io.github.jan.supabase.auth.auth
+import io.github.jan.supabase.auth.providers.Discord
+import io.github.jan.supabase.auth.providers.builtin.Email
+import io.github.jan.supabase.createSupabaseClient
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.web.css.padding
 import org.jetbrains.compose.web.css.px
@@ -24,7 +24,7 @@ fun main() {
         supabaseUrl = ""
         supabaseKey = ""
 
-        install(Auth)
+        install(GoTrue)
     }
 
     renderComposable(rootElementId = "root") {

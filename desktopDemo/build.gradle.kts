@@ -29,7 +29,7 @@ kotlin {
     sourceSets {
         val jvmMain by getting {
             dependencies {
-                api(project(":Supacompose-Auth"))
+                api(project(":gotrue-kt"))
                 implementation("com.russhwolf:multiplatform-settings:${Versions.SETTINGS}")
                 implementation(compose.runtime)
                 implementation(compose.ui)
