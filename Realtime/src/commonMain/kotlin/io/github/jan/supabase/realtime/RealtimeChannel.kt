@@ -2,7 +2,7 @@ package io.github.jan.supabase.realtime
 
 import io.github.aakira.napier.Napier
 import io.github.jan.supabase.SupabaseClient
-import io.github.jan.supabase.annotiations.SupaComposeInternal
+import io.github.jan.supabase.annotiations.SupabaseInternal
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.auth.currentAccessToken
 import io.github.jan.supabase.decodeIfNotEmptyOrDefault
@@ -35,7 +35,7 @@ sealed interface RealtimeChannel {
     val topic: String
     val supabaseClient: SupabaseClient
 
-    @SupaComposeInternal
+    @SupabaseInternal
     val callbackManager: CallbackManager
 
     /**
@@ -72,7 +72,7 @@ sealed interface RealtimeChannel {
      */
     suspend fun untrack()
 
-    @SupaComposeInternal
+    @SupabaseInternal
     fun RealtimeChannel.addPostgresChange(data: PostgresJoinConfig)
 
     enum class Status {
@@ -105,14 +105,14 @@ internal class RealtimeChannelImpl(
 ) : RealtimeChannel {
 
     private val clientChanges = mutableListOf<PostgresJoinConfig>()
-    @SupaComposeInternal
+    @SupabaseInternal
     override val callbackManager = CallbackManagerImpl()
     private val _status = MutableStateFlow(RealtimeChannel.Status.CLOSED)
     override val status = _status.asStateFlow()
 
     override val supabaseClient = realtimeImpl.supabaseClient
 
-    @OptIn(SupaComposeInternal::class)
+    @OptIn(SupabaseInternal::class)
     override suspend fun join() {
         realtimeImpl.run {
             addChannel(this@RealtimeChannelImpl)
@@ -131,7 +131,7 @@ internal class RealtimeChannelImpl(
         realtimeImpl.ws?.sendSerialized(RealtimeMessage(topic, RealtimeChannel.CHANNEL_EVENT_JOIN, joinConfigObject, null))
     }
 
-    @OptIn(SupaComposeInternal::class)
+    @OptIn(SupabaseInternal::class)
     fun onMessage(message: RealtimeMessage) {
         when {
             message.event == "system" && message.payload["status"]?.jsonPrimitive?.content == "ok" -> {
@@ -201,7 +201,7 @@ internal class RealtimeChannelImpl(
         }, (++realtimeImpl.ref).toString()))
     }
 
-    @SupaComposeInternal
+    @SupabaseInternal
     override fun RealtimeChannel.addPostgresChange(data: PostgresJoinConfig) {
         clientChanges.add(data)
     }
@@ -227,7 +227,7 @@ internal class RealtimeChannelImpl(
 /**
  * Listen for clients joining / leaving the channel using presences
  */
-@OptIn(SupaComposeInternal::class)
+@OptIn(SupabaseInternal::class)
 fun RealtimeChannel.presenceChangeFlow(): Flow<PresenceAction> {
     return callbackFlow {
         val callback: (PresenceAction) -> Unit = { action ->
@@ -243,7 +243,7 @@ fun RealtimeChannel.presenceChangeFlow(): Flow<PresenceAction> {
  * You can listen for postgres changes in a channel.
  * @param T The event type you want to listen to (e.g. [PostgresAction.Update] for updates or only [PostgresAction] for all)
  */
-@OptIn(SupaComposeInternal::class)
+@OptIn(SupabaseInternal::class)
 inline fun <reified T : PostgresAction> RealtimeChannel.postgresChangeFlow(filter: PostgresChangeFilter.() -> Unit): Flow<T> {
     if(status.value == RealtimeChannel.Status.JOINED) throw IllegalStateException("You cannot call postgresChangeFlow after joining the channel")
     val event = when(T::class) {
@@ -273,7 +273,7 @@ inline fun <reified T : PostgresAction> RealtimeChannel.postgresChangeFlow(filte
  * Broadcasts can be messages sent by other clients within the same channel under a specific [event].
  * @param event When a message is sent by another client, it will be sent under a specific event. This is the event that you want to listen to
  */
-@OptIn(SupaComposeInternal::class)
+@OptIn(SupabaseInternal::class)
 inline fun <reified T> RealtimeChannel.broadcastFlow(event: String, json: Json = Json): Flow<T> = callbackFlow {
     val id = callbackManager.addBroadcastCallback(event) {
         val decodedValue = try {

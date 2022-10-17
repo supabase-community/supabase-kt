@@ -1,4 +1,4 @@
 package io.github.jan.supabase.annotiations
 
 @DslMarker
-annotation class SupaComposeDsl
+annotation class SupabaseDsl

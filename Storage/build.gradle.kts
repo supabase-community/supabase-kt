@@ -3,8 +3,8 @@ plugins {
     id("com.android.library")
 }
 
-group = "io.github.jan-tennert.supacompose"
-version = Versions.SUPACOMPOSE
+group = "io.github.jan-tennert.supabase"
+version = Versions.SUPABASEKT
 description = "Extends Supacompose with a Storage Client"
 
 repositories {

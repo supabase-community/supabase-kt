@@ -14,7 +14,7 @@ body:
     attributes:
       label: General Info
       options:
-        - label: I installed the latest version of SupaCompose
+        - label: I installed the latest version of Supabase-Kt
           required: true
         - label: I checked for similar bug report
           required: true

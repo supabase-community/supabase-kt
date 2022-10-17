@@ -3,11 +3,11 @@ package io.github.jan.supabase.storage
 import android.app.DownloadManager
 import android.content.Context.DOWNLOAD_SERVICE
 import androidx.core.net.toUri
-import io.github.jan.supabase.annotiations.SupaComposeInternal
+import io.github.jan.supabase.annotiations.SupabaseInternal
 import io.github.jan.supabase.auth.activity
 import io.github.jan.supabase.auth.auth
 
-@OptIn(SupaComposeInternal::class)
+@OptIn(SupabaseInternal::class)
 fun BucketApi.downloadAuthenticatedWithManager(path: String, config: DownloadManager.Request.() -> Unit) {
     val request = DownloadManager.Request((this as BucketApiImpl).storage.resolveUrl("object/authenticated/$bucketId/$path").toUri())
         .apply(config)
@@ -16,7 +16,7 @@ fun BucketApi.downloadAuthenticatedWithManager(path: String, config: DownloadMan
     dm.enqueue(request)
 }
 
-@OptIn(SupaComposeInternal::class)
+@OptIn(SupabaseInternal::class)
 fun BucketApi.downloadPublicWithManager(path: String, config: DownloadManager.Request.() -> Unit) {
     val request = DownloadManager.Request((this as BucketApiImpl).storage.resolveUrl(publicUrl(path)).toUri())
         .apply(config)

@@ -3,7 +3,7 @@ package io.github.jan.supabase.realtime
 import io.github.aakira.napier.Napier
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.SupabaseClientBuilder
-import io.github.jan.supabase.annotiations.SupaComposeInternal
+import io.github.jan.supabase.annotiations.SupabaseInternal
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.plugins.MainConfig
 import io.github.jan.supabase.plugins.MainPlugin
@@ -63,10 +63,10 @@ sealed interface Realtime : MainPlugin<Realtime.Config> {
      */
     fun onStatusChange(callback: (Status) -> Unit)
 
-    @SupaComposeInternal
+    @SupabaseInternal
     fun RealtimeChannel.addChannel(channel: RealtimeChannel)
 
-    @SupaComposeInternal
+    @SupabaseInternal
     fun RealtimeChannel.removeChannel(topic: String)
 
     /**
@@ -260,12 +260,12 @@ internal class RealtimeImpl(override val supabaseClient: SupabaseClient, overrid
         ws?.sendSerialized(RealtimeMessage("phoenix", "heartbeat", buildJsonObject { }, heartbeatRef.toString()))
     }
 
-    @SupaComposeInternal
+    @SupabaseInternal
     override fun RealtimeChannel.removeChannel(topic: String) {
         _subscriptions.remove(topic)
     }
 
-    @SupaComposeInternal
+    @SupabaseInternal
     override fun RealtimeChannel.addChannel(channel: RealtimeChannel) {
         _subscriptions[channel.topic] = channel
     }

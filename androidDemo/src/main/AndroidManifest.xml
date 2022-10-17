@@ -15,7 +15,7 @@
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
                 <!-- Accepts URIs that begin with "example://gizmos” -->
-                <data android:scheme="supacompose"
+                <data android:scheme="supabase"
                       android:host="login" />
             </intent-filter>
         </activity>

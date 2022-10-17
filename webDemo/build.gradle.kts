@@ -13,7 +13,7 @@ repositories {
     }
 }
 
-group = "io.github.jan-tennert.supacompose.web"
+group = "io.github.jan-tennert.supabase.web"
 version = "1.0"
 
 kotlin {

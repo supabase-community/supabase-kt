@@ -37,7 +37,7 @@ class MainActivity : AppCompatActivity() {
         supabaseKey = ""
 
         install(GoTrue) {
-            scheme = "supacompose"
+            scheme = "supabase"
             host = "login"
         }
     }

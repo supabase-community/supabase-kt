@@ -1,6 +1,6 @@
 package io.github.jan.supabase
 
-import io.github.jan.supabase.annotiations.SupaComposeDsl
+import io.github.jan.supabase.annotiations.SupabaseDsl
 import io.github.jan.supabase.plugins.PluginManager
 import io.github.jan.supabase.plugins.SupabasePlugin
 import io.github.jan.supabase.plugins.SupabasePluginProvider
@@ -12,7 +12,7 @@ import io.ktor.client.engine.HttpClientEngine
  *
  * Use [createSupabaseClient] to create a new instance of [SupabaseClient].
  */
-@SupaComposeDsl
+@SupabaseDsl
 class SupabaseClientBuilder @PublishedApi internal constructor() {
 
     lateinit var supabaseUrl: String

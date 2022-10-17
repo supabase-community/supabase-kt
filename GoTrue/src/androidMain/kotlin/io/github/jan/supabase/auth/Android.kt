@@ -8,13 +8,13 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ProcessLifecycleOwner
 import io.github.aakira.napier.Napier
 import io.github.jan.supabase.SupabaseClient
-import io.github.jan.supabase.annotiations.SupaComposeInternal
+import io.github.jan.supabase.annotiations.SupabaseInternal
 import io.github.jan.supabase.auth.user.UserSession
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-@OptIn(SupaComposeInternal::class)
+@OptIn(SupabaseInternal::class)
 internal fun GoTrue.openOAuth(provider: String) {
     this as GoTrueImpl
     val deepLink = "${config.scheme}://${config.host}"
@@ -22,7 +22,7 @@ internal fun GoTrue.openOAuth(provider: String) {
     config.activity.startActivity(browserIntent)
 }
 
-@SupaComposeInternal
+@SupabaseInternal
 var GoTrue.Config.activity: Activity
     get() = params["activity"] as? Activity ?: throw IllegalStateException("Use initializeAndroid on your onCreate method")
     set(value) {
@@ -30,7 +30,7 @@ var GoTrue.Config.activity: Activity
     }
 
 var GoTrue.Config.scheme: String
-    get() = (params["scheme"] as? String) ?: "supacompose"
+    get() = (params["scheme"] as? String) ?: "Supabase"
     set(value) {
         params["scheme"] = value
     }
@@ -42,7 +42,7 @@ var GoTrue.Config.host: String
     }
 
 //add a contextual receiver later in kotlin 1.7 and remove the supabaseClient parameter
-@OptIn(SupaComposeInternal::class)
+@OptIn(SupabaseInternal::class)
 fun Activity.initializeAndroid(supabaseClient: SupabaseClient, onSessionSuccess: (UserSession) -> Unit = {}) {
     val authPlugin = supabaseClient.pluginManager.getPlugin<GoTrueImpl>("auth")
     authPlugin.config.activity = this

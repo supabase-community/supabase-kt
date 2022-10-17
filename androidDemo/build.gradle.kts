@@ -4,7 +4,7 @@ plugins {
     kotlin("android")
 }
 
-group = "io.github.jan-tennert.supacompose.android"
+group = "io.github.jan-tennert.supabase.android"
 version = "1.0"
 
 repositories {

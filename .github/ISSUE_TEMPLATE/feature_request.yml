@@ -9,7 +9,7 @@ body:
     attributes:
       label: General Info
       options:
-        - label: I installed the latest version of SupaCompose
+        - label: I installed the latest version of Supabase Kt
           required: true
         - label: I checked for similar feature requests
           required: true
@@ -17,7 +17,7 @@ body:
     id: feature-request
     attributes:
       label: Feature request
-      description: Please describe what you think should be added to SupaCompose
+      description: Please describe what you think should be added to Supabase Kt
     validations:
       required: true
   - type: textarea

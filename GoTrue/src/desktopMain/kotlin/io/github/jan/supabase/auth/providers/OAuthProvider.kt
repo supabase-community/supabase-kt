@@ -157,7 +157,7 @@ var ExternalAuthConfig.timeout: Duration
     }
 
 var ExternalAuthConfig.htmlTitle: String
-    get() = params["htmlTitle"] as? String ?: "SupaCompose"
+    get() = params["htmlTitle"] as? String ?: "Supabase"
     set(value) {
         params["htmlTitle"] = value
     }

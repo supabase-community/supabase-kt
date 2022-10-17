@@ -16,7 +16,7 @@ repositories {
     }
 }
 
-group = "io.github.jan-tennert.supacompose.desktop"
+group = "io.github.jan-tennert.supabae.desktop"
 version = "1.0"
 
 kotlin {
@@ -52,7 +52,7 @@ compose.desktop {
         mainClass = "MainKt"
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
-            packageName = "SupaCompose"
+            packageName = "SupabaseKt"
             packageVersion = "1.0.0"
         }
     }

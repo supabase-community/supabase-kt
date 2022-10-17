@@ -1,7 +1,7 @@
 package io.github.jan.supabase.functions
 
 import io.github.jan.supabase.SupabaseClient
-import io.github.jan.supabase.annotiations.SupaComposeInternal
+import io.github.jan.supabase.annotiations.SupabaseInternal
 import io.ktor.http.Headers
 import io.ktor.http.HeadersBuilder
 import io.ktor.http.HttpHeaders
@@ -12,7 +12,7 @@ import io.ktor.http.HttpHeaders
  * @param headers Headers to add to the request
  * @param supabaseClient The supabase client to use
  */
-class EdgeFunction @SupaComposeInternal constructor(
+class EdgeFunction @SupabaseInternal constructor(
     val functionName: String,
     val headers: Headers,
     val supabaseClient: SupabaseClient
@@ -33,7 +33,7 @@ class EdgeFunction @SupaComposeInternal constructor(
 
 class EdgeFunctionBuilder(var functionName: String = "", val headers: HeadersBuilder = HeadersBuilder(), private val supabaseClient: SupabaseClient) {
 
-    @OptIn(SupaComposeInternal::class)
+    @OptIn(SupabaseInternal::class)
     fun toEdgeFunction() = EdgeFunction(functionName, headers.build(), supabaseClient)
 
 }
