@@ -16,7 +16,7 @@ kotlin {
     *  To find out how to configure the targets, please follow the link:
     *  https://kotlinlang.org/docs/reference/building-mpp-with-gradle.html#setting-up-targets */
 
-    jvm("desktop") {
+    jvm() {
         compilations.all {
             kotlinOptions.jvmTarget = "11"
             kotlinOptions.freeCompilerArgs = listOf(
@@ -28,7 +28,7 @@ kotlin {
     android {
         publishLibraryVariants("release", "debug")
     }
-    js("web", IR) {
+    js(IR) {
         browser {
             testTask {
                 enabled = false
@@ -48,14 +48,14 @@ kotlin {
                 api("io.ktor:ktor-client-websockets:${Versions.KTOR}")
             }
         }
-        val desktopMain by getting  {
+        val jvmMain by getting  {
             /*dependencies {
                 implementation("ch.qos.logback:logback-classic:1.3.0-beta0")
                 api("io.ktor:ktor-client-cio:${Versions.KTOR}")
             }*/
         }
         val androidMain by getting
-        val webMain by getting
+        val jsMain by getting
     }
 }
 

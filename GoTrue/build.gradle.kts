@@ -16,7 +16,7 @@ kotlin {
      *  To find out how to configure the targets, please follow the link:
      *  https://kotlinlang.org/docs/reference/building-mpp-with-gradle.html#setting-up-targets */
 
-    jvm("desktop") {
+    jvm() {
         compilations.all {
             kotlinOptions.jvmTarget = "11"
             kotlinOptions.freeCompilerArgs = listOf(
@@ -28,7 +28,7 @@ kotlin {
     android {
         publishLibraryVariants("release", "debug")
     }
-    js("web", IR) {
+    js(IR) {
         browser {
             testTask {
                 enabled = false
@@ -58,7 +58,7 @@ kotlin {
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:${Versions.COROUTINES}")
             }
         }
-        val desktopMain by getting {
+        val jvmMain by getting {
             dependencies {
                 api("io.ktor:ktor-server-core:${Versions.KTOR}")
                 // https://mvnrepository.com/artifact/io.ktor/ktor-server-core
@@ -66,7 +66,7 @@ kotlin {
             }
         }
         val androidMain by getting
-        val webMain by getting
+        val jsMain by getting
     }
 }
 

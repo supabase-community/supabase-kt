@@ -138,7 +138,7 @@ group = "io.github.jan-tennert.supabase"
 version = Versions.SUPABASEKT
 
 kotlin {
-    jvm("desktop") {
+    jvm() {
         compilations.all {
             kotlinOptions.jvmTarget = "11"
             kotlinOptions.freeCompilerArgs = listOf(
@@ -150,7 +150,7 @@ kotlin {
     android {
         publishLibraryVariants("release", "debug")
     }
-    js("web", IR) {
+    js(IR) {
         browser {
             testTask {
                 enabled = false
@@ -183,9 +183,9 @@ kotlin {
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:${Versions.COROUTINES}")
             }
         }
-        val desktopMain by getting {
+        val jvmMain by getting {
         }
-        val desktopTest by getting
+        val jvmTest by getting
         val androidMain by getting {
             dependencies {
                 //add android lifecycle
@@ -200,7 +200,7 @@ kotlin {
                 implementation("junit:junit:4.13.2")
             }
         }
-        val webMain by getting {
+        val jsMain by getting {
             dependencies {
               //  api(compose.web.core)
             }

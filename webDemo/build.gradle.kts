@@ -17,12 +17,12 @@ group = "io.github.jan-tennert.supabase.web"
 version = "1.0"
 
 kotlin {
-    js("web", IR) {
+    js(IR) {
         browser()
         binaries.executable()
     }
     sourceSets {
-        val webMain by getting {
+        val jsMain by getting {
             dependencies {
                 implementation(project(":gotrue-kt"))
                 api(compose.web.core)
