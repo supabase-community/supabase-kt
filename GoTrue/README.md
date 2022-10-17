@@ -160,7 +160,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        initializeAndroid(supabaseClient) //if you don't call this function the library will throw an error when trying to authenticate with oauth
+        supabaseClient.handleDeeplinks(intent) //without this no deeplinks will get recognized
         setContent {
             MaterialTheme {
                 val session by supabaseclient.gotrue.currentSession.collectAsState()
