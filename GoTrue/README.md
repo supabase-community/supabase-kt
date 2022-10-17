@@ -320,14 +320,14 @@ renderComposable(rootElementId = "root") {
 By default, supabase-kt uses [multiplatform-settings](https://github.com/russhwolf/multiplatform-settings) for session
 saving and uses their default settings location e.g. on Android **PreferenceManager.getDefaultSharedPreferences()**
 
-You can change how and where the sessions get saved by providing a custom Settings implementation in the Auth config.
-See [multiplatform-settings](https://github.com/russhwolf/multiplatform-settings) for implementations.
+You can either change the Settings implementation (see example below) or **implement the interface SessionManager yourself** and pass it in the config
+See [multiplatform-settings](https://github.com/russhwolf/multiplatform-settings) for settings implementations.
 
 Example on desktop:
 
 ```kotlin
 install(GoTrue) {
-    settings = PreferencesSettings(Preferences.userRoot().node("custom_name"))
+    sessionManager = SettingsSessionManager(PreferencesSettings(Preferences.userRoot().node("custom_name")))
 }
 ```
 

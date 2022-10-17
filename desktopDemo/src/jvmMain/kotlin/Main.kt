@@ -17,6 +17,7 @@ import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import com.russhwolf.settings.PreferencesSettings
 import io.github.jan.supabase.auth.GoTrue
+import io.github.jan.supabase.auth.SettingsSessionManager
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.auth.providers.Google
 import io.github.jan.supabase.auth.providers.builtin.Email
@@ -36,7 +37,7 @@ suspend fun main() {
         supabaseKey = System.getenv("SUPABASE_KEY")
 
         install(GoTrue) {
-            settings = PreferencesSettings(Preferences.userRoot().node("custom_name"))
+            sessionManager = SettingsSessionManager(PreferencesSettings(Preferences.userRoot().node("custom_name")))
         }
     }
     val scope = CoroutineScope(Dispatchers.IO)

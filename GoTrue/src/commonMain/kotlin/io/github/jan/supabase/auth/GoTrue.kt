@@ -151,7 +151,7 @@ sealed interface GoTrue : MainPlugin<GoTrue.Config> {
      */
     suspend fun loadFromStorage(autoRefresh: Boolean = config.alwaysAutoRefresh): Boolean
 
-    data class Config(val params: MutableMap<String, Any> = mutableMapOf(), var retryDelay: Duration = 10.seconds, var alwaysAutoRefresh: Boolean = true, var autoLoadFromStorage: Boolean = true, override var customUrl: String? = null, var settings: Settings = Settings()): MainConfig
+    data class Config(val params: MutableMap<String, Any> = mutableMapOf(), var retryDelay: Duration = 10.seconds, var alwaysAutoRefresh: Boolean = true, var autoLoadFromStorage: Boolean = true, override var customUrl: String? = null, var sessionManager: SessionManager = SettingsSessionManager()): MainConfig
 
     enum class Status {
         LOADING_FROM_STORAGE,

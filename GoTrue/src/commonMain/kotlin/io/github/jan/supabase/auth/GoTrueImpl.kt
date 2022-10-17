@@ -48,8 +48,7 @@ internal class GoTrueImpl(override val supabaseClient: SupabaseClient, override 
     private val _currentSession = MutableStateFlow<UserSession?>(null)
     override val currentSession: StateFlow<UserSession?> = _currentSession.asStateFlow()
     private val authScope = CoroutineScope(Dispatchers.Default + Job())
-    @OptIn(ExperimentalSettingsApi::class)
-    override val sessionManager = SessionManager(config.settings.toSuspendSettings())
+    override val sessionManager = config.sessionManager
     override val admin: AdminApi = AdminApiImpl(this)
     val _status = MutableStateFlow(GoTrue.Status.NOT_AUTHENTICATED)
     override val status = _status.asStateFlow()
