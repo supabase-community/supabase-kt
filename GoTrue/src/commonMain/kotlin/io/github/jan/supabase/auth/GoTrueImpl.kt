@@ -58,21 +58,19 @@ internal class GoTrueImpl(override val supabaseClient: SupabaseClient, override 
 
     init {
         setupPlatform()
-        if (CurrentPlatformTarget == PlatformTarget.WEB || CurrentPlatformTarget == PlatformTarget.DESKTOP && config.autoLoadFromStorage) { //for android see Android.kt
-            authScope.launch {
+        authScope.launch {
+            Napier.d {
+                "Trying to load latest session"
+            }
+            _status.value = GoTrue.Status.LOADING_FROM_STORAGE
+            val session = sessionManager.loadSession()
+            if (session != null) {
                 Napier.d {
-                    "Trying to load latest session"
+                    "Successfully loaded session from storage"
                 }
-                _status.value = GoTrue.Status.LOADING_FROM_STORAGE
-                val session = sessionManager.loadSession()
-                if (session != null) {
-                    Napier.d {
-                        "Successfully loaded session from storage"
-                    }
-                    startJob(session)
-                } else {
-                    _status.value = GoTrue.Status.NOT_AUTHENTICATED
-                }
+                startJob(session)
+            } else {
+                _status.value = GoTrue.Status.NOT_AUTHENTICATED
             }
         }
     }
