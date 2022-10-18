@@ -59,6 +59,13 @@ val changeFlow: Flow<PostgresAction.Insert> = channel.postgresChangeFlow<Postgre
 val changeFlow: Flow<PostgresAction> = channel.postgresChangeFlow<PostgresAction>(schema = "public") {
     table = "test"
 }
+
+//collect changes in e.g. a Android ViewModel
+changeFlow
+    .onEach {
+        println(it)
+    }
+    .launchIn(viewModelScope)
 ```
 
 </details>
