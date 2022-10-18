@@ -56,6 +56,7 @@ kotlin {
                 implementation("io.ktor:ktor-client-mock:${Versions.KTOR}")
                 implementation(kotlin("test"))
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:${Versions.COROUTINES}")
+                implementation("com.russhwolf:multiplatform-settings-test:${Versions.SETTINGS}")
             }
         }
         val jvmMain by getting {
