@@ -246,7 +246,7 @@ fun RealtimeChannel.presenceChangeFlow(): Flow<PresenceAction> {
  * @param schema The schema name of the table that is being monitored. For normal supabase tables that might be "public".
  */
 @OptIn(SupabaseInternal::class)
-inline fun <reified T : PostgresAction> RealtimeChannel.postgresChangeFlow(schema: String, filter: PostgresChangeFilter.() -> Unit): Flow<T> {
+inline fun <reified T : PostgresAction> RealtimeChannel.postgresChangeFlow(schema: String, filter: PostgresChangeFilter.() -> Unit = {}): Flow<T> {
     if(status.value == RealtimeChannel.Status.JOINED) throw IllegalStateException("You cannot call postgresChangeFlow after joining the channel")
     val event = when(T::class) {
         PostgresAction.Insert::class -> "INSERT"
