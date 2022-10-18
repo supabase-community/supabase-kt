@@ -14,6 +14,10 @@ Newest version: [![Maven Central](https://img.shields.io/maven-central/v/io.gith
 ```kotlin
 dependencies {
     implementation("io.github.jan-tennert.supabase:[module e.g. functions-kt or gotrue-kt]:VERSION")
+
+    //add ktor client engine (if you don't already have one, see https://ktor.io/docs/http-client-engines.html for all engines)
+    //e.g. the CIO engine
+    implementation("io.ktor:ktor-client-cio:KTOR_VERSION")
 }
 ```
 
