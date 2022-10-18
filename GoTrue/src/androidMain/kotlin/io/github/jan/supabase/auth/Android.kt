@@ -3,9 +3,6 @@ package io.github.jan.supabase.auth
 import android.app.Activity
 import android.content.Intent
 import android.net.Uri
-import androidx.lifecycle.DefaultLifecycleObserver
-import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.ProcessLifecycleOwner
 import io.github.aakira.napier.Napier
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.annotiations.SupabaseInternal
@@ -14,7 +11,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-@OptIn(SupabaseInternal::class)
 internal fun GoTrue.openOAuth(provider: String) {
     this as GoTrueImpl
     val deepLink = "${config.scheme}://${config.host}"
