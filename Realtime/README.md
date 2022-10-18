@@ -25,9 +25,7 @@ val client = createSupabaseClient {
 }
 ```
 
-# Features
-
-<details><summary>Creating/Joining the channel</summary>
+# Example
 
 ```kotlin
 val channel = supabaseClient.realtime.createChannel("#random") {
@@ -48,7 +46,8 @@ channel.postgresChangeFlow<PostgresAction.Insert> {} // listen for changes
 channel.join()
 ```
 
-</details>
+# Features
+
 <details><summary>Listening for database changes</summary>
 
 ```kotlin
