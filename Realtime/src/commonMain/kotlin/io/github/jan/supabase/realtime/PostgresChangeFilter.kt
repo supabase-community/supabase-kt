@@ -1,11 +1,6 @@
 package io.github.jan.supabase.realtime
 
-class PostgresChangeFilter(private val event: String) {
-
-    /**
-     * The schema name of the table that is being monitored. For normal supabase tables that might be "public".
-     */
-    var schema: String = ""
+class PostgresChangeFilter(private val event: String, private val schema: String) {
 
     /**
      * The table name that should be monitored
@@ -18,6 +13,6 @@ class PostgresChangeFilter(private val event: String) {
      */
     var filter: String? = null
 
-    fun buildConfig() = PostgresJoinConfig(schema.ifBlank { throw IllegalStateException("The schema must be specified") }, table, filter, event)
+    fun buildConfig() = PostgresJoinConfig(schema, table, filter, event)
 
 }

@@ -30,10 +30,3 @@ class EdgeFunction @SupabaseInternal constructor(
     suspend inline operator fun invoke() = supabaseClient.functions.invoke(function = functionName, headers = headers)
 
 }
-
-class EdgeFunctionBuilder(var functionName: String = "", val headers: HeadersBuilder = HeadersBuilder(), private val supabaseClient: SupabaseClient) {
-
-    @OptIn(SupabaseInternal::class)
-    fun toEdgeFunction() = EdgeFunction(functionName, headers.build(), supabaseClient)
-
-}

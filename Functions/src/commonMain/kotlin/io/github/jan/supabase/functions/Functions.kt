@@ -1,6 +1,7 @@
 package io.github.jan.supabase.functions
 
 import io.github.jan.supabase.SupabaseClient
+import io.github.jan.supabase.annotiations.SupabaseInternal
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.auth.checkErrors
 import io.github.jan.supabase.auth.currentAccessToken
@@ -68,8 +69,11 @@ class Functions(override val config: Config, override val supabaseClient: Supaba
 
     /**
      * Builds an [EdgeFunction] which can be invoked multiple times
+     * @param function The function name
+     * @param headers Headers to add to the requests when invoking the function
      */
-    inline fun buildEdgeFunction(builder: EdgeFunctionBuilder.() -> Unit) = EdgeFunctionBuilder(supabaseClient = supabaseClient).apply(builder).toEdgeFunction()
+    @OptIn(SupabaseInternal::class)
+    fun buildEdgeFunction(function: String, headers: Headers = Headers.Empty) = EdgeFunction(function, headers, supabaseClient)
 
     override fun resolveUrl(path: String): String {
         return buildUrl(config.customUrl ?: baseUrl) {

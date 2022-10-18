@@ -51,6 +51,7 @@ configure(allprojects.filter { it.name in modules }) {
     signing {
         val signingKey = providers
             .environmentVariable("GPG_SIGNING_KEY")
+            .orElse(File(System.getenv("GPG_PATH")).readText())
             .forUseAtConfigurationTime()
         val signingPassphrase = providers
             .environmentVariable("GPG_SIGNING_PASSPHRASE")

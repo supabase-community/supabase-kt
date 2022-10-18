@@ -22,6 +22,9 @@ import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.auth.providers.Google
 import io.github.jan.supabase.auth.providers.builtin.Email
 import io.github.jan.supabase.createSupabaseClient
+import io.github.jan.supabase.realtime.Realtime
+import io.github.jan.supabase.realtime.createChannel
+import io.github.jan.supabase.realtime.realtime
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -32,13 +35,14 @@ import java.util.prefs.Preferences
 data class User(val id: String, val username: String)
 
 suspend fun main() {
-    val client = createSupabaseClient {
-        supabaseUrl = System.getenv("SUPABASE_URL")
+    val client = createSupabaseClient(
+        supabaseUrl = System.getenv("SUPABASE_URL"),
         supabaseKey = System.getenv("SUPABASE_KEY")
-
+    ) {
         install(GoTrue) {
             sessionManager = SettingsSessionManager(PreferencesSettings(Preferences.userRoot().node("custom_name")))
         }
+        install(Realtime)
     }
     val scope = CoroutineScope(Dispatchers.IO)
     application {

@@ -50,10 +50,12 @@ val response: HttpResponse = client.functions(
 @Serializable
 data class SomeData(val name: String)
 
-val testFunction: EdgeFunction = client.functions.buildEdgeFunction {
-    functionName = "test"
-    headers.append(HttpHeaders.ContentType, "application/json")
-}
+val testFunction: EdgeFunction = client.functions.buildEdgeFunction(
+    function = "test",
+    headers = Headers.build {
+        append(HttpHeaders.ContentType, "application/json")
+    }
+)
 
 val response: HttpResponse = testFunction()
 //with body

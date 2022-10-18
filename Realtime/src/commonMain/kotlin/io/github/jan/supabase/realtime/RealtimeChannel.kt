@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.buildJsonObject
@@ -242,9 +243,10 @@ fun RealtimeChannel.presenceChangeFlow(): Flow<PresenceAction> {
 /**
  * You can listen for postgres changes in a channel.
  * @param T The event type you want to listen to (e.g. [PostgresAction.Update] for updates or only [PostgresAction] for all)
+ * @param schema The schema name of the table that is being monitored. For normal supabase tables that might be "public".
  */
 @OptIn(SupabaseInternal::class)
-inline fun <reified T : PostgresAction> RealtimeChannel.postgresChangeFlow(filter: PostgresChangeFilter.() -> Unit): Flow<T> {
+inline fun <reified T : PostgresAction> RealtimeChannel.postgresChangeFlow(schema: String, filter: PostgresChangeFilter.() -> Unit): Flow<T> {
     if(status.value == RealtimeChannel.Status.JOINED) throw IllegalStateException("You cannot call postgresChangeFlow after joining the channel")
     val event = when(T::class) {
         PostgresAction.Insert::class -> "INSERT"
@@ -254,7 +256,7 @@ inline fun <reified T : PostgresAction> RealtimeChannel.postgresChangeFlow(filte
         PostgresAction::class -> "*"
         else -> throw IllegalStateException("Unknown event type ${T::class}")
     }
-    val postgrestBuilder = PostgresChangeFilter(event).apply(filter)
+    val postgrestBuilder = PostgresChangeFilter(event, schema).apply(filter)
     val config = postgrestBuilder.buildConfig()
     addPostgresChange(config)
     return callbackFlow {

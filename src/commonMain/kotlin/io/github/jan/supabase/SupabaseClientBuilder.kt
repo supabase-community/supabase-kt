@@ -13,10 +13,7 @@ import io.ktor.client.engine.HttpClientEngine
  * Use [createSupabaseClient] to create a new instance of [SupabaseClient].
  */
 @SupabaseDsl
-class SupabaseClientBuilder @PublishedApi internal constructor() {
-
-    lateinit var supabaseUrl: String
-    lateinit var supabaseKey: String
+class SupabaseClientBuilder @PublishedApi internal constructor(private val supabaseUrl: String, private val supabaseKey: String) {
     var useHTTPS = true
     var httpEngine: HttpClientEngine? = null
     private val httpConfigOverrides = mutableListOf<HttpClientConfig<*>.() -> Unit>()
@@ -24,8 +21,6 @@ class SupabaseClientBuilder @PublishedApi internal constructor() {
 
     @PublishedApi
     internal fun build(): SupabaseClient {
-        if(!::supabaseKey.isInitialized || supabaseKey.isBlank()) throw IllegalArgumentException("Supabase key is not set")
-        if(!::supabaseUrl.isInitialized || supabaseUrl.isBlank()) throw IllegalArgumentException("Supabase url is not set")
         return SupabaseClientImpl(supabaseUrl.split("//").last(), supabaseKey, plugins, httpConfigOverrides, useHTTPS, httpEngine)
     }
 
@@ -54,4 +49,4 @@ class SupabaseClientBuilder @PublishedApi internal constructor() {
 /**
  * Creates a new [SupabaseClient] instance using [builder]
  */
-inline fun createSupabaseClient(builder: SupabaseClientBuilder.() -> Unit) = SupabaseClientBuilder().apply(builder).build()
+inline fun createSupabaseClient(supabaseUrl: String, supabaseKey: String, builder: SupabaseClientBuilder.() -> Unit) = SupabaseClientBuilder(supabaseUrl, supabaseKey).apply(builder).build()

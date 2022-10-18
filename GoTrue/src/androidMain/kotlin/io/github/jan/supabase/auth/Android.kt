@@ -35,7 +35,7 @@ var GoTrue.Config.host: String
 //TODO: Add context receiver 'Activity'
 fun SupabaseClient.handleDeeplinks(intent: Intent, onSessionSuccess: (UserSession) -> Unit = {}) {
     val authPlugin = pluginManager.getPlugin<GoTrueImpl>("auth")
-    val data = intent?.data ?: return
+    val data = intent.data ?: return
     val scheme = data.scheme ?: return
     val host = data.host ?: return
     if(scheme != authPlugin.config.scheme || host != authPlugin.config.host) return
@@ -64,13 +64,13 @@ fun SupabaseClient.handleDeeplinks(intent: Intent, onSessionSuccess: (UserSessio
 }
 
 @OptIn(SupabaseInternal::class)
-@Deprecated("Use SupabaseClient.handleDeeplinks(intent) instead", ReplaceWith("supabaseClient.handleDeeplinks(intent)"), DeprecationLevel.ERROR)
+@Deprecated("initializeAndroid is no longer mandatory for android. If you want to handle deeplinks, use SupabaseClient.handleDeeplinks(intent) instead", ReplaceWith("supabaseClient.handleDeeplinks(intent)"), DeprecationLevel.ERROR)
 fun Activity.initializeAndroid(supabaseClient: SupabaseClient, onSessionSuccess: (UserSession) -> Unit = {}) {
     val authPlugin = supabaseClient.pluginManager.getPlugin<GoTrueImpl>("auth")
    // authPlugin.config.activity = this
    // addLifecycleCallbacks(authPlugin)
 
-    val data = intent?.data ?: return
+    val data = intent.data ?: return
     val scheme = data.scheme ?: return
     val host = data.host ?: return
     if(scheme != authPlugin.config.scheme || host != authPlugin.config.host) return

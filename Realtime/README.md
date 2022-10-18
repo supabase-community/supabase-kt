@@ -52,8 +52,7 @@ channel.join()
 <details><summary>Listening for database changes</summary>
 
 ```kotlin
-val changeFlow: Flow<PostgresAction.Insert> = channel.postgresChangeFlow<PostgresAction.Insert> {
-    schema = "public"
+val changeFlow: Flow<PostgresAction.Insert> = channel.postgresChangeFlow<PostgresAction.Insert>(schema = "public") {
     table = "test"
 }
 ```
