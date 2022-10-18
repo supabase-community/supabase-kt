@@ -41,21 +41,27 @@ class SupabaseClientTest {
 
     @Test
     fun testClientBuilderParametersWithHttpsUrl() {
-        val client = createMockedSupabaseClient {
-            supabaseUrl = "https://example.supabase.co"
+        val client = createMockedSupabaseClient(
+            supabaseUrl = "https://example.supabase.co",
             supabaseKey = "somekey"
+        ) {
+
         }
         assertEquals("example.supabase.co", client.supabaseUrl, "Supabase url should not contain https://")
         assertEquals("somekey", client.supabaseKey, "Supabase key should be set to somekey")
-        assertEquals("https://example.supabase.co", client.supabaseHttpUrl, "Supabase http url should be https://example.supabase.co")
+        assertEquals(
+            "https://example.supabase.co",
+            client.supabaseHttpUrl,
+            "Supabase http url should be https://example.supabase.co"
+        )
     }
 
     @Test
     fun testClientBuilderPlugins() {
-        val client = createMockedSupabaseClient {
-            supabaseUrl = "example.supabase.co"
+        val client = createMockedSupabaseClient(
+            supabaseUrl = "example.supabase.co",
             supabaseKey = "somekey"
-
+        ) {
             install(TestPlugin) {
                 testValue = true
             }
@@ -64,11 +70,19 @@ class SupabaseClientTest {
         //test if the plugin was correctly installed
         assertIs<TestPlugin>(plugin, "Plugin 'test' should be of type TestPlugin")
         //test if the plugin correctly modified the 'useHTTPS' parameter
-        assertEquals("https://example.supabase.co", client.supabaseHttpUrl, "Supabase http url should be https://example.supabase.co because the plugin modifies it")
+        assertEquals(
+            "https://example.supabase.co",
+            client.supabaseHttpUrl,
+            "Supabase http url should be https://example.supabase.co because the plugin modifies it"
+        )
     }
 
-    private fun createMockedSupabaseClient(init: SupabaseClientBuilder.() -> Unit): SupabaseClient {
-        return createSupabaseClient {
+    private fun createMockedSupabaseClient(
+        supabaseUrl: String,
+        supabaseKey: String,
+        init: SupabaseClientBuilder.() -> Unit
+    ): SupabaseClient {
+        return createSupabaseClient(supabaseUrl, supabaseKey) {
             httpEngine = mockEngine
             init()
         }
