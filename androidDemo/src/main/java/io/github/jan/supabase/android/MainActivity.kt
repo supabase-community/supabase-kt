@@ -25,6 +25,7 @@ import io.github.jan.supabase.gotrue.host
 import io.github.jan.supabase.gotrue.providers.Discord
 import io.github.jan.supabase.gotrue.providers.builtin.Email
 import io.github.jan.supabase.gotrue.scheme
+import io.github.jan.supabase.gotrue.gotrue
 import io.github.jan.supabase.createSupabaseClient
 import kotlinx.coroutines.launch
 
@@ -45,7 +46,7 @@ class MainActivity : AppCompatActivity() {
         supabaseClient.handleDeeplinks(intent)
         setContent {
             MaterialTheme {
-                val session by supabaseClient.auth.currentSession.collectAsState()
+                val session by supabaseClient.gotrue.currentSession.collectAsState()
                 val scope = rememberCoroutineScope()
                 if (session != null) {
                     Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
@@ -65,7 +66,7 @@ class MainActivity : AppCompatActivity() {
                             )
                             Button(onClick = {
                                 scope.launch {
-                                    supabaseClient.auth.loginWith(Email) {
+                                    supabaseClient.gotrue.loginWith(Email) {
                                         this.email = email
                                         this.password = password
                                     }
@@ -75,7 +76,7 @@ class MainActivity : AppCompatActivity() {
                             }
                             Button(onClick = {
                                 scope.launch {
-                                    supabaseClient.auth.loginWith(Discord)
+                                    supabaseClient.gotrue.loginWith(Discord)
                                 }
                             }, modifier = Modifier.align(Alignment.CenterHorizontally)) {
                                 Text("Login with Discord")
