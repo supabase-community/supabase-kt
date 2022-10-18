@@ -27,8 +27,8 @@ To create a client simply call the createSupabase top level function:
 
 ```kotlin
 val client = createSupabaseClient(
-    supabaseUrl = System.getenv("SUPABASE_URL"), //e.g. https://project.supabase.co
-    supabaseKey = System.getenv("SUPABASE_KEY")
+    supabaseUrl = "https://PROJECT_ID.supabase.co",
+    supabaseKey = "YOUR_KEY"
 ) {
     install(GoTrue)
     //install other plugins
