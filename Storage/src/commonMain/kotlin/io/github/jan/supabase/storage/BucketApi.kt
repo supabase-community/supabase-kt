@@ -1,6 +1,7 @@
 package io.github.jan.supabase.storage
 
 import io.github.jan.supabase.SupabaseClient
+import io.github.jan.supabase.gotrue.GoTrue
 import io.github.jan.supabase.gotrue.gotrue
 import io.github.jan.supabase.gotrue.currentAccessToken
 import io.github.jan.supabase.putJsonObject
@@ -218,6 +219,6 @@ internal class BucketApiImpl(override val bucketId: String, val storage: Storage
  */
 fun BucketApi.authenticatedRequest(path: String): Pair<String?, String> {
     val url = authenticatedUrl(path)
-    val token = supabaseClient.gotrue.currentAccessToken()
+    val token = supabaseClient.pluginManager.getPluginOrNull<GoTrue>(GoTrue.key)?.currentAccessToken()
     return token to url
 }

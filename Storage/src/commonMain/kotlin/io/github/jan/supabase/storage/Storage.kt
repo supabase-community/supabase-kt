@@ -3,6 +3,8 @@ package io.github.jan.supabase.storage
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.gotrue.gotrue
 import io.github.jan.supabase.exceptions.RestException
+import io.github.jan.supabase.gotrue.GoTrue
+import io.github.jan.supabase.gotrue.currentAccessToken
 import io.github.jan.supabase.plugins.MainConfig
 import io.github.jan.supabase.plugins.MainPlugin
 import io.github.jan.supabase.plugins.SupabasePluginProvider
@@ -121,7 +123,7 @@ internal class StorageImpl(override val supabaseClient: SupabaseClient, override
         if(json) contentType(ContentType.Application.Json)
         addAuthorization()
         body()
-    }.also { 
+    }.also {
         if(it.status.value == 400) {
             val error = it.body<JsonObject>()
             throw RestException(error["statusCode"]!!.jsonPrimitive.int, error["error"]!!.jsonPrimitive.content, error["message"]!!.jsonPrimitive.content)
@@ -129,7 +131,7 @@ internal class StorageImpl(override val supabaseClient: SupabaseClient, override
     }
 
     private fun HttpRequestBuilder.addAuthorization() {
-        supabaseClient.gotrue.currentSession.value?.accessToken?.let {
+        supabaseClient.pluginManager.getPluginOrNull<GoTrue>(GoTrue.key)?.currentAccessToken().let {
             headers {
                 append(HttpHeaders.Authorization, "Bearer $it")
             }

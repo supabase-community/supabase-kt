@@ -6,6 +6,7 @@ import io.github.jan.supabase.annotiations.SupabaseInternal
 import io.github.jan.supabase.gotrue.gotrue
 import io.github.jan.supabase.gotrue.currentAccessToken
 import io.github.jan.supabase.decodeIfNotEmptyOrDefault
+import io.github.jan.supabase.gotrue.GoTrue
 import io.github.jan.supabase.putJsonObject
 import io.github.jan.supabase.supabaseJson
 import io.ktor.client.plugins.websocket.sendSerialized
@@ -29,7 +30,8 @@ import kotlinx.serialization.json.put
 /**
  * Represents a realtime channel
  */
-sealed interface RealtimeChannel {
+sealed interface
+RealtimeChannel {
 
     val status: StateFlow<Status>
     val topic: String
@@ -119,7 +121,7 @@ internal class RealtimeChannelImpl(
         }
         _status.value = RealtimeChannel.Status.JOINING
         Napier.d { "Joining channel $topic" }
-        val currentJwt = realtimeImpl.supabaseClient.gotrue.currentAccessToken()
+        val currentJwt = realtimeImpl.supabaseClient.pluginManager.getPluginOrNull<GoTrue>(GoTrue.key)?.currentAccessToken()
         val postgrestChanges = clientChanges.toList()
         val joinConfig = RealtimeJoinPayload(RealtimeJoinConfig(broadcastJoinConfig, presenceJoinConfig, postgrestChanges))
         val joinConfigObject = buildJsonObject {

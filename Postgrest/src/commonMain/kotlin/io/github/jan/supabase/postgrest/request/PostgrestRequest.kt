@@ -3,6 +3,7 @@ package io.github.jan.supabase.postgrest.request
 import io.github.jan.supabase.gotrue.gotrue
 import io.github.jan.supabase.gotrue.currentAccessToken
 import io.github.jan.supabase.exceptions.RestException
+import io.github.jan.supabase.gotrue.GoTrue
 import io.github.jan.supabase.postgrest.Postgrest
 import io.github.jan.supabase.postgrest.query.Count
 import io.github.jan.supabase.postgrest.query.PostgrestBuilder
@@ -31,7 +32,7 @@ sealed interface PostgrestRequest {
         return postgrest.supabaseClient.httpClient.request(postgrest.resolveUrl(path)) {
             method = this@PostgrestRequest.method
             contentType(ContentType.Application.Json)
-            postgrest.supabaseClient.gotrue.currentAccessToken()?.let {
+            postgrest.supabaseClient.pluginManager.getPluginOrNull<GoTrue>(GoTrue.key)?.currentAccessToken()?.let {
                 headers[HttpHeaders.Authorization] = "Bearer $it"
             }
             headers[PostgrestBuilder.HEADER_PREFER] = prefer.joinToString(",")

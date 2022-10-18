@@ -6,6 +6,7 @@ import io.github.jan.supabase.gotrue.gotrue
 import io.github.jan.supabase.gotrue.checkErrors
 import io.github.jan.supabase.gotrue.currentAccessToken
 import io.github.jan.supabase.buildUrl
+import io.github.jan.supabase.gotrue.GoTrue
 import io.github.jan.supabase.plugins.MainConfig
 import io.github.jan.supabase.plugins.MainPlugin
 import io.github.jan.supabase.plugins.SupabasePluginProvider
@@ -37,7 +38,7 @@ class Functions(override val config: Config, override val supabaseClient: Supaba
      */
     suspend inline operator fun invoke(function: String, builder: HttpRequestBuilder.() -> Unit): HttpResponse {
         return supabaseClient.httpClient.post(resolveUrl(function)) {
-            supabaseClient.gotrue.currentAccessToken()?.let {
+            supabaseClient.pluginManager.getPluginOrNull<GoTrue>(GoTrue.key)?.currentAccessToken()?.let {
                 this.headers[HttpHeaders.Authorization] = "Bearer $it"
             }
             builder()
