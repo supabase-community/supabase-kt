@@ -9,7 +9,7 @@
                 tools:node="merge"
         >
             <meta-data
-                    android:name="io.github.jan.supabase.auth.SupabaseInitializer"
+                    android:name="io.github.jan.supabase.gotrue.SupabaseInitializer"
                     android:value="androidx.startup"
             />
         </provider>

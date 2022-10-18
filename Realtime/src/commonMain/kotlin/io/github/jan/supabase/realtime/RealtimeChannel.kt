@@ -3,8 +3,8 @@ package io.github.jan.supabase.realtime
 import io.github.aakira.napier.Napier
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.annotiations.SupabaseInternal
-import io.github.jan.supabase.auth.auth
-import io.github.jan.supabase.auth.currentAccessToken
+import io.github.jan.supabase.gotrue.gotrue
+import io.github.jan.supabase.gotrue.currentAccessToken
 import io.github.jan.supabase.decodeIfNotEmptyOrDefault
 import io.github.jan.supabase.putJsonObject
 import io.github.jan.supabase.supabaseJson
@@ -15,7 +15,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.callbackFlow
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.buildJsonObject
@@ -120,7 +119,7 @@ internal class RealtimeChannelImpl(
         }
         _status.value = RealtimeChannel.Status.JOINING
         Napier.d { "Joining channel $topic" }
-        val currentJwt = realtimeImpl.supabaseClient.auth.currentAccessToken()
+        val currentJwt = realtimeImpl.supabaseClient.gotrue.currentAccessToken()
         val postgrestChanges = clientChanges.toList()
         val joinConfig = RealtimeJoinPayload(RealtimeJoinConfig(broadcastJoinConfig, presenceJoinConfig, postgrestChanges))
         val joinConfigObject = buildJsonObject {

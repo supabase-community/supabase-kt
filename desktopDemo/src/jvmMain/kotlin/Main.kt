@@ -16,15 +16,13 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import com.russhwolf.settings.PreferencesSettings
-import io.github.jan.supabase.auth.GoTrue
-import io.github.jan.supabase.auth.SettingsSessionManager
-import io.github.jan.supabase.auth.auth
-import io.github.jan.supabase.auth.providers.Google
-import io.github.jan.supabase.auth.providers.builtin.Email
+import io.github.jan.supabase.gotrue.GoTrue
+import io.github.jan.supabase.gotrue.SettingsSessionManager
+import io.github.jan.supabase.gotrue.gotrue
+import io.github.jan.supabase.gotrue.providers.Google
+import io.github.jan.supabase.gotrue.providers.builtin.Email
 import io.github.jan.supabase.createSupabaseClient
 import io.github.jan.supabase.realtime.Realtime
-import io.github.jan.supabase.realtime.createChannel
-import io.github.jan.supabase.realtime.realtime
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -47,7 +45,7 @@ suspend fun main() {
     val scope = CoroutineScope(Dispatchers.IO)
     application {
         Window(::exitApplication) {
-            val session by client.auth.currentSession.collectAsState()
+            val session by client.gotrue.currentSession.collectAsState()
             //val status by client.realtime.status.collectAsState()
             println(session?.accessToken)
             if (session != null) {
@@ -68,7 +66,7 @@ suspend fun main() {
                         )
                         Button(onClick = {
                             scope.launch {
-                                client.auth.loginWith(Email) {
+                                client.gotrue.loginWith(Email) {
                                     this.email = email
                                     this.password = password
                                 }
@@ -78,7 +76,7 @@ suspend fun main() {
                         }
                         Button(onClick = {
                             scope.launch {
-                                client.auth.loginWith(Google)
+                                client.gotrue.loginWith(Google)
                             }
                         }, modifier = Modifier.align(Alignment.CenterHorizontally)) {
                             Text("Login with Discord")

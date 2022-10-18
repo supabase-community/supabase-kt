@@ -19,13 +19,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.PasswordVisualTransformation
-import io.github.jan.supabase.auth.GoTrue
-import io.github.jan.supabase.auth.auth
-import io.github.jan.supabase.auth.handleDeeplinks
-import io.github.jan.supabase.auth.host
-import io.github.jan.supabase.auth.providers.Discord
-import io.github.jan.supabase.auth.providers.builtin.Email
-import io.github.jan.supabase.auth.scheme
+import io.github.jan.supabase.gotrue.GoTrue
+import io.github.jan.supabase.gotrue.handleDeeplinks
+import io.github.jan.supabase.gotrue.host
+import io.github.jan.supabase.gotrue.providers.Discord
+import io.github.jan.supabase.gotrue.providers.builtin.Email
+import io.github.jan.supabase.gotrue.scheme
 import io.github.jan.supabase.createSupabaseClient
 import kotlinx.coroutines.launch
 

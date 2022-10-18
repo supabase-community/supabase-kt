@@ -1,13 +1,11 @@
 package io.github.jan.supabase.storage
 
 import io.github.jan.supabase.SupabaseClient
-import io.github.jan.supabase.auth.auth
-import io.github.jan.supabase.auth.currentAccessToken
+import io.github.jan.supabase.gotrue.gotrue
+import io.github.jan.supabase.gotrue.currentAccessToken
 import io.github.jan.supabase.putJsonObject
 import io.ktor.client.call.body
-import io.ktor.client.request.HttpRequestBuilder
 import io.ktor.client.request.setBody
-import io.ktor.client.statement.HttpResponse
 import io.ktor.http.HttpMethod
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.add
@@ -220,6 +218,6 @@ internal class BucketApiImpl(override val bucketId: String, val storage: Storage
  */
 fun BucketApi.authenticatedRequest(path: String): Pair<String?, String> {
     val url = authenticatedUrl(path)
-    val token = supabaseClient.auth.currentAccessToken()
+    val token = supabaseClient.gotrue.currentAccessToken()
     return token to url
 }

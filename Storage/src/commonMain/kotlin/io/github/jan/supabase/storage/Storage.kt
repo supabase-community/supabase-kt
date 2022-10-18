@@ -1,7 +1,7 @@
 package io.github.jan.supabase.storage
 
 import io.github.jan.supabase.SupabaseClient
-import io.github.jan.supabase.auth.auth
+import io.github.jan.supabase.gotrue.gotrue
 import io.github.jan.supabase.exceptions.RestException
 import io.github.jan.supabase.plugins.MainConfig
 import io.github.jan.supabase.plugins.MainPlugin
@@ -129,7 +129,7 @@ internal class StorageImpl(override val supabaseClient: SupabaseClient, override
     }
 
     private fun HttpRequestBuilder.addAuthorization() {
-        supabaseClient.auth.currentSession.value?.accessToken?.let {
+        supabaseClient.gotrue.currentSession.value?.accessToken?.let {
             headers {
                 append(HttpHeaders.Authorization, "Bearer $it")
             }
