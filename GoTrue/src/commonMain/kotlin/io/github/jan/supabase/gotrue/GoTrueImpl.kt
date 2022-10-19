@@ -47,7 +47,7 @@ internal class GoTrueImpl(override val supabaseClient: SupabaseClient, override 
     private val _currentSession = MutableStateFlow<UserSession?>(null)
     override val currentSession: StateFlow<UserSession?> = _currentSession.asStateFlow()
     private val authScope = CoroutineScope(config.coroutineDispatcher)
-    override val sessionManager = config.sessionManager
+    override val sessionManager = config.sessionManager ?: SettingsSessionManager()
     override val admin: AdminApi = AdminApiImpl(this)
     val _status = MutableStateFlow(GoTrue.Status.NOT_AUTHENTICATED)
     override val status = _status.asStateFlow()
@@ -223,7 +223,6 @@ internal class GoTrueImpl(override val supabaseClient: SupabaseClient, override 
                 "(Re)starting session job"
             }
             try {
-                println(session.refreshToken)
                 refreshSession(session.refreshToken)
             } catch(e: RestException) {
                 invalidateSession()

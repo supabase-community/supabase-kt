@@ -40,7 +40,7 @@ class GoTrueMock {
         }
     }
 
-    private fun MockRequestHandleScope.handleUserRequest(request: HttpRequestData):  HttpResponseData {
+    private fun MockRequestHandleScope.handleUserRequest(request: HttpRequestData): HttpResponseData {
         if(!request.headers.contains(HttpHeaders.Authorization)) return respondUnauthorized()
         if(request.method != HttpMethod.Get) return respondBadRequest("Invalid method")
         val authorizationHeader = request.headers[HttpHeaders.Authorization]!!

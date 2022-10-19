@@ -177,6 +177,8 @@ class GoTrueTest {
                 alwaysAutoRefresh = false
                 coroutineDispatcher = dispatcher
 
+                sessionManager = SettingsSessionManager(MapSettings())
+
                 additionalGoTrueSettings()
             }
         }
