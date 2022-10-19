@@ -65,3 +65,39 @@ object WorkOS : OAuthProvider() {
     override fun provider() = "workos"
 
 }
+
+object Zoom : OAuthProvider() {
+
+    override fun provider() = "zoom"
+
+}
+
+object Bitbucket : OAuthProvider() {
+
+    override fun provider() = "bitbucket"
+
+}
+
+object Azure : OAuthProvider() {
+
+    override fun provider() = "azure"
+
+}
+
+object Apple : OAuthProvider() {
+
+    override fun provider() = "apple"
+
+}
+
+object Spotify : OAuthProvider() {
+
+    override fun provider() = "spotify"
+
+}
+
+operator fun OAuthProvider.Companion.invoke(provider: String) = object : OAuthProvider() {
+
+    override fun provider() = provider
+
+}

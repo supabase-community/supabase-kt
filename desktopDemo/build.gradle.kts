@@ -29,7 +29,7 @@ kotlin {
     sourceSets {
         val jvmMain by getting {
             dependencies {
-                implementation(project(":gotrue-kt"))
+             //   api(project(":gotrue-kt"))
                 api(project(":realtime-kt"))
                 implementation("com.russhwolf:multiplatform-settings:${Versions.SETTINGS}")
                 implementation(compose.runtime)

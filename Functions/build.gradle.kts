@@ -45,7 +45,7 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 api(project(":"))
-                implementation(project(":gotrue-kt"))
+                api(project(":gotrue-kt"))
                 // https://mvnrepository.com/artifact/io.ktor/ktor-server-core
             }
         }

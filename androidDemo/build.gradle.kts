@@ -17,7 +17,7 @@ repositories {
     }
 }
 dependencies {
-    implementation(project(":gotrue-kt"))
+    api(project(":gotrue-kt"))
     //api(project(":Supacompose"))
     implementation(compose.runtime)
     implementation(compose.ui)

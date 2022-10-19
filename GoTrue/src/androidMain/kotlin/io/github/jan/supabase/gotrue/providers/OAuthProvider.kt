@@ -31,5 +31,7 @@ actual abstract class OAuthProvider : AuthProvider<ExternalAuthConfig, Unit> {
         auth.openOAuth(provider())
     }
 
+    actual companion object
+
 
 }

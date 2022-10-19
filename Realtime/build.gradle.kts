@@ -44,7 +44,7 @@ kotlin {
         }
         val commonMain by getting {
             dependencies {
-                implementation(project(":gotrue-kt"))
+                api(project(":gotrue-kt"))
                 api("io.ktor:ktor-client-websockets:${Versions.KTOR}")
             }
         }

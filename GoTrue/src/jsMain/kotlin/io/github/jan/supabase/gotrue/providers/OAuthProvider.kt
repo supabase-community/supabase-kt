@@ -32,6 +32,8 @@ actual abstract class OAuthProvider actual constructor() : AuthProvider<External
         window.location.href = supabaseClient.supabaseHttpUrl + "/auth/v1/auth/v1/authorize?provider=${provider()}&redirect_to=${authConfig.redirectUrl}"
     }
 
+    actual companion object
+
 }
 
 var ExternalAuthConfig.redirectUrl: String

@@ -24,7 +24,7 @@ kotlin {
     sourceSets {
         val jsMain by getting {
             dependencies {
-                implementation(project(":gotrue-kt"))
+                api(project(":gotrue-kt"))
                 api(compose.web.core)
                 api(compose.runtime)
             }

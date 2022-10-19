@@ -145,6 +145,8 @@ actual abstract class OAuthProvider : AuthProvider<ExternalAuthConfig, Unit> {
         }
     }
 
+    actual companion object
+
 }
 
 var ExternalAuthConfig.httpPort: Int

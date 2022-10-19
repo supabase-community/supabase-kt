@@ -21,6 +21,8 @@ expect abstract class OAuthProvider() : AuthProvider<ExternalAuthConfig, Unit> {
         config: (ExternalAuthConfig.() -> Unit)?
     )
 
+    companion object
+
 }
 
 
