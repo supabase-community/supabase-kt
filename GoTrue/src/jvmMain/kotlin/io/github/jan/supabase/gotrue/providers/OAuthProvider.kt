@@ -52,7 +52,10 @@ actual abstract class OAuthProvider : AuthProvider<ExternalAuthConfig, Unit> {
 
     private suspend fun createServer(config: ExternalAuthConfig, supabaseClient: SupabaseClient, redirectUrl: String?, onSuccess: suspend (UserSession) -> Unit, onFail: (AuthFail) -> Unit) {
         if(redirectUrl != null) {
-            Desktop.getDesktop().browse(URI(supabaseClient.supabaseHttpUrl + "/auth/v1/authorize?provider=${provider()}&redirect_to=$redirectUrl"))
+            withContext(Dispatchers.IO) {
+                Desktop.getDesktop()
+                    .browse(URI(supabaseClient.supabaseHttpUrl + "/auth/v1/authorize?provider=${provider()}&redirect_to=$redirectUrl"))
+            }
             return
         }
         coroutineScope {

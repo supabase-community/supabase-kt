@@ -171,7 +171,7 @@ sealed interface GoTrue : MainPlugin<GoTrue.Config> {
 
     companion object : SupabasePluginProvider<Config, GoTrue> {
 
-        override val key = "gotrue"
+        override val key = "auth"
         const val API_VERSION = 1
 
         override fun createConfig(init: Config.() -> Unit) = Config().apply(init)

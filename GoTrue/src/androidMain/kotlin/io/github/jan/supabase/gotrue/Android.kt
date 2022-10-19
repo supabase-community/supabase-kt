@@ -63,7 +63,6 @@ fun SupabaseClient.handleDeeplinks(intent: Intent, onSessionSuccess: (UserSessio
     }
 }
 
-@OptIn(SupabaseInternal::class)
 @Deprecated("initializeAndroid is no longer mandatory for android. If you want to handle deeplinks, use SupabaseClient.handleDeeplinks(intent) instead", ReplaceWith("supabaseClient.handleDeeplinks(intent)"), DeprecationLevel.ERROR)
 fun Activity.initializeAndroid(supabaseClient: SupabaseClient, onSessionSuccess: (UserSession) -> Unit = {}) {
     val authPlugin = supabaseClient.pluginManager.getPlugin<GoTrueImpl>("auth")

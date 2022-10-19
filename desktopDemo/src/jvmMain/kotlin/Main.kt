@@ -16,6 +16,8 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import com.russhwolf.settings.PreferencesSettings
+import io.github.aakira.napier.DebugAntilog
+import io.github.aakira.napier.Napier
 import io.github.jan.supabase.gotrue.GoTrue
 import io.github.jan.supabase.gotrue.SettingsSessionManager
 import io.github.jan.supabase.gotrue.gotrue
@@ -33,6 +35,7 @@ import java.util.prefs.Preferences
 data class User(val id: String, val username: String)
 
 suspend fun main() {
+    Napier.base(DebugAntilog())
     val client = createSupabaseClient(
         supabaseUrl = System.getenv("SUPABASE_URL"),
         supabaseKey = System.getenv("SUPABASE_KEY")

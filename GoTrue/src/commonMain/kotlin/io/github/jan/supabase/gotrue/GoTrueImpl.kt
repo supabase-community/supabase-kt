@@ -182,6 +182,7 @@ internal class GoTrueImpl(override val supabaseClient: SupabaseClient, override 
         return try {
             response.body()
         } catch(e: NoTransformationFoundException) {
+            Napier.e(e) { "Failed to get user" }
             throw UnauthorizedException("Invalid JWT")
         }
     }
