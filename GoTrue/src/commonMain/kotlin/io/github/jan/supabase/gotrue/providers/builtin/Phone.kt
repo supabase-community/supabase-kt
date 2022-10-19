@@ -18,7 +18,7 @@ object Phone : DefaultAuthProvider<Phone.Config, Phone.Result> {
     @Serializable
     data class Result(
         val id: String,
-        val email: String,
+        val phone: String,
         @SerialName("confirmation_sent_at") val confirmationSentAt: Instant,
         @SerialName("created_at") val createdAt: Instant,
         @SerialName("updated_at") val updatedAt: Instant,

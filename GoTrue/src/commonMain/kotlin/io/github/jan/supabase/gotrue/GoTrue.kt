@@ -14,6 +14,8 @@ import io.github.jan.supabase.exceptions.RestException
 import io.github.jan.supabase.plugins.MainConfig
 import io.github.jan.supabase.plugins.MainPlugin
 import io.github.jan.supabase.plugins.SupabasePluginProvider
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
@@ -150,7 +152,15 @@ sealed interface GoTrue : MainPlugin<GoTrue.Config> {
      */
     suspend fun loadFromStorage(autoRefresh: Boolean = config.alwaysAutoRefresh): Boolean
 
-    data class Config(val params: MutableMap<String, Any> = mutableMapOf(), var retryDelay: Duration = 10.seconds, var alwaysAutoRefresh: Boolean = true, var autoLoadFromStorage: Boolean = true, override var customUrl: String? = null, var sessionManager: SessionManager = SettingsSessionManager()): MainConfig
+    data class Config(
+        val params: MutableMap<String, Any> = mutableMapOf(),
+        var retryDelay: Duration = 10.seconds,
+        var alwaysAutoRefresh: Boolean = true,
+        var autoLoadFromStorage: Boolean = true,
+        override var customUrl: String? = null,
+        var sessionManager: SessionManager = SettingsSessionManager(),
+        var coroutineDispatcher: CoroutineDispatcher = Dispatchers.Default
+    ) : MainConfig
 
     enum class Status {
         LOADING_FROM_STORAGE,

@@ -9,9 +9,11 @@ package io.github.jan.supabase.gotrue
  import io.github.jan.supabase.gotrue.user.UserInfo
  import io.github.jan.supabase.gotrue.user.UserSession
  import io.github.jan.supabase.exceptions.RestException
+ import io.github.jan.supabase.exceptions.UnauthorizedException
  import io.github.jan.supabase.putJsonObject
  import io.github.jan.supabase.supabaseJson
  import io.github.jan.supabase.toJsonObject
+ import io.ktor.client.call.NoTransformationFoundException
  import io.ktor.client.call.body
  import io.ktor.client.request.HttpRequestBuilder
  import io.ktor.client.request.get
@@ -20,6 +22,7 @@ package io.github.jan.supabase.gotrue
  import io.ktor.client.request.post
  import io.ktor.client.request.put
  import io.ktor.client.request.setBody
+ import io.ktor.client.statement.bodyAsText
  import io.ktor.http.HttpHeaders
  import kotlinx.coroutines.CoroutineScope
  import kotlinx.coroutines.Dispatchers
@@ -43,7 +46,7 @@ internal class GoTrueImpl(override val supabaseClient: SupabaseClient, override 
 
     private val _currentSession = MutableStateFlow<UserSession?>(null)
     override val currentSession: StateFlow<UserSession?> = _currentSession.asStateFlow()
-    private val authScope = CoroutineScope(Dispatchers.Default + Job())
+    private val authScope = CoroutineScope(config.coroutineDispatcher)
     override val sessionManager = config.sessionManager
     override val admin: AdminApi = AdminApiImpl(this)
     val _status = MutableStateFlow(GoTrue.Status.NOT_AUTHENTICATED)
@@ -54,19 +57,20 @@ internal class GoTrueImpl(override val supabaseClient: SupabaseClient, override 
 
     init {
         setupPlatform()
-        authScope.launch {
-            Napier.d {
-                "Trying to load latest session"
-            }
+        if(config.autoLoadFromStorage) {
             _status.value = GoTrue.Status.LOADING_FROM_STORAGE
-            val session = sessionManager.loadSession()
-            if (session != null) {
+            authScope.launch {
                 Napier.d {
-                    "Successfully loaded session from storage"
+                    "Trying to load latest session"
                 }
-                startJob(session)
-            } else {
-                _status.value = GoTrue.Status.NOT_AUTHENTICATED
+                val successful = loadFromStorage()
+                if (successful) {
+                    Napier.d {
+                        "Successfully loaded session from storage"
+                    }
+                } else {
+                    _status.value = GoTrue.Status.NOT_AUTHENTICATED
+                }
             }
         }
     }
@@ -175,7 +179,11 @@ internal class GoTrueImpl(override val supabaseClient: SupabaseClient, override 
         val response = supabaseClient.httpClient.get(resolveUrl("user")) {
             header(HttpHeaders.Authorization, "Bearer $jwt")
         }
-        return response.body()
+        return try {
+            response.body()
+        } catch(e: NoTransformationFoundException) {
+            throw UnauthorizedException("Invalid JWT")
+        }
     }
 
     override suspend fun invalidateSession() {
@@ -197,7 +205,7 @@ internal class GoTrueImpl(override val supabaseClient: SupabaseClient, override 
         val response = supabaseClient.httpClient.post(resolveUrl("token?grant_type=refresh_token")) {
             setBody(body)
         }
-        if(response.status.value !in 200..299) throw RestException(401, "Unauthorized", "Refresh token is invalid")
+        if(response.status.value !in 200..299) throw RestException(response.status.value, "Unauthorized", response.bodyAsText())
         val newSession =  response.body<UserSession>()
         startJob(newSession)
     }
@@ -215,6 +223,7 @@ internal class GoTrueImpl(override val supabaseClient: SupabaseClient, override 
                 "(Re)starting session job"
             }
             try {
+                println(session.refreshToken)
                 refreshSession(session.refreshToken)
             } catch(e: RestException) {
                 invalidateSession()
