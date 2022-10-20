@@ -12,7 +12,7 @@ dependencies {
 }
 ```
 
-Install plugin in main supabase client. See [supabase-kt](https://github.com/supabase-community/supabase-kt) for more information
+Install plugin in main supabase client. See [Getting started](https://github.com/supabase-community/supabase-kt/wiki/Getting-Started) for more information
 ```kotlin
 val client = createSupabaseClient {
     
