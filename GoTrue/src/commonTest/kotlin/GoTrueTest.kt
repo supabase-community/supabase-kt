@@ -10,9 +10,11 @@ import io.github.jan.supabase.exceptions.UnauthorizedException
 import io.github.jan.supabase.gotrue.GoTrue
 import io.github.jan.supabase.gotrue.GoTrueImpl
 import io.github.jan.supabase.gotrue.SettingsSessionManager
+import io.github.jan.supabase.gotrue.VerifyType
 import io.github.jan.supabase.gotrue.currentAccessToken
 import io.github.jan.supabase.gotrue.gotrue
 import io.github.jan.supabase.gotrue.providers.builtin.Email
+import io.github.jan.supabase.gotrue.providers.builtin.Phone
 import io.github.jan.supabase.gotrue.user.UserInfo
 import io.github.jan.supabase.gotrue.user.UserSession
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -161,6 +163,71 @@ class GoTrueTest {
         runTest(dispatcher) {
             val user = client.gotrue.getUser(GoTrueMock.VALID_ACCESS_TOKEN)
             assertEquals("userid", user.id)
+            client.close()
+        }
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun test_verifying_with_wrong_token() {
+        val client = createSupabaseClient()
+        runTest(dispatcher) {
+            assertFailsWith<RestException>("verifying with a wrong token should fail") {
+                client.gotrue.verify(VerifyType.INVITE, "wrong_token")
+            }
+            client.close()
+        }
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun test_verifying_with_valid_token() {
+        val client = createSupabaseClient()
+        runTest(dispatcher) {
+            client.gotrue.verify(VerifyType.INVITE, GoTrueMock.VALID_VERIFY_TOKEN)
+            assertEquals(GoTrueMock.NEW_ACCESS_TOKEN, client.gotrue.currentAccessToken(), "verify with valid token should update the user session")
+        }
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun test_custom_url() {
+        val client = createSupabaseClient {
+            customUrl = "https://custom.auth.com"
+        }
+        runTest(dispatcher) {
+            assertEquals("https://custom.auth.com/signup", client.gotrue.resolveUrl("signup"))
+            client.close()
+        }
+    }
+
+    @Test
+    fun test_otp_email() {
+        val client = createSupabaseClient()
+        runTest(dispatcher) {
+            client.gotrue.sendOtpTo(Email) {
+                email = "example@email.com"
+            }
+            client.close()
+        }
+    }
+
+    @Test
+    fun test_otp_phone() {
+        val client = createSupabaseClient()
+        runTest(dispatcher) {
+            client.gotrue.sendOtpTo(Phone) {
+                phoneNumber = "12345678"
+            }
+            client.close()
+        }
+    }
+
+    @Test
+    fun test_recovery() {
+        val client = createSupabaseClient()
+        runTest(dispatcher) {
+            client.gotrue.sendRecoveryEmail("example@email.com")
             client.close()
         }
     }

@@ -138,7 +138,7 @@ internal class GoTrueImpl(override val supabaseClient: SupabaseClient, override 
         } ?: ""
         supabaseClient.httpClient.post(resolveUrl("otp$redirect")) {
             setBody(body)
-        }
+        }.checkErrors()
     }
 
     override suspend fun sendRecoveryEmail(email: String, redirectUrl: String?) {
@@ -169,9 +169,23 @@ internal class GoTrueImpl(override val supabaseClient: SupabaseClient, override 
         """.trimIndent()
         val response = supabaseClient.httpClient.post(resolveUrl("verify")) {
             setBody(body)
-            addAuthorization()
         }
-        val session =  response.body<UserSession>()
+        val session =  response.checkErrors().body<UserSession>()
+        startJob(session)
+    }
+
+    override suspend fun verifyPhone(token: String, phoneNumber: String) {
+        val body = """
+            {
+              "type": "sms",
+              "token": "$token",
+              "phone": "$phoneNumber"
+            }
+        """.trimIndent()
+        val response = supabaseClient.httpClient.post(resolveUrl("verify")) {
+            setBody(body)
+        }
+        val session = response.checkErrors().body<UserSession>()
         startJob(session)
     }
 

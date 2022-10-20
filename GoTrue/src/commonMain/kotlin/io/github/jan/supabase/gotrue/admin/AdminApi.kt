@@ -139,7 +139,7 @@ internal class AdminApiImpl(val auth: GoTrue) : AdminApi {
         header(HttpHeaders.Authorization, "Bearer ${auth.currentAccessToken() ?: tokenException()}")
     }
 
-    private fun tokenException(): Nothing = throw IllegalStateException("You need the service role access token to use admin methods. Use Auth#importAuthToken to import it. Never share it publicly")
+    private fun tokenException(): Nothing = throw IllegalStateException("You need the service role access token to use admin methods. Use GoTrue#importAuthToken to import it. Never share it publicly")
 
 }
 

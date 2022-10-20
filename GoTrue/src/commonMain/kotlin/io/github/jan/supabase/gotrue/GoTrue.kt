@@ -126,6 +126,13 @@ sealed interface GoTrue : MainPlugin<GoTrue.Config> {
     suspend fun verify(type: VerifyType, token: String)
 
     /**
+     * Verifies a phone/sms otp
+     * @param token The otp to verify
+     * @param phoneNumber The phone number the token was sent to
+     */
+    suspend fun verifyPhone(token: String, phoneNumber: String)
+
+    /**
      * Retrieves the current user with the session
      */
     suspend fun getUser(jwt: String): UserInfo

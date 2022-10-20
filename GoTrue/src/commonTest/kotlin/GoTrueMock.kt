@@ -6,6 +6,7 @@ import io.github.jan.supabase.gotrue.user.UserSession
 import io.ktor.client.engine.mock.MockEngine
 import io.ktor.client.engine.mock.MockRequestHandleScope
 import io.ktor.client.engine.mock.respond
+import io.ktor.client.engine.mock.respondOk
 import io.ktor.client.engine.mock.toByteArray
 import io.ktor.client.request.HttpRequestData
 import io.ktor.client.request.HttpResponseData
@@ -36,18 +37,70 @@ class GoTrueMock {
             urlWithoutQuery.endsWith("token") -> handleLogin(request)
             urlWithoutQuery.endsWith("signup") -> handleSignUp(request)
             urlWithoutQuery.endsWith("user") -> handleUserRequest(request)
+            urlWithoutQuery.endsWith("verify") -> handleVerify(request)
+            urlWithoutQuery.endsWith("otp") -> handleOtp(request)
+            urlWithoutQuery.endsWith("recover") -> handleRecovery(request)
             else -> null
         }
     }
 
-    private fun MockRequestHandleScope.handleUserRequest(request: HttpRequestData): HttpResponseData {
+    private suspend fun MockRequestHandleScope.handleRecovery(request: HttpRequestData): HttpResponseData {
+        if(request.method != HttpMethod.Post) respondBadRequest("Invalid method")
+        val body = try {
+            request.decodeJsonObject()
+        } catch(e: Exception) {
+            return respondBadRequest("Invalid body")
+        }
+        if(!body.containsKey("email")) return respondBadRequest("Email missing")
+        return respondOk()
+    }
+
+    private suspend fun MockRequestHandleScope.handleOtp(request: HttpRequestData): HttpResponseData {
+        if(request.method != HttpMethod.Post) respondBadRequest("Invalid method")
+        val body = try {
+            request.decodeJsonObject()
+        } catch(e: Exception) {
+            return respondBadRequest("Invalid body")
+        }
+        if(!body.containsKey("create_user")) return respondBadRequest("create_user missing")
+        if(!body.containsKey("phone") && !body.containsKey("email")) return respondBadRequest("email or phone missing")
+        return respondOk("{}")
+    }
+
+    private suspend fun MockRequestHandleScope.handleVerify(request: HttpRequestData): HttpResponseData {
+        if(request.method != HttpMethod.Post) return respondBadRequest("Invalid method")
+        val body = try {
+            request.decodeJsonObject()
+        } catch(e: Exception) {
+            return respondBadRequest("Invalid body")
+        }
+        if(!body.containsKey("token")) return respondBadRequest("token missing")
+        if(!body.containsKey("type")) return respondBadRequest("type missing")
+        val token = body["token"]!!.jsonPrimitive.content
+        if(token != VALID_VERIFY_TOKEN) return respondBadRequest("Failed to verify user")
+        return when(body["type"]!!.jsonPrimitive.content) {
+            in listOf("invite", "signup", "recovery") -> respondValidSession()
+            "sms" -> {
+                body["phone"]?.jsonPrimitive?.contentOrNull ?: return respondBadRequest("Missing parameter: phone_number")
+                respondValidSession()
+            }
+            else -> respondBadRequest("Invalid type")
+        }
+    }
+
+    private suspend fun MockRequestHandleScope.handleUserRequest(request: HttpRequestData): HttpResponseData {
         if(!request.headers.contains(HttpHeaders.Authorization)) return respondUnauthorized()
-        if(request.method != HttpMethod.Get) return respondBadRequest("Invalid method")
         val authorizationHeader = request.headers[HttpHeaders.Authorization]!!
         if(!authorizationHeader.startsWith("Bearer ")) return respondUnauthorized()
         val token = authorizationHeader.substringAfter("Bearer ")
         if(token != VALID_ACCESS_TOKEN) return respondUnauthorized()
-        return respond(UserInfo(AppMetadata("", listOf()), "", id = "userid"))
+        return when(request.method) {
+            HttpMethod.Get -> respond(UserInfo(AppMetadata("", listOf()), "", id = "userid"))
+            HttpMethod.Put -> {
+                respond(UserInfo(AppMetadata("", listOf()), "", id = "userid", email = "old_email@email.com", emailChangeSentAt = Clock.System.now()))
+            }
+            else -> return respondBadRequest("Invalid method")
+        }
     }
 
     private suspend fun MockRequestHandleScope.handleSignUp(request: HttpRequestData): HttpResponseData {
@@ -140,6 +193,7 @@ class GoTrueMock {
         const val VALID_REFRESH_TOKEN = "valid_refresh_token"
         const val NEW_ACCESS_TOKEN = "new_access_token"
         const val VALID_ACCESS_TOKEN = "valid_access_token"
+        const val VALID_VERIFY_TOKEN = "valid_verify_token"
     }
 
 
