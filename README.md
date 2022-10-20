@@ -21,23 +21,7 @@ dependencies {
 }
 ```
 
-# Creating a client
-
-To create a client simply call the createSupabase top level function:
-
-```kotlin
-val client = createSupabaseClient(
-    supabaseUrl = "https://PROJECT_ID.supabase.co",
-    supabaseKey = "YOUR_KEY"
-) {
-    install(GoTrue)
-    //install other plugins
-    install(Postgrest)
-    install(Storage)
-}
-```
-
-### For more information see [Getting started](https://github.com/supabase-community/supabase-kt/wiki/Getting-Started)
+# [Getting started](https://github.com/supabase-community/supabase-kt/wiki/Getting-Started)
 
 # Features
 

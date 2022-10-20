@@ -27,16 +27,16 @@ data class PostgrestResult(val body: JsonElement, val statusCode: Int) {
     /**
      * Decodes [body] as a list of [T], or an empty list if [body] couldn't be parsed as a list of [T]
      */
-    inline fun <reified T> decodeList(json: Json = Json): List<T> = decodeAsOrNull() ?: emptyList()
+    inline fun <reified T> decodeList(json: Json = Json): List<T> = decodeAsOrNull(json) ?: emptyList()
 
     /**
      * Decodes [body] as a list of [T] and returns the first item found
      */
-    inline fun <reified T> decodeSingle(json: Json = Json): T = decodeList<T>().first()
+    inline fun <reified T> decodeSingle(json: Json = Json): T = decodeList<T>(json).first()
 
     /**
      * Decodes [body] as a list of [T] and returns the first item found or null
      */
-    inline fun <reified T> decodeSingleOrNull(json: Json = Json): T? = decodeList<T>().firstOrNull()
+    inline fun <reified T> decodeSingleOrNull(json: Json = Json): T? = decodeList<T>(json).firstOrNull()
 
 }
