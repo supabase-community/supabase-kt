@@ -289,14 +289,6 @@ inline fun Realtime.createChannel(channelId: String, builder: RealtimeChannelBui
 }
 
 /**
- * Creates a new [RealtimeChannel] and joins it after creation
- */
-@Deprecated("Use createChannel and then RealtimeChannel.join() instead", ReplaceWith("createChannel(channelId, builder)"))
-suspend inline fun Realtime.createAndJoinChannel(channelId: String, builder: RealtimeChannelBuilder.() -> Unit): RealtimeChannel {
-    return RealtimeChannelBuilder("realtime:$channelId", this as RealtimeImpl).apply(builder).build().also { it.join() }
-}
-
-/**
  * Supabase Realtime is a way to listen to changes in the PostgreSQL database via websockets
  */
 val SupabaseClient.realtime: Realtime
