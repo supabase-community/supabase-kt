@@ -1,4 +1,4 @@
-# Supabase-kt
+# supabase-kt
 
 A Kotlin Multiplatform Client for Supabase.
 Supported targets:
