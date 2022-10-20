@@ -97,7 +97,7 @@ Napier.base(DebugAntilog())
 
 #### [Authentication (GoTrue)](/GoTrue)
 
-#### [Database/Postgres](/Postgrest)
+#### [Database/Postgrest](/Postgrest)
 
 #### [Storage](/Storage)
 
