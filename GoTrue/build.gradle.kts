@@ -5,7 +5,7 @@ plugins {
 
 group = "io.github.jan-tennert.supabase"
 version = Versions.SUPABASEKT
-description = "Extends Supabase-ktwith a Auth Client"
+description = "Extends supabase-kt with a Auth Client"
 
 repositories {
     mavenCentral()

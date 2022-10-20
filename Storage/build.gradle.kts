@@ -5,7 +5,7 @@ plugins {
 
 group = "io.github.jan-tennert.supabase"
 version = Versions.SUPABASEKT
-description = "Extends Supacompose with a Storage Client"
+description = "Extends supabase-kt with a Storage Client"
 
 repositories {
     mavenCentral()

@@ -5,7 +5,7 @@ plugins {
 
 group = "io.github.jan-tennert.supabase"
 version = Versions.SUPABASEKT
-description = "Extends Supacompose with a Realtime Client"
+description = "Extends supabase-kt with a Realtime Client"
 
 repositories {
     mavenCentral()

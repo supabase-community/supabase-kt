@@ -43,7 +43,7 @@ data class Message(val text: String, @SerialName("author_id") val authorId: Stri
 <details><summary>Select</summary>
 
 ```kotlin
-client.postgrest["messages"]
+val result = client.postgrest["messages"]
     .select {
         //you can use that syntax
         Message::authorId eq "someid"
@@ -55,6 +55,8 @@ client.postgrest["messages"]
         neq("text", "This is a text!")
         isIn("author_id", listOf("test", "test2"))
     }
+
+println(result.decodeList<Message>())
 ````
 
 </details>

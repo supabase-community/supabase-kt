@@ -32,7 +32,6 @@ class GoTrueMock {
     private suspend fun MockRequestHandleScope.handleRequest(request: HttpRequestData): HttpResponseData? {
         val url = request.url
         val urlWithoutQuery = url.encodedPath
-        val query = url.parameters
         return when {
             urlWithoutQuery.endsWith("token") -> handleLogin(request)
             urlWithoutQuery.endsWith("signup") -> handleSignUp(request)

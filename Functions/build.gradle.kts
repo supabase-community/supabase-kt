@@ -5,7 +5,7 @@ plugins {
 
 group = "io.github.jan-tennert.supabase"
 version = Versions.SUPABASEKT
-description = "Extends Supabase-ktwith a Edge Functions Client"
+description = "Extends supabase-kt with a Edge Functions Client"
 
 repositories {
     mavenCentral()

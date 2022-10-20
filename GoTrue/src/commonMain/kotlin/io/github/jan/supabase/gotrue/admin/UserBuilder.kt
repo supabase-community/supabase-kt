@@ -15,8 +15,8 @@ import kotlinx.serialization.json.put
 @Serializable(with = UserBuilder.Companion::class)
 sealed class UserBuilder {
 
-    private var userMetadata: JsonObject? = null
-    private var appMetadata: JsonObject? = null
+    var userMetadata: JsonObject? = null
+    var appMetadata: JsonObject? = null
 
     /**
      * Automatically confirms either the phone number or the email address
@@ -54,7 +54,7 @@ sealed class UserBuilder {
 
     companion object : KSerializer<UserBuilder> {
 
-        override val descriptor = buildClassSerialDescriptor("io.github.jan.supabase.auth.admin.UserBuilder") {
+        override val descriptor = buildClassSerialDescriptor("io.github.jan.supabase.gotrue.admin.UserBuilder") {
             element("password", String.serializer().descriptor)
             element("email", String.serializer().descriptor, isOptional = true)
             element("email_confirm", Boolean.serializer().descriptor, isOptional = true)
