@@ -27,4 +27,4 @@ val client = createSupabaseClient {
 
 # Usage
 
-See [Postgrest docs](https://github.com/supabase-community/supabase-kt/wiki/Postgrest#features) for usage
+See [Postgrest docs](https://github.com/supabase-community/supabase-kt/wiki/Postgrest#usage) for usage

@@ -27,4 +27,4 @@ val client = createSupabaseClient {
 
 # Usage
 
-See [Storage docs](https://github.com/supabase-community/supabase-kt/wiki/Storage#features) for usage
+See [Storage docs](https://github.com/supabase-community/supabase-kt/wiki/Storage#usage) for usage

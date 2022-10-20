@@ -27,4 +27,4 @@ val client = createSupabaseClient {
 
 # Usage
 
-See [Realtime docs](https://github.com/supabase-community/supabase-kt/wiki/Realtime#features) for usage
+See [Realtime docs](https://github.com/supabase-community/supabase-kt/wiki/Realtime#usage) for usage

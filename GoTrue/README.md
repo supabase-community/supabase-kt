@@ -27,4 +27,4 @@ val client = createSupabaseClient {
 
 # Usage
 
-See [GoTrue docs](https://github.com/supabase-community/supabase-kt/wiki/GoTrue#features) for usage
+See [GoTrue docs](https://github.com/supabase-community/supabase-kt/wiki/GoTrue#usage) for usage

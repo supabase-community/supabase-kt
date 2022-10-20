@@ -12,7 +12,7 @@ dependencies {
 }
 ```
 
-Install plugin in main supabase client. See [supabase-kt](https://github.com/supabase-community/supabase-kt) for more information
+Install plugin in main supabase client. See [Getting started](https://github.com/supabase-community/supabase-kt/wiki/Getting-Started) for more information
 ```kotlin
 val client = createSupabaseClient {
     
@@ -25,40 +25,6 @@ val client = createSupabaseClient {
 }
 ```
 
-# Features
+# Usage
 
-<details><summary>Execute edge functions directly</summary>
-
-```kotlin
-@Serializable
-data class SomeData(val name: String)
-
-val response: HttpResponse = client.functions("test")
-//with body
-val response: HttpResponse = client.functions(
-    function = "test",
-    body = SomeData("Name")
-    headers = Headers.build {
-        append(HttpHeaders.ContentType, "application/json")
-    }
-)
-```
-</details>
-<details><summary>Store your edge function in a variable</summary>
-
-```kotlin
-@Serializable
-data class SomeData(val name: String)
-
-val testFunction: EdgeFunction = client.functions.buildEdgeFunction(
-    function = "test",
-    headers = Headers.build {
-        append(HttpHeaders.ContentType, "application/json")
-    }
-)
-
-val response: HttpResponse = testFunction()
-//with body
-val response: HttpResponse = testFunction(SomeData("Name"))
-```
-</details>
+See [Functions docs](https://github.com/supabase-community/supabase-kt/wiki/Functions#usage) for usage
