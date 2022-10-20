@@ -25,38 +25,6 @@ val client = createSupabaseClient {
 }
 ```
 
-# Features
+# Usage
 
-<details><summary>Managing buckets</summary>
-
-```kotlin
-//create a bucket
-client.storage.createBucket(name = "images", id = "images", public = false)
-
-//empty bucket
-client.storage.emptyBucket(id = "images")
-
-//and so on
-```
-
-</details>
-
-<details><summary>Uploading files</summary>
-
-```kotlin
-val bucket = client.storage["images"]
-
-//upload a file (jvm)
-bucket.upload("landscape.png", File("landscape.png"))
-
-//download a file (jvm)
-bucket.downloadTo("landscape.png", File("landscape.png"))
-
-//copy a file
-
-bucket.copy("landscape.png", "landscape2.png")
-
-//and so on
-```
-
-</details>
+See [Storage docs](https://github.com/supabase-community/supabase-kt/wiki/Storage#features) for usage
