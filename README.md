@@ -37,6 +37,8 @@ val client = createSupabaseClient(
 }
 ```
 
+### For more information see [Getting started](https://github.com/supabase-community/supabase-kt/wiki/Getting-Started)
+
 # Features
 
 #### Core
