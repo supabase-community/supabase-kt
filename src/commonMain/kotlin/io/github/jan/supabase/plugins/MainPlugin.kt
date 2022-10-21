@@ -52,7 +52,6 @@ interface MainPlugin <Config : MainConfig> : SupabasePlugin {
      */
     fun resolveUrl(path: String): String {
         val isBase = config.customUrl == null
-        println(config.customUrl)
         return buildUrl(config.customUrl ?: supabaseClient.supabaseHttpUrl) {
             if(isBase) {
                 appendEncodedPathSegments(PLUGIN_KEY, "v${API_VERSION}")
