@@ -23,7 +23,7 @@ dependencies {
 
 # [Getting started](https://github.com/supabase-community/supabase-kt/wiki/Getting-Started)
 
-# Features
+# Modules
 
 #### [Authentication (GoTrue)](/GoTrue)
 
