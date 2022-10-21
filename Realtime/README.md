@@ -25,6 +25,11 @@ val client = createSupabaseClient {
 }
 ```
 
+or create standalone module
+```kotlin
+val realtime = standaloneSupabaseModule(Realtime, url = "wss://your.realtime.url.com", apiKey = "your-api-key")
+```
+
 # Usage
 
 See [Realtime docs](https://github.com/supabase-community/supabase-kt/wiki/Realtime#usage) for usage

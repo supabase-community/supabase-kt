@@ -69,8 +69,8 @@ interface MainPlugin <Config : MainConfig> : SupabasePlugin {
  * @param apiKey The api key for this module
  * @param config The configuration for this module
  */
-inline fun <Config : MainConfig, reified Plugin : MainPlugin<Config>> standaloneSupabaseModule(provider: SupabasePluginProvider<Config, Plugin>, url: String, apiKey: String, crossinline config: Config.() -> Unit = {}): Plugin {
-    val underlyingClient = createSupabaseClient("", apiKey) {
+inline fun <Config : MainConfig, reified Plugin : MainPlugin<Config>> standaloneSupabaseModule(provider: SupabasePluginProvider<Config, Plugin>, url: String, apiKey: String? = null, crossinline config: Config.() -> Unit = {}): Plugin {
+    val underlyingClient = createSupabaseClient("", apiKey ?: "") {
         install(provider) {
             customUrl = url
             config()

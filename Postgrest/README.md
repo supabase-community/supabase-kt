@@ -25,6 +25,11 @@ val client = createSupabaseClient {
 }
 ```
 
+or create standalone module
+```kotlin
+val postgrest = standaloneSupabaseModule(Postgrest, url = "https://your.postgrest.url.com", apiKey = "your-api-key")
+```
+
 # Usage
 
 See [Postgrest docs](https://github.com/supabase-community/supabase-kt/wiki/Postgrest#usage) for usage

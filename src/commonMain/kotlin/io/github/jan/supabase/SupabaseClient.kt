@@ -81,7 +81,9 @@ internal class SupabaseClientImpl(
         HttpClient(httpEngine) {
             install(DefaultRequest) {
                 headers {
-                    append("apikey", supabaseKey)
+                    if(supabaseKey.isNotBlank()) {
+                        append("apikey", supabaseKey)
+                    }
                 }
                 port = 443
             }
@@ -94,7 +96,9 @@ internal class SupabaseClientImpl(
         HttpClient {
             install(DefaultRequest) {
                 headers {
-                    append("apikey", supabaseKey)
+                    if(supabaseKey.isNotBlank()) {
+                        append("apikey", supabaseKey)
+                    }
                 }
                 port = 443
             }

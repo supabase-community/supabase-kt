@@ -165,6 +165,7 @@ sealed interface GoTrue : MainPlugin<GoTrue.Config> {
         var alwaysAutoRefresh: Boolean = true,
         var autoLoadFromStorage: Boolean = true,
         override var customUrl: String? = null,
+        override var jwtToken: String? = null,
         var sessionManager: SessionManager? = null,
         var coroutineDispatcher: CoroutineDispatcher = Dispatchers.Default
     ) : MainConfig
