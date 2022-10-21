@@ -62,7 +62,7 @@ sealed interface Storage : MainPlugin<Storage.Config> {
 
     fun from(id: String): BucketApi = get(id)
 
-    data class Config(override var customUrl: String? = null): MainConfig
+    data class Config(override var customUrl: String? = null, override var jwtToken: String? = null): MainConfig
 
     companion object : SupabasePluginProvider<Config, Storage> {
 
@@ -131,7 +131,8 @@ internal class StorageImpl(override val supabaseClient: SupabaseClient, override
     }
 
     private fun HttpRequestBuilder.addAuthorization() {
-        supabaseClient.pluginManager.getPluginOrNull<GoTrue>(GoTrue.key)?.currentAccessToken().let {
+        val token = config.jwtToken ?: supabaseClient.pluginManager.getPluginOrNull<GoTrue>(GoTrue.key)?.currentAccessToken()
+        token.let {
             headers {
                 append(HttpHeaders.Authorization, "Bearer $it")
             }

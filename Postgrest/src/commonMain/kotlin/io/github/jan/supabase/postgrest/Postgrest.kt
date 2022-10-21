@@ -21,7 +21,7 @@ sealed interface Postgrest : MainPlugin<Postgrest.Config> {
 
     operator fun get(table: String): PostgrestBuilder = from(table)
 
-    data class Config(override var customUrl: String? = null): MainConfig
+    data class Config(override var customUrl: String? = null, override var jwtToken: String? = null): MainConfig
 
     companion object : SupabasePluginProvider<Config, Postgrest> {
 

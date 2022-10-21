@@ -82,6 +82,7 @@ sealed interface Realtime : MainPlugin<Realtime.Config> {
         var customRealtimeURL: String? = null,
         var reconnectDelay: Duration = 7.seconds,
         override var customUrl: String? = null,
+        override var jwtToken: String? = null
     ): MainConfig
 
     companion object : SupabasePluginProvider<Config, Realtime> {

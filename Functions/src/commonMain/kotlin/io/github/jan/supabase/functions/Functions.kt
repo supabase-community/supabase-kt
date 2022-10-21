@@ -38,7 +38,8 @@ class Functions(override val config: Config, override val supabaseClient: Supaba
      */
     suspend inline operator fun invoke(function: String, builder: HttpRequestBuilder.() -> Unit): HttpResponse {
         return supabaseClient.httpClient.post(resolveUrl(function)) {
-            supabaseClient.pluginManager.getPluginOrNull<GoTrue>(GoTrue.key)?.currentAccessToken()?.let {
+            val token = config.jwtToken ?: supabaseClient.pluginManager.getPluginOrNull<GoTrue>(GoTrue.key)?.currentAccessToken()
+            token.let {
                 this.headers[HttpHeaders.Authorization] = "Bearer $it"
             }
             builder()
@@ -83,7 +84,8 @@ class Functions(override val config: Config, override val supabaseClient: Supaba
     }
 
     data class Config(
-        override val customUrl: String? = null
+        override var customUrl: String? = null,
+        override var jwtToken: String? = null
     ) : MainConfig
 
     companion object : SupabasePluginProvider<Config, Functions> {

@@ -54,7 +54,7 @@ actual abstract class OAuthProvider : AuthProvider<ExternalAuthConfig, Unit> {
         if(redirectUrl != null) {
             withContext(Dispatchers.IO) {
                 Desktop.getDesktop()
-                    .browse(URI(supabaseClient.supabaseHttpUrl + "/auth/v1/authorize?provider=${provider()}&redirect_to=$redirectUrl"))
+                    .browse(URI(supabaseClient.gotrue.resolveUrl("/auth/v1/authorize?provider=${provider()}&redirect_to=$redirectUrl")))
             }
             return
         }
@@ -134,7 +134,7 @@ actual abstract class OAuthProvider : AuthProvider<ExternalAuthConfig, Unit> {
                     }
                 }.start(wait = false).also {
                     val port = it.resolvedConnectors().first().port
-                    Desktop.getDesktop().browse(URI(supabaseClient.supabaseHttpUrl + "/auth/v1/authorize?provider=${provider()}&redirect_to=http://localhost:${port}"))
+                    Desktop.getDesktop().browse(URI(supabaseClient.gotrue.resolveUrl("authorize?provider=${provider()}&redirect_to=http://localhost:${port}")))
                     delay(config.timeout.inWholeMilliseconds)
                     it.stop()
                     if(!done) {

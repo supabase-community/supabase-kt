@@ -32,7 +32,8 @@ sealed interface PostgrestRequest {
         return postgrest.supabaseClient.httpClient.request(postgrest.resolveUrl(path)) {
             method = this@PostgrestRequest.method
             contentType(ContentType.Application.Json)
-            postgrest.supabaseClient.pluginManager.getPluginOrNull<GoTrue>(GoTrue.key)?.currentAccessToken()?.let {
+            val token  = postgrest.config.jwtToken ?: postgrest.supabaseClient.pluginManager.getPluginOrNull<GoTrue>(GoTrue.key)?.currentAccessToken()
+            token?.let {
                 headers[HttpHeaders.Authorization] = "Bearer $it"
             }
             headers[PostgrestBuilder.HEADER_PREFER] = prefer.joinToString(",")

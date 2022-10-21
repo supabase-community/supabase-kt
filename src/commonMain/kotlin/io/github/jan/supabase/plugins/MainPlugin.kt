@@ -2,6 +2,7 @@ package io.github.jan.supabase.plugins
 
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.buildUrl
+import io.github.jan.supabase.createSupabaseClient
 import io.ktor.http.appendEncodedPathSegments
 
 /**
@@ -9,7 +10,15 @@ import io.ktor.http.appendEncodedPathSegments
  */
 interface MainConfig {
 
-    val customUrl: String?
+    /**
+     * The url used for this module
+     */
+    var customUrl: String?
+
+    /**
+     * The jwt token used for this module. If null, the client will use the token from GoTrue's current session
+     */
+    var jwtToken: String?
 
 }
 
@@ -43,6 +52,7 @@ interface MainPlugin <Config : MainConfig> : SupabasePlugin {
      */
     fun resolveUrl(path: String): String {
         val isBase = config.customUrl == null
+        println(config.customUrl)
         return buildUrl(config.customUrl ?: supabaseClient.supabaseHttpUrl) {
             if(isBase) {
                 appendEncodedPathSegments(PLUGIN_KEY, "v${API_VERSION}")
@@ -51,4 +61,21 @@ interface MainPlugin <Config : MainConfig> : SupabasePlugin {
         }
     }
 
+}
+
+/**
+ * Creates a standalone Supabase Module. Uses an underlying [SupabaseClient]
+ * @param provider The provider for this module. E.g. GoTrue, Realtime or Storage
+ * @param url The url for this module
+ * @param apiKey The api key for this module
+ * @param config The configuration for this module
+ */
+inline fun <Config : MainConfig, reified Plugin : MainPlugin<Config>> standaloneSupabaseModule(provider: SupabasePluginProvider<Config, Plugin>, url: String, apiKey: String, crossinline config: Config.() -> Unit = {}): Plugin {
+    val underlyingClient = createSupabaseClient("", apiKey) {
+        install(provider) {
+            customUrl = url
+            config()
+        }
+    }
+    return underlyingClient.pluginManager.getPlugin(provider.key)
 }
