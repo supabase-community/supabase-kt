@@ -25,7 +25,6 @@ package io.github.jan.supabase.gotrue
  import io.ktor.client.statement.bodyAsText
  import io.ktor.http.HttpHeaders
  import kotlinx.coroutines.CoroutineScope
- import kotlinx.coroutines.Dispatchers
  import kotlinx.coroutines.Job
  import kotlinx.coroutines.cancel
  import kotlinx.coroutines.coroutineScope
@@ -88,20 +87,20 @@ internal class GoTrueImpl(override val supabaseClient: SupabaseClient, override 
         invalidateSession()
     }
 
-    override suspend fun <Config, Result, Provider : AuthProvider<Config, Result>> loginWith(
+    override suspend fun <C, R, Provider : AuthProvider<C, R>> loginWith(
         provider: Provider,
         redirectUrl: String?,
-        config: (Config.() -> Unit)?
+        config: (C.() -> Unit)?
     ) = provider.login(supabaseClient, {
-        startJob(it)
+        startAutoRefresh(it)
     }, redirectUrl, config)
 
-    override suspend fun <Config, Result, Provider : AuthProvider<Config, Result>> signUpWith(
+    override suspend fun <C, R, Provider : AuthProvider<C, R>> signUpWith(
         provider: Provider,
         redirectUrl: String?,
-        config: (Config.() -> Unit)?
-    ) = provider.signUp(supabaseClient, {
-        startJob(it)
+        config: (C.() -> Unit)?
+    ): R = provider.signUp(supabaseClient, {
+        startAutoRefresh(it)
     }, redirectUrl, config)
 
     override suspend fun <Config, Result, Provider : DefaultAuthProvider<Config, Result>> modifyUser(
@@ -122,11 +121,11 @@ internal class GoTrueImpl(override val supabaseClient: SupabaseClient, override 
         return response.body()
     }
 
-    override suspend fun <Config, Result, Provider : DefaultAuthProvider<Config, Result>> sendOtpTo(
+    override suspend fun <C, R, Provider : DefaultAuthProvider<C, R>> sendOtpTo(
         provider: Provider,
         createUser: Boolean,
         redirectUrl: String?,
-        config: Config.() -> Unit
+        config: C.() -> Unit
     ) {
         val finalRedirectUrl = generateRedirectUrl(redirectUrl)
         val body = buildJsonObject {
@@ -141,7 +140,7 @@ internal class GoTrueImpl(override val supabaseClient: SupabaseClient, override 
         }.checkErrors()
     }
 
-    override suspend fun sendRecoveryEmail(email: String, redirectUrl: String?) {
+    override suspend fun sendRecoveryEmail(email: String, redirectUrl: String?, captchaToken: String?) {
         val finalRedirectUrl = generateRedirectUrl(redirectUrl)
         val body = buildJsonObject {
             put("email", email)
@@ -160,7 +159,7 @@ internal class GoTrueImpl(override val supabaseClient: SupabaseClient, override 
         }
     }
 
-    override suspend fun verify(type: VerifyType, token: String) {
+    override suspend fun verify(type: VerifyType, token: String, captchaToken: String?) {
         val body = """
             {
               "type": "${type.name.lowercase()}",
@@ -171,10 +170,10 @@ internal class GoTrueImpl(override val supabaseClient: SupabaseClient, override 
             setBody(body)
         }
         val session =  response.checkErrors().body<UserSession>()
-        startJob(session)
+        startAutoRefresh(session)
     }
 
-    override suspend fun verifyPhone(token: String, phoneNumber: String) {
+    override suspend fun verifyPhone(token: String, phoneNumber: String, captchaToken: String?) {
         val body = """
             {
               "type": "sms",
@@ -186,7 +185,7 @@ internal class GoTrueImpl(override val supabaseClient: SupabaseClient, override 
             setBody(body)
         }
         val session = response.checkErrors().body<UserSession>()
-        startJob(session)
+        startAutoRefresh(session)
     }
 
     override suspend fun getUser(jwt: String): UserInfo {
@@ -208,7 +207,7 @@ internal class GoTrueImpl(override val supabaseClient: SupabaseClient, override 
         sessionJob = null
     }
 
-    private suspend fun refreshSession(refreshToken: String) {
+    override suspend fun refreshSession(refreshToken: String): UserSession {
         Napier.d {
             "Refreshing session"
         }
@@ -220,12 +219,20 @@ internal class GoTrueImpl(override val supabaseClient: SupabaseClient, override 
         val response = supabaseClient.httpClient.post(resolveUrl("token?grant_type=refresh_token")) {
             setBody(body)
         }
-        if(response.status.value !in 200..299) throw RestException(response.status.value, "Unauthorized", response.bodyAsText())
-        val newSession =  response.body<UserSession>()
-        startJob(newSession)
+        if (response.status.value !in 200..299) throw RestException(
+            response.status.value,
+            "Unauthorized",
+            response.bodyAsText()
+        )
+        return response.body()
     }
 
-    internal suspend fun startJob(session: UserSession, autoRefresh: Boolean = config.alwaysAutoRefresh) {
+    override suspend fun refreshCurrentSession() {
+        val newSession = refreshSession(currentSession.value?.refreshToken ?: throw IllegalStateException("No refresh token found in current session"))
+        startAutoRefresh(newSession)
+    }
+
+    override suspend fun startAutoRefresh(session: UserSession, autoRefresh: Boolean) {
         if(!autoRefresh) {
             updateSession(GoTrue.Status.AUTHENTICATED, session)
             if(session.refreshToken.isNotBlank() && session.expiresIn != 0L) {
@@ -235,7 +242,7 @@ internal class GoTrueImpl(override val supabaseClient: SupabaseClient, override 
         }
         if(session.expiresAt < Clock.System.now()) {
             Napier.d {
-                "(Re)starting session job"
+                "Session expired. Refreshing session..."
             }
             try {
                 refreshSession(session.refreshToken)
@@ -246,7 +253,7 @@ internal class GoTrueImpl(override val supabaseClient: SupabaseClient, override 
                 Napier.e(e) { "Couldn't reach supabase. Either the address doesn't exist or the network might not be on. Retrying in ${config.retryDelay}" }
                 _status.value = GoTrue.Status.NETWORK_ERROR
                 delay(config.retryDelay)
-                startJob(session)
+                startAutoRefresh(session)
             }
         } else {
             updateSession(GoTrue.Status.AUTHENTICATED, session)
@@ -255,6 +262,9 @@ internal class GoTrueImpl(override val supabaseClient: SupabaseClient, override 
                 sessionJob = launch {
                     delay(session.expiresIn.seconds.inWholeMilliseconds)
                     launch {
+                        Napier.d {
+                            "Session expired. Refreshing session..."
+                        }
                         try {
                             refreshSession(session.refreshToken)
                         } catch(e: RestException) {
@@ -266,7 +276,7 @@ internal class GoTrueImpl(override val supabaseClient: SupabaseClient, override 
                             coroutineScope {
                                 launch {
                                     delay(config.retryDelay)
-                                    startJob(session)
+                                    startAutoRefresh(session)
                                 }
                             }
                         }
@@ -276,12 +286,19 @@ internal class GoTrueImpl(override val supabaseClient: SupabaseClient, override 
         }
     }
 
-    override suspend fun importSession(session: UserSession, autoRefresh: Boolean) = startJob(session, autoRefresh)
+    override suspend fun startAutoRefreshForCurrentSession() = startAutoRefresh(currentSession.value ?: throw IllegalStateException("No session found"), true)
+
+    override fun stopAutoRefreshForCurrentSession() {
+        sessionJob?.cancel()
+        sessionJob = null
+    }
+
+    override suspend fun importSession(session: UserSession, autoRefresh: Boolean) = startAutoRefresh(session, autoRefresh)
 
     override suspend fun loadFromStorage(autoRefresh: Boolean): Boolean {
         val session = sessionManager.loadSession()
         val wasSuccessful = session != null
-        if(wasSuccessful) startJob(session!!, autoRefresh)
+        if(wasSuccessful) startAutoRefresh(session!!, autoRefresh)
         return wasSuccessful
     }
 

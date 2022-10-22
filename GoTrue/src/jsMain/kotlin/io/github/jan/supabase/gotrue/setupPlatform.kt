@@ -24,7 +24,7 @@ actual fun GoTrue.setupPlatform() {
         if(accessToken != null && refreshToken != null && expiresIn != null && tokenType != null) {
             scope.launch {
                 val user = getUser(accessToken)
-                startJob(UserSession(accessToken, refreshToken, expiresIn, tokenType, user, type ?: ""))
+                startAutoRefresh(UserSession(accessToken, refreshToken, expiresIn, tokenType, user, type ?: ""))
             }
         }
     }

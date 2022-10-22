@@ -99,14 +99,19 @@ sealed interface GoTrue : MainPlugin<GoTrue.Config> {
      * @param createUser Whether to create a user when a user with the given credentials doesn't exist
      * @param redirectUrl The redirect url to use. If you don't specify this, the platform specific will be use, like deeplinks on android.
      */
-    suspend fun <C, R, Provider : DefaultAuthProvider<C, R>> sendOtpTo(provider: Provider, createUser: Boolean = false, redirectUrl: String? = null, config: C.() -> Unit)
+    suspend fun <C, R, Provider : DefaultAuthProvider<C, R>> sendOtpTo(
+        provider: Provider,
+        createUser: Boolean = false,
+        redirectUrl: String? = null,
+        config: C.() -> Unit
+    )
 
     /**
      * Sends a password reset email to the user with the specified [email]
      * @param email The email to send the password reset email to
      * @param redirectUrl The redirect url to use. If you don't specify this, the platform specific will be use, like deeplinks on android.
      */
-    suspend fun sendRecoveryEmail(email: String, redirectUrl: String? = null)
+    suspend fun sendRecoveryEmail(email: String, redirectUrl: String? = null, captchaToken: String? = null)
 
     /**
      * Sends a nonce to the user's email (preferred) or phone
@@ -123,14 +128,14 @@ sealed interface GoTrue : MainPlugin<GoTrue.Config> {
      * @param type The type of the verification
      * @param token The token used to verify
      */
-    suspend fun verify(type: VerifyType, token: String)
+    suspend fun verify(type: VerifyType, token: String, captchaToken: String? = null)
 
     /**
      * Verifies a phone/sms otp
      * @param token The otp to verify
      * @param phoneNumber The phone number the token was sent to
      */
-    suspend fun verifyPhone(token: String, phoneNumber: String)
+    suspend fun verifyPhone(token: String, phoneNumber: String, captchaToken: String? = null)
 
     /**
      * Retrieves the current user with the session
@@ -158,6 +163,34 @@ sealed interface GoTrue : MainPlugin<GoTrue.Config> {
      * @return true, if a session was found, false otherwise
      */
     suspend fun loadFromStorage(autoRefresh: Boolean = config.alwaysAutoRefresh): Boolean
+
+    /**
+     * Refreshes a session using the refresh token
+     * @param refreshToken The refresh token to use
+     * @return A new session
+     */
+    suspend fun refreshSession(refreshToken: String): UserSession
+
+    /**
+     * Refreshes the current session
+     */
+    suspend fun refreshCurrentSession()
+
+    /**
+     * Starts auto-refreshing [session] for [currentSession]
+     * @param session The session to auto-refresh
+     */
+    suspend fun startAutoRefresh(session: UserSession, autoRefresh: Boolean = config.alwaysAutoRefresh)
+
+    /**
+     * Starts auto refreshing the current session
+     */
+    suspend fun startAutoRefreshForCurrentSession()
+
+    /**
+     * Stops auto-refreshing the current session
+     */
+    fun stopAutoRefreshForCurrentSession()
 
     data class Config(
         val params: MutableMap<String, Any> = mutableMapOf(),
