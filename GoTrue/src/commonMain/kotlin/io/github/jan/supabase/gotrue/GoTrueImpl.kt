@@ -38,6 +38,7 @@ package io.github.jan.supabase.gotrue
  import kotlinx.serialization.json.buildJsonObject
  import kotlinx.serialization.json.encodeToJsonElement
  import kotlinx.serialization.json.put
+ import kotlinx.serialization.json.putJsonObject
  import kotlin.time.Duration.Companion.seconds
 
 @PublishedApi
@@ -144,6 +145,11 @@ internal class GoTrueImpl(override val supabaseClient: SupabaseClient, override 
         val finalRedirectUrl = generateRedirectUrl(redirectUrl)
         val body = buildJsonObject {
             put("email", email)
+            captchaToken?.let {
+                putJsonObject("gotrue_meta_security") {
+                    put("captcha_token", captchaToken)
+                }
+            }
         }.toString()
         val redirect = finalRedirectUrl?.let {
             "?redirect_to=$finalRedirectUrl"
@@ -160,12 +166,15 @@ internal class GoTrueImpl(override val supabaseClient: SupabaseClient, override 
     }
 
     override suspend fun verify(type: VerifyType, token: String, captchaToken: String?) {
-        val body = """
-            {
-              "type": "${type.name.lowercase()}",
-              "token": "$token"
+        val body = buildJsonObject {
+            put("type", type.name.lowercase())
+            put("token", token)
+            captchaToken?.let {
+                putJsonObject("gotrue_meta_security") {
+                    put("captcha_token", captchaToken)
+                }
             }
-        """.trimIndent()
+        }
         val response = supabaseClient.httpClient.post(resolveUrl("verify")) {
             setBody(body)
         }
@@ -174,13 +183,16 @@ internal class GoTrueImpl(override val supabaseClient: SupabaseClient, override 
     }
 
     override suspend fun verifyPhone(token: String, phoneNumber: String, captchaToken: String?) {
-        val body = """
-            {
-              "type": "sms",
-              "token": "$token",
-              "phone": "$phoneNumber"
+        val body = buildJsonObject {
+            put("type", "sms")
+            put("token", token)
+            put("phone", phoneNumber)
+            captchaToken?.let {
+                putJsonObject("gotrue_meta_security") {
+                    put("captcha_token", captchaToken)
+                }
             }
-        """.trimIndent()
+        }
         val response = supabaseClient.httpClient.post(resolveUrl("verify")) {
             setBody(body)
         }
