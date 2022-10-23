@@ -5,6 +5,7 @@ import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.SupabaseClientBuilder
 import io.github.jan.supabase.annotiations.SupabaseInternal
 import io.github.jan.supabase.gotrue.GoTrue
+import io.github.jan.supabase.gotrue.SessionStatus
 import io.github.jan.supabase.gotrue.gotrue
 import io.github.jan.supabase.plugins.MainConfig
 import io.github.jan.supabase.plugins.MainPlugin
@@ -144,14 +145,14 @@ internal class RealtimeImpl(override val supabaseClient: SupabaseClient, overrid
             Napier.d { "Reconnecting..." }
         } else {
             scope.launch {
-                supabaseClient.pluginManager.getPluginOrNull(GoTrue)?.currentSession?.collect {
-                    if (status.value == Realtime.Status.CONNECTED) {
-                        if (it == null) {
+                supabaseClient.pluginManager.getPluginOrNull(GoTrue)?.sessionStatus?.collect {
+                    when(it) {
+                        is SessionStatus.Authenticated -> updateJwt(it.session.accessToken)
+                        is SessionStatus.NotAuthenticated -> {
                             Napier.w { "No auth session found, disconnecting from realtime websocket"}
                             disconnect()
-                        } else {
-                            updateJwt(it.accessToken)
                         }
+                        else -> {}
                     }
                 }
             }
