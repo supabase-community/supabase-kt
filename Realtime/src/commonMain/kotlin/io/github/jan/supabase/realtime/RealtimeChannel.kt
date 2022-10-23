@@ -3,8 +3,6 @@ package io.github.jan.supabase.realtime
 import io.github.aakira.napier.Napier
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.annotiations.SupabaseInternal
-import io.github.jan.supabase.gotrue.gotrue
-import io.github.jan.supabase.gotrue.currentAccessToken
 import io.github.jan.supabase.decodeIfNotEmptyOrDefault
 import io.github.jan.supabase.gotrue.GoTrue
 import io.github.jan.supabase.putJsonObject
@@ -121,7 +119,7 @@ internal class RealtimeChannelImpl(
         }
         _status.value = RealtimeChannel.Status.JOINING
         Napier.d { "Joining channel $topic" }
-        val currentJwt = realtimeImpl.config.jwtToken ?: supabaseClient.pluginManager.getPluginOrNull(GoTrue)?.currentAccessToken()
+        val currentJwt = realtimeImpl.config.jwtToken ?: supabaseClient.pluginManager.getPluginOrNull(GoTrue)?.currentAccessTokenOrNull()
         val postgrestChanges = clientChanges.toList()
         val joinConfig = RealtimeJoinPayload(RealtimeJoinConfig(broadcastJoinConfig, presenceJoinConfig, postgrestChanges))
         val joinConfigObject = buildJsonObject {

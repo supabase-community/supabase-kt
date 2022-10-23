@@ -30,12 +30,12 @@ import kotlin.time.Duration.Companion.seconds
 sealed interface GoTrue : MainPlugin<GoTrue.Config> {
 
     /**
-     * Returns the current user session as a [StateFlow]
+     * Returns the current session status
      */
-    val currentSession: StateFlow<UserSession?>
+    val sessionStatus: StateFlow<SessionStatus>
 
     /**
-     * Whether the [currentSession] session is getting refreshed automatically
+     * Whether the [sessionStatus] session is getting refreshed automatically
      */
     val isAutoRefreshRunning: Boolean
 
@@ -43,11 +43,6 @@ sealed interface GoTrue : MainPlugin<GoTrue.Config> {
      * Returns the session manager instance
      */
     val sessionManager: SessionManager
-
-    /**
-     * Returns the auth's status to distinguish between [Status.LOADING_FROM_STORAGE] in and [Status.NOT_AUTHENTICATED] when dealing with [currentSession] being null
-     */
-    val status: StateFlow<Status>
 
     /**
      * Access to the auth admin api where you can manage users. Service role access token is required. Import it via [importAuthToken]. Never share it publicly
@@ -192,6 +187,19 @@ sealed interface GoTrue : MainPlugin<GoTrue.Config> {
      */
     fun stopAutoRefreshForCurrentSession()
 
+    /**
+     * Returns the current access token, or null if no session is available
+     */
+    fun currentAccessTokenOrNull() = currentSessionOrNull()?.accessToken
+
+    /**
+     * Returns the current session or null
+     */
+    fun currentSessionOrNull() = when(val status = sessionStatus.value) {
+        is SessionStatus.Authenticated -> status.session
+        else -> null
+    }
+
     data class Config(
         val params: MutableMap<String, Any> = mutableMapOf(),
         var retryDelay: Duration = 10.seconds,
@@ -202,13 +210,6 @@ sealed interface GoTrue : MainPlugin<GoTrue.Config> {
         var sessionManager: SessionManager? = null,
         var coroutineDispatcher: CoroutineDispatcher = Dispatchers.Default
     ) : MainConfig
-
-    enum class Status {
-        LOADING_FROM_STORAGE,
-        NETWORK_ERROR,
-        AUTHENTICATED,
-        NOT_AUTHENTICATED
-    }
 
     companion object : SupabasePluginProvider<Config, GoTrue> {
 
@@ -221,11 +222,6 @@ sealed interface GoTrue : MainPlugin<GoTrue.Config> {
     }
 
 }
-
-/**
- * Returns the current access token, or null if no session is available
- */
-fun GoTrue.currentAccessToken() = currentSession.value?.accessToken
 
 /**
  * Modifies a user with the specified [provider]. Extra data can be supplied

@@ -23,7 +23,9 @@ package io.github.jan.supabase.gotrue
  import io.ktor.client.request.put
  import io.ktor.client.request.setBody
  import io.ktor.client.statement.bodyAsText
+ import io.ktor.http.ContentType
  import io.ktor.http.HttpHeaders
+ import io.ktor.http.contentType
  import kotlinx.coroutines.CoroutineScope
  import kotlinx.coroutines.Job
  import kotlinx.coroutines.cancel
@@ -44,13 +46,11 @@ package io.github.jan.supabase.gotrue
 @PublishedApi
 internal class GoTrueImpl(override val supabaseClient: SupabaseClient, override val config: GoTrue.Config) : GoTrue {
 
-    private val _currentSession = MutableStateFlow<UserSession?>(null)
-    override val currentSession: StateFlow<UserSession?> = _currentSession.asStateFlow()
+    private val _sessionStatus = MutableStateFlow<SessionStatus>(SessionStatus.NotAuthenticated)
+    override val sessionStatus: StateFlow<SessionStatus> = _sessionStatus.asStateFlow()
     private val authScope = CoroutineScope(config.coroutineDispatcher)
     override val sessionManager = config.sessionManager ?: SettingsSessionManager()
     override val admin: AdminApi = AdminApiImpl(this)
-    val _status = MutableStateFlow(GoTrue.Status.NOT_AUTHENTICATED)
-    override val status = _status.asStateFlow()
     var sessionJob: Job? = null
     override val isAutoRefreshRunning: Boolean
         get() = sessionJob?.isActive == true
@@ -58,7 +58,7 @@ internal class GoTrueImpl(override val supabaseClient: SupabaseClient, override 
     init {
         setupPlatform()
         if(config.autoLoadFromStorage) {
-            _status.value = GoTrue.Status.LOADING_FROM_STORAGE
+            _sessionStatus.value = SessionStatus.LoadingFromStorage
             authScope.launch {
                 Napier.d {
                     "Trying to load latest session"
@@ -69,7 +69,7 @@ internal class GoTrueImpl(override val supabaseClient: SupabaseClient, override 
                         "Successfully loaded session from storage"
                     }
                 } else {
-                    _status.value = GoTrue.Status.NOT_AUTHENTICATED
+                    _sessionStatus.value = SessionStatus.NotAuthenticated
                 }
             }
         }
@@ -176,6 +176,7 @@ internal class GoTrueImpl(override val supabaseClient: SupabaseClient, override 
             }
         }
         val response = supabaseClient.httpClient.post(resolveUrl("verify")) {
+            contentType(ContentType.Application.Json)
             setBody(body)
         }
         val session =  response.checkErrors().body<UserSession>()
@@ -194,6 +195,7 @@ internal class GoTrueImpl(override val supabaseClient: SupabaseClient, override 
             }
         }
         val response = supabaseClient.httpClient.post(resolveUrl("verify")) {
+            contentType(ContentType.Application.Json)
             setBody(body)
         }
         val session = response.checkErrors().body<UserSession>()
@@ -215,7 +217,7 @@ internal class GoTrueImpl(override val supabaseClient: SupabaseClient, override 
     override suspend fun invalidateSession() {
         sessionManager.deleteSession()
         sessionJob?.cancel()
-        updateSession(GoTrue.Status.NOT_AUTHENTICATED, null)
+        _sessionStatus.value = SessionStatus.NotAuthenticated
         sessionJob = null
     }
 
@@ -240,36 +242,38 @@ internal class GoTrueImpl(override val supabaseClient: SupabaseClient, override 
     }
 
     override suspend fun refreshCurrentSession() {
-        val newSession = refreshSession(currentSession.value?.refreshToken ?: throw IllegalStateException("No refresh token found in current session"))
+        val newSession = refreshSession(currentAccessTokenOrNull() ?: throw IllegalStateException("No refresh token found in current session"))
         startAutoRefresh(newSession)
     }
 
     override suspend fun startAutoRefresh(session: UserSession, autoRefresh: Boolean) {
         if(!autoRefresh) {
-            updateSession(GoTrue.Status.AUTHENTICATED, session)
+            _sessionStatus.value = SessionStatus.Authenticated(session)
             if(session.refreshToken.isNotBlank() && session.expiresIn != 0L) {
                 sessionManager.saveSession(session)
             }
             return
         }
-        if(session.expiresAt < Clock.System.now()) {
+        if(session.expiresAt <= Clock.System.now()) {
             Napier.d {
                 "Session expired. Refreshing session..."
             }
             try {
-                refreshSession(session.refreshToken)
+                val newSession = refreshSession(session.refreshToken)
+                startAutoRefresh(newSession, config.alwaysAutoRefresh)
             } catch(e: RestException) {
                 invalidateSession()
                 Napier.e(e) { "Couldn't refresh session. The refresh token may have been revoked." }
             } catch (e: Exception) {
                 Napier.e(e) { "Couldn't reach supabase. Either the address doesn't exist or the network might not be on. Retrying in ${config.retryDelay}" }
-                _status.value = GoTrue.Status.NETWORK_ERROR
+                _sessionStatus.value = SessionStatus.NetworkError
                 delay(config.retryDelay)
                 startAutoRefresh(session)
             }
         } else {
-            updateSession(GoTrue.Status.AUTHENTICATED, session)
+            _sessionStatus.value = SessionStatus.Authenticated(session)
             sessionManager.saveSession(session)
+            sessionJob?.cancel()
             coroutineScope {
                 sessionJob = launch {
                     delay(session.expiresIn.seconds.inWholeMilliseconds)
@@ -284,7 +288,7 @@ internal class GoTrueImpl(override val supabaseClient: SupabaseClient, override 
                             Napier.e(e) { "Couldn't refresh session. The refresh token may have been revoked." }
                         } catch (e: Exception) {
                             Napier.e(e) { "Couldn't reach supabase. Either the address doesn't exist or the network might not be on. Retrying in ${config.retryDelay}" }
-                            _status.value = GoTrue.Status.NETWORK_ERROR
+                            _sessionStatus.value = SessionStatus.NetworkError
                             coroutineScope {
                                 launch {
                                     delay(config.retryDelay)
@@ -298,7 +302,7 @@ internal class GoTrueImpl(override val supabaseClient: SupabaseClient, override 
         }
     }
 
-    override suspend fun startAutoRefreshForCurrentSession() = startAutoRefresh(currentSession.value ?: throw IllegalStateException("No session found"), true)
+    override suspend fun startAutoRefreshForCurrentSession() = startAutoRefresh(currentSessionOrNull() ?: throw IllegalStateException("No session found"), true)
 
     override fun stopAutoRefreshForCurrentSession() {
         sessionJob?.cancel()
@@ -316,13 +320,8 @@ internal class GoTrueImpl(override val supabaseClient: SupabaseClient, override 
 
     private fun HttpRequestBuilder.addAuthorization() {
         headers {
-            append(HttpHeaders.Authorization, "Bearer ${(!currentSession.value).accessToken}")
+            append(HttpHeaders.Authorization, "Bearer ${(sessionStatus.value as? SessionStatus.Authenticated)?.session?.accessToken}")
         }
-    }
-
-    private fun updateSession(status: GoTrue.Status, newSession: UserSession?) {
-        _status.value = status
-        _currentSession.value = newSession
     }
 
     override suspend fun close() {

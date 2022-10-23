@@ -3,6 +3,7 @@ package io.github.jan.supabase.plugins
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.buildUrl
 import io.github.jan.supabase.createSupabaseClient
+import io.ktor.client.request.HttpRequestBuilder
 import io.ktor.http.appendEncodedPathSegments
 
 /**

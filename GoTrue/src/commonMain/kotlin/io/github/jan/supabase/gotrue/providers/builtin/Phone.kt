@@ -29,6 +29,6 @@ object Phone : DefaultAuthProvider<Phone.Config, Phone.Result> {
 
     override fun decodeResult(json: JsonObject): Result = supabaseJson.decodeFromJsonElement(json)
 
-    override fun encodeCredentials(credentials: Config.() -> Unit): String = supabaseJson.encodeToString(Config().apply(credentials))
+    override fun encodeCredentials(credentials: Config.() -> Unit): String = supabaseJson.encodeToString(Config().apply(credentials) as DefaultAuthProvider.Config)
 
 }

@@ -1,31 +1,23 @@
 @file:OptIn(ExperimentalCoroutinesApi::class)
 
 import com.russhwolf.settings.MapSettings
-import io.github.aakira.napier.DebugAntilog
-import io.github.aakira.napier.Napier
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.createSupabaseClient
 import io.github.jan.supabase.exceptions.RestException
 import io.github.jan.supabase.exceptions.UnauthorizedException
 import io.github.jan.supabase.gotrue.GoTrue
-import io.github.jan.supabase.gotrue.GoTrueImpl
 import io.github.jan.supabase.gotrue.SettingsSessionManager
 import io.github.jan.supabase.gotrue.VerifyType
-import io.github.jan.supabase.gotrue.currentAccessToken
 import io.github.jan.supabase.gotrue.gotrue
 import io.github.jan.supabase.gotrue.providers.builtin.Email
 import io.github.jan.supabase.gotrue.providers.builtin.Phone
-import io.github.jan.supabase.gotrue.user.UserInfo
 import io.github.jan.supabase.gotrue.user.UserSession
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
-import kotlinx.coroutines.test.TestCoroutineScheduler
-import kotlinx.coroutines.test.TestDispatcher
 import kotlinx.coroutines.test.runTest
+import kotlinx.datetime.Clock
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import kotlin.test.AfterTest
-import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
@@ -62,7 +54,7 @@ class GoTrueTest {
                 email = "email@example.com"
                 password = GoTrueMock.VALID_PASSWORD
             }
-            assertEquals(GoTrueMock.NEW_ACCESS_TOKEN, client.gotrue.currentAccessToken())
+            assertEquals(GoTrueMock.NEW_ACCESS_TOKEN, client.gotrue.currentAccessTokenOrNull())
             client.close()
         }
     }
@@ -86,7 +78,7 @@ class GoTrueTest {
         val client = createSupabaseClient()
         runTest(dispatcher) {
             client.gotrue.importAuthToken("some_token")
-            assertEquals("some_token", client.gotrue.currentAccessToken())
+            assertEquals("some_token", client.gotrue.currentAccessTokenOrNull())
             client.close()
         }
     }
@@ -97,10 +89,10 @@ class GoTrueTest {
         runTest(dispatcher) {
             val session = UserSession("some_token", "some_refresh_token", 20, "token_type", null)
             client.gotrue.importSession(session, false)
-            assertEquals("some_token", client.gotrue.currentAccessToken())
-            assertEquals("some_refresh_token", client.gotrue.currentSession.value!!.refreshToken)
+            assertEquals("some_token", client.gotrue.currentAccessTokenOrNull())
+            assertEquals("some_refresh_token", client.gotrue.currentSessionOrNull()!!.refreshToken)
             client.gotrue.invalidateSession()
-            assertEquals(null, client.gotrue.currentAccessToken())
+            assertEquals(null, client.gotrue.currentAccessTokenOrNull())
             client.close()
         }
     }
@@ -113,7 +105,7 @@ class GoTrueTest {
         runTest(dispatcher) {
             val session = UserSession("old_token", "some_refresh_token", 0, "token_type", null)
             client.gotrue.importSession(session, true)
-            assertNull(client.gotrue.currentAccessToken(), null)
+            assertNull(client.gotrue.currentAccessTokenOrNull(), null)
             client.close()
         }
     }
@@ -124,7 +116,7 @@ class GoTrueTest {
         runTest(dispatcher) {
             val session = UserSession("old_token", GoTrueMock.VALID_REFRESH_TOKEN, 0, "token_type", null)
             client.gotrue.importSession(session, true)
-            assertEquals(GoTrueMock.NEW_ACCESS_TOKEN, client.gotrue.currentAccessToken())
+            assertEquals(GoTrueMock.NEW_ACCESS_TOKEN, client.gotrue.currentAccessTokenOrNull())
             client.close()
         }
     }
@@ -139,7 +131,7 @@ class GoTrueTest {
         }
         runTest {
             client.gotrue.loadFromStorage()
-            assertNotNull(client.gotrue.currentSession.value)
+            assertNotNull(client.gotrue.currentSessionOrNull())
             client.close()
         }
     }
@@ -185,7 +177,7 @@ class GoTrueTest {
         val client = createSupabaseClient()
         runTest(dispatcher) {
             client.gotrue.verify(VerifyType.INVITE, GoTrueMock.VALID_VERIFY_TOKEN)
-            assertEquals(GoTrueMock.NEW_ACCESS_TOKEN, client.gotrue.currentAccessToken(), "verify with valid token should update the user session")
+            assertEquals(GoTrueMock.NEW_ACCESS_TOKEN, client.gotrue.currentAccessTokenOrNull(), "verify with valid token should update the user session")
         }
     }
 

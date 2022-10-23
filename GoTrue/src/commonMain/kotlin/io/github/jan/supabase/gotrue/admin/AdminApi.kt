@@ -2,7 +2,6 @@ package io.github.jan.supabase.gotrue.admin
 
 import io.github.jan.supabase.gotrue.GoTrue
 import io.github.jan.supabase.gotrue.checkErrors
-import io.github.jan.supabase.gotrue.currentAccessToken
 import io.github.jan.supabase.gotrue.user.UserInfo
 import io.github.jan.supabase.putJsonObject
 import io.github.jan.supabase.supabaseJson
@@ -136,7 +135,7 @@ internal class AdminApiImpl(val auth: GoTrue) : AdminApi {
     }
 
     fun HttpRequestBuilder.addAuthorization() {
-        header(HttpHeaders.Authorization, "Bearer ${auth.currentAccessToken() ?: tokenException()}")
+        header(HttpHeaders.Authorization, "Bearer ${auth.currentAccessTokenOrNull() ?: tokenException()}")
     }
 
     private fun tokenException(): Nothing = throw IllegalStateException("You need the service role access token to use admin methods. Use GoTrue#importAuthToken to import it. Never share it publicly")

@@ -29,6 +29,6 @@ object Email : DefaultAuthProvider<Email.Config, Email.Result> {
 
     override fun decodeResult(json: JsonObject): Result = supabaseJson.decodeFromJsonElement(json)
 
-    override fun encodeCredentials(credentials: Config.() -> Unit): String = supabaseJson.encodeToString(Config().apply(credentials) as DefaultAuthProvider.Config).also(::println)
+    override fun encodeCredentials(credentials: Config.() -> Unit): String = supabaseJson.encodeToString(Config().apply(credentials) as DefaultAuthProvider.Config)
 
 }

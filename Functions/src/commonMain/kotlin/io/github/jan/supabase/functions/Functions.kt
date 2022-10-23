@@ -2,9 +2,7 @@ package io.github.jan.supabase.functions
 
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.annotiations.SupabaseInternal
-import io.github.jan.supabase.gotrue.gotrue
 import io.github.jan.supabase.gotrue.checkErrors
-import io.github.jan.supabase.gotrue.currentAccessToken
 import io.github.jan.supabase.buildUrl
 import io.github.jan.supabase.gotrue.GoTrue
 import io.github.jan.supabase.plugins.MainConfig
@@ -38,7 +36,7 @@ class Functions(override val config: Config, override val supabaseClient: Supaba
      */
     suspend inline operator fun invoke(function: String, builder: HttpRequestBuilder.() -> Unit): HttpResponse {
         return supabaseClient.httpClient.post(resolveUrl(function)) {
-            val token = config.jwtToken ?: supabaseClient.pluginManager.getPluginOrNull(GoTrue)?.currentAccessToken()
+            val token = config.jwtToken ?: supabaseClient.pluginManager.getPluginOrNull(GoTrue)?.currentAccessTokenOrNull()
             token.let {
                 this.headers[HttpHeaders.Authorization] = "Bearer $it"
             }
