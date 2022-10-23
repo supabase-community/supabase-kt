@@ -8,6 +8,7 @@ import io.ktor.client.engine.mock.respond
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertIs
+import kotlin.test.assertNotNull
 
 class TestPlugin(private val config: Config) : SupabasePlugin {
 
@@ -66,9 +67,9 @@ class SupabaseClientTest {
                 testValue = true
             }
         }
-        val plugin = client.pluginManager.getPlugin<Any?>("test")
+        val plugin = client.pluginManager.getPluginOrNull(TestPlugin)
         //test if the plugin was correctly installed
-        assertIs<TestPlugin>(plugin, "Plugin 'test' should be of type TestPlugin")
+        assertNotNull(plugin, "Plugin 'test' should not be null")
         //test if the plugin correctly modified the 'useHTTPS' parameter
         assertEquals(
             "https://example.supabase.co",

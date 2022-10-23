@@ -8,15 +8,15 @@ class PluginManager(val installedPlugins: Map<String, SupabasePlugin>) {
     /**
      * Retrieve an installed plugin by its [key] or null if no plugin with the given key is installed
      */
-    inline fun <reified Plugin> getPluginOrNull(key: String): Plugin? {
-        return installedPlugins[key] as? Plugin
+    inline fun <reified Plugin: SupabasePlugin, Config, Provider : SupabasePluginProvider<Config, Plugin>> getPluginOrNull(provider: Provider): Plugin? {
+        return installedPlugins[provider.key] as? Plugin
     }
 
     /**
      * Retrieve an installed plugin by its [key] or throw an [IllegalArgumentException] if no plugin with the given key is installed
      */
-    inline fun <reified Plugin> getPlugin(key: String): Plugin {
-        return getPluginOrNull(key) ?: throw IllegalStateException("Plugin $key not installed or not of type ${Plugin::class}")
+    inline fun <reified Plugin: SupabasePlugin, Config, Provider : SupabasePluginProvider<Config, Plugin>> getPlugin(provider: Provider): Plugin {
+        return getPluginOrNull(provider) ?: throw IllegalStateException("Plugin ${provider.key} not installed or not of type ${Plugin::class}")
     }
 
     /**

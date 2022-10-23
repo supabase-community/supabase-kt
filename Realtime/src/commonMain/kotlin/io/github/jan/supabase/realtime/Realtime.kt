@@ -144,7 +144,7 @@ internal class RealtimeImpl(override val supabaseClient: SupabaseClient, overrid
             Napier.d { "Reconnecting..." }
         } else {
             scope.launch {
-                supabaseClient.pluginManager.getPluginOrNull<GoTrue>(GoTrue.key)?.currentSession?.collect {
+                supabaseClient.pluginManager.getPluginOrNull(GoTrue)?.currentSession?.collect {
                     if (status.value == Realtime.Status.CONNECTED) {
                         if (it == null) {
                             Napier.w { "No auth session found, disconnecting from realtime websocket"}
@@ -293,4 +293,4 @@ inline fun Realtime.createChannel(channelId: String, builder: RealtimeChannelBui
  * Supabase Realtime is a way to listen to changes in the PostgreSQL database via websockets
  */
 val SupabaseClient.realtime: Realtime
-    get() = pluginManager.getPlugin(Realtime.key)
+    get() = pluginManager.getPlugin(Realtime)

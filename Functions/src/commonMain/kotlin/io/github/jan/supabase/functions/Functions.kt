@@ -38,7 +38,7 @@ class Functions(override val config: Config, override val supabaseClient: Supaba
      */
     suspend inline operator fun invoke(function: String, builder: HttpRequestBuilder.() -> Unit): HttpResponse {
         return supabaseClient.httpClient.post(resolveUrl(function)) {
-            val token = config.jwtToken ?: supabaseClient.pluginManager.getPluginOrNull<GoTrue>(GoTrue.key)?.currentAccessToken()
+            val token = config.jwtToken ?: supabaseClient.pluginManager.getPluginOrNull(GoTrue)?.currentAccessToken()
             token.let {
                 this.headers[HttpHeaders.Authorization] = "Bearer $it"
             }
@@ -107,4 +107,4 @@ class Functions(override val config: Config, override val supabaseClient: Supaba
  * The Functions plugin handles everything related to supabase's edge functions
  */
 val SupabaseClient.functions: Functions
-    get() = pluginManager.getPlugin(Functions.key)
+    get() = pluginManager.getPlugin(Functions)

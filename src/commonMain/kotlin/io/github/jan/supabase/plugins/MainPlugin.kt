@@ -76,5 +76,5 @@ inline fun <Config : MainConfig, reified Plugin : MainPlugin<Config>> standalone
             config()
         }
     }
-    return underlyingClient.pluginManager.getPlugin(provider.key)
+    return underlyingClient.pluginManager.getPlugin(provider)
 }

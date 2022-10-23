@@ -250,7 +250,7 @@ enum class VerifyType {
  * The Auth plugin handles everything related to supabase's authentication system
  */
 val SupabaseClient.gotrue: GoTrue
-    get() = pluginManager.getPlugin(GoTrue.key)
+    get() = pluginManager.getPlugin(GoTrue)
 
 private suspend fun GoTrue.tryToGetUser(jwt: String) = try {
     getUser(jwt)

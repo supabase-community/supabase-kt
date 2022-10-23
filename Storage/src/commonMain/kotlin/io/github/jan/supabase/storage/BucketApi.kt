@@ -219,6 +219,6 @@ internal class BucketApiImpl(override val bucketId: String, val storage: Storage
  */
 fun BucketApi.authenticatedRequest(path: String): Pair<String?, String> {
     val url = authenticatedUrl(path)
-    val token = supabaseClient.pluginManager.getPluginOrNull<GoTrue>(GoTrue.key)?.currentAccessToken()
+    val token = supabaseClient.pluginManager.getPluginOrNull(GoTrue)?.currentAccessToken()
     return token to url
 }

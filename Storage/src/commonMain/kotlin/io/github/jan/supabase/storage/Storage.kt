@@ -131,7 +131,7 @@ internal class StorageImpl(override val supabaseClient: SupabaseClient, override
     }
 
     private fun HttpRequestBuilder.addAuthorization() {
-        val token = config.jwtToken ?: supabaseClient.pluginManager.getPluginOrNull<GoTrue>(GoTrue.key)?.currentAccessToken()
+        val token = config.jwtToken ?: supabaseClient.pluginManager.getPluginOrNull(GoTrue)?.currentAccessToken()
         token.let {
             headers {
                 append(HttpHeaders.Authorization, "Bearer $it")
@@ -145,4 +145,4 @@ internal class StorageImpl(override val supabaseClient: SupabaseClient, override
  * Supabase Storage is a simple way to store large files for various purposes
  */
 val SupabaseClient.storage: Storage
-    get() = pluginManager.getPlugin(Storage.key)
+    get() = pluginManager.getPlugin(Storage)

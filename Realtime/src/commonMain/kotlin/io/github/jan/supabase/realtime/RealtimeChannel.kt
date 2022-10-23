@@ -121,7 +121,7 @@ internal class RealtimeChannelImpl(
         }
         _status.value = RealtimeChannel.Status.JOINING
         Napier.d { "Joining channel $topic" }
-        val currentJwt = realtimeImpl.config.jwtToken ?: supabaseClient.pluginManager.getPluginOrNull<GoTrue>(GoTrue.key)?.currentAccessToken()
+        val currentJwt = realtimeImpl.config.jwtToken ?: supabaseClient.pluginManager.getPluginOrNull(GoTrue)?.currentAccessToken()
         val postgrestChanges = clientChanges.toList()
         val joinConfig = RealtimeJoinPayload(RealtimeJoinConfig(broadcastJoinConfig, presenceJoinConfig, postgrestChanges))
         val joinConfigObject = buildJsonObject {

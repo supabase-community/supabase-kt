@@ -55,7 +55,7 @@ internal class PostgrestImpl(override val supabaseClient: SupabaseClient, overri
  * With the postgrest plugin you can directly interact with your database via an api
  */
 val SupabaseClient.postgrest: Postgrest
-    get() = pluginManager.getPlugin(Postgrest.key)
+    get() = pluginManager.getPlugin(Postgrest)
 
 /**
  * Executes a database function

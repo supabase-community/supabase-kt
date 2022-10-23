@@ -34,7 +34,7 @@ var GoTrue.Config.host: String
 
 //TODO: Add context receiver 'Activity'
 fun SupabaseClient.handleDeeplinks(intent: Intent, onSessionSuccess: (UserSession) -> Unit = {}) {
-    val authPlugin = pluginManager.getPlugin<GoTrueImpl>("auth")
+    val authPlugin = pluginManager.getPlugin(GoTrue)
     val data = intent.data ?: return
     val scheme = data.scheme ?: return
     val host = data.host ?: return
@@ -59,13 +59,13 @@ fun SupabaseClient.handleDeeplinks(intent: Intent, onSessionSuccess: (UserSessio
         val user = authPlugin.getUser(accessToken)
         val session = UserSession(accessToken, refreshToken, expiresIn, tokenType, user, type)
         onSessionSuccess(session)
-        authPlugin.startJob(session)
+        authPlugin.startAutoRefresh(session)
     }
 }
 
 @Deprecated("initializeAndroid is no longer mandatory for android. If you want to handle deeplinks, use SupabaseClient.handleDeeplinks(intent) instead", ReplaceWith("supabaseClient.handleDeeplinks(intent)"), DeprecationLevel.ERROR)
 fun Activity.initializeAndroid(supabaseClient: SupabaseClient, onSessionSuccess: (UserSession) -> Unit = {}) {
-    val authPlugin = supabaseClient.pluginManager.getPlugin<GoTrueImpl>("auth")
+    val authPlugin = supabaseClient.pluginManager.getPlugin(GoTrue)
    // authPlugin.config.activity = this
    // addLifecycleCallbacks(authPlugin)
 
@@ -94,7 +94,7 @@ fun Activity.initializeAndroid(supabaseClient: SupabaseClient, onSessionSuccess:
             val user = authPlugin.getUser(accessToken)
             val session = UserSession(accessToken, refreshToken, expiresIn, tokenType, user, type)
             onSessionSuccess(session)
-            authPlugin.startJob(session)
+            authPlugin.startAutoRefresh(session)
         }
     }
 
