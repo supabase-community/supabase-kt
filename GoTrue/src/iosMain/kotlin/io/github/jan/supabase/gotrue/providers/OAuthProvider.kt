@@ -20,7 +20,7 @@ actual abstract class OAuthProvider : AuthProvider<ExternalAuthConfig, Unit> {
     ) {
         val gotrue = supabaseClient.gotrue
         val deepLink = "${gotrue.config.scheme}://${gotrue.config.host}"
-        val url = NSURL(supabaseClient.gotrue.resolveUrl("authorize?provider=${provider()}&redirect_to=$deepLink"))
+        val url = NSURL(supabaseClient.gotrue.resolveUrl("authorize?provider=${provider()}&redirect_to=${redirectUrl ?: deepLink}"))
         UIApplication.sharedApplication.openURL(url)
     }
 
@@ -32,7 +32,7 @@ actual abstract class OAuthProvider : AuthProvider<ExternalAuthConfig, Unit> {
     ) {
         val gotrue = supabaseClient.gotrue
         val deepLink = "${gotrue.config.scheme}://${gotrue.config.host}"
-        val url = NSURL(supabaseClient.gotrue.resolveUrl("authorize?provider=${provider()}&redirect_to=$deepLink"))
+        val url = NSURL(supabaseClient.gotrue.resolveUrl("authorize?provider=${provider()}&redirect_to=${redirectUrl ?: deepLink}"))
         UIApplication.sharedApplication.openURL(url)
     }
 

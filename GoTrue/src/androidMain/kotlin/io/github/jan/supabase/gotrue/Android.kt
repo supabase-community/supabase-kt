@@ -10,10 +10,9 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-internal fun GoTrue.openOAuth(provider: String) {
+internal fun GoTrue.openOAuth(provider: String, redirectTo: String) {
     this as GoTrueImpl
-    val deepLink = "${config.scheme}://${config.host}"
-    val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(resolveUrl("authorize?provider=${provider}&redirect_to=$deepLink")))
+    val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(resolveUrl("authorize?provider=${provider}&redirect_to=$redirectTo")))
     browserIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
     applicationContext().startActivity(browserIntent)
 }
