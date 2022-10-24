@@ -13,13 +13,13 @@ import kotlinx.coroutines.launch
 internal fun GoTrue.openOAuth(provider: String) {
     this as GoTrueImpl
     val deepLink = "${config.scheme}://${config.host}"
-    val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(supabaseClient.supabaseHttpUrl + "/auth/v1/authorize?provider=${provider}&redirect_to=$deepLink"))
+    val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(resolveUrl("authorize?provider=${provider}&redirect_to=$deepLink")))
     browserIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
     applicationContext().startActivity(browserIntent)
 }
 
 var GoTrue.Config.scheme: String
-    get() = (params["scheme"] as? String) ?: "Supabase"
+    get() = (params["scheme"] as? String) ?: "supabase"
     set(value) {
         params["scheme"] = value
     }
