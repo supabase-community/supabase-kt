@@ -18,13 +18,13 @@ import androidx.compose.ui.window.application
 import com.russhwolf.settings.PreferencesSettings
 import io.github.aakira.napier.DebugAntilog
 import io.github.aakira.napier.Napier
+import io.github.jan.supabase.createSupabaseClient
 import io.github.jan.supabase.gotrue.GoTrue
+import io.github.jan.supabase.gotrue.SessionStatus
 import io.github.jan.supabase.gotrue.SettingsSessionManager
 import io.github.jan.supabase.gotrue.gotrue
 import io.github.jan.supabase.gotrue.providers.Google
 import io.github.jan.supabase.gotrue.providers.builtin.Email
-import io.github.jan.supabase.createSupabaseClient
-import io.github.jan.supabase.plugins.standaloneSupabaseModule
 import io.github.jan.supabase.realtime.Realtime
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -49,12 +49,11 @@ suspend fun main() {
     val scope = CoroutineScope(Dispatchers.IO)
     application {
         Window(::exitApplication) {
-            val session by client.gotrue.currentSession.collectAsState()
+            val status by client.gotrue.sessionStatus.collectAsState()
             //val status by client.realtime.status.collectAsState()
-            println(session?.accessToken)
-            if (session != null) {
+            if (status is SessionStatus.Authenticated) {
                 Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
-                    Text("Logged in as ${session?.user?.email}")
+                    Text("Logged in as ${(status as SessionStatus.Authenticated).session.user?.email}")
                 }
             } else {
                 Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
