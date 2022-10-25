@@ -1,5 +1,6 @@
 package io.github.jan.supabase.gotrue.providers
 
+import io.github.aakira.napier.Napier
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.gotrue.gotrue
 import io.github.jan.supabase.gotrue.host
@@ -18,10 +19,7 @@ actual abstract class OAuthProvider : AuthProvider<ExternalAuthConfig, Unit> {
         redirectUrl: String?,
         config: (ExternalAuthConfig.() -> Unit)?
     ) {
-        val gotrue = supabaseClient.gotrue
-        val deepLink = "${gotrue.config.scheme}://${gotrue.config.host}"
-        val url = NSURL(supabaseClient.gotrue.resolveUrl("authorize?provider=${provider()}&redirect_to=${redirectUrl ?: deepLink}"))
-        UIApplication.sharedApplication.openURL(url)
+        openOAuth(redirectUrl, supabaseClient)
     }
 
     actual override suspend fun signUp(
@@ -30,10 +28,16 @@ actual abstract class OAuthProvider : AuthProvider<ExternalAuthConfig, Unit> {
         redirectUrl: String?,
         config: (ExternalAuthConfig.() -> Unit)?
     ) {
+        openOAuth(redirectUrl, supabaseClient)
+    }
+
+    private fun openOAuth(redirectUrl: String? = null, supabaseClient: SupabaseClient) {
         val gotrue = supabaseClient.gotrue
         val deepLink = "${gotrue.config.scheme}://${gotrue.config.host}"
         val url = NSURL(supabaseClient.gotrue.resolveUrl("authorize?provider=${provider()}&redirect_to=${redirectUrl ?: deepLink}"))
-        UIApplication.sharedApplication.openURL(url)
+        UIApplication.sharedApplication.openURL(url, emptyMap<Any?, Any>()) {
+            if(it) Napier.d { "Successfully opened provider url in safari" } else Napier.e { "Failed to open provider url in safari" }
+        }
     }
 
     actual companion object
