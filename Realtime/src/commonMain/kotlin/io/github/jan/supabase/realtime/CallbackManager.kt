@@ -1,6 +1,5 @@
 package io.github.jan.supabase.realtime
 
-import kotlinx.atomicfu.atomic
 import kotlinx.serialization.json.JsonObject
 
 sealed interface CallbackManager {
@@ -23,8 +22,7 @@ sealed interface CallbackManager {
 
 internal class CallbackManagerImpl : CallbackManager {
 
-    private val _nextId = atomic(0L)
-    var nextId: Long by _nextId //used to remove callbacks
+    private var nextId = 0L
     var serverChanges = listOf<PostgresJoinConfig>()
     val callbacks = mutableListOf<RealtimeCallback<*>>()
 
