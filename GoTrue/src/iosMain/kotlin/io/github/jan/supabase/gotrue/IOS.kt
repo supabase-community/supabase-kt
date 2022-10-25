@@ -19,7 +19,7 @@ var GoTrue.Config.host: String
     }
 
 @SupabaseExperimental
-fun SupabaseClient.handleDeeplink(url: NSURL, onSessionSuccess: (UserSession) -> Unit = {}) {
+fun SupabaseClient.handleDeeplinks(url: NSURL, onSessionSuccess: (UserSession) -> Unit = {}) {
     val components = NSURLComponents(url, true)
     if(components.scheme != gotrue.config.scheme || components.host != gotrue.config.host) return
     val fragment = components.fragment ?: return
