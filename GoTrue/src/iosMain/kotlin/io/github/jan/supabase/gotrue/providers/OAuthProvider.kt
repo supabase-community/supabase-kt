@@ -1,13 +1,13 @@
 package io.github.jan.supabase.gotrue.providers
 
+import io.github.aakira.napier.Napier
 import io.github.jan.supabase.SupabaseClient
-import io.github.jan.supabase.gotrue.GoTrueImpl
 import io.github.jan.supabase.gotrue.gotrue
 import io.github.jan.supabase.gotrue.host
-import io.github.jan.supabase.gotrue.openOAuth
 import io.github.jan.supabase.gotrue.scheme
 import io.github.jan.supabase.gotrue.user.UserSession
-
+import platform.Foundation.NSURL
+import platform.UIKit.UIApplication
 
 actual abstract class OAuthProvider : AuthProvider<ExternalAuthConfig, Unit> {
 
@@ -19,9 +19,7 @@ actual abstract class OAuthProvider : AuthProvider<ExternalAuthConfig, Unit> {
         redirectUrl: String?,
         config: (ExternalAuthConfig.() -> Unit)?
     ) {
-        val gotrue = supabaseClient.gotrue as GoTrueImpl
-        val deepLink = "${gotrue.config.scheme}://${gotrue.config.host}"
-        gotrue.openOAuth(provider(), redirectUrl ?: deepLink)
+        openOAuth(redirectUrl, supabaseClient)
     }
 
     actual override suspend fun signUp(
@@ -30,12 +28,18 @@ actual abstract class OAuthProvider : AuthProvider<ExternalAuthConfig, Unit> {
         redirectUrl: String?,
         config: (ExternalAuthConfig.() -> Unit)?
     ) {
-        val gotrue = supabaseClient.gotrue as GoTrueImpl
+        openOAuth(redirectUrl, supabaseClient)
+    }
+
+    private fun openOAuth(redirectUrl: String? = null, supabaseClient: SupabaseClient) {
+        val gotrue = supabaseClient.gotrue
         val deepLink = "${gotrue.config.scheme}://${gotrue.config.host}"
-        gotrue.openOAuth(provider(), redirectUrl ?: deepLink)
+        val url = NSURL(supabaseClient.gotrue.resolveUrl("authorize?provider=${provider()}&redirect_to=${redirectUrl ?: deepLink}"))
+        UIApplication.sharedApplication.openURL(url, emptyMap<Any?, Any>()) {
+            if(it) Napier.d { "Successfully opened provider url in safari" } else Napier.e { "Failed to open provider url in safari" }
+        }
     }
 
     actual companion object
-
 
 }

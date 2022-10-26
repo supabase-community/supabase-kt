@@ -167,6 +167,7 @@ kotlin {
             }
         }
     }
+    ios()
     sourceSets {
         all {
             languageSettings.optIn("kotlin.RequiresOptIn")

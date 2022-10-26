@@ -25,8 +25,6 @@ expect abstract class OAuthProvider() : AuthProvider<ExternalAuthConfig, Unit> {
 
 }
 
-
-
 sealed interface AuthFail {
 
     object Timeout: AuthFail

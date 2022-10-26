@@ -1,6 +1,7 @@
 plugins {
     kotlin("multiplatform")
     id("com.android.library")
+    id("com.louiscad.complete-kotlin") version "1.1.0"
 }
 
 group = "io.github.jan-tennert.supabase"
@@ -38,6 +39,7 @@ kotlin {
             }
         }
     }
+    ios()
     sourceSets {
         all {
             languageSettings.optIn("kotlin.RequiresOptIn")
@@ -72,6 +74,7 @@ kotlin {
             }
         }
         val jsMain by getting
+        val iosMain by getting
     }
 }
 
