@@ -32,13 +32,28 @@ private fun addLifecycleCallbacks(gotrue: GoTrue) {
         object : DefaultLifecycleObserver {
 
             override fun onStart(owner: LifecycleOwner) {
-                scope.launch {
-                    gotrue.startAutoRefreshForCurrentSession()
+                if(!gotrue.isAutoRefreshRunning && gotrue.config.alwaysAutoRefresh) {
+                    Napier.d {
+                        "Starting auto refresh"
+                    }
+                    scope.launch {
+                        try {
+                            gotrue.startAutoRefreshForCurrentSession()
+                        } catch(e: IllegalStateException) {
+                            Napier.d {
+                                "No session found for auto refresh"
+                            }
+                        }
+                    }
                 }
             }
             override fun onStop(owner: LifecycleOwner) {
-                Napier.d { "Cancelling session job because app is switching to the background" }
-                gotrue.stopAutoRefreshForCurrentSession()
+                if(gotrue.isAutoRefreshRunning) {
+                    Napier.d { "Cancelling auto refresh because app is switching to the background" }
+                    scope.launch {
+                        gotrue.stopAutoRefreshForCurrentSession()
+                    }
+                }
             }
         }
     )

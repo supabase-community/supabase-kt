@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.Button
-import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.runtime.collectAsState
@@ -19,6 +18,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import io.github.aakira.napier.DebugAntilog
+import io.github.aakira.napier.Napier
 import io.github.jan.supabase.createSupabaseClient
 import io.github.jan.supabase.gotrue.GoTrue
 import io.github.jan.supabase.gotrue.SessionStatus
@@ -33,8 +34,7 @@ import kotlinx.coroutines.launch
 class MainActivity : AppCompatActivity() {
 
     val supabaseClient = createSupabaseClient(
-        supabaseUrl = "https://arnyfaeuskyqfxkvotgj.supabase.co",
-        supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFybnlmYWV1c2t5cWZ4a3ZvdGdqIiwicm9sZSI6ImFub24iLCJpYXQiOjE2NTMwMzkxMTEsImV4cCI6MTk2ODYxNTExMX0.ItmL8lfnOL9oy7CEX9N6TnYt10VVhk-KTlwley4aq1M"
+        "", ""
     ) {
         install(GoTrue) {
             scheme = "supabase"
@@ -44,9 +44,10 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        Napier.base(DebugAntilog())
         supabaseClient.handleDeeplinks(intent)
         setContent {
-            MaterialTheme {
+            MaterialThemeKeine {
                 val status by supabaseClient.gotrue.sessionStatus.collectAsState()
                 val scope = rememberCoroutineScope()
                 if (status is SessionStatus.Authenticated) {
