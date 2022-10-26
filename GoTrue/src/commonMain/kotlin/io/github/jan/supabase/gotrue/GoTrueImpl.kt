@@ -2,18 +2,17 @@ package io.github.jan.supabase.gotrue
 
  import io.github.aakira.napier.Napier
  import io.github.jan.supabase.SupabaseClient
+ import io.github.jan.supabase.exceptions.RestException
+ import io.github.jan.supabase.exceptions.UnauthorizedException
  import io.github.jan.supabase.gotrue.admin.AdminApi
  import io.github.jan.supabase.gotrue.admin.AdminApiImpl
  import io.github.jan.supabase.gotrue.providers.AuthProvider
  import io.github.jan.supabase.gotrue.providers.builtin.DefaultAuthProvider
  import io.github.jan.supabase.gotrue.user.UserInfo
  import io.github.jan.supabase.gotrue.user.UserSession
- import io.github.jan.supabase.exceptions.RestException
- import io.github.jan.supabase.exceptions.UnauthorizedException
  import io.github.jan.supabase.putJsonObject
  import io.github.jan.supabase.supabaseJson
  import io.github.jan.supabase.toJsonObject
- import io.ktor.client.call.NoTransformationFoundException
  import io.ktor.client.call.body
  import io.ktor.client.request.HttpRequestBuilder
  import io.ktor.client.request.get
@@ -36,6 +35,7 @@ package io.github.jan.supabase.gotrue
  import kotlinx.coroutines.flow.asStateFlow
  import kotlinx.coroutines.launch
  import kotlinx.datetime.Clock
+ import kotlinx.serialization.decodeFromString
  import kotlinx.serialization.json.JsonObject
  import kotlinx.serialization.json.buildJsonObject
  import kotlinx.serialization.json.encodeToJsonElement
@@ -206,10 +206,11 @@ internal class GoTrueImpl(override val supabaseClient: SupabaseClient, override 
         val response = supabaseClient.httpClient.get(resolveUrl("user")) {
             header(HttpHeaders.Authorization, "Bearer $jwt")
         }
+        val body = response.bodyAsText()
         return try {
-            response.body()
-        } catch(e: NoTransformationFoundException) {
-            Napier.e(e) { "Failed to get user" }
+            supabaseJson.decodeFromString(body)
+        } catch(e: Exception) {
+            Napier.e(e) { "Failed to get user. Full response body: $body" }
             throw UnauthorizedException("Invalid JWT")
         }
     }
