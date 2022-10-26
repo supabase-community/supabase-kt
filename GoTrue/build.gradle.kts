@@ -39,7 +39,7 @@ kotlin {
             }
         }
     }
-    ios()
+    //ios()
     sourceSets {
         all {
             languageSettings.optIn("kotlin.RequiresOptIn")
@@ -74,7 +74,7 @@ kotlin {
             }
         }
         val jsMain by getting
-        val iosMain by getting
+        //val iosMain by getting
     }
 }
 
