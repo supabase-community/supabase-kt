@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.Button
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.runtime.collectAsState
@@ -47,7 +48,7 @@ class MainActivity : AppCompatActivity() {
         Napier.base(DebugAntilog())
         supabaseClient.handleDeeplinks(intent)
         setContent {
-            MaterialThemeKeine {
+            MaterialTheme {
                 val status by supabaseClient.gotrue.sessionStatus.collectAsState()
                 val scope = rememberCoroutineScope()
                 if (status is SessionStatus.Authenticated) {
