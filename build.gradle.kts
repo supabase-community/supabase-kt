@@ -114,7 +114,7 @@ configure(allprojects.filter { it.name in modules }) {
                 pom {
                     name.set(this@configure.name)
                     description.set(this@configure.description ?: "A Kotlin Multiplatform Supabase Framework")
-                    url.set("https://github.com/jan-tennert/DiscordKM")
+                    url.set("https://github.com/supabase-community/supabase-kt")
                     licenses {
                         license {
                             name.set("GPL-3.0")
@@ -123,11 +123,11 @@ configure(allprojects.filter { it.name in modules }) {
                     }
                     issueManagement {
                         system.set("Github")
-                        url.set("https://github.com/jan-tennert/SupaCompose/issues")
+                        url.set("https://github.com/supabase-community/supabase-kt/issues")
                     }
                     scm {
-                        connection.set("https://github.com/jan-tennert/SupaCompose.git")
-                        url.set("https://github.com/jan-tennert/SupaCompose")
+                        connection.set("https://github.com/supabase-community/supabase-kt.git")
+                        url.set("https://github.com/supabase-community/supabase-kt")
                     }
                     developers {
                         developer {
