@@ -15,7 +15,6 @@ import io.github.jan.supabase.gotrue.user.UserSession
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
-import kotlinx.datetime.Clock
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlin.test.Test
@@ -235,6 +234,7 @@ class GoTrueTest {
                 autoLoadFromStorage = false
                 alwaysAutoRefresh = false
                 coroutineDispatcher = dispatcher
+                params["enableLifecycleCallbacks"] = false
 
                 sessionManager = SettingsSessionManager(MapSettings())
 

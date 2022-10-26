@@ -24,6 +24,11 @@ var GoTrue.Config.host: String
         params["host"] = value
     }
 
+var GoTrue.Config.enableLifecycleCallbacks: Boolean
+    get() = (params["enableLifecycleCallbacks"] as? Boolean) ?: true
+    set(value) {
+        params["enableLifecycleCallbacks"] = value
+    }
 
 //TODO: Add context receiver 'Activity'
 fun SupabaseClient.handleDeeplinks(intent: Intent, onSessionSuccess: (UserSession) -> Unit = {}) {

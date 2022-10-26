@@ -26,6 +26,7 @@ actual fun GoTrue.setupPlatform() {
 }
 
 private fun addLifecycleCallbacks(gotrue: GoTrue) {
+    if(!gotrue.config.enableLifecycleCallbacks) return
     val lifecycle = ProcessLifecycleOwner.get().lifecycle
     val scope = CoroutineScope(Dispatchers.IO)
     lifecycle.addObserver(
