@@ -93,7 +93,9 @@ internal class GoTrueImpl(override val supabaseClient: SupabaseClient, override 
         redirectUrl: String?,
         config: (C.() -> Unit)?
     ) = provider.login(supabaseClient, {
-        startAutoRefresh(it)
+        authScope.launch {
+            startAutoRefresh(it)
+        }
     }, redirectUrl, config)
 
     override suspend fun <C, R, Provider : AuthProvider<C, R>> signUpWith(
