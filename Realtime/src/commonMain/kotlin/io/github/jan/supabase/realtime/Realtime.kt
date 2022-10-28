@@ -6,7 +6,6 @@ import io.github.jan.supabase.SupabaseClientBuilder
 import io.github.jan.supabase.annotiations.SupabaseInternal
 import io.github.jan.supabase.gotrue.GoTrue
 import io.github.jan.supabase.gotrue.SessionStatus
-import io.github.jan.supabase.gotrue.gotrue
 import io.github.jan.supabase.plugins.MainConfig
 import io.github.jan.supabase.plugins.MainPlugin
 import io.github.jan.supabase.plugins.SupabasePluginProvider
@@ -124,7 +123,8 @@ internal class RealtimeImpl(override val supabaseClient: SupabaseClient, overrid
         get() = _subscriptions.toMap()
     private val scope = CoroutineScope(Dispatchers.Default + SupervisorJob())
     private val statusListeners = mutableListOf<(Realtime.Status) -> Unit>()
-    lateinit var heartbeatJob: Job
+    var heartbeatJob: Job? = null
+    var messageJob: Job? = null
     var ref = 0
     var heartbeatRef = 0
     override val API_VERSION: Int
@@ -187,7 +187,7 @@ internal class RealtimeImpl(override val supabaseClient: SupabaseClient, overrid
     }
 
     private fun listenForMessages() {
-        scope.launch {
+        messageJob = scope.launch {
             try {
                 ws?.let {
                     for (frame in it.incoming) {
@@ -196,6 +196,7 @@ internal class RealtimeImpl(override val supabaseClient: SupabaseClient, overrid
                     }
                 }
             } catch(e: Exception) {
+                if(!isActive) return@launch
                 Napier.e(e) { "Error while listening for messages. Trying again in ${config.reconnectDelay}" }
                 updateStatus(Realtime.Status.DISCONNECTED)
                 disconnect()
@@ -223,9 +224,10 @@ internal class RealtimeImpl(override val supabaseClient: SupabaseClient, overrid
 
     override fun disconnect() {
         Napier.d { "Closing websocket connection" }
+        messageJob?.cancel()
         ws?.cancel()
         ws = null
-        heartbeatJob.cancel()
+        heartbeatJob?.cancel()
         updateStatus(Realtime.Status.DISCONNECTED)
     }
 
