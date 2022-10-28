@@ -28,7 +28,6 @@ package io.github.jan.supabase.gotrue
  import kotlinx.coroutines.CoroutineScope
  import kotlinx.coroutines.Job
  import kotlinx.coroutines.cancel
- import kotlinx.coroutines.coroutineScope
  import kotlinx.coroutines.delay
  import kotlinx.coroutines.flow.MutableStateFlow
  import kotlinx.coroutines.flow.StateFlow
@@ -282,19 +281,14 @@ internal class GoTrueImpl(override val supabaseClient: SupabaseClient, override 
                         "Session expired. Refreshing session..."
                     }
                     try {
-                        refreshSession(session.refreshToken)
+                        val newSession = refreshSession(session.refreshToken)
+                        startAutoRefresh(newSession)
                     } catch(e: RestException) {
                         invalidateSession()
                         Napier.e(e) { "Couldn't refresh session. The refresh token may have been revoked." }
                     } catch (e: Exception) {
                         Napier.e(e) { "Couldn't reach supabase. Either the address doesn't exist or the network might not be on. Retrying in ${config.retryDelay}" }
                         _sessionStatus.value = SessionStatus.NetworkError
-                        coroutineScope {
-                            launch {
-                                delay(config.retryDelay)
-                                startAutoRefresh(session)
-                            }
-                        }
                     }
                 }
             }
