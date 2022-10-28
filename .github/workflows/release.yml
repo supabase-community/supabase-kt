@@ -12,7 +12,7 @@ env:
    OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
    OSSRH_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
    SONATYPE_REPOSITORY_ID: ${{ secrets.SONATYPE_REPOSITORY_ID }}
-   SONATYPE_PROFILE_ID: ${{ inputs.repository_id }}
+   SONATYPE_PROFILE_ID: ${{ github.event.inputs.repository_id }}
 
 jobs:
   publish:
