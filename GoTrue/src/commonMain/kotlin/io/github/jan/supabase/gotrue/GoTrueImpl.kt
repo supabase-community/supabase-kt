@@ -93,9 +93,7 @@ internal class GoTrueImpl(override val supabaseClient: SupabaseClient, override 
         redirectUrl: String?,
         config: (C.() -> Unit)?
     ) = provider.login(supabaseClient, {
-        authScope.launch {
-            startAutoRefresh(it)
-        }
+        startAutoRefresh(it)
     }, redirectUrl, config)
 
     override suspend fun <C, R, Provider : AuthProvider<C, R>> signUpWith(
@@ -277,26 +275,24 @@ internal class GoTrueImpl(override val supabaseClient: SupabaseClient, override 
             _sessionStatus.value = SessionStatus.Authenticated(session)
             sessionManager.saveSession(session)
             sessionJob?.cancel()
-            coroutineScope {
-                sessionJob = launch {
-                    delay(session.expiresIn.seconds.inWholeMilliseconds)
-                    launch {
-                        Napier.d {
-                            "Session expired. Refreshing session..."
-                        }
-                        try {
-                            refreshSession(session.refreshToken)
-                        } catch(e: RestException) {
-                            invalidateSession()
-                            Napier.e(e) { "Couldn't refresh session. The refresh token may have been revoked." }
-                        } catch (e: Exception) {
-                            Napier.e(e) { "Couldn't reach supabase. Either the address doesn't exist or the network might not be on. Retrying in ${config.retryDelay}" }
-                            _sessionStatus.value = SessionStatus.NetworkError
-                            coroutineScope {
-                                launch {
-                                    delay(config.retryDelay)
-                                    startAutoRefresh(session)
-                                }
+            sessionJob = authScope.launch {
+                delay(session.expiresIn.seconds.inWholeMilliseconds)
+                launch {
+                    Napier.d {
+                        "Session expired. Refreshing session..."
+                    }
+                    try {
+                        refreshSession(session.refreshToken)
+                    } catch(e: RestException) {
+                        invalidateSession()
+                        Napier.e(e) { "Couldn't refresh session. The refresh token may have been revoked." }
+                    } catch (e: Exception) {
+                        Napier.e(e) { "Couldn't reach supabase. Either the address doesn't exist or the network might not be on. Retrying in ${config.retryDelay}" }
+                        _sessionStatus.value = SessionStatus.NetworkError
+                        coroutineScope {
+                            launch {
+                                delay(config.retryDelay)
+                                startAutoRefresh(session)
                             }
                         }
                     }
