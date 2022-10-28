@@ -1,6 +1,10 @@
 name: release-to-maven-central
 on:
   workflow_dispatch:
+    inputs:
+      repository_id:
+        required: true
+        type: string
 
 env:
    GPG_SIGNING_KEY: ${{ secrets.GPG_SIGNING_KEY }}
@@ -8,7 +12,7 @@ env:
    OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
    OSSRH_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
    SONATYPE_REPOSITORY_ID: ${{ secrets.SONATYPE_REPOSITORY_ID }}
-   SONATYPE_PROFILE_ID: ${{ secrets.SONATYPE_PROFILE_ID }}
+   SONATYPE_PROFILE_ID: ${{ inputs.repository_id }}
 
 jobs:
   publish:
