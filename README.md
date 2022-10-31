@@ -21,6 +21,19 @@ dependencies {
 }
 ```
 
+If you use multiple modules, you can use the bom dependency to get the correct versions for all modules:
+
+```kotlin
+implementation(platform("io.github.jan-tennert.supabase:bom:VERSION"))
+implementation("io.github.jan-tennert.supabase:[module e.g. functions-kt or gotrue-kt]")
+```
+
+In Multiplatform projects:
+```kotlin
+implementation(project.dependencies.platform("io.github.jan-tennert.supabase:bom:VERSION"))
+implementation("io.github.jan-tennert.supabase:[module e.g. functions-kt or gotrue-kt]")
+```
+
 # [Getting started](https://github.com/supabase-community/supabase-kt/wiki/Getting-Started)
 
 # Modules
