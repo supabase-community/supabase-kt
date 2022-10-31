@@ -210,7 +210,9 @@ internal class RealtimeImpl(override val supabaseClient: SupabaseClient, overrid
             while (isActive) {
                 delay(config.heartbeatInterval)
                 if(!isActive) break
-                sendHeartbeat()
+                launch {
+                    sendHeartbeat()
+                }
             }
         }
     }
