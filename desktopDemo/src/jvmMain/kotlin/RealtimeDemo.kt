@@ -1,7 +1,6 @@
 import io.github.aakira.napier.DebugAntilog
 import io.github.aakira.napier.Napier
 import io.github.jan.supabase.createSupabaseClient
-import io.github.jan.supabase.gotrue.GoTrue
 import io.github.jan.supabase.realtime.PostgresAction
 import io.github.jan.supabase.realtime.Realtime
 import io.github.jan.supabase.realtime.createChannel
@@ -14,7 +13,6 @@ suspend fun main() {
         supabaseUrl = "https://URL.supabase.co",
         supabaseKey = "API_KEY"
     ) {
-        install(GoTrue)
         install(Realtime)
     }
     client.realtime.connect()
