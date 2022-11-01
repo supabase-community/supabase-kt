@@ -16,6 +16,7 @@ import io.ktor.client.engine.HttpClientEngine
 class SupabaseClientBuilder @PublishedApi internal constructor(private val supabaseUrl: String, private val supabaseKey: String) {
     var useHTTPS = true
     var httpEngine: HttpClientEngine? = null
+    var ignoreModulesInUrl = false
     private val httpConfigOverrides = mutableListOf<HttpClientConfig<*>.() -> Unit>()
     private val plugins = mutableMapOf<String, ((SupabaseClient) -> SupabasePlugin)>()
 
@@ -27,8 +28,8 @@ class SupabaseClientBuilder @PublishedApi internal constructor(private val supab
             supabaseUrl.contains("rest/v1") -> "rest/v1"
             else -> null
         }
-        module?.let {
-            throw IllegalStateException("The supabase url should not contain ($it), supabase-kt handles the url endpoints. If you want to use a custom url for a module specify it in their builder but that's not necessary for normal supabase projects")
+        if(!ignoreModulesInUrl && module != null) {
+            throw IllegalStateException("The supabase url should not contain ($module), supabase-kt handles the url endpoints. If you want to use a custom url for a module specify it in their builder but that's not necessary for normal supabase projects")
         }
     }
 
