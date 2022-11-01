@@ -20,11 +20,15 @@ class SupabaseClientBuilder @PublishedApi internal constructor(private val supab
     private val plugins = mutableMapOf<String, ((SupabaseClient) -> SupabasePlugin)>()
 
     init {
-        when {
-            supabaseUrl.contains("realtime/v1") -> throw IllegalArgumentException("The supabase url must not contain realtime/v1")
-            supabaseUrl.contains("auth/v1") -> throw IllegalArgumentException("The supabase url must not contain auth/v1")
-            supabaseUrl.contains("storage/v1") -> throw IllegalArgumentException("The supabase url must not contain storage/v1")
-            supabaseUrl.contains("rest/v1") -> throw IllegalArgumentException("The supabase url must not contain rest/v1")
+        val module = when {
+            supabaseUrl.contains("realtime/v1") -> "realtime/v1"
+            supabaseUrl.contains("auth/v1") -> "auth/v1"
+            supabaseUrl.contains("storage/v1") -> "storage/v1"
+            supabaseUrl.contains("rest/v1") -> "rest/v1"
+            else -> null
+        }
+        module?.let {
+            throw IllegalStateException("The supabase url should not contain ($it), supabase-kt handles the url endpoints. If you want to use a custom url for a module specify it in their builder but that's not necessary for normal supabase projects")
         }
     }
 
