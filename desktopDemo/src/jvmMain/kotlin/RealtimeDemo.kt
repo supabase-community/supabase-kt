@@ -11,8 +11,8 @@ import io.github.jan.supabase.realtime.realtime
 suspend fun main() {
     Napier.base(DebugAntilog())
     val client = createSupabaseClient(
-        supabaseUrl = "https://URL.supabase.co/realtime/v1",
-        supabaseKey = System.getenv("SUPABASE_KEY")
+        supabaseUrl = "https://URL.supabase.co",
+        supabaseKey = "API_KEY"
     ) {
         install(GoTrue)
         install(Realtime)
