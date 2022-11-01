@@ -27,7 +27,7 @@ val client = createSupabaseClient {
 
 or create standalone module
 ```kotlin
-val storage = standaloneSupabaseModule(Storage, url = "https://your.storage.url.com", apiKey = "your-api-key")
+val storage = standaloneSupabaseModule(Functions, url = "https://your.storage.url.com", apiKey = "your-api-key")
 ```
 
 # Usage
