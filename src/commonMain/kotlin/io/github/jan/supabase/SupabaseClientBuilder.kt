@@ -19,6 +19,15 @@ class SupabaseClientBuilder @PublishedApi internal constructor(private val supab
     private val httpConfigOverrides = mutableListOf<HttpClientConfig<*>.() -> Unit>()
     private val plugins = mutableMapOf<String, ((SupabaseClient) -> SupabasePlugin)>()
 
+    init {
+        when {
+            supabaseUrl.contains("realtime/v1") -> throw IllegalArgumentException("The supabase url must not contain realtime/v1")
+            supabaseUrl.contains("auth/v1") -> throw IllegalArgumentException("The supabase url must not contain auth/v1")
+            supabaseUrl.contains("storage/v1") -> throw IllegalArgumentException("The supabase url must not contain storage/v1")
+            supabaseUrl.contains("rest/v1") -> throw IllegalArgumentException("The supabase url must not contain rest/v1")
+        }
+    }
+
     @PublishedApi
     internal fun build(): SupabaseClient {
         return SupabaseClientImpl(supabaseUrl.split("//").last(), supabaseKey, plugins, httpConfigOverrides, useHTTPS, httpEngine)
