@@ -9,7 +9,7 @@ import io.github.jan.supabase.realtime.postgresChangeFlow
 import io.github.jan.supabase.realtime.realtime
 
 suspend fun main() {
-    Napier.base(DebugAntilog())
+    Napier.base(DebugAntilog()) //to see supabase-kt logs
     val client = createSupabaseClient(
         supabaseUrl = "https://URL.supabase.co",
         supabaseKey = "API_KEY"
