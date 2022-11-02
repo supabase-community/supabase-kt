@@ -235,6 +235,7 @@ internal class RealtimeImpl(override val supabaseClient: SupabaseClient, overrid
 
     private fun onMessage(stringMessage: String) {
         val message = supabaseJson.decodeFromString<RealtimeMessage>(stringMessage)
+        Napier.d { "Received message $stringMessage" }
         val channel = subscriptions[message.topic] as? RealtimeChannelImpl
         if(message.ref?.toIntOrNull() == heartbeatRef) {
             Napier.i { "Heartbeat received" }

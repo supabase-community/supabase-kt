@@ -128,6 +128,7 @@ internal class RealtimeChannelImpl(
                 put("access_token", currentJwt)
             }
         }
+        Napier.d { "Joining realtime socket with body $joinConfigObject" }
         realtimeImpl.ws?.sendSerialized(RealtimeMessage(topic, RealtimeChannel.CHANNEL_EVENT_JOIN, joinConfigObject, null))
     }
 
