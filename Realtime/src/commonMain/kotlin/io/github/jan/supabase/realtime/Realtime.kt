@@ -82,7 +82,8 @@ sealed interface Realtime : MainPlugin<Realtime.Config> {
         var customRealtimeURL: String? = null,
         var reconnectDelay: Duration = 7.seconds,
         override var customUrl: String? = null,
-        override var jwtToken: String? = null
+        override var jwtToken: String? = null,
+        var disconnectOnSessionLoss: Boolean = true
     ): MainConfig
 
     companion object : SupabasePluginProvider<Config, Realtime> {
@@ -149,8 +150,10 @@ internal class RealtimeImpl(override val supabaseClient: SupabaseClient, overrid
                     when(it) {
                         is SessionStatus.Authenticated -> updateJwt(it.session.accessToken)
                         is SessionStatus.NotAuthenticated -> {
-                            Napier.w { "No auth session found, disconnecting from realtime websocket"}
-                            disconnect()
+                            if(config.disconnectOnSessionLoss) {
+                                Napier.w { "No auth session found, disconnecting from realtime websocket"}
+                                disconnect()
+                            }
                         }
                         else -> {}
                     }
