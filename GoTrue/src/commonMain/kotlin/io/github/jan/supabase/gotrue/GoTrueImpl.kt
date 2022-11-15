@@ -15,16 +15,9 @@ package io.github.jan.supabase.gotrue
  import io.github.jan.supabase.toJsonObject
  import io.ktor.client.call.body
  import io.ktor.client.request.HttpRequestBuilder
- import io.ktor.client.request.get
- import io.ktor.client.request.header
  import io.ktor.client.request.headers
- import io.ktor.client.request.post
- import io.ktor.client.request.put
- import io.ktor.client.request.setBody
  import io.ktor.client.statement.bodyAsText
- import io.ktor.http.ContentType
  import io.ktor.http.HttpHeaders
- import io.ktor.http.contentType
  import kotlinx.coroutines.CoroutineScope
  import kotlinx.coroutines.Job
  import kotlinx.coroutines.cancel
@@ -49,6 +42,7 @@ internal class GoTrueImpl(override val supabaseClient: SupabaseClient, override 
     override val sessionStatus: StateFlow<SessionStatus> = _sessionStatus.asStateFlow()
     private val authScope = CoroutineScope(config.coroutineDispatcher)
     override val sessionManager = config.sessionManager ?: SettingsSessionManager()
+    internal val api = supabaseClient.authenticatedSupabaseApi(this)
     override val admin: AdminApi = AdminApiImpl(this)
     var sessionJob: Job? = null
     override val isAutoRefreshRunning: Boolean
@@ -81,9 +75,7 @@ internal class GoTrueImpl(override val supabaseClient: SupabaseClient, override 
         get() = GoTrue.key
 
     override suspend fun invalidateAllRefreshTokens() {
-        supabaseClient.httpClient.post(resolveUrl("logout")) {
-            addAuthorization()
-        }
+        api.post("logout")
         invalidateSession()
     }
 
@@ -114,10 +106,7 @@ internal class GoTrueImpl(override val supabaseClient: SupabaseClient, override 
                 put("data", supabaseJson.encodeToJsonElement(it))
             }
         }.toString()
-        val response = supabaseClient.httpClient.put(resolveUrl("user")) {
-            addAuthorization()
-            setBody(body)
-        }
+        val response = api.putJson("user", body)
         return response.body()
     }
 
@@ -132,11 +121,8 @@ internal class GoTrueImpl(override val supabaseClient: SupabaseClient, override 
             putJsonObject(provider.encodeCredentials(config).toJsonObject())
             put("create_user", createUser)
         }.toString()
-        val redirect = finalRedirectUrl?.let {
-            "?redirect_to=$finalRedirectUrl"
-        } ?: ""
-        supabaseClient.httpClient.post(resolveUrl("otp$redirect")) {
-            setBody(body)
+        api.postJson("otp", body) {
+            finalRedirectUrl?.let { url.parameters.append("redirect_to", it) }
         }.checkErrors()
     }
 
@@ -150,18 +136,13 @@ internal class GoTrueImpl(override val supabaseClient: SupabaseClient, override 
                 }
             }
         }.toString()
-        val redirect = finalRedirectUrl?.let {
-            "?redirect_to=$finalRedirectUrl"
-        } ?: ""
-        supabaseClient.httpClient.post(resolveUrl("recover$redirect")) {
-            setBody(body)
-        }
+        api.postJson("recover", body) {
+            finalRedirectUrl?.let { url.encodedParameters.append("redirect_to", it) }
+        }.checkErrors()
     }
 
     override suspend fun reauthenticate() {
-        supabaseClient.httpClient.get(resolveUrl("reauthenticate")) {
-            addAuthorization()
-        }
+        api.get("reauthenticate").checkErrors()
     }
 
     override suspend fun verify(type: VerifyType, token: String, captchaToken: String?) {
@@ -174,10 +155,7 @@ internal class GoTrueImpl(override val supabaseClient: SupabaseClient, override 
                 }
             }
         }
-        val response = supabaseClient.httpClient.post(resolveUrl("verify")) {
-            contentType(ContentType.Application.Json)
-            setBody(body)
-        }
+        val response = api.postJson("verify", body)
         val session =  response.checkErrors().body<UserSession>()
         startAutoRefresh(session)
     }
@@ -193,18 +171,13 @@ internal class GoTrueImpl(override val supabaseClient: SupabaseClient, override 
                 }
             }
         }
-        val response = supabaseClient.httpClient.post(resolveUrl("verify")) {
-            contentType(ContentType.Application.Json)
-            setBody(body)
-        }
+        val response = api.postJson("verify", body)
         val session = response.checkErrors().body<UserSession>()
         startAutoRefresh(session)
     }
 
     override suspend fun getUser(jwt: String): UserInfo {
-        val response = supabaseClient.httpClient.get(resolveUrl("user")) {
-            header(HttpHeaders.Authorization, "Bearer $jwt")
-        }
+        val response = api.get("user")
         val body = response.bodyAsText()
         return try {
             supabaseJson.decodeFromString(body)
@@ -230,9 +203,7 @@ internal class GoTrueImpl(override val supabaseClient: SupabaseClient, override 
               "refresh_token": "$refreshToken"
             }
         """.trimIndent()
-        val response = supabaseClient.httpClient.post(resolveUrl("token?grant_type=refresh_token")) {
-            setBody(body)
-        }
+        val response = api.post("token?grant_type=refresh_token")
         if (response.status.value !in 200..299) throw RestException(
             response.status.value,
             "Unauthorized",

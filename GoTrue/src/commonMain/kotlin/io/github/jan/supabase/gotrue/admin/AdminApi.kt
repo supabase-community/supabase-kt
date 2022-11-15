@@ -1,21 +1,12 @@
 package io.github.jan.supabase.gotrue.admin
 
 import io.github.jan.supabase.gotrue.GoTrue
+import io.github.jan.supabase.gotrue.GoTrueImpl
 import io.github.jan.supabase.gotrue.checkErrors
 import io.github.jan.supabase.gotrue.user.UserInfo
 import io.github.jan.supabase.putJsonObject
 import io.github.jan.supabase.supabaseJson
 import io.ktor.client.call.body
-import io.ktor.client.request.HttpRequestBuilder
-import io.ktor.client.request.delete
-import io.ktor.client.request.get
-import io.ktor.client.request.header
-import io.ktor.client.request.post
-import io.ktor.client.request.put
-import io.ktor.client.request.setBody
-import io.ktor.http.ContentType
-import io.ktor.http.HttpHeaders
-import io.ktor.http.contentType
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.buildJsonObject
@@ -75,67 +66,43 @@ sealed interface AdminApi {
 }
 
 @PublishedApi
-internal class AdminApiImpl(val auth: GoTrue) : AdminApi {
+internal class AdminApiImpl(val gotrue: GoTrue) : AdminApi {
+
+    val api = (gotrue as GoTrueImpl).api
 
     override suspend fun createUserWithEmail(builder: UserBuilder.Email.() -> Unit): UserInfo {
-        val userBuilder = UserBuilder.Email().apply(builder)
-        return auth.supabaseClient.httpClient.post(auth.resolveUrl("/admin/users")) {
-            contentType(ContentType.Application.Json)
-            setBody(userBuilder as UserBuilder)
-            addAuthorization()
-        }.checkErrors().body()
+        val userBuilder = UserBuilder.Email().apply(builder) as UserBuilder
+        return api.postJson("admin/users", userBuilder).checkErrors().body()
     }
 
     override suspend fun createUserWithPhone(builder: UserBuilder.Phone.() -> Unit): UserInfo {
-        val userBuilder = UserBuilder.Phone().apply(builder)
-        return auth.supabaseClient.httpClient.post(auth.resolveUrl("/admin/users")) {
-            contentType(ContentType.Application.Json)
-            setBody(userBuilder as UserBuilder)
-            addAuthorization()
-        }.checkErrors().body()
+        val userBuilder = UserBuilder.Phone().apply(builder) as UserBuilder
+        return api.postJson("admin/users", userBuilder).checkErrors().body()
     }
 
     override suspend fun retrieveUsers(): List<UserInfo> {
-        return auth.supabaseClient.httpClient.get(auth.resolveUrl("/admin/users")) {
-            addAuthorization()
-        }.checkErrors().body<JsonObject>().let { supabaseJson.decodeFromJsonElement(it["users"] ?: throw IllegalStateException("Didn't get users json field on method retrieveUsers. Full body: $it")) }
+        return api.get("admin/users").checkErrors().body<JsonObject>().let { supabaseJson.decodeFromJsonElement(it["users"] ?: throw IllegalStateException("Didn't get users json field on method retrieveUsers. Full body: $it")) }
     }
 
     override suspend fun retrieveUserById(uid: String): UserInfo {
-        return auth.supabaseClient.httpClient.get(auth.resolveUrl("/admin/users/$uid")) {
-            addAuthorization()
-        }.checkErrors().body()
+        return api.get("admin/users/$uid").checkErrors().body()
     }
 
     override suspend fun deleteUser(uid: String) {
-        auth.supabaseClient.httpClient.delete(auth.resolveUrl("/admin/users/$uid")) {
-            addAuthorization()
-        }.checkErrors()
+        api.delete("admin/users/$uid").checkErrors()
     }
 
     override suspend fun inviteUserByEmail(email: String, redirectTo: String?, data: JsonObject?) {
-        val redirect = redirectTo?.let { "?redirect_to=$it" } ?: ""
-        auth.supabaseClient.httpClient.post(auth.resolveUrl("/invite$redirect")) {
-            contentType(ContentType.Application.Json)
-            setBody(buildJsonObject {
-                put("email", email)
-                data?.let { put("data", it) }
-            })
-            addAuthorization()
-        }.checkErrors()
+        val body = buildJsonObject {
+            put("email", email)
+            data?.let { put("data", it) }
+        }
+        api.postJson("invite", body) { redirectTo?.let { url.parameters.append("redirect_to", it) }}.checkErrors()
     }
 
     override suspend fun updateUserById(uid: String, builder: UserUpdateBuilder.() -> Unit): UserInfo {
         val updateBuilder = UserUpdateBuilder().apply(builder)
-        return auth.supabaseClient.httpClient.put(auth.resolveUrl("/admin/users/$uid")) {
-            contentType(ContentType.Application.Json)
-            setBody(updateBuilder)
-            addAuthorization()
-        }.checkErrors().body()
-    }
-
-    fun HttpRequestBuilder.addAuthorization() {
-        header(HttpHeaders.Authorization, "Bearer ${auth.currentAccessTokenOrNull() ?: tokenException()}")
+        return api.putJson("admin/users/$uid", updateBuilder).checkErrors().body()
     }
 
     private fun tokenException(): Nothing = throw IllegalStateException("You need the service role access token to use admin methods. Use GoTrue#importAuthToken to import it. Never share it publicly")
@@ -162,14 +129,10 @@ suspend inline fun <reified C : LinkType.Config> AdminApi.generateLinkFor(
 ): Pair<String, UserInfo> {
     this as AdminApiImpl
     val generatedConfig = linkType.createConfig(config)
-    val redirect = redirectTo?.let { "?redirect_to=$redirectTo" } ?: ""
-    val user = auth.supabaseClient.httpClient.post(auth.resolveUrl("/admin/generate_link$redirect")) {
-        contentType(ContentType.Application.Json)
-        setBody(buildJsonObject {
-            put("type", linkType.type)
-            putJsonObject(Json.encodeToJsonElement(generatedConfig).jsonObject)
-        })
-        addAuthorization()
-    }.checkErrors().body<UserInfo>();
+    val body = buildJsonObject {
+        put("type", linkType.type)
+        putJsonObject(Json.encodeToJsonElement(generatedConfig).jsonObject)
+    }
+    val user = api.postJson("admin/generate_link", body) { redirectTo?.let { url.parameters.append("redirect_to", it) }}.checkErrors().body<UserInfo>()
     return user.actionLink!! to user
 }

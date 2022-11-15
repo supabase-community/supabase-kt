@@ -1,6 +1,7 @@
 package io.github.jan.supabase.postgrest
 
 import io.github.jan.supabase.SupabaseClient
+import io.github.jan.supabase.gotrue.authenticatedSupabaseApi
 import io.github.jan.supabase.plugins.MainConfig
 import io.github.jan.supabase.plugins.MainPlugin
 import io.github.jan.supabase.plugins.SupabasePluginProvider
@@ -44,6 +45,8 @@ internal class PostgrestImpl(override val supabaseClient: SupabaseClient, overri
 
     override val PLUGIN_KEY: String
         get() = Postgrest.key
+
+    val api = supabaseClient.authenticatedSupabaseApi(this)
 
     override fun from(table: String): PostgrestBuilder {
         return PostgrestBuilder(this, table)
