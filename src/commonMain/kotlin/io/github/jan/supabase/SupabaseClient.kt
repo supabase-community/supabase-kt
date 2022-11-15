@@ -2,7 +2,6 @@ package io.github.jan.supabase
 
 import io.github.aakira.napier.Napier
 import io.github.jan.supabase.network.KtorSupabaseHttpClient
-import io.github.jan.supabase.network.SupabaseHttpClient
 import io.github.jan.supabase.plugins.PluginManager
 import io.github.jan.supabase.plugins.SupabasePlugin
 import io.ktor.client.HttpClientConfig
@@ -38,7 +37,7 @@ sealed interface SupabaseClient {
     /**
      * The http client used to interact with the supabase api
      */
-    val httpClient: SupabaseHttpClient
+    val httpClient: KtorSupabaseHttpClient
 
     /**
      * Releases all resources held by the [httpClient] and all plugins the [pluginManager]
@@ -77,7 +76,7 @@ internal class SupabaseClientImpl(
     override val httpClient = KtorSupabaseHttpClient(supabaseKey, httpConfigOverrides, httpEngine)
 
     override suspend fun close() {
-        httpClient.httpClient.close()
+        httpClient.close()
         pluginManager.closeAllPlugins()
     }
 

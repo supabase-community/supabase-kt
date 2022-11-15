@@ -7,6 +7,9 @@ import io.ktor.http.ContentType
 import io.ktor.http.HttpMethod
 import io.ktor.http.contentType
 
+/**
+ * The base HttpClients used by all main plugins
+ */
 abstract class SupabaseHttpClient {
 
     abstract suspend fun request(url: String, builder: HttpRequestBuilder.() -> Unit): HttpResponse

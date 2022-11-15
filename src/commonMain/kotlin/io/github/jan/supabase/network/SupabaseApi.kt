@@ -6,7 +6,7 @@ import io.ktor.client.request.HttpRequestBuilder
 import io.ktor.client.statement.HttpResponse
 
 open class SupabaseApi(
-    private val resolveUrl: (String) -> String,
+    private val resolveUrl: (path: String) -> String,
     val supabaseClient: SupabaseClient
 ) : SupabaseHttpClient() {
 
@@ -16,6 +16,20 @@ open class SupabaseApi(
 
 }
 
-fun SupabaseClient.supabaseApi(baseUrl: String) = SupabaseApi({ baseUrl + it }, this)
+/**
+ * Creates a [SupabaseApi] with the given [baseUrl]
+ * All requests will be resolved relative to this url
+ */
+fun SupabaseClient.supabaseApi(baseUrl: String) = supabaseApi { baseUrl + it }
 
-fun SupabaseClient.supabaseApi(plugin: MainPlugin<*>) = SupabaseApi(plugin::resolveUrl, this)
+/**
+ * Creates a [SupabaseApi] for the given [plugin]
+ * All requests will be resolved using the [MainPlugin.resolveUrl] function
+ */
+fun SupabaseClient.supabaseApi(plugin: MainPlugin<*>) = supabaseApi(plugin::resolveUrl)
+
+/**
+ * Creates a [SupabaseApi] with the given [resolveUrl] function
+ * All requests will be resolved using this function
+ */
+fun SupabaseClient.supabaseApi(resolveUrl: (path: String) -> String) = SupabaseApi(resolveUrl, this)

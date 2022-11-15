@@ -8,7 +8,7 @@ import io.ktor.client.request.headers
 import io.ktor.client.statement.HttpResponse
 
 class AuthenticatedSupabaseApi(
-    resolveUrl: (String) -> String,
+    resolveUrl: (path: String) -> String,
     supabaseClient: SupabaseClient,
 ): SupabaseApi(resolveUrl, supabaseClient) {
 
@@ -23,6 +23,20 @@ class AuthenticatedSupabaseApi(
 
 }
 
-fun SupabaseClient.authenticatedSupabaseApi(baseUrl: String) = AuthenticatedSupabaseApi({ baseUrl + it }, this)
+/**
+ * Creates a [AuthenticatedSupabaseApi] with the given [baseUrl]. Requires [GoTrue] to authenticate requests
+ * All requests will be resolved relative to this url
+ */
+fun SupabaseClient.authenticatedSupabaseApi(baseUrl: String) = authenticatedSupabaseApi { baseUrl + it }
 
-fun SupabaseClient.authenticatedSupabaseApi(plugin: MainPlugin<*>) = AuthenticatedSupabaseApi(plugin::resolveUrl, this)
+/**
+ * Creates a [AuthenticatedSupabaseApi] for the given [plugin]. Requires [GoTrue] to authenticate requests
+ * All requests will be resolved using the [MainPlugin.resolveUrl] function
+ */
+fun SupabaseClient.authenticatedSupabaseApi(plugin: MainPlugin<*>) = authenticatedSupabaseApi(plugin::resolveUrl)
+
+/**
+ * Creates a [AuthenticatedSupabaseApi] with the given [resolveUrl] function. Requires [GoTrue] to authenticate requests
+ * All requests will be resolved using this function
+ */
+fun SupabaseClient.authenticatedSupabaseApi(resolveUrl: (path: String) -> String) = AuthenticatedSupabaseApi(resolveUrl, this)

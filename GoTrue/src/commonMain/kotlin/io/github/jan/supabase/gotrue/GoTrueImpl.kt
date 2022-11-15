@@ -15,6 +15,7 @@ package io.github.jan.supabase.gotrue
  import io.github.jan.supabase.toJsonObject
  import io.ktor.client.call.body
  import io.ktor.client.request.HttpRequestBuilder
+ import io.ktor.client.request.header
  import io.ktor.client.request.headers
  import io.ktor.client.statement.bodyAsText
  import io.ktor.http.HttpHeaders
@@ -177,7 +178,9 @@ internal class GoTrueImpl(override val supabaseClient: SupabaseClient, override 
     }
 
     override suspend fun getUser(jwt: String): UserInfo {
-        val response = api.get("user")
+        val response = api.get("user") {
+            header("Authorization", "Bearer $jwt")
+        }
         val body = response.bodyAsText()
         return try {
             supabaseJson.decodeFromString(body)
@@ -198,12 +201,10 @@ internal class GoTrueImpl(override val supabaseClient: SupabaseClient, override 
         Napier.d {
             "Refreshing session"
         }
-        val body = """
-            {
-              "refresh_token": "$refreshToken"
-            }
-        """.trimIndent()
-        val response = api.post("token?grant_type=refresh_token")
+        val body = buildJsonObject {
+            put("refresh_token", refreshToken)
+        }
+        val response = api.postJson("token?grant_type=refresh_token", body)
         if (response.status.value !in 200..299) throw RestException(
             response.status.value,
             "Unauthorized",
