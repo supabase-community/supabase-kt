@@ -166,7 +166,7 @@ internal class RealtimeImpl(override val supabaseClient: SupabaseClient, overrid
         updateStatus(Realtime.Status.CONNECTING)
         val realtimeUrl = config.customRealtimeURL ?: (prefix + supabaseClient.supabaseUrl + ("/realtime/v${Realtime.API_VERSION}/websocket?apikey=${supabaseClient.supabaseKey}&vsn=1.0.0"))
          try {
-            ws = (supabaseClient.httpClient as KtorSupabaseHttpClient).httpClient.webSocketSession(realtimeUrl)
+            ws = (supabaseClient.httpClient as KtorSupabaseHttpClient).httpClient.webSocketSession(realtimeUrl) //this is just temporary
             updateStatus(Realtime.Status.CONNECTED)
             Napier.i { "Connected to realtime websocket!" }
             listenForMessages()

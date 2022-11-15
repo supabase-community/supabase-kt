@@ -7,7 +7,7 @@ import io.ktor.client.statement.HttpResponse
 
 open class SupabaseApi(
     private val resolveUrl: (String) -> String,
-    private val supabaseClient: SupabaseClient
+    val supabaseClient: SupabaseClient
 ) : SupabaseHttpClient() {
 
     override suspend fun request(url: String, builder: HttpRequestBuilder.() -> Unit): HttpResponse {
