@@ -2,9 +2,9 @@ package io.github.jan.supabase.gotrue
 
  import io.github.aakira.napier.Napier
  import io.github.jan.supabase.SupabaseClient
- import io.github.jan.supabase.exceptions.BadRequestException
+ import io.github.jan.supabase.exceptions.BadRequestRestException
  import io.github.jan.supabase.exceptions.RestException
- import io.github.jan.supabase.exceptions.UnauthorizedException
+ import io.github.jan.supabase.exceptions.UnauthorizedRestException
  import io.github.jan.supabase.exceptions.UnknownRestException
  import io.github.jan.supabase.gotrue.admin.AdminApi
  import io.github.jan.supabase.gotrue.admin.AdminApiImpl
@@ -290,9 +290,9 @@ internal class GoTrueImpl(override val supabaseClient: SupabaseClient, override 
         val errorCode = response.status.value
         val errorBody = response.body<GoTrueErrorResponse>()
         return when(errorCode) {
-            401 -> UnauthorizedException(errorBody.error, response)
-            400 -> BadRequestException(errorBody.error, response)
-            422 -> BadRequestException(errorBody.error, response)
+            401 -> UnauthorizedRestException(errorBody.error, response)
+            400 -> BadRequestRestException(errorBody.error, response)
+            422 -> BadRequestRestException(errorBody.error, response)
             else -> UnknownRestException(errorBody.error, response)
         }
     }

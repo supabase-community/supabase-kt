@@ -1,10 +1,10 @@
 package io.github.jan.supabase.storage
 
 import io.github.jan.supabase.SupabaseClient
-import io.github.jan.supabase.exceptions.BadRequestException
-import io.github.jan.supabase.exceptions.NotFoundException
+import io.github.jan.supabase.exceptions.BadRequestRestException
+import io.github.jan.supabase.exceptions.NotFoundRestException
 import io.github.jan.supabase.exceptions.RestException
-import io.github.jan.supabase.exceptions.UnauthorizedException
+import io.github.jan.supabase.exceptions.UnauthorizedRestException
 import io.github.jan.supabase.exceptions.UnknownRestException
 import io.github.jan.supabase.gotrue.GoTrue
 import io.github.jan.supabase.gotrue.authenticatedSupabaseApi
@@ -119,9 +119,9 @@ internal class StorageImpl(override val supabaseClient: SupabaseClient, override
         val error = response.body<StorageErrorResponse>()
         if(statusCode != 400) return UnknownRestException("Unknown error response", response)
         when(error.statusCode) {
-            401 -> throw UnauthorizedException(error.error, response, error.message)
-            400 -> throw BadRequestException(error.error, response, error.message)
-            404 -> throw NotFoundException(error.error, response, error.message)
+            401 -> throw UnauthorizedRestException(error.error, response, error.message)
+            400 -> throw BadRequestRestException(error.error, response, error.message)
+            404 -> throw NotFoundRestException(error.error, response, error.message)
             else -> throw UnknownRestException("Unknown error response", response)
         }
     }

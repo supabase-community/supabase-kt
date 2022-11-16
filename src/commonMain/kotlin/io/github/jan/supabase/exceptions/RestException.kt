@@ -14,10 +14,10 @@ sealed class RestException(message: String): Exception(message) {
 
 }
 
-class UnauthorizedException(error: String, response: HttpResponse, message: String? = null): RestException(error, response, message)
+class UnauthorizedRestException(error: String, response: HttpResponse, message: String? = null): RestException(error, response, message)
 
-class BadRequestException(error: String, response: HttpResponse, message: String? = null): RestException(error, response, message)
+class BadRequestRestException(error: String, response: HttpResponse, message: String? = null): RestException(error, response, message)
 
 class UnknownRestException(error: String, response: HttpResponse, message: String? = null): RestException(error, response, message)
 
-class NotFoundException(error: String, response: HttpResponse, message: String? = null): RestException(error, response, message)
+class NotFoundRestException(error: String, response: HttpResponse, message: String? = null): RestException(error, response, message)
