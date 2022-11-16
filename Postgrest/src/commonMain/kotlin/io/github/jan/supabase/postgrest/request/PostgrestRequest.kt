@@ -1,6 +1,5 @@
 package io.github.jan.supabase.postgrest.request
 
-import io.github.jan.supabase.exceptions.RestException
 import io.github.jan.supabase.gotrue.GoTrue
 import io.github.jan.supabase.postgrest.Postgrest
 import io.github.jan.supabase.postgrest.PostgrestImpl

@@ -2,8 +2,10 @@ package io.github.jan.supabase.gotrue
 
  import io.github.aakira.napier.Napier
  import io.github.jan.supabase.SupabaseClient
+ import io.github.jan.supabase.exceptions.BadRequestException
  import io.github.jan.supabase.exceptions.RestException
  import io.github.jan.supabase.exceptions.UnauthorizedException
+ import io.github.jan.supabase.exceptions.UnknownRestException
  import io.github.jan.supabase.gotrue.admin.AdminApi
  import io.github.jan.supabase.gotrue.admin.AdminApiImpl
  import io.github.jan.supabase.gotrue.providers.AuthProvider
@@ -17,6 +19,7 @@ package io.github.jan.supabase.gotrue
  import io.ktor.client.request.HttpRequestBuilder
  import io.ktor.client.request.header
  import io.ktor.client.request.headers
+ import io.ktor.client.statement.HttpResponse
  import io.ktor.client.statement.bodyAsText
  import io.ktor.http.HttpHeaders
  import kotlinx.coroutines.CoroutineScope
@@ -182,12 +185,7 @@ internal class GoTrueImpl(override val supabaseClient: SupabaseClient, override 
             header("Authorization", "Bearer $jwt")
         }
         val body = response.bodyAsText()
-        return try {
-            supabaseJson.decodeFromString(body)
-        } catch(e: Exception) {
-            Napier.e(e) { "Failed to get user. Full response body: $body" }
-            throw UnauthorizedException("Invalid JWT")
-        }
+        return supabaseJson.decodeFromString(body)
     }
 
     override suspend fun invalidateSession() {
@@ -205,11 +203,6 @@ internal class GoTrueImpl(override val supabaseClient: SupabaseClient, override 
             put("refresh_token", refreshToken)
         }
         val response = api.postJson("token?grant_type=refresh_token", body)
-        if (response.status.value !in 200..299) throw RestException(
-            response.status.value,
-            "Unauthorized",
-            response.bodyAsText()
-        )
         return response.body()
     }
 
@@ -293,8 +286,15 @@ internal class GoTrueImpl(override val supabaseClient: SupabaseClient, override 
         authScope.cancel()
     }
 
-    private operator fun UserSession?.not(): UserSession {
-        return this ?: throw IllegalStateException("No user session available")
+    override suspend fun parseErrorResponse(response: HttpResponse): RestException {
+        val errorCode = response.status.value
+        val errorBody = response.body<GoTrueErrorResponse>()
+        return when(errorCode) {
+            401 -> UnauthorizedException(errorBody.error, response)
+            400 -> BadRequestException(errorBody.error, response)
+            422 -> BadRequestException(errorBody.error, response)
+            else -> UnknownRestException(errorBody.error, response)
+        }
     }
 
 }

@@ -2,17 +2,16 @@ package io.github.jan.supabase.gotrue
 
 import io.github.aakira.napier.Napier
 import io.github.jan.supabase.SupabaseClient
-import io.github.jan.supabase.exceptions.RestException
 import io.github.jan.supabase.gotrue.user.UserSession
 import io.ktor.client.statement.HttpResponse
-import io.ktor.client.statement.bodyAsText
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 suspend fun HttpResponse.checkErrors(error: String = "Error while performing request"): HttpResponse {
     if(status.value !in 200..299) {
-        throw RestException(status.value, error, bodyAsText(), headers.entries().flatMap { (key, value) -> listOf(key) + value })
+        throw Exception("da")
+      //  throw RestException(status.value, error, bodyAsText(), headers.entries().flatMap { (key, value) -> listOf(key) + value })
     }
     return this
 }

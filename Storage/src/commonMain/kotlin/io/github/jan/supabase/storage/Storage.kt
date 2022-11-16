@@ -1,6 +1,11 @@
 package io.github.jan.supabase.storage
 
 import io.github.jan.supabase.SupabaseClient
+import io.github.jan.supabase.exceptions.BadRequestException
+import io.github.jan.supabase.exceptions.NotFoundException
+import io.github.jan.supabase.exceptions.RestException
+import io.github.jan.supabase.exceptions.UnauthorizedException
+import io.github.jan.supabase.exceptions.UnknownRestException
 import io.github.jan.supabase.gotrue.GoTrue
 import io.github.jan.supabase.gotrue.authenticatedSupabaseApi
 import io.github.jan.supabase.plugins.MainConfig
@@ -9,6 +14,7 @@ import io.github.jan.supabase.plugins.SupabasePluginProvider
 import io.ktor.client.call.body
 import io.ktor.client.request.HttpRequestBuilder
 import io.ktor.client.request.headers
+import io.ktor.client.statement.HttpResponse
 import io.ktor.http.HttpHeaders
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
@@ -107,6 +113,18 @@ internal class StorageImpl(override val supabaseClient: SupabaseClient, override
     }
 
     override fun get(bucketId: String): BucketApi = BucketApiImpl(bucketId, this)
+
+    override suspend fun parseErrorResponse(response: HttpResponse): RestException {
+        val statusCode = response.status.value
+        val error = response.body<StorageErrorResponse>()
+        if(statusCode != 400) return UnknownRestException("Unknown error response", response)
+        when(error.statusCode) {
+            401 -> throw UnauthorizedException(error.error, response, error.message)
+            400 -> throw BadRequestException(error.error, response, error.message)
+            404 -> throw NotFoundException(error.error, response, error.message)
+            else -> throw UnknownRestException("Unknown error response", response)
+        }
+    }
 
     private fun HttpRequestBuilder.addAuthorization() {
         val token = config.jwtToken ?: supabaseClient.pluginManager.getPluginOrNull(GoTrue)?.currentAccessTokenOrNull()
