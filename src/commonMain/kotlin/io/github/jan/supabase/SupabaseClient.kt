@@ -1,15 +1,11 @@
 package io.github.jan.supabase
 
 import io.github.aakira.napier.Napier
+import io.github.jan.supabase.network.KtorSupabaseHttpClient
 import io.github.jan.supabase.plugins.PluginManager
 import io.github.jan.supabase.plugins.SupabasePlugin
-import io.ktor.client.HttpClient
 import io.ktor.client.HttpClientConfig
 import io.ktor.client.engine.HttpClientEngine
-import io.ktor.client.plugins.DefaultRequest
-import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
-import io.ktor.client.request.headers
-import io.ktor.serialization.kotlinx.json.json
 
 /**
  * The main class to interact with Supabase.
@@ -41,7 +37,7 @@ sealed interface SupabaseClient {
     /**
      * The http client used to interact with the supabase api
      */
-    val httpClient: HttpClient
+    val httpClient: KtorSupabaseHttpClient
 
     /**
      * Releases all resources held by the [httpClient] and all plugins the [pluginManager]
@@ -77,37 +73,7 @@ internal class SupabaseClientImpl(
         key to value(this)
     })
 
-    override val httpClient = if(httpEngine != null) {
-        HttpClient(httpEngine) {
-            install(DefaultRequest) {
-                headers {
-                    if(supabaseKey.isNotBlank()) {
-                        append("apikey", supabaseKey)
-                    }
-                }
-                port = 443
-            }
-            install(ContentNegotiation) {
-                json(supabaseJson)
-            }
-            httpConfigOverrides.forEach { it.invoke(this) }
-        }
-    } else {
-        HttpClient {
-            install(DefaultRequest) {
-                headers {
-                    if(supabaseKey.isNotBlank()) {
-                        append("apikey", supabaseKey)
-                    }
-                }
-                port = 443
-            }
-            install(ContentNegotiation) {
-                json(supabaseJson)
-            }
-            httpConfigOverrides.forEach { it.invoke(this) }
-        }
-    }
+    override val httpClient = KtorSupabaseHttpClient(supabaseKey, httpConfigOverrides, httpEngine)
 
     override suspend fun close() {
         httpClient.close()

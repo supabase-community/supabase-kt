@@ -3,12 +3,12 @@ package io.github.jan.supabase.postgrest.request
 import io.github.jan.supabase.exceptions.RestException
 import io.github.jan.supabase.gotrue.GoTrue
 import io.github.jan.supabase.postgrest.Postgrest
+import io.github.jan.supabase.postgrest.PostgrestImpl
 import io.github.jan.supabase.postgrest.query.Count
 import io.github.jan.supabase.postgrest.query.PostgrestBuilder
 import io.github.jan.supabase.postgrest.query.PostgrestResult
 import io.github.jan.supabase.postgrest.query.Returning
 import io.ktor.client.call.body
-import io.ktor.client.request.request
 import io.ktor.client.request.setBody
 import io.ktor.client.statement.HttpResponse
 import io.ktor.http.ContentType
@@ -27,7 +27,8 @@ sealed interface PostgrestRequest {
     val prefer: List<String>
 
     suspend fun execute(path: String, postgrest: Postgrest): PostgrestResult {
-        return postgrest.supabaseClient.httpClient.request(postgrest.resolveUrl(path)) {
+        postgrest as PostgrestImpl
+        return postgrest.api.request(path) {
             method = this@PostgrestRequest.method
             contentType(ContentType.Application.Json)
             val token  = postgrest.config.jwtToken ?: postgrest.supabaseClient.pluginManager.getPluginOrNull(GoTrue)?.currentAccessTokenOrNull()
@@ -45,7 +46,7 @@ sealed interface PostgrestRequest {
             val error = body<JsonElement>()
             throw RestException(status.value, "Unknown error", error.toString(), headers = headers.entries().flatMap { (key, value) -> listOf(key) + value })
         }
-        return PostgrestResult(body(), status.value)
+        return PostgrestResult(body())
     }
 
     data class RPC(

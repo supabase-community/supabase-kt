@@ -2,14 +2,14 @@ package io.github.jan.supabase.functions
 
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.annotiations.SupabaseInternal
-import io.github.jan.supabase.gotrue.checkErrors
 import io.github.jan.supabase.buildUrl
 import io.github.jan.supabase.gotrue.GoTrue
+import io.github.jan.supabase.gotrue.authenticatedSupabaseApi
+import io.github.jan.supabase.gotrue.checkErrors
 import io.github.jan.supabase.plugins.MainConfig
 import io.github.jan.supabase.plugins.MainPlugin
 import io.github.jan.supabase.plugins.SupabasePluginProvider
 import io.ktor.client.request.HttpRequestBuilder
-import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.client.statement.HttpResponse
 import io.ktor.http.Headers
@@ -29,13 +29,16 @@ class Functions(override val config: Config, override val supabaseClient: Supaba
 
     private val baseUrl = supabaseClient.supabaseHttpUrl.replaceFirst(".", ".functions.")
 
+    @PublishedApi
+    internal val api = supabaseClient.authenticatedSupabaseApi(this)
+
     /**
      * Invokes a remote edge function. The authorization token is automatically added to the request.
      * @param function The function to invoke
      * @param builder The request builder to configure the request
      */
-    suspend inline operator fun invoke(function: String, builder: HttpRequestBuilder.() -> Unit): HttpResponse {
-        return supabaseClient.httpClient.post(resolveUrl(function)) {
+    suspend inline operator fun invoke(function: String, crossinline builder: HttpRequestBuilder.() -> Unit): HttpResponse {
+        return api.post(function) {
             val token = config.jwtToken ?: supabaseClient.pluginManager.getPluginOrNull(GoTrue)?.currentAccessTokenOrNull()
             token.let {
                 this.headers[HttpHeaders.Authorization] = "Bearer $it"

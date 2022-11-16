@@ -122,78 +122,67 @@ internal class BucketApiImpl(override val bucketId: String, val storage: Storage
     override suspend fun upload(path: String, data: ByteArray): String = uploadOrUpdate(HttpMethod.Post, bucketId, path, data)
 
     override suspend fun delete(paths: Collection<String>) {
-        storage.makeRequest(HttpMethod.Delete, "object/$bucketId") {
-            setBody(buildJsonObject {
-                putJsonArray("prefixes") {
-                    paths.forEach(this::add)
-                }
-            })
-        }
+        storage.api.deleteJson("object/$bucketId", buildJsonObject {
+            putJsonArray("prefixes") {
+                paths.forEach(this::add)
+            }
+        })
     }
 
     override suspend fun move(from: String, to: String) {
-        storage.makeRequest(HttpMethod.Post, "object/move") {
-            setBody(buildJsonObject {
-                put("bucketId", bucketId)
-                put("sourceKey", from)
-                put("destinationKey", to)
-            })
-        }
+        storage.api.postJson("object/move", buildJsonObject {
+            put("bucketId", bucketId)
+            put("sourceKey", from)
+            put("destinationKey", to)
+        })
     }
 
     override suspend fun copy(from: String, to: String) {
-        storage.makeRequest(HttpMethod.Post, "object/copy") {
-            setBody(buildJsonObject {
-                put("bucketId", bucketId)
-                put("sourceKey", from)
-                put("destinationKey", to)
-            })
-        }
+        storage.api.postJson("object/copy", buildJsonObject {
+            put("bucketId", bucketId)
+            put("sourceKey", from)
+            put("destinationKey", to)
+        })
     }
 
     override suspend fun createSignedUrl(path: String, expiresIn: Duration): String {
-        return storage.resolveUrl(
-            storage.makeRequest(HttpMethod.Post, "object/sign/$bucketId/$path") {
-                setBody(buildJsonObject {
-                    put("expiresIn", expiresIn.inWholeSeconds)
-                })
-            }.body<JsonObject>()["signedURL"]?.jsonPrimitive?.content?.substring(1)
-                ?: throw IllegalStateException("Expected signed url in response")
-        )
+        val body = storage.api.postJson("object/sign/$bucketId/$path", buildJsonObject {
+            put("expiresIn", expiresIn.inWholeSeconds)
+        }).body<JsonObject>()
+        return body["signedURL"]?.jsonPrimitive?.content?.substring(1)
+            ?: throw IllegalStateException("Expected signed url in response")
     }
 
     override suspend fun createSignedUrls(expiresIn: Duration, paths: Collection<String>): List<SignedUrl> {
-        return storage.makeRequest(HttpMethod.Post, "object/sign/$bucketId") {
-            setBody(buildJsonObject {
-                putJsonArray("paths") {
-                    paths.forEach(this::add)
-                }
-                put("expiresIn", expiresIn.inWholeSeconds)
-            })
-        }.body<List<SignedUrl>>().map {
+        val body = storage.api.postJson("object/sign/$bucketId", buildJsonObject {
+            putJsonArray("paths") {
+                paths.forEach(this::add)
+            }
+            put("expiresIn", expiresIn.inWholeSeconds)
+        }).body<List<SignedUrl>>().map {
             it.copy(signedURL = storage.resolveUrl(it.signedURL.substring(1)))
         }
+        return body
     }
 
     override suspend fun downloadAuthenticated(path: String): ByteArray {
-        return storage.makeRequest(HttpMethod.Get, "object/authenticated/$bucketId/$path").body()
+        return storage.api.get("object/authenticated/$bucketId/$path").body()
     }
 
     override suspend fun downloadPublic(path: String): ByteArray {
-        return storage.makeRequest(HttpMethod.Get, publicUrl(path)).body()
+        return storage.api.get(publicUrl(path)).body()
     }
 
     override suspend fun list(prefix: String, filter: BucketListFilter.() -> Unit): List<BucketItem> {
-        return storage.makeRequest(HttpMethod.Post, "object/list/$bucketId") {
-            setBody(buildJsonObject {
-                put("prefix", prefix)
-                putJsonObject(BucketListFilter().apply(filter).build())
-            })
-        }.body<List<BucketItem>>()
+        return storage.api.postJson("object/list/$bucketId", buildJsonObject {
+            put("prefix", prefix)
+            putJsonObject(BucketListFilter().apply(filter).build())
+        }).body()
     }
 
     private suspend fun uploadOrUpdate(method: HttpMethod, bucket: String, path: String, body: ByteArray): String {
-        return storage.makeRequest(method, "object/$bucket/$path", false) {
+        return storage.api.request("object/$bucket/$path") {
+            this.method = method
             setBody(body)
         }.body<JsonObject>()["Key"]?.jsonPrimitive?.content ?: throw IllegalStateException("Expected a key in a upload response")
     }

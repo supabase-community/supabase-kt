@@ -1,24 +1,16 @@
 package io.github.jan.supabase.storage
 
 import io.github.jan.supabase.SupabaseClient
-import io.github.jan.supabase.exceptions.RestException
 import io.github.jan.supabase.gotrue.GoTrue
+import io.github.jan.supabase.gotrue.authenticatedSupabaseApi
 import io.github.jan.supabase.plugins.MainConfig
 import io.github.jan.supabase.plugins.MainPlugin
 import io.github.jan.supabase.plugins.SupabasePluginProvider
 import io.ktor.client.call.body
 import io.ktor.client.request.HttpRequestBuilder
 import io.ktor.client.request.headers
-import io.ktor.client.request.request
-import io.ktor.client.request.setBody
-import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
-import io.ktor.http.HttpMethod
-import io.ktor.http.contentType
-import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.buildJsonObject
-import kotlinx.serialization.json.int
-import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.put
 
 sealed interface Storage : MainPlugin<Storage.Config> {
@@ -84,49 +76,37 @@ internal class StorageImpl(override val supabaseClient: SupabaseClient, override
     override val API_VERSION: Int
         get() = Storage.API_VERSION
 
-    override suspend fun getAllBuckets(): List<Bucket> = makeRequest(HttpMethod.Get, "bucket").body()
+    internal val api = supabaseClient.authenticatedSupabaseApi(this)
 
-    override suspend fun getBucket(id: String): Bucket? = makeRequest(HttpMethod.Get, "bucket/$id").body()
+    override suspend fun getAllBuckets(): List<Bucket> = api.get("bucket").body()
+
+    override suspend fun getBucket(id: String): Bucket? = api.get("bucket/$id").body()
 
     override suspend fun deleteBucket(id: String) {
-        makeRequest(HttpMethod.Delete, "bucket/$id")
+        api.delete("bucket/$id")
     }
 
     override suspend fun createBucket(name: String, id: String, public: Boolean) {
-        makeRequest(HttpMethod.Post, "bucket") {
-            setBody(buildJsonObject {
-                put("name", name)
-                put("id", id)
-                put("public", public)
-            })
+        val body = buildJsonObject {
+            put("name", name)
+            put("id", id)
+            put("public", public)
         }
+        api.postJson("bucket", body)
     }
 
     override suspend fun changePublicStatus(bucketId: String, public: Boolean) {
-        makeRequest(HttpMethod.Put, "bucket/$bucketId") {
-            setBody(buildJsonObject {
-                put("public", public)
-            })
+        val body = buildJsonObject {
+            put("public", public)
         }
+        api.putJson("bucket/$bucketId", body)
     }
 
     override suspend fun emptyBucket(bucketId: String) {
-        makeRequest(HttpMethod.Post, "bucket/$bucketId/empty")
+        api.post("bucket/$bucketId/empty")
     }
 
     override fun get(bucketId: String): BucketApi = BucketApiImpl(bucketId, this)
-
-    suspend inline fun makeRequest(method: HttpMethod, path: String, json: Boolean = true, body: HttpRequestBuilder.() -> Unit = {}) = supabaseClient.httpClient.request(resolveUrl(path)) {
-        this.method = method
-        if(json) contentType(ContentType.Application.Json)
-        addAuthorization()
-        body()
-    }.also {
-        if(it.status.value == 400) {
-            val error = it.body<JsonObject>()
-            throw RestException(error["statusCode"]!!.jsonPrimitive.int, error["error"]!!.jsonPrimitive.content, error["message"]!!.jsonPrimitive.content)
-        }
-    }
 
     private fun HttpRequestBuilder.addAuthorization() {
         val token = config.jwtToken ?: supabaseClient.pluginManager.getPluginOrNull(GoTrue)?.currentAccessTokenOrNull()
