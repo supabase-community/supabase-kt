@@ -17,6 +17,7 @@ class SupabaseClientBuilder @PublishedApi internal constructor(private val supab
     var useHTTPS = true
     var httpEngine: HttpClientEngine? = null
     var ignoreModulesInUrl = false
+    var logNetworkTraffic = false
     private val httpConfigOverrides = mutableListOf<HttpClientConfig<*>.() -> Unit>()
     private val plugins = mutableMapOf<String, ((SupabaseClient) -> SupabasePlugin)>()
 
@@ -35,7 +36,7 @@ class SupabaseClientBuilder @PublishedApi internal constructor(private val supab
 
     @PublishedApi
     internal fun build(): SupabaseClient {
-        return SupabaseClientImpl(supabaseUrl.split("//").last(), supabaseKey, plugins, httpConfigOverrides, useHTTPS, httpEngine)
+        return SupabaseClientImpl(supabaseUrl.split("//").last(), supabaseKey, plugins, httpConfigOverrides, useHTTPS, logNetworkTraffic, httpEngine)
     }
 
     /**
