@@ -50,9 +50,6 @@ kotlin {
             }
         }
         val jvmMain by getting {
-            dependencies {
-                implementation("io.ktor:ktor-client-cio:2.0.3")
-            }
         }
         val androidMain by getting {
         }
