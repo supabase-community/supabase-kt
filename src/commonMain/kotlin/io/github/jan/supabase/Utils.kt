@@ -1,5 +1,7 @@
 package io.github.jan.supabase
 
+import io.ktor.client.statement.HttpResponse
+import io.ktor.client.statement.bodyAsText
 import io.ktor.http.URLBuilder
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
@@ -31,5 +33,14 @@ inline fun <reified T> JsonObject.decodeIfNotEmptyOrDefault(default: T): T {
         default
     } else {
         supabaseJson.decodeFromJsonElement<T>(this)
+    }
+}
+
+suspend inline fun <reified T> HttpResponse.bodyOrNull(): T? {
+    val text = bodyAsText()
+    return try {
+        Json.decodeFromString<T>(text)
+    } catch(e: Exception) {
+        null
     }
 }

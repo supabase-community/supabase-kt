@@ -1,6 +1,7 @@
 package io.github.jan.supabase.storage
 
 import io.github.jan.supabase.SupabaseClient
+import io.github.jan.supabase.bodyOrNull
 import io.github.jan.supabase.exceptions.BadRequestRestException
 import io.github.jan.supabase.exceptions.NotFoundRestException
 import io.github.jan.supabase.exceptions.RestException
@@ -22,31 +23,37 @@ sealed interface Storage : MainPlugin<Storage.Config> {
      * @param name the name of the bucket
      * @param id the id of the bucket
      * @param public whether the bucket should be public or not
+     * @throws RestException or one of its subclasses if the request failed
      */
     suspend fun createBucket(name: String, id: String, public: Boolean)
 
     /**
      * Returns all buckets in the storage
+     * @throws RestException or one of its subclasses if the request failed
      */
     suspend fun getAllBuckets(): List<Bucket>
 
     /**
      * Retrieves a bucket by its [id]
+     * @throws RestException or one of its subclasses if the request failed
      */
     suspend fun getBucket(id: String): Bucket?
 
     /**
      * Changes a bucket's public status to [public]
+     * @throws RestException or one of its subclasses if the request failed
      */
     suspend fun changePublicStatus(bucketId: String, public: Boolean)
 
     /**
      * Empties a bucket by its [bucketId]
+     * @throws RestException or one of its subclasses if the request failed
      */
     suspend fun emptyBucket(bucketId: String)
 
     /**
      * Deletes a bucket by its [id]
+     * @throws RestException or one of its subclasses if the request failed
      */
     suspend fun deleteBucket(id: String)
 
@@ -112,7 +119,7 @@ internal class StorageImpl(override val supabaseClient: SupabaseClient, override
 
     override suspend fun parseErrorResponse(response: HttpResponse): RestException {
         val statusCode = response.status.value
-        val error = response.body<StorageErrorResponse>()
+        val error = response.bodyOrNull<StorageErrorResponse>() ?: StorageErrorResponse(response.status.value, "Unknown error", "")
         if(statusCode != 400) return UnknownRestException("Unknown error response", response)
         when(error.statusCode) {
             401 -> throw UnauthorizedRestException(error.error, response, error.message)

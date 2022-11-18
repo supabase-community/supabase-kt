@@ -2,6 +2,7 @@ package io.github.jan.supabase.gotrue
 
 import io.github.aakira.napier.Napier
 import io.github.jan.supabase.SupabaseClient
+import io.github.jan.supabase.exceptions.RestException
 import io.github.jan.supabase.gotrue.admin.AdminApi
 import io.github.jan.supabase.gotrue.providers.AuthProvider
 import io.github.jan.supabase.gotrue.providers.Google
@@ -53,7 +54,7 @@ sealed interface GoTrue : MainPlugin<GoTrue.Config> {
      * @param provider the provider to use for signing up. E.g. [Email], [Phone] or [Google]
      * @param redirectUrl The redirect url to use. If you don't specify this, the platform specific will be use, like deeplinks on android.
      * @param config The configuration to use for the sign-up.
-     * @throws RestException If the credentials are invalid
+     * @throws RestException or one of its subclasses if the request failed
      */
     suspend fun <C, R, Provider : AuthProvider<C, R>> signUpWith(
         provider: Provider,
@@ -66,7 +67,7 @@ sealed interface GoTrue : MainPlugin<GoTrue.Config> {
      * @param provider the provider to use for signing up. E.g. [Email], [Phone] or [Google]
      * @param redirectUrl The redirect url to use. If you don't specify this, the platform specific will be use, like deeplinks on android.
      * @param config The configuration to use for the sign-up.
-     * @throws RestException If the credentials are invalid
+     * @throws RestException or one of its subclasses if the request failed
      */
     suspend fun <C, R, Provider : AuthProvider<C, R>> loginWith(
         provider: Provider,
@@ -79,7 +80,7 @@ sealed interface GoTrue : MainPlugin<GoTrue.Config> {
      * @param provider The provider to use. Either [Email] or [Phone]
      * @param extraData Extra data to store
      * @param config The configuration to use
-     * @throws RestException If the current session is invalid
+     * @throws RestException or one of its subclasses if the request failed
      */
     suspend fun <C, R, Provider : DefaultAuthProvider<C, R>> modifyUser(
         provider: Provider,
@@ -92,6 +93,7 @@ sealed interface GoTrue : MainPlugin<GoTrue.Config> {
      * @param provider The provider to use. Either [Email] or [Phone]
      * @param createUser Whether to create a user when a user with the given credentials doesn't exist
      * @param redirectUrl The redirect url to use. If you don't specify this, the platform specific will be use, like deeplinks on android.
+     * @throws RestException or one of its subclasses if the request failed
      */
     suspend fun <C, R, Provider : DefaultAuthProvider<C, R>> sendOtpTo(
         provider: Provider,
@@ -104,16 +106,19 @@ sealed interface GoTrue : MainPlugin<GoTrue.Config> {
      * Sends a password reset email to the user with the specified [email]
      * @param email The email to send the password reset email to
      * @param redirectUrl The redirect url to use. If you don't specify this, the platform specific will be use, like deeplinks on android.
+     * @throws RestException or one of its subclasses if the request failed
      */
     suspend fun sendRecoveryEmail(email: String, redirectUrl: String? = null, captchaToken: String? = null)
 
     /**
      * Sends a nonce to the user's email (preferred) or phone
+     * @throws RestException or one of its subclasses if the request failed
      */
     suspend fun reauthenticate()
 
     /**
      * Revokes all refresh tokens for the user, and invalidates the session
+     * @throws RestException or one of its subclasses if the request failed
      */
     suspend fun invalidateAllRefreshTokens()
 
@@ -121,6 +126,7 @@ sealed interface GoTrue : MainPlugin<GoTrue.Config> {
      * Verifies a registration, invite or password recovery
      * @param type The type of the verification
      * @param token The token used to verify
+     * @throws RestException or one of its subclasses if the request failed
      */
     suspend fun verify(type: VerifyType, token: String, captchaToken: String? = null)
 
@@ -128,16 +134,19 @@ sealed interface GoTrue : MainPlugin<GoTrue.Config> {
      * Verifies a phone/sms otp
      * @param token The otp to verify
      * @param phoneNumber The phone number the token was sent to
+     * @throws RestException or one of its subclasses if the request failed
      */
     suspend fun verifyPhone(token: String, phoneNumber: String, captchaToken: String? = null)
 
     /**
      * Retrieves the current user with the session
+     * @throws RestException or one of its subclasses if the request failed
      */
     suspend fun getUser(jwt: String): UserInfo
 
     /**
-     * Invalidates the current session, which means [currentSession] will be null
+     * Invalidates the current session, which means [sessionStatus] will be [SessionStatus.NotAuthenticated]
+     * @throws RestException or one of its subclasses if the request failed
      */
     suspend fun invalidateSession()
 
@@ -162,11 +171,13 @@ sealed interface GoTrue : MainPlugin<GoTrue.Config> {
      * Refreshes a session using the refresh token
      * @param refreshToken The refresh token to use
      * @return A new session
+     * @throws RestException or one of its subclasses if the request failed
      */
     suspend fun refreshSession(refreshToken: String): UserSession
 
     /**
      * Refreshes the current session
+     * @throws RestException or one of its subclasses if the request failed
      */
     suspend fun refreshCurrentSession()
 

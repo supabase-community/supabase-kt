@@ -2,6 +2,7 @@ package io.github.jan.supabase.gotrue
 
  import io.github.aakira.napier.Napier
  import io.github.jan.supabase.SupabaseClient
+ import io.github.jan.supabase.bodyOrNull
  import io.github.jan.supabase.exceptions.BadRequestRestException
  import io.github.jan.supabase.exceptions.RestException
  import io.github.jan.supabase.exceptions.UnauthorizedRestException
@@ -19,6 +20,7 @@ package io.github.jan.supabase.gotrue
  import io.ktor.client.request.header
  import io.ktor.client.statement.HttpResponse
  import io.ktor.client.statement.bodyAsText
+ import io.ktor.http.HttpStatusCode
  import kotlinx.coroutines.CoroutineScope
  import kotlinx.coroutines.Job
  import kotlinx.coroutines.cancel
@@ -278,12 +280,11 @@ internal class GoTrueImpl(override val supabaseClient: SupabaseClient, override 
     }
 
     override suspend fun parseErrorResponse(response: HttpResponse): RestException {
-        val errorCode = response.status.value
-        val errorBody = response.body<GoTrueErrorResponse>()
-        return when(errorCode) {
-            401 -> UnauthorizedRestException(errorBody.error, response)
-            400 -> BadRequestRestException(errorBody.error, response)
-            422 -> BadRequestRestException(errorBody.error, response)
+        val errorBody = response.bodyOrNull<GoTrueErrorResponse>() ?: GoTrueErrorResponse("Unknown error")
+        return when(response.status) {
+            HttpStatusCode.Unauthorized -> UnauthorizedRestException(errorBody.error, response)
+            HttpStatusCode.BadRequest -> BadRequestRestException(errorBody.error, response)
+            HttpStatusCode.UnprocessableEntity -> BadRequestRestException(errorBody.error, response)
             else -> UnknownRestException(errorBody.error, response)
         }
     }

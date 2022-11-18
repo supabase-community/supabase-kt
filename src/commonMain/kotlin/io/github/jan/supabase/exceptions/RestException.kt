@@ -6,7 +6,7 @@ import io.ktor.client.statement.request
 sealed class RestException(message: String): Exception(message) {
 
     constructor(error: String, response: HttpResponse, message: String? = null): this("""
-        $error: ${message?.let { "($it)" }}
+        $error ${message?.let { ":($it)" } ?: ""}
         URL: ${response.request.url}
         Headers: ${response.request.headers.entries()}
         Http Method: ${response.request.method.value}
