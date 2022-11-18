@@ -16,12 +16,8 @@ package io.github.jan.supabase.gotrue
  import io.github.jan.supabase.supabaseJson
  import io.github.jan.supabase.toJsonObject
  import io.ktor.client.call.body
- import io.ktor.client.request.HttpRequestBuilder
  import io.ktor.client.request.header
- import io.ktor.client.request.headers
- import io.ktor.client.statement.HttpResponse
  import io.ktor.client.statement.bodyAsText
- import io.ktor.http.HttpHeaders
  import kotlinx.coroutines.CoroutineScope
  import kotlinx.coroutines.Job
  import kotlinx.coroutines.cancel
@@ -274,12 +270,6 @@ internal class GoTrueImpl(override val supabaseClient: SupabaseClient, override 
         val wasSuccessful = session != null
         if(wasSuccessful) startAutoRefresh(session!!, autoRefresh)
         return wasSuccessful
-    }
-
-    private fun HttpRequestBuilder.addAuthorization() {
-        headers {
-            append(HttpHeaders.Authorization, "Bearer ${(sessionStatus.value as? SessionStatus.Authenticated)?.session?.accessToken}")
-        }
     }
 
     override suspend fun close() {
