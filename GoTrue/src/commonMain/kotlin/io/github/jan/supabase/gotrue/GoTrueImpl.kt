@@ -126,7 +126,7 @@ internal class GoTrueImpl(override val supabaseClient: SupabaseClient, override 
         }.toString()
         api.postJson("otp", body) {
             finalRedirectUrl?.let { url.parameters.append("redirect_to", it) }
-        }.checkErrors()
+        }
     }
 
     override suspend fun sendRecoveryEmail(email: String, redirectUrl: String?, captchaToken: String?) {
@@ -141,11 +141,11 @@ internal class GoTrueImpl(override val supabaseClient: SupabaseClient, override 
         }.toString()
         api.postJson("recover", body) {
             finalRedirectUrl?.let { url.encodedParameters.append("redirect_to", it) }
-        }.checkErrors()
+        }
     }
 
     override suspend fun reauthenticate() {
-        api.get("reauthenticate").checkErrors()
+        api.get("reauthenticate")
     }
 
     override suspend fun verify(type: VerifyType, token: String, captchaToken: String?) {
@@ -159,7 +159,7 @@ internal class GoTrueImpl(override val supabaseClient: SupabaseClient, override 
             }
         }
         val response = api.postJson("verify", body)
-        val session =  response.checkErrors().body<UserSession>()
+        val session =  response.body<UserSession>()
         startAutoRefresh(session)
     }
 
@@ -175,7 +175,7 @@ internal class GoTrueImpl(override val supabaseClient: SupabaseClient, override 
             }
         }
         val response = api.postJson("verify", body)
-        val session = response.checkErrors().body<UserSession>()
+        val session = response.body<UserSession>()
         startAutoRefresh(session)
     }
 

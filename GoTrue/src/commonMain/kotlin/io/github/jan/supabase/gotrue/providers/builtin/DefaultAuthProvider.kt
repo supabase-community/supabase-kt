@@ -1,18 +1,15 @@
 package io.github.jan.supabase.gotrue.providers.builtin
 
 import io.github.jan.supabase.SupabaseClient
-import io.github.jan.supabase.gotrue.gotrue
-import io.github.jan.supabase.gotrue.checkErrors
 import io.github.jan.supabase.gotrue.generateRedirectUrl
+import io.github.jan.supabase.gotrue.gotrue
 import io.github.jan.supabase.gotrue.providers.AuthProvider
 import io.github.jan.supabase.gotrue.user.UserSession
 import io.ktor.client.call.body
-import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.builtins.serializer
-import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.descriptors.buildClassSerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
@@ -73,7 +70,6 @@ sealed interface DefaultAuthProvider<C, R> : AuthProvider<C, R> {
         val response = supabaseClient.httpClient.post(supabaseClient.gotrue.resolveUrl("token?grant_type=password")) {
             setBody(encodedCredentials)
         }
-        response.checkErrors()
         response.body<UserSession>().also {
             onSuccess(it)
         }
@@ -94,7 +90,6 @@ sealed interface DefaultAuthProvider<C, R> : AuthProvider<C, R> {
         val response = supabaseClient.httpClient.post(supabaseClient.gotrue.resolveUrl("signup$redirect")) {
             setBody(body)
         }
-        response.checkErrors()
         val json = response.body<JsonObject>()
         return decodeResult(json)
     }

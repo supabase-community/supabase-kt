@@ -9,7 +9,6 @@ import io.github.jan.supabase.exceptions.RestException
 import io.github.jan.supabase.exceptions.UnauthorizedRestException
 import io.github.jan.supabase.gotrue.GoTrue
 import io.github.jan.supabase.gotrue.authenticatedSupabaseApi
-import io.github.jan.supabase.gotrue.checkErrors
 import io.github.jan.supabase.plugins.MainConfig
 import io.github.jan.supabase.plugins.MainPlugin
 import io.github.jan.supabase.plugins.SupabasePluginProvider
