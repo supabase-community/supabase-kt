@@ -1,4 +1,3 @@
-import org.jetbrains.compose.compose
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 
 plugins {
@@ -22,6 +21,10 @@ version = "1.0"
 kotlin {
     jvm {
         compilations.all {
+            kotlinOptions.freeCompilerArgs += listOf(
+                "-P",
+                "plugin:androidx.compose.compiler.plugins.kotlin:suppressKotlinVersionCompatibilityCheck=true"
+            )
             kotlinOptions.jvmTarget = "11"
         }
         withJava()
@@ -57,4 +60,8 @@ compose.desktop {
             packageVersion = "1.0.0"
         }
     }
+}
+
+compose {
+    kotlinCompilerPlugin.set("org.jetbrains.compose.compiler:compiler:${Versions.COMPOSE_COMPILER}") // see versions here https://mvnrepository.com/artifact/org.jetbrains.compose.compiler/compiler
 }

@@ -16,6 +16,7 @@ repositories {
         name = "ktor-eap"
     }
 }
+
 dependencies {
     api(project(":gotrue-kt"))
     //api(project(":Supacompose"))
@@ -45,4 +46,12 @@ android {
             isMinifyEnabled = false
         }
     }
+    kotlinOptions.freeCompilerArgs += listOf(
+        "-P",
+        "plugin:androidx.compose.compiler.plugins.kotlin:suppressKotlinVersionCompatibilityCheck=true"
+    )
+}
+
+compose {
+    kotlinCompilerPlugin.set("org.jetbrains.compose.compiler:compiler:${Versions.COMPOSE_COMPILER}") // see versions here https://mvnrepository.com/artifact/org.jetbrains.compose.compiler/compiler
 }
