@@ -1,15 +1,11 @@
 package io.github.jan.supabase.storage
 
 import io.github.jan.supabase.SupabaseClient
-import io.github.jan.supabase.gotrue.GoTrue
 import io.github.jan.supabase.gotrue.authenticatedSupabaseApi
 import io.github.jan.supabase.plugins.MainConfig
 import io.github.jan.supabase.plugins.MainPlugin
 import io.github.jan.supabase.plugins.SupabasePluginProvider
 import io.ktor.client.call.body
-import io.ktor.client.request.HttpRequestBuilder
-import io.ktor.client.request.headers
-import io.ktor.http.HttpHeaders
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
 
@@ -107,15 +103,6 @@ internal class StorageImpl(override val supabaseClient: SupabaseClient, override
     }
 
     override fun get(bucketId: String): BucketApi = BucketApiImpl(bucketId, this)
-
-    private fun HttpRequestBuilder.addAuthorization() {
-        val token = config.jwtToken ?: supabaseClient.pluginManager.getPluginOrNull(GoTrue)?.currentAccessTokenOrNull()
-        token.let {
-            headers {
-                append(HttpHeaders.Authorization, "Bearer $it")
-            }
-        }
-    }
 
 }
 
