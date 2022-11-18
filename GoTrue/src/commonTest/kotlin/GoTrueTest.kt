@@ -3,6 +3,8 @@
 import com.russhwolf.settings.MapSettings
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.createSupabaseClient
+import io.github.jan.supabase.exceptions.BadRequestRestException
+import io.github.jan.supabase.exceptions.UnauthorizedRestException
 import io.github.jan.supabase.gotrue.GoTrue
 import io.github.jan.supabase.gotrue.SettingsSessionManager
 import io.github.jan.supabase.gotrue.VerifyType
@@ -32,7 +34,7 @@ class GoTrueTest {
     fun test_login_with_email_with_wrong_credentials() {
         val client = createSupabaseClient()
         runTest(dispatcher) {
-            assertFailsWith<RestException>("Login with email and wrong password should fail") {
+            assertFailsWith<BadRequestRestException>("Login with email and wrong password should fail") {
                 client.gotrue.loginWith(Email, "https://website.com") {
                     email = "email@example.com"
                     password = "wrong_password"
@@ -138,7 +140,7 @@ class GoTrueTest {
     fun test_requesting_user_with_invalid_token() {
         val client = createSupabaseClient()
         runTest(dispatcher) {
-            assertFailsWith<UnauthorizedException>("Requesting user with invalid token should fail") {
+            assertFailsWith<UnauthorizedRestException>("Requesting user with invalid token should fail") {
                 client.gotrue.getUser("invalid_token")
             }
             client.close()
@@ -161,7 +163,7 @@ class GoTrueTest {
     fun test_verifying_with_wrong_token() {
         val client = createSupabaseClient()
         runTest(dispatcher) {
-            assertFailsWith<RestException>("verifying with a wrong token should fail") {
+            assertFailsWith<BadRequestRestException>("verifying with a wrong token should fail") {
                 client.gotrue.verify(VerifyType.INVITE, "wrong_token")
             }
             client.close()

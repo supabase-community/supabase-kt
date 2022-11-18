@@ -37,8 +37,8 @@ inline fun <reified T> JsonObject.decodeIfNotEmptyOrDefault(default: T): T {
 }
 
 suspend inline fun <reified T> HttpResponse.bodyOrNull(): T? {
-    val text = bodyAsText()
     return try {
+        val text = bodyAsText()
         Json.decodeFromString<T>(text)
     } catch(e: Exception) {
         null

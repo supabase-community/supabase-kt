@@ -50,7 +50,7 @@ class Functions(override val config: Config, override val supabaseClient: Supaba
                 this.headers[HttpHeaders.Authorization] = "Bearer $it"
             }
             builder()
-        }.checkErrors("Couldn't invoke function $function")
+        }
     }
 
     /**
