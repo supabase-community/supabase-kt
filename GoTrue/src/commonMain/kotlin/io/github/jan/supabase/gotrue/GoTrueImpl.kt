@@ -17,6 +17,7 @@ package io.github.jan.supabase.gotrue
  import io.github.jan.supabase.toJsonObject
  import io.ktor.client.call.body
  import io.ktor.client.request.header
+ import io.ktor.client.statement.HttpResponse
  import io.ktor.client.statement.bodyAsText
  import kotlinx.coroutines.CoroutineScope
  import kotlinx.coroutines.Job
