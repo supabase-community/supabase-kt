@@ -3,6 +3,7 @@ package io.github.jan.supabase.storage
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.bodyOrNull
 import io.github.jan.supabase.exceptions.BadRequestRestException
+import io.github.jan.supabase.exceptions.HttpRequestException
 import io.github.jan.supabase.exceptions.NotFoundRestException
 import io.github.jan.supabase.exceptions.RestException
 import io.github.jan.supabase.exceptions.UnauthorizedRestException
@@ -12,6 +13,7 @@ import io.github.jan.supabase.plugins.MainConfig
 import io.github.jan.supabase.plugins.MainPlugin
 import io.github.jan.supabase.plugins.SupabasePluginProvider
 import io.ktor.client.call.body
+import io.ktor.client.plugins.HttpRequestTimeoutException
 import io.ktor.client.statement.HttpResponse
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
@@ -23,37 +25,49 @@ sealed interface Storage : MainPlugin<Storage.Config> {
      * @param name the name of the bucket
      * @param id the id of the bucket
      * @param public whether the bucket should be public or not
-     * @throws RestException or one of its subclasses if the request failed
+     * @throws RestException or one of its subclasses if receiving an error response
+     * @throws HttpRequestTimeoutException if the request timed out
+     * @throws HttpRequestException on network related issues
      */
     suspend fun createBucket(name: String, id: String, public: Boolean)
 
     /**
      * Returns all buckets in the storage
-     * @throws RestException or one of its subclasses if the request failed
+     * @throws RestException or one of its subclasses if receiving an error response
+     * @throws HttpRequestTimeoutException if the request timed out
+     * @throws HttpRequestException on network related issues
      */
     suspend fun getAllBuckets(): List<Bucket>
 
     /**
      * Retrieves a bucket by its [id]
-     * @throws RestException or one of its subclasses if the request failed
+     * @throws RestException or one of its subclasses if receiving an error response
+     * @throws HttpRequestTimeoutException if the request timed out
+     * @throws HttpRequestException on network related issues
      */
     suspend fun getBucket(id: String): Bucket?
 
     /**
      * Changes a bucket's public status to [public]
-     * @throws RestException or one of its subclasses if the request failed
+     * @throws RestException or one of its subclasses if receiving an error response
+     * @throws HttpRequestTimeoutException if the request timed out
+     * @throws HttpRequestException on network related issues
      */
     suspend fun changePublicStatus(bucketId: String, public: Boolean)
 
     /**
      * Empties a bucket by its [bucketId]
-     * @throws RestException or one of its subclasses if the request failed
+     * @throws RestException or one of its subclasses if receiving an error response
+     * @throws HttpRequestTimeoutException if the request timed out
+     * @throws HttpRequestException on network related issues
      */
     suspend fun emptyBucket(bucketId: String)
 
     /**
      * Deletes a bucket by its [id]
-     * @throws RestException or one of its subclasses if the request failed
+     * @throws RestException or one of its subclasses if receiving an error response
+     * @throws HttpRequestTimeoutException if the request timed out
+     * @throws HttpRequestException on network related issues
      */
     suspend fun deleteBucket(id: String)
 

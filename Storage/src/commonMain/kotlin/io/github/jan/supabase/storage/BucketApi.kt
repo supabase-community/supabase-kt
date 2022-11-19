@@ -1,10 +1,12 @@
 package io.github.jan.supabase.storage
 
 import io.github.jan.supabase.SupabaseClient
+import io.github.jan.supabase.exceptions.HttpRequestException
 import io.github.jan.supabase.exceptions.RestException
 import io.github.jan.supabase.gotrue.GoTrue
 import io.github.jan.supabase.putJsonObject
 import io.ktor.client.call.body
+import io.ktor.client.plugins.HttpRequestTimeoutException
 import io.ktor.client.request.setBody
 import io.ktor.http.HttpMethod
 import kotlinx.serialization.json.JsonObject
@@ -24,38 +26,50 @@ sealed interface BucketApi {
      * Uploads a file in [bucketId] under [path]
      * @param path The path to upload the file to
      * @return the key to the uploaded file
-     * @throws RestException or one of its subclasses if the request failed
+     * @throws RestException or one of its subclasses if receiving an error response
+     * @throws HttpRequestTimeoutException if the request timed out
+     * @throws HttpRequestException on network related issues
      */
     suspend fun upload(path: String, data: ByteArray): String
 
     /**
      * Updates a file in [bucketId] under [path]
      * @return the key to the updated file
-     * @throws RestException or one of its subclasses if the request failed
+     * @throws RestException or one of its subclasses if receiving an error response
+     * @throws HttpRequestTimeoutException if the request timed out
+     * @throws HttpRequestException on network related issues
      */
     suspend fun update(path: String, data: ByteArray): String
 
     /**
      * Deletes all files in [bucketId] with in [paths]
-     * @throws RestException or one of its subclasses if the request failed
+     * @throws RestException or one of its subclasses if receiving an error response
+     * @throws HttpRequestTimeoutException if the request timed out
+     * @throws HttpRequestException on network related issues
      */
     suspend fun delete(paths: Collection<String>)
 
     /**
      * Deletes all files in [bucketId] with in [paths]
-     * @throws RestException or one of its subclasses if the request failed
+     * @throws RestException or one of its subclasses if receiving an error response
+     * @throws HttpRequestTimeoutException if the request timed out
+     * @throws HttpRequestException on network related issues
      */
     suspend fun delete(vararg paths: String) = delete(paths.toList())
 
     /**
      * Moves a file under [from] to [to]
-     * @throws RestException or one of its subclasses if the request failed
+     * @throws RestException or one of its subclasses if receiving an error response
+     * @throws HttpRequestTimeoutException if the request timed out
+     * @throws HttpRequestException on network related issues
      */
     suspend fun move(from: String, to: String)
 
     /**
      * Copies a file under [from] to [to]
-     * @throws RestException or one of its subclasses if the request failed
+     * @throws RestException or one of its subclasses if receiving an error response
+     * @throws HttpRequestTimeoutException if the request timed out
+     * @throws HttpRequestException on network related issues
      */
     suspend fun copy(from: String, to: String)
 
@@ -64,7 +78,9 @@ sealed interface BucketApi {
      * @param path The path to create an url for
      * @param expiresIn The duration the url is valid
      * @return The url to download the file
-     * @throws RestException or one of its subclasses if the request failed
+     * @throws RestException or one of its subclasses if receiving an error response
+     * @throws HttpRequestTimeoutException if the request timed out
+     * @throws HttpRequestException on network related issues
      */
     suspend fun createSignedUrl(path: String, expiresIn: Duration): String
 
@@ -73,7 +89,9 @@ sealed interface BucketApi {
      * @param expiresIn The duration the urls are valid
      * @param paths The paths to create urls for
      * @return A list of [SignedUrl]s
-     * @throws RestException or one of its subclasses if the request failed
+     * @throws RestException or one of its subclasses if receiving an error response
+     * @throws HttpRequestTimeoutException if the request timed out
+     * @throws HttpRequestException on network related issues
      */
     suspend fun createSignedUrls(expiresIn: Duration, paths: Collection<String>): List<SignedUrl>
 
@@ -82,7 +100,9 @@ sealed interface BucketApi {
      * @param expiresIn The duration the urls are valid
      * @param paths The paths to create urls for
      * @return A list of [SignedUrl]s
-     * @throws RestException or one of its subclasses if the request failed
+     * @throws RestException or one of its subclasses if receiving an error response
+     * @throws HttpRequestTimeoutException if the request timed out
+     * @throws HttpRequestException on network related issues
      */
     suspend fun createSignedUrls(expiresIn: Duration, vararg paths: String) = createSignedUrls(expiresIn, paths.toList())
 
@@ -90,7 +110,9 @@ sealed interface BucketApi {
      * Downloads a file from [bucketId] under [path]
      * @param path The path to download
      * @return The file as a byte array
-     * @throws RestException or one of its subclasses if the request failed
+     * @throws RestException or one of its subclasses if receiving an error response
+     * @throws HttpRequestTimeoutException if the request timed out
+     * @throws HttpRequestException on network related issues
      */
     suspend fun downloadAuthenticated(path: String): ByteArray
 
@@ -98,32 +120,42 @@ sealed interface BucketApi {
      * Downloads a file from [bucketId] under [path] using the public url
      * @param path The path to download
      * @return The file as a byte array
-     * @throws RestException or one of its subclasses if the request failed
+     * @throws RestException or one of its subclasses if receiving an error response
+     * @throws HttpRequestTimeoutException if the request timed out
+     * @throws HttpRequestException on network related issues
      */
     suspend fun downloadPublic(path: String): ByteArray
 
     /**
      * Searches for buckets with the given [prefix] and [filter]
      * @return The filtered buckets
-     * @throws RestException or one of its subclasses if the request failed
+     * @throws RestException or one of its subclasses if receiving an error response
+     * @throws HttpRequestTimeoutException if the request timed out
+     * @throws HttpRequestException on network related issues
      */
     suspend fun list(prefix: String, filter: BucketListFilter.() -> Unit = {}): List<BucketItem>
 
     /**
      * Changes the bucket's public status to [public]
-     * @throws RestException or one of its subclasses if the request failed
+     * @throws RestException or one of its subclasses if receiving an error response
+     * @throws HttpRequestTimeoutException if the request timed out
+     * @throws HttpRequestException on network related issues
      */
     suspend fun changePublicStatusTo(public: Boolean)
 
     /**
      * Returns the public url of [path]
-     * @throws RestException or one of its subclasses if the request failed
+     * @throws RestException or one of its subclasses if receiving an error response
+     * @throws HttpRequestTimeoutException if the request timed out
+     * @throws HttpRequestException on network related issues
      */
     fun publicUrl(path: String): String
 
     /**
      * Returns the authenticated url of [path]. Requires bearer token authentication using the user's access token
-     * @throws RestException or one of its subclasses if the request failed
+     * @throws RestException or one of its subclasses if receiving an error response
+     * @throws HttpRequestTimeoutException if the request timed out
+     * @throws HttpRequestException on network related issues
      */
     fun authenticatedUrl(path: String): String
     

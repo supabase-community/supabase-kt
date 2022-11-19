@@ -1,9 +1,11 @@
 package io.github.jan.supabase.postgrest.query
 
+import io.github.jan.supabase.exceptions.HttpRequestException
 import io.github.jan.supabase.exceptions.RestException
 import io.github.jan.supabase.postgrest.Postgrest
 import io.github.jan.supabase.postgrest.request.PostgrestRequest
 import io.github.jan.supabase.supabaseJson
+import io.ktor.client.plugins.HttpRequestTimeoutException
 import kotlinx.serialization.json.encodeToJsonElement
 import kotlinx.serialization.json.jsonArray
 import kotlin.experimental.ExperimentalTypeInference
@@ -21,7 +23,9 @@ class PostgrestBuilder(val postgrest: Postgrest, val table: String) {
      * @param count Count algorithm to use to count rows in a table.
      * @param filter Additional filtering to apply to the query
      * @return PostgrestResult which is either an error, an empty JsonArray or the data you requested as an JsonArray
-     * @throws RestException or one of its subclasses if the request failed
+     * @throws RestException or one of its subclasses if receiving an error response
+     * @throws HttpRequestTimeoutException if the request timed out
+     * @throws HttpRequestException on network related issues
      */
     @OptIn(ExperimentalTypeInference::class)
     suspend inline fun select(
@@ -38,7 +42,9 @@ class PostgrestBuilder(val postgrest: Postgrest, val table: String) {
      * @param upsert Performs an upsert if true.
      * @param onConflict When specifying onConflict, you can make upsert work on a columns that has a unique constraint.
      * @param returning By default, the new record is returned. You can set this to 'minimal' if you don't need this value
-     * @throws RestException or one of its subclasses if the request failed
+     * @throws RestException or one of its subclasses if receiving an error response
+     * @throws HttpRequestTimeoutException if the request timed out
+     * @throws HttpRequestException on network related issues
      */
     suspend inline fun <reified T : Any> insert(
         values: List<T>,
@@ -59,7 +65,9 @@ class PostgrestBuilder(val postgrest: Postgrest, val table: String) {
      * @param upsert Performs an upsert if true.
      * @param onConflict When specifying onConflict, you can make upsert work on a columns that has a unique constraint.
      * @param returning By default, the new record is returned. You can set this to 'minimal' if you don't need this value
-     * @throws RestException or one of its subclasses if the request failed
+     * @throws RestException or one of its subclasses if receiving an error response
+     * @throws HttpRequestTimeoutException if the request timed out
+     * @throws HttpRequestException on network related issues
      */
     suspend inline fun <reified T : Any> insert(
         value: T,
@@ -75,7 +83,9 @@ class PostgrestBuilder(val postgrest: Postgrest, val table: String) {
      *
      * @param update Specifies the fields to update via a DSL
      * @param returning By default, the new record is returned. You can set this to 'minimal' if you don't need this value
-     * @throws RestException or one of its subclasses if the request failed
+     * @throws RestException or one of its subclasses if receiving an error response
+     * @throws HttpRequestTimeoutException if the request timed out
+     * @throws HttpRequestException on network related issues
      */
     @OptIn(ExperimentalTypeInference::class)
     suspend inline fun update(
@@ -89,7 +99,9 @@ class PostgrestBuilder(val postgrest: Postgrest, val table: String) {
      * Executes a delete operation on the [table].
      *
      * @param returning If set to true, you get the deleted rows as the response
-     * @throws RestException or one of its subclasses if the request failed
+     * @throws RestException or one of its subclasses if receiving an error response
+     * @throws HttpRequestTimeoutException if the request timed out
+     * @throws HttpRequestException on network related issues
      */
     @OptIn(ExperimentalTypeInference::class)
     suspend inline fun delete(

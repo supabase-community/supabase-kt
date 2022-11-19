@@ -5,13 +5,13 @@ import io.github.jan.supabase.annotiations.SupabaseInternal
 import io.github.jan.supabase.buildUrl
 import io.github.jan.supabase.exceptions.BadRequestRestException
 import io.github.jan.supabase.exceptions.NotFoundRestException
-import io.github.jan.supabase.exceptions.RestException
 import io.github.jan.supabase.exceptions.UnauthorizedRestException
 import io.github.jan.supabase.gotrue.GoTrue
 import io.github.jan.supabase.gotrue.authenticatedSupabaseApi
 import io.github.jan.supabase.plugins.MainConfig
 import io.github.jan.supabase.plugins.MainPlugin
 import io.github.jan.supabase.plugins.SupabasePluginProvider
+import io.ktor.client.plugins.HttpRequestTimeoutException
 import io.ktor.client.request.HttpRequestBuilder
 import io.ktor.client.request.setBody
 import io.ktor.client.statement.HttpResponse
@@ -41,7 +41,9 @@ class Functions(override val config: Config, override val supabaseClient: Supaba
      * Invokes a remote edge function. The authorization token is automatically added to the request.
      * @param function The function to invoke
      * @param builder The request builder to configure the request
-     * @throws RestException or one of its subclasses if the request failed
+     * @throws RestException or one of its subclasses if receiving an error response
+     * @throws HttpRequestTimeoutException if the request timed out
+     * @throws HttpRequestException on network related issues
      */
     suspend inline operator fun invoke(function: String, crossinline builder: HttpRequestBuilder.() -> Unit): HttpResponse {
         return api.post(function) {
@@ -59,7 +61,9 @@ class Functions(override val config: Config, override val supabaseClient: Supaba
      * @param function The function to invoke
      * @param body The body of the request
      * @param headers Headers to add to the request
-     * @throws RestException or one of its subclasses if the request failed
+     * @throws RestException or one of its subclasses if receiving an error response
+     * @throws HttpRequestTimeoutException if the request timed out
+     * @throws HttpRequestException on network related issues
      */
     suspend inline operator fun <reified T> invoke(function: String, body: T, headers: Headers = Headers.Empty): HttpResponse = invoke(function) {
         this.headers.appendAll(headers)
@@ -72,7 +76,9 @@ class Functions(override val config: Config, override val supabaseClient: Supaba
      * Invokes a remote edge function. The authorization token is automatically added to the request.
      * @param function The function to invoke
      * @param headers Headers to add to the request
-     * @throws RestException or one of its subclasses if the request failed
+     * @throws RestException or one of its subclasses if receiving an error response
+     * @throws HttpRequestTimeoutException if the request timed out
+     * @throws HttpRequestException on network related issues
      */
     suspend inline operator fun invoke(function: String, headers: Headers = Headers.Empty): HttpResponse = invoke(function) {
         this.headers.appendAll(headers)
