@@ -6,6 +6,8 @@ import io.ktor.client.HttpClient
 import io.ktor.client.HttpClientConfig
 import io.ktor.client.engine.HttpClientEngine
 import io.ktor.client.plugins.DefaultRequest
+import io.ktor.client.plugins.HttpRequestTimeoutException
+import io.ktor.client.plugins.HttpTimeout
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.websocket.webSocketSession
 import io.ktor.client.request.HttpRequestBuilder
@@ -23,6 +25,7 @@ class KtorSupabaseHttpClient(
     private val supabaseKey: String,
     modifiers: List<HttpClientConfig<*>.() -> Unit> = listOf(),
     private val logNetworkTraffic: Boolean,
+    private val requestTimeout: Long,
     engine: HttpClientEngine? = null,
 ): SupabaseHttpClient() {
 
@@ -31,22 +34,27 @@ class KtorSupabaseHttpClient(
         else HttpClient { applyDefaultConfiguration(modifiers) }
 
     override suspend fun request(url: String, builder: HttpRequestBuilder.() -> Unit): HttpResponse {
-        return httpClient.request(url, builder).also {
-            if(logNetworkTraffic) {
-                Napier.d {
-                    """
+        val response = try {
+            httpClient.request(url, builder)
+        } catch(e: HttpRequestTimeoutException) {
+            Napier.d { "Request timed out after $requestTimeout ms" }
+            throw e
+        }
+        if(logNetworkTraffic) {
+            Napier.d {
+                """
                         
                         --------------------
-                        Making a request to $url with method ${it.request.method.value}
-                        Request headers: ${it.request.headers}
-                        Request body: ${(it.request.content as? TextContent)?.text}
-                        Response status: ${it.status}
-                        Response headers: ${it.headers}
+                        Making a request to $url with method ${response.request.method.value}
+                        Request headers: ${response.request.headers}
+                        Request body: ${(response.request.content as? TextContent)?.text}
+                        Response status: ${response.status}
+                        Response headers: ${response.headers}
                         --------------------
                     """.trimIndent()
-                }
             }
         }
+        return response
     }
 
     suspend fun webSocketSession(url: String, block: HttpRequestBuilder.() -> Unit = {}) = httpClient.webSocketSession(url, block)
@@ -64,6 +72,9 @@ class KtorSupabaseHttpClient(
         }
         install(ContentNegotiation) {
             json(supabaseJson)
+        }
+        install(HttpTimeout) {
+            requestTimeoutMillis = requestTimeout
         }
         modifiers.forEach { it.invoke(this) }
     }

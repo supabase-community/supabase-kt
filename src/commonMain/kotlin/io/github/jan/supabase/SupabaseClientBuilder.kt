@@ -6,6 +6,7 @@ import io.github.jan.supabase.plugins.SupabasePlugin
 import io.github.jan.supabase.plugins.SupabasePluginProvider
 import io.ktor.client.HttpClientConfig
 import io.ktor.client.engine.HttpClientEngine
+import kotlin.time.Duration.Companion.seconds
 
 /**
  * Creates a new [SupabaseClient] with the given options.
@@ -18,6 +19,7 @@ class SupabaseClientBuilder @PublishedApi internal constructor(private val supab
     var httpEngine: HttpClientEngine? = null
     var ignoreModulesInUrl = false
     var logNetworkTraffic = false
+    var requestTimeout = 10.seconds
     private val httpConfigOverrides = mutableListOf<HttpClientConfig<*>.() -> Unit>()
     private val plugins = mutableMapOf<String, ((SupabaseClient) -> SupabasePlugin)>()
 
@@ -36,7 +38,7 @@ class SupabaseClientBuilder @PublishedApi internal constructor(private val supab
 
     @PublishedApi
     internal fun build(): SupabaseClient {
-        return SupabaseClientImpl(supabaseUrl.split("//").last(), supabaseKey, plugins, httpConfigOverrides, useHTTPS, logNetworkTraffic, httpEngine)
+        return SupabaseClientImpl(supabaseUrl.split("//").last(), supabaseKey, plugins, httpConfigOverrides, useHTTPS, logNetworkTraffic, requestTimeout.inWholeMilliseconds, httpEngine)
     }
 
     /**
