@@ -3,6 +3,9 @@ package io.github.jan.supabase.exceptions
 import io.ktor.client.statement.HttpResponse
 import io.ktor.client.statement.request
 
+/**
+ * Base class for all response-related exceptions
+ */
 sealed class RestException(message: String): Exception(message) {
 
     constructor(error: String, response: HttpResponse, message: String? = null): this("""
@@ -14,10 +17,22 @@ sealed class RestException(message: String): Exception(message) {
 
 }
 
+/**
+ * Thrown when supabase-kt receives a response indicating an authentication error
+ */
 class UnauthorizedRestException(error: String, response: HttpResponse, message: String? = null): RestException(error, response, message)
 
+/**
+ * Thrown when supabase-kt receives a response indicating that the request was invalid due to missing or wrong fields
+ */
 class BadRequestRestException(error: String, response: HttpResponse, message: String? = null): RestException(error, response, message)
 
-class UnknownRestException(error: String, response: HttpResponse, message: String? = null): RestException(error, response, message)
-
+/**
+ * Thrown when supabase-kt receives a response indicating that the wanted resource was not found
+ */
 class NotFoundRestException(error: String, response: HttpResponse, message: String? = null): RestException(error, response, message)
+
+/**
+ * Thrown for all other response codes
+ */
+class UnknownRestException(error: String, response: HttpResponse, message: String? = null): RestException(error, response, message)

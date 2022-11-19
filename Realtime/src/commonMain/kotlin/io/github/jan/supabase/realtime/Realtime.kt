@@ -4,6 +4,7 @@ import io.github.aakira.napier.Napier
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.SupabaseClientBuilder
 import io.github.jan.supabase.annotiations.SupabaseInternal
+import io.github.jan.supabase.exceptions.RestException
 import io.github.jan.supabase.gotrue.GoTrue
 import io.github.jan.supabase.gotrue.SessionStatus
 import io.github.jan.supabase.plugins.MainConfig
@@ -13,6 +14,7 @@ import io.github.jan.supabase.supabaseJson
 import io.ktor.client.plugins.websocket.DefaultClientWebSocketSession
 import io.ktor.client.plugins.websocket.WebSockets
 import io.ktor.client.plugins.websocket.sendSerialized
+import io.ktor.client.statement.HttpResponse
 import io.ktor.serialization.kotlinx.KotlinxWebsocketSerializationConverter
 import io.ktor.websocket.Frame
 import io.ktor.websocket.readText
@@ -267,6 +269,10 @@ internal class RealtimeImpl(override val supabaseClient: SupabaseClient, overrid
 
     override suspend fun block() {
         ws?.coroutineContext?.job?.join() ?: throw IllegalStateException("No connection available")
+    }
+
+    override suspend fun parseErrorResponse(response: HttpResponse): RestException {
+        throw UnsupportedOperationException("Realtime does not support REST requests")
     }
 
 }

@@ -15,7 +15,7 @@ class AuthenticatedSupabaseApi(
 ): SupabaseApi(resolveUrl, parseErrorResponse, supabaseClient) {
 
     override suspend fun request(url: String, builder: HttpRequestBuilder.() -> Unit): HttpResponse = super.request(url) {
-        supabaseClient.gotrue.currentSessionOrNull()?.let {
+        supabaseClient.pluginManager.getPluginOrNull(GoTrue)?.currentSessionOrNull()?.let {
             headers {
                 append("Authorization", "Bearer ${it.accessToken}")
             }

@@ -1,6 +1,7 @@
 package io.github.jan.supabase.network
 
 import io.github.aakira.napier.Napier
+import io.github.jan.supabase.exceptions.HttpRequestException
 import io.github.jan.supabase.supabaseJson
 import io.ktor.client.HttpClient
 import io.ktor.client.HttpClientConfig
@@ -13,6 +14,7 @@ import io.ktor.client.plugins.websocket.webSocketSession
 import io.ktor.client.request.HttpRequestBuilder
 import io.ktor.client.request.headers
 import io.ktor.client.request.request
+import io.ktor.client.request.url
 import io.ktor.client.statement.HttpResponse
 import io.ktor.client.statement.request
 import io.ktor.http.content.TextContent
@@ -34,32 +36,46 @@ class KtorSupabaseHttpClient(
         else HttpClient { applyDefaultConfiguration(modifiers) }
 
     override suspend fun request(url: String, builder: HttpRequestBuilder.() -> Unit): HttpResponse {
+        val request = HttpRequestBuilder().apply {
+            url(url)
+            builder()
+        }
+
         val response = try {
-            httpClient.request(url, builder)
+            httpClient.request(builder)
         } catch(e: HttpRequestTimeoutException) {
             Napier.d { "Request timed out after $requestTimeout ms" }
             throw e
+        } catch(e: Exception) {
+            Napier.d { "Request failed with ${e.message}" }
+            throw HttpRequestException(e.message ?: "", request)
         }
+
         if(logNetworkTraffic) {
-            Napier.d {
-                """
-                        
-                        --------------------
-                        Making a request to $url with method ${response.request.method.value}
-                        Request headers: ${response.request.headers}
-                        Request body: ${(response.request.content as? TextContent)?.text}
-                        Response status: ${response.status}
-                        Response headers: ${response.headers}
-                        --------------------
-                    """.trimIndent()
-            }
+            response.logResponse(url)
         }
+
         return response
     }
 
     suspend fun webSocketSession(url: String, block: HttpRequestBuilder.() -> Unit = {}) = httpClient.webSocketSession(url, block)
 
     fun close() = httpClient.close()
+
+    private fun HttpResponse.logResponse(url: String) {
+        Napier.d {
+            """
+                        
+                        --------------------
+                        Making a request to $url with method ${request.method.value}
+                        Request headers: ${request.headers}
+                        Request body: ${(request.content as? TextContent)?.text}
+                        Response status: $status
+                        Response headers: $headers
+                        --------------------
+                    """.trimIndent()
+        }
+    }
 
     private fun HttpClientConfig<*>.applyDefaultConfiguration(modifiers: List<HttpClientConfig<*>.() -> Unit>) {
         install(DefaultRequest) {
