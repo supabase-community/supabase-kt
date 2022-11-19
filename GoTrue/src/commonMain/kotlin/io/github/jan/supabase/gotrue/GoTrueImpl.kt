@@ -2,8 +2,11 @@ package io.github.jan.supabase.gotrue
 
  import io.github.aakira.napier.Napier
  import io.github.jan.supabase.SupabaseClient
+ import io.github.jan.supabase.bodyOrNull
+ import io.github.jan.supabase.exceptions.BadRequestRestException
  import io.github.jan.supabase.exceptions.RestException
- import io.github.jan.supabase.exceptions.UnauthorizedException
+ import io.github.jan.supabase.exceptions.UnauthorizedRestException
+ import io.github.jan.supabase.exceptions.UnknownRestException
  import io.github.jan.supabase.gotrue.admin.AdminApi
  import io.github.jan.supabase.gotrue.admin.AdminApiImpl
  import io.github.jan.supabase.gotrue.providers.AuthProvider
@@ -15,7 +18,9 @@ package io.github.jan.supabase.gotrue
  import io.github.jan.supabase.toJsonObject
  import io.ktor.client.call.body
  import io.ktor.client.request.header
+ import io.ktor.client.statement.HttpResponse
  import io.ktor.client.statement.bodyAsText
+ import io.ktor.http.HttpStatusCode
  import kotlinx.coroutines.CoroutineScope
  import kotlinx.coroutines.Job
  import kotlinx.coroutines.cancel
@@ -121,7 +126,7 @@ internal class GoTrueImpl(override val supabaseClient: SupabaseClient, override 
         }.toString()
         api.postJson("otp", body) {
             finalRedirectUrl?.let { url.parameters.append("redirect_to", it) }
-        }.checkErrors()
+        }
     }
 
     override suspend fun sendRecoveryEmail(email: String, redirectUrl: String?, captchaToken: String?) {
@@ -136,11 +141,11 @@ internal class GoTrueImpl(override val supabaseClient: SupabaseClient, override 
         }.toString()
         api.postJson("recover", body) {
             finalRedirectUrl?.let { url.encodedParameters.append("redirect_to", it) }
-        }.checkErrors()
+        }
     }
 
     override suspend fun reauthenticate() {
-        api.get("reauthenticate").checkErrors()
+        api.get("reauthenticate")
     }
 
     override suspend fun verify(type: VerifyType, token: String, captchaToken: String?) {
@@ -154,7 +159,7 @@ internal class GoTrueImpl(override val supabaseClient: SupabaseClient, override 
             }
         }
         val response = api.postJson("verify", body)
-        val session =  response.checkErrors().body<UserSession>()
+        val session =  response.body<UserSession>()
         startAutoRefresh(session)
     }
 
@@ -170,7 +175,7 @@ internal class GoTrueImpl(override val supabaseClient: SupabaseClient, override 
             }
         }
         val response = api.postJson("verify", body)
-        val session = response.checkErrors().body<UserSession>()
+        val session = response.body<UserSession>()
         startAutoRefresh(session)
     }
 
@@ -179,12 +184,7 @@ internal class GoTrueImpl(override val supabaseClient: SupabaseClient, override 
             header("Authorization", "Bearer $jwt")
         }
         val body = response.bodyAsText()
-        return try {
-            supabaseJson.decodeFromString(body)
-        } catch(e: Exception) {
-            Napier.e(e) { "Failed to get user. Full response body: $body" }
-            throw UnauthorizedException("Invalid JWT")
-        }
+        return supabaseJson.decodeFromString(body)
     }
 
     override suspend fun invalidateSession() {
@@ -202,11 +202,6 @@ internal class GoTrueImpl(override val supabaseClient: SupabaseClient, override 
             put("refresh_token", refreshToken)
         }
         val response = api.postJson("token?grant_type=refresh_token", body)
-        if (response.status.value !in 200..299) throw RestException(
-            response.status.value,
-            "Unauthorized",
-            response.bodyAsText()
-        )
         return response.body()
     }
 
@@ -284,8 +279,14 @@ internal class GoTrueImpl(override val supabaseClient: SupabaseClient, override 
         authScope.cancel()
     }
 
-    private operator fun UserSession?.not(): UserSession {
-        return this ?: throw IllegalStateException("No user session available")
+    override suspend fun parseErrorResponse(response: HttpResponse): RestException {
+        val errorBody = response.bodyOrNull<GoTrueErrorResponse>() ?: GoTrueErrorResponse("Unknown error")
+        return when(response.status) {
+            HttpStatusCode.Unauthorized -> UnauthorizedRestException(errorBody.error, response)
+            HttpStatusCode.BadRequest -> BadRequestRestException(errorBody.error, response)
+            HttpStatusCode.UnprocessableEntity -> BadRequestRestException(errorBody.error, response)
+            else -> UnknownRestException(errorBody.error, response)
+        }
     }
 
 }

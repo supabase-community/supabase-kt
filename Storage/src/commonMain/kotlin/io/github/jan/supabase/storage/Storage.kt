@@ -1,11 +1,18 @@
 package io.github.jan.supabase.storage
 
 import io.github.jan.supabase.SupabaseClient
+import io.github.jan.supabase.bodyOrNull
+import io.github.jan.supabase.exceptions.BadRequestRestException
+import io.github.jan.supabase.exceptions.NotFoundRestException
+import io.github.jan.supabase.exceptions.RestException
+import io.github.jan.supabase.exceptions.UnauthorizedRestException
+import io.github.jan.supabase.exceptions.UnknownRestException
 import io.github.jan.supabase.gotrue.authenticatedSupabaseApi
 import io.github.jan.supabase.plugins.MainConfig
 import io.github.jan.supabase.plugins.MainPlugin
 import io.github.jan.supabase.plugins.SupabasePluginProvider
 import io.ktor.client.call.body
+import io.ktor.client.statement.HttpResponse
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
 
@@ -16,31 +23,37 @@ sealed interface Storage : MainPlugin<Storage.Config> {
      * @param name the name of the bucket
      * @param id the id of the bucket
      * @param public whether the bucket should be public or not
+     * @throws RestException or one of its subclasses if the request failed
      */
     suspend fun createBucket(name: String, id: String, public: Boolean)
 
     /**
      * Returns all buckets in the storage
+     * @throws RestException or one of its subclasses if the request failed
      */
     suspend fun getAllBuckets(): List<Bucket>
 
     /**
      * Retrieves a bucket by its [id]
+     * @throws RestException or one of its subclasses if the request failed
      */
     suspend fun getBucket(id: String): Bucket?
 
     /**
      * Changes a bucket's public status to [public]
+     * @throws RestException or one of its subclasses if the request failed
      */
     suspend fun changePublicStatus(bucketId: String, public: Boolean)
 
     /**
      * Empties a bucket by its [bucketId]
+     * @throws RestException or one of its subclasses if the request failed
      */
     suspend fun emptyBucket(bucketId: String)
 
     /**
      * Deletes a bucket by its [id]
+     * @throws RestException or one of its subclasses if the request failed
      */
     suspend fun deleteBucket(id: String)
 
@@ -103,6 +116,18 @@ internal class StorageImpl(override val supabaseClient: SupabaseClient, override
     }
 
     override fun get(bucketId: String): BucketApi = BucketApiImpl(bucketId, this)
+
+    override suspend fun parseErrorResponse(response: HttpResponse): RestException {
+        val statusCode = response.status.value
+        val error = response.bodyOrNull<StorageErrorResponse>() ?: StorageErrorResponse(response.status.value, "Unknown error", "")
+        if(statusCode != 400) return UnknownRestException("Unknown error response", response)
+        when(error.statusCode) {
+            401 -> throw UnauthorizedRestException(error.error, response, error.message)
+            400 -> throw BadRequestRestException(error.error, response, error.message)
+            404 -> throw NotFoundRestException(error.error, response, error.message)
+            else -> throw UnknownRestException("Unknown error response", response)
+        }
+    }
 
 }
 

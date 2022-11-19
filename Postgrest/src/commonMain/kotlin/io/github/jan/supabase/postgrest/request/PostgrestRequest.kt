@@ -1,6 +1,5 @@
 package io.github.jan.supabase.postgrest.request
 
-import io.github.jan.supabase.exceptions.RestException
 import io.github.jan.supabase.gotrue.GoTrue
 import io.github.jan.supabase.postgrest.Postgrest
 import io.github.jan.supabase.postgrest.PostgrestImpl
@@ -38,16 +37,10 @@ sealed interface PostgrestRequest {
             headers[PostgrestBuilder.HEADER_PREFER] = prefer.joinToString(",")
             setBody(this@PostgrestRequest.body)
             url.parameters.appendAll(parametersOf(filter.mapValues { (_, value) -> listOf(value) }))
-        }.checkForErrorCodes()
+        }.asPostgrestResult()
     }
 
-    private suspend fun HttpResponse.checkForErrorCodes(): PostgrestResult {
-        if(status.value !in 200..299) {
-            val error = body<JsonElement>()
-            throw RestException(status.value, "Unknown error", error.toString(), headers = headers.entries().flatMap { (key, value) -> listOf(key) + value })
-        }
-        return PostgrestResult(body())
-    }
+    private suspend fun HttpResponse.asPostgrestResult(): PostgrestResult = PostgrestResult(body())
 
     data class RPC(
         private val head: Boolean = false,

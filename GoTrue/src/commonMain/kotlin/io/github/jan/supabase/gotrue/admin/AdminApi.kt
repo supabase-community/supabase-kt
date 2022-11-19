@@ -2,7 +2,6 @@ package io.github.jan.supabase.gotrue.admin
 
 import io.github.jan.supabase.gotrue.GoTrue
 import io.github.jan.supabase.gotrue.GoTrueImpl
-import io.github.jan.supabase.gotrue.checkErrors
 import io.github.jan.supabase.gotrue.user.UserInfo
 import io.github.jan.supabase.putJsonObject
 import io.github.jan.supabase.supabaseJson
@@ -72,24 +71,24 @@ internal class AdminApiImpl(val gotrue: GoTrue) : AdminApi {
 
     override suspend fun createUserWithEmail(builder: UserBuilder.Email.() -> Unit): UserInfo {
         val userBuilder = UserBuilder.Email().apply(builder) as UserBuilder
-        return api.postJson("admin/users", userBuilder).checkErrors().body()
+        return api.postJson("admin/users", userBuilder).body()
     }
 
     override suspend fun createUserWithPhone(builder: UserBuilder.Phone.() -> Unit): UserInfo {
         val userBuilder = UserBuilder.Phone().apply(builder) as UserBuilder
-        return api.postJson("admin/users", userBuilder).checkErrors().body()
+        return api.postJson("admin/users", userBuilder).body()
     }
 
     override suspend fun retrieveUsers(): List<UserInfo> {
-        return api.get("admin/users").checkErrors().body<JsonObject>().let { supabaseJson.decodeFromJsonElement(it["users"] ?: throw IllegalStateException("Didn't get users json field on method retrieveUsers. Full body: $it")) }
+        return api.get("admin/users").body<JsonObject>().let { supabaseJson.decodeFromJsonElement(it["users"] ?: throw IllegalStateException("Didn't get users json field on method retrieveUsers. Full body: $it")) }
     }
 
     override suspend fun retrieveUserById(uid: String): UserInfo {
-        return api.get("admin/users/$uid").checkErrors().body()
+        return api.get("admin/users/$uid").body()
     }
 
     override suspend fun deleteUser(uid: String) {
-        api.delete("admin/users/$uid").checkErrors()
+        api.delete("admin/users/$uid")
     }
 
     override suspend fun inviteUserByEmail(email: String, redirectTo: String?, data: JsonObject?) {
@@ -97,12 +96,12 @@ internal class AdminApiImpl(val gotrue: GoTrue) : AdminApi {
             put("email", email)
             data?.let { put("data", it) }
         }
-        api.postJson("invite", body) { redirectTo?.let { url.parameters.append("redirect_to", it) }}.checkErrors()
+        api.postJson("invite", body) { redirectTo?.let { url.parameters.append("redirect_to", it) }}
     }
 
     override suspend fun updateUserById(uid: String, builder: UserUpdateBuilder.() -> Unit): UserInfo {
         val updateBuilder = UserUpdateBuilder().apply(builder)
-        return api.putJson("admin/users/$uid", updateBuilder).checkErrors().body()
+        return api.putJson("admin/users/$uid", updateBuilder).body()
     }
 
     private fun tokenException(): Nothing = throw IllegalStateException("You need the service role access token to use admin methods. Use GoTrue#importAuthToken to import it. Never share it publicly")
@@ -133,6 +132,6 @@ suspend inline fun <reified C : LinkType.Config> AdminApi.generateLinkFor(
         put("type", linkType.type)
         putJsonObject(Json.encodeToJsonElement(generatedConfig).jsonObject)
     }
-    val user = api.postJson("admin/generate_link", body) { redirectTo?.let { url.parameters.append("redirect_to", it) }}.checkErrors().body<UserInfo>()
+    val user = api.postJson("admin/generate_link", body) { redirectTo?.let { url.parameters.append("redirect_to", it) }}.body<UserInfo>()
     return user.actionLink!! to user
 }
