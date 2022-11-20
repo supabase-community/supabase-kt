@@ -7,7 +7,9 @@ Supported targets:
 - JS (Browser)
 - _iOS (planned)_
 
-Newest version: [![Maven Central](https://img.shields.io/maven-central/v/io.github.jan-tennert.supabase/supabase-kt)](https://search.maven.org/search?q=g%3Aio.github.jan-tennert.supabase)
+Newest stable version: ![release](https://img.shields.io/github/release/supabase-community/supabase-kt)
+
+Newest experimental version: [![Maven Central](https://img.shields.io/maven-central/v/io.github.jan-tennert.supabase/supabase-kt)](https://search.maven.org/search?q=g%3Aio.github.jan-tennert.supabase)
 
 # Installation
 
