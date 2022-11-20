@@ -49,9 +49,12 @@ kotlin {
                 // https://mvnrepository.com/artifact/io.ktor/ktor-server-core
             }
         }
+        val nonJsMain by creating {}
         val jvmMain by getting {
+            dependsOn(nonJsMain)
         }
         val androidMain by getting {
+            dependsOn(nonJsMain)
         }
         val jsMain by getting
     }
