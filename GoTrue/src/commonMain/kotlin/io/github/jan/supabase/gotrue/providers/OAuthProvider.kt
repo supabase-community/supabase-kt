@@ -5,7 +5,7 @@ import io.github.jan.supabase.gotrue.user.UserSession
 
 expect abstract class OAuthProvider() : AuthProvider<ExternalAuthConfig, Unit> {
 
-    abstract fun provider(): String
+    abstract val name: String
 
     override suspend fun login(
         supabaseClient: SupabaseClient,

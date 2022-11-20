@@ -11,7 +11,7 @@ import io.github.jan.supabase.gotrue.user.UserSession
 
 actual abstract class OAuthProvider : AuthProvider<ExternalAuthConfig, Unit> {
 
-    actual abstract fun provider(): String
+    actual abstract val name: String
 
     actual override suspend fun login(
         supabaseClient: SupabaseClient,
@@ -21,7 +21,7 @@ actual abstract class OAuthProvider : AuthProvider<ExternalAuthConfig, Unit> {
     ) {
         val gotrue = supabaseClient.gotrue as GoTrueImpl
         val deepLink = "${gotrue.config.scheme}://${gotrue.config.host}"
-        gotrue.openOAuth(provider(), redirectUrl ?: deepLink)
+        gotrue.openOAuth(name, redirectUrl ?: deepLink)
     }
 
     actual override suspend fun signUp(
@@ -32,7 +32,7 @@ actual abstract class OAuthProvider : AuthProvider<ExternalAuthConfig, Unit> {
     ) {
         val gotrue = supabaseClient.gotrue as GoTrueImpl
         val deepLink = "${gotrue.config.scheme}://${gotrue.config.host}"
-        gotrue.openOAuth(provider(), redirectUrl ?: deepLink)
+        gotrue.openOAuth(name, redirectUrl ?: deepLink)
     }
 
     actual companion object

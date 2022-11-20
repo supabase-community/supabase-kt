@@ -7,7 +7,7 @@ import kotlin.jvm.JvmInline
 
 /**
  * Represents the result from a postgrest request
- * @param body The body of the response. Can be decoded using [decodeAs] or [decodeAsOrNull]
+ * @param body The body of the response
  */
 @JvmInline
 value class PostgrestResult(val body: JsonElement) {

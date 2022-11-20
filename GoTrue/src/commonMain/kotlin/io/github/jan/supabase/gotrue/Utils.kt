@@ -3,6 +3,7 @@ package io.github.jan.supabase.gotrue
 import io.github.aakira.napier.Napier
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.gotrue.user.UserSession
+import io.ktor.client.request.HttpRequestBuilder
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -30,4 +31,8 @@ internal fun SupabaseClient.parseFragment(fragment: String, onSessionSuccess: (U
         onSessionSuccess(session)
         authPlugin.startAutoRefresh(session)
     }
+}
+
+fun HttpRequestBuilder.redirectTo(url: String) {
+    this.url.parameters["redirect_to"] = url
 }

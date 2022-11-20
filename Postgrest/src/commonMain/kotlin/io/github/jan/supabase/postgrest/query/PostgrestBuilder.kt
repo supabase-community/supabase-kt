@@ -8,7 +8,6 @@ import io.github.jan.supabase.supabaseJson
 import io.ktor.client.plugins.HttpRequestTimeoutException
 import kotlinx.serialization.json.encodeToJsonElement
 import kotlinx.serialization.json.jsonArray
-import kotlin.experimental.ExperimentalTypeInference
 
 /**
  * The main class to build a postgrest request
@@ -27,12 +26,11 @@ class PostgrestBuilder(val postgrest: Postgrest, val table: String) {
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
-    @OptIn(ExperimentalTypeInference::class)
     suspend inline fun select(
         columns: String = "*",
         head: Boolean = false,
         count: Count? = null,
-        @BuilderInference filter: PostgrestFilterBuilder.() -> Unit = {}
+        filter: PostgrestFilterBuilder.() -> Unit = {}
     ): PostgrestResult = PostgrestRequest.Select(head, count, buildPostgrestFilter { filter(); _params["select"] = columns }).execute(table, postgrest)
 
     /**
@@ -87,12 +85,11 @@ class PostgrestBuilder(val postgrest: Postgrest, val table: String) {
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
-    @OptIn(ExperimentalTypeInference::class)
     suspend inline fun update(
         crossinline update: PostgrestUpdate.() -> Unit = {},
         returning: Returning = Returning.REPRESENTATION,
         count: Count? = null,
-        @BuilderInference filter: PostgrestFilterBuilder.() -> Unit = {}
+        filter: PostgrestFilterBuilder.() -> Unit = {}
     ): PostgrestResult = PostgrestRequest.Update(returning, count, buildPostgrestFilter(filter), buildPostgrestUpdate(update)).execute(table, postgrest)
 
     /**
@@ -103,11 +100,10 @@ class PostgrestBuilder(val postgrest: Postgrest, val table: String) {
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
-    @OptIn(ExperimentalTypeInference::class)
     suspend inline fun delete(
         returning: Returning = Returning.REPRESENTATION,
         count: Count? = null,
-        @BuilderInference filter: PostgrestFilterBuilder.() -> Unit = {}
+        filter: PostgrestFilterBuilder.() -> Unit = {}
     ): PostgrestResult = PostgrestRequest.Delete(returning, count, buildPostgrestFilter(filter)).execute(table, postgrest)
 
     companion object {

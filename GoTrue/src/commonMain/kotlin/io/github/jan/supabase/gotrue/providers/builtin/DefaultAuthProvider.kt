@@ -5,6 +5,7 @@ import io.github.jan.supabase.gotrue.GoTrueImpl
 import io.github.jan.supabase.gotrue.generateRedirectUrl
 import io.github.jan.supabase.gotrue.gotrue
 import io.github.jan.supabase.gotrue.providers.AuthProvider
+import io.github.jan.supabase.gotrue.redirectTo
 import io.github.jan.supabase.gotrue.user.UserSession
 import io.ktor.client.call.body
 import kotlinx.serialization.KSerializer
@@ -68,8 +69,11 @@ sealed interface DefaultAuthProvider<C, R> : AuthProvider<C, R> {
     ) {
         if(config == null) throw IllegalArgumentException("Credentials are required")
         val encodedCredentials = encodeCredentials(config)
+        val finalRedirectUrl = supabaseClient.gotrue.generateRedirectUrl(redirectUrl)
         val gotrue = supabaseClient.gotrue as GoTrueImpl
-        val response = gotrue.api.post("token?grant_type=password", encodedCredentials)
+        val response = gotrue.api.post("token?grant_type=password", encodedCredentials) {
+            finalRedirectUrl?.let { redirectTo(it) }
+        }
         response.body<UserSession>().also {
             onSuccess(it)
         }
@@ -83,12 +87,11 @@ sealed interface DefaultAuthProvider<C, R> : AuthProvider<C, R> {
     ): R {
         if (config == null) throw IllegalArgumentException("Credentials are required")
         val finalRedirectUrl = supabaseClient.gotrue.generateRedirectUrl(redirectUrl)
-        val redirect = finalRedirectUrl?.let {
-            "?redirect_to=$finalRedirectUrl"
-        } ?: ""
         val body = encodeCredentials(config)
         val gotrue = supabaseClient.gotrue as GoTrueImpl
-        val response = gotrue.api.post("signup$redirect", body)
+        val response = gotrue.api.post("signup", body) {
+            finalRedirectUrl?.let { redirectTo(it) }
+        }
         val json = response.body<JsonObject>()
         return decodeResult(json)
     }
