@@ -14,7 +14,6 @@ import io.ktor.client.plugins.websocket.webSocketSession
 import io.ktor.client.request.HttpRequestBuilder
 import io.ktor.client.request.headers
 import io.ktor.client.request.request
-import io.ktor.client.request.url
 import io.ktor.client.statement.HttpResponse
 import io.ktor.client.statement.request
 import io.ktor.http.content.TextContent
@@ -37,12 +36,11 @@ class KtorSupabaseHttpClient(
 
     override suspend fun request(url: String, builder: HttpRequestBuilder.() -> Unit): HttpResponse {
         val request = HttpRequestBuilder().apply {
-            url(url)
             builder()
         }
 
         val response = try {
-            httpClient.request(builder)
+            httpClient.request(url, builder)
         } catch(e: HttpRequestTimeoutException) {
             Napier.d { "Request timed out after $requestTimeout ms" }
             throw e
