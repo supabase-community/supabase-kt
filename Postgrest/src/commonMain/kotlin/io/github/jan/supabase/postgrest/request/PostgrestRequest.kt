@@ -24,6 +24,7 @@ sealed interface PostgrestRequest {
     val method: HttpMethod
     val filter: Map<String, String>
     val prefer: List<String>
+    val urlParams: Map<String, String> get() = mapOf()
 
     suspend fun execute(path: String, postgrest: Postgrest): PostgrestResult {
         postgrest as PostgrestImpl
@@ -36,15 +37,16 @@ sealed interface PostgrestRequest {
             }
             headers[PostgrestBuilder.HEADER_PREFER] = prefer.joinToString(",")
             setBody(this@PostgrestRequest.body)
+            url.parameters.appendAll(parametersOf(urlParams.mapValues { (_, value) -> listOf(value) }))
             url.parameters.appendAll(parametersOf(filter.mapValues { (_, value) -> listOf(value) }))
         }.asPostgrestResult()
     }
 
     private suspend fun HttpResponse.asPostgrestResult(): PostgrestResult = PostgrestResult(body())
 
-    data class RPC(
-        private val head: Boolean = false,
-        private val count: Count? = null,
+    class RPC(
+        head: Boolean = false,
+        count: Count? = null,
         override val filter: Map<String, String>,
         override val body: JsonElement? = null,
         ): PostgrestRequest {
@@ -54,9 +56,9 @@ sealed interface PostgrestRequest {
 
     }
 
-    data class Select(
-        private val head: Boolean = false,
-        private val count: Count? = null,
+    class Select(
+        head: Boolean = false,
+        count: Count? = null,
         override val filter: Map<String, String>
     ): PostgrestRequest {
 
@@ -65,7 +67,7 @@ sealed interface PostgrestRequest {
 
     }
 
-    data class Insert(
+    class Insert(
         override val body: JsonArray,
         private val upsert: Boolean = false,
         private val onConflict: String? = null,
@@ -80,10 +82,11 @@ sealed interface PostgrestRequest {
             if(upsert) add("resolution=merge-duplicates")
             if(count != null) add("count=${count.identifier}")
         }
+        override val urlParams = if (upsert && onConflict != null) mapOf("on_conflict" to onConflict) else mapOf()
 
     }
 
-    data class Update(
+    class Update(
         private val returning: Returning = Returning.REPRESENTATION,
         private val count: Count? = null,
         override val filter: Map<String, String>,
@@ -98,7 +101,7 @@ sealed interface PostgrestRequest {
 
     }
 
-    data class Delete(
+    class Delete(
         private val returning: Returning = Returning.REPRESENTATION,
         private val count: Count? = null,
         override val filter: Map<String, String>
