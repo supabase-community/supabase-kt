@@ -36,7 +36,7 @@ sealed interface PostgrestRequest {
                 headers[HttpHeaders.Authorization] = "Bearer $it"
             }
             headers[PostgrestBuilder.HEADER_PREFER] = prefer.joinToString(",")
-            setBody(this@PostgrestRequest.body)
+            this@PostgrestRequest.body?.let { setBody(it) }
             url.parameters.appendAll(parametersOf(urlParams.mapValues { (_, value) -> listOf(value) }))
             url.parameters.appendAll(parametersOf(filter.mapValues { (_, value) -> listOf(value) }))
         }.asPostgrestResult()

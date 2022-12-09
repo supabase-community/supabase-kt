@@ -1,7 +1,7 @@
 object Versions {
 
     const val KOTLIN = "1.7.21"
-    const val KTOR = "2.2.0"
+    const val KTOR = "2.2.1"
     const val ANDROID_CORE = "1.9.0"
     const val COROUTINES = "1.6.4"
     const val DOKKA = "1.7.20"
