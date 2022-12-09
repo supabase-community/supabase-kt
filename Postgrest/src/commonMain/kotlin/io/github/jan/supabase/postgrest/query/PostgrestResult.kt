@@ -27,9 +27,9 @@ value class PostgrestResult(val body: JsonElement) {
     }
 
     /**
-     * Decodes [body] as a list of [T], or an empty list if [body] couldn't be parsed as a list of [T]
+     * Decodes [body] as a list of [T]
      */
-    inline fun <reified T> decodeList(json: Json = Json): List<T> = decodeAsOrNull(json) ?: emptyList()
+    inline fun <reified T> decodeList(json: Json = Json): List<T> = decodeAs(json)
 
     /**
      * Decodes [body] as a list of [T] and returns the first item found
