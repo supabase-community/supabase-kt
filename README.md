@@ -9,7 +9,7 @@ Supported targets:
 
 Newest stable version: ![stable](https://img.shields.io/github/release/supabase-community/supabase-kt?label=stable)
 
-Newest experimental version: ![experimental](https://img.shields.io/maven-central/v/io.github.jan-tennert.supabase/supabase-kt)
+Newest experimental version: ![experimental](https://img.shields.io/maven-central/v/io.github.jan-tennert.supabase/supabase-kt?label=experimental)
 
 # Installation
 
