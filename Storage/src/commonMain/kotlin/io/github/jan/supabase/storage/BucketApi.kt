@@ -77,12 +77,13 @@ sealed interface BucketApi {
      * Creates a signed url to download without authentication. The url will expire after [expiresIn]
      * @param path The path to create an url for
      * @param expiresIn The duration the url is valid
+     * @param transform The transformation to apply to the image
      * @return The url to download the file
      * @throws RestException or one of its subclasses if receiving an error response
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
-    suspend fun createSignedUrl(path: String, expiresIn: Duration): String
+    suspend fun createSignedUrl(path: String, expiresIn: Duration, transform: ImageTransformation.() -> Unit = {}): String
 
     /**
      * Creates signed urls for all specified paths. The urls will expire after [expiresIn]
@@ -109,22 +110,24 @@ sealed interface BucketApi {
     /**
      * Downloads a file from [bucketId] under [path]
      * @param path The path to download
+     * @param transform The transformation to apply to the image
      * @return The file as a byte array
      * @throws RestException or one of its subclasses if receiving an error response
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
-    suspend fun downloadAuthenticated(path: String): ByteArray
+    suspend fun downloadAuthenticated(path: String, transform: ImageTransformation.() -> Unit = {}): ByteArray
 
     /**
      * Downloads a file from [bucketId] under [path] using the public url
      * @param path The path to download
+     * @param transform The transformation to apply to the image
      * @return The file as a byte array
      * @throws RestException or one of its subclasses if receiving an error response
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
-    suspend fun downloadPublic(path: String): ByteArray
+    suspend fun downloadPublic(path: String, transform: ImageTransformation.() -> Unit = {}): ByteArray
 
     /**
      * Searches for buckets with the given [prefix] and [filter]
@@ -158,6 +161,22 @@ sealed interface BucketApi {
      * @throws HttpRequestException on network related issues
      */
     fun authenticatedUrl(path: String): String
+
+    /**
+     * Returns the authenticated render url of [path] with the given [transform]
+     * @throws RestException or one of its subclasses if receiving an error response
+     * @throws HttpRequestTimeoutException if the request timed out
+     * @throws HttpRequestException on network related issues
+     */
+    fun authenticatedRenderUrl(path: String, transform: ImageTransformation.() -> Unit = {}): String
+
+    /**
+     * Returns the public render url of [path] with the given [transform]
+     * @throws RestException or one of its subclasses if receiving an error response
+     * @throws HttpRequestTimeoutException if the request timed out
+     * @throws HttpRequestException on network related issues
+     */
+    fun publicRenderUrl(path: String, transform: ImageTransformation.() -> Unit = {}): String
     
 }
 
@@ -193,9 +212,17 @@ internal class BucketApiImpl(override val bucketId: String, val storage: Storage
         })
     }
 
-    override suspend fun createSignedUrl(path: String, expiresIn: Duration): String {
+    override suspend fun createSignedUrl(
+        path: String,
+        expiresIn: Duration,
+        transform: ImageTransformation.() -> Unit
+    ): String {
+        val transformation = ImageTransformation().apply(transform)
         val body = storage.api.postJson("object/sign/$bucketId/$path", buildJsonObject {
             put("expiresIn", expiresIn.inWholeSeconds)
+            transformation.width?.let { put("width", it) }
+            transformation.height?.let { put("height", it) }
+            transformation.resize?.let { put("resize", it.name.lowercase()) }
         }).body<JsonObject>()
         return body["signedURL"]?.jsonPrimitive?.content?.substring(1)
             ?: throw IllegalStateException("Expected signed url in response")
@@ -213,12 +240,16 @@ internal class BucketApiImpl(override val bucketId: String, val storage: Storage
         return body
     }
 
-    override suspend fun downloadAuthenticated(path: String): ByteArray {
-        return storage.api.get("object/authenticated/$bucketId/$path").body()
+    override suspend fun downloadAuthenticated(path: String, transform: ImageTransformation.() -> Unit): ByteArray {
+        val transformation = ImageTransformation().apply(transform).queryString()
+        val url = if(transformation.isBlank()) authenticatedUrl(path) else authenticatedRenderUrl(path, transform)
+        return storage.api.get(url).body()
     }
 
-    override suspend fun downloadPublic(path: String): ByteArray {
-        return storage.api.get(publicUrl(path)).body()
+    override suspend fun downloadPublic(path: String, transform: ImageTransformation.() -> Unit): ByteArray {
+        val transformation = ImageTransformation().apply(transform).queryString()
+        val url = if(transformation.isBlank()) publicUrl(path) else publicRenderUrl(path, transform)
+        return storage.api.get(url).body()
     }
 
     override suspend fun list(prefix: String, filter: BucketListFilter.() -> Unit): List<BucketItem> {
@@ -237,9 +268,19 @@ internal class BucketApiImpl(override val bucketId: String, val storage: Storage
 
     override suspend fun changePublicStatusTo(public: Boolean) = storage.changePublicStatus(bucketId, public)
 
-    override fun authenticatedUrl(path: String) = storage.resolveUrl("object/authenticated/$bucketId/$path")
+    override fun authenticatedUrl(path: String): String = storage.resolveUrl("object/authenticated/$bucketId/$path")
 
-    override fun publicUrl(path: String) = storage.resolveUrl("object/public/$bucketId/$path")
+    override fun publicUrl(path: String): String = storage.resolveUrl("object/public/$bucketId/$path")
+
+    override fun authenticatedRenderUrl(path: String, transform: ImageTransformation.() -> Unit): String {
+        val transformation = ImageTransformation().apply(transform).queryString()
+        return storage.resolveUrl("render/image/authenticated/$bucketId/$path${if(transformation.isNotBlank()) "?$transformation" else ""}")
+    }
+
+    override fun publicRenderUrl(path: String, transform: ImageTransformation.() -> Unit): String {
+        val transformation = ImageTransformation().apply(transform).queryString()
+        return storage.resolveUrl("render/image/public/$bucketId/$path${if(transformation.isNotBlank()) "?$transformation" else ""}")
+    }
 
 }
 
