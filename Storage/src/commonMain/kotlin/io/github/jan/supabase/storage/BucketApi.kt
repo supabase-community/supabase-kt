@@ -77,12 +77,13 @@ sealed interface BucketApi {
      * Creates a signed url to download without authentication. The url will expire after [expiresIn]
      * @param path The path to create an url for
      * @param expiresIn The duration the url is valid
+     * @param transform The transformation to apply to the image
      * @return The url to download the file
      * @throws RestException or one of its subclasses if receiving an error response
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
-    suspend fun createSignedUrl(path: String, expiresIn: Duration): String
+    suspend fun createSignedUrl(path: String, expiresIn: Duration, transform: ImageTransformation.() -> Unit = {}): String
 
     /**
      * Creates signed urls for all specified paths. The urls will expire after [expiresIn]
@@ -211,9 +212,17 @@ internal class BucketApiImpl(override val bucketId: String, val storage: Storage
         })
     }
 
-    override suspend fun createSignedUrl(path: String, expiresIn: Duration): String {
+    override suspend fun createSignedUrl(
+        path: String,
+        expiresIn: Duration,
+        transform: ImageTransformation.() -> Unit
+    ): String {
+        val transformation = ImageTransformation().apply(transform)
         val body = storage.api.postJson("object/sign/$bucketId/$path", buildJsonObject {
             put("expiresIn", expiresIn.inWholeSeconds)
+            transformation.width?.let { put("width", it) }
+            transformation.height?.let { put("height", it) }
+            transformation.resize?.let { put("resize", it.name.lowercase()) }
         }).body<JsonObject>()
         return body["signedURL"]?.jsonPrimitive?.content?.substring(1)
             ?: throw IllegalStateException("Expected signed url in response")

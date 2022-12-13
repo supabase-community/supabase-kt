@@ -21,7 +21,7 @@ data class ImageTransformation(
         val builder = ParametersBuilder()
         width?.let { builder.append("width", it.toString()) }
         height?.let { builder.append("height", it.toString()) }
-        resize?.let { builder.append("resize", it.name) }
+        resize?.let { builder.append("resize", it.name.lowercase()) }
         return builder.build().formUrlEncode()
     }
 
