@@ -274,12 +274,12 @@ internal class BucketApiImpl(override val bucketId: String, val storage: Storage
 
     override fun authenticatedRenderUrl(path: String, transform: ImageTransformation.() -> Unit): String {
         val transformation = ImageTransformation().apply(transform).queryString()
-        return storage.resolveUrl("render/image/authenticated/$bucketId/$path$transformation")
+        return storage.resolveUrl("render/image/authenticated/$bucketId/$path${if(transformation.isNotBlank()) "?$transformation" else ""}")
     }
 
     override fun publicRenderUrl(path: String, transform: ImageTransformation.() -> Unit): String {
         val transformation = ImageTransformation().apply(transform).queryString()
-        return storage.resolveUrl("render/image/public/$bucketId/$path$transformation")
+        return storage.resolveUrl("render/image/public/$bucketId/$path${if(transformation.isNotBlank()) "?$transformation" else ""}")
     }
 
 }
