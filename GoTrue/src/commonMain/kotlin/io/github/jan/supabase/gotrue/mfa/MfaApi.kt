@@ -17,7 +17,7 @@ import okio.ByteString.Companion.decodeBase64
 sealed interface MfaApi {
 
     /**
-     * Returns the current mfa status of the user as a flow (changes whenever the user session changes)
+     * Checks whether the current session was authenticated with MFA or the user has a verified MFA factor.
      */
     val isMfaEnabledFlow: Flow<Boolean>
 
@@ -29,6 +29,17 @@ sealed interface MfaApi {
             val mfaLevel = getAuthenticatorAssuranceLevel()
             return mfaLevel.current == AuthenticatorAssuranceLevel.AAL2 || mfaLevel.next == AuthenticatorAssuranceLevel.AAL2
         }
+
+    /**
+     * Checks whether the current session is authenticated with MFA
+     */
+    val loggedInUsingMfa: Boolean
+        get() = getAuthenticatorAssuranceLevel().current == AuthenticatorAssuranceLevel.AAL2
+
+    /**
+     * Checks whether the current session is authenticated with MFA
+     */
+    val loggedInUsingMfaFlow: Flow<Boolean>
 
     /**
      * @param factorType The type of MFA factor to enroll. Currently only supports TOTP. Defaults to TOTP.
@@ -58,6 +69,14 @@ internal class MfaApiImpl(
     override val isMfaEnabledFlow: Flow<Boolean> = gotrue.sessionStatus.map {
         when(it) {
             is SessionStatus.Authenticated -> isMfaEnabled
+            SessionStatus.LoadingFromStorage -> false
+            SessionStatus.NetworkError -> false
+            SessionStatus.NotAuthenticated -> false
+        }
+    }
+    override val loggedInUsingMfaFlow: Flow<Boolean> = gotrue.sessionStatus.map {
+        when(it) {
+            is SessionStatus.Authenticated -> loggedInUsingMfa
             SessionStatus.LoadingFromStorage -> false
             SessionStatus.NetworkError -> false
             SessionStatus.NotAuthenticated -> false
