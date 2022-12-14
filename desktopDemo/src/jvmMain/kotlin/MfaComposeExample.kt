@@ -1,4 +1,3 @@
-// Copyright 2000-2021 JetBrains s.r.o. and contributors. Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE file.
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -13,6 +12,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import com.russhwolf.settings.PreferencesSettings
@@ -23,18 +23,14 @@ import io.github.jan.supabase.gotrue.GoTrue
 import io.github.jan.supabase.gotrue.SessionStatus
 import io.github.jan.supabase.gotrue.SettingsSessionManager
 import io.github.jan.supabase.gotrue.gotrue
+import io.github.jan.supabase.gotrue.mfa.FactorType
+import io.github.jan.supabase.gotrue.mfa.MfaEnroll
 import io.github.jan.supabase.gotrue.providers.Google
 import io.github.jan.supabase.gotrue.providers.builtin.Email
-import io.github.jan.supabase.realtime.Realtime
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlinx.serialization.Serializable
 import java.util.prefs.Preferences
-
-@Serializable
-data class User(val id: String, val username: String)
 
 suspend fun main() {
     Napier.base(DebugAntilog())
@@ -45,20 +41,33 @@ suspend fun main() {
         install(GoTrue) {
             sessionManager = SettingsSessionManager(PreferencesSettings(Preferences.userRoot().node("custom_name")))
         }
-        install(Realtime)
     }
-    delay(3000)
-
-    println(client.gotrue.mfa.getAuthenticatorAssuranceLevel())
-    return
     val scope = CoroutineScope(Dispatchers.IO)
     application {
         Window(::exitApplication) {
             val status by client.gotrue.sessionStatus.collectAsState()
+            val mfaEnabled by client.gotrue.mfa.isMfaEnabledFlow.collectAsState(false)
+            var factor by remember { mutableStateOf<MfaEnroll<FactorType.TOTP.Response>?>(null) }
             //val status by client.realtime.status.collectAsState()
             if (status is SessionStatus.Authenticated) {
                 Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
-                    Text("Logged in as ${(status as SessionStatus.Authenticated).session.user?.email}")
+                    Column {
+                        Text("Logged in as ${(status as SessionStatus.Authenticated).session.user?.email}")
+                        Text("MFA enabled: $mfaEnabled")
+                        if (!mfaEnabled && factor == null) {
+                            Button({
+                                scope.launch {
+                                    factor = client.gotrue.mfa.enroll(FactorType.TOTP)
+                                }
+                            }) {
+                                Text("Enable MFA")
+                            }
+                        } else if (factor != null) {
+                            Dialog({ factor = null}) {
+                                //display qr code
+                            }
+                        }
+                    }
                 }
             } else {
                 Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {

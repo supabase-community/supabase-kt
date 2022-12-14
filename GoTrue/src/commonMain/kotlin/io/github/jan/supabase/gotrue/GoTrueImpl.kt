@@ -9,6 +9,8 @@ package io.github.jan.supabase.gotrue
  import io.github.jan.supabase.exceptions.UnknownRestException
  import io.github.jan.supabase.gotrue.admin.AdminApi
  import io.github.jan.supabase.gotrue.admin.AdminApiImpl
+ import io.github.jan.supabase.gotrue.mfa.MfaApi
+ import io.github.jan.supabase.gotrue.mfa.MfaApiImpl
  import io.github.jan.supabase.gotrue.providers.AuthProvider
  import io.github.jan.supabase.gotrue.providers.builtin.DefaultAuthProvider
  import io.github.jan.supabase.gotrue.user.UserInfo
@@ -47,6 +49,7 @@ internal class GoTrueImpl(override val supabaseClient: SupabaseClient, override 
     override val sessionManager = config.sessionManager ?: SettingsSessionManager()
     internal val api = supabaseClient.authenticatedSupabaseApi(this)
     override val admin: AdminApi = AdminApiImpl(this)
+    override val mfa: MfaApi = MfaApiImpl(this)
     var sessionJob: Job? = null
     override val isAutoRefreshRunning: Boolean
         get() = sessionJob?.isActive == true
@@ -184,7 +187,7 @@ internal class GoTrueImpl(override val supabaseClient: SupabaseClient, override 
             header("Authorization", "Bearer $jwt")
         }
         val body = response.bodyAsText()
-        return supabaseJson.decodeFromString(body)
+        return supabaseJson.decodeFromString<UserInfo>(body).also(::println)
     }
 
     override suspend fun invalidateSession() {
@@ -270,6 +273,7 @@ internal class GoTrueImpl(override val supabaseClient: SupabaseClient, override 
 
     override suspend fun loadFromStorage(autoRefresh: Boolean): Boolean {
         val session = sessionManager.loadSession()
+        println(session)
         val wasSuccessful = session != null
         if(wasSuccessful) startAutoRefresh(session!!, autoRefresh)
         return wasSuccessful
