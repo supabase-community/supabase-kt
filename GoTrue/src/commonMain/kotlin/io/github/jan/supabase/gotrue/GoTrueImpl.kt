@@ -273,7 +273,6 @@ internal class GoTrueImpl(override val supabaseClient: SupabaseClient, override 
 
     override suspend fun loadFromStorage(autoRefresh: Boolean): Boolean {
         val session = sessionManager.loadSession()
-        println(session)
         val wasSuccessful = session != null
         if(wasSuccessful) startAutoRefresh(session!!, autoRefresh)
         return wasSuccessful
