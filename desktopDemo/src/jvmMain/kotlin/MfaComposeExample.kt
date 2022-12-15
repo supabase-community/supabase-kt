@@ -89,7 +89,7 @@ suspend fun main() {
                             }) {
                                 Text("Disable MFA")
                             }
-                        } else if (factor != null) {
+                        } else {
                             Dialog({
                                 scope.launch {
                                     client.gotrue.mfa.unenroll(factor!!.id) //unenroll the factor we just enrolled
