@@ -90,7 +90,7 @@ sealed interface MfaApi {
     /**
      * Retrieves all factors for the current user
      */
-    suspend fun retrieveFactors(): List<UserMfaFactor>
+    suspend fun retrieveFactorsForCurrentUser(): List<UserMfaFactor>
 
     /**
      * Parses the current JWT and returns the AuthenticatorAssuranceLevel for the current session and the next session
@@ -180,7 +180,7 @@ internal class MfaApiImpl(
     }
 
 
-    override suspend fun retrieveFactors(): List<UserMfaFactor> {
+    override suspend fun retrieveFactorsForCurrentUser(): List<UserMfaFactor> {
         return gotrue.getUser(gotrue.currentAccessTokenOrNull() ?: throw IllegalStateException("Current session is null")).factors
     }
 
