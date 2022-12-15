@@ -57,7 +57,7 @@ sealed interface MfaApi {
     suspend fun <Response> enroll(factorType: FactorType<Response>, issuer: String? = null, friendlyName: String? = null): MfaFactor<Response>
 
     /**
-     * Unenrolls a MFA factor
+     * Unenrolls an MFA factor
      * @param factorId The id of the MFA factor to unenroll
      */
     suspend fun unenroll(factorId: String)

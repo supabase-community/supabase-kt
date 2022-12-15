@@ -59,7 +59,6 @@ suspend fun main() {
             val mfaEnabled by client.gotrue.mfa.isMfaEnabledFlow.collectAsState(false)
             val loggedInUsingMfa by client.gotrue.mfa.loggedInUsingMfaFlow.collectAsState(false)
             var factor by remember { mutableStateOf<MfaFactor<FactorType.TOTP.Response>?>(null) }
-            //val status by client.realtime.status.collectAsState()
             if (status is SessionStatus.Authenticated && (loggedInUsingMfa || !mfaEnabled)) { //check if the user is authenticated and already logged in using mfa
                 Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
                     Column {
