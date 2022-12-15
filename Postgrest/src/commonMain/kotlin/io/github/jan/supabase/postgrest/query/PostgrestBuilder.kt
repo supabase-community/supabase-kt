@@ -20,6 +20,7 @@ class PostgrestBuilder(val postgrest: Postgrest, val table: String) {
      * @param columns The columns to retrieve, separated by commas.
      * @param head If true, select will delete the selected data.
      * @param count Count algorithm to use to count rows in a table.
+     * @param single If true, select will return a single row. Throws an error if the query returns more than one row.
      * @param filter Additional filtering to apply to the query
      * @return PostgrestResult which is either an error, an empty JsonArray or the data you requested as an JsonArray
      * @throws RestException or one of its subclasses if receiving an error response
@@ -30,8 +31,9 @@ class PostgrestBuilder(val postgrest: Postgrest, val table: String) {
         columns: String = "*",
         head: Boolean = false,
         count: Count? = null,
+        single: Boolean = false,
         filter: PostgrestFilterBuilder.() -> Unit = {}
-    ): PostgrestResult = PostgrestRequest.Select(head, count, buildPostgrestFilter { filter(); _params["select"] = columns }).execute(table, postgrest)
+    ): PostgrestResult = PostgrestRequest.Select(head, count, single, buildPostgrestFilter { filter(); _params["select"] = columns }).execute(table, postgrest)
 
     /**
      * Executes an insert operation on the [table]
