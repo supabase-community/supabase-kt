@@ -1,9 +1,11 @@
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -11,7 +13,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.unit.Density
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
@@ -24,12 +29,13 @@ import io.github.jan.supabase.gotrue.SessionStatus
 import io.github.jan.supabase.gotrue.SettingsSessionManager
 import io.github.jan.supabase.gotrue.gotrue
 import io.github.jan.supabase.gotrue.mfa.FactorType
-import io.github.jan.supabase.gotrue.mfa.MfaEnroll
+import io.github.jan.supabase.gotrue.mfa.MfaFactor
 import io.github.jan.supabase.gotrue.providers.Google
 import io.github.jan.supabase.gotrue.providers.builtin.Email
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import java.io.ByteArrayInputStream
 import java.util.prefs.Preferences
 
 suspend fun main() {
@@ -47,7 +53,7 @@ suspend fun main() {
         Window(::exitApplication) {
             val status by client.gotrue.sessionStatus.collectAsState()
             val mfaEnabled by client.gotrue.mfa.isMfaEnabledFlow.collectAsState(false)
-            var factor by remember { mutableStateOf<MfaEnroll<FactorType.TOTP.Response>?>(null) }
+            var factor by remember { mutableStateOf<MfaFactor<FactorType.TOTP.Response>?>(null) }
             //val status by client.realtime.status.collectAsState()
             if (status is SessionStatus.Authenticated) {
                 Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
@@ -57,6 +63,7 @@ suspend fun main() {
                         if (!mfaEnabled && factor == null) {
                             Button({
                                 scope.launch {
+                                    client.gotrue.mfa.retrieveFactors()
                                     factor = client.gotrue.mfa.enroll(FactorType.TOTP)
                                 }
                             }) {
@@ -64,7 +71,7 @@ suspend fun main() {
                             }
                         } else if (factor != null) {
                             Dialog({ factor = null}) {
-                                //display qr code
+                                Image(rememberSvgPainter(factor!!.data.qrCode), "QR Code")
                             }
                         }
                     }
@@ -106,4 +113,12 @@ suspend fun main() {
         }
     }
 
+}
+
+fun svgPainter(encodedData: ByteArray, density: Density) : Painter = androidx.compose.ui.res.loadSvgPainter(ByteArrayInputStream(encodedData), density)
+
+@Composable
+fun rememberSvgPainter(svg: String): Painter {
+    val density = LocalDensity.current
+    return remember(svg) { svgPainter(svg.encodeToByteArray(), density) }
 }

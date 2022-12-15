@@ -48,7 +48,7 @@ sealed interface MfaApi {
      * @return MfaEnrollResponse containing the id of the MFA factor, the type of MFA factor and the data of the MFA factor (like QR-Code for TOTP)
      * @see FactorType
      */
-    suspend fun <Response> enroll(factorType: FactorType<Response>, issuer: String? = null, friendlyName: String? = null): MfaEnroll<Response>
+    suspend fun <Response> enroll(factorType: FactorType<Response>, issuer: String? = null, friendlyName: String? = null): MfaFactor<Response>
 
     suspend fun unenroll(factorId: String)
 
@@ -57,6 +57,8 @@ sealed interface MfaApi {
     suspend fun verifyChallenge(factorId: String, challengeId: String, code: String): UserSession
 
     suspend fun verifyChallengeAndLogin(factorId: String, challengeId: String, code: String)
+
+    suspend fun retrieveFactors()
 
     fun getAuthenticatorAssuranceLevel(): MfaLevel
 
@@ -88,7 +90,7 @@ internal class MfaApiImpl(
         factorType: FactorType<Response>,
         issuer: String?,
         friendlyName: String?
-    ): MfaEnroll<Response> {
+    ): MfaFactor<Response> {
         val result = api.postJson("factors", buildJsonObject {
             put("factor_type", factorType.value)
             issuer?.let { put("issuer", it) }
@@ -96,7 +98,7 @@ internal class MfaApiImpl(
         })
         val json = result.body<JsonObject>()
         val factorData = factorType.decodeResponse(json)
-        return MfaEnroll(
+        return MfaFactor(
             json["id"]!!.jsonPrimitive.content,
             factorType.value,
             factorData
@@ -133,6 +135,11 @@ internal class MfaApiImpl(
         val aal = AuthenticatorAssuranceLevel.from(decodedJwt["aal"]?.jsonPrimitive?.content ?: throw IllegalStateException("No 'aal' claim found in JWT"))
         val nextAal = AuthenticatorAssuranceLevel.AAL1 //TODO
         return MfaLevel(aal, nextAal)
+    }
+
+
+    override suspend fun retrieveFactors() {
+        gotrue.getUser(gotrue.currentAccessTokenOrNull() ?: throw IllegalStateException("Current session is null"))
     }
 
 }
