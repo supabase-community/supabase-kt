@@ -50,6 +50,7 @@ kotlin {
                 implementation("com.russhwolf:multiplatform-settings-no-arg:${Versions.SETTINGS}")
                 //implementation("com.russhwolf:multiplatform-settings-serialization:${Versions.SETTINGS}") (no support for coroutines)
                 implementation("com.russhwolf:multiplatform-settings-coroutines:${Versions.SETTINGS}")
+                implementation("com.squareup.okio:okio:3.2.0")
                 // https://mvnrepository.com/artifact/io.ktor/ktor-server-core
             }
         }

@@ -2,6 +2,7 @@ package io.github.jan.supabase.gotrue
 
  import io.github.aakira.napier.Napier
  import io.github.jan.supabase.SupabaseClient
+ import io.github.jan.supabase.annotiations.SupabaseExperimental
  import io.github.jan.supabase.bodyOrNull
  import io.github.jan.supabase.exceptions.BadRequestRestException
  import io.github.jan.supabase.exceptions.RestException
@@ -9,6 +10,8 @@ package io.github.jan.supabase.gotrue
  import io.github.jan.supabase.exceptions.UnknownRestException
  import io.github.jan.supabase.gotrue.admin.AdminApi
  import io.github.jan.supabase.gotrue.admin.AdminApiImpl
+ import io.github.jan.supabase.gotrue.mfa.MfaApi
+ import io.github.jan.supabase.gotrue.mfa.MfaApiImpl
  import io.github.jan.supabase.gotrue.providers.AuthProvider
  import io.github.jan.supabase.gotrue.providers.builtin.DefaultAuthProvider
  import io.github.jan.supabase.gotrue.user.UserInfo
@@ -17,7 +20,7 @@ package io.github.jan.supabase.gotrue
  import io.github.jan.supabase.supabaseJson
  import io.github.jan.supabase.toJsonObject
  import io.ktor.client.call.body
- import io.ktor.client.request.header
+ import io.ktor.client.request.headers
  import io.ktor.client.statement.HttpResponse
  import io.ktor.client.statement.bodyAsText
  import io.ktor.http.HttpStatusCode
@@ -47,6 +50,8 @@ internal class GoTrueImpl(override val supabaseClient: SupabaseClient, override 
     override val sessionManager = config.sessionManager ?: SettingsSessionManager()
     internal val api = supabaseClient.authenticatedSupabaseApi(this)
     override val admin: AdminApi = AdminApiImpl(this)
+    @SupabaseExperimental
+    override val mfa: MfaApi = MfaApiImpl(this)
     var sessionJob: Job? = null
     override val isAutoRefreshRunning: Boolean
         get() = sessionJob?.isActive == true
@@ -181,7 +186,9 @@ internal class GoTrueImpl(override val supabaseClient: SupabaseClient, override 
 
     override suspend fun getUser(jwt: String): UserInfo {
         val response = api.get("user") {
-            header("Authorization", "Bearer $jwt")
+            headers {
+                set("Authorization", "Bearer $jwt")
+            }
         }
         val body = response.bodyAsText()
         return supabaseJson.decodeFromString(body)
@@ -208,6 +215,13 @@ internal class GoTrueImpl(override val supabaseClient: SupabaseClient, override 
     override suspend fun refreshCurrentSession() {
         val newSession = refreshSession(currentAccessTokenOrNull() ?: throw IllegalStateException("No refresh token found in current session"))
         startAutoRefresh(newSession)
+    }
+
+    override suspend fun updateCurrentUser() {
+        val session = currentSessionOrNull() ?: throw IllegalStateException("No session found")
+        val user = getUser(session.accessToken)
+        _sessionStatus.value = SessionStatus.Authenticated(session.copy(user = user))
+        sessionManager.saveSession(session)
     }
 
     override suspend fun startAutoRefresh(session: UserSession, autoRefresh: Boolean) {

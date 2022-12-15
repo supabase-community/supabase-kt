@@ -3,6 +3,7 @@ package io.github.jan.supabase.gotrue.admin
 import io.github.jan.supabase.gotrue.GoTrue
 import io.github.jan.supabase.gotrue.GoTrueImpl
 import io.github.jan.supabase.gotrue.user.UserInfo
+import io.github.jan.supabase.gotrue.user.UserMfaFactor
 import io.github.jan.supabase.putJsonObject
 import io.github.jan.supabase.supabaseJson
 import io.ktor.client.call.body
@@ -62,6 +63,20 @@ sealed interface AdminApi {
      */
     suspend fun updateUserById(uid: String, builder: UserUpdateBuilder.() -> Unit): UserInfo
 
+    /**
+     * Retrieves all MFA factors of a user
+     * @param uid the id of the user
+     * @return A list of all MFA factors
+     */
+    suspend fun retrieveFactors(uid: String): List<UserMfaFactor>
+
+    /**
+     * Deletes a verified MFA factor of a user
+     * @param uid the id of the user
+     * @param factorId the id of the factor
+     */
+    suspend fun deleteFactor(uid: String, factorId: String)
+
 }
 
 @PublishedApi
@@ -104,7 +119,13 @@ internal class AdminApiImpl(val gotrue: GoTrue) : AdminApi {
         return api.putJson("admin/users/$uid", updateBuilder).body()
     }
 
-    private fun tokenException(): Nothing = throw IllegalStateException("You need the service role access token to use admin methods. Use GoTrue#importAuthToken to import it. Never share it publicly")
+    override suspend fun deleteFactor(uid: String, factorId: String) {
+        api.delete("admin/users/$uid/factors/$factorId")
+    }
+
+    override suspend fun retrieveFactors(uid: String): List<UserMfaFactor> {
+        return api.get("admin/users/$uid/factors").body()
+    }
 
 }
 
