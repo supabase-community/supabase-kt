@@ -24,6 +24,7 @@ import androidx.compose.ui.window.application
 import com.russhwolf.settings.PreferencesSettings
 import io.github.aakira.napier.DebugAntilog
 import io.github.aakira.napier.Napier
+import io.github.jan.supabase.annotiations.SupabaseExperimental
 import io.github.jan.supabase.createSupabaseClient
 import io.github.jan.supabase.exceptions.BadRequestRestException
 import io.github.jan.supabase.gotrue.GoTrue
@@ -40,6 +41,7 @@ import kotlinx.coroutines.launch
 import java.io.ByteArrayInputStream
 import java.util.prefs.Preferences
 
+@OptIn(SupabaseExperimental::class)
 suspend fun main() {
     Napier.base(DebugAntilog())
     val client = createSupabaseClient(

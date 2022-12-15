@@ -2,6 +2,7 @@ package io.github.jan.supabase.gotrue
 
  import io.github.aakira.napier.Napier
  import io.github.jan.supabase.SupabaseClient
+ import io.github.jan.supabase.annotiations.SupabaseExperimental
  import io.github.jan.supabase.bodyOrNull
  import io.github.jan.supabase.exceptions.BadRequestRestException
  import io.github.jan.supabase.exceptions.RestException
@@ -49,6 +50,7 @@ internal class GoTrueImpl(override val supabaseClient: SupabaseClient, override 
     override val sessionManager = config.sessionManager ?: SettingsSessionManager()
     internal val api = supabaseClient.authenticatedSupabaseApi(this)
     override val admin: AdminApi = AdminApiImpl(this)
+    @SupabaseExperimental
     override val mfa: MfaApi = MfaApiImpl(this)
     var sessionJob: Job? = null
     override val isAutoRefreshRunning: Boolean
@@ -213,6 +215,13 @@ internal class GoTrueImpl(override val supabaseClient: SupabaseClient, override 
     override suspend fun refreshCurrentSession() {
         val newSession = refreshSession(currentAccessTokenOrNull() ?: throw IllegalStateException("No refresh token found in current session"))
         startAutoRefresh(newSession)
+    }
+
+    override suspend fun updateCurrentUser() {
+        val session = currentSessionOrNull() ?: throw IllegalStateException("No session found")
+        val user = getUser(session.accessToken)
+        _sessionStatus.value = SessionStatus.Authenticated(session.copy(user = user))
+        sessionManager.saveSession(session)
     }
 
     override suspend fun startAutoRefresh(session: UserSession, autoRefresh: Boolean) {

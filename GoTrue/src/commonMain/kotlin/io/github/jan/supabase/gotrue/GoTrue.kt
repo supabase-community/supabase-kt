@@ -2,6 +2,7 @@ package io.github.jan.supabase.gotrue
 
 import io.github.aakira.napier.Napier
 import io.github.jan.supabase.SupabaseClient
+import io.github.jan.supabase.annotiations.SupabaseExperimental
 import io.github.jan.supabase.exceptions.HttpRequestException
 import io.github.jan.supabase.exceptions.RestException
 import io.github.jan.supabase.gotrue.admin.AdminApi
@@ -53,8 +54,9 @@ sealed interface GoTrue : MainPlugin<GoTrue.Config> {
     val admin: AdminApi
 
     /**
-     * Access to the mfa api where you can manage multifactor authentication for the current user.
+     * Access to the mfa api where you can manage multi-factor authentication for the current user.
      */
+    @SupabaseExperimental
     val mfa: MfaApi
 
     /**
@@ -214,6 +216,11 @@ sealed interface GoTrue : MainPlugin<GoTrue.Config> {
      * @throws HttpRequestException on network related issues
      */
     suspend fun refreshCurrentSession()
+
+    /**
+     * Updates the current user with the current access token
+     */
+    suspend fun updateCurrentUser()
 
     /**
      * Starts auto-refreshing [session] for [currentSession]
