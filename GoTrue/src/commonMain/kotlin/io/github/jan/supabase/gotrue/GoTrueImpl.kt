@@ -19,7 +19,7 @@ package io.github.jan.supabase.gotrue
  import io.github.jan.supabase.supabaseJson
  import io.github.jan.supabase.toJsonObject
  import io.ktor.client.call.body
- import io.ktor.client.request.header
+ import io.ktor.client.request.headers
  import io.ktor.client.statement.HttpResponse
  import io.ktor.client.statement.bodyAsText
  import io.ktor.http.HttpStatusCode
@@ -184,10 +184,12 @@ internal class GoTrueImpl(override val supabaseClient: SupabaseClient, override 
 
     override suspend fun getUser(jwt: String): UserInfo {
         val response = api.get("user") {
-            header("Authorization", "Bearer $jwt")
+            headers {
+                set("Authorization", "Bearer $jwt")
+            }
         }
         val body = response.bodyAsText()
-        return supabaseJson.decodeFromString<UserInfo>(body).also(::println)
+        return supabaseJson.decodeFromString(body)
     }
 
     override suspend fun invalidateSession() {

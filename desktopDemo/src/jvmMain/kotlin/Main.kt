@@ -28,7 +28,6 @@ import io.github.jan.supabase.gotrue.providers.builtin.Email
 import io.github.jan.supabase.realtime.Realtime
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import java.util.prefs.Preferences
@@ -47,10 +46,6 @@ suspend fun main() {
         }
         install(Realtime)
     }
-    delay(3000)
-
-    println(client.gotrue.mfa.getAuthenticatorAssuranceLevel())
-    return
     val scope = CoroutineScope(Dispatchers.IO)
     application {
         Window(::exitApplication) {

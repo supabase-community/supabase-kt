@@ -2,6 +2,7 @@ package io.github.jan.supabase.gotrue.mfa
 
 import io.github.jan.supabase.gotrue.GoTrueImpl
 import io.github.jan.supabase.gotrue.SessionStatus
+import io.github.jan.supabase.gotrue.user.UserMfaFactor
 import io.github.jan.supabase.gotrue.user.UserSession
 import io.ktor.client.call.body
 import kotlinx.coroutines.flow.Flow
@@ -31,6 +32,11 @@ sealed interface MfaApi {
         }
 
     /**
+     * Returns all verified factors from the current user session. If the user has no verified factors or there is no session, an empty list is returned.
+     */
+    val verifiedFactors: List<UserMfaFactor>
+
+    /**
      * Checks whether the current session is authenticated with MFA
      */
     val loggedInUsingMfa: Boolean
@@ -50,16 +56,45 @@ sealed interface MfaApi {
      */
     suspend fun <Response> enroll(factorType: FactorType<Response>, issuer: String? = null, friendlyName: String? = null): MfaFactor<Response>
 
+    /**
+     * Unenrolls a MFA factor
+     * @param factorId The id of the MFA factor to unenroll
+     */
     suspend fun unenroll(factorId: String)
 
+    /**
+     * Creates a new MFA challenge, which can be used to verify the user's code using [verifyChallenge]
+     */
     suspend fun createChallenge(factorId: String): MfaChallenge
 
-    suspend fun verifyChallenge(factorId: String, challengeId: String, code: String): UserSession
+    /**
+     * Creates a new MFA challenge and immediately verifies it
+     * @param factorId The id of the MFA factor to verify
+     * @param code The code to verify
+     * @param saveSession Whether to save the session after verification in GoTrue
+     */
+    suspend fun createChallengeAndVerify(factorId: String, code: String, saveSession: Boolean = true): UserSession {
+        val challenge = createChallenge(factorId)
+        return verifyChallenge(factorId, challenge.id, code, saveSession)
+    }
 
-    suspend fun verifyChallengeAndLogin(factorId: String, challengeId: String, code: String)
+    /**
+     * Verifies a MFA challenge
+     * @param factorId The id of the MFA factor to verify
+     * @param challengeId The id of the challenge to verify
+     * @param code The code to verify
+     * @param saveSession Whether to save the session after verification in GoTrue
+     */
+    suspend fun verifyChallenge(factorId: String, challengeId: String, code: String, saveSession: Boolean = true): UserSession
 
-    suspend fun retrieveFactors()
+    /**
+     * Retrieves all factors for the current user
+     */
+    suspend fun retrieveFactors(): List<UserMfaFactor>
 
+    /**
+     * Parses the current JWT and returns the AuthenticatorAssuranceLevel for the current session and the next session
+     */
     fun getAuthenticatorAssuranceLevel(): MfaLevel
 
 }
@@ -84,6 +119,9 @@ internal class MfaApiImpl(
             SessionStatus.NotAuthenticated -> false
         }
     }
+    override val verifiedFactors: List<UserMfaFactor>
+        get() = (gotrue.sessionStatus.value as? SessionStatus.Authenticated)?.session?.user?.factors?.filter(UserMfaFactor::isVerified) ?: emptyList()
+
     val api = gotrue.api
 
     override suspend fun <Response> enroll(
@@ -111,17 +149,21 @@ internal class MfaApiImpl(
         return result.body()
     }
 
-    override suspend fun verifyChallenge(factorId: String, challengeId: String, code: String): UserSession {
+    override suspend fun verifyChallenge(
+        factorId: String,
+        challengeId: String,
+        code: String,
+        saveSession: Boolean
+    ): UserSession {
         val result = api.postJson("factors/$factorId/verify", buildJsonObject {
             put("code", code)
             put("challenge_id", challengeId)
         })
-        return result.body()
-    }
-
-    override suspend fun verifyChallengeAndLogin(factorId: String, challengeId: String, code: String) {
-        val session = verifyChallenge(factorId, challengeId, code)
-        gotrue.importSession(session)
+        val session = result.body<UserSession>()
+        if(saveSession) {
+            gotrue.importSession(session)
+        }
+        return session
     }
 
     override suspend fun unenroll(factorId: String) {
@@ -133,13 +175,13 @@ internal class MfaApiImpl(
         val parts = jwt.split(".")
         val decodedJwt = Json.decodeFromString<JsonObject>(parts[1].decodeBase64()?.utf8() ?: throw IllegalStateException("Could not decode current JWT"))
         val aal = AuthenticatorAssuranceLevel.from(decodedJwt["aal"]?.jsonPrimitive?.content ?: throw IllegalStateException("No 'aal' claim found in JWT"))
-        val nextAal = AuthenticatorAssuranceLevel.AAL1 //TODO
+        val nextAal = if (verifiedFactors.isNotEmpty()) AuthenticatorAssuranceLevel.AAL2 else AuthenticatorAssuranceLevel.AAL1
         return MfaLevel(aal, nextAal)
     }
 
 
-    override suspend fun retrieveFactors() {
-        gotrue.getUser(gotrue.currentAccessTokenOrNull() ?: throw IllegalStateException("Current session is null"))
+    override suspend fun retrieveFactors(): List<UserMfaFactor> {
+        return gotrue.getUser(gotrue.currentAccessTokenOrNull() ?: throw IllegalStateException("Current session is null")).factors
     }
 
 }
