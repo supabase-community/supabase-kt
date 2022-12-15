@@ -1,7 +1,6 @@
 package io.github.jan.supabase.postgrest.query
 
 import io.github.jan.supabase.postgrest.getColumnName
-import io.ktor.http.HeadersBuilder
 import kotlin.reflect.KProperty1
 
 /**
@@ -11,8 +10,6 @@ class PostgrestFilterBuilder {
 
     @PublishedApi
     internal val _params = mutableMapOf<String, String>()
-    @PublishedApi
-    internal val _headers = HeadersBuilder()
     val params: Map<String, String>
         get() = _params.toMap()
 
@@ -84,10 +81,6 @@ class PostgrestFilterBuilder {
 
         _params[keyOffset] = from.toString()
         _params[keyLimit] = (to - from + 1).toString()
-    }
-
-    fun single() {
-        _headers["Accept"] = "application/vnd.pgrst.object+json"
     }
 
     fun range(range: LongRange, foreignTable: String? = null) = range(range.first, range.last, foreignTable)

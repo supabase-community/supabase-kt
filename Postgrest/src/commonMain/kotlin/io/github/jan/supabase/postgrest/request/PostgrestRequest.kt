@@ -24,6 +24,7 @@ sealed interface PostgrestRequest {
     val method: HttpMethod
     val filter: Map<String, String>
     val prefer: List<String>
+    val single: Boolean get() = false
     val urlParams: Map<String, String> get() = mapOf()
 
     suspend fun execute(path: String, postgrest: Postgrest): PostgrestResult {
@@ -34,6 +35,9 @@ sealed interface PostgrestRequest {
             val token  = postgrest.config.jwtToken ?: postgrest.supabaseClient.pluginManager.getPluginOrNull(GoTrue)?.currentAccessTokenOrNull()
             token?.let {
                 headers[HttpHeaders.Authorization] = "Bearer $it"
+            }
+            if(single) {
+                headers[HttpHeaders.Accept] = "application/vnd.pgrst.object+json"
             }
             headers[PostgrestBuilder.HEADER_PREFER] = prefer.joinToString(",")
             this@PostgrestRequest.body?.let { setBody(it) }
@@ -59,6 +63,7 @@ sealed interface PostgrestRequest {
     class Select(
         head: Boolean = false,
         count: Count? = null,
+        override val single: Boolean = false,
         override val filter: Map<String, String>
     ): PostgrestRequest {
 
