@@ -14,7 +14,7 @@ open class SupabaseApi(
 
     override suspend fun request(url: String, builder: HttpRequestBuilder.() -> Unit): HttpResponse {
         return supabaseClient.httpClient.request(resolveUrl(url), builder).also {
-            if(it.status.value in 400..499 && parseErrorResponse != null) throw parseErrorResponse.invoke(it)
+            if(it.status.value in 400..501 && parseErrorResponse != null) throw parseErrorResponse.invoke(it)
         }
     }
 
