@@ -1,6 +1,7 @@
 package io.github.jan.supabase.postgrest.query
 
 import io.github.jan.supabase.postgrest.getColumnName
+import io.ktor.http.HeadersBuilder
 import kotlin.reflect.KProperty1
 
 /**
@@ -10,6 +11,8 @@ class PostgrestFilterBuilder {
 
     @PublishedApi
     internal val _params = mutableMapOf<String, String>()
+    @PublishedApi
+    internal val _headers = HeadersBuilder()
     val params: Map<String, String>
         get() = _params.toMap()
 
@@ -64,6 +67,30 @@ class PostgrestFilterBuilder {
         _params[column] = "${textSearchType.identifier}${configPart}.${query}"
         return this
     }
+
+    fun order(column: String, order: Order, nullsFirst: Boolean = false, foreignTable: String? = null) {
+        val key = if (foreignTable == null) "order" else "\"$foreignTable\".order"
+        _params[key] = "${column}.${order.value}.${if (nullsFirst) "nullsfirst" else "nullslast"}"
+    }
+
+    fun limit(count: Long, foreignTable: String? = null) {
+        val key = if (foreignTable == null) "limit" else "\"$foreignTable\".limit"
+        _params[key] = count.toString()
+    }
+
+    fun range(from: Long, to: Long, foreignTable: String? = null) {
+        val keyOffset = if (foreignTable == null) "offset" else "\"$foreignTable\".offset"
+        val keyLimit = if (foreignTable == null) "limit" else "\"$foreignTable\".limit"
+
+        _params[keyOffset] = from.toString()
+        _params[keyLimit] = (to - from + 1).toString()
+    }
+
+    fun single() {
+        _headers["Accept"] = "application/vnd.pgrst.object+json"
+    }
+
+    fun range(range: LongRange, foreignTable: String? = null) = range(range.first, range.last, foreignTable)
 
     infix fun <T, V> KProperty1<T, V>.eq(value: V) = filter(FilterOperation(getColumnName(this), FilterOperator.EQ, value.toString()))
 
