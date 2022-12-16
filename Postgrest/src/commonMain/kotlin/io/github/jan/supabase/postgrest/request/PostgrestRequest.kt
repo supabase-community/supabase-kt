@@ -1,14 +1,13 @@
 package io.github.jan.supabase.postgrest.request
 
-import io.github.jan.supabase.exceptions.RestException
 import io.github.jan.supabase.gotrue.GoTrue
 import io.github.jan.supabase.postgrest.Postgrest
+import io.github.jan.supabase.postgrest.PostgrestImpl
 import io.github.jan.supabase.postgrest.query.Count
 import io.github.jan.supabase.postgrest.query.PostgrestBuilder
 import io.github.jan.supabase.postgrest.query.PostgrestResult
 import io.github.jan.supabase.postgrest.query.Returning
 import io.ktor.client.call.body
-import io.ktor.client.request.request
 import io.ktor.client.request.setBody
 import io.ktor.client.statement.HttpResponse
 import io.ktor.http.ContentType
@@ -25,32 +24,33 @@ sealed interface PostgrestRequest {
     val method: HttpMethod
     val filter: Map<String, String>
     val prefer: List<String>
+    val single: Boolean get() = false
+    val urlParams: Map<String, String> get() = mapOf()
 
     suspend fun execute(path: String, postgrest: Postgrest): PostgrestResult {
-        return postgrest.supabaseClient.httpClient.request(postgrest.resolveUrl(path)) {
+        postgrest as PostgrestImpl
+        return postgrest.api.request(path) {
             method = this@PostgrestRequest.method
             contentType(ContentType.Application.Json)
             val token  = postgrest.config.jwtToken ?: postgrest.supabaseClient.pluginManager.getPluginOrNull(GoTrue)?.currentAccessTokenOrNull()
             token?.let {
                 headers[HttpHeaders.Authorization] = "Bearer $it"
             }
+            if(single) {
+                headers[HttpHeaders.Accept] = "application/vnd.pgrst.object+json"
+            }
             headers[PostgrestBuilder.HEADER_PREFER] = prefer.joinToString(",")
             this@PostgrestRequest.body?.let { setBody(it) }
+            url.parameters.appendAll(parametersOf(urlParams.mapValues { (_, value) -> listOf(value) }))
             url.parameters.appendAll(parametersOf(filter.mapValues { (_, value) -> listOf(value) }))
-        }.checkForErrorCodes()
+        }.asPostgrestResult()
     }
 
-    private suspend fun HttpResponse.checkForErrorCodes(): PostgrestResult {
-        if(status.value !in 200..299) {
-            val error = body<JsonElement>()
-            throw RestException(status.value, "Unknown error", error.toString(), headers = headers.entries().flatMap { (key, value) -> listOf(key) + value })
-        }
-        return PostgrestResult(body(), status.value)
-    }
+    private suspend fun HttpResponse.asPostgrestResult(): PostgrestResult = PostgrestResult(body())
 
-    data class RPC(
-        private val head: Boolean = false,
-        private val count: Count? = null,
+    class RPC(
+        head: Boolean = false,
+        count: Count? = null,
         override val filter: Map<String, String>,
         override val body: JsonElement? = null,
         ): PostgrestRequest {
@@ -60,9 +60,10 @@ sealed interface PostgrestRequest {
 
     }
 
-    data class Select(
-        private val head: Boolean = false,
-        private val count: Count? = null,
+    class Select(
+        head: Boolean = false,
+        count: Count? = null,
+        override val single: Boolean = false,
         override val filter: Map<String, String>
     ): PostgrestRequest {
 
@@ -71,7 +72,7 @@ sealed interface PostgrestRequest {
 
     }
 
-    data class Insert(
+    class Insert(
         override val body: JsonArray,
         private val upsert: Boolean = false,
         private val onConflict: String? = null,
@@ -86,10 +87,11 @@ sealed interface PostgrestRequest {
             if(upsert) add("resolution=merge-duplicates")
             if(count != null) add("count=${count.identifier}")
         }
+        override val urlParams = if (upsert && onConflict != null) mapOf("on_conflict" to onConflict) else mapOf()
 
     }
 
-    data class Update(
+    class Update(
         private val returning: Returning = Returning.REPRESENTATION,
         private val count: Count? = null,
         override val filter: Map<String, String>,
@@ -104,7 +106,7 @@ sealed interface PostgrestRequest {
 
     }
 
-    data class Delete(
+    class Delete(
         private val returning: Returning = Returning.REPRESENTATION,
         private val count: Count? = null,
         override val filter: Map<String, String>

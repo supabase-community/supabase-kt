@@ -2,10 +2,16 @@ package io.github.jan.supabase.gotrue
 
  import io.github.aakira.napier.Napier
  import io.github.jan.supabase.SupabaseClient
+ import io.github.jan.supabase.annotiations.SupabaseExperimental
+ import io.github.jan.supabase.bodyOrNull
+ import io.github.jan.supabase.exceptions.BadRequestRestException
  import io.github.jan.supabase.exceptions.RestException
- import io.github.jan.supabase.exceptions.UnauthorizedException
+ import io.github.jan.supabase.exceptions.UnauthorizedRestException
+ import io.github.jan.supabase.exceptions.UnknownRestException
  import io.github.jan.supabase.gotrue.admin.AdminApi
  import io.github.jan.supabase.gotrue.admin.AdminApiImpl
+ import io.github.jan.supabase.gotrue.mfa.MfaApi
+ import io.github.jan.supabase.gotrue.mfa.MfaApiImpl
  import io.github.jan.supabase.gotrue.providers.AuthProvider
  import io.github.jan.supabase.gotrue.providers.builtin.DefaultAuthProvider
  import io.github.jan.supabase.gotrue.user.UserInfo
@@ -14,17 +20,10 @@ package io.github.jan.supabase.gotrue
  import io.github.jan.supabase.supabaseJson
  import io.github.jan.supabase.toJsonObject
  import io.ktor.client.call.body
- import io.ktor.client.request.HttpRequestBuilder
- import io.ktor.client.request.get
- import io.ktor.client.request.header
  import io.ktor.client.request.headers
- import io.ktor.client.request.post
- import io.ktor.client.request.put
- import io.ktor.client.request.setBody
+ import io.ktor.client.statement.HttpResponse
  import io.ktor.client.statement.bodyAsText
- import io.ktor.http.ContentType
- import io.ktor.http.HttpHeaders
- import io.ktor.http.contentType
+ import io.ktor.http.HttpStatusCode
  import kotlinx.coroutines.CoroutineScope
  import kotlinx.coroutines.Job
  import kotlinx.coroutines.cancel
@@ -49,7 +48,10 @@ internal class GoTrueImpl(override val supabaseClient: SupabaseClient, override 
     override val sessionStatus: StateFlow<SessionStatus> = _sessionStatus.asStateFlow()
     private val authScope = CoroutineScope(config.coroutineDispatcher)
     override val sessionManager = config.sessionManager ?: SettingsSessionManager()
+    internal val api = supabaseClient.authenticatedSupabaseApi(this)
     override val admin: AdminApi = AdminApiImpl(this)
+    @SupabaseExperimental
+    override val mfa: MfaApi = MfaApiImpl(this)
     var sessionJob: Job? = null
     override val isAutoRefreshRunning: Boolean
         get() = sessionJob?.isActive == true
@@ -81,9 +83,7 @@ internal class GoTrueImpl(override val supabaseClient: SupabaseClient, override 
         get() = GoTrue.key
 
     override suspend fun invalidateAllRefreshTokens() {
-        supabaseClient.httpClient.post(resolveUrl("logout")) {
-            addAuthorization()
-        }
+        api.post("logout")
         invalidateSession()
     }
 
@@ -114,10 +114,7 @@ internal class GoTrueImpl(override val supabaseClient: SupabaseClient, override 
                 put("data", supabaseJson.encodeToJsonElement(it))
             }
         }.toString()
-        val response = supabaseClient.httpClient.put(resolveUrl("user")) {
-            addAuthorization()
-            setBody(body)
-        }
+        val response = api.putJson("user", body)
         return response.body()
     }
 
@@ -132,12 +129,9 @@ internal class GoTrueImpl(override val supabaseClient: SupabaseClient, override 
             putJsonObject(provider.encodeCredentials(config).toJsonObject())
             put("create_user", createUser)
         }.toString()
-        val redirect = finalRedirectUrl?.let {
-            "?redirect_to=$finalRedirectUrl"
-        } ?: ""
-        supabaseClient.httpClient.post(resolveUrl("otp$redirect")) {
-            setBody(body)
-        }.checkErrors()
+        api.postJson("otp", body) {
+            finalRedirectUrl?.let { url.parameters.append("redirect_to", it) }
+        }
     }
 
     override suspend fun sendRecoveryEmail(email: String, redirectUrl: String?, captchaToken: String?) {
@@ -150,18 +144,13 @@ internal class GoTrueImpl(override val supabaseClient: SupabaseClient, override 
                 }
             }
         }.toString()
-        val redirect = finalRedirectUrl?.let {
-            "?redirect_to=$finalRedirectUrl"
-        } ?: ""
-        supabaseClient.httpClient.post(resolveUrl("recover$redirect")) {
-            setBody(body)
+        api.postJson("recover", body) {
+            finalRedirectUrl?.let { url.encodedParameters.append("redirect_to", it) }
         }
     }
 
     override suspend fun reauthenticate() {
-        supabaseClient.httpClient.get(resolveUrl("reauthenticate")) {
-            addAuthorization()
-        }
+        api.get("reauthenticate")
     }
 
     override suspend fun verify(type: VerifyType, token: String, captchaToken: String?) {
@@ -174,11 +163,8 @@ internal class GoTrueImpl(override val supabaseClient: SupabaseClient, override 
                 }
             }
         }
-        val response = supabaseClient.httpClient.post(resolveUrl("verify")) {
-            contentType(ContentType.Application.Json)
-            setBody(body)
-        }
-        val session =  response.checkErrors().body<UserSession>()
+        val response = api.postJson("verify", body)
+        val session =  response.body<UserSession>()
         startAutoRefresh(session)
     }
 
@@ -193,25 +179,19 @@ internal class GoTrueImpl(override val supabaseClient: SupabaseClient, override 
                 }
             }
         }
-        val response = supabaseClient.httpClient.post(resolveUrl("verify")) {
-            contentType(ContentType.Application.Json)
-            setBody(body)
-        }
-        val session = response.checkErrors().body<UserSession>()
+        val response = api.postJson("verify", body)
+        val session = response.body<UserSession>()
         startAutoRefresh(session)
     }
 
     override suspend fun getUser(jwt: String): UserInfo {
-        val response = supabaseClient.httpClient.get(resolveUrl("user")) {
-            header(HttpHeaders.Authorization, "Bearer $jwt")
+        val response = api.get("user") {
+            headers {
+                set("Authorization", "Bearer $jwt")
+            }
         }
         val body = response.bodyAsText()
-        return try {
-            supabaseJson.decodeFromString(body)
-        } catch(e: Exception) {
-            Napier.e(e) { "Failed to get user. Full response body: $body" }
-            throw UnauthorizedException("Invalid JWT")
-        }
+        return supabaseJson.decodeFromString(body)
     }
 
     override suspend fun invalidateSession() {
@@ -225,25 +205,23 @@ internal class GoTrueImpl(override val supabaseClient: SupabaseClient, override 
         Napier.d {
             "Refreshing session"
         }
-        val body = """
-            {
-              "refresh_token": "$refreshToken"
-            }
-        """.trimIndent()
-        val response = supabaseClient.httpClient.post(resolveUrl("token?grant_type=refresh_token")) {
-            setBody(body)
+        val body = buildJsonObject {
+            put("refresh_token", refreshToken)
         }
-        if (response.status.value !in 200..299) throw RestException(
-            response.status.value,
-            "Unauthorized",
-            response.bodyAsText()
-        )
+        val response = api.postJson("token?grant_type=refresh_token", body)
         return response.body()
     }
 
     override suspend fun refreshCurrentSession() {
         val newSession = refreshSession(currentAccessTokenOrNull() ?: throw IllegalStateException("No refresh token found in current session"))
         startAutoRefresh(newSession)
+    }
+
+    override suspend fun updateCurrentUser() {
+        val session = currentSessionOrNull() ?: throw IllegalStateException("No session found")
+        val user = getUser(session.accessToken)
+        _sessionStatus.value = SessionStatus.Authenticated(session.copy(user = user))
+        sessionManager.saveSession(session)
     }
 
     override suspend fun startAutoRefresh(session: UserSession, autoRefresh: Boolean) {
@@ -311,18 +289,18 @@ internal class GoTrueImpl(override val supabaseClient: SupabaseClient, override 
         return wasSuccessful
     }
 
-    private fun HttpRequestBuilder.addAuthorization() {
-        headers {
-            append(HttpHeaders.Authorization, "Bearer ${(sessionStatus.value as? SessionStatus.Authenticated)?.session?.accessToken}")
-        }
-    }
-
     override suspend fun close() {
         authScope.cancel()
     }
 
-    private operator fun UserSession?.not(): UserSession {
-        return this ?: throw IllegalStateException("No user session available")
+    override suspend fun parseErrorResponse(response: HttpResponse): RestException {
+        val errorBody = response.bodyOrNull<GoTrueErrorResponse>() ?: GoTrueErrorResponse("Unknown error")
+        return when(response.status) {
+            HttpStatusCode.Unauthorized -> UnauthorizedRestException(errorBody.error, response)
+            HttpStatusCode.BadRequest -> BadRequestRestException(errorBody.error, response)
+            HttpStatusCode.UnprocessableEntity -> BadRequestRestException(errorBody.error, response)
+            else -> UnknownRestException(errorBody.error, response)
+        }
     }
 
 }

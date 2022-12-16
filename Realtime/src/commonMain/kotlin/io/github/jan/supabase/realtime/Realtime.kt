@@ -4,6 +4,8 @@ import io.github.aakira.napier.Napier
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.SupabaseClientBuilder
 import io.github.jan.supabase.annotiations.SupabaseInternal
+import io.github.jan.supabase.exceptions.RestException
+import io.github.jan.supabase.exceptions.UnknownRestException
 import io.github.jan.supabase.gotrue.GoTrue
 import io.github.jan.supabase.gotrue.SessionStatus
 import io.github.jan.supabase.plugins.MainConfig
@@ -13,7 +15,7 @@ import io.github.jan.supabase.supabaseJson
 import io.ktor.client.plugins.websocket.DefaultClientWebSocketSession
 import io.ktor.client.plugins.websocket.WebSockets
 import io.ktor.client.plugins.websocket.sendSerialized
-import io.ktor.client.plugins.websocket.webSocketSession
+import io.ktor.client.statement.HttpResponse
 import io.ktor.serialization.kotlinx.KotlinxWebsocketSerializationConverter
 import io.ktor.websocket.Frame
 import io.ktor.websocket.readText
@@ -58,11 +60,6 @@ sealed interface Realtime : MainPlugin<Realtime.Config> {
      * Disconnects from the realtime websocket
      */
     fun disconnect()
-
-    /**
-     * Calls [callback] whenever [status] changes
-     */
-    fun onStatusChange(callback: (Status) -> Unit)
 
     @SupabaseInternal
     fun RealtimeChannel.addChannel(channel: RealtimeChannel)
@@ -123,7 +120,6 @@ internal class RealtimeImpl(override val supabaseClient: SupabaseClient, overrid
     override val subscriptions: Map<String, RealtimeChannel>
         get() = _subscriptions.toMap()
     private val scope = CoroutineScope(Dispatchers.Default + SupervisorJob())
-    private val statusListeners = mutableListOf<(Realtime.Status) -> Unit>()
     var heartbeatJob: Job? = null
     var messageJob: Job? = null
     var ref = 0
@@ -133,10 +129,6 @@ internal class RealtimeImpl(override val supabaseClient: SupabaseClient, overrid
 
     override val PLUGIN_KEY: String
         get() = Realtime.key
-
-    override fun onStatusChange(callback: (Realtime.Status) -> Unit) {
-        statusListeners.add(callback)
-    }
 
     override suspend fun connect() = connect(false)
 
@@ -162,11 +154,11 @@ internal class RealtimeImpl(override val supabaseClient: SupabaseClient, overrid
         }
         if (status.value == Realtime.Status.CONNECTED) throw IllegalStateException("Websocket already connected")
         val prefix = if (config.secure) "wss://" else "ws://"
-        updateStatus(Realtime.Status.CONNECTING)
+        _status.value = Realtime.Status.CONNECTING
         val realtimeUrl = config.customRealtimeURL ?: (prefix + supabaseClient.supabaseUrl + ("/realtime/v${Realtime.API_VERSION}/websocket?apikey=${supabaseClient.supabaseKey}&vsn=1.0.0"))
          try {
             ws = supabaseClient.httpClient.webSocketSession(realtimeUrl)
-            updateStatus(Realtime.Status.CONNECTED)
+            _status.value = Realtime.Status.CONNECTED
             Napier.i { "Connected to realtime websocket!" }
             listenForMessages()
             startHeartbeating()
@@ -175,7 +167,6 @@ internal class RealtimeImpl(override val supabaseClient: SupabaseClient, overrid
              }
         } catch(e: Exception) {
              Napier.e(e) { "Error while trying to connect to realtime websocket. Trying again in ${config.reconnectDelay}" }
-             updateStatus(Realtime.Status.DISCONNECTED)
              disconnect()
              connect(true)
         }
@@ -201,7 +192,6 @@ internal class RealtimeImpl(override val supabaseClient: SupabaseClient, overrid
             } catch(e: Exception) {
                 if(!isActive) return@launch
                 Napier.e(e) { "Error while listening for messages. Trying again in ${config.reconnectDelay}" }
-                updateStatus(Realtime.Status.DISCONNECTED)
                 disconnect()
                 connect(true)
             }
@@ -220,20 +210,13 @@ internal class RealtimeImpl(override val supabaseClient: SupabaseClient, overrid
         }
     }
 
-    private fun updateStatus(status: Realtime.Status) {
-        if (status != _status.value) {
-            _status.value = status
-            statusListeners.forEach { it(status) }
-        }
-    }
-
     override fun disconnect() {
         Napier.d { "Closing websocket connection" }
         messageJob?.cancel()
         ws?.cancel()
         ws = null
         heartbeatJob?.cancel()
-        updateStatus(Realtime.Status.DISCONNECTED)
+        _status.value = Realtime.Status.DISCONNECTED
     }
 
     private fun onMessage(stringMessage: String) {
@@ -287,6 +270,10 @@ internal class RealtimeImpl(override val supabaseClient: SupabaseClient, overrid
 
     override suspend fun block() {
         ws?.coroutineContext?.job?.join() ?: throw IllegalStateException("No connection available")
+    }
+
+    override suspend fun parseErrorResponse(response: HttpResponse): RestException {
+        return UnknownRestException("Unknown error in realtime plugin", response)
     }
 
 }

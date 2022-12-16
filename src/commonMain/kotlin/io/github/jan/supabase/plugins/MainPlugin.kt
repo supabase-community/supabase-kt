@@ -3,7 +3,8 @@ package io.github.jan.supabase.plugins
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.buildUrl
 import io.github.jan.supabase.createSupabaseClient
-import io.ktor.client.request.HttpRequestBuilder
+import io.github.jan.supabase.exceptions.RestException
+import io.ktor.client.statement.HttpResponse
 import io.ktor.http.appendEncodedPathSegments
 
 /**
@@ -60,6 +61,11 @@ interface MainPlugin <Config : MainConfig> : SupabasePlugin {
             appendEncodedPathSegments(path)
         }
     }
+
+    /**
+     * Parses the response from the server and builds a [RestException]
+     */
+    suspend fun parseErrorResponse(response: HttpResponse): RestException
 
 }
 

@@ -3,12 +3,14 @@ package io.github.jan.supabase.postgrest.query
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.decodeFromJsonElement
+import kotlin.jvm.JvmInline
 
 /**
  * Represents the result from a postgrest request
- * @param body The body of the response. Can be decoded using [decodeAs] or [decodeAsOrNull]
+ * @param body The body of the response
  */
-data class PostgrestResult(val body: JsonElement, val statusCode: Int) {
+@JvmInline
+value class PostgrestResult(val body: JsonElement) {
 
     /**
      * Decodes [body] as [T] using [json]
@@ -25,9 +27,9 @@ data class PostgrestResult(val body: JsonElement, val statusCode: Int) {
     }
 
     /**
-     * Decodes [body] as a list of [T], or an empty list if [body] couldn't be parsed as a list of [T]
+     * Decodes [body] as a list of [T]
      */
-    inline fun <reified T> decodeList(json: Json = Json): List<T> = decodeAsOrNull(json) ?: emptyList()
+    inline fun <reified T> decodeList(json: Json = Json): List<T> = decodeAs(json)
 
     /**
      * Decodes [body] as a list of [T] and returns the first item found

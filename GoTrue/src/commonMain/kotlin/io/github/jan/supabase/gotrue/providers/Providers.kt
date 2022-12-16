@@ -2,102 +2,102 @@ package io.github.jan.supabase.gotrue.providers
 
 object Google : OAuthProvider() {
 
-    override fun provider() = "google"
+    override val name = "google"
 
 }
 
 object Discord : OAuthProvider() {
 
-    override fun provider() = "discord"
+    override val name = "discord"
 
 }
 
 object Github : OAuthProvider() {
 
-    override fun provider() = "github"
+    override val name = "github"
 
 }
 
 object Gitlab : OAuthProvider() {
 
-    override fun provider() = "gitlab"
+    override val name = "gitlab"
 
 }
 
 object Keycloak : OAuthProvider() {
 
-    override fun provider() = "keycloak"
+    override val name = "keycloak"
 
 }
 
 object LinkedIn : OAuthProvider() {
 
-    override fun provider() = "linkedin"
+    override val name = "linkedin"
 
 }
 
 object Notion : OAuthProvider() {
 
-    override fun provider() = "notion"
+    override val name = "notion"
 
 }
 
 object Slack : OAuthProvider() {
 
-    override fun provider() = "slack"
+    override val name = "slack"
 
 }
 
 object Twitch : OAuthProvider() {
 
-    override fun provider() = "twitch"
+    override val name = "twitch"
 
 }
 
 object Twitter : OAuthProvider() {
 
-    override fun provider() = "twitter"
+    override val name = "twitter"
 
 }
 
 object WorkOS : OAuthProvider() {
 
-    override fun provider() = "workos"
+    override val name = "workos"
 
 }
 
 object Zoom : OAuthProvider() {
 
-    override fun provider() = "zoom"
+    override val name = "zoom"
 
 }
 
 object Bitbucket : OAuthProvider() {
 
-    override fun provider() = "bitbucket"
+    override val name = "bitbucket"
 
 }
 
 object Azure : OAuthProvider() {
 
-    override fun provider() = "azure"
+    override val name = "azure"
 
 }
 
 object Apple : OAuthProvider() {
 
-    override fun provider() = "apple"
+    override val name = "apple"
 
 }
 
 object Spotify : OAuthProvider() {
 
-    override fun provider() = "spotify"
+    override val name = "spotify"
 
 }
 
 operator fun OAuthProvider.Companion.invoke(provider: String) = object : OAuthProvider() {
 
-    override fun provider() = provider
+    override val name = provider
 
 }

@@ -21,6 +21,7 @@ data class UserInfo(
     val email: String? = null,
     @SerialName("email_confirmed_at")
     val emailConfirmedAt: Instant? = null,
+    val factors: List<UserMfaFactor> = listOf(),
     @SerialName("id")
     val id: String,
     @SerialName("identities")
@@ -52,3 +53,22 @@ data class UserInfo(
     @SerialName("action_link")
     val actionLink: String? = null,
 )
+
+@Serializable
+data class UserMfaFactor(
+    val id: String,
+    @SerialName("created_at")
+    val createdAt: Instant,
+    @SerialName("updated_at")
+    val updatedAt: Instant,
+    private val status: String,
+    @SerialName("friendly_name")
+    val friendlyName: String? = null,
+    @SerialName("factor_type")
+    val factorType: String
+) {
+
+    val isVerified: Boolean
+        get() = status == "verified"
+
+}

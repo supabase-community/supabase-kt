@@ -1,6 +1,13 @@
 package io.github.jan.supabase.postgrest
 
 import io.github.jan.supabase.SupabaseClient
+import io.github.jan.supabase.bodyOrNull
+import io.github.jan.supabase.exceptions.BadRequestRestException
+import io.github.jan.supabase.exceptions.NotFoundRestException
+import io.github.jan.supabase.exceptions.RestException
+import io.github.jan.supabase.exceptions.UnauthorizedRestException
+import io.github.jan.supabase.exceptions.UnknownRestException
+import io.github.jan.supabase.gotrue.authenticatedSupabaseApi
 import io.github.jan.supabase.plugins.MainConfig
 import io.github.jan.supabase.plugins.MainPlugin
 import io.github.jan.supabase.plugins.SupabasePluginProvider
@@ -8,6 +15,8 @@ import io.github.jan.supabase.postgrest.query.Count
 import io.github.jan.supabase.postgrest.query.PostgrestBuilder
 import io.github.jan.supabase.postgrest.query.PostgrestFilterBuilder
 import io.github.jan.supabase.postgrest.request.PostgrestRequest
+import io.ktor.client.statement.HttpResponse
+import io.ktor.http.HttpStatusCode
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.encodeToJsonElement
@@ -45,8 +54,20 @@ internal class PostgrestImpl(override val supabaseClient: SupabaseClient, overri
     override val PLUGIN_KEY: String
         get() = Postgrest.key
 
+    val api = supabaseClient.authenticatedSupabaseApi(this)
+
     override fun from(table: String): PostgrestBuilder {
         return PostgrestBuilder(this, table)
+    }
+
+    override suspend fun parseErrorResponse(response: HttpResponse): RestException {
+        val body = response.bodyOrNull<PostgrestErrorResponse>() ?: PostgrestErrorResponse("Unknown error")
+        return when(response.status) {
+            HttpStatusCode.Unauthorized -> UnauthorizedRestException(body.message, response, body.details ?: body.hint)
+            HttpStatusCode.NotFound -> NotFoundRestException(body.message, response, body.details ?: body.hint)
+            HttpStatusCode.BadRequest -> BadRequestRestException(body.message, response, body.details ?: body.hint)
+            else -> UnknownRestException(body.message, response, body.details ?: body.hint)
+        }
     }
 
 }
@@ -65,6 +86,7 @@ val SupabaseClient.postgrest: Postgrest
  * @param head If true, select will delete the selected data.
  * @param count Count algorithm to use to count rows in a table.
  * @param filter Filter the result
+ * @throws RestException or one of its subclasses if the request failed
  */
 suspend inline fun <reified T> Postgrest.rpc(
     function: String,
@@ -82,6 +104,7 @@ suspend inline fun <reified T> Postgrest.rpc(
  * @param head If true, select will delete the selected data.
  * @param count Count algorithm to use to count rows in a table.
  * @param filter Filter the result
+ * @throws RestException or one of its subclasses if the request failed
  */
 suspend inline fun Postgrest.rpc(
     function: String,

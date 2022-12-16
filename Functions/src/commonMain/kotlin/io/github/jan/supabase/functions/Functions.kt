@@ -2,18 +2,24 @@ package io.github.jan.supabase.functions
 
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.annotiations.SupabaseInternal
-import io.github.jan.supabase.gotrue.checkErrors
 import io.github.jan.supabase.buildUrl
+import io.github.jan.supabase.exceptions.BadRequestRestException
+import io.github.jan.supabase.exceptions.NotFoundRestException
+import io.github.jan.supabase.exceptions.RestException
+import io.github.jan.supabase.exceptions.UnauthorizedRestException
 import io.github.jan.supabase.gotrue.GoTrue
+import io.github.jan.supabase.gotrue.authenticatedSupabaseApi
 import io.github.jan.supabase.plugins.MainConfig
 import io.github.jan.supabase.plugins.MainPlugin
 import io.github.jan.supabase.plugins.SupabasePluginProvider
+import io.ktor.client.plugins.HttpRequestTimeoutException
 import io.ktor.client.request.HttpRequestBuilder
-import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.client.statement.HttpResponse
+import io.ktor.client.statement.bodyAsText
 import io.ktor.http.Headers
 import io.ktor.http.HttpHeaders
+import io.ktor.http.HttpStatusCode
 import io.ktor.http.appendEncodedPathSegments
 
 /**
@@ -29,19 +35,25 @@ class Functions(override val config: Config, override val supabaseClient: Supaba
 
     private val baseUrl = supabaseClient.supabaseHttpUrl.replaceFirst(".", ".functions.")
 
+    @PublishedApi
+    internal val api = supabaseClient.authenticatedSupabaseApi(this)
+
     /**
      * Invokes a remote edge function. The authorization token is automatically added to the request.
      * @param function The function to invoke
      * @param builder The request builder to configure the request
+     * @throws RestException or one of its subclasses if receiving an error response
+     * @throws HttpRequestTimeoutException if the request timed out
+     * @throws HttpRequestException on network related issues
      */
-    suspend inline operator fun invoke(function: String, builder: HttpRequestBuilder.() -> Unit): HttpResponse {
-        return supabaseClient.httpClient.post(resolveUrl(function)) {
+    suspend inline operator fun invoke(function: String, crossinline builder: HttpRequestBuilder.() -> Unit): HttpResponse {
+        return api.post(function) {
             val token = config.jwtToken ?: supabaseClient.pluginManager.getPluginOrNull(GoTrue)?.currentAccessTokenOrNull()
             token.let {
                 this.headers[HttpHeaders.Authorization] = "Bearer $it"
             }
             builder()
-        }.checkErrors("Couldn't invoke function $function")
+        }
     }
 
     /**
@@ -50,6 +62,9 @@ class Functions(override val config: Config, override val supabaseClient: Supaba
      * @param function The function to invoke
      * @param body The body of the request
      * @param headers Headers to add to the request
+     * @throws RestException or one of its subclasses if receiving an error response
+     * @throws HttpRequestTimeoutException if the request timed out
+     * @throws HttpRequestException on network related issues
      */
     suspend inline operator fun <reified T> invoke(function: String, body: T, headers: Headers = Headers.Empty): HttpResponse = invoke(function) {
         this.headers.appendAll(headers)
@@ -62,6 +77,9 @@ class Functions(override val config: Config, override val supabaseClient: Supaba
      * Invokes a remote edge function. The authorization token is automatically added to the request.
      * @param function The function to invoke
      * @param headers Headers to add to the request
+     * @throws RestException or one of its subclasses if receiving an error response
+     * @throws HttpRequestTimeoutException if the request timed out
+     * @throws HttpRequestException on network related issues
      */
     suspend inline operator fun invoke(function: String, headers: Headers = Headers.Empty): HttpResponse = invoke(function) {
         this.headers.appendAll(headers)
@@ -78,6 +96,16 @@ class Functions(override val config: Config, override val supabaseClient: Supaba
     override fun resolveUrl(path: String): String {
         return buildUrl(config.customUrl ?: baseUrl) {
             appendEncodedPathSegments(path)
+        }
+    }
+
+    override suspend fun parseErrorResponse(response: HttpResponse): RestException {
+        val error = response.bodyAsText()
+        return when(response.status) {
+            HttpStatusCode.Unauthorized -> UnauthorizedRestException(error, response)
+            HttpStatusCode.NotFound -> NotFoundRestException(error, response)
+            HttpStatusCode.BadRequest -> BadRequestRestException(error, response)
+            else -> UnauthorizedRestException(error, response)
         }
     }
 

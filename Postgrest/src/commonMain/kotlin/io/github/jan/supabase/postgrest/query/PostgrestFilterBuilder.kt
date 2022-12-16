@@ -65,6 +65,26 @@ class PostgrestFilterBuilder {
         return this
     }
 
+    fun order(column: String, order: Order, nullsFirst: Boolean = false, foreignTable: String? = null) {
+        val key = if (foreignTable == null) "order" else "\"$foreignTable\".order"
+        _params[key] = "${column}.${order.value}.${if (nullsFirst) "nullsfirst" else "nullslast"}"
+    }
+
+    fun limit(count: Long, foreignTable: String? = null) {
+        val key = if (foreignTable == null) "limit" else "\"$foreignTable\".limit"
+        _params[key] = count.toString()
+    }
+
+    fun range(from: Long, to: Long, foreignTable: String? = null) {
+        val keyOffset = if (foreignTable == null) "offset" else "\"$foreignTable\".offset"
+        val keyLimit = if (foreignTable == null) "limit" else "\"$foreignTable\".limit"
+
+        _params[keyOffset] = from.toString()
+        _params[keyLimit] = (to - from + 1).toString()
+    }
+
+    fun range(range: LongRange, foreignTable: String? = null) = range(range.first, range.last, foreignTable)
+
     infix fun <T, V> KProperty1<T, V>.eq(value: V) = filter(FilterOperation(getColumnName(this), FilterOperator.EQ, value.toString()))
 
     infix fun <T, V> KProperty1<T, V>.neq(value: V) = filter(FilterOperation(getColumnName(this), FilterOperator.NEQ, value.toString()))
