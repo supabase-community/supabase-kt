@@ -8,7 +8,7 @@ object Versions {
     const val NEXUS_STAGING = "0.30.0"
     const val SUPABASEKT = "0.7.0"
     const val ANDROID_COMPAT = "1.5.1"
-    const val COMPOSE = "1.3.0-beta02"
+    const val COMPOSE = "1.3.0-rc01"
     const val COMPOSE_COMPILER = "1.3.2.1"
     const val NAPIER = "2.6.1"
     const val DATETIME = "0.4.0"

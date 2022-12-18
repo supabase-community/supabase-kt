@@ -31,3 +31,8 @@ kotlin {
         }
     }
 }
+
+compose {
+    kotlinCompilerPlugin.set(dependencies.compiler.forKotlin("1.7.20"))
+    kotlinCompilerPluginArgs.add("suppressKotlinVersionCompatibilityCheck=1.7.22")
+}
