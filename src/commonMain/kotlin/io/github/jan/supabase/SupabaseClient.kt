@@ -52,7 +52,6 @@ internal class SupabaseClientImpl(
     plugins: Map<String, (SupabaseClient) -> SupabasePlugin>,
     httpConfigOverrides: MutableList<HttpClientConfig<*>.() -> Unit>,
     useHTTPS: Boolean,
-    logNetworkTraffic: Boolean,
     requestTimeout: Long,
     httpEngine: HttpClientEngine?,
 ) : SupabaseClient {
@@ -75,7 +74,7 @@ internal class SupabaseClientImpl(
         key to value(this)
     })
 
-    override val httpClient = KtorSupabaseHttpClient(supabaseKey, httpConfigOverrides, logNetworkTraffic, requestTimeout, httpEngine)
+    override val httpClient = KtorSupabaseHttpClient(supabaseKey, httpConfigOverrides, requestTimeout, httpEngine)
 
     override suspend fun close() {
         httpClient.close()

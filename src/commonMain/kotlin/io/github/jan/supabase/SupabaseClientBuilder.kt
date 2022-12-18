@@ -6,6 +6,8 @@ import io.github.jan.supabase.plugins.SupabasePlugin
 import io.github.jan.supabase.plugins.SupabasePluginProvider
 import io.ktor.client.HttpClientConfig
 import io.ktor.client.engine.HttpClientEngine
+import io.ktor.client.plugins.HttpRequestTimeoutException
+import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
 /**
@@ -15,10 +17,31 @@ import kotlin.time.Duration.Companion.seconds
  */
 @SupabaseDsl
 class SupabaseClientBuilder @PublishedApi internal constructor(private val supabaseUrl: String, private val supabaseKey: String) {
+
+    /**
+     * Whether to use HTTPS for network requests with the [supabaseUrl]
+     *
+     * Default: true
+     */
     var useHTTPS = true
+
+    /**
+     * Custom ktor http client engine. If null, an engine from the dependencies will be used.
+     */
     var httpEngine: HttpClientEngine? = null
+
+    /**
+     * Whether to ignore if [supabaseUrl] contains modules like 'realtime' or 'auth'. If false, an exception will be thrown.
+     *
+     * Default: false
+     */
     var ignoreModulesInUrl = false
-    var logNetworkTraffic = false
+
+    /**
+     * [Duration] after network requests throw a [HttpRequestTimeoutException]
+     *
+     * Default: 10 seconds
+     */
     var requestTimeout = 10.seconds
     private val httpConfigOverrides = mutableListOf<HttpClientConfig<*>.() -> Unit>()
     private val plugins = mutableMapOf<String, ((SupabaseClient) -> SupabasePlugin)>()
@@ -38,7 +61,7 @@ class SupabaseClientBuilder @PublishedApi internal constructor(private val supab
 
     @PublishedApi
     internal fun build(): SupabaseClient {
-        return SupabaseClientImpl(supabaseUrl.split("//").last(), supabaseKey, plugins, httpConfigOverrides, useHTTPS, logNetworkTraffic, requestTimeout.inWholeMilliseconds, httpEngine)
+        return SupabaseClientImpl(supabaseUrl.split("//").last(), supabaseKey, plugins, httpConfigOverrides, useHTTPS, requestTimeout.inWholeMilliseconds, httpEngine)
     }
 
     /**
@@ -65,5 +88,7 @@ class SupabaseClientBuilder @PublishedApi internal constructor(private val supab
 
 /**
  * Creates a new [SupabaseClient] instance using [builder]
+ * @param supabaseUrl The supabase url. Example: 'id.supabase.co' or 'https://id.supabase.co' (no 'https://id.supabase.co/auth/v1')
+ * @param supabaseKey The supabase api key
  */
 inline fun createSupabaseClient(supabaseUrl: String, supabaseKey: String, builder: SupabaseClientBuilder.() -> Unit) = SupabaseClientBuilder(supabaseUrl, supabaseKey).apply(builder).build()
