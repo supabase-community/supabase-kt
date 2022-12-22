@@ -170,21 +170,21 @@ internal class GoTrueImpl(override val supabaseClient: SupabaseClient, override 
         startAutoRefresh(session)
     }
 
-    override suspend fun verifyEmail(
+    override suspend fun verifyEmailOtp(
         type: OtpType.Email,
         email: String,
         token: String,
         captchaToken: String?
-    ) = verify(type.value, token, captchaToken) {
+    ) = verify(type.type, token, captchaToken) {
         put("email", email)
     }
 
-    override suspend fun verifyPhone(
+    override suspend fun verifyPhoneOtp(
         type: OtpType.Phone,
         phoneNumber: String,
         token: String,
         captchaToken: String?
-    ) = verify(type.value, token, captchaToken) {
+    ) = verify(type.type, token, captchaToken) {
         put("phone", phoneNumber)
     }
 
