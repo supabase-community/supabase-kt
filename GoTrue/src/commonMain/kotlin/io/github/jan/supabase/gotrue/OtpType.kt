@@ -1,8 +1,10 @@
 package io.github.jan.supabase.gotrue
 
-object OtpType {
+sealed interface OtpType {
 
-    enum class Email(val value: String) {
+    val type: String
+
+    enum class Email(override val type: String): OtpType {
         MAGIC_LINK("magiclink"),
         SIGNUP("signup"),
         INVITE("invite"),
@@ -10,7 +12,7 @@ object OtpType {
         EMAIL_CHANGE("email_change")
     }
 
-    enum class Phone(val value: String) {
+    enum class Phone(override val type: String): OtpType {
         SMS("sms"),
         PHONE_CHANGE("phone_change")
     }

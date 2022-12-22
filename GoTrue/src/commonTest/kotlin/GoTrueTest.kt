@@ -164,7 +164,7 @@ class GoTrueTest {
         val client = createSupabaseClient()
         runTest(dispatcher) {
             assertFailsWith<BadRequestRestException>("verifying with a wrong token should fail") {
-                client.gotrue.verify(OtpType.INVITE, "wrong_token")
+                client.gotrue.verifyEmailOtp(OtpType.Email.INVITE, "example@email.com", "wrong_token")
             }
             client.close()
         }
@@ -175,7 +175,7 @@ class GoTrueTest {
     fun test_verifying_with_valid_token() {
         val client = createSupabaseClient()
         runTest(dispatcher) {
-            client.gotrue.verify(OtpType.INVITE, GoTrueMock.VALID_VERIFY_TOKEN)
+            client.gotrue.verifyEmailOtp(OtpType.Email.INVITE, "example@gmail.com", GoTrueMock.VALID_VERIFY_TOKEN)
             assertEquals(GoTrueMock.NEW_ACCESS_TOKEN, client.gotrue.currentAccessTokenOrNull(), "verify with valid token should update the user session")
         }
     }
