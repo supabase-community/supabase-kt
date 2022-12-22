@@ -35,6 +35,7 @@ package io.github.jan.supabase.gotrue
  import kotlinx.datetime.Clock
  import kotlinx.serialization.decodeFromString
  import kotlinx.serialization.json.JsonObject
+ import kotlinx.serialization.json.JsonObjectBuilder
  import kotlinx.serialization.json.buildJsonObject
  import kotlinx.serialization.json.encodeToJsonElement
  import kotlinx.serialization.json.put
@@ -153,35 +154,38 @@ internal class GoTrueImpl(override val supabaseClient: SupabaseClient, override 
         api.get("reauthenticate")
     }
 
-    override suspend fun verify(type: VerifyType, token: String, captchaToken: String?) {
+    private suspend fun verify(type: String, token: String, captchaToken: String?, additionalData: JsonObjectBuilder.() -> Unit) {
         val body = buildJsonObject {
-            put("type", type.name.lowercase())
+            put("type", type)
             put("token", token)
             captchaToken?.let {
                 putJsonObject("gotrue_meta_security") {
                     put("captcha_token", captchaToken)
                 }
             }
+            additionalData()
         }
         val response = api.postJson("verify", body)
         val session =  response.body<UserSession>()
         startAutoRefresh(session)
     }
 
-    override suspend fun verifyPhone(token: String, phoneNumber: String, captchaToken: String?) {
-        val body = buildJsonObject {
-            put("type", "sms")
-            put("token", token)
-            put("phone", phoneNumber)
-            captchaToken?.let {
-                putJsonObject("gotrue_meta_security") {
-                    put("captcha_token", captchaToken)
-                }
-            }
-        }
-        val response = api.postJson("verify", body)
-        val session = response.body<UserSession>()
-        startAutoRefresh(session)
+    override suspend fun verifyEmail(
+        type: VerifyType.Email,
+        email: String,
+        token: String,
+        captchaToken: String?
+    ) = verify(type.value, token, captchaToken) {
+        put("email", email)
+    }
+
+    override suspend fun verifyPhone(
+        type: VerifyType.Phone,
+        phoneNumber: String,
+        token: String,
+        captchaToken: String?
+    ) = verify(type.value, token, captchaToken) {
+        put("phone", phoneNumber)
     }
 
     override suspend fun getUser(jwt: String): UserInfo {
