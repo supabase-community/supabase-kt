@@ -171,7 +171,7 @@ internal class GoTrueImpl(override val supabaseClient: SupabaseClient, override 
     }
 
     override suspend fun verifyEmail(
-        type: VerifyType.Email,
+        type: OtpType.Email,
         email: String,
         token: String,
         captchaToken: String?
@@ -180,7 +180,7 @@ internal class GoTrueImpl(override val supabaseClient: SupabaseClient, override 
     }
 
     override suspend fun verifyPhone(
-        type: VerifyType.Phone,
+        type: OtpType.Phone,
         phoneNumber: String,
         token: String,
         captchaToken: String?

@@ -155,7 +155,7 @@ sealed interface GoTrue : MainPlugin<GoTrue.Config> {
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
-    suspend fun verifyEmailOtp(type: VerifyType.Email, email: String, token: String, captchaToken: String? = null)
+    suspend fun verifyEmailOtp(type: OtpType.Email, email: String, token: String, captchaToken: String? = null)
 
     /**
      * Verifies a phone/sms otp
@@ -166,7 +166,7 @@ sealed interface GoTrue : MainPlugin<GoTrue.Config> {
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
-    suspend fun verifyPhoneOtp(type: VerifyType.Phone, phoneNumber: String, token: String, captchaToken: String? = null)
+    suspend fun verifyPhoneOtp(type: OtpType.Phone, phoneNumber: String, token: String, captchaToken: String? = null)
 
     /**
      * Retrieves the current user with the session

@@ -1,6 +1,6 @@
 package io.github.jan.supabase.gotrue
 
-object VerifyType {
+object OtpType {
 
     enum class Email(val value: String) {
         MAGIC_LINK("magiclink"),
@@ -14,6 +14,5 @@ object VerifyType {
         SMS("sms"),
         PHONE_CHANGE("phone_change")
     }
-
 
 }
