@@ -6,8 +6,8 @@ import io.github.jan.supabase.createSupabaseClient
 import io.github.jan.supabase.exceptions.BadRequestRestException
 import io.github.jan.supabase.exceptions.UnauthorizedRestException
 import io.github.jan.supabase.gotrue.GoTrue
+import io.github.jan.supabase.gotrue.OtpType
 import io.github.jan.supabase.gotrue.SettingsSessionManager
-import io.github.jan.supabase.gotrue.VerifyType
 import io.github.jan.supabase.gotrue.gotrue
 import io.github.jan.supabase.gotrue.providers.builtin.Email
 import io.github.jan.supabase.gotrue.providers.builtin.Phone
@@ -164,7 +164,7 @@ class GoTrueTest {
         val client = createSupabaseClient()
         runTest(dispatcher) {
             assertFailsWith<BadRequestRestException>("verifying with a wrong token should fail") {
-                client.gotrue.verify(VerifyType.INVITE, "wrong_token")
+                client.gotrue.verifyEmailOtp(OtpType.Email.INVITE, "example@email.com", "wrong_token")
             }
             client.close()
         }
@@ -175,7 +175,7 @@ class GoTrueTest {
     fun test_verifying_with_valid_token() {
         val client = createSupabaseClient()
         runTest(dispatcher) {
-            client.gotrue.verify(VerifyType.INVITE, GoTrueMock.VALID_VERIFY_TOKEN)
+            client.gotrue.verifyEmailOtp(OtpType.Email.INVITE, "example@gmail.com", GoTrueMock.VALID_VERIFY_TOKEN)
             assertEquals(GoTrueMock.NEW_ACCESS_TOKEN, client.gotrue.currentAccessTokenOrNull(), "verify with valid token should update the user session")
         }
     }

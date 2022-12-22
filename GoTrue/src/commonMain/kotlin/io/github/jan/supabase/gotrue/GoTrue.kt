@@ -147,24 +147,26 @@ sealed interface GoTrue : MainPlugin<GoTrue.Config> {
     suspend fun invalidateAllRefreshTokens()
 
     /**
-     * Verifies a registration, invite or password recovery
+     * Verifies a email otp
      * @param type The type of the verification
+     * @param email The email to verify
      * @param token The token used to verify
      * @throws RestException or one of its subclasses if receiving an error response
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
-    suspend fun verify(type: VerifyType, token: String, captchaToken: String? = null)
+    suspend fun verifyEmailOtp(type: OtpType.Email, email: String, token: String, captchaToken: String? = null)
 
     /**
      * Verifies a phone/sms otp
+     * @param type The type of the verification
      * @param token The otp to verify
      * @param phoneNumber The phone number the token was sent to
      * @throws RestException or one of its subclasses if receiving an error response
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
-    suspend fun verifyPhone(token: String, phoneNumber: String, captchaToken: String? = null)
+    suspend fun verifyPhoneOtp(type: OtpType.Phone, phoneNumber: String, token: String, captchaToken: String? = null)
 
     /**
      * Retrieves the current user with the session
@@ -286,12 +288,6 @@ suspend inline fun <C, R, reified D, Provider : DefaultAuthProvider<C, R>> GoTru
     extraData: D? = null,
     noinline config: C.() -> Unit = { }
 ): UserInfo = modifyUser(provider, extraData?.let { Json.encodeToJsonElement(extraData) }?.jsonObject, config)
-
-enum class VerifyType {
-    SIGNUP,
-    RECOVERY,
-    INVITE
-}
 
 /**
  * The Auth plugin handles everything related to supabase's authentication system
