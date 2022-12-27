@@ -1,5 +1,6 @@
 package io.github.jan.supabase
 
+import io.github.aakira.napier.Napier
 import io.github.jan.supabase.annotiations.SupabaseDsl
 import io.github.jan.supabase.plugins.PluginManager
 import io.github.jan.supabase.plugins.SupabasePlugin
@@ -55,7 +56,11 @@ class SupabaseClientBuilder @PublishedApi internal constructor(private val supab
             else -> null
         }
         if(!ignoreModulesInUrl && module != null) {
-            throw IllegalStateException("The supabase url should not contain ($module), supabase-kt handles the url endpoints. If you want to use a custom url for a module specify it in their builder but that's not necessary for normal supabase projects")
+            throw IllegalStateException("The supabase url should not contain ($module), supabase-kt handles the url endpoints. If you want to use a custom url for a module, specify it within their builder but that's not necessary for normal supabase projects")
+        }
+        if(supabaseUrl.startsWith("http://")) {
+            useHTTPS = false
+            Napier.w { "You are using a non https supabase url ($supabaseUrl)."}
         }
     }
 
