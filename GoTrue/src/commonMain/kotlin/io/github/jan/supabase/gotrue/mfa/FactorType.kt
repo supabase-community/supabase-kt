@@ -7,10 +7,16 @@ import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.decodeFromJsonElement
 import kotlinx.serialization.json.jsonObject
 
+/**
+ * Represents an MFA factor type
+ */
 sealed class FactorType<T>(val value: String) {
 
     abstract suspend fun decodeResponse(json: JsonObject): T
 
+    /**
+     * TOTP (timed one-time password) MFA factor
+     */
     object TOTP : FactorType<TOTP.Response>("totp") {
 
         override suspend fun decodeResponse(json: JsonObject): Response {

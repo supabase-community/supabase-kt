@@ -9,6 +9,6 @@ data class MfaChallenge(val id: String) {
 
     @SerialName("expires_at") private val expiresAtSeconds: Long = 0
     val expiresAt: Instant
-        get() = Instant.fromEpochSeconds(expiresAtSeconds.toLong())
+        get() = Instant.fromEpochSeconds(expiresAtSeconds)
 
 }

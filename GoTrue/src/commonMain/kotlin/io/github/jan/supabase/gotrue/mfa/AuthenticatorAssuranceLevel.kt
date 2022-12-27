@@ -1,7 +1,18 @@
 package io.github.jan.supabase.gotrue.mfa
 
+/**
+ * The assurance level of a session
+ */
 enum class AuthenticatorAssuranceLevel {
-    AAL1, AAL2;
+    /**
+     * The user is logged in using a provider (Password, OAuth, etc.)
+     */
+    AAL1,
+
+    /**
+     * The user is logged in using at least one MFA factor
+     */
+    AAL2;
 
     companion object {
 
@@ -16,6 +27,10 @@ enum class AuthenticatorAssuranceLevel {
     }
 }
 
+/**
+ * @param current The current assurance level of the session
+ * @param next The next possible assurance level (for the next login)
+ */
 data class MfaLevel(
     val current: AuthenticatorAssuranceLevel,
     val next: AuthenticatorAssuranceLevel
