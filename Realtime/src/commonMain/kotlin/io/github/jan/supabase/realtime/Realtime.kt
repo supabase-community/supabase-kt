@@ -74,7 +74,7 @@ sealed interface Realtime : MainPlugin<Realtime.Config> {
 
     /**
      * @property websocketConfig Custom configuration for the ktor websocket
-     * @property secure Whether to use wss or ws. Defaults to [SupabaseClient.useHTTPS]
+     * @property secure Whether to use wss or ws. Defaults to [SupabaseClient.useHTTPS] when null
      * @property customRealtimeURL Custom url for the realtime websocket. Uses [SupabaseClient.supabaseUrl] by default
      * @property disconnectOnSessionLoss Whether to disconnect from the websocket when the session is lost. Defaults to true
      * @property reconnectDelay The delay between reconnect attempts. Defaults to 7 seconds
