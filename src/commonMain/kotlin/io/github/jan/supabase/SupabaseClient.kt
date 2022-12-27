@@ -40,6 +40,11 @@ sealed interface SupabaseClient {
     val httpClient: KtorSupabaseHttpClient
 
     /**
+     * Whether [supabaseHttpUrl] uses https
+     */
+    val useHTTPS: Boolean
+
+    /**
      * Releases all resources held by the [httpClient] and all plugins the [pluginManager]
      */
     suspend fun close()
@@ -51,7 +56,7 @@ internal class SupabaseClientImpl(
     override val supabaseKey: String,
     plugins: Map<String, (SupabaseClient) -> SupabasePlugin>,
     httpConfigOverrides: MutableList<HttpClientConfig<*>.() -> Unit>,
-    useHTTPS: Boolean,
+    override val useHTTPS: Boolean,
     requestTimeout: Long,
     httpEngine: HttpClientEngine?,
 ) : SupabaseClient {

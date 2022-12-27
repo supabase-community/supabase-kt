@@ -72,9 +72,17 @@ sealed interface Realtime : MainPlugin<Realtime.Config> {
      */
     suspend fun block()
 
+    /**
+     * @property websocketConfig Custom configuration for the ktor websocket
+     * @property secure Whether to use wss or ws. Defaults to [SupabaseClient.useHTTPS]
+     * @property customRealtimeURL Custom url for the realtime websocket. Uses [SupabaseClient.supabaseUrl] by default
+     * @property disconnectOnSessionLoss Whether to disconnect from the websocket when the session is lost. Defaults to true
+     * @property reconnectDelay The delay between reconnect attempts. Defaults to 7 seconds
+     * @property heartbeatInterval The interval between heartbeat messages. Defaults to 15 seconds
+     */
     data class Config(
         var websocketConfig: WebSockets.Config.() -> Unit = {},
-        var secure: Boolean = true,
+        var secure: Boolean? = null,
         var heartbeatInterval: Duration = 15.seconds,
         var customRealtimeURL: String? = null,
         var reconnectDelay: Duration = 7.seconds,
@@ -130,6 +138,12 @@ internal class RealtimeImpl(override val supabaseClient: SupabaseClient, overrid
     override val PLUGIN_KEY: String
         get() = Realtime.key
 
+    init {
+        if(config.secure == null) {
+            config.secure = supabaseClient.useHTTPS
+        }
+    }
+
     override suspend fun connect() = connect(false)
 
     suspend fun connect(reconnect: Boolean) {
@@ -153,10 +167,10 @@ internal class RealtimeImpl(override val supabaseClient: SupabaseClient, overrid
             }
         }
         if (status.value == Realtime.Status.CONNECTED) throw IllegalStateException("Websocket already connected")
-        val prefix = if (config.secure) "wss://" else "ws://"
+        val prefix = if (config.secure == true) "wss://" else "ws://"
         _status.value = Realtime.Status.CONNECTING
         val realtimeUrl = config.customRealtimeURL ?: (prefix + supabaseClient.supabaseUrl + ("/realtime/v${Realtime.API_VERSION}/websocket?apikey=${supabaseClient.supabaseKey}&vsn=1.0.0"))
-         try {
+        try {
             ws = supabaseClient.httpClient.webSocketSession(realtimeUrl)
             _status.value = Realtime.Status.CONNECTED
             Napier.i { "Connected to realtime websocket!" }
