@@ -203,7 +203,7 @@ kotlin {
                 api("androidx.appcompat:appcompat:${Versions.ANDROID_COMPAT}")
             }
         }
-        val androidTest by getting {
+        val androidUnitTest by getting {
             dependencies {
                 implementation("junit:junit:4.13.2")
             }
