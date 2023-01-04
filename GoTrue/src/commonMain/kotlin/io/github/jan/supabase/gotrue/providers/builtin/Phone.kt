@@ -17,6 +17,7 @@ import kotlinx.serialization.json.put
  */
 object Phone : DefaultAuthProvider<Phone.Config, Phone.Result> {
 
+    @Serializable(with = DefaultAuthProvider.Config.Companion::class)
     data class Config(var phoneNumber: String = ""): DefaultAuthProvider.Config()
     @Serializable
     data class Result(
@@ -29,6 +30,6 @@ object Phone : DefaultAuthProvider<Phone.Config, Phone.Result> {
 
     override fun decodeResult(json: JsonObject): Result = supabaseJson.decodeFromJsonElement(json)
 
-    override fun encodeCredentials(credentials: Config.() -> Unit): String = supabaseJson.encodeToString(Config().apply(credentials) as DefaultAuthProvider.Config)
+    override fun encodeCredentials(credentials: Config.() -> Unit): String = supabaseJson.encodeToString(Config().apply(credentials))
 
 }

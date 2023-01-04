@@ -22,13 +22,13 @@ import kotlinx.serialization.json.putJsonObject
 
 sealed interface DefaultAuthProvider<C, R> : AuthProvider<C, R> {
 
-    @Serializable(with = DefaultAuthProvider.Config.Companion::class)
+    @Serializable
     sealed class Config(
         var password: String = "",
         var captchaToken: String? = null
     ) {
 
-        companion object  : KSerializer<Config> {
+        companion object : KSerializer<Config> {
 
             override val descriptor = buildClassSerialDescriptor("io.github.jan.supabase.gotrue.providers.builtin.Config") {
                 element("email", String.serializer().descriptor, isOptional = true)
