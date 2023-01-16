@@ -7,8 +7,12 @@ import io.github.jan.supabase.gotrue.GoTrue
 import io.github.jan.supabase.putJsonObject
 import io.ktor.client.call.body
 import io.ktor.client.plugins.HttpRequestTimeoutException
+import io.ktor.client.request.header
 import io.ktor.client.request.setBody
+import io.ktor.http.ContentType
+import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
+import io.ktor.http.defaultForFilePath
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.add
 import kotlinx.serialization.json.buildJsonObject
@@ -263,6 +267,8 @@ internal class BucketApiImpl(override val bucketId: String, val storage: Storage
         return storage.api.request("object/$bucket/$path") {
             this.method = method
             setBody(body)
+
+            header(HttpHeaders.ContentType, ContentType.defaultForFilePath(path))
         }.body<JsonObject>()["Key"]?.jsonPrimitive?.content ?: throw IllegalStateException("Expected a key in a upload response")
     }
 
