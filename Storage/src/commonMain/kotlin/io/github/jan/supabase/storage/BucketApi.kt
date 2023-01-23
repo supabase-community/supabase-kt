@@ -7,6 +7,7 @@ import io.github.jan.supabase.gotrue.GoTrue
 import io.github.jan.supabase.putJsonObject
 import io.ktor.client.call.body
 import io.ktor.client.plugins.HttpRequestTimeoutException
+import io.ktor.client.request.bearerAuth
 import io.ktor.client.request.header
 import io.ktor.client.request.setBody
 import io.ktor.http.ContentType
@@ -247,13 +248,17 @@ internal class BucketApiImpl(override val bucketId: String, val storage: Storage
     override suspend fun downloadAuthenticated(path: String, transform: ImageTransformation.() -> Unit): ByteArray {
         val transformation = ImageTransformation().apply(transform).queryString()
         val url = if(transformation.isBlank()) authenticatedUrl(path) else authenticatedRenderUrl(path, transform)
-        return storage.api.get(url).body()
+        return storage.api.rawRequest(url) {
+            method = HttpMethod.Get
+        }.body()
     }
 
     override suspend fun downloadPublic(path: String, transform: ImageTransformation.() -> Unit): ByteArray {
         val transformation = ImageTransformation().apply(transform).queryString()
         val url = if(transformation.isBlank()) publicUrl(path) else publicRenderUrl(path, transform)
-        return storage.api.get(url).body()
+        return storage.api.rawRequest(url) {
+            method = HttpMethod.Get
+        }.body()
     }
 
     override suspend fun list(prefix: String, filter: BucketListFilter.() -> Unit): List<BucketItem> {

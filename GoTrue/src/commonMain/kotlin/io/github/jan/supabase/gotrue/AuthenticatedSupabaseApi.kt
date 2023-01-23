@@ -5,6 +5,7 @@ import io.github.jan.supabase.exceptions.RestException
 import io.github.jan.supabase.network.SupabaseApi
 import io.github.jan.supabase.plugins.MainPlugin
 import io.ktor.client.request.HttpRequestBuilder
+import io.ktor.client.request.bearerAuth
 import io.ktor.client.request.headers
 import io.ktor.client.statement.HttpResponse
 
@@ -14,11 +15,9 @@ class AuthenticatedSupabaseApi(
     supabaseClient: SupabaseClient,
 ): SupabaseApi(resolveUrl, parseErrorResponse, supabaseClient) {
 
-    override suspend fun request(url: String, builder: HttpRequestBuilder.() -> Unit): HttpResponse = super.request(url) {
+    override suspend fun rawRequest(url: String, builder: HttpRequestBuilder.() -> Unit): HttpResponse = super.rawRequest(url) {
         supabaseClient.pluginManager.getPluginOrNull(GoTrue)?.currentSessionOrNull()?.let {
-            headers {
-                append("Authorization", "Bearer ${it.accessToken}")
-            }
+            bearerAuth(it.accessToken)
         }
         builder()
     }

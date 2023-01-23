@@ -12,8 +12,12 @@ open class SupabaseApi(
     val supabaseClient: SupabaseClient
 ) : SupabaseHttpClient() {
 
-    override suspend fun request(url: String, builder: HttpRequestBuilder.() -> Unit): HttpResponse {
-        return supabaseClient.httpClient.request(resolveUrl(url), builder).also {
+    final override suspend fun request(url: String, builder: HttpRequestBuilder.() -> Unit): HttpResponse {
+        return rawRequest(resolveUrl(url), builder)
+    }
+
+    open suspend fun rawRequest(url: String, builder: HttpRequestBuilder.() -> Unit): HttpResponse {
+        return supabaseClient.httpClient.request(url, builder).also {
             if(it.status.value in 400..501 && parseErrorResponse != null) throw parseErrorResponse.invoke(it)
         }
     }
