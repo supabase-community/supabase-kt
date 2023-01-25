@@ -20,7 +20,7 @@ actual fun GoTrue.setupPlatform() {
         val expiresIn = map["expires_in"]?.toLong()
         val tokenType = map["token_type"]
         val type = map["type"]
-        val scope = CoroutineScope(Dispatchers.Default)
+        val scope = CoroutineScope(config.coroutineDispatcher)
         if(accessToken != null && refreshToken != null && expiresIn != null && tokenType != null) {
             scope.launch {
                 val user = getUser(accessToken)
