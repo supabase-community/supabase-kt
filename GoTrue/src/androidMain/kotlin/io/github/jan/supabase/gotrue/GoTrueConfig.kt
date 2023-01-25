@@ -14,4 +14,9 @@ actual class GoTrueConfig : MainConfig, GoTrueConfigDefaults() {
      */
     var host: String = "login"
 
+    /**
+     * Whether to stop auto-refresh on focus loss, and resume it on focus again
+     */
+    var enableLifecycleCallbacks: Boolean = true
+
 }
