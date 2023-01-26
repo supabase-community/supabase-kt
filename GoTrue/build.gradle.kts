@@ -64,9 +64,13 @@ kotlin {
         }
         val jvmMain by getting {
             dependencies {
-                api("io.ktor:ktor-server-core:${Versions.KTOR}")
+           //     api("io.ktor:ktor-server-core:${Versions.KTOR}")
                 // https://mvnrepository.com/artifact/io.ktor/ktor-server-core
-                api("io.ktor:ktor-server-cio:${Versions.KTOR}")
+              //  api("io.ktor:ktor-server-cio:${Versions.KTOR}")
+                implementation("io.javalin:javalin:5.3.2")
+                //logback
+                // https://mvnrepository.com/artifact/ch.qos.logback/logback-classic
+
             }
         }
         val androidMain by getting {
@@ -89,5 +93,8 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
+    }
+    lint {
+        isAbortOnError = false
     }
 }

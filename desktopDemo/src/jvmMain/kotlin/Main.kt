@@ -42,7 +42,7 @@ suspend fun main() {
         supabaseKey = System.getenv("SUPABASE_KEY")
     ) {
         install(GoTrue) {
-            sessionManager = SettingsSessionManager(PreferencesSettings(Preferences.userRoot().node("custom_name")))
+            sessionManager = SettingsSessionManager()
         }
         install(Realtime)
     }
@@ -53,7 +53,12 @@ suspend fun main() {
             //val status by client.realtime.status.collectAsState()
             if (status is SessionStatus.Authenticated) {
                 Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
-                    Text("Logged in as ${(status as SessionStatus.Authenticated).session.user?.email}")
+                    Column {
+                        Text("Logged in as ${(status as SessionStatus.Authenticated).session.user?.email}")
+                        Button(onClick = { scope.launch { client.gotrue.invalidateSession() } }) {
+                            Text("Sign out")
+                        }
+                    }
                 }
             } else {
                 Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
@@ -82,7 +87,7 @@ suspend fun main() {
                                 client.gotrue.loginWith(Google)
                             }
                         }, modifier = Modifier.align(Alignment.CenterHorizontally)) {
-                            Text("Login with Discord")
+                            Text("Login with Google")
                         }
                         //
                     }
