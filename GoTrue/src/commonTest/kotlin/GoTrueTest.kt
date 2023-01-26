@@ -6,6 +6,7 @@ import io.github.jan.supabase.createSupabaseClient
 import io.github.jan.supabase.exceptions.BadRequestRestException
 import io.github.jan.supabase.exceptions.UnauthorizedRestException
 import io.github.jan.supabase.gotrue.GoTrue
+import io.github.jan.supabase.gotrue.GoTrueConfig
 import io.github.jan.supabase.gotrue.OtpType
 import io.github.jan.supabase.gotrue.SettingsSessionManager
 import io.github.jan.supabase.gotrue.gotrue
@@ -223,7 +224,7 @@ class GoTrueTest {
         }
     }
 
-    private fun createSupabaseClient(additionalGoTrueSettings: GoTrue.Config.() -> Unit = {}): SupabaseClient {
+    private fun createSupabaseClient(additionalGoTrueSettings: GoTrueConfig.() -> Unit = {}): SupabaseClient {
         return createSupabaseClient(
             supabaseUrl = "https://example.com",
             supabaseKey = "example",
@@ -234,7 +235,6 @@ class GoTrueTest {
                 autoLoadFromStorage = false
                 alwaysAutoRefresh = false
                 coroutineDispatcher = dispatcher
-                params["enableLifecycleCallbacks"] = false
 
                 sessionManager = SettingsSessionManager(MapSettings())
 

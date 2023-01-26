@@ -6,7 +6,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
-expect class GoTrueConfig : MainConfig, GoTrueConfigDefaults
+expect class GoTrueConfig() : MainConfig, GoTrueConfigDefaults
 
 open class GoTrueConfigDefaults {
 
