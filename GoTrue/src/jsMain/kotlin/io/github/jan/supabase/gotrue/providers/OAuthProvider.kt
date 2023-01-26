@@ -36,9 +36,3 @@ actual abstract class OAuthProvider actual constructor() : AuthProvider<External
     actual companion object
 
 }
-
-var ExternalAuthConfig.redirectUrl: String
-    get() = params["redirectUrl"] as? String ?: (window.location.origin)
-    set(value) {
-        params["redirectUrl"] = value
-    }

@@ -19,7 +19,6 @@ import io.github.jan.supabase.plugins.MainPlugin
 import io.github.jan.supabase.plugins.SupabasePluginProvider
 import io.ktor.client.plugins.HttpRequestTimeoutException
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
@@ -31,7 +30,7 @@ import kotlin.time.Duration.Companion.seconds
 /**
  * Plugin to interact with the supabase Auth API
  */
-sealed interface GoTrue : MainPlugin<GoTrue.Config> {
+sealed interface GoTrue : MainPlugin<GoTrueConfig> {
 
     /**
      * Returns the current session status
@@ -253,28 +252,18 @@ sealed interface GoTrue : MainPlugin<GoTrue.Config> {
         else -> null
     }
 
-    data class Config(
-        val params: MutableMap<String, Any> = mutableMapOf(),
-        var retryDelay: Duration = 10.seconds,
-        var alwaysAutoRefresh: Boolean = true,
-        var autoLoadFromStorage: Boolean = true,
-        override var customUrl: String? = null,
-        override var jwtToken: String? = null,
-        var sessionManager: SessionManager? = null,
-        var coroutineDispatcher: CoroutineDispatcher = Dispatchers.Default
-    ) : MainConfig
-
-    companion object : SupabasePluginProvider<Config, GoTrue> {
+    companion object : SupabasePluginProvider<GoTrueConfig, GoTrue> {
 
         override val key = "auth"
         const val API_VERSION = 1
 
-        override fun createConfig(init: Config.() -> Unit) = Config().apply(init)
-        override fun create(supabaseClient: SupabaseClient, config: Config): GoTrue = GoTrueImpl(supabaseClient, config)
+        override fun createConfig(init: GoTrueConfig.() -> Unit) = GoTrueConfig().apply(init)
+        override fun create(supabaseClient: SupabaseClient, config: GoTrueConfig): GoTrue = GoTrueImpl(supabaseClient, config)
 
     }
 
 }
+
 
 /**
  * Modifies a user with the specified [provider]. Extra data can be supplied

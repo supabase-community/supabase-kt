@@ -26,10 +26,8 @@ import io.github.jan.supabase.gotrue.GoTrue
 import io.github.jan.supabase.gotrue.SessionStatus
 import io.github.jan.supabase.gotrue.gotrue
 import io.github.jan.supabase.gotrue.handleDeeplinks
-import io.github.jan.supabase.gotrue.host
 import io.github.jan.supabase.gotrue.providers.Discord
 import io.github.jan.supabase.gotrue.providers.builtin.Email
-import io.github.jan.supabase.gotrue.scheme
 import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {

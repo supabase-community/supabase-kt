@@ -47,13 +47,7 @@ class Functions(override val config: Config, override val supabaseClient: Supaba
      * @throws HttpRequestException on network related issues
      */
     suspend inline operator fun invoke(function: String, crossinline builder: HttpRequestBuilder.() -> Unit): HttpResponse {
-        return api.post(function) {
-            val token = config.jwtToken ?: supabaseClient.pluginManager.getPluginOrNull(GoTrue)?.currentAccessTokenOrNull()
-            token.let {
-                this.headers[HttpHeaders.Authorization] = "Bearer $it"
-            }
-            builder()
-        }
+        return api.post(function, builder)
     }
 
     /**
@@ -111,7 +105,7 @@ class Functions(override val config: Config, override val supabaseClient: Supaba
 
     data class Config(
         override var customUrl: String? = null,
-        override var jwtToken: String? = null
+        override var jwtToken: String? = null,
     ) : MainConfig
 
     companion object : SupabasePluginProvider<Config, Functions> {
