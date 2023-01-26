@@ -24,10 +24,3 @@ expect abstract class OAuthProvider() : AuthProvider<ExternalAuthConfig, Unit> {
     companion object
 
 }
-
-sealed interface AuthFail {
-
-    object Timeout: AuthFail
-
-}
-

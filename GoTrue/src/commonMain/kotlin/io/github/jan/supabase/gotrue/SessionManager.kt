@@ -29,12 +29,12 @@ class SettingsSessionManager(settings: Settings = Settings()): SessionManager {
 
     @OptIn(ExperimentalSettingsApi::class)
     override suspend fun saveSession(session: UserSession) {
-        suspendSettings.putString("session", supabaseJson.encodeToString(session))
+        suspendSettings.putString(SETTINGS_KEY, supabaseJson.encodeToString(session))
     }
 
     @OptIn(ExperimentalSettingsApi::class)
     override suspend fun loadSession(): UserSession? {
-        val session = suspendSettings.getStringOrNull("session") ?: return null
+        val session = suspendSettings.getStringOrNull(SETTINGS_KEY) ?: return null
         return try {
             supabaseJson.decodeFromString(session)
         } catch(e: Exception) {
@@ -45,7 +45,13 @@ class SettingsSessionManager(settings: Settings = Settings()): SessionManager {
 
     @OptIn(ExperimentalSettingsApi::class)
     override suspend fun deleteSession() {
-        suspendSettings.remove("session")
+        suspendSettings.remove(SETTINGS_KEY)
+    }
+
+    companion object {
+
+        const val SETTINGS_KEY = "session"
+
     }
 
 }

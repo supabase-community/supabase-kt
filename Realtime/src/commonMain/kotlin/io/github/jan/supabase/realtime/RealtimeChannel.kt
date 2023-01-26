@@ -28,8 +28,7 @@ import kotlinx.serialization.json.put
 /**
  * Represents a realtime channel
  */
-sealed interface
-RealtimeChannel {
+sealed interface RealtimeChannel {
 
     val status: StateFlow<Status>
     val topic: String
