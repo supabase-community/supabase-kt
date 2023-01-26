@@ -238,9 +238,12 @@ class GoTrueTest {
 
                 sessionManager = SettingsSessionManager(MapSettings())
 
+                platformSettings()
                 additionalGoTrueSettings()
             }
         }
     }
 
 }
+
+expect fun GoTrueConfig.platformSettings()
