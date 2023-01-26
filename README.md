@@ -5,7 +5,7 @@ Supported targets:
 - JVM
 - Android
 - JS (Browser)
-- _IOS/Mac (planned)_
+- _IOS/Mac (blocked, as I don't have access to github actions)_
 
 Newest stable version: ![stable](https://img.shields.io/github/release/supabase-community/supabase-kt?label=stable)
 
