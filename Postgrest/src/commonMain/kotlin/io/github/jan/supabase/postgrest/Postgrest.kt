@@ -28,9 +28,17 @@ sealed interface Postgrest : MainPlugin<Postgrest.Config> {
 
     fun from(table: String): PostgrestBuilder
 
+    fun from(schema: String, table: String): PostgrestBuilder
+
+    operator fun get(schema: String, table: String): PostgrestBuilder = from(schema, table)
+
     operator fun get(table: String): PostgrestBuilder = from(table)
 
-    data class Config(override var customUrl: String? = null, override var jwtToken: String? = null): MainConfig
+    /**
+     * Config for the Postgrest plugin
+     * @param defaultSchema The default schema to use for the requests. Defaults to "public"
+     */
+    data class Config(override var customUrl: String? = null, override var jwtToken: String? = null, var defaultSchema: String = "public"): MainConfig
 
     companion object : SupabasePluginProvider<Config, Postgrest> {
 
@@ -58,6 +66,10 @@ internal class PostgrestImpl(override val supabaseClient: SupabaseClient, overri
 
     override fun from(table: String): PostgrestBuilder {
         return PostgrestBuilder(this, table)
+    }
+
+    override fun from(schema: String, table: String): PostgrestBuilder {
+        return PostgrestBuilder(this, table, schema)
     }
 
     override suspend fun parseErrorResponse(response: HttpResponse): RestException {

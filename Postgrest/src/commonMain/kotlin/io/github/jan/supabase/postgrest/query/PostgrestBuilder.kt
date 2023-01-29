@@ -12,7 +12,7 @@ import kotlinx.serialization.json.jsonArray
 /**
  * The main class to build a postgrest request
  */
-class PostgrestBuilder(val postgrest: Postgrest, val table: String) {
+class PostgrestBuilder(val postgrest: Postgrest, val table: String, val schema: String = postgrest.config.defaultSchema) {
 
     /**
      * Executes vertical filtering with select on [table]
@@ -33,7 +33,7 @@ class PostgrestBuilder(val postgrest: Postgrest, val table: String) {
         count: Count? = null,
         single: Boolean = false,
         filter: PostgrestFilterBuilder.() -> Unit = {}
-    ): PostgrestResult = PostgrestRequest.Select(head, count, single, buildPostgrestFilter { filter(); _params["select"] = columns }).execute(table, postgrest)
+    ): PostgrestResult = PostgrestRequest.Select(head, count, single, buildPostgrestFilter { filter(); _params["select"] = columns }, schema).execute(table, postgrest)
 
     /**
      * Executes an insert operation on the [table]
@@ -56,7 +56,7 @@ class PostgrestBuilder(val postgrest: Postgrest, val table: String) {
     ): PostgrestResult = PostgrestRequest.Insert(supabaseJson.encodeToJsonElement(values).jsonArray, upsert, onConflict, returning, count, buildPostgrestFilter {
         filter()
         if (upsert && onConflict != null) _params["on_conflict"] = onConflict
-    }).execute(table, postgrest)
+    }, schema).execute(table, postgrest)
 
     /**
      * Executes an insert operation on the [table]
@@ -92,7 +92,7 @@ class PostgrestBuilder(val postgrest: Postgrest, val table: String) {
         returning: Returning = Returning.REPRESENTATION,
         count: Count? = null,
         filter: PostgrestFilterBuilder.() -> Unit = {}
-    ): PostgrestResult = PostgrestRequest.Update(returning, count, buildPostgrestFilter(filter), buildPostgrestUpdate(update)).execute(table, postgrest)
+    ): PostgrestResult = PostgrestRequest.Update(returning, count, buildPostgrestFilter(filter), buildPostgrestUpdate(update), schema).execute(table, postgrest)
 
     /**
      * Executes a delete operation on the [table].
@@ -106,7 +106,7 @@ class PostgrestBuilder(val postgrest: Postgrest, val table: String) {
         returning: Returning = Returning.REPRESENTATION,
         count: Count? = null,
         filter: PostgrestFilterBuilder.() -> Unit = {}
-    ): PostgrestResult = PostgrestRequest.Delete(returning, count, buildPostgrestFilter(filter)).execute(table, postgrest)
+    ): PostgrestResult = PostgrestRequest.Delete(returning, count, buildPostgrestFilter(filter), schema).execute(table, postgrest)
 
     companion object {
         const val HEADER_PREFER = "Prefer"
