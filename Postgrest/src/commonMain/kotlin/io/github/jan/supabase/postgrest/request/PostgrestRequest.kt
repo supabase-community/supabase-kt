@@ -8,6 +8,7 @@ import io.github.jan.supabase.postgrest.query.PostgrestBuilder
 import io.github.jan.supabase.postgrest.query.PostgrestResult
 import io.github.jan.supabase.postgrest.query.Returning
 import io.ktor.client.call.body
+import io.ktor.client.request.header
 import io.ktor.client.request.setBody
 import io.ktor.client.statement.HttpResponse
 import io.ktor.http.ContentType
@@ -26,6 +27,7 @@ sealed interface PostgrestRequest {
     val prefer: List<String>
     val single: Boolean get() = false
     val urlParams: Map<String, String> get() = mapOf()
+    val schema: String
 
     suspend fun execute(path: String, postgrest: Postgrest): PostgrestResult {
         postgrest as PostgrestImpl
@@ -43,6 +45,14 @@ sealed interface PostgrestRequest {
             this@PostgrestRequest.body?.let { setBody(it) }
             url.parameters.appendAll(parametersOf(urlParams.mapValues { (_, value) -> listOf(value) }))
             url.parameters.appendAll(parametersOf(filter.mapValues { (_, value) -> listOf(value) }))
+
+            if(schema.isNotBlank()) {
+                if(method in listOf(HttpMethod.Get, HttpMethod.Head)) {
+                    header("Accept-Profile", schema)
+                } else {
+                    header("Content-Profile", schema)
+                }
+            }
         }.asPostgrestResult()
     }
 
@@ -55,6 +65,8 @@ sealed interface PostgrestRequest {
         override val body: JsonElement? = null,
         ): PostgrestRequest {
 
+        override val schema: String = ""
+
         override val method = if(head) HttpMethod.Head else HttpMethod.Post
         override val prefer = if (count != null) listOf("count=${count.identifier}") else listOf()
 
@@ -64,7 +76,8 @@ sealed interface PostgrestRequest {
         head: Boolean = false,
         count: Count? = null,
         override val single: Boolean = false,
-        override val filter: Map<String, String>
+        override val filter: Map<String, String>,
+        override val schema: String
     ): PostgrestRequest {
 
         override val method = if(head) HttpMethod.Head else HttpMethod.Get
@@ -79,6 +92,7 @@ sealed interface PostgrestRequest {
         private val returning: Returning = Returning.REPRESENTATION,
         private val count: Count? = null,
         override val filter: Map<String, String>,
+        override val schema: String
     ): PostgrestRequest {
 
         override val method = HttpMethod.Post
@@ -95,7 +109,8 @@ sealed interface PostgrestRequest {
         private val returning: Returning = Returning.REPRESENTATION,
         private val count: Count? = null,
         override val filter: Map<String, String>,
-        override val body: JsonElement
+        override val body: JsonElement,
+        override val schema: String
     ) : PostgrestRequest {
 
         override val method = HttpMethod.Patch
@@ -109,7 +124,8 @@ sealed interface PostgrestRequest {
     class Delete(
         private val returning: Returning = Returning.REPRESENTATION,
         private val count: Count? = null,
-        override val filter: Map<String, String>
+        override val filter: Map<String, String>,
+        override val schema: String
     ): PostgrestRequest {
 
         override val method = HttpMethod.Delete
