@@ -112,7 +112,7 @@ kotlin {
             }
         }
     }
-    //ios()
+    ios()
     sourceSets {
         all {
             languageSettings.optIn("kotlin.RequiresOptIn")
