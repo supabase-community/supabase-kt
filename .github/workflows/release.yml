@@ -12,39 +12,43 @@ env:
    OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
    OSSRH_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
    SONATYPE_REPOSITORY_ID: ${{ secrets.SONATYPE_REPOSITORY_ID }}
-   SONATYPE_PROFILE_ID: ${{ github.event.inputs.repository_id }}
+   SONATYPE_PROFILE_ID: ${{ inputs.repository_id }}
 
 jobs:
-  publish:
-    runs-on: macos-latest
-    steps:
-      - run: echo "Will start a Maven Central upload"
-
-      - uses: actions/checkout@v2
-
-      - name: Set up Maven Central Repository
-        uses: actions/setup-java@v1
-        with:
-          java-version: 11
-      - name: Grant execute permission for gradlew
-        run: chmod +x gradlew
-      - name: Publish package
-        run: ./gradlew publishAllPublicationsToOssRepository
-
-  closeAndRelease:
-    needs: [publish]
+  jobTest:
     runs-on: ubuntu-latest
     steps:
-      - run: echo "Closing and releasing package"
-
-      - uses: actions/checkout@v2
-
-      - name: Set up Maven Central Repository
-        uses: actions/setup-java@v1
-        with:
-          java-version: 11
-      - name: Grant execute permission for gradlew
-        run: chmod +x gradlew
-      - name: Publish package
-        run: ./gradlew closeAndRelease
+      - run: echo ${{ inputs.repository_id }}
+#  publish:
+#    runs-on: macos-latest
+#    steps:
+#      - run: echo "Will start a Maven Central upload"
+#
+#      - uses: actions/checkout@v2
+#
+#      - name: Set up Maven Central Repository
+#        uses: actions/setup-java@v1
+#        with:
+#          java-version: 11
+#      - name: Grant execute permission for gradlew
+#        run: chmod +x gradlew
+#      - name: Publish package
+#        run: ./gradlew publishAllPublicationsToOssRepository
+#
+#  closeAndRelease:
+#    needs: [publish]
+#    runs-on: ubuntu-latest
+#    steps:
+#      - run: echo "Closing and releasing package"
+#
+#      - uses: actions/checkout@v2
+#
+#      - name: Set up Maven Central Repository
+#        uses: actions/setup-java@v1
+#        with:
+#          java-version: 11
+#      - name: Grant execute permission for gradlew
+#        run: chmod +x gradlew
+#      - name: Publish package
+#        run: ./gradlew closeAndRelease
 
