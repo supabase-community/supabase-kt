@@ -23,6 +23,20 @@ import kotlinx.serialization.json.encodeToJsonElement
 
 /**
  * Plugin to interact with the supabase Postgrest API
+ *
+ * To use it you need to install it to the [SupabaseClient]:
+ * ```kotlin
+ * val client = createSupabaseClient(supabaseUrl, supabaseKey) {
+ *    install(Postgrest)
+ * }
+ * ```
+ *
+ * then you can use it like this:
+ * ```kotlin
+ * val product = client.postgrest["products"].select {
+ *    Product::id eq 2
+ * }.decodeSingle<Product>()
+ * ```
  */
 sealed interface Postgrest : MainPlugin<Postgrest.Config> {
 

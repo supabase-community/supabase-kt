@@ -60,6 +60,17 @@ sealed interface GoTrue : MainPlugin<GoTrueConfig> {
 
     /**
      * Signs up a new user with the specified [provider]
+     *
+     * Example:
+     * ```kotlin
+     * val result = gotrue.signUpWith(Email) {
+     *    email = "example@email.com"
+     *    password = "password"
+     * }
+     * or
+     * gotrue.signUpWith(Google) // Opens the browser to login with google
+     * ```
+     *
      * @param provider the provider to use for signing up. E.g. [Email], [Phone] or [Google]
      * @param redirectUrl The redirect url to use. If you don't specify this, the platform specific will be use, like deeplinks on android.
      * @param config The configuration to use for the sign-up.
@@ -75,6 +86,17 @@ sealed interface GoTrue : MainPlugin<GoTrueConfig> {
 
     /**
      * Logins the user with the specified [provider]
+     *
+     * Example:
+     * ```kotlin
+     * val result = gotrue.loginWith(Email) {
+     *    email = "example@email.com"
+     *    password = "password"
+     * }
+     * or
+     * gotrue.loginWith(Google) // Opens the browser to login with google
+     * ```
+     *
      * @param provider the provider to use for signing up. E.g. [Email], [Phone] or [Google]
      * @param redirectUrl The redirect url to use. If you don't specify this, the platform specific will be use, like deeplinks on android.
      * @param config The configuration to use for the sign-up.
@@ -105,6 +127,15 @@ sealed interface GoTrue : MainPlugin<GoTrueConfig> {
 
     /**
      * Sends a one time password to the specified [provider]
+     *
+     * Example:
+     * ```kotlin
+     * gotrue.sendOtpTo(Email) {
+     *    email = "example@email.com"
+     *    password = "password"
+     * }
+     * ```
+     *
      * @param provider The provider to use. Either [Email] or [Phone]
      * @param createUser Whether to create a user when a user with the given credentials doesn't exist
      * @param redirectUrl The redirect url to use. If you don't specify this, the platform specific will be use, like deeplinks on android.
