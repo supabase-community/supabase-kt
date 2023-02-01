@@ -5,11 +5,13 @@ Supported targets:
 - JVM
 - Android
 - JS (Browser)
-- _IOS/Mac (blocked, as I don't have access to github actions)_
+- _IOS ([PR open](https://github.com/supabase-community/supabase-kt/pull/53), help appreciated)_
 
 Newest stable version: ![stable](https://img.shields.io/github/release/supabase-community/supabase-kt?label=stable)
 
 Newest experimental version: ![experimental](https://img.shields.io/maven-central/v/io.github.jan-tennert.supabase/supabase-kt?label=experimental)
+
+Dokka documentation: [stable](https://supabase-community.github.io/supabase-kt/)
 
 # Installation
 
@@ -30,9 +32,9 @@ implementation(platform("io.github.jan-tennert.supabase:bom:VERSION"))
 implementation("io.github.jan-tennert.supabase:[module e.g. functions-kt or gotrue-kt]")
 ```
 
-In Multiplatform projects:
+In Multiplatform projects (as of Kotlin 1.8.0):
 ```kotlin
-implementation(project.dependencies.platform("io.github.jan-tennert.supabase:bom:VERSION"))
+implementation(platform("io.github.jan-tennert.supabase:bom:VERSION"))
 implementation("io.github.jan-tennert.supabase:[module e.g. functions-kt or gotrue-kt]")
 ```
 
