@@ -1,3 +1,5 @@
+import java.net.URL
+
 buildscript {
     dependencies {
         classpath("org.jetbrains.kotlinx:atomicfu-gradle-plugin:${Versions.ATOMICFU}")
@@ -106,6 +108,24 @@ configure(allprojects.filter { it.name in modules }) {
             dependsOn(deleteDokkaOutputDir, tasks.dokkaHtml)
             archiveClassifier.set("javadoc")
             from(dokkaOutputDir)
+        }
+
+        tasks.withType<org.jetbrains.dokka.gradle.DokkaTaskPartial>().configureEach {
+            dokkaSourceSets.configureEach {
+                sourceLink {
+                    val name = when(moduleName.get()) {
+                        "functions-kt" -> "Functions"
+                        "gotrue-kt" -> "GoTrue"
+                        "postgrest-kt" -> "Postgrest"
+                        "realtime-kt" -> "Realtime"
+                        "storage-kt" -> "Storage"
+                        else -> ""
+                    }
+                    localDirectory.set(projectDir.resolve("src"))
+                    remoteUrl.set(URL("https://github.com/supabase-community/supabase-kt/tree/master/$name/src"))
+                    remoteLineSuffix.set("#L")
+                }
+            }
         }
 
         publications {
