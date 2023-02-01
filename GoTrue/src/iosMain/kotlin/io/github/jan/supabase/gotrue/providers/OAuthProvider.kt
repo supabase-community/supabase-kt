@@ -32,7 +32,7 @@ actual abstract class OAuthProvider : AuthProvider<ExternalAuthConfig, Unit> {
     private fun openOAuth(redirectUrl: String? = null, supabaseClient: SupabaseClient) {
         val gotrue = supabaseClient.gotrue
         val deepLink = "${gotrue.config.scheme}://${gotrue.config.host}"
-        val url = NSURL(supabaseClient.gotrue.resolveUrl("authorize?provider=$name&redirect_to=${redirectUrl ?: deepLink}"))
+        val url = NSURL(string = supabaseClient.gotrue.resolveUrl("authorize?provider=$name&redirect_to=${redirectUrl ?: deepLink}"))
         UIApplication.sharedApplication.openURL(url, emptyMap<Any?, Any>()) {
             if(it) Napier.d { "Successfully opened provider url in safari" } else Napier.e { "Failed to open provider url in safari" }
         }
