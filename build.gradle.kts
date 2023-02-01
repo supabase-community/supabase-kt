@@ -29,7 +29,7 @@ allprojects {
     }
 }
 
-subprojects {
+configure(allprojects.filter { it.name in modules || it.name == "bom" }) {
     apply(plugin = "signing")
     apply(plugin = "maven-publish")
     apply(plugin = "org.jetbrains.dokka")
