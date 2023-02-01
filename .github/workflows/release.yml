@@ -15,40 +15,36 @@ env:
    SONATYPE_PROFILE_ID: ${{ inputs.repository_id }}
 
 jobs:
-  jobTest:
+  publish:
+    runs-on: macos-latest
+    steps:
+      - run: echo "Will start a Maven Central upload"
+
+      - uses: actions/checkout@v2
+
+      - name: Set up Maven Central Repository
+        uses: actions/setup-java@v1
+        with:
+          java-version: 11
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+      - name: Publish package
+        run: ./gradlew publishAllPublicationsToOssRepository
+
+  closeAndRelease:
+    needs: [publish]
     runs-on: ubuntu-latest
     steps:
-      - run: echo ${{ inputs.repository_id }}
-#  publish:
-#    runs-on: macos-latest
-#    steps:
-#      - run: echo "Will start a Maven Central upload"
-#
-#      - uses: actions/checkout@v2
-#
-#      - name: Set up Maven Central Repository
-#        uses: actions/setup-java@v1
-#        with:
-#          java-version: 11
-#      - name: Grant execute permission for gradlew
-#        run: chmod +x gradlew
-#      - name: Publish package
-#        run: ./gradlew publishAllPublicationsToOssRepository
-#
-#  closeAndRelease:
-#    needs: [publish]
-#    runs-on: ubuntu-latest
-#    steps:
-#      - run: echo "Closing and releasing package"
-#
-#      - uses: actions/checkout@v2
-#
-#      - name: Set up Maven Central Repository
-#        uses: actions/setup-java@v1
-#        with:
-#          java-version: 11
-#      - name: Grant execute permission for gradlew
-#        run: chmod +x gradlew
-#      - name: Publish package
-#        run: ./gradlew closeAndRelease
+      - run: echo "Closing and releasing package"
+
+      - uses: actions/checkout@v2
+
+      - name: Set up Maven Central Repository
+        uses: actions/setup-java@v1
+        with:
+          java-version: 11
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+      - name: Publish package
+        run: ./gradlew closeAndRelease
 
