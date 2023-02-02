@@ -11,7 +11,7 @@ Newest stable version: ![stable](https://img.shields.io/github/release/supabase-
 
 Newest experimental version: ![experimental](https://img.shields.io/maven-central/v/io.github.jan-tennert.supabase/supabase-kt?label=experimental)
 
-Dokka documentation for the latest version: [stable](https://jan-tennert.github.io/supabase-kt/))
+Dokka documentation for the latest version: [stable](https://jan-tennert.github.io/supabase-kt/)
 
 # Installation
 
