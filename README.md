@@ -32,9 +32,9 @@ implementation(platform("io.github.jan-tennert.supabase:bom:VERSION"))
 implementation("io.github.jan-tennert.supabase:[module e.g. functions-kt or gotrue-kt]")
 ```
 
-In Multiplatform projects (as of Kotlin 1.8.0):
+In Multiplatform projects (before Kotlin 1.8.0):
 ```kotlin
-implementation(platform("io.github.jan-tennert.supabase:bom:VERSION"))
+implementation(project.dependencies.platform("io.github.jan-tennert.supabase:bom:VERSION"))
 implementation("io.github.jan-tennert.supabase:[module e.g. functions-kt or gotrue-kt]")
 ```
 
