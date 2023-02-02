@@ -11,8 +11,6 @@ Newest stable version: ![stable](https://img.shields.io/github/release/supabase-
 
 Newest experimental version: ![experimental](https://img.shields.io/maven-central/v/io.github.jan-tennert.supabase/supabase-kt?label=experimental)
 
-Dokka documentation: [stable](https://supabase-community.github.io/supabase-kt/)
-
 # Installation
 
 ```kotlin
