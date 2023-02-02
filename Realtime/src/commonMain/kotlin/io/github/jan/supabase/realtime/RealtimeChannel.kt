@@ -28,8 +28,7 @@ import kotlinx.serialization.json.put
 /**
  * Represents a realtime channel
  */
-sealed interface
-RealtimeChannel {
+sealed interface RealtimeChannel {
 
     val status: StateFlow<Status>
     val topic: String
@@ -227,6 +226,16 @@ internal class RealtimeChannelImpl(
 
 /**
  * Listen for clients joining / leaving the channel using presences
+ *
+ * Example:
+ * ```kotlin
+ * val presenceChangeFlow = channel.presenceChangeFlow()
+ *
+ * presenceChangeFlow.collect {
+ *    val joins = it.decodeJoinsAs<User>()
+ *    val leaves = it.decodeLeavesAs<User>()
+ * }
+ * ```
  */
 @OptIn(SupabaseInternal::class)
 fun RealtimeChannel.presenceChangeFlow(): Flow<PresenceAction> {
@@ -242,6 +251,14 @@ fun RealtimeChannel.presenceChangeFlow(): Flow<PresenceAction> {
 
 /**
  * You can listen for postgres changes in a channel.
+ *
+ * Example:
+ * ```kotlin
+ * val productChangeFlow = channel.postgrestChangeFlow<PostgresAction.Update>("public") {
+ *    table = "products"
+ * }.map { it.decodeRecord<Product>() }
+ * ```
+ *
  * @param T The event type you want to listen to (e.g. [PostgresAction.Update] for updates or only [PostgresAction] for all)
  * @param schema The schema name of the table that is being monitored. For normal supabase tables that might be "public".
  */
@@ -273,6 +290,15 @@ inline fun <reified T : PostgresAction> RealtimeChannel.postgresChangeFlow(schem
 
 /**
  * Broadcasts can be messages sent by other clients within the same channel under a specific [event].
+ *
+ * Example:
+ * ```kotlin
+ * val messageFlow = channel.broadcastFlow<Message>("message")
+ * messageFlow.collect {
+ *    println("Received message: $it")
+ * }
+ * ```
+ *
  * @param event When a message is sent by another client, it will be sent under a specific event. This is the event that you want to listen to
  */
 @OptIn(SupabaseInternal::class)
@@ -299,6 +325,15 @@ suspend inline fun <reified T> RealtimeChannel.broadcast(event: String, message:
 /**
  * Store an object in your presence's state. Other clients can get this data when you either join or leave the channel.
  * Use this method again to update the state.
+ *
+ * Example:
+ * ```kotlin
+ * @Serializable
+ * data class PresenceData(val name: String)
+ *
+ * channel.track(PresenceData("Your Name"))
+ * ```
+ *
  * @param state the data to store (can only be something that can be encoded as a json object)
  */
 suspend inline fun <reified T> RealtimeChannel.track(state: T, json: Json = Json) = track(json.encodeToJsonElement(state).jsonObject)

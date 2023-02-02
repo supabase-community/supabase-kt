@@ -13,11 +13,15 @@ class AuthenticatedSupabaseApi(
     resolveUrl: (path: String) -> String,
     parseErrorResponse: (suspend (response: HttpResponse) -> RestException)? = null,
     supabaseClient: SupabaseClient,
+    private val jwtToken: String? = null // Can be configured plugin-wide. By default, all plugins use the token from the current session
 ): SupabaseApi(resolveUrl, parseErrorResponse, supabaseClient) {
 
     override suspend fun rawRequest(url: String, builder: HttpRequestBuilder.() -> Unit): HttpResponse = super.rawRequest(url) {
-        supabaseClient.pluginManager.getPluginOrNull(GoTrue)?.currentSessionOrNull()?.let {
-            bearerAuth(it.accessToken)
+        supabaseClient.pluginManager.getPluginOrNull(GoTrue)?.let { gotrue ->
+            val jwtToken = jwtToken ?: gotrue.currentAccessTokenOrNull()
+            jwtToken?.let { token ->
+                bearerAuth(token)
+            }
         }
         builder()
     }
@@ -34,10 +38,10 @@ fun SupabaseClient.authenticatedSupabaseApi(baseUrl: String, parseErrorResponse:
  * Creates a [AuthenticatedSupabaseApi] for the given [plugin]. Requires [GoTrue] to authenticate requests
  * All requests will be resolved using the [MainPlugin.resolveUrl] function
  */
-fun SupabaseClient.authenticatedSupabaseApi(plugin: MainPlugin<*>) = authenticatedSupabaseApi(plugin::resolveUrl, plugin::parseErrorResponse)
+fun SupabaseClient.authenticatedSupabaseApi(plugin: MainPlugin<*>) = authenticatedSupabaseApi(plugin::resolveUrl, plugin::parseErrorResponse, plugin.config.jwtToken)
 
 /**
  * Creates a [AuthenticatedSupabaseApi] with the given [resolveUrl] function. Requires [GoTrue] to authenticate requests
  * All requests will be resolved using this function
  */
-fun SupabaseClient.authenticatedSupabaseApi(resolveUrl: (path: String) -> String, parseErrorResponse: (suspend (response: HttpResponse) -> RestException)? = null) = AuthenticatedSupabaseApi(resolveUrl, parseErrorResponse, this)
+fun SupabaseClient.authenticatedSupabaseApi(resolveUrl: (path: String) -> String, parseErrorResponse: (suspend (response: HttpResponse) -> RestException)? = null, jwtToken: String? = null) = AuthenticatedSupabaseApi(resolveUrl, parseErrorResponse, this, jwtToken)
