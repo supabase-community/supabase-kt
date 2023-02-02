@@ -10,7 +10,6 @@ import kotlinx.serialization.Serializable
 data class RealtimeJoinPayload(
     val config: RealtimeJoinConfig
 )
-
 @Serializable
 data class RealtimeJoinConfig(
     val broadcast: BroadcastJoinConfig,

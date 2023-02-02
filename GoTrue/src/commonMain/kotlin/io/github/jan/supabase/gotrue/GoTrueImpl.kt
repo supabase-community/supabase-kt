@@ -43,11 +43,11 @@ package io.github.jan.supabase.gotrue
  import kotlin.time.Duration.Companion.seconds
 
 @PublishedApi
-internal class GoTrueImpl(override val supabaseClient: SupabaseClient, override val config: GoTrueConfig) : GoTrue {
+internal class GoTrueImpl(override val supabaseClient: SupabaseClient, override val config: GoTrue.Config) : GoTrue {
 
     private val _sessionStatus = MutableStateFlow<SessionStatus>(SessionStatus.NotAuthenticated)
     override val sessionStatus: StateFlow<SessionStatus> = _sessionStatus.asStateFlow()
-    internal val authScope = CoroutineScope(config.coroutineDispatcher)
+    private val authScope = CoroutineScope(config.coroutineDispatcher)
     override val sessionManager = config.sessionManager ?: SettingsSessionManager()
     internal val api = supabaseClient.authenticatedSupabaseApi(this)
     override val admin: AdminApi = AdminApiImpl(this)

@@ -12,9 +12,6 @@ class BucketListFilter {
     private var column: String? = null
     private var order: String? = null
 
-    /**
-     * Sorts the result by the given [column] in the given [order]
-     */
     fun sortBy(column: String, order: String) {
         this.column = column
         this.order = order

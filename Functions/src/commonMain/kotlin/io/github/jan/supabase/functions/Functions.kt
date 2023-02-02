@@ -24,21 +24,6 @@ import io.ktor.http.appendEncodedPathSegments
 
 /**
  * Plugin to interact with the supabase Edge Functions API
- *
- * To use it you need to install it to the [SupabaseClient]:
- * ```kotlin
- * val client = createSupabaseClient(supabaseUrl, supabaseKey) {
- *    install(Functions)
- * }
- * ```
- *
- * then you can use it like this:
- * ```kotlin
- * val response = client.functions("myFunction")
- * //or store it in a variable
- * val function = client.functions.buildEdgeFunction("myFunction")
- * val response = function()
- * ```
  */
 class Functions(override val config: Config, override val supabaseClient: SupabaseClient) : MainPlugin<Functions.Config> {
 
@@ -62,7 +47,13 @@ class Functions(override val config: Config, override val supabaseClient: Supaba
      * @throws HttpRequestException on network related issues
      */
     suspend inline operator fun invoke(function: String, crossinline builder: HttpRequestBuilder.() -> Unit): HttpResponse {
-        return api.post(function, builder)
+        return api.post(function) {
+            val token = config.jwtToken ?: supabaseClient.pluginManager.getPluginOrNull(GoTrue)?.currentAccessTokenOrNull()
+            token.let {
+                this.headers[HttpHeaders.Authorization] = "Bearer $it"
+            }
+            builder()
+        }
     }
 
     /**
@@ -120,7 +111,7 @@ class Functions(override val config: Config, override val supabaseClient: Supaba
 
     data class Config(
         override var customUrl: String? = null,
-        override var jwtToken: String? = null,
+        override var jwtToken: String? = null
     ) : MainConfig
 
     companion object : SupabasePluginProvider<Config, Functions> {

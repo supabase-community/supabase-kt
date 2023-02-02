@@ -1,3 +1,5 @@
 package io.github.jan.supabase.gotrue.providers
 
-expect class ExternalAuthConfig
+data class ExternalAuthConfig(
+    val params: MutableMap<String, Any> = mutableMapOf()
+)

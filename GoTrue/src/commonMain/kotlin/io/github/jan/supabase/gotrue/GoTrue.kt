@@ -19,6 +19,7 @@ import io.github.jan.supabase.plugins.MainPlugin
 import io.github.jan.supabase.plugins.SupabasePluginProvider
 import io.ktor.client.plugins.HttpRequestTimeoutException
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
@@ -30,7 +31,7 @@ import kotlin.time.Duration.Companion.seconds
 /**
  * Plugin to interact with the supabase Auth API
  */
-sealed interface GoTrue : MainPlugin<GoTrueConfig> {
+sealed interface GoTrue : MainPlugin<GoTrue.Config> {
 
     /**
      * Returns the current session status
@@ -60,17 +61,6 @@ sealed interface GoTrue : MainPlugin<GoTrueConfig> {
 
     /**
      * Signs up a new user with the specified [provider]
-     *
-     * Example:
-     * ```kotlin
-     * val result = gotrue.signUpWith(Email) {
-     *    email = "example@email.com"
-     *    password = "password"
-     * }
-     * or
-     * gotrue.signUpWith(Google) // Opens the browser to login with google
-     * ```
-     *
      * @param provider the provider to use for signing up. E.g. [Email], [Phone] or [Google]
      * @param redirectUrl The redirect url to use. If you don't specify this, the platform specific will be use, like deeplinks on android.
      * @param config The configuration to use for the sign-up.
@@ -86,17 +76,6 @@ sealed interface GoTrue : MainPlugin<GoTrueConfig> {
 
     /**
      * Logins the user with the specified [provider]
-     *
-     * Example:
-     * ```kotlin
-     * val result = gotrue.loginWith(Email) {
-     *    email = "example@email.com"
-     *    password = "password"
-     * }
-     * or
-     * gotrue.loginWith(Google) // Opens the browser to login with google
-     * ```
-     *
      * @param provider the provider to use for signing up. E.g. [Email], [Phone] or [Google]
      * @param redirectUrl The redirect url to use. If you don't specify this, the platform specific will be use, like deeplinks on android.
      * @param config The configuration to use for the sign-up.
@@ -127,15 +106,6 @@ sealed interface GoTrue : MainPlugin<GoTrueConfig> {
 
     /**
      * Sends a one time password to the specified [provider]
-     *
-     * Example:
-     * ```kotlin
-     * gotrue.sendOtpTo(Email) {
-     *    email = "example@email.com"
-     *    password = "password"
-     * }
-     * ```
-     *
      * @param provider The provider to use. Either [Email] or [Phone]
      * @param createUser Whether to create a user when a user with the given credentials doesn't exist
      * @param redirectUrl The redirect url to use. If you don't specify this, the platform specific will be use, like deeplinks on android.
@@ -283,18 +253,28 @@ sealed interface GoTrue : MainPlugin<GoTrueConfig> {
         else -> null
     }
 
-    companion object : SupabasePluginProvider<GoTrueConfig, GoTrue> {
+    data class Config(
+        val params: MutableMap<String, Any> = mutableMapOf(),
+        var retryDelay: Duration = 10.seconds,
+        var alwaysAutoRefresh: Boolean = true,
+        var autoLoadFromStorage: Boolean = true,
+        override var customUrl: String? = null,
+        override var jwtToken: String? = null,
+        var sessionManager: SessionManager? = null,
+        var coroutineDispatcher: CoroutineDispatcher = Dispatchers.Default
+    ) : MainConfig
+
+    companion object : SupabasePluginProvider<Config, GoTrue> {
 
         override val key = "auth"
         const val API_VERSION = 1
 
-        override fun createConfig(init: GoTrueConfig.() -> Unit) = GoTrueConfig().apply(init)
-        override fun create(supabaseClient: SupabaseClient, config: GoTrueConfig): GoTrue = GoTrueImpl(supabaseClient, config)
+        override fun createConfig(init: Config.() -> Unit) = Config().apply(init)
+        override fun create(supabaseClient: SupabaseClient, config: Config): GoTrue = GoTrueImpl(supabaseClient, config)
 
     }
 
 }
-
 
 /**
  * Modifies a user with the specified [provider]. Extra data can be supplied

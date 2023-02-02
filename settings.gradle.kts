@@ -16,6 +16,9 @@ pluginManagement {
 
 include("GoTrue")
 include("Postgrest")
+include(":desktopDemo")
+include(":androidDemo")
+include(":webDemo")
 include("Storage")
 include("Realtime")
 include("Functions")

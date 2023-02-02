@@ -12,7 +12,7 @@ import kotlinx.serialization.json.jsonArray
 /**
  * The main class to build a postgrest request
  */
-class PostgrestBuilder(val postgrest: Postgrest, val table: String, val schema: String = postgrest.config.defaultSchema) {
+class PostgrestBuilder(val postgrest: Postgrest, val table: String) {
 
     /**
      * Executes vertical filtering with select on [table]
@@ -33,7 +33,7 @@ class PostgrestBuilder(val postgrest: Postgrest, val table: String, val schema: 
         count: Count? = null,
         single: Boolean = false,
         filter: PostgrestFilterBuilder.() -> Unit = {}
-    ): PostgrestResult = PostgrestRequest.Select(head, count, single, buildPostgrestFilter { filter(); _params["select"] = columns }, schema).execute(table, postgrest)
+    ): PostgrestResult = PostgrestRequest.Select(head, count, single, buildPostgrestFilter { filter(); _params["select"] = columns }).execute(table, postgrest)
 
     /**
      * Executes an insert operation on the [table]
@@ -56,7 +56,7 @@ class PostgrestBuilder(val postgrest: Postgrest, val table: String, val schema: 
     ): PostgrestResult = PostgrestRequest.Insert(supabaseJson.encodeToJsonElement(values).jsonArray, upsert, onConflict, returning, count, buildPostgrestFilter {
         filter()
         if (upsert && onConflict != null) _params["on_conflict"] = onConflict
-    }, schema).execute(table, postgrest)
+    }).execute(table, postgrest)
 
     /**
      * Executes an insert operation on the [table]
@@ -92,7 +92,7 @@ class PostgrestBuilder(val postgrest: Postgrest, val table: String, val schema: 
         returning: Returning = Returning.REPRESENTATION,
         count: Count? = null,
         filter: PostgrestFilterBuilder.() -> Unit = {}
-    ): PostgrestResult = PostgrestRequest.Update(returning, count, buildPostgrestFilter(filter), buildPostgrestUpdate(update), schema).execute(table, postgrest)
+    ): PostgrestResult = PostgrestRequest.Update(returning, count, buildPostgrestFilter(filter), buildPostgrestUpdate(update)).execute(table, postgrest)
 
     /**
      * Executes a delete operation on the [table].
@@ -106,7 +106,7 @@ class PostgrestBuilder(val postgrest: Postgrest, val table: String, val schema: 
         returning: Returning = Returning.REPRESENTATION,
         count: Count? = null,
         filter: PostgrestFilterBuilder.() -> Unit = {}
-    ): PostgrestResult = PostgrestRequest.Delete(returning, count, buildPostgrestFilter(filter), schema).execute(table, postgrest)
+    ): PostgrestResult = PostgrestRequest.Delete(returning, count, buildPostgrestFilter(filter)).execute(table, postgrest)
 
     companion object {
         const val HEADER_PREFER = "Prefer"
@@ -114,20 +114,13 @@ class PostgrestBuilder(val postgrest: Postgrest, val table: String, val schema: 
 
 }
 
-/**
- * Used to obtain an estimated amount of rows in a table. See [Postgrest](https://postgrest.org/en/stable/api.html#exact-count) for information about the different count algorithms
- */
 enum class Count(val identifier: String) {
     EXACT("exact"),
     PLANNED("planned"),
     ESTIMATED("estimated")
 }
 
-/**
- * Can be used to specify whether you want e.g. the inserted row to be returned on creation with all its new fields
- */
 enum class Returning(val identifier: String) {
     MINIMAL("minimal"),
-    REPRESENTATION("representation"),
-    HEADERS_ONLY("headers-only")
+    REPRESENTATION("representation")
 }

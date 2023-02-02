@@ -18,22 +18,6 @@ import io.ktor.client.statement.HttpResponse
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
 
-/**
- * Plugin for interacting with the supabase storage api
- *
- * To use it you need to install it to the [SupabaseClient]:
- * ```kotlin
- * val client = createSupabaseClient(supabaseUrl, supabaseKey) {
- *    install(Storage)
- * }
- * ```
- *
- * then you have to interact with the storage api:
- * ```kotlin
- * val bucket = client.storage["icons"]
- * val bytes = bucket.downloadAuthenticated("icon.png")
- * ```
- */
 sealed interface Storage : MainPlugin<Storage.Config> {
 
     /**

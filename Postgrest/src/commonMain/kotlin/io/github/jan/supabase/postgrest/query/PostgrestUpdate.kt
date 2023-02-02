@@ -16,94 +16,52 @@ class PostgrestUpdate {
     @PublishedApi
     internal val map = mutableMapOf<String, JsonElement>()
 
-    /**
-     * Sets the value of the column with the name of the [KProperty1] to [value]
-     */
     inline infix fun <T, reified V> KProperty1<T, V>.setTo(value: V) {
         map[getColumnName(this)] = supabaseJson.encodeToJsonElement(value)
     }
 
-    /**
-     * Sets the value of the column with the name of the [KProperty1] to [value]
-     */
     @Suppress("NOTHING_TO_INLINE")
     inline infix fun <T> KProperty1<T, String>.setTo(value: String) = set(getColumnName(this), value)
 
-    /**
-     * Sets the value of the column with the name of the [KProperty1] to [value]
-     */
     @Suppress("NOTHING_TO_INLINE")
     inline infix fun <T> KProperty1<T, Int>.setTo(value: Int) = set(getColumnName(this), value)
 
-    /**
-     * Sets the value of the column with the name of the [KProperty1] to [value]
-     */
     @Suppress("NOTHING_TO_INLINE")
     inline infix fun <T> KProperty1<T, Long>.setTo(value: Long) = set(getColumnName(this), value)
 
-    /**
-     * Sets the value of the column with the name of the [KProperty1] to [value]
-     */
     @Suppress("NOTHING_TO_INLINE")
     inline infix fun <T> KProperty1<T, Float>.setTo(value: Float) = set(getColumnName(this), value)
 
-    /**
-     * Sets the value of the column with the name of the [KProperty1] to [value]
-     */
     @Suppress("NOTHING_TO_INLINE")
     inline infix fun <T> KProperty1<T, Double>.setTo(value: Double) = set(getColumnName(this), value)
 
-    /**
-     * Sets the value of the column with the name of the [KProperty1] to [value]
-     */
     @Suppress("NOTHING_TO_INLINE")
     inline infix fun <T> KProperty1<T, Boolean>.setTo(value: Boolean) = set(getColumnName(this), value)
 
-    /**
-     * Sets the value of the [column] to [value]
-     */
     operator fun set(column: String, value: String) {
         map[column] = JsonPrimitive(value)
     }
 
-    /**
-     * Sets the value of the [column] to [value]
-     */
     operator fun set(column: String, value: Int) {
         map[column] = JsonPrimitive(value)
     }
 
-    /**
-     * Sets the value of the [column] to [value]
-     */
     operator fun set(column: String, value: Long) {
         map[column] = JsonPrimitive(value)
     }
 
-    /**
-     * Sets the value of the [column] to [value]
-     */
     operator fun set(column: String, value: Float) {
         map[column] = JsonPrimitive(value)
     }
 
-    /**
-     * Sets the value of the [column] to [value]
-     */
     operator fun set(column: String, value: Double) {
         map[column] = JsonPrimitive(value)
     }
 
-    /**
-     * Sets the value of the [column] to [value]
-     */
     operator fun set(column: String, value: Boolean) {
         map[column] = JsonPrimitive(value)
     }
 
-    /**
-     * Sets the value of the [column] to [value]
-     */
     operator fun set(column: String, value: JsonElement) {
         map[column] = value
     }

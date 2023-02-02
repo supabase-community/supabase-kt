@@ -12,6 +12,24 @@ internal fun GoTrue.openOAuth(provider: String, redirectTo: String) {
     applicationContext().startActivity(browserIntent)
 }
 
+var GoTrue.Config.scheme: String
+    get() = (params["scheme"] as? String) ?: "supabase"
+    set(value) {
+        params["scheme"] = value
+    }
+
+var GoTrue.Config.host: String
+    get() = (params["host"] as? String) ?: "login"
+    set(value) {
+        params["host"] = value
+    }
+
+var GoTrue.Config.enableLifecycleCallbacks: Boolean
+    get() = (params["enableLifecycleCallbacks"] as? Boolean) ?: true
+    set(value) {
+        params["enableLifecycleCallbacks"] = value
+    }
+
 //TODO: Add context receiver 'Activity'
 fun SupabaseClient.handleDeeplinks(intent: Intent, onSessionSuccess: (UserSession) -> Unit = {}) {
     val authPlugin = pluginManager.getPlugin(GoTrue)

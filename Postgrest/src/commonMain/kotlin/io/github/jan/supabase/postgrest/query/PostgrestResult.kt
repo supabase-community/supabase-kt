@@ -1,15 +1,16 @@
 package io.github.jan.supabase.postgrest.query
 
-import io.ktor.http.Headers
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.decodeFromJsonElement
+import kotlin.jvm.JvmInline
 
 /**
  * Represents the result from a postgrest request
  * @param body The body of the response
  */
-data class PostgrestResult(val body: JsonElement, val headers: Headers) {
+@JvmInline
+value class PostgrestResult(val body: JsonElement) {
 
     /**
      * Decodes [body] as [T] using [json]
