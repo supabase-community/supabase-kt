@@ -114,13 +114,20 @@ class PostgrestBuilder(val postgrest: Postgrest, val table: String, val schema: 
 
 }
 
+/**
+ * Used to obtain an estimated amount of rows in a table. See [Postgrest](https://postgrest.org/en/stable/api.html#exact-count) for information about the different count algorithms
+ */
 enum class Count(val identifier: String) {
     EXACT("exact"),
     PLANNED("planned"),
     ESTIMATED("estimated")
 }
 
+/**
+ * Can be used to specify whether you want e.g. the inserted row to be returned on creation with all its new fields
+ */
 enum class Returning(val identifier: String) {
     MINIMAL("minimal"),
-    REPRESENTATION("representation")
+    REPRESENTATION("representation"),
+    HEADERS_ONLY("headers-only")
 }

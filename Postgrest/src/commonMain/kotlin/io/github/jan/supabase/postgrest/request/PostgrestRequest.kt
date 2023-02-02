@@ -56,7 +56,7 @@ sealed interface PostgrestRequest {
         }.asPostgrestResult()
     }
 
-    private suspend fun HttpResponse.asPostgrestResult(): PostgrestResult = PostgrestResult(body())
+    private suspend fun HttpResponse.asPostgrestResult(): PostgrestResult = PostgrestResult(body(), headers)
 
     class RPC(
         head: Boolean = false,
