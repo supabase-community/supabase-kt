@@ -8,7 +8,7 @@ description = "A Kotlin Multiplatform Supabase Framework"
 
 val bomProject = project
 
-val excludedModules = listOf("")
+val excludedModules = listOf("demo")
 
 fun shouldIncludeInBom(candidateProject: Project) =
     excludedModules.all { !candidateProject.name.contains(it) } &&
