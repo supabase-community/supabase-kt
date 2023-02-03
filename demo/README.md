@@ -6,8 +6,7 @@ This is a demo of a chat app using Compose Multiplatform, Koin and supabase-kt.
 
 **Modules used:** Realtime, GoTrue and Postgrest 
 
-
-https://user-images.githubusercontent.com/26686035/216403906-b190423d-1df3-497c-8091-66df85558fa5.mp4
+https://user-images.githubusercontent.com/26686035/216710629-d809ff58-cd3b-449f-877f-4c6c773daec4.mp4
 
 
 # Configuration
