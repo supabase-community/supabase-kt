@@ -15,5 +15,6 @@ object Versions {
     const val STATELY = "1.2.2"
     const val ATOMICFU = "0.19.0"
     const val SETTINGS = "1.0.0"
+    const val APOLLO_GRAPHQL = "3.7.3"
 
 }

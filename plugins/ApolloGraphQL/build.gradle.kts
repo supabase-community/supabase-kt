@@ -47,7 +47,7 @@ kotlin {
             dependencies {
                 api(project(":"))
                 api(project(":gotrue-kt"))
-                api("com.apollographql.apollo3:apollo-runtime:3.7.3")
+                api("com.apollographql.apollo3:apollo-runtime:${Versions.APOLLO_GRAPHQL}")
                 // https://mvnrepository.com/artifact/io.ktor/ktor-server-core
             }
         }
