@@ -17,5 +17,6 @@
 /Realtime/src/jvmMain/kotlin/Test.kt
 /Functions/src/jvmMain/kotlin/Test.kt
 /Auth/src/jvmMain/kotlin/Test.kt
+/plugins/ApolloGraphQL/build
 .idea
 local.properties
