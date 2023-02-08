@@ -15,7 +15,7 @@ To run the app, you need to create a supabase project and create a table called 
 
 ![image](https://user-images.githubusercontent.com/26686035/216403760-067b563f-621c-435e-887b-0ef2086854a1.png)
 
-Then you need to specify your supabase url and key in [supabaseModule.kt](https://github.com/supabase-community/supabase-kt/blob/master/demo/common/src/commonMain/kotlin/io/github/jan/supabase/common/di/supabaseModule.kt)
+Then you need to specify your supabase url and key in [supabaseModule.kt](https://github.com/supabase-community/supabase-kt/blob/master/demos/chat-demo-mpp/common/src/commonMain/kotlin/io/github/jan/supabase/common/di/supabaseModule.kt)
 
 # Running
 
