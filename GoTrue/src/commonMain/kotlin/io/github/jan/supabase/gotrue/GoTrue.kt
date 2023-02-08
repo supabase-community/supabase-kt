@@ -14,21 +14,32 @@ import io.github.jan.supabase.gotrue.providers.builtin.Email
 import io.github.jan.supabase.gotrue.providers.builtin.Phone
 import io.github.jan.supabase.gotrue.user.UserInfo
 import io.github.jan.supabase.gotrue.user.UserSession
-import io.github.jan.supabase.plugins.MainConfig
 import io.github.jan.supabase.plugins.MainPlugin
 import io.github.jan.supabase.plugins.SupabasePluginProvider
 import io.ktor.client.plugins.HttpRequestTimeoutException
-import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.encodeToJsonElement
 import kotlinx.serialization.json.jsonObject
-import kotlin.time.Duration
-import kotlin.time.Duration.Companion.seconds
 
 /**
  * Plugin to interact with the supabase Auth API
+ *
+ * To use it you need to install it to the [SupabaseClient]:
+ * ```kotlin
+ * val client = createSupabaseClient(supabaseUrl, supabaseKey) {
+ *    install(GoTrue)
+ * }
+ * ```
+ *
+ * then you can use it like this:
+ * ```kotlin
+ * val result = client.gotrue.signUpWith(Email) {
+ *   email = "example@email.com"
+ *   password = "password"
+ * }
+ * ```
  */
 sealed interface GoTrue : MainPlugin<GoTrueConfig> {
 
