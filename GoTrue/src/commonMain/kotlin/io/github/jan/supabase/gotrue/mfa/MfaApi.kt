@@ -181,7 +181,7 @@ internal class MfaApiImpl(
 
 
     override suspend fun retrieveFactorsForCurrentUser(): List<UserMfaFactor> {
-        return gotrue.getUser(gotrue.currentAccessTokenOrNull() ?: throw IllegalStateException("Current session is null")).factors
+        return gotrue.retrieveUser(gotrue.currentAccessTokenOrNull() ?: throw IllegalStateException("Current session is null")).factors
     }
 
 }

@@ -142,7 +142,7 @@ class GoTrueTest {
         val client = createSupabaseClient()
         runTest(dispatcher) {
             assertFailsWith<UnauthorizedRestException>("Requesting user with invalid token should fail") {
-                client.gotrue.getUser("invalid_token")
+                client.gotrue.retrieveUser("invalid_token")
             }
             client.close()
         }
@@ -153,7 +153,7 @@ class GoTrueTest {
     fun test_requesting_user_with_valid_token() {
         val client = createSupabaseClient()
         runTest(dispatcher) {
-            val user = client.gotrue.getUser(GoTrueMock.VALID_ACCESS_TOKEN)
+            val user = client.gotrue.retrieveUser(GoTrueMock.VALID_ACCESS_TOKEN)
             assertEquals("userid", user.id)
             client.close()
         }

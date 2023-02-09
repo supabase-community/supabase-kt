@@ -7,7 +7,6 @@ import io.github.jan.supabase.gotrue.GoTrueImpl
 import io.github.jan.supabase.gotrue.gotrue
 import io.github.jan.supabase.gotrue.user.UserSession
 import io.javalin.Javalin
-import io.javalin.http.ContentType
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -65,7 +64,7 @@ actual abstract class OAuthProvider : AuthProvider<ExternalAuthConfig, Unit> {
             val tokenType = ctx.queryParam("token_type") ?: return@get
             val type = ctx.queryParam("type") ?: ""
             (gotrue as GoTrueImpl).authScope.launch {
-                val user = gotrue.getUser(accessToken)
+                val user = gotrue.retrieveUser(accessToken)
                 onSuccess(UserSession(accessToken, refreshToken, expiresIn, tokenType, user, type))
             }
             Napier.d {

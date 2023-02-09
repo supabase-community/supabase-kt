@@ -20,7 +20,7 @@ package io.github.jan.supabase.gotrue
  import io.github.jan.supabase.supabaseJson
  import io.github.jan.supabase.toJsonObject
  import io.ktor.client.call.body
- import io.ktor.client.request.headers
+ import io.ktor.client.request.bearerAuth
  import io.ktor.client.statement.HttpResponse
  import io.ktor.client.statement.bodyAsText
  import io.ktor.http.HttpStatusCode
@@ -188,14 +188,21 @@ internal class GoTrueImpl(override val supabaseClient: SupabaseClient, override 
         put("phone", phoneNumber)
     }
 
-    override suspend fun getUser(jwt: String): UserInfo {
+    override suspend fun retrieveUser(jwt: String): UserInfo {
         val response = api.get("user") {
-            headers {
-                set("Authorization", "Bearer $jwt")
-            }
+            bearerAuth(jwt)
         }
         val body = response.bodyAsText()
         return supabaseJson.decodeFromString(body)
+    }
+
+    override suspend fun retrieveUserForCurrentSession(updateSession: Boolean): UserInfo {
+        val user = retrieveUser(currentAccessTokenOrNull() ?: throw IllegalStateException("No session found"))
+        if(updateSession) {
+            val session = currentSessionOrNull() ?: throw IllegalStateException("No session found")
+            _sessionStatus.value = SessionStatus.Authenticated(session.copy(user = user))
+        }
+        return user
     }
 
     override suspend fun invalidateSession() {
@@ -223,7 +230,7 @@ internal class GoTrueImpl(override val supabaseClient: SupabaseClient, override 
 
     override suspend fun updateCurrentUser() {
         val session = currentSessionOrNull() ?: throw IllegalStateException("No session found")
-        val user = getUser(session.accessToken)
+        val user = retrieveUser(session.accessToken)
         _sessionStatus.value = SessionStatus.Authenticated(session.copy(user = user))
         sessionManager.saveSession(session)
     }

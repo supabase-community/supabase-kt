@@ -26,7 +26,7 @@ internal fun SupabaseClient.parseFragment(fragment: String, onSessionSuccess: (U
         "Received session deeplink"
     }
     scope.launch {
-        val user = authPlugin.getUser(accessToken)
+        val user = authPlugin.retrieveUser(accessToken)
         val session = UserSession(accessToken, refreshToken, expiresIn, tokenType, user, type)
         onSessionSuccess(session)
         authPlugin.startAutoRefresh(session)

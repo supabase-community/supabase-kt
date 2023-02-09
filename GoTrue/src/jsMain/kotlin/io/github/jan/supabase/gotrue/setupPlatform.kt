@@ -3,7 +3,6 @@ package io.github.jan.supabase.gotrue
 import io.github.jan.supabase.gotrue.user.UserSession
 import kotlinx.browser.window
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 actual fun GoTrue.setupPlatform() {
@@ -23,7 +22,7 @@ actual fun GoTrue.setupPlatform() {
         val scope = CoroutineScope(config.coroutineDispatcher)
         if(accessToken != null && refreshToken != null && expiresIn != null && tokenType != null) {
             scope.launch {
-                val user = getUser(accessToken)
+                val user = retrieveUser(accessToken)
                 startAutoRefresh(UserSession(accessToken, refreshToken, expiresIn, tokenType, user, type ?: ""))
             }
         }

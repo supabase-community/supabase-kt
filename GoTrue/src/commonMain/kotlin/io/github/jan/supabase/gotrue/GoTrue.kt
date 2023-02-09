@@ -210,12 +210,21 @@ sealed interface GoTrue : MainPlugin<GoTrueConfig> {
     suspend fun verifyPhoneOtp(type: OtpType.Phone, phoneNumber: String, token: String, captchaToken: String? = null)
 
     /**
-     * Retrieves the current user with the session
+     * Retrieves the user attached to the specified [jwt]
      * @throws RestException or one of its subclasses if receiving an error response
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
-    suspend fun getUser(jwt: String): UserInfo
+    suspend fun retrieveUser(jwt: String): UserInfo
+
+    /**
+     * Retrieves the current user with the current session
+     * @param updateSession Whether to update [sessionStatus] with the updated user, if [sessionStatus] is [SessionStatus.Authenticated]
+     * @throws RestException or one of its subclasses if receiving an error response
+     * @throws HttpRequestTimeoutException if the request timed out
+     * @throws HttpRequestException on network related issues
+     */
+    suspend fun retrieveUserForCurrentSession(updateSession: Boolean = false): UserInfo
 
     /**
      * Invalidates the current session, which means [sessionStatus] will be [SessionStatus.NotAuthenticated]
@@ -327,7 +336,7 @@ val SupabaseClient.gotrue: GoTrue
     get() = pluginManager.getPlugin(GoTrue)
 
 private suspend fun GoTrue.tryToGetUser(jwt: String) = try {
-    getUser(jwt)
+    retrieveUser(jwt)
 } catch (e: Exception) {
     Napier.e(e) { "Couldn't retrieve user using your custom jwt token. If you use the project secret ignore this message" }
     null
