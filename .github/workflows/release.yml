@@ -5,6 +5,10 @@ on:
       repository_id:
         required: true
         type: string
+      close_and_release:
+        required: false
+        default: true
+        type: boolean
 
 env:
    GPG_SIGNING_KEY: ${{ secrets.GPG_SIGNING_KEY }}
@@ -31,4 +35,5 @@ jobs:
       - name: Publish
         run: ./gradlew publishAllPublicationsToOssRepository
       - name: Close and release
+        if: inputs.close_and_release
         run: ./gradlew closeAndRelease
