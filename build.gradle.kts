@@ -17,7 +17,7 @@ plugins {
  //   id("org.jetbrains.compose") version Versions.COMPOSE
 }
 
-val modules = listOf("supabase-kt", "gotrue-kt", "postgrest-kt", "storage-kt", "realtime-kt", "functions-kt")
+val modules = listOf("supabase-kt", "gotrue-kt", "postgrest-kt", "storage-kt", "realtime-kt", "functions-kt", "apollo-graphql")
 
 allprojects {
     repositories {
