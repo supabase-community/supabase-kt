@@ -40,7 +40,7 @@ implementation("io.github.jan-tennert.supabase:[module e.g. functions-kt or gotr
 
 # [Getting started](https://github.com/supabase-community/supabase-kt/wiki/Getting-Started)
 
-# Modules
+# Main Modules
 
 #### [Authentication (GoTrue)](/GoTrue)
 
@@ -51,6 +51,10 @@ implementation("io.github.jan-tennert.supabase:[module e.g. functions-kt or gotr
 #### [Realtime](/Realtime)
 
 #### [Functions (Edge Functions)](/Functions)
+
+### Plugins
+
+#### [Apollo GraphQL integration](/plugins/ApolloGraphQL)
 
 # Credits
 
