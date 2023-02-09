@@ -5,6 +5,8 @@ import com.apollographql.apollo3.api.http.HttpRequest
 import com.apollographql.apollo3.network.http.HttpInterceptor
 import com.apollographql.apollo3.network.http.HttpInterceptorChain
 import io.github.jan.supabase.SupabaseClient
+import io.github.jan.supabase.SupabaseClientBuilder
+import io.github.jan.supabase.annotiations.SupabaseExperimental
 import io.github.jan.supabase.exceptions.RestException
 import io.github.jan.supabase.gotrue.GoTrue
 import io.github.jan.supabase.plugins.MainConfig
@@ -38,6 +40,7 @@ sealed interface GraphQL: MainPlugin<GraphQL.Config> {
 
     }
 
+    @SupabaseExperimental
     companion object: SupabasePluginProvider<Config, GraphQL> {
 
         override val key: String = "graphql"
@@ -51,11 +54,16 @@ sealed interface GraphQL: MainPlugin<GraphQL.Config> {
             return Config()
         }
 
+        override fun setup(builder: SupabaseClientBuilder, config: Config) {
+            builder.install(GraphQL)
+        }
+
 
     }
 
 }
 
+@OptIn(SupabaseExperimental::class)
 internal class GraphQLImpl(override val config: GraphQL.Config, override val supabaseClient: SupabaseClient) : GraphQL {
 
     override val API_VERSION: Int = GraphQL.API_VERSION
@@ -90,5 +98,6 @@ internal class GraphQLImpl(override val config: GraphQL.Config, override val sup
 
 }
 
+@SupabaseExperimental
 val SupabaseClient.graphql: GraphQL
     get() = pluginManager.getPlugin(GraphQL)

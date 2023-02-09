@@ -29,4 +29,12 @@ val client = createSupabaseClient(supabaseUrl, supabaseKey) {
 
 # Usage
 
-_TODO_
+The plugin automatically creates an Apollo Client with the corresponding headers for Authorization depending on your session.
+
+To access the client, you can use the `apolloClient` property of the `GraphQL` plugin instance.
+
+```kotlin
+client.graphql.apolloClient.query(YourQuery()).execute().data //execute a query
+```
+
+To learn about how to use Apollo GraphQL, see [Apollo Kotlin](https://github.com/apollographql/apollo-kotlin#getting-started).
