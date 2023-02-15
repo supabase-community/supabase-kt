@@ -6,7 +6,7 @@ object Versions {
     const val COROUTINES = "1.6.4"
     const val DOKKA = "1.7.20"
     const val NEXUS_STAGING = "0.30.0"
-    const val SUPABASEKT = "0.8.0-beta-2"
+    const val SUPABASEKT = "0.8.0"
     const val ANDROID_COMPAT = "1.5.1"
     const val COMPOSE = "1.3.0"
     const val COMPOSE_COMPILER = "1.3.2.1"
