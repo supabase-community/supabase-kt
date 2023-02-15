@@ -16,7 +16,7 @@ import io.ktor.client.statement.HttpResponse
 import io.ktor.http.HttpHeaders
 
 /**
- * Adds an apollo graphql client to supabase-kt with all necessary automatically managed.
+ * Adds an apollo graphql client to supabase-kt with all necessary headers automatically managed.
  *
  *
  * This plugin uses the default GraphQL endpoint for supabase projects and adds the `apikey` and `Authorization` headers automatically
