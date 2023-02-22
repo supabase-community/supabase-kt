@@ -4,6 +4,7 @@ import io.github.jan.supabase.gotrue.GoTrueImpl
 import io.github.jan.supabase.gotrue.SessionStatus
 import io.github.jan.supabase.gotrue.user.UserMfaFactor
 import io.github.jan.supabase.gotrue.user.UserSession
+import io.github.jan.supabase.safeBody
 import io.ktor.client.call.body
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -146,7 +147,7 @@ internal class MfaApiImpl(
 
     override suspend fun createChallenge(factorId: String): MfaChallenge {
         val result = api.post("factors/$factorId/challenge")
-        return result.body()
+        return result.safeBody()
     }
 
     override suspend fun verifyChallenge(

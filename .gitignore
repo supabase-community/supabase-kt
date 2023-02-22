@@ -20,3 +20,4 @@
 /plugins/ApolloGraphQL/build
 .idea
 local.properties
+/test/

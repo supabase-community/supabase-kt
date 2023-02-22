@@ -12,7 +12,7 @@ import io.github.jan.supabase.gotrue.authenticatedSupabaseApi
 import io.github.jan.supabase.plugins.MainConfig
 import io.github.jan.supabase.plugins.MainPlugin
 import io.github.jan.supabase.plugins.SupabasePluginProvider
-import io.ktor.client.call.body
+import io.github.jan.supabase.safeBody
 import io.ktor.client.plugins.HttpRequestTimeoutException
 import io.ktor.client.statement.HttpResponse
 import kotlinx.serialization.json.buildJsonObject
@@ -117,9 +117,9 @@ internal class StorageImpl(override val supabaseClient: SupabaseClient, override
 
     internal val api = supabaseClient.authenticatedSupabaseApi(this)
 
-    override suspend fun getAllBuckets(): List<Bucket> = api.get("bucket").body()
+    override suspend fun getAllBuckets(): List<Bucket> = api.get("bucket").safeBody()
 
-    override suspend fun getBucket(id: String): Bucket? = api.get("bucket/$id").body()
+    override suspend fun getBucket(id: String): Bucket? = api.get("bucket/$id").safeBody()
 
     override suspend fun deleteBucket(id: String) {
         api.delete("bucket/$id")

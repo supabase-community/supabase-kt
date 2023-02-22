@@ -17,6 +17,7 @@ package io.github.jan.supabase.gotrue
  import io.github.jan.supabase.gotrue.user.UserInfo
  import io.github.jan.supabase.gotrue.user.UserSession
  import io.github.jan.supabase.putJsonObject
+ import io.github.jan.supabase.safeBody
  import io.github.jan.supabase.supabaseJson
  import io.github.jan.supabase.toJsonObject
  import io.ktor.client.call.body
@@ -116,7 +117,7 @@ internal class GoTrueImpl(override val supabaseClient: SupabaseClient, override 
             }
         }.toString()
         val response = api.putJson("user", body)
-        return response.body()
+        return response.safeBody()
     }
 
     override suspend fun <C, R, Provider : DefaultAuthProvider<C, R>> sendOtpTo(
@@ -220,7 +221,7 @@ internal class GoTrueImpl(override val supabaseClient: SupabaseClient, override 
             put("refresh_token", refreshToken)
         }
         val response = api.postJson("token?grant_type=refresh_token", body)
-        return response.body()
+        return response.safeBody("GoTrue#refreshSession")
     }
 
     override suspend fun refreshCurrentSession() {

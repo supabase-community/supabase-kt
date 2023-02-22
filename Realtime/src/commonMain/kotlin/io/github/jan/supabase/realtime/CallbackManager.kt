@@ -1,5 +1,6 @@
 package io.github.jan.supabase.realtime
 
+import kotlinx.atomicfu.atomic
 import kotlinx.serialization.json.JsonObject
 
 sealed interface CallbackManager {
@@ -22,9 +23,9 @@ sealed interface CallbackManager {
 
 internal class CallbackManagerImpl : CallbackManager {
 
-    private var nextId = 0L
+    private var nextId by atomic(0L)
     var serverChanges = listOf<PostgresJoinConfig>()
-    val callbacks = mutableListOf<RealtimeCallback<*>>()
+    private val callbacks = mutableListOf<RealtimeCallback<*>>()
 
     override fun addBroadcastCallback(event: String, callback: (JsonObject) -> Unit): Long {
         val id = nextId++

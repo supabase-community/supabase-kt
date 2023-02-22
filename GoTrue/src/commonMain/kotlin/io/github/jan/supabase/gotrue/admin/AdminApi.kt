@@ -5,6 +5,7 @@ import io.github.jan.supabase.gotrue.GoTrueImpl
 import io.github.jan.supabase.gotrue.user.UserInfo
 import io.github.jan.supabase.gotrue.user.UserMfaFactor
 import io.github.jan.supabase.putJsonObject
+import io.github.jan.supabase.safeBody
 import io.github.jan.supabase.supabaseJson
 import io.ktor.client.call.body
 import kotlinx.serialization.json.Json
@@ -86,12 +87,12 @@ internal class AdminApiImpl(val gotrue: GoTrue) : AdminApi {
 
     override suspend fun createUserWithEmail(builder: UserBuilder.Email.() -> Unit): UserInfo {
         val userBuilder = UserBuilder.Email().apply(builder) as UserBuilder
-        return api.postJson("admin/users", userBuilder).body()
+        return api.postJson("admin/users", userBuilder).safeBody()
     }
 
     override suspend fun createUserWithPhone(builder: UserBuilder.Phone.() -> Unit): UserInfo {
         val userBuilder = UserBuilder.Phone().apply(builder) as UserBuilder
-        return api.postJson("admin/users", userBuilder).body()
+        return api.postJson("admin/users", userBuilder).safeBody()
     }
 
     override suspend fun retrieveUsers(): List<UserInfo> {
@@ -99,7 +100,7 @@ internal class AdminApiImpl(val gotrue: GoTrue) : AdminApi {
     }
 
     override suspend fun retrieveUserById(uid: String): UserInfo {
-        return api.get("admin/users/$uid").body()
+        return api.get("admin/users/$uid").safeBody()
     }
 
     override suspend fun deleteUser(uid: String) {
@@ -116,7 +117,7 @@ internal class AdminApiImpl(val gotrue: GoTrue) : AdminApi {
 
     override suspend fun updateUserById(uid: String, builder: UserUpdateBuilder.() -> Unit): UserInfo {
         val updateBuilder = UserUpdateBuilder().apply(builder)
-        return api.putJson("admin/users/$uid", updateBuilder).body()
+        return api.putJson("admin/users/$uid", updateBuilder).safeBody()
     }
 
     override suspend fun deleteFactor(uid: String, factorId: String) {
@@ -124,7 +125,7 @@ internal class AdminApiImpl(val gotrue: GoTrue) : AdminApi {
     }
 
     override suspend fun retrieveFactors(uid: String): List<UserMfaFactor> {
-        return api.get("admin/users/$uid/factors").body()
+        return api.get("admin/users/$uid/factors").safeBody()
     }
 
 }

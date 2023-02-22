@@ -5,9 +5,9 @@ import io.github.jan.supabase.exceptions.HttpRequestException
 import io.github.jan.supabase.exceptions.RestException
 import io.github.jan.supabase.gotrue.GoTrue
 import io.github.jan.supabase.putJsonObject
+import io.github.jan.supabase.safeBody
 import io.ktor.client.call.body
 import io.ktor.client.plugins.HttpRequestTimeoutException
-import io.ktor.client.request.bearerAuth
 import io.ktor.client.request.header
 import io.ktor.client.request.setBody
 import io.ktor.http.ContentType
@@ -265,7 +265,7 @@ internal class BucketApiImpl(override val bucketId: String, val storage: Storage
         return storage.api.postJson("object/list/$bucketId", buildJsonObject {
             put("prefix", prefix)
             putJsonObject(BucketListFilter().apply(filter).build())
-        }).body()
+        }).safeBody()
     }
 
     private suspend fun uploadOrUpdate(method: HttpMethod, bucket: String, path: String, body: ByteArray): String {
