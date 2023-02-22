@@ -17,9 +17,9 @@ kotlin {
      *  To find out how to configure the targets, please follow the link:
      *  https://kotlinlang.org/docs/reference/building-mpp-with-gradle.html#setting-up-targets */
 
-    jvm() {
+    jvm {
+        jvmToolchain(11)
         compilations.all {
-            kotlinOptions.jvmTarget = "11"
             kotlinOptions.freeCompilerArgs = listOf(
                 "-Xjvm-default=all",  // use default methods in interfaces,
                 "-Xlambdas=indy"      // use invokedynamic lambdas instead of synthetic classes
@@ -88,13 +88,12 @@ android {
     sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
     defaultConfig {
         minSdk = 21
-        targetSdk = 33
-    }
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
     }
     lint {
         abortOnError = false
+    }
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
     }
 }
