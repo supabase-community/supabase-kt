@@ -67,7 +67,7 @@ class GoTrueTest {
             val result = client.gotrue.signUpWith(Email) {
                 email = "email@example.com"
                 password = GoTrueMock.VALID_PASSWORD
-            }
+            } ?: error("Sign up with email should not return null")
             assertEquals("email@example.com", result.email)
             client.close()
         }
