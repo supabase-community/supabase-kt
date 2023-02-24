@@ -7,6 +7,7 @@ import io.github.jan.supabase.gotrue.gotrue
 import io.github.jan.supabase.gotrue.providers.AuthProvider
 import io.github.jan.supabase.gotrue.redirectTo
 import io.github.jan.supabase.gotrue.user.UserSession
+import io.github.jan.supabase.supabaseJson
 import io.ktor.client.call.body
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
@@ -17,6 +18,7 @@ import kotlinx.serialization.encoding.Encoder
 import kotlinx.serialization.json.JsonEncoder
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.decodeFromJsonElement
 import kotlinx.serialization.json.put
 import kotlinx.serialization.json.putJsonObject
 
@@ -84,7 +86,7 @@ sealed interface DefaultAuthProvider<C, R> : AuthProvider<C, R> {
         onSuccess: suspend (UserSession) -> Unit,
         redirectUrl: String?,
         config: (C.() -> Unit)?
-    ): R {
+    ): R? {
         if (config == null) throw IllegalArgumentException("Credentials are required")
         val finalRedirectUrl = supabaseClient.gotrue.generateRedirectUrl(redirectUrl)
         val body = encodeCredentials(config)
@@ -93,6 +95,11 @@ sealed interface DefaultAuthProvider<C, R> : AuthProvider<C, R> {
             finalRedirectUrl?.let { redirectTo(it) }
         }
         val json = response.body<JsonObject>()
+        if(json.containsKey("access_token")) {
+            val userSession = supabaseJson.decodeFromJsonElement<UserSession>(json)
+            onSuccess(userSession)
+            return null
+        }
         return decodeResult(json)
     }
 

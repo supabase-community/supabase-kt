@@ -17,6 +17,6 @@ interface AuthProvider<C, R> {
         onSuccess: suspend (UserSession) -> Unit,
         redirectUrl: String? = null,
         config: (C.() -> Unit)? = null
-    ): R
+    ): R?
 
 }

@@ -78,8 +78,8 @@ publishing {
                 url.set("https://github.com/supabase-community/supabase-kt")
                 licenses {
                     license {
-                        name.set("GPL-3.0")
-                        url.set("https://www.gnu.org/licenses/gpl-3.0.en.html")
+                        name.set("MIT License")
+                        url.set("https://mit-license.org/")
                     }
                 }
                 issueManagement {

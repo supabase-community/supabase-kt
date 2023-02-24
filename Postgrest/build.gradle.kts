@@ -17,7 +17,7 @@ kotlin {
     *  https://kotlinlang.org/docs/reference/building-mpp-with-gradle.html#setting-up-targets */
 
     jvm {
-        jvmToolchain(11)
+        jvmToolchain(8)
         compilations.all {
             kotlinOptions.freeCompilerArgs = listOf(
                 "-Xjvm-default=all",  // use default methods in interfaces,
@@ -62,7 +62,7 @@ android {
         minSdk = 21
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
     }
 }

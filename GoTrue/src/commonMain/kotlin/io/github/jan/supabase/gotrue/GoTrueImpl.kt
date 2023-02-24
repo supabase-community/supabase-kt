@@ -101,7 +101,7 @@ internal class GoTrueImpl(override val supabaseClient: SupabaseClient, override 
         provider: Provider,
         redirectUrl: String?,
         config: (C.() -> Unit)?
-    ): R = provider.signUp(supabaseClient, {
+    ): R? = provider.signUp(supabaseClient, {
         startAutoRefresh(it)
     }, redirectUrl, config)
 

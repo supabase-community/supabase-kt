@@ -1,16 +1,15 @@
 package io.github.jan.supabase.gotrue.providers.builtin
 
+import io.github.jan.supabase.exceptions.SupabaseEncodingException
 import io.github.jan.supabase.supabaseJson
 import kotlinx.datetime.Instant
-import kotlinx.serialization.Required
+import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.MissingFieldException
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.Transient
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.JsonObject
-import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.decodeFromJsonElement
-import kotlinx.serialization.json.put
 
 /**
  * Authentication method with phone numbers and password
@@ -27,8 +26,12 @@ object Phone : DefaultAuthProvider<Phone.Config, Phone.Result> {
         @SerialName("created_at") val createdAt: Instant,
         @SerialName("updated_at") val updatedAt: Instant,
     )
-
-    override fun decodeResult(json: JsonObject): Result = supabaseJson.decodeFromJsonElement(json)
+    @OptIn(ExperimentalSerializationApi::class)
+    override fun decodeResult(json: JsonObject): Result = try {
+        supabaseJson.decodeFromJsonElement(json)
+    } catch(e: MissingFieldException) {
+        throw SupabaseEncodingException("Couldn't decode sign up phone result. Input: $json")
+    }
 
     override fun encodeCredentials(credentials: Config.() -> Unit): String = supabaseJson.encodeToString(Config().apply(credentials))
 

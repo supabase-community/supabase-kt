@@ -50,6 +50,13 @@ nexusStaging {
 }
 
 configure(allprojects.filter { it.name in modules }) {
+
+    val dependsOnTasks = mutableListOf<String>()
+    tasks.withType<AbstractPublishToMaven>().configureEach {
+        dependsOnTasks.add(this.name.replace("publish", "sign").replaceAfter("Publication", ""))
+        dependsOn(dependsOnTasks)
+    }
+
     signing {
         val signingKey = providers
             .environmentVariable("GPG_SIGNING_KEY")
@@ -137,8 +144,8 @@ configure(allprojects.filter { it.name in modules }) {
                     url.set("https://github.com/supabase-community/supabase-kt")
                     licenses {
                         license {
-                            name.set("GPL-3.0")
-                            url.set("https://www.gnu.org/licenses/gpl-3.0.en.html")
+                            name.set("MIT License")
+                            url.set("https://mit-license.org/")
                         }
                     }
                     issueManagement {
@@ -166,7 +173,7 @@ version = Versions.SUPABASEKT
 
 kotlin {
     jvm {
-        jvmToolchain(11)
+        jvmToolchain(8)
         compilations.all {
             kotlinOptions.freeCompilerArgs = listOf(
                 "-Xjvm-default=all",  // use default methods in interfaces,
@@ -246,7 +253,7 @@ android {
         abortOnError = false
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
     }
 }
