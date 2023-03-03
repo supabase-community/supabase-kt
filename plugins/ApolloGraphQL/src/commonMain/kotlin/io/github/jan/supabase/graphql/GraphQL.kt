@@ -5,7 +5,6 @@ import com.apollographql.apollo3.api.http.HttpRequest
 import com.apollographql.apollo3.network.http.HttpInterceptor
 import com.apollographql.apollo3.network.http.HttpInterceptorChain
 import io.github.jan.supabase.SupabaseClient
-import io.github.jan.supabase.SupabaseClientBuilder
 import io.github.jan.supabase.annotiations.SupabaseExperimental
 import io.github.jan.supabase.exceptions.RestException
 import io.github.jan.supabase.gotrue.GoTrue
@@ -53,11 +52,6 @@ sealed interface GraphQL: MainPlugin<GraphQL.Config> {
         override fun createConfig(init: Config.() -> Unit): Config {
             return Config()
         }
-
-        override fun setup(builder: SupabaseClientBuilder, config: Config) {
-            builder.install(GraphQL)
-        }
-
 
     }
 
