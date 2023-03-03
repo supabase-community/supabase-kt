@@ -50,7 +50,7 @@ sealed interface GraphQL: MainPlugin<GraphQL.Config> {
         }
 
         override fun createConfig(init: Config.() -> Unit): Config {
-            return Config()
+            return Config().apply(init)
         }
 
     }
