@@ -63,7 +63,7 @@ internal class GraphQLImpl(override val config: GraphQL.Config, override val sup
     override val API_VERSION: Int = GraphQL.API_VERSION
     override val PLUGIN_KEY: String = GraphQL.key
     override val apolloClient = ApolloClient.Builder().apply {
-        serverUrl(config.customUrl ?: resolveUrl(""))
+        serverUrl(config.customUrl ?: resolveUrl())
         addHttpHeader("apikey", supabaseClient.supabaseKey)
         addHttpInterceptor(ApolloHttpInterceptor())
         apply(config.apolloConfiguration)

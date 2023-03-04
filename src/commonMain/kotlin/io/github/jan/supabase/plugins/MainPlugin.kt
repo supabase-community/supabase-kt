@@ -52,13 +52,15 @@ interface MainPlugin <Config : MainConfig> : SupabasePlugin {
     /**
      * Gets the auth url from either [config.customUrl] or [SupabaseClient.supabaseHttpUrl] and adds [path] to it
      */
-    fun resolveUrl(path: String): String {
+    fun resolveUrl(path: String = ""): String {
         val isBase = config.customUrl == null
         return buildUrl(config.customUrl ?: supabaseClient.supabaseHttpUrl) {
             if(isBase) {
                 appendEncodedPathSegments(PLUGIN_KEY, "v${API_VERSION}")
             }
-            appendEncodedPathSegments(path)
+            if(path.isNotBlank()) {
+                appendEncodedPathSegments(path)
+            }
         }
     }
 
