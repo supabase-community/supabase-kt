@@ -115,7 +115,12 @@ class PostgrestFilterBuilder {
     }
 
     private fun formatJoiningFilter(filter: PostgrestFilterBuilder.() -> Unit): String {
-        val formattedFilter = buildPostgrestFilter(filter).toList().joinToString(",") { it.second.joinToString(",") { filter -> it.first + "." + filter } }
+        val formattedFilter = buildPostgrestFilter(filter).toList().joinToString(",") {
+            it.second.joinToString(",") { filter ->
+                val isLogicalOperator = filter.startsWith("(") && filter.endsWith(")")
+                it.first + (if(isLogicalOperator) "" else ".") + filter
+            }
+        }
         return "($formattedFilter)"
     }
 
