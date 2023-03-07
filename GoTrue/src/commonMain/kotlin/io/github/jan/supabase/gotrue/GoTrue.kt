@@ -2,7 +2,6 @@ package io.github.jan.supabase.gotrue
 
 import io.github.aakira.napier.Napier
 import io.github.jan.supabase.SupabaseClient
-import io.github.jan.supabase.annotiations.SupabaseExperimental
 import io.github.jan.supabase.exceptions.HttpRequestException
 import io.github.jan.supabase.exceptions.RestException
 import io.github.jan.supabase.gotrue.admin.AdminApi
@@ -66,7 +65,6 @@ sealed interface GoTrue : MainPlugin<GoTrueConfig> {
     /**
      * Access to the mfa api where you can manage multi-factor authentication for the current user.
      */
-    @SupabaseExperimental
     val mfa: MfaApi
 
     /**

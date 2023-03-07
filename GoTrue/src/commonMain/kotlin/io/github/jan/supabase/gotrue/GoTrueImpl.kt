@@ -2,7 +2,6 @@ package io.github.jan.supabase.gotrue
 
  import io.github.aakira.napier.Napier
  import io.github.jan.supabase.SupabaseClient
- import io.github.jan.supabase.annotiations.SupabaseExperimental
  import io.github.jan.supabase.bodyOrNull
  import io.github.jan.supabase.exceptions.BadRequestRestException
  import io.github.jan.supabase.exceptions.RestException
@@ -52,7 +51,6 @@ internal class GoTrueImpl(override val supabaseClient: SupabaseClient, override 
     override val sessionManager = config.sessionManager ?: SettingsSessionManager()
     internal val api = supabaseClient.authenticatedSupabaseApi(this)
     override val admin: AdminApi = AdminApiImpl(this)
-    @SupabaseExperimental
     override val mfa: MfaApi = MfaApiImpl(this)
     var sessionJob: Job? = null
     override val isAutoRefreshRunning: Boolean
