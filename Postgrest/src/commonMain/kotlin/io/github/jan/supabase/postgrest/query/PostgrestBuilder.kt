@@ -33,7 +33,7 @@ class PostgrestBuilder(val postgrest: Postgrest, val table: String, val schema: 
         count: Count? = null,
         single: Boolean = false,
         filter: PostgrestFilterBuilder.() -> Unit = {}
-    ): PostgrestResult = PostgrestRequest.Select(head, count, single, buildPostgrestFilter { filter(); _params["select"] = columns }, schema).execute(table, postgrest)
+    ): PostgrestResult = PostgrestRequest.Select(head, count, single, buildPostgrestFilter { filter(); _params["select"] = listOf(columns) }, schema).execute(table, postgrest)
 
     /**
      * Executes an insert operation on the [table]
@@ -55,7 +55,7 @@ class PostgrestBuilder(val postgrest: Postgrest, val table: String, val schema: 
         filter: PostgrestFilterBuilder.() -> Unit = {}
     ): PostgrestResult = PostgrestRequest.Insert(supabaseJson.encodeToJsonElement(values).jsonArray, upsert, onConflict, returning, count, buildPostgrestFilter {
         filter()
-        if (upsert && onConflict != null) _params["on_conflict"] = onConflict
+        if (upsert && onConflict != null) _params["on_conflict"] = listOf(onConflict)
     }, schema).execute(table, postgrest)
 
     /**

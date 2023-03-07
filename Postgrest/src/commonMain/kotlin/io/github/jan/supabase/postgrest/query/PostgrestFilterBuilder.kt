@@ -1,5 +1,6 @@
 package io.github.jan.supabase.postgrest.query
 
+import io.github.jan.supabase.annotiations.SupabaseExperimental
 import io.github.jan.supabase.postgrest.getColumnName
 import kotlinx.serialization.SerialName
 import kotlin.reflect.KProperty1
@@ -10,18 +11,20 @@ import kotlin.reflect.KProperty1
 class PostgrestFilterBuilder {
 
     @PublishedApi
-    internal val _params = mutableMapOf<String, String>()
-    val params: Map<String, String>
+    internal val _params = mutableMapOf<String, List<String>>()
+    val params: Map<String, List<String>>
         get() = _params.toMap()
 
     fun filterNot(column: String, operator: FilterOperator, value: Any?) {
-        _params[column] = "not.${operator.identifier}.$value"
+        val columnValue = params[column] ?: emptyList()
+        _params[column] = columnValue + listOf("not.${operator.identifier}.$value")
     }
 
     fun filterNot(operation: FilterOperation) = filterNot(operation.column, operation.operator, operation.value)
 
     fun filter(column: String, operator: FilterOperator, value: Any?) {
-        _params[column] = "${operator.identifier}.$value"
+        val columnValue = params[column] ?: emptyList()
+        _params[column] = columnValue + listOf("${operator.identifier}.$value")
     }
 
     fun filter(operation: FilterOperation) = filter(operation.column, operation.operator, operation.value)
@@ -101,8 +104,19 @@ class PostgrestFilterBuilder {
      */
     fun adjacent(column: String, range: String) = filter(column, FilterOperator.ADJ, range)
 
-    fun or(filters: String) {
-        _params["or"] = "($filters)"
+    @SupabaseExperimental
+    fun or(filter: PostgrestFilterBuilder.() -> Unit) {
+        _params["or"] = listOf(formatJoiningFilter(filter))
+    }
+
+    @SupabaseExperimental
+    fun and(filter: PostgrestFilterBuilder.() -> Unit) {
+        _params["and"] = listOf(formatJoiningFilter(filter))
+    }
+
+    private fun formatJoiningFilter(filter: PostgrestFilterBuilder.() -> Unit): String {
+        val formattedFilter = buildPostgrestFilter(filter).toList().joinToString(",") { it.second.joinToString(",") { filter -> it.first + "." + filter } }
+        return "($formattedFilter)"
     }
 
     /**
@@ -110,7 +124,7 @@ class PostgrestFilterBuilder {
      */
     fun textSearch(column: String, query: String, textSearchType: TextSearchType, config: String? = null): PostgrestFilterBuilder {
         val configPart = if (config === null) "" else "(${config})"
-        _params[column] = "${textSearchType.identifier}${configPart}.${query}"
+        _params[column] = listOf("${textSearchType.identifier}${configPart}.${query}")
         return this
     }
 
@@ -121,7 +135,7 @@ class PostgrestFilterBuilder {
      */
     fun order(column: String, order: Order, nullsFirst: Boolean = false, foreignTable: String? = null) {
         val key = if (foreignTable == null) "order" else "\"$foreignTable\".order"
-        _params[key] = "${column}.${order.value}.${if (nullsFirst) "nullsfirst" else "nullslast"}"
+        _params[key] = listOf("${column}.${order.value}.${if (nullsFirst) "nullsfirst" else "nullslast"}")
     }
 
     /**
@@ -130,7 +144,7 @@ class PostgrestFilterBuilder {
      */
     fun limit(count: Long, foreignTable: String? = null) {
         val key = if (foreignTable == null) "limit" else "\"$foreignTable\".limit"
-        _params[key] = count.toString()
+        _params[key] = listOf(count.toString())
     }
 
     /**
@@ -141,8 +155,8 @@ class PostgrestFilterBuilder {
         val keyOffset = if (foreignTable == null) "offset" else "\"$foreignTable\".offset"
         val keyLimit = if (foreignTable == null) "limit" else "\"$foreignTable\".limit"
 
-        _params[keyOffset] = from.toString()
-        _params[keyLimit] = (to - from + 1).toString()
+        _params[keyOffset] = listOf(from.toString())
+        _params[keyLimit] = listOf((to - from + 1).toString())
     }
 
     /**
@@ -228,7 +242,7 @@ class PostgrestFilterBuilder {
 
 }
 
-inline fun buildPostgrestFilter(block: PostgrestFilterBuilder.() -> Unit): Map<String, String> {
+inline fun buildPostgrestFilter(block: PostgrestFilterBuilder.() -> Unit): Map<String, List<String>> {
     val filter = PostgrestFilterBuilder()
     filter.block()
     return filter.params
