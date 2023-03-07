@@ -23,7 +23,7 @@ sealed interface PostgrestRequest {
 
     val body: JsonElement? get() = null
     val method: HttpMethod
-    val filter: Map<String, String>
+    val filter: Map<String, List<String>>
     val prefer: List<String>
     val single: Boolean get() = false
     val urlParams: Map<String, String> get() = mapOf()
@@ -44,7 +44,7 @@ sealed interface PostgrestRequest {
             headers[PostgrestBuilder.HEADER_PREFER] = prefer.joinToString(",")
             this@PostgrestRequest.body?.let { setBody(it) }
             url.parameters.appendAll(parametersOf(urlParams.mapValues { (_, value) -> listOf(value) }))
-            url.parameters.appendAll(parametersOf(filter.mapValues { (_, value) -> listOf(value) }))
+            url.parameters.appendAll(parametersOf(filter.mapValues { (_, value) -> listOf(value.first()) }))
 
             if(schema.isNotBlank()) {
                 if(method in listOf(HttpMethod.Get, HttpMethod.Head)) {
@@ -61,7 +61,7 @@ sealed interface PostgrestRequest {
     class RPC(
         head: Boolean = false,
         count: Count? = null,
-        override val filter: Map<String, String>,
+        override val filter: Map<String, List<String>>,
         override val body: JsonElement? = null,
         ): PostgrestRequest {
 
@@ -76,7 +76,7 @@ sealed interface PostgrestRequest {
         head: Boolean = false,
         count: Count? = null,
         override val single: Boolean = false,
-        override val filter: Map<String, String>,
+        override val filter: Map<String, List<String>>,
         override val schema: String
     ): PostgrestRequest {
 
@@ -91,7 +91,7 @@ sealed interface PostgrestRequest {
         private val onConflict: String? = null,
         private val returning: Returning = Returning.REPRESENTATION,
         private val count: Count? = null,
-        override val filter: Map<String, String>,
+        override val filter: Map<String, List<String>>,
         override val schema: String
     ): PostgrestRequest {
 
@@ -108,7 +108,7 @@ sealed interface PostgrestRequest {
     class Update(
         private val returning: Returning = Returning.REPRESENTATION,
         private val count: Count? = null,
-        override val filter: Map<String, String>,
+        override val filter: Map<String, List<String>>,
         override val body: JsonElement,
         override val schema: String
     ) : PostgrestRequest {
@@ -124,7 +124,7 @@ sealed interface PostgrestRequest {
     class Delete(
         private val returning: Returning = Returning.REPRESENTATION,
         private val count: Count? = null,
-        override val filter: Map<String, String>,
+        override val filter: Map<String, List<String>>,
         override val schema: String
     ): PostgrestRequest {
 
