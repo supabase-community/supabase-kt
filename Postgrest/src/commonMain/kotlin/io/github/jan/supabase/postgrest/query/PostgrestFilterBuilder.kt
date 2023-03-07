@@ -105,13 +105,15 @@ class PostgrestFilterBuilder {
     fun adjacent(column: String, range: String) = filter(column, FilterOperator.ADJ, range)
 
     @SupabaseExperimental
-    fun or(filter: PostgrestFilterBuilder.() -> Unit) {
-        _params["or"] = listOf(formatJoiningFilter(filter))
+    fun or(negate: Boolean = false, filter: PostgrestFilterBuilder.() -> Unit) {
+        val prefix = if(negate) "not." else ""
+        _params[prefix + "or"] = listOf(formatJoiningFilter(filter))
     }
 
     @SupabaseExperimental
-    fun and(filter: PostgrestFilterBuilder.() -> Unit) {
-        _params["and"] = listOf(formatJoiningFilter(filter))
+    fun and(negate: Boolean = false, filter: PostgrestFilterBuilder.() -> Unit) {
+        val prefix = if(negate) "not." else ""
+        _params[prefix + "and"] = listOf(formatJoiningFilter(filter))
     }
 
     private fun formatJoiningFilter(filter: PostgrestFilterBuilder.() -> Unit): String {
