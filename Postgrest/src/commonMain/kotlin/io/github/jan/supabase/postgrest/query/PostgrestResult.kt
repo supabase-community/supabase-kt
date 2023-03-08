@@ -11,6 +11,21 @@ import kotlinx.serialization.json.decodeFromJsonElement
  */
 data class PostgrestResult(val body: JsonElement, val headers: Headers) {
 
+    private val contentRange = headers["Content-Range"]
+
+    /**
+     * Returns the total amount of items in the database (null if no [Count] option was used in the request)
+     */
+    fun count(): Long? = contentRange?.substringAfter("/")?.toLongOrNull()
+
+    /**
+     * Returns the range of items returned
+     */
+    fun range(): LongRange? = contentRange?.substringBefore("/")?.let {
+        val (start, end) = it.split("-")
+        LongRange(start.toLong(), end.toLong())
+    }
+
     /**
      * Decodes [body] as [T] using [json]
      */

@@ -1,6 +1,7 @@
 package io.github.jan.supabase.postgrest.query
 
 import io.github.jan.supabase.annotiations.SupabaseExperimental
+import io.github.jan.supabase.postgrest.formatJoiningFilter
 import io.github.jan.supabase.postgrest.getColumnName
 import kotlinx.serialization.SerialName
 import kotlin.reflect.KProperty1
@@ -105,25 +106,15 @@ class PostgrestFilterBuilder {
     fun adjacent(column: String, range: String) = filter(column, FilterOperator.ADJ, range)
 
     @SupabaseExperimental
-    fun or(negate: Boolean = false, filter: PostgrestFilterBuilder.() -> Unit) {
+    inline fun or(negate: Boolean = false, filter: PostgrestFilterBuilder.() -> Unit) {
         val prefix = if(negate) "not." else ""
         _params[prefix + "or"] = listOf(formatJoiningFilter(filter))
     }
 
     @SupabaseExperimental
-    fun and(negate: Boolean = false, filter: PostgrestFilterBuilder.() -> Unit) {
-        val prefix = if(negate) "not." else ""
+    inline fun and(negate: Boolean = false, filter: PostgrestFilterBuilder.() -> Unit) {
+        val prefix = if (negate) "not." else ""
         _params[prefix + "and"] = listOf(formatJoiningFilter(filter))
-    }
-
-    private fun formatJoiningFilter(filter: PostgrestFilterBuilder.() -> Unit): String {
-        val formattedFilter = buildPostgrestFilter(filter).toList().joinToString(",") {
-            it.second.joinToString(",") { filter ->
-                val isLogicalOperator = filter.startsWith("(") && filter.endsWith(")")
-                it.first + (if(isLogicalOperator) "" else ".") + filter
-            }
-        }
-        return "($formattedFilter)"
     }
 
     /**
