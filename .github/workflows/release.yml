@@ -2,9 +2,6 @@ name: release-to-maven-central
 on:
   workflow_dispatch:
     inputs:
-      repository_id:
-        required: true
-        type: string
       close_and_release:
         required: false
         default: true
@@ -31,7 +28,7 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
       - name: Publish
-        run: ./gradlew publishAllPublicationsToOssRepository
+        run: ./gradlew publishAllPublicationsToMavenCentral
       - name: Close and release
         if: inputs.close_and_release
-        run: ./gradlew closeAndRelease
+        run: ./gradlew closeAndReleaseRepository
