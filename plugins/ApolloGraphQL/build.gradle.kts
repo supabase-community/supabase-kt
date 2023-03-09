@@ -4,7 +4,7 @@ plugins {
 }
 
 group = "io.github.jan-tennert.supabase"
-version = Versions.SUPABASEKT
+version = Versions.PROJECT
 description = "Extends supabase-kt with a Apollo GraphQL Client"
 
 repositories {
@@ -32,9 +32,6 @@ kotlin {
         browser {
             testTask {
                 enabled = false
-                /**useKarma {
-                    useFirefox()
-                }*/
             }
         }
     }
@@ -47,8 +44,7 @@ kotlin {
             dependencies {
                 api(project(":"))
                 api(project(":gotrue-kt"))
-                api("com.apollographql.apollo3:apollo-runtime:${Versions.APOLLO_GRAPHQL}")
-                // https://mvnrepository.com/artifact/io.ktor/ktor-server-core
+                api(libs.apollo.kotlin)
             }
         }
         val commonTest by getting

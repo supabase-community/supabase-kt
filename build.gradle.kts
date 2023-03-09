@@ -2,19 +2,16 @@ import java.net.URL
 
 buildscript {
     dependencies {
-        classpath("org.jetbrains.kotlinx:atomicfu-gradle-plugin:${Versions.ATOMICFU}")
+        classpath(libs.kotlinx.atomicfu)
     }
 }
 
 plugins {
-    kotlin("multiplatform") version Versions.KOTLIN
-    id("com.android.library")
-    id("maven-publish")
-    signing
-    id("org.jetbrains.dokka") version Versions.DOKKA
-    id("io.codearte.nexus-staging") version Versions.NEXUS_STAGING
-    kotlin("plugin.serialization") version Versions.KOTLIN
- //   id("org.jetbrains.compose") version Versions.COMPOSE
+    alias(libs.plugins.kotlin.multiplatform)
+    alias(libs.plugins.android.library)
+    alias(libs.plugins.dokka)
+    alias(libs.plugins.kotlinx.plugin.serialization)
+    alias(libs.plugins.maven.publish)
 }
 
 val modules = listOf("supabase-kt", "gotrue-kt", "postgrest-kt", "storage-kt", "realtime-kt", "functions-kt", "apollo-graphql")
@@ -32,144 +29,68 @@ allprojects {
 }
 
 configure(allprojects.filter { it.name in modules || it.name == "bom" }) {
-    apply(plugin = "signing")
-    apply(plugin = "maven-publish")
     apply(plugin = "org.jetbrains.dokka")
     apply(plugin = "org.jetbrains.kotlin.plugin.serialization")
     apply(plugin = "kotlinx-atomicfu")
-    //apply(plugin = "com.android.library")
-  //  apply(plugin = "org.jetbrains.compose")
-}
+    apply(plugin = "com.vanniktech.maven.publish")
 
-nexusStaging {
-    stagingProfileId = Publishing.PROFILE_ID
-    stagingRepositoryId.set(Publishing.REPOSITORY_ID)
-    username = Publishing.SONATYPE_USERNAME
-    password = Publishing.SONATYPE_PASSWORD
-    serverUrl = "https://s01.oss.sonatype.org/service/local/"
+    mavenPublishing {
+        publishToMavenCentral(com.vanniktech.maven.publish.SonatypeHost.S01)
+
+        signAllPublications()
+
+        coordinates("io.github.jan-tennert.supabase", this@configure.name, "0.8.4")
+
+        pom {
+            name.set(this@configure.name)
+            description.set(this@configure.description ?: "A Kotlin Multiplatform Supabase SDK")
+            inceptionYear.set("2023")
+            url.set("https://github.com/supabase-community/supabase-kt/")
+            licenses {
+                license {
+                    name.set("MIT License")
+                    url.set("https://mit-license.org/")
+                    distribution.set("https://mit-license.org/")
+                }
+            }
+            developers {
+                developer {
+                    id.set("TheRealJan")
+                    name.set("Jan Tennert")
+                    url.set("https://github.com/jan-tennert/")
+                }
+            }
+            scm {
+                url.set("https://github.com/supabase-community/supabase-kt/")
+                connection.set("scm:git:git://github.com/supabase-community/supabase-kt.git")
+                developerConnection.set("scm:git:ssh://git@github.com/supabase-community/supabase-kt.git")
+            }
+        }
+    }
 }
 
 configure(allprojects.filter { it.name in modules }) {
-
-    val dependsOnTasks = mutableListOf<String>()
-    tasks.withType<AbstractPublishToMaven>().configureEach {
-        dependsOnTasks.add(this.name.replace("publish", "sign").replaceAfter("Publication", ""))
-        dependsOn(dependsOnTasks)
-    }
-
-    signing {
-        val signingKey = providers
-            .environmentVariable("GPG_SIGNING_KEY")
-            .orElse(File(System.getenv("GPG_PATH") ?: "").let {
-                try {
-                    it.readText()
-                } catch(_: Exception) {
-                    ""
+    tasks.withType<org.jetbrains.dokka.gradle.DokkaTaskPartial>().configureEach {
+        dokkaSourceSets.configureEach {
+            sourceLink {
+                val name = when(moduleName.get()) {
+                    "functions-kt" -> "Functions"
+                    "gotrue-kt" -> "GoTrue"
+                    "postgrest-kt" -> "Postgrest"
+                    "realtime-kt" -> "Realtime"
+                    "storage-kt" -> "Storage"
+                    else -> ""
                 }
-            })
-            .forUseAtConfigurationTime()
-        val signingPassphrase = providers
-            .environmentVariable("GPG_SIGNING_PASSPHRASE")
-            .forUseAtConfigurationTime()
-
-        if (signingKey.isPresent && signingPassphrase.isPresent) {
-            useInMemoryPgpKeys(signingKey.get(), signingPassphrase.get())
-            val extension = extensions
-                .getByName("publishing") as PublishingExtension
-            sign(extension.publications)
-        }
-    }
-    publishing {
-        repositories {
-            maven {
-                name = "Oss"
-                setUrl {
-                    "https://s01.oss.sonatype.org/service/local/staging/deployByRepositoryId/${Publishing.REPOSITORY_ID}"
-                }
-                credentials {
-                    username = Publishing.SONATYPE_USERNAME
-                    password = Publishing.SONATYPE_PASSWORD
-                }
-            }
-            maven {
-                name = "Snapshot"
-                setUrl { "https://s01.oss.sonatype.org/content/repositories/snapshots/" }
-                credentials {
-                    username = Publishing.SONATYPE_USERNAME
-                    password = Publishing.SONATYPE_PASSWORD
-                }
-            }
-        }
-//val dokkaOutputDir = "H:/Programming/Other/DiscordKMDocs"
-        val dokkaOutputDir = "$buildDir/dokka/${this@configure.name}"
-
-        tasks.dokkaHtml {
-            outputDirectory.set(file(dokkaOutputDir))
-        }
-
-        val deleteDokkaOutputDir by tasks.register<Delete>("deleteDokkaOutputDirectory") {
-            delete(dokkaOutputDir)
-        }
-
-        val javadocJar = tasks.register<Jar>("javadocJar") {
-            dependsOn(deleteDokkaOutputDir, tasks.dokkaHtml)
-            archiveClassifier.set("javadoc")
-            from(dokkaOutputDir)
-        }
-
-        tasks.withType<org.jetbrains.dokka.gradle.DokkaTaskPartial>().configureEach {
-            dokkaSourceSets.configureEach {
-                sourceLink {
-                    val name = when(moduleName.get()) {
-                        "functions-kt" -> "Functions"
-                        "gotrue-kt" -> "GoTrue"
-                        "postgrest-kt" -> "Postgrest"
-                        "realtime-kt" -> "Realtime"
-                        "storage-kt" -> "Storage"
-                        else -> ""
-                    }
-                    localDirectory.set(projectDir.resolve("src"))
-                    remoteUrl.set(URL("https://github.com/supabase-community/supabase-kt/tree/master/$name/src"))
-                    remoteLineSuffix.set("#L")
-                }
-            }
-        }
-
-        publications {
-            withType<MavenPublication> {
-                artifact(javadocJar)
-                pom {
-                    name.set(this@configure.name)
-                    description.set(this@configure.description ?: "A Kotlin Multiplatform Supabase Framework")
-                    url.set("https://github.com/supabase-community/supabase-kt")
-                    licenses {
-                        license {
-                            name.set("MIT License")
-                            url.set("https://mit-license.org/")
-                        }
-                    }
-                    issueManagement {
-                        system.set("Github")
-                        url.set("https://github.com/supabase-community/supabase-kt/issues")
-                    }
-                    scm {
-                        connection.set("https://github.com/supabase-community/supabase-kt.git")
-                        url.set("https://github.com/supabase-community/supabase-kt")
-                    }
-                    developers {
-                        developer {
-                            name.set("TheRealJanGER")
-                            email.set("jan.m.tennert@gmail.com")
-                        }
-                    }
-                }
+                localDirectory.set(projectDir.resolve("src"))
+                remoteUrl.set(URL("https://github.com/supabase-community/supabase-kt/tree/master/$name/src"))
+                remoteLineSuffix.set("#L")
             }
         }
     }
 }
 
 group = "io.github.jan-tennert.supabase"
-version = Versions.SUPABASEKT
+version = Versions.PROJECT
 
 kotlin {
     jvm {
@@ -188,9 +109,6 @@ kotlin {
         browser {
             testTask {
                 enabled = false
-                /**useKarma {
-                    useFirefox()
-                }*/
             }
         }
     }
@@ -201,21 +119,17 @@ kotlin {
         }
         val commonMain by getting {
             dependencies {
-                api("org.jetbrains.kotlinx:kotlinx-datetime:${Versions.DATETIME}")
-                api("io.ktor:ktor-client-core:${Versions.KTOR}")
-                api("io.ktor:ktor-client-content-negotiation:${Versions.KTOR}")
-                api("org.jetbrains.kotlinx:kotlinx-coroutines-core:${Versions.COROUTINES}")
-                api("io.ktor:ktor-serialization-kotlinx-json:${Versions.KTOR}")
-                api("io.github.aakira:napier:${Versions.NAPIER}")
-                api("org.jetbrains.kotlinx:atomicfu:${Versions.ATOMICFU}")
+                api(libs.kotlinx.datetime)
+                api(libs.kotlinx.coroutines.core)
+                api(libs.napier)
+                api(libs.bundles.ktor.client)
             }
         }
         val commonTest by getting {
             dependencies {
                 implementation(kotlin("test"))
-                implementation("io.ktor:ktor-client-mock:${Versions.KTOR}")
-                // https://mvnrepository.com/artifact/org.jetbrains.kotlinx/kotlinx-coroutines-test
-                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:${Versions.COROUTINES}")
+                implementation(libs.ktor.client.mock)
+                implementation(libs.kotlinx.coroutines.test)
             }
         }
         val jvmMain by getting {
@@ -223,11 +137,7 @@ kotlin {
         val jvmTest by getting
         val androidMain by getting {
             dependencies {
-                //add android lifecycle
-                api("androidx.lifecycle:lifecycle-viewmodel-ktx:2.5.1")
-                api("androidx.lifecycle:lifecycle-process:2.5.1")
-                api("androidx.core:core-ktx:${Versions.ANDROID_CORE}")
-                api("androidx.appcompat:appcompat:${Versions.ANDROID_COMPAT}")
+                api(libs.android.lifecycle.process)
             }
         }
         val androidUnitTest by getting {

@@ -4,7 +4,7 @@ plugins {
 }
 
 group = "io.github.jan-tennert.supabase"
-version = Versions.SUPABASEKT
+version = Versions.PROJECT
 description = "Extends supabase-kt with a Storage Client"
 
 repositories {
@@ -12,10 +12,6 @@ repositories {
 }
 
 kotlin {
-    /** Targets configuration omitted. 
-    *  To find out how to configure the targets, please follow the link:
-    *  https://kotlinlang.org/docs/reference/building-mpp-with-gradle.html#setting-up-targets */
-
     jvm {
         jvmToolchain(8)
         compilations.all {
@@ -32,9 +28,6 @@ kotlin {
         browser {
             testTask {
                 enabled = false
-                /**useKarma {
-                    useFirefox()
-                }*/
             }
         }
     }
@@ -46,7 +39,6 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 api(project(":gotrue-kt"))
-                // https://mvnrepository.com/artifact/io.ktor/ktor-server-core
             }
         }
         val nonJsMain by creating {}

@@ -1,11 +1,11 @@
 plugins {
     kotlin("multiplatform")
     id("com.android.library")
-    id("com.louiscad.complete-kotlin") version "1.1.0"
+    alias(libs.plugins.complete.kotlin)
 }
 
 group = "io.github.jan-tennert.supabase"
-version = Versions.SUPABASEKT
+version = Versions.PROJECT
 description = "Extends supabase-kt with a Auth Client"
 
 repositories {
@@ -13,10 +13,6 @@ repositories {
 }
 
 kotlin {
-    /** Targets configuration omitted.
-     *  To find out how to configure the targets, please follow the link:
-     *  https://kotlinlang.org/docs/reference/building-mpp-with-gradle.html#setting-up-targets */
-
     jvm {
         jvmToolchain(8)
         compilations.all {
@@ -33,9 +29,6 @@ kotlin {
         browser {
             testTask {
                 enabled = false
-                /**useKarma {
-                useFirefox()
-                }*/
             }
         }
     }
@@ -47,35 +40,26 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 api(project(":"))
-                implementation("com.russhwolf:multiplatform-settings-no-arg:${Versions.SETTINGS}")
-                //implementation("com.russhwolf:multiplatform-settings-serialization:${Versions.SETTINGS}") (no support for coroutines)
-                implementation("com.russhwolf:multiplatform-settings-coroutines:${Versions.SETTINGS}")
-                implementation("com.squareup.okio:okio:3.2.0")
-                // https://mvnrepository.com/artifact/io.ktor/ktor-server-core
+                api(libs.bundles.multiplatform.settings)
+                implementation(libs.okio)
             }
         }
         val commonTest by getting {
             dependencies {
-                implementation("io.ktor:ktor-client-mock:${Versions.KTOR}")
+                implementation(libs.ktor.client.mock)
                 implementation(kotlin("test"))
-                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:${Versions.COROUTINES}")
-                implementation("com.russhwolf:multiplatform-settings-test:${Versions.SETTINGS}")
+                implementation(libs.kotlinx.coroutines.test)
+                implementation(libs.multiplatform.settings.test)
             }
         }
         val jvmMain by getting {
             dependencies {
-           //     api("io.ktor:ktor-server-core:${Versions.KTOR}")
-                // https://mvnrepository.com/artifact/io.ktor/ktor-server-core
-              //  api("io.ktor:ktor-server-cio:${Versions.KTOR}")
-                implementation("io.javalin:javalin:5.3.2")
-                //logback
-                // https://mvnrepository.com/artifact/ch.qos.logback/logback-classic
-
+                implementation(libs.javalin)
             }
         }
         val androidMain by getting {
             dependencies {
-                api("androidx.startup:startup-runtime:1.1.1")
+                api(libs.androidx.startup.runtime)
             }
         }
         val jsMain by getting

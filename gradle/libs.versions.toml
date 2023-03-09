@@ -1,0 +1,57 @@
+[versions]
+kotlin = "1.8.10"
+dokka = "1.8.10"
+ktor = "2.2.4"
+kotlinx-datetime = "0.4.0"
+napir = "2.6.1"
+atomicfu = "0.20.0"
+coroutines = "1.7.0-Beta"
+android-lifecycle = "2.6.0"
+androidx-startup = "1.1.1"
+multiplatform-settings = "1.0.0"
+okio = "3.3.0"
+javalin = "5.4.2"
+complete-kotlin = "1.1.0"
+agp = "7.4.1"
+maven-publish = "0.24.0"
+apollo-kotlin = "3.7.4"
+
+[plugins]
+kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
+dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }
+kotlinx-plugin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+complete-kotlin = { id = "com.louiscad.complete-kotlin", version.ref = "complete-kotlin" }
+android-library = { id = "com.android.library", version.ref = "agp" }
+maven-publish = { id = "com.vanniktech.maven.publish", version.ref = "maven-publish" }
+
+[libraries]
+kotlinx-atomicfu = { module = "org.jetbrains.kotlinx:atomicfu-gradle-plugin", version.ref = "atomicfu" }
+kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinx-datetime" }
+kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
+kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "coroutines" }
+kotlin-reflect = { module = "org.jetbrains.kotlin:kotlin-reflect", version.ref = "kotlin" }
+
+ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
+ktor-client-content-negotiation = { module = "io.ktor:ktor-client-content-negotiation", version.ref = "ktor" }
+ktor-client-websockets = { module = "io.ktor:ktor-client-websockets", version.ref = "ktor" }
+ktor-client-mock = { module = "io.ktor:ktor-client-mock", version.ref = "ktor" }
+ktor-json = { module = "io.ktor:ktor-serialization-kotlinx-json", version.ref = "ktor" }
+
+napier = { module = "io.github.aakira:napier", version.ref = "napir" }
+
+android-lifecycle-process = { module = "androidx.lifecycle:lifecycle-process", version.ref = "android-lifecycle" }
+androidx-startup-runtime = { module = "androidx.startup:startup-runtime", version.ref = "androidx-startup" }
+
+multiplatform-settings-no-arg = { module = "com.russhwolf:multiplatform-settings-no-arg", version.ref = "multiplatform-settings" }
+multiplatform-settings-coroutines = { module = "com.russhwolf:multiplatform-settings-coroutines", version.ref = "multiplatform-settings" }
+multiplatform-settings-test = { module = "com.russhwolf:multiplatform-settings-test", version.ref = "multiplatform-settings" }
+
+okio = { module = "com.squareup.okio:okio", version.ref = "okio" }
+
+javalin = { module = "io.javalin:javalin", version.ref = "javalin" }
+
+apollo-kotlin = { module = "com.apollographql.apollo3:apollo-runtime", version.ref = "apollo-kotlin" }
+
+[bundles]
+ktor-client = ["ktor-client-core", "ktor-client-content-negotiation", "ktor-json"]
+multiplatform-settings = ["multiplatform-settings-no-arg", "multiplatform-settings-coroutines"]

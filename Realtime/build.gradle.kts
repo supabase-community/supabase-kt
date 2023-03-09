@@ -4,7 +4,7 @@ plugins {
 }
 
 group = "io.github.jan-tennert.supabase"
-version = Versions.SUPABASEKT
+version = Versions.PROJECT
 description = "Extends supabase-kt with a Realtime Client"
 
 repositories {
@@ -32,9 +32,6 @@ kotlin {
         browser {
             testTask {
                 enabled = false
-                /**useKarma {
-                    useFirefox()
-                }*/
             }
         }
     }
@@ -46,15 +43,10 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 api(project(":gotrue-kt"))
-                api("io.ktor:ktor-client-websockets:${Versions.KTOR}")
+                api(libs.ktor.client.websockets)
             }
         }
-        val jvmMain by getting  {
-            /*dependencies {
-                implementation("ch.qos.logback:logback-classic:1.3.0-beta0")
-                api("io.ktor:ktor-client-cio:${Versions.KTOR}")
-            }*/
-        }
+        val jvmMain by getting
         val androidMain by getting
         val jsMain by getting
     }
