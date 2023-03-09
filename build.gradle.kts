@@ -39,7 +39,7 @@ configure(allprojects.filter { it.name in modules || it.name == "bom" }) {
 
         signAllPublications()
 
-        coordinates("io.github.jan-tennert.supabase", this@configure.name, "0.8.4")
+        coordinates("io.github.jan-tennert.supabase", this@configure.name, this@configure.version.toString())
 
         pom {
             name.set(this@configure.name)
@@ -90,7 +90,7 @@ configure(allprojects.filter { it.name in modules }) {
 }
 
 group = "io.github.jan-tennert.supabase"
-version = Versions.PROJECT
+version = libs.versions.supabase.get()
 
 kotlin {
     jvm {

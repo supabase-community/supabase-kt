@@ -4,7 +4,7 @@ plugins {
 }
 
 group = "io.github.jan-tennert.supabase"
-version = Versions.PROJECT
+version = libs.versions.supabase.get()
 description = "Extends supabase-kt with a Storage Client"
 
 repositories {

@@ -3,7 +3,7 @@ plugins {
 }
 
 group = "io.github.jan-tennert.supabase"
-version = Versions.PROJECT
+version = libs.versions.supabase.get()
 description = "A Kotlin Multiplatform Supabase Framework"
 
 val bomProject = project
