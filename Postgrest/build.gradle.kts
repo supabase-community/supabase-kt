@@ -4,7 +4,7 @@ plugins {
 }
 
 group = "io.github.jan-tennert.supabase"
-version = libs.versions.supabase.get()
+version = Versions.PROJECT
 description = "Extends supabase-kt with a Postgrest Client"
 
 repositories {
