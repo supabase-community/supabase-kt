@@ -1,5 +1,6 @@
 package io.github.jan.supabase.postgrest.query
 
+import io.github.jan.supabase.annotiations.SupabaseExperimental
 import io.ktor.http.Headers
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
@@ -16,11 +17,13 @@ data class PostgrestResult(val body: JsonElement, val headers: Headers) {
     /**
      * Returns the total amount of items in the database (null if no [Count] option was used in the request)
      */
+    @SupabaseExperimental
     fun count(): Long? = contentRange?.substringAfter("/")?.toLongOrNull()
 
     /**
      * Returns the range of items returned
      */
+    @SupabaseExperimental
     fun range(): LongRange? = contentRange?.substringBefore("/")?.let {
         val (start, end) = it.split("-")
         LongRange(start.toLong(), end.toLong())

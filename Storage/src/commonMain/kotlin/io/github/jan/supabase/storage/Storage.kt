@@ -53,7 +53,16 @@ sealed interface Storage : MainPlugin<Storage.Config> {
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
-    suspend fun getAllBuckets(): List<Bucket>
+    @Deprecated("Use retrieveBuckets instead", ReplaceWith("retrieveBuckets()"))
+    suspend fun getAllBuckets(): List<Bucket> = retrieveBuckets()
+
+    /**
+     * Returns all buckets in the storage
+     * @throws RestException or one of its subclasses if receiving an error response
+     * @throws HttpRequestTimeoutException if the request timed out
+     * @throws HttpRequestException on network related issues
+     */
+    suspend fun retrieveBuckets(): List<Bucket>
 
     /**
      * Retrieves a bucket by its [id]
@@ -61,7 +70,16 @@ sealed interface Storage : MainPlugin<Storage.Config> {
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
-    suspend fun getBucket(id: String): Bucket?
+    @Deprecated("Use retrieveBucketById instead", ReplaceWith("retrieveBucketById(id)"))
+    suspend fun getBucket(id: String): Bucket? = retrieveBucketById(id)
+
+    /**
+     * Retrieves a bucket by its [id]
+     * @throws RestException or one of its subclasses if receiving an error response
+     * @throws HttpRequestTimeoutException if the request timed out
+     * @throws HttpRequestException on network related issues
+     */
+    suspend fun retrieveBucketById(bucketId: String): Bucket?
 
     /**
      * Changes a bucket's public status to [public]
@@ -85,7 +103,7 @@ sealed interface Storage : MainPlugin<Storage.Config> {
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
-    suspend fun deleteBucket(id: String)
+    suspend fun deleteBucket(bucketId: String)
 
     operator fun get(bucketId: String): BucketApi
 
@@ -117,12 +135,12 @@ internal class StorageImpl(override val supabaseClient: SupabaseClient, override
 
     internal val api = supabaseClient.authenticatedSupabaseApi(this)
 
-    override suspend fun getAllBuckets(): List<Bucket> = api.get("bucket").safeBody()
+    override suspend fun retrieveBuckets(): List<Bucket> = api.get("bucket").safeBody()
 
-    override suspend fun getBucket(id: String): Bucket? = api.get("bucket/$id").safeBody()
+    override suspend fun retrieveBucketById(bucketId: String): Bucket? = api.get("bucket/$bucketId").safeBody()
 
-    override suspend fun deleteBucket(id: String) {
-        api.delete("bucket/$id")
+    override suspend fun deleteBucket(bucketId: String) {
+        api.delete("bucket/$bucketId")
     }
 
     override suspend fun createBucket(name: String, id: String, public: Boolean) {
