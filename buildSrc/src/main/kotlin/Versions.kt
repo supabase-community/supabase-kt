@@ -1,5 +1,5 @@
 object Versions {
 
-    const val PROJECT = "0.8.4-dev-2"
+    const val PROJECT = "0.8.4"
 
 }

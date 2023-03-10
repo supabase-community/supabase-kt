@@ -2,7 +2,7 @@ import java.net.URL
 
 buildscript {
     dependencies {
-        classpath(libs.kotlinx.atomicfu)
+        classpath(libs.kotlinx.atomicfu.plugin)
     }
 }
 
@@ -123,6 +123,7 @@ kotlin {
                 api(libs.kotlinx.coroutines.core)
                 api(libs.napier)
                 api(libs.bundles.ktor.client)
+                api(libs.kotlinx.atomicfu)
             }
         }
         val commonTest by getting {
