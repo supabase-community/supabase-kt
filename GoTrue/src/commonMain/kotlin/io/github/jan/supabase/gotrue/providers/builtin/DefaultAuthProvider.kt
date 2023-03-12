@@ -26,7 +26,6 @@ sealed interface DefaultAuthProvider<C, R> : AuthProvider<C, R> {
 
     @Serializable
     sealed class Config(
-        var password: String = "",
         var captchaToken: String? = null
     ) {
 
@@ -43,11 +42,24 @@ sealed interface DefaultAuthProvider<C, R> : AuthProvider<C, R> {
                 encoder as JsonEncoder
                 encoder.encodeJsonElement(buildJsonObject {
                     when(value) {
-                        is Email.Config -> put("email", value.email)
-                        is Phone.Config -> put("phone", value.phoneNumber)
+                        is Email.Config -> {
+                            put("email", value.email)
+                            put("password", value.password)
+                        }
+                        is Phone.Config -> {
+                            put("phone", value.phoneNumber)
+                            put("password", value.password)
+                        }
+                        is IDToken.Config -> {
+                            put("id_token", value.id_token)
+                            put("client_id", value.client_id)
+                            put("provider", value.provider)
+                            value.nonce?.let {
+                                put("nonce", it)
+                            }
+                        }
                         else -> throw IllegalArgumentException("Unknown config type")
                     }
-                    put("password", value.password)
                     value.captchaToken?.let {
                         putJsonObject("gotrue_meta_security") {
                             put("captcha_token", value.captchaToken)
@@ -73,7 +85,14 @@ sealed interface DefaultAuthProvider<C, R> : AuthProvider<C, R> {
         val encodedCredentials = encodeCredentials(config)
         val finalRedirectUrl = supabaseClient.gotrue.generateRedirectUrl(redirectUrl)
         val gotrue = supabaseClient.gotrue as GoTrueImpl
-        val response = gotrue.api.post("token?grant_type=password", encodedCredentials) {
+        val url = "token?grant_type=${
+            when (this) {
+                Email -> "password"
+                Phone -> "password"
+                IDToken -> "id_token"
+            }
+        }"
+        val response = gotrue.api.post(url, encodedCredentials) {
             finalRedirectUrl?.let { redirectTo(it) }
         }
         response.body<UserSession>().also {
@@ -91,7 +110,12 @@ sealed interface DefaultAuthProvider<C, R> : AuthProvider<C, R> {
         val finalRedirectUrl = supabaseClient.gotrue.generateRedirectUrl(redirectUrl)
         val body = encodeCredentials(config)
         val gotrue = supabaseClient.gotrue as GoTrueImpl
-        val response = gotrue.api.post("signup", body) {
+        val url = when (this) {
+            Email -> "signup"
+            Phone -> "signup"
+            IDToken -> "token?grant_type=id_token"
+        }
+        val response = gotrue.api.post(url, body) {
             finalRedirectUrl?.let { redirectTo(it) }
         }
         val json = response.body<JsonObject>()
