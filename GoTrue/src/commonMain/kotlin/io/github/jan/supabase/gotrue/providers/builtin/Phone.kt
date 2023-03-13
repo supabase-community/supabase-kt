@@ -17,7 +17,7 @@ import kotlinx.serialization.json.decodeFromJsonElement
 object Phone : DefaultAuthProvider<Phone.Config, Phone.Result> {
 
     @Serializable(with = DefaultAuthProvider.Config.Companion::class)
-    data class Config(var phoneNumber: String = ""): DefaultAuthProvider.Config()
+    data class Config(var phoneNumber: String = "", var password: String = ""): DefaultAuthProvider.Config()
     @Serializable
     data class Result(
         val id: String,

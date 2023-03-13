@@ -1,6 +1,6 @@
 package io.github.jan.supabase.gotrue.providers
 
-object Google : OAuthProvider() {
+object Google : OAuthProvider(), IDTokenProvider {
 
     override val name = "google"
 
@@ -84,7 +84,7 @@ object Azure : OAuthProvider() {
 
 }
 
-object Apple : OAuthProvider() {
+object Apple : OAuthProvider(), IDTokenProvider {
 
     override val name = "apple"
 
