@@ -22,6 +22,7 @@ object IDToken : DefaultAuthProvider<IDToken.Config, IDToken.Result> {
 
     @Serializable(with = DefaultAuthProvider.Config.Companion::class)
     data class Config(@SerialName("id_token") var idToken: String = "", @SerialName("client_id") var clientId: String = "", var provider: IDTokenProvider? = null, var nonce: String? = null): DefaultAuthProvider.Config()
+
     @Serializable
     data class Result(
         val id: String,
