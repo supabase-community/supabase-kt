@@ -1,6 +1,5 @@
 package io.github.jan.supabase.postgrest.query
 
-import io.github.jan.supabase.annotiations.SupabaseExperimental
 import io.github.jan.supabase.postgrest.formatJoiningFilter
 import io.github.jan.supabase.postgrest.getColumnName
 import kotlinx.serialization.SerialName
@@ -105,13 +104,11 @@ class PostgrestFilterBuilder {
      */
     fun adjacent(column: String, range: String) = filter(column, FilterOperator.ADJ, range)
 
-    @SupabaseExperimental
     inline fun or(negate: Boolean = false, filter: PostgrestFilterBuilder.() -> Unit) {
         val prefix = if(negate) "not." else ""
         _params[prefix + "or"] = listOf(formatJoiningFilter(filter))
     }
 
-    @SupabaseExperimental
     inline fun and(negate: Boolean = false, filter: PostgrestFilterBuilder.() -> Unit) {
         val prefix = if (negate) "not." else ""
         _params[prefix + "and"] = listOf(formatJoiningFilter(filter))
