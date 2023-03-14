@@ -56,7 +56,7 @@ sealed interface Postgrest : MainPlugin<Postgrest.Config> {
         override var customUrl: String? = null,
         override var jwtToken: String? = null,
         var defaultSchema: String = "public",
-        var propertyConversionMethod: PropertyConversionMethod = PropertyConversionMethod.SERIAL_NAME
+        var propertyConversionMethod: PropertyConversionMethod = PropertyConversionMethod.CAMEL_CASE_TO_SNAKE_CASE
     ): MainConfig
 
     companion object : SupabasePluginProvider<Config, Postgrest> {
