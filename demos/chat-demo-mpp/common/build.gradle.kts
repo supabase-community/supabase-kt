@@ -14,9 +14,7 @@ version = "1.0-SNAPSHOT"
 kotlin {
     android()
     jvm("desktop") {
-        compilations.all {
-            kotlinOptions.jvmTarget = "11"
-        }
+        jvmToolchain(11)
     }
     js(IR) {
         browser()
