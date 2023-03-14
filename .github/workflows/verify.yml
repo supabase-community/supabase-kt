@@ -22,5 +22,9 @@ jobs:
         distribution: 'adopt'
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
-    - name: Build with Gradle
+    - name: Grant execute permission for gradlew (demo)
+      run: chmod +x demos/chat-demo-mpp/gradlew
+    - name: Build supabase-kt
       run: ./gradlew build test --stacktrace
+    - name: Build demo
+      run: ./demos/chat-demo-mpp/gradlew build test --stacktrace
