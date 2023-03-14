@@ -2,7 +2,6 @@ package io.github.jan.supabase.postgrest.query
 
 import io.github.jan.supabase.postgrest.PropertyConversionMethod
 import io.github.jan.supabase.postgrest.formatJoiningFilter
-import io.github.jan.supabase.postgrest.getColumnName
 import kotlinx.serialization.SerialName
 import kotlin.reflect.KProperty1
 
@@ -232,77 +231,77 @@ class PostgrestFilterBuilder(@PublishedApi internal val propertyConversionMethod
     /**
      * Finds all rows where the value of the column with the name of the [KProperty1] (or the value of the [SerialName] annotation on JVM) is equal to [value]
      */
-    infix fun <T, V> KProperty1<T, V>.eq(value: V) = filter(FilterOperation(getColumnName(this), FilterOperator.EQ, value.toString()))
+    infix fun <T, V> KProperty1<T, V>.eq(value: V) = filter(FilterOperation(propertyConversionMethod(this), FilterOperator.EQ, value.toString()))
 
     /**
      * Finds all rows where the value of the column with the name of the [KProperty1] (or the value of the [SerialName] annotation on JVM) is not equal to [value]
      */
-    infix fun <T, V> KProperty1<T, V>.neq(value: V) = filter(FilterOperation(getColumnName(this), FilterOperator.NEQ, value.toString()))
+    infix fun <T, V> KProperty1<T, V>.neq(value: V) = filter(FilterOperation(propertyConversionMethod(this), FilterOperator.NEQ, value.toString()))
 
     /**
      * Finds all rows where the value of the column with the name of the [KProperty1] (or the value of the [SerialName] annotation on JVM) is greater than [value]
      */
-    infix fun <T, V> KProperty1<T, V>.gt(value: V) = filter(FilterOperation(getColumnName(this), FilterOperator.GT, value.toString()))
+    infix fun <T, V> KProperty1<T, V>.gt(value: V) = filter(FilterOperation(propertyConversionMethod(this), FilterOperator.GT, value.toString()))
 
     /**
      * Finds all rows where the value of the column with the name of the [KProperty1] (or the value of the [SerialName] annotation on JVM) is greater than or equal to [value]
      */
-    infix fun <T, V> KProperty1<T, V>.gte(value: V) = filter(FilterOperation(getColumnName(this), FilterOperator.GTE, value.toString()))
+    infix fun <T, V> KProperty1<T, V>.gte(value: V) = filter(FilterOperation(propertyConversionMethod(this), FilterOperator.GTE, value.toString()))
 
     /**
      * Finds all rows where the value of the column with the name of the [KProperty1] (or the value of the [SerialName] annotation on JVM) is less than [value]
      */
-    infix fun <T, V> KProperty1<T, V>.lt(value: V) = filter(FilterOperation(getColumnName(this), FilterOperator.LT, value.toString()))
+    infix fun <T, V> KProperty1<T, V>.lt(value: V) = filter(FilterOperation(propertyConversionMethod(this), FilterOperator.LT, value.toString()))
 
     /**
      * Finds all rows where the value of the column with the name of the [KProperty1] (or the value of the [SerialName] annotation on JVM) is less than or equal to [value]
      */
-    infix fun <T, V> KProperty1<T, V>.lte(value: V) = filter(FilterOperation(getColumnName(this), FilterOperator.LTE, value.toString()))
+    infix fun <T, V> KProperty1<T, V>.lte(value: V) = filter(FilterOperation(propertyConversionMethod(this), FilterOperator.LTE, value.toString()))
 
     /**
      * Finds all rows where the value of the column with the name of the [KProperty1] (or the value of the [SerialName] annotation on JVM) matches the specified [pattern]
      */
-    infix fun <T, V> KProperty1<T, V>.like(pattern: String) = filter(FilterOperation(getColumnName(this), FilterOperator.LIKE, pattern))
+    infix fun <T, V> KProperty1<T, V>.like(pattern: String) = filter(FilterOperation(propertyConversionMethod(this), FilterOperator.LIKE, pattern))
 
     /**
      * Finds all rows where the value of the column with the name of the [KProperty1] (or the value of the [SerialName] annotation on JVM) matches the specified [pattern] (case-insensitive)
      */
-    infix fun <T, V> KProperty1<T, V>.ilike(pattern: String) = filter(FilterOperation(getColumnName(this), FilterOperator.ILIKE, pattern))
+    infix fun <T, V> KProperty1<T, V>.ilike(pattern: String) = filter(FilterOperation(propertyConversionMethod(this), FilterOperator.ILIKE, pattern))
 
     /**
      * Finds all rows where the value of the column with the name of the [KProperty1] (or the value of the [SerialName] annotation on JVM) equals to one of these values: null,true,false,unknown
      */
-    infix fun <T, V> KProperty1<T, V>.isExact(value: Boolean?) = filter(FilterOperation(getColumnName(this), FilterOperator.IS, value.toString()))
+    infix fun <T, V> KProperty1<T, V>.isExact(value: Boolean?) = filter(FilterOperation(propertyConversionMethod(this), FilterOperator.IS, value.toString()))
 
     /**
      * Finds all rows where the value of the column with the name of the [KProperty1] (or the value of the [SerialName] annotation on JVM) is in the specified [list]
      */
-    infix fun <T, V> KProperty1<T, V>.isIn(list: List<V>) = filter(FilterOperation(getColumnName(this), FilterOperator.IN, "(${list.joinToString(",")})"))
+    infix fun <T, V> KProperty1<T, V>.isIn(list: List<V>) = filter(FilterOperation(propertyConversionMethod(this), FilterOperator.IN, "(${list.joinToString(",")})"))
 
     /**
      * Finds all rows where the value of the column with the name of the [KProperty1] (or the value of the [SerialName] annotation on JVM) is strictly left of [range]
      */
-    infix fun <T, V> KProperty1<T, V>.rangeLt(range: LongRange) = this@PostgrestFilterBuilder.rangeLt(getColumnName(this), range)
+    infix fun <T, V> KProperty1<T, V>.rangeLt(range: LongRange) = this@PostgrestFilterBuilder.rangeLt(propertyConversionMethod(this), range)
 
     /**
      * Finds all rows where the value of the column with the name of the [KProperty1] (or the value of the [SerialName] annotation on JVM) does not extend to the left of [range]
      */
-    infix fun <T, V> KProperty1<T, V>.rangeLte(range: LongRange) = this@PostgrestFilterBuilder.rangeLte(getColumnName(this), range)
+    infix fun <T, V> KProperty1<T, V>.rangeLte(range: LongRange) = this@PostgrestFilterBuilder.rangeLte(propertyConversionMethod(this), range)
 
     /**
      * Finds all rows where the value of the column with the name of the [KProperty1] (or the value of the [SerialName] annotation on JVM) does not extend to the right of [range]
      */
-    infix fun <T, V> KProperty1<T, V>.rangeGt(range: LongRange) = this@PostgrestFilterBuilder.rangeGt(getColumnName(this), range)
+    infix fun <T, V> KProperty1<T, V>.rangeGt(range: LongRange) = this@PostgrestFilterBuilder.rangeGt(propertyConversionMethod(this), range)
 
     /**
      * Finds all rows where the value of the column with the name of the [KProperty1] (or the value of the [SerialName] annotation on JVM) does not strictly right of [range]
      */
-    infix fun <T, V> KProperty1<T, V>.rangeGte(range: LongRange) = this@PostgrestFilterBuilder.rangeGte(getColumnName(this), range)
+    infix fun <T, V> KProperty1<T, V>.rangeGte(range: LongRange) = this@PostgrestFilterBuilder.rangeGte(propertyConversionMethod(this), range)
 
     /**
      * Finds all rows where the value of the column with the name of the [KProperty1] (or the value of the [SerialName] annotation on JVM) is adjacent to the specified [range]
      */
-    infix fun <T, V> KProperty1<T, V>.adjacent(range: LongRange) = this@PostgrestFilterBuilder.adjacent(getColumnName(this), range)
+    infix fun <T, V> KProperty1<T, V>.adjacent(range: LongRange) = this@PostgrestFilterBuilder.adjacent(propertyConversionMethod(this), range)
 
 }
 
