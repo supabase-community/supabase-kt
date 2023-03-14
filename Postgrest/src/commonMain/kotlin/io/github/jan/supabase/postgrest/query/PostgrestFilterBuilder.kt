@@ -113,12 +113,12 @@ class PostgrestFilterBuilder(@PublishedApi internal val propertyConversionMethod
     /**
      * Finds all rows where the value of the [column] does not extend to the right of [range]
      */
-    fun rangeLt(column: String, range: LongRange) = sr(column, range)
+    fun rangeLt(column: String, range: LongRange) = sl(column, range)
 
     /**
      * Finds all rows where the value of the [column] does not extend to the right of [range]
      */
-    fun rangeGt(column: String, range: LongRange) = sl(column, range)
+    fun rangeGt(column: String, range: LongRange) = sr(column, range)
 
     /**
      * Finds all rows where the value of the [column] is adjacent to [range]
