@@ -1,5 +1,6 @@
 package io.github.jan.supabase.postgrest.query
 
+import io.github.jan.supabase.postgrest.PropertyConversionMethod
 import io.github.jan.supabase.postgrest.formatJoiningFilter
 import io.github.jan.supabase.postgrest.getColumnName
 import kotlinx.serialization.SerialName
@@ -8,7 +9,7 @@ import kotlin.reflect.KProperty1
 /**
  * A filter builder for a postgrest query
  */
-class PostgrestFilterBuilder {
+class PostgrestFilterBuilder(@PublishedApi internal val propertyConversionMethod: PropertyConversionMethod) {
 
     @PublishedApi
     internal val _params = mutableMapOf<String, List<String>>()
@@ -82,27 +83,47 @@ class PostgrestFilterBuilder {
     /**
      * Finds all rows where the value of the [column] is strictly left of [range]
      */
-    fun rangeLt(column: String, range: String) = filter(column, FilterOperator.SL, range)
+    fun sl(column: String, range: LongRange) = filter(column, FilterOperator.SL, "(${range.first},${range.last})")
 
     /**
      * Finds all rows where the value of the [column] is strictly right of [range]
      */
-    fun rangeGt(column: String, range: String) = filter(column, FilterOperator.SR, range)
+    fun sr(column: String, range: LongRange) = filter(column, FilterOperator.SR, "(${range.first},${range.last})")
 
     /**
      * Finds all rows where the value of the [column] does not extend to the left of [range]
      */
-    fun rangeGte(column: String, range: String) = filter(column, FilterOperator.NXL, range)
+    fun nxl(column: String, range: LongRange) = filter(column, FilterOperator.NXL, "(${range.first},${range.last})")
 
     /**
      * Finds all rows where the value of the [column] does not extend to the right of [range]
      */
-    fun rangeLte(column: String, range: String) = filter(column, FilterOperator.NXR, range)
+    fun nxr(column: String, range: LongRange) = filter(column, FilterOperator.NXR, "(${range.first},${range.last})")
+
+    /**
+     * Finds all rows where the value of the [column] is strictly left of [range]
+     */
+    fun rangeLte(column: String, range: LongRange) = nxr(column, range)
+
+    /**
+     * Finds all rows where the value of the [column] is strictly right of [range]
+     */
+    fun rangeGte(column: String, range: LongRange) = nxl(column, range)
+
+    /**
+     * Finds all rows where the value of the [column] does not extend to the right of [range]
+     */
+    fun rangeLt(column: String, range: LongRange) = sr(column, range)
+
+    /**
+     * Finds all rows where the value of the [column] does not extend to the right of [range]
+     */
+    fun rangeGt(column: String, range: LongRange) = sl(column, range)
 
     /**
      * Finds all rows where the value of the [column] is adjacent to [range]
      */
-    fun adjacent(column: String, range: String) = filter(column, FilterOperator.ADJ, range)
+    fun adjacent(column: String, range: LongRange) = filter(column, FilterOperator.ADJ, "(${range.first},${range.last})")
 
     inline fun or(negate: Boolean = false, filter: PostgrestFilterBuilder.() -> Unit) {
         val prefix = if(negate) "not." else ""
@@ -161,6 +182,54 @@ class PostgrestFilterBuilder {
     fun range(range: LongRange, foreignTable: String? = null) = range(range.first, range.last, foreignTable)
 
     /**
+     * Finds all rows where the value of the [column] contains [values]
+     *
+     * @param column The column name to filter on
+     * @param values The values to filter on
+     */
+    fun contains(column: String, values: List<Any>) = filter(column, FilterOperator.CS, "{${values.joinToString(",")}}")
+
+    /**
+     * Finds all rows where the value of the [column] is contained in [values]
+     *
+     * @param column The column name to filter on
+     * @param values The values to filter on
+     */
+    fun contained(column: String, values: List<Any>) = filter(column, FilterOperator.CD, "{${values.joinToString(",")}}")
+
+    /**
+     * Finds all rows where the value of the [column] contains [values]
+     *
+     * @param column The column name to filter on
+     * @param values The values to filter on
+     */
+    fun cs(column: String, values: List<Any>) = contains(column, values)
+
+    /**
+     * Finds all rows where the value of the [column] is contained in [values]
+     *
+     * @param column The column name to filter on
+     * @param values The values to filter on
+     */
+    fun cd(column: String, values: List<Any>) = contained(column, values)
+
+    /**
+     * Finds all rows where the value of the [column] overlaps with [values]
+     *
+     * @param column The column name to filter on
+     * @param values The values to filter on
+     */
+    fun ov(column: String, values: List<Any>) = overlaps(column, values)
+
+    /**
+     * Finds all rows where the value of the [column] overlaps with [values]
+     *
+     * @param column The column name to filter on
+     * @param values The values to filter on
+     */
+    fun overlaps(column: String, values: List<Any>) = filter(column, FilterOperator.OV, "{${values.joinToString(",")}}")
+
+    /**
      * Finds all rows where the value of the column with the name of the [KProperty1] (or the value of the [SerialName] annotation on JVM) is equal to [value]
      */
     infix fun <T, V> KProperty1<T, V>.eq(value: V) = filter(FilterOperation(getColumnName(this), FilterOperator.EQ, value.toString()))
@@ -213,32 +282,32 @@ class PostgrestFilterBuilder {
     /**
      * Finds all rows where the value of the column with the name of the [KProperty1] (or the value of the [SerialName] annotation on JVM) is strictly left of [range]
      */
-    infix fun <T, V> KProperty1<T, V>.rangeLt(range: String) = filter(FilterOperation(getColumnName(this), FilterOperator.SL, range))
+    infix fun <T, V> KProperty1<T, V>.rangeLt(range: LongRange) = this@PostgrestFilterBuilder.rangeLt(getColumnName(this), range)
 
     /**
      * Finds all rows where the value of the column with the name of the [KProperty1] (or the value of the [SerialName] annotation on JVM) does not extend to the left of [range]
      */
-    infix fun <T, V> KProperty1<T, V>.rangeLte(range: String) = filter(FilterOperation(getColumnName(this), FilterOperator.NXR, range))
+    infix fun <T, V> KProperty1<T, V>.rangeLte(range: LongRange) = this@PostgrestFilterBuilder.rangeLte(getColumnName(this), range)
 
     /**
      * Finds all rows where the value of the column with the name of the [KProperty1] (or the value of the [SerialName] annotation on JVM) does not extend to the right of [range]
      */
-    infix fun <T, V> KProperty1<T, V>.rangeGt(range: String) = filter(FilterOperation(getColumnName(this), FilterOperator.SR, range))
+    infix fun <T, V> KProperty1<T, V>.rangeGt(range: LongRange) = this@PostgrestFilterBuilder.rangeGt(getColumnName(this), range)
 
     /**
      * Finds all rows where the value of the column with the name of the [KProperty1] (or the value of the [SerialName] annotation on JVM) does not strictly right of [range]
      */
-    infix fun <T, V> KProperty1<T, V>.rangeGte(range: String) = filter(FilterOperation(getColumnName(this), FilterOperator.NXL, range))
+    infix fun <T, V> KProperty1<T, V>.rangeGte(range: LongRange) = this@PostgrestFilterBuilder.rangeGte(getColumnName(this), range)
 
     /**
      * Finds all rows where the value of the column with the name of the [KProperty1] (or the value of the [SerialName] annotation on JVM) is adjacent to the specified [range]
      */
-    infix fun <T, V> KProperty1<T, V>.adjacent(range: String) = filter(FilterOperation(getColumnName(this), FilterOperator.ADJ, range))
+    infix fun <T, V> KProperty1<T, V>.adjacent(range: LongRange) = this@PostgrestFilterBuilder.adjacent(getColumnName(this), range)
 
 }
 
-inline fun buildPostgrestFilter(block: PostgrestFilterBuilder.() -> Unit): Map<String, List<String>> {
-    val filter = PostgrestFilterBuilder()
+inline fun buildPostgrestFilter(propertyConversionMethod: PropertyConversionMethod = PropertyConversionMethod.SERIAL_NAME, block: PostgrestFilterBuilder.() -> Unit): Map<String, List<String>> {
+    val filter = PostgrestFilterBuilder(propertyConversionMethod)
     filter.block()
     return filter.params
 }

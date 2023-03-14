@@ -52,7 +52,12 @@ sealed interface Postgrest : MainPlugin<Postgrest.Config> {
      * Config for the Postgrest plugin
      * @param defaultSchema The default schema to use for the requests. Defaults to "public"
      */
-    data class Config(override var customUrl: String? = null, override var jwtToken: String? = null, var defaultSchema: String = "public"): MainConfig
+    data class Config(
+        override var customUrl: String? = null,
+        override var jwtToken: String? = null,
+        var defaultSchema: String = "public",
+        var propertyConversionMethod: PropertyConversionMethod = PropertyConversionMethod.SERIAL_NAME
+    ): MainConfig
 
     companion object : SupabasePluginProvider<Config, Postgrest> {
 
@@ -121,7 +126,7 @@ suspend inline fun <reified T> Postgrest.rpc(
     count: Count? = null,
     json: Json = Json,
     filter: PostgrestFilterBuilder.() -> Unit = {}
-) = PostgrestRequest.RPC(head, count, PostgrestFilterBuilder().apply(filter).params, if(parameters is JsonElement) parameters else json.encodeToJsonElement(parameters)).execute("rpc/$function", this)
+) = PostgrestRequest.RPC(head, count, PostgrestFilterBuilder(config.propertyConversionMethod).apply(filter).params, if(parameters is JsonElement) parameters else json.encodeToJsonElement(parameters)).execute("rpc/$function", this)
 
 /**
  * Executes a database function
@@ -137,4 +142,4 @@ suspend inline fun Postgrest.rpc(
     head: Boolean = false,
     count: Count? = null,
     filter: PostgrestFilterBuilder.() -> Unit = {}
-) = PostgrestRequest.RPC(head, count, PostgrestFilterBuilder().apply(filter).params).execute("rpc/$function", this)
+) = PostgrestRequest.RPC(head, count, PostgrestFilterBuilder(config.propertyConversionMethod).apply(filter).params).execute("rpc/$function", this)

@@ -42,6 +42,11 @@ kotlin {
                 api(libs.kotlin.reflect)
             }
         }
+        val commonTest by getting {
+            dependencies {
+                implementation(kotlin("test"))
+            }
+        }
         val jvmMain by getting
         val androidMain by getting
         val jsMain by getting

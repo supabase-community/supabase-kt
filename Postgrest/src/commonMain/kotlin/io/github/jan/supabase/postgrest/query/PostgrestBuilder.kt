@@ -4,8 +4,8 @@ import io.github.jan.supabase.exceptions.HttpRequestException
 import io.github.jan.supabase.exceptions.RestException
 import io.github.jan.supabase.postgrest.Postgrest
 import io.github.jan.supabase.postgrest.request.PostgrestRequest
-import io.github.jan.supabase.supabaseJson
 import io.ktor.client.plugins.HttpRequestTimeoutException
+import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.encodeToJsonElement
 import kotlinx.serialization.json.jsonArray
 
@@ -33,7 +33,7 @@ class PostgrestBuilder(val postgrest: Postgrest, val table: String, val schema: 
         count: Count? = null,
         single: Boolean = false,
         filter: PostgrestFilterBuilder.() -> Unit = {}
-    ): PostgrestResult = PostgrestRequest.Select(head, count, single, buildPostgrestFilter { filter(); _params["select"] = listOf(columns) }, schema).execute(table, postgrest)
+    ): PostgrestResult = PostgrestRequest.Select(head, count, single, buildPostgrestFilter(postgrest.config.propertyConversionMethod) { filter(); _params["select"] = listOf(columns) }, schema).execute(table, postgrest)
 
     /**
      * Executes an insert operation on the [table]
@@ -42,6 +42,8 @@ class PostgrestBuilder(val postgrest: Postgrest, val table: String, val schema: 
      * @param upsert Performs an upsert if true.
      * @param onConflict When specifying onConflict, you can make upsert work on a columns that has a unique constraint.
      * @param returning By default, the new record is returned. You can set this to 'minimal' if you don't need this value
+     * @param count Count algorithm to use to count rows in a table
+     * @param filter Additional filtering to apply to the query
      * @throws RestException or one of its subclasses if receiving an error response
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
@@ -52,8 +54,9 @@ class PostgrestBuilder(val postgrest: Postgrest, val table: String, val schema: 
         onConflict: String? = null,
         returning: Returning = Returning.REPRESENTATION,
         count: Count? = null,
+        json: Json = Json,
         filter: PostgrestFilterBuilder.() -> Unit = {}
-    ): PostgrestResult = PostgrestRequest.Insert(supabaseJson.encodeToJsonElement(values).jsonArray, upsert, onConflict, returning, count, buildPostgrestFilter {
+    ): PostgrestResult = PostgrestRequest.Insert(json.encodeToJsonElement(values).jsonArray, upsert, onConflict, returning, count, buildPostgrestFilter(postgrest.config.propertyConversionMethod) {
         filter()
         if (upsert && onConflict != null) _params["on_conflict"] = listOf(onConflict)
     }, schema).execute(table, postgrest)
@@ -65,6 +68,8 @@ class PostgrestBuilder(val postgrest: Postgrest, val table: String, val schema: 
      * @param upsert Performs an upsert if true.
      * @param onConflict When specifying onConflict, you can make upsert work on a columns that has a unique constraint.
      * @param returning By default, the new record is returned. You can set this to 'minimal' if you don't need this value
+     * @param count Count algorithm to use to count rows in a table
+     * @param filter Additional filtering to apply to the query
      * @throws RestException or one of its subclasses if receiving an error response
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
@@ -75,13 +80,16 @@ class PostgrestBuilder(val postgrest: Postgrest, val table: String, val schema: 
         onConflict: String? = null,
         returning: Returning = Returning.REPRESENTATION,
         count: Count? = null,
+        json: Json = Json,
         filter: PostgrestFilterBuilder.() -> Unit = {}
-    ) = insert(listOf(value), upsert, onConflict, returning, count, filter)
+    ) = insert(listOf(value), upsert, onConflict, returning, count, json, filter)
 
     /**
      * Executes an update operation on the [table].
      *
      * @param update Specifies the fields to update via a DSL
+     * @param count Count algorithm to use to count rows in a table
+     * @param filter Additional filtering to apply to the query
      * @param returning By default, the new record is returned. You can set this to 'minimal' if you don't need this value
      * @throws RestException or one of its subclasses if receiving an error response
      * @throws HttpRequestTimeoutException if the request timed out
@@ -92,12 +100,33 @@ class PostgrestBuilder(val postgrest: Postgrest, val table: String, val schema: 
         returning: Returning = Returning.REPRESENTATION,
         count: Count? = null,
         filter: PostgrestFilterBuilder.() -> Unit = {}
-    ): PostgrestResult = PostgrestRequest.Update(returning, count, buildPostgrestFilter(filter), buildPostgrestUpdate(update), schema).execute(table, postgrest)
+    ): PostgrestResult = update(buildPostgrestUpdate(postgrest.config.propertyConversionMethod, update), returning, count, Json, filter)
+
+    /**
+     * Executes an update operation on the [table].
+     *
+     * @param value The value to update, will automatically get serialized into json.
+     * @param count Count algorithm to use to count rows in a table
+     * @param filter Additional filtering to apply to the query
+     * @param returning By default, the new record is returned. You can set this to 'minimal' if you don't need this value
+     * @throws RestException or one of its subclasses if receiving an error response
+     * @throws HttpRequestTimeoutException if the request timed out
+     * @throws HttpRequestException on network related issues
+     */
+    suspend inline fun <reified T : Any> update(
+        value: T,
+        returning: Returning = Returning.REPRESENTATION,
+        count: Count? = null,
+        json: Json = Json,
+        filter: PostgrestFilterBuilder.() -> Unit = {}
+    ): PostgrestResult = PostgrestRequest.Update(returning, count, buildPostgrestFilter(postgrest.config.propertyConversionMethod, filter), json.encodeToJsonElement(value), schema).execute(table, postgrest)
 
     /**
      * Executes a delete operation on the [table].
      *
      * @param returning If set to true, you get the deleted rows as the response
+     * @param count Count algorithm to use to count rows in a table
+     * @param filter Additional filtering to apply to the query
      * @throws RestException or one of its subclasses if receiving an error response
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
@@ -106,7 +135,7 @@ class PostgrestBuilder(val postgrest: Postgrest, val table: String, val schema: 
         returning: Returning = Returning.REPRESENTATION,
         count: Count? = null,
         filter: PostgrestFilterBuilder.() -> Unit = {}
-    ): PostgrestResult = PostgrestRequest.Delete(returning, count, buildPostgrestFilter(filter), schema).execute(table, postgrest)
+    ): PostgrestResult = PostgrestRequest.Delete(returning, count, buildPostgrestFilter(postgrest.config.propertyConversionMethod, filter), schema).execute(table, postgrest)
 
     companion object {
         const val HEADER_PREFER = "Prefer"
