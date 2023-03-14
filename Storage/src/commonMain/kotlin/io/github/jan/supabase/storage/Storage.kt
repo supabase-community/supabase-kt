@@ -53,25 +53,7 @@ sealed interface Storage : MainPlugin<Storage.Config> {
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
-    @Deprecated("Use retrieveBuckets instead", ReplaceWith("retrieveBuckets()"))
-    suspend fun getAllBuckets(): List<Bucket> = retrieveBuckets()
-
-    /**
-     * Returns all buckets in the storage
-     * @throws RestException or one of its subclasses if receiving an error response
-     * @throws HttpRequestTimeoutException if the request timed out
-     * @throws HttpRequestException on network related issues
-     */
     suspend fun retrieveBuckets(): List<Bucket>
-
-    /**
-     * Retrieves a bucket by its [id]
-     * @throws RestException or one of its subclasses if receiving an error response
-     * @throws HttpRequestTimeoutException if the request timed out
-     * @throws HttpRequestException on network related issues
-     */
-    @Deprecated("Use retrieveBucketById instead", ReplaceWith("retrieveBucketById(id)"))
-    suspend fun getBucket(id: String): Bucket? = retrieveBucketById(id)
 
     /**
      * Retrieves a bucket by its [id]
@@ -105,9 +87,15 @@ sealed interface Storage : MainPlugin<Storage.Config> {
      */
     suspend fun deleteBucket(bucketId: String)
 
+    /**
+     * Builder function for interacting with a bucket with the given [bucketId]
+     */
     operator fun get(bucketId: String): BucketApi
 
-    fun from(id: String): BucketApi = get(id)
+    /**
+     * Builder function for interacting with a bucket with the given [bucketId]
+     */
+    fun from(bucketId: String): BucketApi = get(bucketId)
 
     data class Config(override var customUrl: String? = null, override var jwtToken: String? = null): MainConfig
 
