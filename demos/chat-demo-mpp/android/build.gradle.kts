@@ -19,7 +19,6 @@ dependencies {
 
 android {
     compileSdk = 33
-    sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
     defaultConfig {
         applicationId = "io.github.jan.supabase.android"
         minSdk = 24
