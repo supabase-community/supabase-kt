@@ -18,11 +18,11 @@ dependencies {
 }
 
 android {
-    compileSdkVersion(33)
+    compileSdk = 33
+    sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
     defaultConfig {
         applicationId = "io.github.jan.supabase.android"
-        minSdkVersion(24)
-        targetSdkVersion(33)
+        minSdk = 24
         versionCode = 1
         versionName = "1.0-SNAPSHOT"
     }

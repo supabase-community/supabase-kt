@@ -14,7 +14,7 @@ version = "1.0-SNAPSHOT"
 kotlin {
     android()
     jvm("desktop") {
-        jvmToolchain(11)
+        jvmToolchain(8)
     }
     js(IR) {
         browser()
@@ -59,11 +59,10 @@ kotlin {
 }
 
 android {
-    compileSdkVersion(33)
+    compileSdk = 33
     sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
     defaultConfig {
-        minSdkVersion(24)
-        targetSdkVersion(33)
+        minSdk = 21
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
