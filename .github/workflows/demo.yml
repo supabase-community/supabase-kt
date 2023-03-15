@@ -21,6 +21,8 @@ jobs:
         java-version: '11'
         distribution: 'adopt'
     - name: Grant execute permission for gradlew
+      working-directory: ./demos/chat-demo-mpp
       run: chmod +x gradlew
-    - name: Build supabase-kt
-      run: ./gradlew build test --stacktrace
+    - name: Build demo
+      working-directory: ./demos/chat-demo-mpp
+      run: ./gradlew build --stacktrace
