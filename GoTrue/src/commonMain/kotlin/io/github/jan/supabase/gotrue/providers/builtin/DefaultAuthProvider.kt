@@ -53,7 +53,7 @@ sealed interface DefaultAuthProvider<C, R> : AuthProvider<C, R> {
                         is IDToken.Config -> {
                             put("id_token", value.idToken)
                             put("client_id", value.clientId)
-                            value.provider?.let {
+                            value.provider?.also {
                                 put("provider", it.name)
                             } ?: throw IllegalArgumentException("A provider must be specified.")
                             value.nonce?.let {
