@@ -152,9 +152,13 @@ kotlin {
               //  api(compose.web.core)
             }
         }
+        val iosTest by getting
         val iosMain by getting
         val iosSimulatorArm64Main by getting {
             dependsOn(iosMain)
+        }
+        val iosSimulatorArm64Test by getting {
+            dependsOn(iosTest)
         }
     }
 }
