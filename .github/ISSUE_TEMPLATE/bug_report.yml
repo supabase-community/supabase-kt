@@ -21,6 +21,7 @@ body:
     attributes:
       label: Version
       description: which supabase-kt versions are affected
+      placeholder: 0.8.4
     validations:
       required: true
   - type: input
