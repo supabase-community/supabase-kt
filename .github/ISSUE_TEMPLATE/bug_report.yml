@@ -16,18 +16,19 @@ body:
       options:
         - label: I checked for similar bug report
           required: true
-  - type: textarea
+  - type: input
     id: version
     attributes:
       label: Version
-      description: |
-        examples:
-          - **Target**: Android and JVM
-          - **Version**: 0.9.0 
-      value: |
-          - Target:
-          - Version:
-      render: markdown
+      description: version where this bug is occuring
+    validations:
+      required: true
+  - type: input
+    id: target
+    attributes:
+      label: Target
+      description: on which kotlin targets this problem is occuring
+      placeholder: JVM and Android
     validations:
       required: true
   - type: textarea
