@@ -10,14 +10,26 @@ body:
       value: |
         Thanks for taking the time to fill out this bug report!
   - type: checkboxes
-    id: latest-version
+    id: general-info
     attributes:
       label: General Info
       options:
-        - label: I installed the latest version of Supabase-Kt
-          required: true
         - label: I checked for similar bug report
           required: true
+  - type: textarea
+    label: Version
+    id: version
+    attributes:
+      description: |
+        examples:
+          - **Target**: Android and JVM
+          - **Version**: 0.9.0 
+      value: |
+          - Target:
+          - Version:
+      render: markdown
+    validations:
+      required: true
   - type: textarea
     id: code
     attributes:
@@ -27,18 +39,15 @@ body:
       value: "A bug happened!"
     validations:
       required: true
-  - type: dropdown
-    id: platform
+  - type: textarea
     attributes:
-      label: Platform(s)
-      description: Which Platform did you use?
-      multiple: true
-      options:
-        - Desktop
-        - Android
-        - Web
+      label: Steps To Reproduce
+      description: Steps to reproduce the behavior.
+      placeholder: |
+        1. ..
+        2. ..
     validations:
-      required: true
+      required: false
   - type: textarea
     id: logs
     attributes:
