@@ -23,7 +23,7 @@ interface SessionManager {
 /**
  * Represents the session manager. Used for saving and restoring the session from storage
  */
-class SettingsSessionManager(settings: Settings = Settings()): SessionManager {
+class SettingsSessionManager(settings: Settings = createDefaultSettings()): SessionManager {
 
     private val suspendSettings = settings.toSuspendSettings()
 
@@ -54,4 +54,10 @@ class SettingsSessionManager(settings: Settings = Settings()): SessionManager {
 
     }
 
+}
+
+fun createDefaultSettings() = try {
+    Settings()
+} catch(e: Exception) {
+    throw IllegalStateException("Failed to create default settings for SettingsSessionManager. You might have to provide a custom settings instance or a custom session manager. Learn more at https://github.com/supabase-community/supabase-kt/wiki/Session-Saving")
 }
