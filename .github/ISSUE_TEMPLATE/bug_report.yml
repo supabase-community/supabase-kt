@@ -17,9 +17,9 @@ body:
         - label: I checked for similar bug report
           required: true
   - type: textarea
-    label: Version
     id: version
     attributes:
+      label: Version
       description: |
         examples:
           - **Target**: Android and JVM
