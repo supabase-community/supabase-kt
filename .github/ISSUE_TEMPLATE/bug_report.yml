@@ -20,14 +20,14 @@ body:
     id: version
     attributes:
       label: Version
-      description: version where this bug is occuring
+      description: which supabase-kt versions are affected
     validations:
       required: true
   - type: input
     id: target
     attributes:
       label: Target
-      description: on which kotlin targets this problem is occuring
+      description: which kotlin targets are affected
       placeholder: JVM and Android
     validations:
       required: true
@@ -42,7 +42,7 @@ body:
       required: true
   - type: textarea
     attributes:
-      label: Steps To Reproduce
+      label: Steps To Reproduce (optional)
       description: Steps to reproduce the behavior.
       placeholder: |
         1. ..
@@ -52,6 +52,6 @@ body:
   - type: textarea
     id: logs
     attributes:
-      label: Relevant log output
+      label: Relevant log output (optional)
       description: Please copy and paste any relevant log output. This will be automatically formatted into code, so no need for backticks.
       render: shell
