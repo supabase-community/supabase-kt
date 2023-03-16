@@ -19,7 +19,7 @@ body:
   - type: input
     id: version
     attributes:
-      label: Version
+      label: Version(s)
       description: which supabase-kt versions are affected
       placeholder: 0.8.4
     validations:
@@ -27,7 +27,7 @@ body:
   - type: input
     id: target
     attributes:
-      label: Target
+      label: Target(s)
       description: which kotlin targets are affected
       placeholder: JVM and Android
     validations:
