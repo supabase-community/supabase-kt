@@ -14,7 +14,7 @@ javalin = "5.4.2"
 complete-kotlin = "1.1.0"
 agp = "7.4.2"
 maven-publish = "0.24.0"
-apollo-kotlin = "3.7.4"
+apollo-kotlin = "3.7.5"
 
 [plugins]
 kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
