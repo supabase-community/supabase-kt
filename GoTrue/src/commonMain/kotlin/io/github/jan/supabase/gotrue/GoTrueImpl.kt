@@ -21,7 +21,6 @@ package io.github.jan.supabase.gotrue
  import io.github.jan.supabase.supabaseJson
  import io.github.jan.supabase.toJsonObject
  import io.ktor.client.call.body
- import io.ktor.client.request.bearerAuth
  import io.ktor.client.statement.HttpResponse
  import io.ktor.client.statement.bodyAsText
  import io.ktor.http.HttpStatusCode
@@ -191,7 +190,7 @@ internal class GoTrueImpl(override val supabaseClient: SupabaseClient, override 
 
     override suspend fun retrieveUser(jwt: String): UserInfo {
         val response = api.get("user") {
-            bearerAuth(jwt)
+            headers["Authorization"] = "Bearer $jwt"
         }
         val body = response.bodyAsText()
         return supabaseJson.decodeFromString(body)
@@ -220,12 +219,14 @@ internal class GoTrueImpl(override val supabaseClient: SupabaseClient, override 
         val body = buildJsonObject {
             put("refresh_token", refreshToken)
         }
-        val response = api.postJson("token?grant_type=refresh_token", body)
+        val response = api.postJson("token?grant_type=refresh_token", body) {
+            headers.remove("Authorization")
+        }
         return response.safeBody("GoTrue#refreshSession")
     }
 
     override suspend fun refreshCurrentSession() {
-        val newSession = refreshSession(currentAccessTokenOrNull() ?: throw IllegalStateException("No refresh token found in current session"))
+        val newSession = refreshSession(currentSessionOrNull()?.refreshToken ?: throw IllegalStateException("No refresh token found in current session"))
         startAutoRefresh(newSession)
     }
 
