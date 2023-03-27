@@ -13,7 +13,7 @@ okio = "3.3.0"
 javalin = "5.4.2"
 complete-kotlin = "1.1.0"
 agp = "7.4.2"
-maven-publish = "0.24.0"
+maven-publish = "0.25.1"
 apollo-kotlin = "3.7.5"
 
 [plugins]
