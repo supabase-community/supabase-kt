@@ -14,7 +14,7 @@ data class Identity(
     @SerialName("identity_data")
     val identityData: Map<String, JsonElement>,
     @SerialName("last_sign_in_at")
-    val lastSignInAt: String,
+    val lastSignInAt: String? = null,
     @SerialName("provider")
     val provider: String,
     @SerialName("updated_at")
