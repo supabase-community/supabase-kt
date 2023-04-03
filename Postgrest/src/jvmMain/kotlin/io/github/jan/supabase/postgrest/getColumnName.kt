@@ -8,3 +8,5 @@ actual fun <T, V> getSerialName(property: KProperty1<T, V>): String {
     val serialName = property.findAnnotation<SerialName>()
     return serialName?.value ?: property.name
 }
+
+actual inline fun <reified T> classPropertyNames(): List<String> = T::class.members.filterIsInstance<KProperty1<T, *>>().map { it.name }

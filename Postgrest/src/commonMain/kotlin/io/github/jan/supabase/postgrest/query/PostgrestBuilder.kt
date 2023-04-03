@@ -28,12 +28,12 @@ class PostgrestBuilder(val postgrest: Postgrest, val table: String, val schema: 
      * @throws HttpRequestException on network related issues
      */
     suspend inline fun select(
-        columns: String = "*",
+        columns: Columns = Columns.ALL,
         head: Boolean = false,
         count: Count? = null,
         single: Boolean = false,
         filter: PostgrestFilterBuilder.() -> Unit = {}
-    ): PostgrestResult = PostgrestRequest.Select(head, count, single, buildPostgrestFilter(postgrest.config.propertyConversionMethod) { filter(); _params["select"] = listOf(columns) }, schema).execute(table, postgrest)
+    ): PostgrestResult = PostgrestRequest.Select(head, count, single, buildPostgrestFilter(postgrest.config.propertyConversionMethod) { filter(); _params["select"] = listOf(columns.value) }, schema).execute(table, postgrest)
 
     /**
      * Executes an insert operation on the [table]

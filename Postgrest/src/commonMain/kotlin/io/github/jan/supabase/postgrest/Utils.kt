@@ -21,3 +21,5 @@ expect fun <T, V> getSerialName(property: KProperty1<T, V>): String
 internal fun String.camelToSnakeCase(): String {
     return this.replace(SNAKE_CASE_REGEX, "_$0").lowercase()
 }
+
+expect inline fun <reified T> classPropertyNames(): List<String>
