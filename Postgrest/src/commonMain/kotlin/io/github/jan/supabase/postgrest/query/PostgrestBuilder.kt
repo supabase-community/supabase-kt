@@ -4,7 +4,7 @@ import io.github.jan.supabase.exceptions.HttpRequestException
 import io.github.jan.supabase.exceptions.RestException
 import io.github.jan.supabase.postgrest.Postgrest
 import io.github.jan.supabase.postgrest.request.PostgrestRequest
-import io.ktor.client.plugins.HttpRequestTimeoutException
+import io.ktor.client.plugins.*
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.encodeToJsonElement
 import kotlinx.serialization.json.jsonArray
@@ -17,7 +17,7 @@ class PostgrestBuilder(val postgrest: Postgrest, val table: String, val schema: 
     /**
      * Executes vertical filtering with select on [table]
      *
-     * @param columns The columns to retrieve, separated by commas.
+     * @param columns The columns to retrieve, defaults to [Columns.ALL]. You can also use [Columns.list], [Columns.type] or [Columns.raw] to specify the columns
      * @param head If true, select will delete the selected data.
      * @param count Count algorithm to use to count rows in a table.
      * @param single If true, select will return a single row. Throws an error if the query returns more than one row.
