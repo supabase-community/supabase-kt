@@ -32,7 +32,8 @@ kotlin {
             }
         }
     }
-    //ios()
+    ios()
+    iosSimulatorArm64()
     sourceSets {
         all {
             languageSettings.optIn("kotlin.RequiresOptIn")
@@ -63,7 +64,14 @@ kotlin {
             }
         }
         val jsMain by getting
-        //val iosMain by getting
+        val iosMain by getting
+        val iosTest by getting
+        val iosSimulatorArm64Main by getting {
+            dependsOn(iosMain)
+        }
+        val iosSimulatorArm64Test by getting {
+            dependsOn(iosTest)
+        }
     }
 }
 
