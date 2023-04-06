@@ -26,33 +26,34 @@ kotlin {
                 api(compose.foundation)
                 api(compose.material3)
                 api(compose.materialIconsExtended)
-             //   implementation(platform("io.github.jan-tennert.supabase:bom:${Versions.SUPABASE}"))
-                api("io.github.jan-tennert.supabase:gotrue-kt:${Versions.SUPABASE}")
-                api("io.github.jan-tennert.supabase:realtime-kt:${Versions.SUPABASE}")
-                api("io.github.jan-tennert.supabase:postgrest-kt:${Versions.SUPABASE}")
-                api("io.insert-koin:koin-core:${Versions.KOIN}")
+                api(libs.bundles.supabase)
+                api(libs.koin.core)
+            }
+        }
+        val nonJsMain by creating {
+            dependencies {
+                api(libs.ktor.cio)
             }
         }
         val androidMain by getting {
+            dependsOn(nonJsMain)
             dependencies {
-                api("androidx.appcompat:appcompat:1.6.0")
-                api("androidx.core:core-ktx:1.9.0")
-                api("io.insert-koin:koin-android:${Versions.KOIN}")
-                api("androidx.lifecycle:lifecycle-viewmodel-ktx:${Versions.LIFECYCLE}")
-                api("androidx.lifecycle:lifecycle-viewmodel-compose:${Versions.LIFECYCLE}")
-                //android ktor client engine
-                api("io.ktor:ktor-client-cio:${Versions.KTOR}")
+                api(libs.androidx.compat)
+                api(libs.androidx.core)
+                api(libs.koin.android)
+                api(libs.androidx.lifecycle.viewmodel.ktx)
+                api(libs.androidx.lifecycle.viewmodel.compose)
             }
         }
         val desktopMain by getting {
+            dependsOn(nonJsMain)
             dependencies {
                 api(compose.preview)
-                api("io.ktor:ktor-client-cio:${Versions.KTOR}")
             }
         }
         val jsMain by getting {
             dependencies {
-                api("io.ktor:ktor-client-js:${Versions.KTOR}")
+                api(libs.ktor.js)
             }
         }
     }

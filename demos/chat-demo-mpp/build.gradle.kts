@@ -1,5 +1,5 @@
-group "io.github.jan.supabase"
-version "1.0-SNAPSHOT"
+group = "io.github.jan.supabase"
+version = "1.0-SNAPSHOT"
 
 allprojects {
     repositories {
@@ -10,10 +10,10 @@ allprojects {
 }
 
 plugins {
-    kotlin("multiplatform") apply false
-    kotlin("android") apply false
-    kotlin("plugin.serialization") apply false
-    id("com.android.application") apply false
-    id("com.android.library") apply false
-    id("org.jetbrains.compose") apply false
+    alias(libs.plugins.kotlin.multiplatform) apply false
+    alias(libs.plugins.kotlin.android) apply false
+    alias(libs.plugins.kotlinx.plugin.serialization) apply false
+    alias(libs.plugins.android.application) apply false
+    alias(libs.plugins.android.library) apply false
+    alias(libs.plugins.compose) apply false
 }

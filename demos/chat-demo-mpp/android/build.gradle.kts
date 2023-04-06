@@ -8,13 +8,9 @@ plugins {
 group "io.github.jan.supabase"
 version "1.0-SNAPSHOT"
 
-repositories {
-    jcenter()
-}
-
 dependencies {
     implementation(project(":common"))
-    implementation("androidx.activity:activity-compose:1.3.0")
+    implementation(libs.androidx.activity.compose)
 }
 
 android {
