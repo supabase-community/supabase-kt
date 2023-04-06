@@ -4,14 +4,16 @@ A Kotlin Multiplatform Client for Supabase.
 Supported targets:
 - JVM
 - Android
-- JS (Browser)
-- _IOS ([PR open](https://github.com/supabase-community/supabase-kt/pull/53), help appreciated)_
+- JS (Browser) 
+- IOS (experimental, see [PR](https://github.com/supabase-community/supabase-kt/pull/53) for more information
+
+*Note: WASM planned see [issue](https://github.com/supabase-community/supabase-kt/issues/86)*
 
 Newest stable version: ![stable](https://img.shields.io/github/release/supabase-community/supabase-kt?label=stable)
 
 Newest experimental version: ![experimental](https://img.shields.io/maven-central/v/io.github.jan-tennert.supabase/supabase-kt?label=experimental)
 
-Dokka documentation for the latest version: [stable](https://supabase-community.github.io/supabase-kt/)
+[Dokka documentation for the latest version](https://supabase-community.github.io/supabase-kt/)
 
 # Installation
 
