@@ -5,7 +5,7 @@ Supported targets:
 - JVM
 - Android
 - JS (Browser) 
-- IOS (experimental, see [PR](https://github.com/supabase-community/supabase-kt/pull/53) for more information
+- IOS (experimental as of 0.9.0, see [PR](https://github.com/supabase-community/supabase-kt/pull/53) for more information
 
 *Note: WASM planned see [issue](https://github.com/supabase-community/supabase-kt/issues/86)*
 
