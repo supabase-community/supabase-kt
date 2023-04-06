@@ -13,6 +13,8 @@ Newest stable version: ![stable](https://img.shields.io/github/release/supabase-
 
 Newest experimental version: ![experimental](https://img.shields.io/maven-central/v/io.github.jan-tennert.supabase/supabase-kt?label=experimental)
 
+### Links
+
 [Dokka documentation for the latest version](https://supabase-community.github.io/supabase-kt/)
 
 [Wiki](https://github.com/supabase-community/supabase-kt/wiki)
@@ -53,6 +55,10 @@ implementation("io.github.jan-tennert.supabase:[module e.g. functions-kt or gotr
 ### Plugins
 
 #### [Apollo GraphQL integration](/plugins/ApolloGraphQL)
+
+# Demos
+
+- [Compose Multiplatform Chat Demo (Desktop/Android/Browser)](https://github.com/supabase-community/supabase-kt/tree/master/demos/chat-demo-mpp)
 
 # Contribution
 
