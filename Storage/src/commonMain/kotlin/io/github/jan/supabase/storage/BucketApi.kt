@@ -9,7 +9,6 @@ import io.github.jan.supabase.safeBody
 import io.ktor.client.call.*
 import io.ktor.client.plugins.*
 import io.ktor.client.request.*
-import io.ktor.client.statement.*
 import io.ktor.http.*
 import kotlinx.serialization.json.*
 import kotlin.time.Duration
@@ -206,10 +205,11 @@ internal class BucketApiImpl(override val bucketId: String, val storage: Storage
 
     override suspend fun createUploadSignedUrl(path: String): UploadSignedUrl {
         val result = storage.api.post("object/upload/sign/$bucketId/$path")
-        val url = result.request.url
+        val urlPath = result.body<JsonObject>()["url"]?.jsonPrimitive?.content ?: throw IllegalStateException("Expected a url in create upload signed url response")
+        val url = Url(storage.resolveUrl(urlPath))
         return UploadSignedUrl(
-            url = storage.resolveUrl(url.encodedPath),
-            path = url.encodedPath,
+            url = url.toString(),
+            path = urlPath,
             token = url.parameters["token"] ?: throw IllegalStateException("Expected a token in create upload signed url response")
         )
     }
