@@ -49,6 +49,11 @@ kotlin {
         val androidMain by getting {
             dependsOn(nonJsMain)
         }
+        val commonTest by getting {
+            dependencies {
+                implementation(kotlin("test"))
+            }
+        }
         val jsMain by getting
         val iosMain by getting
         val iosSimulatorArm64Main by getting {

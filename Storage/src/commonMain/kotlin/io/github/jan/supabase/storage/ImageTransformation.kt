@@ -11,14 +11,20 @@ import io.ktor.http.*
  * @property quality The quality of the image. (Percentage 1-100, defaults to 80)
  * @property format Specify in which format you want the image to receive. (Defaults to 'origin', which means the original format
  * @see Resize
+ * @see BucketApi.downloadAuthenticated
+ * @see BucketApi.downloadPublic
  */
-data class ImageTransformation(
-    var width: Int? = null,
-    var height: Int? = null,
-    var resize: Resize? = null,
-    var quality: Int? = null,
+class ImageTransformation {
+
+    var width: Int? = null
+    var height: Int? = null
+    var resize: Resize? = null
+    var quality: Int? = null
+        set(value) {
+            if(value !in 1..100) throw IllegalArgumentException("Quality must be between 1 and 100")
+            field = value
+        }
     var format: String? = null
-) {
 
     fun queryString(): String {
         val builder = ParametersBuilder()
