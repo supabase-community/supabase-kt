@@ -1,14 +1,15 @@
+import io.github.jan.supabase.CurrentPlatformTarget
+import io.github.jan.supabase.PlatformTarget
 import io.github.jan.supabase.postgrest.PropertyConversionMethod
 import io.github.jan.supabase.postgrest.query.PostgrestFilterBuilder
 import io.github.jan.supabase.postgrest.query.buildPostgrestFilter
-import io.ktor.http.decodeURLQueryComponent
-import io.ktor.http.formUrlEncode
-import io.ktor.http.parametersOf
+import io.ktor.http.*
 import kotlinx.datetime.Instant
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFails
 
 @Serializable
 data class TestData(@SerialName("created_at") val createdAt: Instant)
@@ -180,7 +181,11 @@ class PostgrestFilterBuilderTest {
 
     @Test
     fun propertyConversionWithSerialName() {
-        assertEquals("created_at", PropertyConversionMethod.SERIAL_NAME(TestData::createdAt))
+        if(CurrentPlatformTarget in listOf(PlatformTarget.DESKTOP, PlatformTarget.ANDROID)) {
+            assertEquals("created_at", PropertyConversionMethod.SERIAL_NAME(TestData::createdAt))
+        } else {
+            assertFails { PropertyConversionMethod.SERIAL_NAME(TestData::createdAt) }
+        }
     }
 
     private fun filterToString(builder: PostgrestFilterBuilder.() -> Unit): String {
