@@ -305,7 +305,7 @@ class PostgrestFilterBuilder(@PublishedApi internal val propertyConversionMethod
 
 }
 
-inline fun buildPostgrestFilter(propertyConversionMethod: PropertyConversionMethod = PropertyConversionMethod.SERIAL_NAME, block: PostgrestFilterBuilder.() -> Unit): Map<String, List<String>> {
+inline fun buildPostgrestFilter(propertyConversionMethod: PropertyConversionMethod = PropertyConversionMethod.CAMEL_CASE_TO_SNAKE_CASE, block: PostgrestFilterBuilder.() -> Unit): Map<String, List<String>> {
     val filter = PostgrestFilterBuilder(propertyConversionMethod)
     filter.block()
     return filter.params
