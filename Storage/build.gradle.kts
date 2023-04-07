@@ -42,7 +42,9 @@ kotlin {
                 api(project(":gotrue-kt"))
             }
         }
-        val nonJsMain by creating {}
+        val nonJsMain by creating {
+            dependsOn(commonMain)
+        }
         val jvmMain by getting {
             dependsOn(nonJsMain)
         }

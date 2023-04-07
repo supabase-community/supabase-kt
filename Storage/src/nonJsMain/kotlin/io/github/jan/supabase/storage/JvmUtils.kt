@@ -22,6 +22,22 @@ suspend fun BucketApi.upload(path: String, file: File) = upload(path, file.readB
 suspend fun BucketApi.upload(path: String, file: Path) = upload(path, file.readBytes())
 
 /**
+ * Uploads a file in [BucketApi.bucketId] under [path] using a presigned url
+ * @param path The path to upload the file to
+ * @param file The presigned url token
+ * @param file The file to upload
+ */
+suspend fun BucketApi.uploadToSignedUrl(path: String, token: String, file: File) = uploadToSignedUrl(path, token, file.readBytes())
+
+/**
+ * Uploads a file in [BucketApi.bucketId] under [path] using a presigned url
+ * @param path The path to upload the file to
+ * @param file The presigned url token
+ * @param file The file to upload
+ */
+suspend fun BucketApi.uploadToSignedUrl(path: String, token: String, file: Path) = uploadToSignedUrl(path, token, file.readBytes())
+
+/**
  * Updates a file in [BucketApi.bucketId] under [path]
  * @param path The path to be updated
  * @param file The new file
