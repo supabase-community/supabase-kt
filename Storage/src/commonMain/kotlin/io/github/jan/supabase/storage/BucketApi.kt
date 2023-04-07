@@ -6,20 +6,11 @@ import io.github.jan.supabase.exceptions.RestException
 import io.github.jan.supabase.gotrue.GoTrue
 import io.github.jan.supabase.putJsonObject
 import io.github.jan.supabase.safeBody
-import io.ktor.client.call.body
-import io.ktor.client.plugins.HttpRequestTimeoutException
-import io.ktor.client.request.header
-import io.ktor.client.request.setBody
-import io.ktor.http.ContentType
-import io.ktor.http.HttpHeaders
-import io.ktor.http.HttpMethod
-import io.ktor.http.defaultForFilePath
-import kotlinx.serialization.json.JsonObject
-import kotlinx.serialization.json.add
-import kotlinx.serialization.json.buildJsonObject
-import kotlinx.serialization.json.jsonPrimitive
-import kotlinx.serialization.json.put
-import kotlinx.serialization.json.putJsonArray
+import io.ktor.client.call.*
+import io.ktor.client.plugins.*
+import io.ktor.client.request.*
+import io.ktor.http.*
+import kotlinx.serialization.json.*
 import kotlin.time.Duration
 
 sealed interface BucketApi {
@@ -36,6 +27,15 @@ sealed interface BucketApi {
      * @throws HttpRequestException on network related issues
      */
     suspend fun upload(path: String, data: ByteArray): String
+
+    /**
+     * Uploads a file in [bucketId] under [path] using a presigned url
+     * @param path The path to upload the file to
+     * @param token The presigned url token
+     * @param data The data to upload
+     * @return the key of the uploaded file
+     */
+    suspend fun uploadToSignedUrl(path: String, token: String, data: ByteArray): String
 
     /**
      * Updates a file in [bucketId] under [path]
@@ -77,6 +77,12 @@ sealed interface BucketApi {
      * @throws HttpRequestException on network related issues
      */
     suspend fun copy(from: String, to: String)
+
+    /**
+     * Creates a signed url to upload without authentication.
+     * @param path The path to create an url for
+     */
+    suspend fun createUploadSignedUrl(path: String): UploadSignedUrl
 
     /**
      * Creates a signed url to download without authentication. The url will expire after [expiresIn]
@@ -190,6 +196,23 @@ internal class BucketApiImpl(override val bucketId: String, val storage: Storage
     override val supabaseClient = storage.supabaseClient
 
     override suspend fun update(path: String, data: ByteArray): String = uploadOrUpdate(HttpMethod.Put, bucketId, path, data)
+
+    override suspend fun uploadToSignedUrl(path: String, token: String, data: ByteArray): String {
+        return storage.api.put("object/upload/sign/$bucketId/$path") {
+            parameter("token", token)
+        }.body<JsonObject>()["Key"]?.jsonPrimitive?.content ?: throw IllegalStateException("Expected a key in a upload response")
+    }
+
+    override suspend fun createUploadSignedUrl(path: String): UploadSignedUrl {
+        val result = storage.api.post("object/upload/sign/$bucketId/$path")
+        val urlPath = result.body<JsonObject>()["url"]?.jsonPrimitive?.content ?: throw IllegalStateException("Expected a url in create upload signed url response")
+        val url = Url(storage.resolveUrl(urlPath))
+        return UploadSignedUrl(
+            url = url.toString(),
+            path = path,
+            token = url.parameters["token"] ?: throw IllegalStateException("Expected a token in create upload signed url response")
+        )
+    }
 
     override suspend fun upload(path: String, data: ByteArray): String = uploadOrUpdate(HttpMethod.Post, bucketId, path, data)
 

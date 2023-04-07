@@ -42,12 +42,19 @@ kotlin {
                 api(project(":gotrue-kt"))
             }
         }
-        val nonJsMain by creating {}
+        val nonJsMain by creating {
+            dependsOn(commonMain)
+        }
         val jvmMain by getting {
             dependsOn(nonJsMain)
         }
         val androidMain by getting {
             dependsOn(nonJsMain)
+        }
+        val commonTest by getting {
+            dependencies {
+                implementation(kotlin("test"))
+            }
         }
         val jsMain by getting
         val iosMain by getting
