@@ -15,6 +15,7 @@ fun interface PropertyConversionMethod {
                 return field
             }
         val CAMEL_CASE_TO_SNAKE_CASE = PropertyConversionMethod { it.name.camelToSnakeCase() }
+        val NONE = PropertyConversionMethod { it.name }
     }
 
 }
