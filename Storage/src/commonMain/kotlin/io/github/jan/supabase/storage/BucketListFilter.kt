@@ -4,10 +4,24 @@ import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
 import kotlinx.serialization.json.putJsonObject
 
+/**
+ * A filter builder for [BucketApi.list]
+ */
 class BucketListFilter {
 
+    /**
+     * The limit of items to return
+     */
     var limit: Int? = null
+
+    /**
+     * The starting position
+     */
     var offset: Int? = null
+
+    /**
+     * The search string to filter files by.
+     */
     var search: String? = null
     private var column: String? = null
     private var order: String? = null

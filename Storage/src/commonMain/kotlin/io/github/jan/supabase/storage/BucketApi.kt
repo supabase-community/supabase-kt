@@ -209,7 +209,7 @@ internal class BucketApiImpl(override val bucketId: String, val storage: Storage
         val url = Url(storage.resolveUrl(urlPath))
         return UploadSignedUrl(
             url = url.toString(),
-            path = urlPath,
+            path = path,
             token = url.parameters["token"] ?: throw IllegalStateException("Expected a token in create upload signed url response")
         )
     }
