@@ -19,6 +19,8 @@ Newest experimental version: ![experimental](https://img.shields.io/maven-centra
 
 [Wiki](https://github.com/supabase-community/supabase-kt/wiki)
 
+[Troubleshooting](https://github.com/supabase-community/supabase-kt/wiki/Troubleshooting)
+
 # Installation
 
 ```kotlin
