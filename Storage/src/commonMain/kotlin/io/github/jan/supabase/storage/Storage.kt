@@ -2,19 +2,16 @@ package io.github.jan.supabase.storage
 
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.bodyOrNull
-import io.github.jan.supabase.exceptions.BadRequestRestException
-import io.github.jan.supabase.exceptions.HttpRequestException
-import io.github.jan.supabase.exceptions.NotFoundRestException
-import io.github.jan.supabase.exceptions.RestException
-import io.github.jan.supabase.exceptions.UnauthorizedRestException
-import io.github.jan.supabase.exceptions.UnknownRestException
+import io.github.jan.supabase.exceptions.*
 import io.github.jan.supabase.gotrue.authenticatedSupabaseApi
 import io.github.jan.supabase.plugins.MainConfig
 import io.github.jan.supabase.plugins.MainPlugin
 import io.github.jan.supabase.plugins.SupabasePluginProvider
 import io.github.jan.supabase.safeBody
-import io.ktor.client.plugins.HttpRequestTimeoutException
-import io.ktor.client.statement.HttpResponse
+import io.ktor.client.plugins.*
+import io.ktor.client.statement.*
+import kotlinx.serialization.json.JsonArray
+import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
 
@@ -40,12 +37,11 @@ sealed interface Storage : MainPlugin<Storage.Config> {
      * Creates a new bucket in the storage
      * @param name the name of the bucket
      * @param id the id of the bucket
-     * @param public whether the bucket should be public or not
      * @throws RestException or one of its subclasses if receiving an error response
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
-    suspend fun createBucket(name: String, id: String, public: Boolean)
+    suspend fun createBucket(name: String, id: String, builder: BucketBuilder.() -> Unit = {})
 
     /**
      * Returns all buckets in the storage
@@ -131,11 +127,18 @@ internal class StorageImpl(override val supabaseClient: SupabaseClient, override
         api.delete("bucket/$bucketId")
     }
 
-    override suspend fun createBucket(name: String, id: String, public: Boolean) {
+    override suspend fun createBucket(name: String, id: String, builder: BucketBuilder.() -> Unit) {
+        val bucketBuilder = BucketBuilder().apply(builder)
         val body = buildJsonObject {
             put("name", name)
             put("id", id)
-            put("public", public)
+            put("public", bucketBuilder.public)
+            bucketBuilder.allowedMimeTypes?.let {
+                put("allowed_mime_types", JsonArray(it.map { type -> JsonPrimitive(type) }))
+            }
+            bucketBuilder.fileSizeLimit?.let {
+                put("file_size_limit", it.value)
+            }
         }
         api.postJson("bucket", body)
     }

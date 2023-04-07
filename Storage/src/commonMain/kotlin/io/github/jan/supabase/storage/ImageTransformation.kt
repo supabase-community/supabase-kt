@@ -1,20 +1,23 @@
 package io.github.jan.supabase.storage
 
 import io.github.jan.supabase.storage.ImageTransformation.Resize
-import io.ktor.http.ParametersBuilder
-import io.ktor.http.formUrlEncode
+import io.ktor.http.*
 
 /**
  * Represents a transformation for an image. Used for [Storage] objects-
  * @property width The width of the image
  * @property height The height of the image
  * @property resize The resize mode
+ * @property quality The quality of the image. (Percentage 1-100, defaults to 80)
+ * @property format Specify in which format you want the image to receive. (Defaults to 'origin', which means the original format
  * @see Resize
  */
 data class ImageTransformation(
     var width: Int? = null,
     var height: Int? = null,
     var resize: Resize? = null,
+    var quality: Int? = null,
+    var format: String? = null
 ) {
 
     fun queryString(): String {
@@ -22,6 +25,7 @@ data class ImageTransformation(
         width?.let { builder.append("width", it.toString()) }
         height?.let { builder.append("height", it.toString()) }
         resize?.let { builder.append("resize", it.name.lowercase()) }
+        quality?.let { builder.append("quality", it.toString()) }
         return builder.build().formUrlEncode()
     }
 

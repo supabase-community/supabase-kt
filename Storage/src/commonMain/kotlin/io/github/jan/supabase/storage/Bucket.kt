@@ -16,5 +16,10 @@ data class Bucket(
     @SerialName("owner")
     val owner: String,
     @SerialName("updated_at")
-    val updatedAt: Instant
+    val updatedAt: Instant,
+    val public: Boolean,
+    @SerialName("allowed_mime_types")
+    val allowedMimeTypes: List<String>? = null,
+    @SerialName("file_size_limit")
+    val fileSizeLimit: Long? = null
 )
