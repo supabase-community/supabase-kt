@@ -26,12 +26,13 @@ class ImageTransformation {
         }
     var format: String? = null
 
-    fun queryString(): String {
+    internal fun queryString(): String {
         val builder = ParametersBuilder()
         width?.let { builder.append("width", it.toString()) }
         height?.let { builder.append("height", it.toString()) }
         resize?.let { builder.append("resize", it.name.lowercase()) }
         quality?.let { builder.append("quality", it.toString()) }
+        format?.let { builder.append("format", it) }
         return builder.build().formUrlEncode()
     }
 
