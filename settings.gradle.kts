@@ -12,7 +12,6 @@ include("Storage")
 include("Realtime")
 include("Functions")
 include("bom")
-include("test")
 include(":plugins:ApolloGraphQL")
 project(":GoTrue").name = "gotrue-kt"
 project(":Postgrest").name = "postgrest-kt"
