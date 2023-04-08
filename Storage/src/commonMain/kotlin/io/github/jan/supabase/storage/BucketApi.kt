@@ -1,6 +1,7 @@
 package io.github.jan.supabase.storage
 
 import io.github.jan.supabase.SupabaseClient
+import io.github.jan.supabase.annotiations.SupabaseExperimental
 import io.github.jan.supabase.exceptions.HttpRequestException
 import io.github.jan.supabase.exceptions.RestException
 import io.github.jan.supabase.gotrue.GoTrue
@@ -38,6 +39,7 @@ sealed interface BucketApi {
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
+    @SupabaseExperimental
     suspend fun uploadAsFlow(path: String, data: ByteArray): Flow<UploadStatus>
 
     /**
@@ -56,6 +58,7 @@ sealed interface BucketApi {
      * @param data The data to upload
      * @return A flow that emits the upload progress and at last the key to the uploaded file
      */
+    @SupabaseExperimental
     suspend fun uploadToSignedUrlAsFlow(path: String, token: String, data: ByteArray): Flow<UploadStatus>
 
     /**
@@ -78,6 +81,7 @@ sealed interface BucketApi {
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
+    @SupabaseExperimental
     suspend fun updateAsFlow(path: String, data: ByteArray): Flow<UploadStatus>
 
     /**
@@ -172,6 +176,7 @@ sealed interface BucketApi {
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
+    @SupabaseExperimental
     suspend fun downloadAuthenticatedAsFlow(path: String, transform: ImageTransformation.() -> Unit = {}): Flow<DownloadStatus>
 
     /**
@@ -194,6 +199,7 @@ sealed interface BucketApi {
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
+    @SupabaseExperimental
     suspend fun downloadPublicAsFlow(path: String, transform: ImageTransformation.() -> Unit = {}): Flow<DownloadStatus>
 
     /**
@@ -253,6 +259,7 @@ internal class BucketApiImpl(override val bucketId: String, val storage: Storage
 
     override suspend fun update(path: String, data: ByteArray): String = uploadOrUpdate(HttpMethod.Put, bucketId, path, data)
 
+    @SupabaseExperimental
     override suspend fun updateAsFlow(path: String, data: ByteArray): Flow<UploadStatus> = callbackFlow {
         val key = uploadOrUpdate(HttpMethod.Put, bucketId, path, data) {
             onUpload { bytesSentTotal, contentLength ->
@@ -267,6 +274,7 @@ internal class BucketApiImpl(override val bucketId: String, val storage: Storage
         return uploadToSignedUrl(path, token, data)
     }
 
+    @SupabaseExperimental
     override suspend fun uploadToSignedUrlAsFlow(path: String, token: String, data: ByteArray): Flow<UploadStatus> {
         return callbackFlow {
             val key = uploadToSignedUrl(path, token, data) {
@@ -292,6 +300,7 @@ internal class BucketApiImpl(override val bucketId: String, val storage: Storage
 
     override suspend fun upload(path: String, data: ByteArray): String = uploadOrUpdate(HttpMethod.Post, bucketId, path, data)
 
+    @SupabaseExperimental
     override suspend fun uploadAsFlow(path: String, data: ByteArray): Flow<UploadStatus> {
         return callbackFlow {
             val key = uploadOrUpdate(HttpMethod.Post, bucketId, path, data) {
@@ -362,6 +371,7 @@ internal class BucketApiImpl(override val bucketId: String, val storage: Storage
         }.body()
     }
 
+    @SupabaseExperimental
     override suspend fun downloadAuthenticatedAsFlow(
         path: String,
         transform: ImageTransformation.() -> Unit
@@ -384,6 +394,7 @@ internal class BucketApiImpl(override val bucketId: String, val storage: Storage
         }.body()
     }
 
+    @SupabaseExperimental
     override suspend fun downloadPublicAsFlow(path: String, transform: ImageTransformation.() -> Unit): Flow<DownloadStatus> {
         return callbackFlow {
             val data = storage.api.rawRequest {

@@ -1,5 +1,6 @@
 package io.github.jan.supabase.storage
 
+import io.github.jan.supabase.annotiations.SupabaseExperimental
 import java.io.File
 import java.nio.file.Path
 import kotlin.io.path.readBytes
@@ -19,6 +20,7 @@ suspend fun BucketApi.upload(path: String, file: File) = upload(path, file.readB
  * @param file The file to upload
  * @return A flow that emits the upload progress and at last the key to the uploaded file
  */
+@SupabaseExperimental
 suspend fun BucketApi.uploadAsFlow(path: String, file: File) = uploadAsFlow(path, file.readBytes())
 
 /**
@@ -35,6 +37,7 @@ suspend fun BucketApi.upload(path: String, file: Path) = upload(path, file.readB
  * @param file The file to upload
  * @return A flow that emits the upload progress and at last the key to the uploaded file
  */
+@SupabaseExperimental
 suspend fun BucketApi.uploadAsFlow(path: String, file: Path) = uploadAsFlow(path, file.readBytes())
 
 /**
@@ -53,6 +56,7 @@ suspend fun BucketApi.uploadToSignedUrl(path: String, token: String, file: File)
  * @param file The file to upload
  * @return A flow that emits the upload progress and at last the key to the uploaded file
  */
+@SupabaseExperimental
 suspend fun BucketApi.uploadToSignedUrlAsFlow(path: String, token: String, file: File) = uploadToSignedUrlAsFlow(path, token, file.readBytes())
 
 /**
@@ -70,6 +74,7 @@ suspend fun BucketApi.uploadToSignedUrl(path: String, token: String, file: Path)
  * @param file The file to upload
  * @return A flow that emits the upload progress and at last the key to the uploaded file
  */
+@SupabaseExperimental
 suspend fun BucketApi.uploadToSignedUrlAsFlow(path: String, token: String, file: Path) = uploadToSignedUrlAsFlow(path, token, file.readBytes())
 
 /**
@@ -85,6 +90,7 @@ suspend fun BucketApi.update(path: String, file: Path) = update(path, file.readB
  * @param file The new file
  * @return A flow that emits the upload progress and at last the key to the uploaded file
  */
+@SupabaseExperimental
 suspend fun BucketApi.updateAsFlow(path: String, file: Path) = updateAsFlow(path, file.readBytes())
 
 /**
@@ -100,6 +106,7 @@ suspend fun BucketApi.update(path: String, file: File) = update(path, file.readB
  * @param file The new file
  * @return A flow that emits the upload progress and at last the key to the uploaded file
  */
+@SupabaseExperimental
 suspend fun BucketApi.updateAsFlow(path: String, file: File) = updateAsFlow(path, file.readBytes())
 
 /**
