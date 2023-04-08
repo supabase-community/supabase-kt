@@ -30,6 +30,14 @@ sealed interface BucketApi {
      */
     suspend fun upload(path: String, data: ByteArray): String
 
+    /**
+     * Uploads a file in [bucketId] under [path]
+     * @param path The path to upload the file to
+     * @return A flow that emits the upload progress and at last the key to the uploaded file
+     * @throws RestException or one of its subclasses if receiving an error response
+     * @throws HttpRequestTimeoutException if the request timed out
+     * @throws HttpRequestException on network related issues
+     */
     suspend fun uploadAsFlow(path: String, data: ByteArray): Flow<UploadStatus>
 
     /**
@@ -41,10 +49,19 @@ sealed interface BucketApi {
      */
     suspend fun uploadToSignedUrl(path: String, token: String, data: ByteArray): String
 
+    /**
+     * Uploads a file in [bucketId] under [path] using a presigned url
+     * @param path The path to upload the file to
+     * @param token The presigned url token
+     * @param data The data to upload
+     * @return A flow that emits the upload progress and at last the key to the uploaded file
+     */
     suspend fun uploadToSignedUrlAsFlow(path: String, token: String, data: ByteArray): Flow<UploadStatus>
 
     /**
      * Updates a file in [bucketId] under [path]
+     * @param path The path to update the file to
+     * @param data The new data
      * @return the key to the updated file
      * @throws RestException or one of its subclasses if receiving an error response
      * @throws HttpRequestTimeoutException if the request timed out
@@ -52,6 +69,15 @@ sealed interface BucketApi {
      */
     suspend fun update(path: String, data: ByteArray): String
 
+    /**
+     * Updates a file in [bucketId] under [path]
+     * @param path The path to update the file to
+     * @param data The new data
+     * @return A flow that emits the upload progress and at last the key to the uploaded file
+     * @throws RestException or one of its subclasses if receiving an error response
+     * @throws HttpRequestTimeoutException if the request timed out
+     * @throws HttpRequestException on network related issues
+     */
     suspend fun updateAsFlow(path: String, data: ByteArray): Flow<UploadStatus>
 
     /**
@@ -137,6 +163,15 @@ sealed interface BucketApi {
      */
     suspend fun downloadAuthenticated(path: String, transform: ImageTransformation.() -> Unit = {}): ByteArray
 
+    /**
+     * Downloads a file from [bucketId] under [path]
+     * @param path The path to download
+     * @param transform The transformation to apply to the image
+     * @return A flow that emits the download progress and at last the data as a byte array
+     * @throws RestException or one of its subclasses if receiving an error response
+     * @throws HttpRequestTimeoutException if the request timed out
+     * @throws HttpRequestException on network related issues
+     */
     suspend fun downloadAuthenticatedAsFlow(path: String, transform: ImageTransformation.() -> Unit = {}): Flow<DownloadStatus>
 
     /**
@@ -150,6 +185,15 @@ sealed interface BucketApi {
      */
     suspend fun downloadPublic(path: String, transform: ImageTransformation.() -> Unit = {}): ByteArray
 
+    /**
+     * Downloads a file from [bucketId] under [path] using the public url
+     * @param path The path to download
+     * @param transform The transformation to apply to the image
+     * @return A flow that emits the download progress and at last the data as a byte array
+     * @throws RestException or one of its subclasses if receiving an error response
+     * @throws HttpRequestTimeoutException if the request timed out
+     * @throws HttpRequestException on network related issues
+     */
     suspend fun downloadPublicAsFlow(path: String, transform: ImageTransformation.() -> Unit = {}): Flow<DownloadStatus>
 
     /**
