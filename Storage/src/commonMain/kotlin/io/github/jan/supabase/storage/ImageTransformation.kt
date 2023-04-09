@@ -18,13 +18,39 @@ class ImageTransformation {
 
     var width: Int? = null
     var height: Int? = null
-    var resize: Resize? = null
     var quality: Int? = null
         set(value) {
             if(value !in 1..100) throw IllegalArgumentException("Quality must be between 1 and 100")
             field = value
         }
     var format: String? = null
+    private var resize: Resize? = null
+
+    fun size(width: Int, height: Int) {
+        this.width = width
+        this.height = height
+    }
+
+    /**
+     * Resizes the image while keeping the aspect ratio to fill a given size and crops projecting parts
+     */
+    fun cover() {
+        resize = Resize.COVER
+    }
+
+    /**
+     * Resizes the image while keeping the aspect ratio to fit a given size.
+     */
+    fun contain() {
+        resize = Resize.CONTAIN
+    }
+
+    /**
+     * Resizes the image without keeping the aspect ratio.
+     */
+    fun fill() {
+        resize = Resize.FILL
+    }
 
     internal fun queryString(): String {
         val builder = ParametersBuilder()
