@@ -1,0 +1,47 @@
+package io.github.jan.supabase.storage
+
+import kotlin.jvm.JvmInline
+
+/**
+ * Represents the status of a download
+ */
+sealed interface DownloadStatus {
+
+    /**
+     * Represents the progress of a download
+     * @param totalBytesReceived The total bytes received
+     * @param contentLength The total bytes to receive
+     */
+    //TODO: Replace with multi-field value class
+    data class Progress(val totalBytesReceived: Long, val contentLength: Long) : DownloadStatus
+
+    /**
+     * Represents the success of a download
+     * @param data The downloaded data
+     */
+    @JvmInline
+    value class Success(val data: ByteArray) : DownloadStatus
+
+}
+
+/**
+ * Represents the status of an upload
+ */
+sealed interface UploadStatus {
+
+    /**
+     * Represents the progress of an upload
+     * @param totalBytesSend The total bytes sent
+     * @param contentLength The total bytes to send
+     */
+    //TODO: Replace with multi-field value class
+    data class Progress(val totalBytesSend: Long, val contentLength: Long) : UploadStatus
+
+    /**
+     * Represents the success of an upload
+     * @param key The key of the uploaded file
+     */
+    @JvmInline
+    value class Success(val key: String) : UploadStatus
+
+}

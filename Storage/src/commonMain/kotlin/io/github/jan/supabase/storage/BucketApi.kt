@@ -1,6 +1,7 @@
 package io.github.jan.supabase.storage
 
 import io.github.jan.supabase.SupabaseClient
+import io.github.jan.supabase.annotiations.SupabaseExperimental
 import io.github.jan.supabase.exceptions.HttpRequestException
 import io.github.jan.supabase.exceptions.RestException
 import io.github.jan.supabase.gotrue.GoTrue
@@ -10,6 +11,8 @@ import io.ktor.client.call.*
 import io.ktor.client.plugins.*
 import io.ktor.client.request.*
 import io.ktor.http.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.serialization.json.*
 import kotlin.time.Duration
 
@@ -29,6 +32,17 @@ sealed interface BucketApi {
     suspend fun upload(path: String, data: ByteArray): String
 
     /**
+     * Uploads a file in [bucketId] under [path]
+     * @param path The path to upload the file to
+     * @return A flow that emits the upload progress and at last the key to the uploaded file
+     * @throws RestException or one of its subclasses if receiving an error response
+     * @throws HttpRequestTimeoutException if the request timed out
+     * @throws HttpRequestException on network related issues
+     */
+    @SupabaseExperimental
+    suspend fun uploadAsFlow(path: String, data: ByteArray): Flow<UploadStatus>
+
+    /**
      * Uploads a file in [bucketId] under [path] using a presigned url
      * @param path The path to upload the file to
      * @param token The presigned url token
@@ -38,13 +52,37 @@ sealed interface BucketApi {
     suspend fun uploadToSignedUrl(path: String, token: String, data: ByteArray): String
 
     /**
+     * Uploads a file in [bucketId] under [path] using a presigned url
+     * @param path The path to upload the file to
+     * @param token The presigned url token
+     * @param data The data to upload
+     * @return A flow that emits the upload progress and at last the key to the uploaded file
+     */
+    @SupabaseExperimental
+    suspend fun uploadToSignedUrlAsFlow(path: String, token: String, data: ByteArray): Flow<UploadStatus>
+
+    /**
      * Updates a file in [bucketId] under [path]
+     * @param path The path to update the file to
+     * @param data The new data
      * @return the key to the updated file
      * @throws RestException or one of its subclasses if receiving an error response
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
     suspend fun update(path: String, data: ByteArray): String
+
+    /**
+     * Updates a file in [bucketId] under [path]
+     * @param path The path to update the file to
+     * @param data The new data
+     * @return A flow that emits the upload progress and at last the key to the uploaded file
+     * @throws RestException or one of its subclasses if receiving an error response
+     * @throws HttpRequestTimeoutException if the request timed out
+     * @throws HttpRequestException on network related issues
+     */
+    @SupabaseExperimental
+    suspend fun updateAsFlow(path: String, data: ByteArray): Flow<UploadStatus>
 
     /**
      * Deletes all files in [bucketId] with in [paths]
@@ -130,6 +168,18 @@ sealed interface BucketApi {
     suspend fun downloadAuthenticated(path: String, transform: ImageTransformation.() -> Unit = {}): ByteArray
 
     /**
+     * Downloads a file from [bucketId] under [path]
+     * @param path The path to download
+     * @param transform The transformation to apply to the image
+     * @return A flow that emits the download progress and at last the data as a byte array
+     * @throws RestException or one of its subclasses if receiving an error response
+     * @throws HttpRequestTimeoutException if the request timed out
+     * @throws HttpRequestException on network related issues
+     */
+    @SupabaseExperimental
+    suspend fun downloadAuthenticatedAsFlow(path: String, transform: ImageTransformation.() -> Unit = {}): Flow<DownloadStatus>
+
+    /**
      * Downloads a file from [bucketId] under [path] using the public url
      * @param path The path to download
      * @param transform The transformation to apply to the image
@@ -139,6 +189,18 @@ sealed interface BucketApi {
      * @throws HttpRequestException on network related issues
      */
     suspend fun downloadPublic(path: String, transform: ImageTransformation.() -> Unit = {}): ByteArray
+
+    /**
+     * Downloads a file from [bucketId] under [path] using the public url
+     * @param path The path to download
+     * @param transform The transformation to apply to the image
+     * @return A flow that emits the download progress and at last the data as a byte array
+     * @throws RestException or one of its subclasses if receiving an error response
+     * @throws HttpRequestTimeoutException if the request timed out
+     * @throws HttpRequestException on network related issues
+     */
+    @SupabaseExperimental
+    suspend fun downloadPublicAsFlow(path: String, transform: ImageTransformation.() -> Unit = {}): Flow<DownloadStatus>
 
     /**
      * Searches for buckets with the given [prefix] and [filter]
@@ -197,10 +259,32 @@ internal class BucketApiImpl(override val bucketId: String, val storage: Storage
 
     override suspend fun update(path: String, data: ByteArray): String = uploadOrUpdate(HttpMethod.Put, bucketId, path, data)
 
+    @SupabaseExperimental
+    override suspend fun updateAsFlow(path: String, data: ByteArray): Flow<UploadStatus> = callbackFlow {
+        val key = uploadOrUpdate(HttpMethod.Put, bucketId, path, data) {
+            onUpload { bytesSentTotal, contentLength ->
+                trySend(UploadStatus.Progress(bytesSentTotal, contentLength))
+            }
+        }
+        trySend(UploadStatus.Success(key))
+        close()
+    }
+
     override suspend fun uploadToSignedUrl(path: String, token: String, data: ByteArray): String {
-        return storage.api.put("object/upload/sign/$bucketId/$path") {
-            parameter("token", token)
-        }.body<JsonObject>()["Key"]?.jsonPrimitive?.content ?: throw IllegalStateException("Expected a key in a upload response")
+        return uploadToSignedUrl(path, token, data)
+    }
+
+    @SupabaseExperimental
+    override suspend fun uploadToSignedUrlAsFlow(path: String, token: String, data: ByteArray): Flow<UploadStatus> {
+        return callbackFlow {
+            val key = uploadToSignedUrl(path, token, data) {
+                onUpload { bytesSentTotal, contentLength ->
+                    trySend(UploadStatus.Progress(bytesSentTotal, contentLength))
+                }
+            }
+            trySend(UploadStatus.Success(key))
+            close()
+        }
     }
 
     override suspend fun createUploadSignedUrl(path: String): UploadSignedUrl {
@@ -215,6 +299,19 @@ internal class BucketApiImpl(override val bucketId: String, val storage: Storage
     }
 
     override suspend fun upload(path: String, data: ByteArray): String = uploadOrUpdate(HttpMethod.Post, bucketId, path, data)
+
+    @SupabaseExperimental
+    override suspend fun uploadAsFlow(path: String, data: ByteArray): Flow<UploadStatus> {
+        return callbackFlow {
+            val key = uploadOrUpdate(HttpMethod.Post, bucketId, path, data) {
+                onUpload { bytesSentTotal, contentLength ->
+                    trySend(UploadStatus.Progress(bytesSentTotal, contentLength))
+                }
+            }
+            trySend(UploadStatus.Success(key))
+            close()
+        }
+    }
 
     override suspend fun delete(paths: Collection<String>) {
         storage.api.deleteJson("object/$bucketId", buildJsonObject {
@@ -269,19 +366,56 @@ internal class BucketApiImpl(override val bucketId: String, val storage: Storage
     }
 
     override suspend fun downloadAuthenticated(path: String, transform: ImageTransformation.() -> Unit): ByteArray {
-        val transformation = ImageTransformation().apply(transform).queryString()
-        val url = if(transformation.isBlank()) authenticatedUrl(path) else authenticatedRenderUrl(path, transform)
-        return storage.api.rawRequest(url) {
-            method = HttpMethod.Get
+        return storage.api.rawRequest {
+            prepareDownloadRequest(path, false, transform)
         }.body()
     }
 
+    @SupabaseExperimental
+    override suspend fun downloadAuthenticatedAsFlow(
+        path: String,
+        transform: ImageTransformation.() -> Unit
+    ): Flow<DownloadStatus> {
+        return callbackFlow {
+            val data = storage.api.rawRequest {
+                prepareDownloadRequest(path, false, transform)
+                onDownload { bytesSentTotal, contentLength ->
+                    trySend(DownloadStatus.Progress(bytesSentTotal, contentLength))
+                }
+            }.body<ByteArray>()
+            trySend(DownloadStatus.Success(data))
+            close()
+        }
+    }
+
     override suspend fun downloadPublic(path: String, transform: ImageTransformation.() -> Unit): ByteArray {
-        val transformation = ImageTransformation().apply(transform).queryString()
-        val url = if(transformation.isBlank()) publicUrl(path) else publicRenderUrl(path, transform)
-        return storage.api.rawRequest(url) {
-            method = HttpMethod.Get
+        return storage.api.rawRequest {
+            prepareDownloadRequest(path, true, transform)
         }.body()
+    }
+
+    @SupabaseExperimental
+    override suspend fun downloadPublicAsFlow(path: String, transform: ImageTransformation.() -> Unit): Flow<DownloadStatus> {
+        return callbackFlow {
+            val data = storage.api.rawRequest {
+                prepareDownloadRequest(path, true, transform)
+                onDownload { bytesSentTotal, contentLength ->
+                    trySend(DownloadStatus.Progress(bytesSentTotal, contentLength))
+                }
+            }.body<ByteArray>()
+            trySend(DownloadStatus.Success(data))
+            close()
+        }
+    }
+
+    private fun HttpRequestBuilder.prepareDownloadRequest(path: String, public: Boolean, transform: ImageTransformation.() -> Unit) {
+        val transformation = ImageTransformation().apply(transform).queryString()
+        val url = when(public) {
+            true -> if(transformation.isBlank()) publicUrl(path) else publicRenderUrl(path, transform)
+            false -> if(transformation.isBlank()) authenticatedUrl(path) else authenticatedRenderUrl(path, transform)
+        }
+        method = HttpMethod.Get
+        url(url)
     }
 
     override suspend fun list(prefix: String, filter: BucketListFilter.() -> Unit): List<BucketItem> {
@@ -291,12 +425,21 @@ internal class BucketApiImpl(override val bucketId: String, val storage: Storage
         }).safeBody()
     }
 
-    private suspend fun uploadOrUpdate(method: HttpMethod, bucket: String, path: String, body: ByteArray): String {
+    private suspend fun uploadOrUpdate(method: HttpMethod, bucket: String, path: String, body: ByteArray, extra: HttpRequestBuilder.() -> Unit = {}): String {
         return storage.api.request("object/$bucket/$path") {
             this.method = method
             setBody(body)
-
             header(HttpHeaders.ContentType, ContentType.defaultForFilePath(path))
+            extra()
+        }.body<JsonObject>()["Key"]?.jsonPrimitive?.content ?: throw IllegalStateException("Expected a key in a upload response")
+    }
+
+    private suspend fun uploadToSignedUrl(path: String, token: String, body: ByteArray, extra: HttpRequestBuilder.() -> Unit = {}): String {
+        return storage.api.put("object/upload/sign/$bucketId/$path") {
+            parameter("token", token)
+            setBody(body)
+            header(HttpHeaders.ContentType, ContentType.defaultForFilePath(path))
+            extra()
         }.body<JsonObject>()["Key"]?.jsonPrimitive?.content ?: throw IllegalStateException("Expected a key in a upload response")
     }
 

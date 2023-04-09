@@ -4,10 +4,8 @@ import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.exceptions.RestException
 import io.github.jan.supabase.network.SupabaseApi
 import io.github.jan.supabase.plugins.MainPlugin
-import io.ktor.client.request.HttpRequestBuilder
-import io.ktor.client.request.bearerAuth
-import io.ktor.client.request.headers
-import io.ktor.client.statement.HttpResponse
+import io.ktor.client.request.*
+import io.ktor.client.statement.*
 
 class AuthenticatedSupabaseApi(
     resolveUrl: (path: String) -> String,
@@ -25,6 +23,8 @@ class AuthenticatedSupabaseApi(
         }
         builder()
     }
+
+    suspend fun rawRequest(builder: HttpRequestBuilder.() -> Unit): HttpResponse = rawRequest("", builder)
 
 }
 
