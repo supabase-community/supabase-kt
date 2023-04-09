@@ -1,6 +1,7 @@
 package io.github.jan.supabase.storage
 
 import io.ktor.http.*
+import kotlin.jvm.JvmName
 
 /**
  * A builder for [Bucket]s
@@ -40,6 +41,7 @@ class BucketBuilder {
     /**
      * Sets the allowed mime types for the bucket
      */
+    @JvmName("allowedMimeTypesContentType")
     fun allowedMimeTypes(mimeTypes: List<ContentType>) {
         allowedMimeTypes = mimeTypes.map { it.toString() }
     }
