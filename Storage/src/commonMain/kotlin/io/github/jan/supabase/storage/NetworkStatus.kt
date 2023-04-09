@@ -12,6 +12,7 @@ sealed interface DownloadStatus {
      * @param totalBytesReceived The total bytes received
      * @param contentLength The total bytes to receive
      */
+    //TODO: Replace with multi-field value class
     data class Progress(val totalBytesReceived: Long, val contentLength: Long) : DownloadStatus
 
     /**
@@ -33,6 +34,7 @@ sealed interface UploadStatus {
      * @param totalBytesSend The total bytes sent
      * @param contentLength The total bytes to send
      */
+    //TODO: Replace with multi-field value class
     data class Progress(val totalBytesSend: Long, val contentLength: Long) : UploadStatus
 
     /**
