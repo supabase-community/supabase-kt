@@ -24,7 +24,7 @@ class ImageTransformation {
             field = value
         }
     var format: String? = null
-    private var resize: Resize? = null
+    var resize: Resize? = null
 
     fun size(width: Int, height: Int) {
         this.width = width
