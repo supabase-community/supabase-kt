@@ -164,7 +164,7 @@ internal class StorageImpl(override val supabaseClient: SupabaseClient, override
             401 -> throw UnauthorizedRestException(error.error, response, error.message)
             400 -> throw BadRequestRestException(error.error, response, error.message)
             404 -> throw NotFoundRestException(error.error, response, error.message)
-            else -> throw UnknownRestException("Unknown error response", response)
+            else -> throw UnknownRestException(error.message, response)
         }
     }
 
