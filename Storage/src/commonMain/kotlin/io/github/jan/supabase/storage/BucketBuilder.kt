@@ -24,23 +24,29 @@ class BucketBuilder {
 
 
     /**
-     * Sets the file size limit for the bucket
+     * Sets the allowed mime types for the bucket
      */
     fun allowedMimeTypes(vararg mimeTypes: String) {
         allowedMimeTypes = mimeTypes.toList()
     }
 
     /**
-     * Sets the file size limit for the bucket
+     * Sets the allowed mime types for the bucket
      */
     fun allowedMimeTypes(mimeTypes: List<String>) {
         allowedMimeTypes = mimeTypes
     }
 
+    /**
+     * Sets the allowed mime types for the bucket
+     */
     fun allowedMimeTypes(mimeTypes: List<ContentType>) {
         allowedMimeTypes = mimeTypes.map { it.toString() }
     }
 
+    /**
+     * Sets the allowed mime types for the bucket
+     */
     fun allowedMimeTypes(vararg mimeTypes: ContentType) {
         allowedMimeTypes = mimeTypes.map { it.toString() }
     }
