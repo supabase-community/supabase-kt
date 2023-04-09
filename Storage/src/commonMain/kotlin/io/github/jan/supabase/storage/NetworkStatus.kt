@@ -12,14 +12,14 @@ sealed interface DownloadStatus {
      * @param totalBytesReceived The total bytes received
      * @param contentLength The total bytes to receive
      */
-    data class DownloadProgress(val totalBytesReceived: Long, val contentLength: Long) : DownloadStatus
+    data class Progress(val totalBytesReceived: Long, val contentLength: Long) : DownloadStatus
 
     /**
      * Represents the success of a download
      * @param data The downloaded data
      */
     @JvmInline
-    value class DownloadSuccess(val data: ByteArray) : DownloadStatus
+    value class Success(val data: ByteArray) : DownloadStatus
 
 }
 
@@ -33,13 +33,13 @@ sealed interface UploadStatus {
      * @param totalBytesSend The total bytes sent
      * @param contentLength The total bytes to send
      */
-    data class UploadProgress(val totalBytesSend: Long, val contentLength: Long) : UploadStatus
+    data class Progress(val totalBytesSend: Long, val contentLength: Long) : UploadStatus
 
     /**
      * Represents the success of an upload
      * @param key The key of the uploaded file
      */
     @JvmInline
-    value class UploadSuccess(val key: String) : UploadStatus
+    value class Success(val key: String) : UploadStatus
 
 }

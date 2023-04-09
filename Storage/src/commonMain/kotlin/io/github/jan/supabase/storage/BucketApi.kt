@@ -263,10 +263,10 @@ internal class BucketApiImpl(override val bucketId: String, val storage: Storage
     override suspend fun updateAsFlow(path: String, data: ByteArray): Flow<UploadStatus> = callbackFlow {
         val key = uploadOrUpdate(HttpMethod.Put, bucketId, path, data) {
             onUpload { bytesSentTotal, contentLength ->
-                trySend(UploadStatus.UploadProgress(bytesSentTotal, contentLength))
+                trySend(UploadStatus.Progress(bytesSentTotal, contentLength))
             }
         }
-        trySend(UploadStatus.UploadSuccess(key))
+        trySend(UploadStatus.Success(key))
         close()
     }
 
@@ -279,10 +279,10 @@ internal class BucketApiImpl(override val bucketId: String, val storage: Storage
         return callbackFlow {
             val key = uploadToSignedUrl(path, token, data) {
                 onUpload { bytesSentTotal, contentLength ->
-                    trySend(UploadStatus.UploadProgress(bytesSentTotal, contentLength))
+                    trySend(UploadStatus.Progress(bytesSentTotal, contentLength))
                 }
             }
-            trySend(UploadStatus.UploadSuccess(key))
+            trySend(UploadStatus.Success(key))
             close()
         }
     }
@@ -305,10 +305,10 @@ internal class BucketApiImpl(override val bucketId: String, val storage: Storage
         return callbackFlow {
             val key = uploadOrUpdate(HttpMethod.Post, bucketId, path, data) {
                 onUpload { bytesSentTotal, contentLength ->
-                    trySend(UploadStatus.UploadProgress(bytesSentTotal, contentLength))
+                    trySend(UploadStatus.Progress(bytesSentTotal, contentLength))
                 }
             }
-            trySend(UploadStatus.UploadSuccess(key))
+            trySend(UploadStatus.Success(key))
             close()
         }
     }
@@ -380,10 +380,10 @@ internal class BucketApiImpl(override val bucketId: String, val storage: Storage
             val data = storage.api.rawRequest {
                 prepareDownloadRequest(path, false, transform)
                 onDownload { bytesSentTotal, contentLength ->
-                    trySend(DownloadStatus.DownloadProgress(bytesSentTotal, contentLength))
+                    trySend(DownloadStatus.Progress(bytesSentTotal, contentLength))
                 }
             }.body<ByteArray>()
-            trySend(DownloadStatus.DownloadSuccess(data))
+            trySend(DownloadStatus.Success(data))
             close()
         }
     }
@@ -400,10 +400,10 @@ internal class BucketApiImpl(override val bucketId: String, val storage: Storage
             val data = storage.api.rawRequest {
                 prepareDownloadRequest(path, true, transform)
                 onDownload { bytesSentTotal, contentLength ->
-                    trySend(DownloadStatus.DownloadProgress(bytesSentTotal, contentLength))
+                    trySend(DownloadStatus.Progress(bytesSentTotal, contentLength))
                 }
             }.body<ByteArray>()
-            trySend(DownloadStatus.DownloadSuccess(data))
+            trySend(DownloadStatus.Success(data))
             close()
         }
     }
