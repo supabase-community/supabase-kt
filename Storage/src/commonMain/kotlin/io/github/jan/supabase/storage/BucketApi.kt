@@ -24,65 +24,73 @@ sealed interface BucketApi {
     /**
      * Uploads a file in [bucketId] under [path]
      * @param path The path to upload the file to
+     * @param data The data to upload
+     * @param upsert Whether to overwrite an existing file
      * @return the key to the uploaded file
      * @throws RestException or one of its subclasses if receiving an error response
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
-    suspend fun upload(path: String, data: ByteArray): String
+    suspend fun upload(path: String, data: ByteArray, upsert: Boolean = false): String
 
     /**
      * Uploads a file in [bucketId] under [path]
      * @param path The path to upload the file to
+     * @param upsert Whether to overwrite an existing file
+     * @param data The data to upload
      * @return A flow that emits the upload progress and at last the key to the uploaded file
      * @throws RestException or one of its subclasses if receiving an error response
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
     @SupabaseExperimental
-    suspend fun uploadAsFlow(path: String, data: ByteArray): Flow<UploadStatus>
+    suspend fun uploadAsFlow(path: String, data: ByteArray, upsert: Boolean = false): Flow<UploadStatus>
 
     /**
      * Uploads a file in [bucketId] under [path] using a presigned url
      * @param path The path to upload the file to
      * @param token The presigned url token
      * @param data The data to upload
+     * @param upsert Whether to overwrite an existing file
      * @return the key of the uploaded file
      */
-    suspend fun uploadToSignedUrl(path: String, token: String, data: ByteArray): String
+    suspend fun uploadToSignedUrl(path: String, token: String, data: ByteArray, upsert: Boolean = false): String
 
     /**
      * Uploads a file in [bucketId] under [path] using a presigned url
      * @param path The path to upload the file to
      * @param token The presigned url token
      * @param data The data to upload
+     * @param upsert Whether to overwrite an existing file
      * @return A flow that emits the upload progress and at last the key to the uploaded file
      */
     @SupabaseExperimental
-    suspend fun uploadToSignedUrlAsFlow(path: String, token: String, data: ByteArray): Flow<UploadStatus>
+    suspend fun uploadToSignedUrlAsFlow(path: String, token: String, data: ByteArray, upsert: Boolean = false): Flow<UploadStatus>
 
     /**
      * Updates a file in [bucketId] under [path]
      * @param path The path to update the file to
      * @param data The new data
+     * @param upsert Whether to overwrite an existing file
      * @return the key to the updated file
      * @throws RestException or one of its subclasses if receiving an error response
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
-    suspend fun update(path: String, data: ByteArray): String
+    suspend fun update(path: String, data: ByteArray, upsert: Boolean = false): String
 
     /**
      * Updates a file in [bucketId] under [path]
      * @param path The path to update the file to
      * @param data The new data
+     * @param upsert Whether to overwrite an existing file
      * @return A flow that emits the upload progress and at last the key to the uploaded file
      * @throws RestException or one of its subclasses if receiving an error response
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
     @SupabaseExperimental
-    suspend fun updateAsFlow(path: String, data: ByteArray): Flow<UploadStatus>
+    suspend fun updateAsFlow(path: String, data: ByteArray, upsert: Boolean = false): Flow<UploadStatus>
 
     /**
      * Deletes all files in [bucketId] with in [paths]
@@ -257,11 +265,11 @@ internal class BucketApiImpl(override val bucketId: String, val storage: Storage
 
     override val supabaseClient = storage.supabaseClient
 
-    override suspend fun update(path: String, data: ByteArray): String = uploadOrUpdate(HttpMethod.Put, bucketId, path, data)
+    override suspend fun update(path: String, data: ByteArray, upsert: Boolean): String = uploadOrUpdate(HttpMethod.Put, bucketId, path, data, upsert)
 
     @SupabaseExperimental
-    override suspend fun updateAsFlow(path: String, data: ByteArray): Flow<UploadStatus> = callbackFlow {
-        val key = uploadOrUpdate(HttpMethod.Put, bucketId, path, data) {
+    override suspend fun updateAsFlow(path: String, data: ByteArray, upsert: Boolean): Flow<UploadStatus> = callbackFlow {
+        val key = uploadOrUpdate(HttpMethod.Put, bucketId, path, data, upsert) {
             onUpload { bytesSentTotal, contentLength ->
                 trySend(UploadStatus.Progress(bytesSentTotal, contentLength))
             }
@@ -270,14 +278,19 @@ internal class BucketApiImpl(override val bucketId: String, val storage: Storage
         close()
     }
 
-    override suspend fun uploadToSignedUrl(path: String, token: String, data: ByteArray): String {
-        return uploadToSignedUrl(path, token, data)
+    override suspend fun uploadToSignedUrl(path: String, token: String, data: ByteArray, upsert: Boolean): String {
+        return uploadToSignedUrl(path, token, data, upsert) {}
     }
 
     @SupabaseExperimental
-    override suspend fun uploadToSignedUrlAsFlow(path: String, token: String, data: ByteArray): Flow<UploadStatus> {
+    override suspend fun uploadToSignedUrlAsFlow(
+        path: String,
+        token: String,
+        data: ByteArray,
+        upsert: Boolean
+    ): Flow<UploadStatus> {
         return callbackFlow {
-            val key = uploadToSignedUrl(path, token, data) {
+            val key = uploadToSignedUrl(path, token, data, upsert) {
                 onUpload { bytesSentTotal, contentLength ->
                     trySend(UploadStatus.Progress(bytesSentTotal, contentLength))
                 }
@@ -298,12 +311,12 @@ internal class BucketApiImpl(override val bucketId: String, val storage: Storage
         )
     }
 
-    override suspend fun upload(path: String, data: ByteArray): String = uploadOrUpdate(HttpMethod.Post, bucketId, path, data)
+    override suspend fun upload(path: String, data: ByteArray, upsert: Boolean): String = uploadOrUpdate(HttpMethod.Post, bucketId, path, data, upsert)
 
     @SupabaseExperimental
-    override suspend fun uploadAsFlow(path: String, data: ByteArray): Flow<UploadStatus> {
+    override suspend fun uploadAsFlow(path: String, data: ByteArray, upsert: Boolean): Flow<UploadStatus> {
         return callbackFlow {
-            val key = uploadOrUpdate(HttpMethod.Post, bucketId, path, data) {
+            val key = uploadOrUpdate(HttpMethod.Post, bucketId, path, data, upsert) {
                 onUpload { bytesSentTotal, contentLength ->
                     trySend(UploadStatus.Progress(bytesSentTotal, contentLength))
                 }
@@ -425,20 +438,22 @@ internal class BucketApiImpl(override val bucketId: String, val storage: Storage
         }).safeBody()
     }
 
-    private suspend fun uploadOrUpdate(method: HttpMethod, bucket: String, path: String, body: ByteArray, extra: HttpRequestBuilder.() -> Unit = {}): String {
+    private suspend fun uploadOrUpdate(method: HttpMethod, bucket: String, path: String, body: ByteArray, upsert: Boolean, extra: HttpRequestBuilder.() -> Unit = {}): String {
         return storage.api.request("object/$bucket/$path") {
             this.method = method
             setBody(body)
             header(HttpHeaders.ContentType, ContentType.defaultForFilePath(path))
+            header("x-upsert", upsert.toString())
             extra()
         }.body<JsonObject>()["Key"]?.jsonPrimitive?.content ?: throw IllegalStateException("Expected a key in a upload response")
     }
 
-    private suspend fun uploadToSignedUrl(path: String, token: String, body: ByteArray, extra: HttpRequestBuilder.() -> Unit = {}): String {
+    private suspend fun uploadToSignedUrl(path: String, token: String, body: ByteArray, upsert: Boolean, extra: HttpRequestBuilder.() -> Unit = {}): String {
         return storage.api.put("object/upload/sign/$bucketId/$path") {
             parameter("token", token)
             setBody(body)
             header(HttpHeaders.ContentType, ContentType.defaultForFilePath(path))
+            header("x-upsert", upsert.toString())
             extra()
         }.body<JsonObject>()["Key"]?.jsonPrimitive?.content ?: throw IllegalStateException("Expected a key in a upload response")
     }

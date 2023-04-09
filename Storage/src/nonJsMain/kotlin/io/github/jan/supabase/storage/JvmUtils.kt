@@ -10,104 +10,116 @@ import kotlin.io.path.writeBytes
  * Uploads a file in [BucketApi.bucketId] under [path]
  * @param path The path to upload the file to
  * @param file The file to upload
+ * @param upsert Whether to overwrite an existing file
  * @return the key to the uploaded file
  */
-suspend fun BucketApi.upload(path: String, file: File) = upload(path, file.readBytes())
+suspend fun BucketApi.upload(path: String, file: File, upsert: Boolean = false) = upload(path, file.readBytes(), upsert)
 
 /**
  * Uploads a file in [BucketApi.bucketId] under [path]
  * @param path The path to upload the file to
  * @param file The file to upload
+ * @param upsert Whether to overwrite an existing file
  * @return A flow that emits the upload progress and at last the key to the uploaded file
  */
 @SupabaseExperimental
-suspend fun BucketApi.uploadAsFlow(path: String, file: File) = uploadAsFlow(path, file.readBytes())
+suspend fun BucketApi.uploadAsFlow(path: String, file: File, upsert: Boolean = false) = uploadAsFlow(path, file.readBytes(), upsert)
 
 /**
  * Uploads a file in [BucketApi.bucketId] under [path]
  * @param path The path to upload the file to
  * @param file The file to upload
+ * @param upsert Whether to overwrite an existing file
  * @return the key to the uploaded file
  */
-suspend fun BucketApi.upload(path: String, file: Path) = upload(path, file.readBytes())
+suspend fun BucketApi.upload(path: String, file: Path, upsert: Boolean = false) = upload(path, file.readBytes(), upsert)
 
 /**
  * Uploads a file in [BucketApi.bucketId] under [path]
  * @param path The path to upload the file to
  * @param file The file to upload
+ * @param upsert Whether to overwrite an existing file
  * @return A flow that emits the upload progress and at last the key to the uploaded file
  */
 @SupabaseExperimental
-suspend fun BucketApi.uploadAsFlow(path: String, file: Path) = uploadAsFlow(path, file.readBytes())
+suspend fun BucketApi.uploadAsFlow(path: String, file: Path, upsert: Boolean = false) = uploadAsFlow(path, file.readBytes(), upsert)
 
 /**
  * Uploads a file in [BucketApi.bucketId] under [path] using a presigned url
  * @param path The path to upload the file to
  * @param token The presigned url token
  * @param file The file to upload
+ * @param upsert Whether to overwrite an existing file
  * @return the key to the uploaded file
  */
-suspend fun BucketApi.uploadToSignedUrl(path: String, token: String, file: File) = uploadToSignedUrl(path, token, file.readBytes())
+suspend fun BucketApi.uploadToSignedUrl(path: String, token: String, file: File, upsert: Boolean = false) = uploadToSignedUrl(path, token, file.readBytes(), upsert)
 
 /**
  * Uploads a file in [BucketApi.bucketId] under [path] using a presigned url
  * @param path The path to upload the file to
  * @param token The presigned url token
  * @param file The file to upload
+ * @param upsert Whether to overwrite an existing file
  * @return A flow that emits the upload progress and at last the key to the uploaded file
  */
 @SupabaseExperimental
-suspend fun BucketApi.uploadToSignedUrlAsFlow(path: String, token: String, file: File) = uploadToSignedUrlAsFlow(path, token, file.readBytes())
-
-/**
- * Uploads a file in [BucketApi.bucketId] under [path] using a presigned url
- * @param path The path to upload the file to
- * @param file The presigned url token
- * @param file The file to upload
- */
-suspend fun BucketApi.uploadToSignedUrl(path: String, token: String, file: Path) = uploadToSignedUrl(path, token, file.readBytes())
+suspend fun BucketApi.uploadToSignedUrlAsFlow(path: String, token: String, file: File, upsert: Boolean = false) = uploadToSignedUrlAsFlow(path, token, file.readBytes(), upsert)
 
 /**
  * Uploads a file in [BucketApi.bucketId] under [path] using a presigned url
  * @param path The path to upload the file to
  * @param token The presigned url token
  * @param file The file to upload
+ * @param upsert Whether to overwrite an existing file
+ */
+suspend fun BucketApi.uploadToSignedUrl(path: String, token: String, file: Path, upsert: Boolean = false) = uploadToSignedUrl(path, token, file.readBytes(), upsert)
+
+/**
+ * Uploads a file in [BucketApi.bucketId] under [path] using a presigned url
+ * @param path The path to upload the file to
+ * @param token The presigned url token
+ * @param file The file to upload
+ * @param upsert Whether to overwrite an existing file
  * @return A flow that emits the upload progress and at last the key to the uploaded file
  */
 @SupabaseExperimental
-suspend fun BucketApi.uploadToSignedUrlAsFlow(path: String, token: String, file: Path) = uploadToSignedUrlAsFlow(path, token, file.readBytes())
+suspend fun BucketApi.uploadToSignedUrlAsFlow(path: String, token: String, file: Path, upsert: Boolean = false) = uploadToSignedUrlAsFlow(path, token, file.readBytes(), upsert)
 
 /**
  * Updates a file in [BucketApi.bucketId] under [path]
  * @param path The path to be updated
  * @param file The new file
+ * @param upsert Whether to overwrite an existing file
  */
-suspend fun BucketApi.update(path: String, file: Path) = update(path, file.readBytes())
+suspend fun BucketApi.update(path: String, file: Path, upsert: Boolean = false) = update(path, file.readBytes(), upsert)
 
 /**
  * Updates a file in [BucketApi.bucketId] under [path]
  * @param path The path to be updated
  * @param file The new file
+ * @param upsert Whether to overwrite an existing file
  * @return A flow that emits the upload progress and at last the key to the uploaded file
  */
 @SupabaseExperimental
-suspend fun BucketApi.updateAsFlow(path: String, file: Path) = updateAsFlow(path, file.readBytes())
+suspend fun BucketApi.updateAsFlow(path: String, file: Path, upsert: Boolean = false) = updateAsFlow(path, file.readBytes(), upsert)
 
 /**
  * Updates a file in [BucketApi.bucketId] under [path]
  * @param path The path to be updated
  * @param file The new file
+ * @param upsert Whether to overwrite an existing file
  */
-suspend fun BucketApi.update(path: String, file: File) = update(path, file.readBytes())
+suspend fun BucketApi.update(path: String, file: File, upsert: Boolean = false) = update(path, file.readBytes(), upsert)
 
 /**
  * Updates a file in [BucketApi.bucketId] under [path]
  * @param path The path to be updated
  * @param file The new file
+ * @param upsert Whether to overwrite an existing file
  * @return A flow that emits the upload progress and at last the key to the uploaded file
  */
 @SupabaseExperimental
-suspend fun BucketApi.updateAsFlow(path: String, file: File) = updateAsFlow(path, file.readBytes())
+suspend fun BucketApi.updateAsFlow(path: String, file: File, upsert: Boolean = false) = updateAsFlow(path, file.readBytes(), upsert)
 
 /**
  * Downloads a file from [BucketApi.bucketId] under [path] and saves it to [file]
