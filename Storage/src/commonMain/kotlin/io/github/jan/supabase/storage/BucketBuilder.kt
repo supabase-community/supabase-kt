@@ -1,5 +1,7 @@
 package io.github.jan.supabase.storage
 
+import io.ktor.http.*
+
 /**
  * A builder for [Bucket]s
  */
@@ -33,6 +35,14 @@ class BucketBuilder {
      */
     fun allowedMimeTypes(mimeTypes: List<String>) {
         allowedMimeTypes = mimeTypes
+    }
+
+    fun allowedMimeTypes(mimeTypes: List<ContentType>) {
+        allowedMimeTypes = mimeTypes.map { it.toString() }
+    }
+
+    fun allowedMimeTypes(vararg mimeTypes: ContentType) {
+        allowedMimeTypes = mimeTypes.map { it.toString() }
     }
 
     val Long.bytes get() = FileSizeLimit("${this}b")
