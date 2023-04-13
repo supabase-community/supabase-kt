@@ -21,7 +21,7 @@ sealed interface BucketApi {
 
     val bucketId: String
     val supabaseClient: SupabaseClient
-    val resumableClient: ResumableClient
+    val resumable: ResumableClient
 
     /**
      * Uploads a file in [bucketId] under [path]
@@ -266,7 +266,7 @@ sealed interface BucketApi {
 internal class BucketApiImpl(override val bucketId: String, val storage: StorageImpl) : BucketApi {
 
     override val supabaseClient = storage.supabaseClient
-    override val resumableClient = ResumableClient(this, storage.config.resumableCache)
+    override val resumable = ResumableClient(this, storage.config.resumableCache)
 
     override suspend fun update(path: String, data: ByteArray, upsert: Boolean): String = uploadOrUpdate(HttpMethod.Put, bucketId, path, data, upsert)
 

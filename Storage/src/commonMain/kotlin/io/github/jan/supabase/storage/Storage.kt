@@ -4,8 +4,8 @@ package io.github.jan.supabase.storage
 
 import com.russhwolf.settings.ExperimentalSettingsApi
 import com.russhwolf.settings.Settings
-import com.russhwolf.settings.coroutines.toSuspendSettings
 import io.github.jan.supabase.SupabaseClient
+import io.github.jan.supabase.SupabaseClientBuilder
 import io.github.jan.supabase.bodyOrNull
 import io.github.jan.supabase.exceptions.*
 import io.github.jan.supabase.gotrue.authenticatedSupabaseApi
@@ -15,6 +15,7 @@ import io.github.jan.supabase.plugins.SupabasePluginProvider
 import io.github.jan.supabase.safeBody
 import io.github.jan.supabase.storage.resumable.ResumableCache
 import io.ktor.client.plugins.*
+import io.ktor.client.plugins.logging.*
 import io.ktor.client.statement.*
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonPrimitive
@@ -103,8 +104,9 @@ sealed interface Storage : MainPlugin<Storage.Config> {
         override var customUrl: String? = null,
         override var jwtToken: String? = null,
         var resumableCache: ResumableCache = ResumableCache.Settings(
-            Settings().toSuspendSettings()
-        )
+            Settings()
+        ),
+        var defaultChunkSize: Long = 1024 * 1024 * 5,
     ) : MainConfig
 
     companion object : SupabasePluginProvider<Config, Storage> {
@@ -115,6 +117,15 @@ sealed interface Storage : MainPlugin<Storage.Config> {
         override fun createConfig(init: Config.() -> Unit) = Config().apply(init)
         override fun create(supabaseClient: SupabaseClient, config: Config): Storage {
             return StorageImpl(supabaseClient, config)
+        }
+
+        override fun setup(builder: SupabaseClientBuilder, config: Config) {
+            builder.httpConfig {
+                install(Logging) {
+                    logger = Logger.DEFAULT
+                    level = LogLevel.HEADERS
+                }
+            }
         }
 
     }
