@@ -2,29 +2,30 @@ package io.github.jan.supabase.storage.resumable
 
 import io.github.jan.supabase.gotrue.GoTrue
 import io.github.jan.supabase.storage.BucketApi
-import io.github.jan.supabase.storage.storage
 import io.ktor.client.request.*
+import io.ktor.client.statement.*
 import io.ktor.http.*
 import io.ktor.utils.io.*
 import io.ktor.utils.io.core.*
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
 
-class ResumableClient(private val storageApi: BucketApi) {
+class ResumableClient(private val storageApi: BucketApi, private val cache: ResumableCache) {
 
     private val httpClient = storageApi.supabaseClient.httpClient
-    private val url = storageApi.supabaseClient.storage.resolveUrl("upload/resumable")
+    private val url = "http://localhost:1080"//storageApi.supabaseClient.storage.resolveUrl("upload/resumable")
 
-    suspend fun startOrResumeDownload(data: ByteArray, path: String) {
+    suspend fun startOrResumeDownload(data: ByteArray, path: String): ResumableUpload {
         val response = httpClient.post(url) {
             header("Upload-Metadata", encodeMetadata(createMetadata(path)))
             bearerAuth(accessTokenOrApiKey())
             header("Upload-Length", data.size)
             header("Tus-Resumable", "1.0.0")
         }
+        println(response.status)
+        println(response.bodyAsText())
         val uploadUrl = response.headers["Location"] ?: error("No upload url found")
-        val upload = ResumableUpload(ByteReadChannel(data), data.size.toLong(), uploadUrl, httpClient, storageApi)
-        upload.uploadChunksUntilFinished()
+        return ResumableUpload(ByteReadChannel(data), data.size.toLong(), uploadUrl, httpClient, storageApi)
     }
 
     private fun accessTokenOrApiKey() = storageApi.supabaseClient.pluginManager.getPluginOrNull(GoTrue)?.currentAccessTokenOrNull() ?: storageApi.supabaseClient.supabaseKey

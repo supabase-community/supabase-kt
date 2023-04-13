@@ -1,5 +1,10 @@
+@file:OptIn(ExperimentalSettingsApi::class)
+
 package io.github.jan.supabase.storage
 
+import com.russhwolf.settings.ExperimentalSettingsApi
+import com.russhwolf.settings.Settings
+import com.russhwolf.settings.coroutines.toSuspendSettings
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.bodyOrNull
 import io.github.jan.supabase.exceptions.*
@@ -8,6 +13,7 @@ import io.github.jan.supabase.plugins.MainConfig
 import io.github.jan.supabase.plugins.MainPlugin
 import io.github.jan.supabase.plugins.SupabasePluginProvider
 import io.github.jan.supabase.safeBody
+import io.github.jan.supabase.storage.resumable.ResumableCache
 import io.ktor.client.plugins.*
 import io.ktor.client.statement.*
 import kotlinx.serialization.json.JsonArray
@@ -93,7 +99,13 @@ sealed interface Storage : MainPlugin<Storage.Config> {
      */
     fun from(bucketId: String): BucketApi = get(bucketId)
 
-    data class Config(override var customUrl: String? = null, override var jwtToken: String? = null): MainConfig
+    data class Config(
+        override var customUrl: String? = null,
+        override var jwtToken: String? = null,
+        var resumableCache: ResumableCache = ResumableCache.Settings(
+            Settings().toSuspendSettings()
+        )
+    ) : MainConfig
 
     companion object : SupabasePluginProvider<Config, Storage> {
 
@@ -158,9 +170,13 @@ internal class StorageImpl(override val supabaseClient: SupabaseClient, override
 
     override suspend fun parseErrorResponse(response: HttpResponse): RestException {
         val statusCode = response.status.value
-        val error = response.bodyOrNull<StorageErrorResponse>() ?: StorageErrorResponse(response.status.value, "Unknown error", "")
-        if(statusCode != 400) return UnknownRestException("Unknown error response", response)
-        when(error.statusCode) {
+        val error = response.bodyOrNull<StorageErrorResponse>() ?: StorageErrorResponse(
+            response.status.value,
+            "Unknown error",
+            ""
+        )
+        if (statusCode != 400) return UnknownRestException("Unknown error response", response)
+        when (error.statusCode) {
             401 -> throw UnauthorizedRestException(error.error, response, error.message)
             400 -> throw BadRequestRestException(error.error, response, error.message)
             404 -> throw NotFoundRestException(error.error, response, error.message)

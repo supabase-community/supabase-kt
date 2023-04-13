@@ -266,7 +266,7 @@ sealed interface BucketApi {
 internal class BucketApiImpl(override val bucketId: String, val storage: StorageImpl) : BucketApi {
 
     override val supabaseClient = storage.supabaseClient
-    override val resumableClient = ResumableClient(this)
+    override val resumableClient = ResumableClient(this, storage.config.resumableCache)
 
     override suspend fun update(path: String, data: ByteArray, upsert: Boolean): String = uploadOrUpdate(HttpMethod.Put, bucketId, path, data, upsert)
 
