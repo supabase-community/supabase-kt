@@ -7,6 +7,7 @@ import io.github.jan.supabase.exceptions.RestException
 import io.github.jan.supabase.gotrue.GoTrue
 import io.github.jan.supabase.putJsonObject
 import io.github.jan.supabase.safeBody
+import io.github.jan.supabase.storage.resumable.ResumableClient
 import io.ktor.client.call.*
 import io.ktor.client.plugins.*
 import io.ktor.client.request.*
@@ -20,6 +21,7 @@ sealed interface BucketApi {
 
     val bucketId: String
     val supabaseClient: SupabaseClient
+    val resumableClient: ResumableClient
 
     /**
      * Uploads a file in [bucketId] under [path]
@@ -264,6 +266,7 @@ sealed interface BucketApi {
 internal class BucketApiImpl(override val bucketId: String, val storage: StorageImpl) : BucketApi {
 
     override val supabaseClient = storage.supabaseClient
+    override val resumableClient = ResumableClient(this)
 
     override suspend fun update(path: String, data: ByteArray, upsert: Boolean): String = uploadOrUpdate(HttpMethod.Put, bucketId, path, data, upsert)
 
