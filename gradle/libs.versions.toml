@@ -12,7 +12,7 @@ multiplatform-settings = "1.0.0"
 okio = "3.3.0"
 javalin = "5.4.2"
 complete-kotlin = "1.1.0"
-agp = "7.4.2"
+agp = "8.0.0"
 maven-publish = "0.25.1"
 apollo-kotlin = "3.8.0"
 
