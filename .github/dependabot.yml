@@ -13,3 +13,11 @@ updates:
       - "jan-tennert"
     assignees:
       - "jan-tennert"
+  - package-ecosystem: "gradle"
+    directory: "/demos/chat-demo-mpp/"
+    schedule:
+      interval: "weekly"
+    reviewers:
+      - "jan-tennert"
+    assignees:
+      - "jan-tennert"
