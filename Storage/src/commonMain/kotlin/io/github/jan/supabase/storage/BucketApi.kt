@@ -8,19 +8,47 @@ import io.github.jan.supabase.gotrue.GoTrue
 import io.github.jan.supabase.putJsonObject
 import io.github.jan.supabase.safeBody
 import io.github.jan.supabase.storage.resumable.ResumableClient
-import io.ktor.client.call.*
-import io.ktor.client.plugins.*
-import io.ktor.client.request.*
-import io.ktor.http.*
+import io.github.jan.supabase.storage.resumable.ResumableClientImpl
+import io.ktor.client.call.body
+import io.ktor.client.plugins.HttpRequestTimeoutException
+import io.ktor.client.plugins.onDownload
+import io.ktor.client.plugins.onUpload
+import io.ktor.client.request.HttpRequestBuilder
+import io.ktor.client.request.header
+import io.ktor.client.request.parameter
+import io.ktor.client.request.setBody
+import io.ktor.client.request.url
+import io.ktor.http.ContentType
+import io.ktor.http.HttpHeaders
+import io.ktor.http.HttpMethod
+import io.ktor.http.Url
+import io.ktor.http.defaultForFilePath
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
-import kotlinx.serialization.json.*
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.add
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.jsonPrimitive
+import kotlinx.serialization.json.put
+import kotlinx.serialization.json.putJsonArray
 import kotlin.time.Duration
 
+/**
+ * The api for interacting with a bucket
+ */
 sealed interface BucketApi {
 
+    /**
+     * The id of the bucket
+     */
     val bucketId: String
+
     val supabaseClient: SupabaseClient
+
+    /**
+     * The client for interacting with the resumable upload api
+     */
+    @SupabaseExperimental
     val resumable: ResumableClient
 
     /**
@@ -266,7 +294,8 @@ sealed interface BucketApi {
 internal class BucketApiImpl(override val bucketId: String, val storage: StorageImpl) : BucketApi {
 
     override val supabaseClient = storage.supabaseClient
-    override val resumable = ResumableClient(this, storage.config.resumableCache)
+    @SupabaseExperimental
+    override val resumable = ResumableClientImpl(this, storage.config.resumableCache)
 
     override suspend fun update(path: String, data: ByteArray, upsert: Boolean): String = uploadOrUpdate(HttpMethod.Put, bucketId, path, data, upsert)
 

@@ -40,8 +40,7 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 api(project(":gotrue-kt"))
-                implementation("io.github.reactivecircus.cache4k:cache4k:0.9.0")
-                implementation("io.ktor:ktor-client-logging:2.2.4")
+                api(libs.cache4k)
             }
         }
         val nonJsMain by creating {
@@ -49,26 +48,16 @@ kotlin {
         }
         val jvmMain by getting {
             dependsOn(nonJsMain)
-            dependencies {
-                api("io.tus.java.client:tus-java-client:0.5.0")
-                implementation("ch.qos.logback:logback-classic:1.4.6")
-
-            }
         }
         val androidMain by getting {
             dependsOn(nonJsMain)
-            dependencies {
-            }
         }
         val commonTest by getting {
             dependencies {
                 implementation(kotlin("test"))
             }
         }
-        val jsMain by getting {
-            dependencies {
-            }
-        }
+        val jsMain by getting
         val iosMain by getting
         val iosSimulatorArm64Main by getting {
             dependsOn(iosMain)

@@ -1,14 +1,19 @@
 package io.github.jan.supabase.storage.resumable
 
 import io.github.aakira.napier.Napier
+import io.github.jan.supabase.annotiations.SupabaseInternal
 import io.github.jan.supabase.gotrue.GoTrue
 import io.github.jan.supabase.storage.BucketApi
+import io.github.jan.supabase.storage.Storage
 import io.github.jan.supabase.storage.UploadStatus
-import io.ktor.client.*
-import io.ktor.client.request.*
-import io.ktor.http.*
-import io.ktor.http.content.*
-import io.ktor.utils.io.*
+import io.github.jan.supabase.storage.resumable.ResumableClient.Companion.TUS_VERSION
+import io.ktor.client.HttpClient
+import io.ktor.client.request.bearerAuth
+import io.ktor.client.request.header
+import io.ktor.client.request.patch
+import io.ktor.client.request.setBody
+import io.ktor.http.HttpStatusCode
+import io.ktor.utils.io.ByteReadChannel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
@@ -21,22 +26,32 @@ import kotlinx.coroutines.sync.withLock
 import kotlin.math.min
 import kotlin.time.ExperimentalTime
 
-class StreamContent(
-    size: Long,
-    private val copyTo: suspend ByteWriteChannel.() -> Unit
-) : OutgoingContent.WriteChannelContent() {
+/**
+ * Represents a resumable upload. Can be paused, resumed or cancelled.
+ * The upload urls are automatically cashed, so you can resume the upload after your program crashed or the network reconnected without losing the upload progress.
+ * You can customize the caching in [Storage.Config]
+ */
+sealed interface ResumableUpload {
 
-    override val contentLength: Long = size
-    override val contentType: ContentType = ContentType.parse("application/offset+octet-stream")
+    /**
+     * Pauses this upload after the current chunk has been uploaded. Can be resumed using [startOrResumeUploading].
+     * If the upload is already paused, this method does nothing.
+     */
+    suspend fun pause()
 
-    override suspend fun writeTo(channel: ByteWriteChannel) {
-        copyTo(channel)
-    }
+    /**
+     * Cancels this upload and removes the upload url from the cache.
+     */
+    suspend fun cancel()
+
+    /**
+     * Starts or resumes this upload. Location url may be retrieved from the cache, so can start of after your program crashed or the network reconnected.
+     */
+    suspend fun startOrResumeUploading()
 
 }
 
-
-class ResumableUpload(
+class ResumableUploadImpl(
     private val path: String,
     private val dataStream: ByteReadChannel,
     private val size: Long,
@@ -46,7 +61,7 @@ class ResumableUpload(
     private val httpClient: HttpClient,
     private val storageApi: BucketApi,
     private val removeFromCache: suspend () -> Unit
-) {
+): ResumableUpload {
 
     private var serverOffset = 0L
     private var paused = false
@@ -55,19 +70,19 @@ class ResumableUpload(
     val progressFlow: StateFlow<UploadStatus> = _progressFlow.asStateFlow()
     private val scope = CoroutineScope(Dispatchers.Default)
 
-    suspend fun pause() {
+    override suspend fun pause() {
         mutex.withLock {
             paused = true
         }
     }
 
-    suspend fun cancel() {
+    override suspend fun cancel() {
         scope.cancel()
         removeFromCache()
     }
 
     @OptIn(ExperimentalTime::class)
-    suspend fun startOrResumeUploadingChunks() {
+    override suspend fun startOrResumeUploading() {
         scope.launch {
             if(paused) {
                 mutex.withLock {
@@ -85,6 +100,7 @@ class ResumableUpload(
         }
     }
 
+    @OptIn(SupabaseInternal::class)
     private suspend fun uploadChunk(): Int {
         val limit = min(chunkSize, size.toInt() - offset)
         val buffer = ByteArray(limit.toInt())
@@ -99,7 +115,7 @@ class ResumableUpload(
             totalRead += read
         }
         val uploadResponse = httpClient.patch(locationUrl) {
-            header("Tus-Resumable", "1.0.0")
+            header("Tus-Resumable", TUS_VERSION)
             header("Content-Type", "application/offset+octet-stream")
             header("Upload-Offset", offset)
             bearerAuth(accessTokenOrApiKey())
@@ -112,7 +128,7 @@ class ResumableUpload(
                 serverOffset = uploadResponse.headers["Upload-Offset"]?.toLong() ?: error("No upload offset found")
             }
             HttpStatusCode.Conflict -> {
-                Napier.d { "Upload confict, skipping chunk" }
+                Napier.w { "Upload conflict, skipping chunk" }
                 serverOffset = offset + totalRead
             }
         }

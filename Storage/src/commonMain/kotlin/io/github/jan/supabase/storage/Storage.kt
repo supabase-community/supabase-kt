@@ -3,9 +3,8 @@
 package io.github.jan.supabase.storage
 
 import com.russhwolf.settings.ExperimentalSettingsApi
-import com.russhwolf.settings.Settings
+import io.github.aakira.napier.Napier
 import io.github.jan.supabase.SupabaseClient
-import io.github.jan.supabase.SupabaseClientBuilder
 import io.github.jan.supabase.bodyOrNull
 import io.github.jan.supabase.exceptions.*
 import io.github.jan.supabase.gotrue.authenticatedSupabaseApi
@@ -14,9 +13,8 @@ import io.github.jan.supabase.plugins.MainPlugin
 import io.github.jan.supabase.plugins.SupabasePluginProvider
 import io.github.jan.supabase.safeBody
 import io.github.jan.supabase.storage.resumable.ResumableCache
-import io.ktor.client.plugins.*
-import io.ktor.client.plugins.logging.*
-import io.ktor.client.statement.*
+import io.ktor.client.plugins.HttpRequestTimeoutException
+import io.ktor.client.statement.HttpResponse
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.buildJsonObject
@@ -100,14 +98,30 @@ sealed interface Storage : MainPlugin<Storage.Config> {
      */
     fun from(bucketId: String): BucketApi = get(bucketId)
 
+    /**
+     * Config for the storage plugin
+     * @param customUrl the custom url to use for the storage api
+     * @param jwtToken the jwt token to use for the storage api
+     * @param resumableCache the cache for caching resumable upload urls
+     */
     data class Config(
         override var customUrl: String? = null,
         override var jwtToken: String? = null,
-        var resumableCache: ResumableCache = ResumableCache.Settings(
-            Settings()
-        ),
-        var defaultChunkSize: Long = 1024 * 1024 * 5,
-    ) : MainConfig
+        var resumableCache: ResumableCache = ResumableCache.Memory()
+    ) : MainConfig {
+
+        /**
+         * The default chunk size for resumable uploads. **Supabase currently only supports a chunk size of 6MB, so be careful when changing this value**
+         */
+        var defaultChunkSize: Long = 6 * 1024 * 1024
+            set(value) {
+                if(value.toInt() != 6 * 1024 * 1024) {
+                    Napier.w { "supabase currently only supports a chunk size of 6MB" }
+                }
+                field = value
+            }
+
+    }
 
     companion object : SupabasePluginProvider<Config, Storage> {
 
@@ -117,15 +131,6 @@ sealed interface Storage : MainPlugin<Storage.Config> {
         override fun createConfig(init: Config.() -> Unit) = Config().apply(init)
         override fun create(supabaseClient: SupabaseClient, config: Config): Storage {
             return StorageImpl(supabaseClient, config)
-        }
-
-        override fun setup(builder: SupabaseClientBuilder, config: Config) {
-            builder.httpConfig {
-                install(Logging) {
-                    logger = Logger.DEFAULT
-                    level = LogLevel.HEADERS
-                }
-            }
         }
 
     }
