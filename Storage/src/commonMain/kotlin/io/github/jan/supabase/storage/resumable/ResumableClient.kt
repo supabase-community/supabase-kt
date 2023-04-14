@@ -100,6 +100,7 @@ internal class ResumableClientImpl(private val storageApi: BucketApi, private va
         put("contentType", ContentType.defaultForFilePath(path).toString())
     }
 
+    @OptIn(ExperimentalEncodingApi::class)
     private fun encodeMetadata(metadata: Map<String, String>): String {
         return metadata.entries.joinToString(",") { (key, value) ->
             key + " " + Base64.encode(value.toByteArray())
