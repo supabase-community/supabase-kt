@@ -6,7 +6,6 @@ import com.russhwolf.settings.ExperimentalSettingsApi
 import com.russhwolf.settings.Settings
 import com.russhwolf.settings.coroutines.toSuspendSettings
 import io.github.reactivecircus.cache4k.Cache
-import kotlin.time.Duration.Companion.minutes
 
 /**
  * A cache for storing resumable upload urls
@@ -69,7 +68,6 @@ interface ResumableCache {
      */
     class Memory(
         private val cache: Cache<String, String> = Cache.Builder()
-            .expireAfterWrite(30.minutes)
             .build()
     ) : ResumableCache {
 

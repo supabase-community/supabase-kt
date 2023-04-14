@@ -34,6 +34,11 @@ import kotlin.time.ExperimentalTime
 sealed interface ResumableUpload {
 
     /**
+     * The current upload progress as a [StateFlow]. The [UploadStatus] contains the total bytes sent and the total size of the upload. At the end of the upload, the [UploadStatus] will be [UploadStatus.Success].
+     */
+    val progressFlow: StateFlow<UploadStatus>
+
+    /**
      * Pauses this upload after the current chunk has been uploaded. Can be resumed using [startOrResumeUploading].
      * If the upload is already paused, this method does nothing.
      */
@@ -67,7 +72,7 @@ class ResumableUploadImpl(
     private var paused = false
     private val mutex = Mutex()
     private val _progressFlow = MutableStateFlow<UploadStatus>(UploadStatus.Progress(offset, size))
-    val progressFlow: StateFlow<UploadStatus> = _progressFlow.asStateFlow()
+    override val progressFlow: StateFlow<UploadStatus> = _progressFlow.asStateFlow()
     private val scope = CoroutineScope(Dispatchers.Default)
 
     override suspend fun pause() {
