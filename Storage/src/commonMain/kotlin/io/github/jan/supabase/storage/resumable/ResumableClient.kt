@@ -2,6 +2,7 @@
 
 package io.github.jan.supabase.storage.resumable
 
+import io.github.jan.supabase.annotiations.SupabaseInternal
 import io.github.jan.supabase.gotrue.GoTrue
 import io.github.jan.supabase.storage.BucketApi
 import io.github.jan.supabase.storage.resumable.ResumableClient.Companion.TUS_VERSION
@@ -53,6 +54,7 @@ sealed interface ResumableClient {
 
 internal class ResumableClientImpl(private val storageApi: BucketApi, private val cache: ResumableCache): ResumableClient {
 
+    @OptIn(SupabaseInternal::class)
     private val httpClient = storageApi.supabaseClient.httpClient.httpClient
     private val url = storageApi.supabaseClient.storage.resolveUrl("upload/resumable")
 

@@ -1,20 +1,27 @@
 package io.github.jan.supabase.network
 
 import io.github.aakira.napier.Napier
+import io.github.jan.supabase.annotiations.SupabaseInternal
 import io.github.jan.supabase.exceptions.HttpRequestException
 import io.github.jan.supabase.supabaseJson
-import io.ktor.client.*
-import io.ktor.client.engine.*
-import io.ktor.client.plugins.*
-import io.ktor.client.plugins.contentnegotiation.*
-import io.ktor.client.plugins.websocket.*
-import io.ktor.client.request.*
-import io.ktor.client.statement.*
-import io.ktor.serialization.kotlinx.json.*
+import io.ktor.client.HttpClient
+import io.ktor.client.HttpClientConfig
+import io.ktor.client.engine.HttpClientEngine
+import io.ktor.client.plugins.DefaultRequest
+import io.ktor.client.plugins.HttpRequestTimeoutException
+import io.ktor.client.plugins.HttpTimeout
+import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.client.plugins.websocket.webSocketSession
+import io.ktor.client.request.HttpRequestBuilder
+import io.ktor.client.request.headers
+import io.ktor.client.request.request
+import io.ktor.client.statement.HttpResponse
+import io.ktor.serialization.kotlinx.json.json
 
 /**
  * A [SupabaseHttpClient] that uses ktor to send requests
  */
+@OptIn(SupabaseInternal::class)
 class KtorSupabaseHttpClient(
     private val supabaseKey: String,
     modifiers: List<HttpClientConfig<*>.() -> Unit> = listOf(),
@@ -22,6 +29,7 @@ class KtorSupabaseHttpClient(
     engine: HttpClientEngine? = null,
 ): SupabaseHttpClient() {
 
+    @SupabaseInternal
     val httpClient =
         if(engine != null) HttpClient(engine) { applyDefaultConfiguration(modifiers) }
         else HttpClient { applyDefaultConfiguration(modifiers) }
