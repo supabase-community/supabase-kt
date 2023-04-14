@@ -6,6 +6,16 @@ import com.russhwolf.settings.ExperimentalSettingsApi
 import com.russhwolf.settings.Settings
 import com.russhwolf.settings.coroutines.toSuspendSettings
 import io.github.reactivecircus.cache4k.Cache
+import kotlinx.datetime.Instant
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
+
+@Serializable
+data class ResumableCacheEntry(val url: String, val expiresAt: Instant, val source: String)
+
+typealias CachePair = Pair<Fingerprint, ResumableCacheEntry>
 
 /**
  * A cache for storing resumable upload urls
@@ -13,17 +23,17 @@ import io.github.reactivecircus.cache4k.Cache
 interface ResumableCache {
 
     /**
-     * Stores the [url] for the [fingerprint]. The fingerprint consists of the bucket id, the file path and the file size
+     * Stores the [entry] for the [fingerprint]. The fingerprint consists of the bucket id, the file path and the file size
      */
-    suspend fun set(fingerprint: Fingerprint, url: String)
+    suspend fun set(fingerprint: Fingerprint, entry: ResumableCacheEntry)
 
     /**
-     * Returns the url for the [fingerprint] or null if no url was stored
+     * Returns the resumable cache entry for the [fingerprint] or null if no url was stored
      */
-    suspend fun get(fingerprint: Fingerprint): String?
+    suspend fun get(fingerprint: Fingerprint): ResumableCacheEntry?
 
     /**
-     * Removes the url for the [fingerprint]
+     * Removes the entry for the [fingerprint]
      */
     suspend fun remove(fingerprint: Fingerprint)
 
@@ -31,6 +41,8 @@ interface ResumableCache {
      * Clears the cache
      */
     suspend fun clear()
+
+    suspend fun entries(): List<CachePair>
 
     /**
      * A [ResumableCache] implementation using [com.russhwolf.settings.Settings]. This implementation saves the urls on the disk. If you want a memory only cache, use [Memory]
@@ -41,14 +53,15 @@ interface ResumableCache {
         private val settings = settings.toSuspendSettings()
 
         @OptIn(ExperimentalSettingsApi::class)
-        override suspend fun set(fingerprint: Fingerprint, url: String) {
-            settings.putString(fingerprint.value, url)
+        override suspend fun set(fingerprint: Fingerprint, entry: ResumableCacheEntry) {
+            settings.putString(fingerprint.value, Json.encodeToString(entry))
         }
 
         @OptIn(ExperimentalSettingsApi::class)
-        override suspend fun get(fingerprint: Fingerprint): String? {
-            settings.clear()
-            return settings.getStringOrNull(fingerprint.value)
+        override suspend fun get(fingerprint: Fingerprint): ResumableCacheEntry? {
+            return settings.getStringOrNull(fingerprint.value)?.let {
+                Json.decodeFromString(it)
+            }
         }
 
         override suspend fun remove(fingerprint: Fingerprint) {
@@ -58,6 +71,14 @@ interface ResumableCache {
         @OptIn(ExperimentalSettingsApi::class)
         override suspend fun clear() {
             settings.clear()
+        }
+
+        override suspend fun entries(): List<CachePair> {
+            return settings.keys().mapNotNull { key ->
+                Fingerprint(key) //filter out invalid fingerprints
+            }.map {
+                it to (get(it) ?: error("No entry found for $it"))
+            }
         }
 
     }
@@ -71,12 +92,14 @@ interface ResumableCache {
             .build()
     ) : ResumableCache {
 
-        override suspend fun set(fingerprint: Fingerprint, url: String) {
-            cache.put(fingerprint.value, url)
+        override suspend fun set(fingerprint: Fingerprint, entry: ResumableCacheEntry) {
+            cache.put(fingerprint.value, Json.encodeToString(entry))
         }
 
-        override suspend fun get(fingerprint: Fingerprint): String? {
-            return cache.get(fingerprint.value)
+        override suspend fun get(fingerprint: Fingerprint): ResumableCacheEntry? {
+            return cache.get(fingerprint.value)?.let {
+                Json.decodeFromString(it)
+            }
         }
 
         override suspend fun remove(fingerprint: Fingerprint) {
@@ -85,6 +108,14 @@ interface ResumableCache {
 
         override suspend fun clear() {
             cache.invalidateAll()
+        }
+
+        override suspend fun entries(): List<CachePair> {
+            return cache.asMap().mapNotNull {
+                Fingerprint(it.key.toString())
+            }.map {
+                it to Json.decodeFromString(it.value)
+            }
         }
 
     }

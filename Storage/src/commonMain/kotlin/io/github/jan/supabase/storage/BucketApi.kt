@@ -295,7 +295,7 @@ internal class BucketApiImpl(override val bucketId: String, val storage: Storage
 
     override val supabaseClient = storage.supabaseClient
     @SupabaseExperimental
-    override val resumable = ResumableClientImpl(this, storage.config.resumableCache)
+    override val resumable = ResumableClientImpl(this, storage.config.resumable.cache)
 
     override suspend fun update(path: String, data: ByteArray, upsert: Boolean): String = uploadOrUpdate(HttpMethod.Put, bucketId, path, data, upsert)
 

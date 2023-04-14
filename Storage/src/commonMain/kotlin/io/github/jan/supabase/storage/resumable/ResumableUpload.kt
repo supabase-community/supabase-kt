@@ -7,22 +7,29 @@ import io.github.jan.supabase.storage.BucketApi
 import io.github.jan.supabase.storage.Storage
 import io.github.jan.supabase.storage.UploadStatus
 import io.github.jan.supabase.storage.resumable.ResumableClient.Companion.TUS_VERSION
+import io.github.jan.supabase.storage.storage
 import io.ktor.client.HttpClient
+import io.ktor.client.plugins.onUpload
 import io.ktor.client.request.bearerAuth
 import io.ktor.client.request.header
 import io.ktor.client.request.patch
 import io.ktor.client.request.setBody
+import io.ktor.client.statement.bodyAsText
 import io.ktor.http.HttpStatusCode
 import io.ktor.utils.io.ByteReadChannel
+import io.ktor.utils.io.cancel
+import kotlinx.atomicfu.atomic
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.transformWhile
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
 import kotlin.math.min
 import kotlin.time.ExperimentalTime
 
@@ -36,7 +43,7 @@ sealed interface ResumableUpload {
     /**
      * The current upload progress as a [StateFlow]. The [UploadStatus] contains the total bytes sent and the total size of the upload. At the end of the upload, the [UploadStatus] will be [UploadStatus.Success].
      */
-    val progressFlow: StateFlow<UploadStatus>
+    val progressFlow: Flow<UploadStatus>
 
     /**
      * Pauses this upload after the current chunk has been uploaded. Can be resumed using [startOrResumeUploading].
@@ -58,50 +65,77 @@ sealed interface ResumableUpload {
 
 class ResumableUploadImpl(
     private val path: String,
-    private val dataStream: ByteReadChannel,
+    private val createDataStream: suspend (Long) -> ByteReadChannel,
     private val size: Long,
     private var offset: Long,
     private val chunkSize: Long,
     private val locationUrl: String,
     private val httpClient: HttpClient,
     private val storageApi: BucketApi,
+    private val retrieveServerOffset: suspend () -> Long,
     private val removeFromCache: suspend () -> Unit
 ): ResumableUpload {
 
     private var serverOffset = 0L
-    private var paused = false
-    private val mutex = Mutex()
+    private var paused by atomic(false)
     private val _progressFlow = MutableStateFlow<UploadStatus>(UploadStatus.Progress(offset, size))
-    override val progressFlow: StateFlow<UploadStatus> = _progressFlow.asStateFlow()
+    override val progressFlow: Flow<UploadStatus> = _progressFlow.asStateFlow().transformWhile {
+        emit(it)
+        it !is UploadStatus.Success
+    }
     private val scope = CoroutineScope(Dispatchers.Default)
+    private val config = storageApi.supabaseClient.storage.config.resumable
+    private lateinit var dataStream: ByteReadChannel
 
     override suspend fun pause() {
-        mutex.withLock {
-            paused = true
-        }
+        paused = true
     }
 
     override suspend fun cancel() {
         scope.cancel()
+        dataStream.cancel()
         removeFromCache()
     }
 
     @OptIn(ExperimentalTime::class)
     override suspend fun startOrResumeUploading() {
+        if(paused) paused = false
+        if(!::dataStream.isInitialized) dataStream = createDataStream(offset)
         scope.launch {
-            if(paused) {
-                mutex.withLock {
-                    paused = false
-                }
-            }
+            var updateOffset = false
             while (offset < size) {
-                if(paused) return@launch
-                offset += uploadChunk()
+                if(paused || !isActive) return@launch //check if paused or the scope is still active
+                if(updateOffset) { //after an upload error we retrieve the server offset and update the data stream to avoid conflicts
+                    Napier.d { "Trying to update server offset for $path" }
+                    try {
+                        serverOffset = retrieveServerOffset() //retrieve server offset
+                        offset = serverOffset
+                        dataStream.cancel() //cancel old data stream as we are start reading from a new offset
+                        dataStream = createDataStream(offset) //create new data stream
+                    } catch(e: Exception) {
+                        Napier.e("Error while updating server offset for $path. Retrying in ${config.retryTimeout}", e)
+                        delay(config.retryTimeout)
+                        continue
+                    }
+                    updateOffset = false
+                }
+                try {
+                    val uploaded = uploadChunk()
+                    offset += uploaded
+                } catch(e: Exception) {
+                    if(e !is IllegalStateException) {
+                        Napier.e("Error while uploading chunk. Retrying in ${config.retryTimeout}", e)
+                        delay(config.retryTimeout)
+                        updateOffset = true //if an error occurs, we need to update the server offset to avoid conflicts
+                        continue
+                    }
+                }
                 _progressFlow.value = UploadStatus.Progress(offset, size)
             }
             if(offset != serverOffset) error("Upload offset does not match server offset")
             _progressFlow.value = UploadStatus.Success(path)
             removeFromCache()
+            dataStream.cancel()
         }
     }
 
@@ -112,7 +146,7 @@ class ResumableUploadImpl(
         var totalRead = 0
         var read: Int
 
-        while (totalRead < limit.toInt()) {
+        while (totalRead < limit.toInt()) { //read data from data stream until we have read the chunk size we want to upload
             read = dataStream.readAvailable(buffer, totalRead, limit.toInt() - totalRead)
             if (read == -1) {
                 break
@@ -127,7 +161,11 @@ class ResumableUploadImpl(
             setBody(StreamContent(totalRead.toLong()) {
                 writeFully(buffer, 0, totalRead)
             })
+            onUpload { bytesSentTotal, _ ->
+                _progressFlow.value = UploadStatus.Progress(offset + bytesSentTotal, size)
+            }
         }
+        println(uploadResponse.status)
         when(uploadResponse.status) {
             HttpStatusCode.NoContent -> {
                 serverOffset = uploadResponse.headers["Upload-Offset"]?.toLong() ?: error("No upload offset found")
@@ -136,6 +174,10 @@ class ResumableUploadImpl(
                 Napier.w { "Upload conflict, skipping chunk" }
                 serverOffset = offset + totalRead
             }
+            HttpStatusCode.NoContent -> {
+                Napier.d { "Uploaded chunk" }
+            }
+            else -> error("Upload failed with status ${uploadResponse.status}. ${uploadResponse.bodyAsText()}")
         }
         return totalRead
     }

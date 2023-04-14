@@ -19,6 +19,8 @@ import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
 
 /**
  * Plugin for interacting with the supabase storage api
@@ -102,24 +104,41 @@ sealed interface Storage : MainPlugin<Storage.Config> {
      * Config for the storage plugin
      * @param customUrl the custom url to use for the storage api
      * @param jwtToken the jwt token to use for the storage api
-     * @param resumableCache the cache for caching resumable upload urls
      */
     data class Config(
         override var customUrl: String? = null,
         override var jwtToken: String? = null,
-        var resumableCache: ResumableCache = ResumableCache.Memory()
+        @PublishedApi internal var resumable: Resumable = Resumable()
     ) : MainConfig {
 
         /**
-         * The default chunk size for resumable uploads. **Supabase currently only supports a chunk size of 6MB, so be careful when changing this value**
+         * @param cache the cache for caching resumable upload urls
+         * @param retryTimeout the timeout for retrying resumable uploads when uploading a chunk fails
          */
-        var defaultChunkSize: Long = 6 * 1024 * 1024
-            set(value) {
-                if(value.toInt() != 6 * 1024 * 1024) {
-                    Napier.w { "supabase currently only supports a chunk size of 6MB" }
+        data class Resumable(
+            var cache: ResumableCache = ResumableCache.Memory(),
+            var retryTimeout: Duration = 5.seconds
+        ) {
+
+            /**
+             * The default chunk size for resumable uploads. **Supabase currently only supports a chunk size of 6MB, so be careful when changing this value**
+             */
+            var defaultChunkSize: Long = 6 * 1024 * 1024
+                set(value) {
+                    if(value.toInt() != 6 * 1024 * 1024) {
+                        Napier.w { "supabase currently only supports a chunk size of 6MB" }
+                    }
+                    field = value
                 }
-                field = value
-            }
+
+        }
+
+        /**
+         * Config for resumable uploads
+         */
+        inline fun resumable(builder: Resumable.() -> Unit) {
+            resumable = Resumable().apply(builder)
+        }
 
     }
 

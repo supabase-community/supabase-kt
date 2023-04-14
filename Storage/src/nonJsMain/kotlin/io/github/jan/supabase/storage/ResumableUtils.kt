@@ -5,6 +5,7 @@ import io.github.jan.supabase.storage.resumable.ResumableClient
 import io.ktor.util.cio.readChannel
 import java.io.File
 import java.nio.file.Path
+import kotlin.io.path.absolutePathString
 import kotlin.io.path.fileSize
 
 /**
@@ -14,7 +15,7 @@ import kotlin.io.path.fileSize
  * @param path The path to upload the data to
  * @param upsert Whether to overwrite existing files
  */
-suspend fun ResumableClient.createOrContinueUpload(file: File, path: String, upsert: Boolean = false) = createOrContinueUpload(file.readChannel(), file.length(), path, upsert)
+suspend fun ResumableClient.createOrContinueUpload(file: File, path: String, upsert: Boolean = false) = createOrContinueUpload({ file.readChannel().apply { discard(it) } }, file.absolutePath, file.length(), path, upsert)
 
 /**
  * Creates a new resumable upload or continues an existing one.
@@ -23,4 +24,9 @@ suspend fun ResumableClient.createOrContinueUpload(file: File, path: String, ups
  * @param path The path to upload the data to
  * @param upsert Whether to overwrite existing files
  */
-suspend fun ResumableClient.createOrContinueUpload(file: Path, path: String, upsert: Boolean = false) = createOrContinueUpload(file.readChannel(), file.fileSize(), path, upsert)
+suspend fun ResumableClient.createOrContinueUpload(file: Path, path: String, upsert: Boolean = false) = createOrContinueUpload({ file.readChannel().apply { discard(it) } }, file.absolutePathString(), file.fileSize(), path, upsert)
+
+/**
+ * Reads pending uploads from the cache and creates a new [ResumableUpload] for each of them. This done in parallel, so you can start the downloads independently.
+ */
+suspend fun ResumableClient.continuePreviousFileUploads() = continuePreviousUploads { File(it).readChannel() }
