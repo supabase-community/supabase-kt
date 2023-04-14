@@ -60,6 +60,7 @@ kotlin {
 android {
     compileSdk = 33
     sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
+    namespace = "io.github.jan.supabase.realtime.library"
     defaultConfig {
         minSdk = 21
     }
