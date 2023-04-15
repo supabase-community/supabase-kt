@@ -46,6 +46,11 @@ sealed interface ResumableUpload {
     val progressFlow: Flow<UploadStatus>
 
     /**
+     * The upload fingerprint
+     */
+    val fingerprint: Fingerprint
+
+    /**
      * Pauses this upload after the current chunk has been uploaded. Can be resumed using [startOrResumeUploading].
      * If the upload is already paused, this method does nothing.
      */
@@ -86,6 +91,7 @@ class ResumableUploadImpl(
     private val scope = CoroutineScope(Dispatchers.Default)
     private val config = storageApi.supabaseClient.storage.config.resumable
     private lateinit var dataStream: ByteReadChannel
+    override val fingerprint: Fingerprint = Fingerprint(storageApi.bucketId, path, size)
 
     override suspend fun pause() {
         paused = true
