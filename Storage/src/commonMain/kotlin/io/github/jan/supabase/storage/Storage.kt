@@ -2,6 +2,7 @@
 
 package io.github.jan.supabase.storage
 
+import co.touchlab.stately.collections.IsoMutableMap
 import com.russhwolf.settings.ExperimentalSettingsApi
 import io.github.aakira.napier.Napier
 import io.github.jan.supabase.SupabaseClient
@@ -114,10 +115,12 @@ sealed interface Storage : MainPlugin<Storage.Config> {
         /**
          * @param cache the cache for caching resumable upload urls
          * @param retryTimeout the timeout for retrying resumable uploads when uploading a chunk fails
+         * @param onlyUpdateStateAfterChunk whether the state should only be updated after a chunk was uploaded successfully or also when the chunk is currently being uploaded
          */
         data class Resumable(
             var cache: ResumableCache = ResumableCache.Memory(),
-            var retryTimeout: Duration = 5.seconds
+            var retryTimeout: Duration = 5.seconds,
+            var onlyUpdateStateAfterChunk: Boolean = false
         ) {
 
             /**
@@ -165,6 +168,7 @@ internal class StorageImpl(override val supabaseClient: SupabaseClient, override
         get() = Storage.API_VERSION
 
     internal val api = supabaseClient.authenticatedSupabaseApi(this)
+    private val resumableClients = IsoMutableMap<String, BucketApi>()
 
     override suspend fun retrieveBuckets(): List<Bucket> = api.get("bucket").safeBody()
 
@@ -201,7 +205,9 @@ internal class StorageImpl(override val supabaseClient: SupabaseClient, override
         api.post("bucket/$bucketId/empty")
     }
 
-    override fun get(bucketId: String): BucketApi = BucketApiImpl(bucketId, this)
+    override fun get(bucketId: String): BucketApi = resumableClients.getOrPut(bucketId) {
+        BucketApiImpl(bucketId, this)
+    }
 
     override suspend fun parseErrorResponse(response: HttpResponse): RestException {
         val statusCode = response.status.value

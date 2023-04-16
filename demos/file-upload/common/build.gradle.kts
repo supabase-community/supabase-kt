@@ -1,5 +1,4 @@
 @file:OptIn(org.jetbrains.compose.ExperimentalComposeLibrary::class)
-import org.jetbrains.compose.compose
 
 plugins {
     kotlin("multiplatform")
@@ -25,6 +24,7 @@ kotlin {
                 api(compose.materialIconsExtended)
                 api(libs.bundles.supabase)
                 api(libs.koin.core)
+                api(libs.filepicker)
             }
         }
         val nonJsMain by creating {

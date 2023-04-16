@@ -16,7 +16,7 @@ fun main() {
     initKoin()
     val root = RootComponent()
     application {
-        Window(onCloseRequest = ::exitApplication, title = "Chat App") {
+        Window(onCloseRequest = ::exitApplication, title = "File Upload") {
             App(root.viewModel)
         }
     }

@@ -7,7 +7,7 @@ import org.koin.dsl.module
 
 expect fun Module.viewModel()
 
-fun Scope.createViewModule() = UploadViewModel(get(), get())
+fun Scope.createViewModule() = UploadViewModel(get())
 
 val viewModelModule = module {
     viewModel()

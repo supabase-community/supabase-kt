@@ -23,11 +23,9 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.transformWhile
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlin.math.min
@@ -43,7 +41,7 @@ sealed interface ResumableUpload {
     /**
      * The current upload progress as a [StateFlow]. The [UploadStatus] contains the total bytes sent and the total size of the upload. At the end of the upload, the [UploadStatus] will be [UploadStatus.Success].
      */
-    val progressFlow: Flow<UploadStatus>
+    val stateFlow: StateFlow<ResumableUploadState>
 
     /**
      * The upload fingerprint
@@ -69,9 +67,8 @@ sealed interface ResumableUpload {
 }
 
 class ResumableUploadImpl(
-    private val path: String,
+    override val fingerprint: Fingerprint,
     private val createDataStream: suspend (Long) -> ByteReadChannel,
-    private val size: Long,
     private var offset: Long,
     private val chunkSize: Long,
     private val locationUrl: String,
@@ -81,17 +78,17 @@ class ResumableUploadImpl(
     private val removeFromCache: suspend () -> Unit
 ): ResumableUpload {
 
+    private val bucketId = fingerprint.bucket
+    private val path = fingerprint.path
+    private val size = fingerprint.size
+
+    private var paused by atomic(true)
     private var serverOffset = 0L
-    private var paused by atomic(false)
-    private val _progressFlow = MutableStateFlow<UploadStatus>(UploadStatus.Progress(offset, size))
-    override val progressFlow: Flow<UploadStatus> = _progressFlow.asStateFlow().transformWhile {
-        emit(it)
-        it !is UploadStatus.Success
-    }
+    private val _stateFlow = MutableStateFlow<ResumableUploadState>(ResumableUploadState(fingerprint, UploadStatus.Progress(offset, size), paused))
+    override val stateFlow: StateFlow<ResumableUploadState> = _stateFlow.asStateFlow()
     private val scope = CoroutineScope(Dispatchers.Default)
     private val config = storageApi.supabaseClient.storage.config.resumable
     private lateinit var dataStream: ByteReadChannel
-    override val fingerprint: Fingerprint = Fingerprint(storageApi.bucketId, path, size)
 
     override suspend fun pause() {
         paused = true
@@ -99,7 +96,7 @@ class ResumableUploadImpl(
 
     override suspend fun cancel() {
         scope.cancel()
-        dataStream.cancel()
+        if(::dataStream.isInitialized) dataStream.cancel()
         removeFromCache()
     }
 
@@ -136,10 +133,10 @@ class ResumableUploadImpl(
                         continue
                     }
                 }
-                _progressFlow.value = UploadStatus.Progress(offset, size)
+                _stateFlow.value = ResumableUploadState(fingerprint, UploadStatus.Progress(offset, size), paused)
             }
             if(offset != serverOffset) error("Upload offset does not match server offset")
-            _progressFlow.value = UploadStatus.Success(path)
+            _stateFlow.value = ResumableUploadState(fingerprint, UploadStatus.Success(path), false)
             removeFromCache()
             dataStream.cancel()
         }
@@ -168,7 +165,9 @@ class ResumableUploadImpl(
                 writeFully(buffer, 0, totalRead)
             })
             onUpload { bytesSentTotal, _ ->
-                _progressFlow.value = UploadStatus.Progress(offset + bytesSentTotal, size)
+                if(!config.onlyUpdateStateAfterChunk) {
+                    _stateFlow.value = ResumableUploadState(fingerprint, UploadStatus.Progress(offset + bytesSentTotal, size), paused)
+                }
             }
         }
         println(uploadResponse.status)

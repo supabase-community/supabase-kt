@@ -9,7 +9,7 @@ import kotlin.jvm.JvmInline
 @JvmInline
 value class Fingerprint private constructor(val value: String) {
 
-    private val parts get() = value.split(":")
+    private val parts get() = value.split("::")
 
     /**
      * The bucket id
@@ -17,27 +17,31 @@ value class Fingerprint private constructor(val value: String) {
     val bucket get() = parts[0]
 
     /**
+     * The source of the file upload
+     */
+    val source get() = parts[1]
+
+    /**
      * The path of the file upload
      */
-    val path get() = parts[1]
+    val path get() = parts[2]
 
     /**
      * The size of the data
      */
-    val size get() = parts[2].toLong()
-
+    val size get() = parts[3].toLong()
 
     companion object {
 
         /**
          * Creates a fingerprint from the [bucket], the [path] and the [size] of the file
          */
-        operator fun invoke(bucket: String, path: String, size: Long) = Fingerprint("$bucket:$path:$size")
+        operator fun invoke(bucket: String, source: String, path: String, size: Long) = Fingerprint("$bucket::$source::$path::$size")
 
         operator fun invoke(value: String): Fingerprint? {
             val fingerprint = Fingerprint(value)
             val parts = fingerprint.parts
-            return if(parts.size != 3) null else fingerprint
+            return if(parts.size != 4) null else fingerprint
         }
 
     }

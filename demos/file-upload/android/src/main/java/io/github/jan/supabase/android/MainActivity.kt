@@ -8,7 +8,6 @@ import io.github.aakira.napier.DebugAntilog
 import io.github.aakira.napier.Napier
 import io.github.jan.supabase.common.App
 import io.github.jan.supabase.common.UploadViewModel
-import io.github.jan.supabase.gotrue.handleDeeplinks
 import org.koin.android.ext.android.inject
 
 class MainActivity : ComponentActivity() {
@@ -18,7 +17,6 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Napier.base(DebugAntilog())
-        viewModel.supabaseClient.handleDeeplinks(intent)
         setContent {
             MaterialTheme {
                 App(viewModel)

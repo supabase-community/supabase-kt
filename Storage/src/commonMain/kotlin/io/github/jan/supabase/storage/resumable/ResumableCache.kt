@@ -13,7 +13,7 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
 @Serializable
-data class ResumableCacheEntry(val url: String, val expiresAt: Instant, val source: String)
+data class ResumableCacheEntry(val url: String, val expiresAt: Instant)
 
 typealias CachePair = Pair<Fingerprint, ResumableCacheEntry>
 

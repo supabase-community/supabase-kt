@@ -7,17 +7,19 @@ import io.github.jan.supabase.storage.Storage
 import io.github.jan.supabase.storage.storage
 import org.koin.dsl.module
 
+const val BUCKET = "YOUR_BUCKET"
+
 @OptIn(SupabaseExperimental::class)
 val supabaseModule = module {
     single {
         createSupabaseClient(
-            supabaseUrl = "YOUR_URL",
-            supabaseKey = "YOUR_KEY"
+            supabaseUrl = "",
+            supabaseKey = ""
         ) {
             install(Storage)
         }
     }
     single {
-        get<SupabaseClient>().storage["test"].resumable
+        get<SupabaseClient>().storage[BUCKET].resumable
     }
 }

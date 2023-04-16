@@ -4,6 +4,8 @@ package io.github.jan.supabase.storage.resumable
 
 import io.github.aakira.napier.Napier
 import io.github.jan.supabase.annotiations.SupabaseInternal
+import io.github.jan.supabase.exceptions.HttpRequestException
+import io.github.jan.supabase.exceptions.RestException
 import io.github.jan.supabase.gotrue.GoTrue
 import io.github.jan.supabase.storage.BucketApi
 import io.github.jan.supabase.storage.resumable.ResumableClient.Companion.TUS_VERSION
@@ -77,7 +79,7 @@ internal class ResumableClientImpl(private val storageApi: BucketApi, private va
             Napier.d { "Found cached upload for ${fingerprint.path}" }
             coroutineScope {
                 async {
-                    resumeUpload({ channelProducer(cacheEntry.source) }, cacheEntry, cacheEntry.source, fingerprint.path, fingerprint.size)
+                    resumeUpload({ channelProducer(fingerprint.source) }, cacheEntry, fingerprint.source, fingerprint.path, fingerprint.size)
                 }
             }
         }
@@ -90,9 +92,9 @@ internal class ResumableClientImpl(private val storageApi: BucketApi, private va
         path: String,
         upsert: Boolean
     ): ResumableUpload {
-        val cachedEntry = cache.get(Fingerprint(storageApi.bucketId, path, size))
+        val cachedEntry = cache.get(Fingerprint(storageApi.bucketId, source, path, size))
         if(cachedEntry != null) {
-            Napier.d { "Resuming upload for $path" }
+            Napier.d { "Found cached upload for $path" }
             return resumeUpload(channel, cachedEntry, source, path, size)
         }
         return createUpload(channel, source, path, size, upsert)
@@ -113,22 +115,24 @@ internal class ResumableClientImpl(private val storageApi: BucketApi, private va
             }
         }
         val uploadUrl = response.headers["Location"] ?: error("No upload url found")
-        cache.set(Fingerprint(storageApi.bucketId, path, size), ResumableCacheEntry(uploadUrl, Clock.System.now() + 1.days, source))
-        return ResumableUploadImpl(path, channel, size, 0, chunkSize, uploadUrl, httpClient, storageApi, { retrieveServerOffset(uploadUrl, path) }) {
-            cache.remove(Fingerprint(storageApi.bucketId, path, size))
+        val fingerprint = Fingerprint(storageApi.bucketId, source, path, size)
+        cache.set(fingerprint, ResumableCacheEntry(uploadUrl, Clock.System.now() + 1.days))
+        return ResumableUploadImpl(fingerprint, channel, 0, chunkSize, uploadUrl, httpClient, storageApi, { retrieveServerOffset(uploadUrl, path) }) {
+            cache.remove(fingerprint)
         }
     }
 
     private suspend fun resumeUpload(channel: suspend (Long) -> ByteReadChannel, entry: ResumableCacheEntry, source: String, path: String, size: Long): ResumableUploadImpl {
+        val fingerprint = Fingerprint(storageApi.bucketId, source, path, size)
         if(Clock.System.now() > entry.expiresAt) {
             Napier.d { "Upload url for $path expired. Creating new one" }
-            cache.remove(Fingerprint(storageApi.bucketId, path, size))
+            cache.remove(Fingerprint(storageApi.bucketId, source, path, size))
             return createUpload(channel, source, path, size, false)
         }
         val offset = retrieveServerOffset(entry.url, path)
         if(offset < size) {
-            return ResumableUploadImpl(path, channel, size, offset, chunkSize, entry.url, httpClient, storageApi, { retrieveServerOffset(entry.url, path)}) {
-                cache.remove(Fingerprint(storageApi.bucketId, path, size))
+            return ResumableUploadImpl(fingerprint, channel,offset, chunkSize, entry.url, httpClient, storageApi, { retrieveServerOffset(entry.url, path)}) {
+                cache.remove(fingerprint)
             }
         } else error("File already uploaded")
     }
