@@ -1,5 +1,6 @@
 package io.github.jan.supabase.postgrest.request
 
+import io.github.jan.supabase.bodyOrNull
 import io.github.jan.supabase.gotrue.GoTrue
 import io.github.jan.supabase.postgrest.Postgrest
 import io.github.jan.supabase.postgrest.PostgrestImpl
@@ -7,7 +8,6 @@ import io.github.jan.supabase.postgrest.query.Count
 import io.github.jan.supabase.postgrest.query.PostgrestBuilder
 import io.github.jan.supabase.postgrest.query.PostgrestResult
 import io.github.jan.supabase.postgrest.query.Returning
-import io.ktor.client.call.body
 import io.ktor.client.request.header
 import io.ktor.client.request.setBody
 import io.ktor.client.statement.HttpResponse
@@ -56,7 +56,7 @@ sealed interface PostgrestRequest {
         }.asPostgrestResult()
     }
 
-    private suspend fun HttpResponse.asPostgrestResult(): PostgrestResult = PostgrestResult(body(), headers)
+    private suspend fun HttpResponse.asPostgrestResult(): PostgrestResult = PostgrestResult(bodyOrNull(), headers)
 
     class RPC(
         head: Boolean = false,
