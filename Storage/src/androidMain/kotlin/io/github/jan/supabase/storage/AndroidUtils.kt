@@ -10,6 +10,7 @@ import io.github.jan.supabase.annotiations.SupabaseExperimental
  * @param upsert Whether to overwrite an existing file
  * @return the key to the updated file
  */
+@SupabaseExperimental
 suspend fun BucketApi.upload(path: String, uri: Uri, upsert: Boolean = false) = upload(path, uri.readBytes(), upsert)
 
 /**
@@ -29,6 +30,7 @@ suspend fun BucketApi.uploadAsFlow(path: String, uri: Uri, upsert: Boolean = fal
  * @param uri The uri to upload
  * @return the key to the updated file
  */
+@SupabaseExperimental
 suspend fun BucketApi.uploadToSignedUrl(path: String, token: String, uri: Uri, upsert: Boolean = false) = uploadToSignedUrl(path, token, uri.readBytes(), upsert)
 
 /**
@@ -49,6 +51,7 @@ suspend fun BucketApi.uploadToSignedUrlAsFlow(path: String, token: String, uri: 
  * @param upsert Whether to overwrite an existing file
  * @return the key to the updated file
  */
+@SupabaseExperimental
 suspend fun BucketApi.update(path: String, uri: Uri, upsert: Boolean = false) = update(path, uri.readBytes(), upsert)
 
 /**
