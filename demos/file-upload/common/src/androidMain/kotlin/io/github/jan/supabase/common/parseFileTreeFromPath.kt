@@ -13,4 +13,5 @@ actual fun parseFileTreeFromURIs(paths: List<String>): List<MPFile> {
     TODO("Not yet implemented")
 }
 
-actual suspend fun ResumableClient.continuePreviousPlatformUploads(): List<Deferred<ResumableUpload>> = continuePreviousUriUploads()
+actual suspend fun ResumableClient.continuePreviousPlatformUploads(): List<Deferred<ResumableUpload>> = throw UnsupportedOperationException()
+//not supported as you loose access to the uri's file after the app is closed

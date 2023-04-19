@@ -104,14 +104,14 @@ fun UploadScreen(viewModel: UploadViewModel) {
             verticalAlignment = Alignment.CenterVertically
         ) {
             Button({
-                viewModel.cancelAll(selected)
+                viewModel.uploadAll(selected)
             }) {
-                Text("Cancel selected")
+                Text("Upload selected")
             }
             Button({
-                viewModel.uploadAll(selected)
+                viewModel.cancelAll(selected)
             }, modifier = Modifier.padding(start = 10.dp)) {
-                Text("Upload selected")
+                Text("Cancel selected")
             }
         }
     }

@@ -42,6 +42,9 @@ interface ResumableCache {
      */
     suspend fun clear()
 
+    /**
+     * Returns all entries in the cache
+     */
     suspend fun entries(): List<CachePair>
 
     /**

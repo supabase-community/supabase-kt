@@ -10,8 +10,14 @@ import io.github.jan.supabase.storage.UploadStatus
  */
 data class ResumableUploadState(val fingerprint: Fingerprint, private val cacheEntry: ResumableCacheEntry, val status: UploadStatus, val paused: Boolean) {
 
+    /**
+     * The path for the upload
+     */
     val path = cacheEntry.path
 
+    /**
+     * The bucket id for the upload
+     */
     val bucketId = cacheEntry.bucketId
 
     /**

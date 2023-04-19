@@ -1,27 +1,24 @@
-# Chat App Demo
+# File Upload Demo
 
-This is a demo of a chat app using Compose Multiplatform, Koin and supabase-kt.
+This is a demo of a file upload demo using Compose Multiplatform, Koin and supabase-kt.
 
-**Available platforms:** Android, Desktop, JS Canvas
+**Available platforms:** Android, Desktop
 
-**Modules used:** Realtime, GoTrue and Postgrest 
+**Modules used:** Storage
 
-https://user-images.githubusercontent.com/26686035/216710629-d809ff58-cd3b-449f-877f-4c6c773daec4.mp4
+*Video*
 
 
 # Configuration
 
-To run the app, you need to create a supabase project and create a table called `messages` with the following columns:
+To run the app, you need to create a supabase project and create a public bucket with the permissions for anonymous users to upload files.
 
-![image](https://user-images.githubusercontent.com/26686035/216403760-067b563f-621c-435e-887b-0ef2086854a1.png)
-
-Then you need to specify your supabase url and key in [supabaseModule.kt](https://github.com/supabase-community/supabase-kt/blob/master/demos/chat-demo-mpp/common/src/commonMain/kotlin/io/github/jan/supabase/common/di/supabaseModule.kt)
+Then you need to specify your bucket id, supabase url and key in [supabaseModule.kt](https://github.com/supabase-community/supabase-kt/blob/master/demos/chat-demo-mpp/common/src/commonMain/kotlin/io/github/jan/supabase/common/di/supabaseModule.kt)
 
 # Running
 
 To run the app, you need to run the following commands:
 
     ./gradlew :desktop:runDistributable (Desktop)
-    ./gradlew :web:jsBrowserDevelopmentRun (JS Canvas)
 
 For android, use the IDE to run the app.

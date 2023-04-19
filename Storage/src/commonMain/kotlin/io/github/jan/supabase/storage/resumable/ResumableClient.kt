@@ -54,7 +54,7 @@ sealed interface ResumableClient {
 
     /**
      * Reads pending uploads from the cache and creates a new [ResumableUpload] for each of them. This done in parallel, so you can start the downloads independently.
-     * @param channelProducer A function that takes the source of the upload (e.g. file path) and returns a [ByteReadChannel] for the data to upload
+     * @param channelProducer A function that takes the source of the upload (e.g. file path) plus the channel offset (you can use [ByteReadChannel.discard] for that) and returns a [ByteReadChannel] for the data to upload
      */
     suspend fun continuePreviousUploads(channelProducer: suspend (source: String, offset: Long) -> ByteReadChannel): List<Deferred<ResumableUpload>>
 

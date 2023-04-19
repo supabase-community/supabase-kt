@@ -133,18 +133,28 @@ class UploadViewModel(
 
     fun loadPreviousUploads() {
         coroutineScope.launch {
-            resumableClient.continuePreviousPlatformUploads().map {
-                it.await()
-            }.forEach { upload ->
-                uploads[upload.fingerprint] = upload
-                uploadItems.value += UploadState.Loaded(upload.fingerprint, upload.stateFlow.value)
-                upload.stateFlow
-                    .onEach {
-                        uploadItems.value = uploadItems.value.map { state ->
-                            if (state.fingerprint == it.fingerprint) UploadState.Loaded(it.fingerprint, it) else state
+            kotlin.runCatching {
+                resumableClient.continuePreviousPlatformUploads().map {
+                    it.await()
+                }.forEach { upload ->
+                    uploads[upload.fingerprint] = upload
+                    uploadItems.value += UploadState.Loaded(
+                        upload.fingerprint,
+                        upload.stateFlow.value
+                    )
+                    upload.stateFlow
+                        .onEach {
+                            uploadItems.value = uploadItems.value.map { state ->
+                                if (state.fingerprint == it.fingerprint) UploadState.Loaded(
+                                    it.fingerprint,
+                                    it
+                                ) else state
+                            }
                         }
-                    }
-                    .launchIn(coroutineScope)
+                        .launchIn(coroutineScope)
+                }
+            }.onFailure {
+                it.printStackTrace()
             }
         }
     }
