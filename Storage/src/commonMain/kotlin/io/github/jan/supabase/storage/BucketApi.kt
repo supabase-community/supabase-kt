@@ -288,7 +288,7 @@ sealed interface BucketApi {
      * @throws HttpRequestException on network related issues
      */
     fun publicRenderUrl(path: String, transform: ImageTransformation.() -> Unit = {}): String
-    
+
 }
 
 internal class BucketApiImpl(override val bucketId: String, val storage: StorageImpl) : BucketApi {
@@ -363,7 +363,9 @@ internal class BucketApiImpl(override val bucketId: String, val storage: Storage
             putJsonArray("prefixes") {
                 paths.forEach(this::add)
             }
-        })
+        }) {
+            headers["Authorization"] = "Bearer ${accessTokenOrApiKey()}"
+        }
     }
 
     override suspend fun move(from: String, to: String) {
@@ -371,7 +373,9 @@ internal class BucketApiImpl(override val bucketId: String, val storage: Storage
             put("bucketId", bucketId)
             put("sourceKey", from)
             put("destinationKey", to)
-        })
+        }) {
+            headers["Authorization"] = "Bearer ${accessTokenOrApiKey()}"
+        }
     }
 
     override suspend fun copy(from: String, to: String) {
@@ -379,7 +383,9 @@ internal class BucketApiImpl(override val bucketId: String, val storage: Storage
             put("bucketId", bucketId)
             put("sourceKey", from)
             put("destinationKey", to)
-        })
+        }) {
+            headers["Authorization"] = "Bearer ${accessTokenOrApiKey()}"
+        }
     }
 
     override suspend fun createSignedUrl(
@@ -393,7 +399,9 @@ internal class BucketApiImpl(override val bucketId: String, val storage: Storage
             transformation.width?.let { put("width", it) }
             transformation.height?.let { put("height", it) }
             transformation.resize?.let { put("resize", it.name.lowercase()) }
-        }).body<JsonObject>()
+        }) {
+            headers["Authorization"] = "Bearer ${accessTokenOrApiKey()}"
+        }.body<JsonObject>()
         return body["signedURL"]?.jsonPrimitive?.content?.substring(1)
             ?: throw IllegalStateException("Expected signed url in response")
     }
@@ -404,7 +412,9 @@ internal class BucketApiImpl(override val bucketId: String, val storage: Storage
                 paths.forEach(this::add)
             }
             put("expiresIn", expiresIn.inWholeSeconds)
-        }).body<List<SignedUrl>>().map {
+        }) {
+            headers["Authorization"] = "Bearer ${accessTokenOrApiKey()}"
+        }.body<List<SignedUrl>>().map {
             it.copy(signedURL = storage.resolveUrl(it.signedURL.substring(1)))
         }
         return body
@@ -460,6 +470,7 @@ internal class BucketApiImpl(override val bucketId: String, val storage: Storage
             false -> if(transformation.isBlank()) authenticatedUrl(path) else authenticatedRenderUrl(path, transform)
         }
         method = HttpMethod.Get
+        headers["Authorization"] = "Bearer ${accessTokenOrApiKey()}"
         url(url)
     }
 
@@ -467,7 +478,9 @@ internal class BucketApiImpl(override val bucketId: String, val storage: Storage
         return storage.api.postJson("object/list/$bucketId", buildJsonObject {
             put("prefix", prefix)
             putJsonObject(BucketListFilter().apply(filter).build())
-        }).safeBody()
+        }){
+            headers["Authorization"] = "Bearer ${accessTokenOrApiKey()}"
+        }.safeBody()
     }
 
     private suspend fun uploadOrUpdate(method: HttpMethod, bucket: String, path: String, body: ByteArray, upsert: Boolean, extra: HttpRequestBuilder.() -> Unit = {}): String {
@@ -477,7 +490,9 @@ internal class BucketApiImpl(override val bucketId: String, val storage: Storage
             header(HttpHeaders.ContentType, ContentType.defaultForFilePath(path))
             header("x-upsert", upsert.toString())
             extra()
-        }.body<JsonObject>()["Key"]?.jsonPrimitive?.content ?: throw IllegalStateException("Expected a key in a upload response")
+            headers["Authorization"] = "Bearer ${accessTokenOrApiKey()}"
+        }.body<JsonObject>()["Key"]?.jsonPrimitive?.content
+            ?: throw IllegalStateException("Expected a key in a upload response")
     }
 
     private suspend fun uploadToSignedUrl(path: String, token: String, body: ByteArray, upsert: Boolean, extra: HttpRequestBuilder.() -> Unit = {}): String {
@@ -487,6 +502,7 @@ internal class BucketApiImpl(override val bucketId: String, val storage: Storage
             header(HttpHeaders.ContentType, ContentType.defaultForFilePath(path))
             header("x-upsert", upsert.toString())
             extra()
+            headers["Authorization"] = "Bearer ${accessTokenOrApiKey()}"
         }.body<JsonObject>()["Key"]?.jsonPrimitive?.content ?: throw IllegalStateException("Expected a key in a upload response")
     }
 
@@ -505,6 +521,9 @@ internal class BucketApiImpl(override val bucketId: String, val storage: Storage
         val transformation = ImageTransformation().apply(transform).queryString()
         return storage.resolveUrl("render/image/public/$bucketId/$path${if(transformation.isNotBlank()) "?$transformation" else ""}")
     }
+
+    private fun accessTokenOrApiKey() = supabaseClient.pluginManager.getPluginOrNull(GoTrue)?.currentAccessTokenOrNull()
+        ?: supabaseClient.supabaseKey
 
 }
 

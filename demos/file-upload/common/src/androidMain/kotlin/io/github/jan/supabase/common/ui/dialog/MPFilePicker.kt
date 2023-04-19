@@ -16,7 +16,8 @@ import io.ktor.utils.io.jvm.javaio.toByteReadChannel
 @Composable
 actual fun MPFilePicker(
     showFileDialog: Boolean,
-    onFileSelected: (MPFile) -> Unit
+    onFileSelected: (MPFile) -> Unit,
+    close: () -> Unit
 ) {
     val context = LocalContext.current
     FilePicker(showFileDialog, fileExtension = "jpg") {
@@ -40,5 +41,6 @@ actual fun MPFilePicker(
                 )
             )
         }
+        close()
     }
 }

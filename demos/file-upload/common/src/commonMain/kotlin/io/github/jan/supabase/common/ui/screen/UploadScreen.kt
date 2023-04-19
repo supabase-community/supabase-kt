@@ -27,6 +27,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
@@ -48,6 +49,9 @@ import io.github.jan.supabase.storage.resumable.Fingerprint
 @OptIn(ExperimentalFoundationApi::class, ExperimentalComposeUiApi::class)
 @Composable
 fun UploadScreen(viewModel: UploadViewModel) {
+    LaunchedEffect(Unit) {
+        viewModel.loadPreviousUploads()
+    }
     val states by viewModel.uploadItems.collectAsState(emptyList())
     val isDragging = remember { mutableStateOf(false) }
     val selected = remember { mutableStateListOf<Fingerprint>() }
@@ -63,7 +67,7 @@ fun UploadScreen(viewModel: UploadViewModel) {
                     viewModel.queueUploadFromURIs(it)
                 }
         ) {
-            items(states, { it.fingerprint.path + it.fingerprint.size }) {
+            items(states, { it.fingerprint.source + it.fingerprint.size }) {
                 Box(Modifier.animateItemPlacement()) {
                     if(it is UploadState.Loaded) {
                         UploadCard(
@@ -132,9 +136,10 @@ fun UploadScreen(viewModel: UploadViewModel) {
     }
 
 
-    MPFilePicker(showFileDialog) {
-        showFileDialog = false
+    MPFilePicker(showFileDialog, {
         viewModel.queueUpload(it, it.name)
+    }) {
+        showFileDialog = false
     }
 
     Box(

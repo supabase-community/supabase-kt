@@ -13,7 +13,7 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
 @Serializable
-data class ResumableCacheEntry(val url: String, val expiresAt: Instant)
+data class ResumableCacheEntry(val url: String, val path: String, val bucketId: String, val expiresAt: Instant)
 
 typealias CachePair = Pair<Fingerprint, ResumableCacheEntry>
 
@@ -64,13 +64,16 @@ interface ResumableCache {
             }
         }
 
+        @OptIn(ExperimentalSettingsApi::class)
         override suspend fun remove(fingerprint: Fingerprint) {
             settings.remove(fingerprint.value)
         }
 
         @OptIn(ExperimentalSettingsApi::class)
         override suspend fun clear() {
-            settings.clear()
+            settings.keys().forEach {
+                if(it.split("::").size == 4) remove(Fingerprint(it) ?: error("Invalid fingerprint $it"))
+            }
         }
 
         override suspend fun entries(): List<CachePair> {

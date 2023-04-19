@@ -6,5 +6,6 @@ import io.github.jan.supabase.common.MPFile
 @Composable
 expect fun MPFilePicker(
     showFileDialog: Boolean,
-    onFileSelected: (MPFile) -> Unit
+    onFileSelected: (MPFile) -> Unit,
+    close: () -> Unit
 )

@@ -8,11 +8,13 @@ import java.nio.file.Paths
 @Composable
 actual fun MPFilePicker(
     showFileDialog: Boolean,
-    onFileSelected: (MPFile) -> Unit
+    onFileSelected: (MPFile) -> Unit,
+    close: () -> Unit
 ) {
     FilePicker(showFileDialog, fileExtension = "jpg") {
         it?.let { path ->
             onFileSelected(MPFile(Paths.get(path)))
         }
+        close()
     }
 }

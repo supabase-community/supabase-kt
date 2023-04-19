@@ -12,36 +12,26 @@ value class Fingerprint private constructor(val value: String) {
     private val parts get() = value.split("::")
 
     /**
-     * The bucket id
-     */
-    val bucket get() = parts[0]
-
-    /**
      * The source of the file upload
      */
-    val source get() = parts[1]
-
-    /**
-     * The path of the file upload
-     */
-    val path get() = parts[2]
+    val source get() = parts[0]
 
     /**
      * The size of the data
      */
-    val size get() = parts[3].toLong()
+    val size get() = parts[1].toLong()
 
     companion object {
 
         /**
-         * Creates a fingerprint from the [bucket], the [path] and the [size] of the file
+         * Creates a fingerprint from the [source] and the [size] of the file
          */
-        operator fun invoke(bucket: String, source: String, path: String, size: Long) = Fingerprint("$bucket::$source::$path::$size")
+        operator fun invoke(source: String, size: Long) = Fingerprint("$source::$size")
 
         operator fun invoke(value: String): Fingerprint? {
             val fingerprint = Fingerprint(value)
             val parts = fingerprint.parts
-            return if(parts.size != 4) null else fingerprint
+            return if(parts.size != 2) null else fingerprint
         }
 
     }

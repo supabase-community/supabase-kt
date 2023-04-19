@@ -68,6 +68,8 @@ sealed interface ResumableUpload {
 
 class ResumableUploadImpl(
     override val fingerprint: Fingerprint,
+    private val path: String,
+    private val cacheEntry: ResumableCacheEntry,
     private val createDataStream: suspend (Long) -> ByteReadChannel,
     private var offset: Long,
     private val chunkSize: Long,
@@ -78,13 +80,11 @@ class ResumableUploadImpl(
     private val removeFromCache: suspend () -> Unit
 ): ResumableUpload {
 
-    private val bucketId = fingerprint.bucket
-    private val path = fingerprint.path
     private val size = fingerprint.size
 
     private var paused by atomic(true)
     private var serverOffset = 0L
-    private val _stateFlow = MutableStateFlow<ResumableUploadState>(ResumableUploadState(fingerprint, UploadStatus.Progress(offset, size), paused))
+    private val _stateFlow = MutableStateFlow<ResumableUploadState>(ResumableUploadState(fingerprint, cacheEntry, UploadStatus.Progress(offset, size), paused))
     override val stateFlow: StateFlow<ResumableUploadState> = _stateFlow.asStateFlow()
     private val scope = CoroutineScope(Dispatchers.Default)
     private val config = storageApi.supabaseClient.storage.config.resumable
@@ -133,10 +133,10 @@ class ResumableUploadImpl(
                         continue
                     }
                 }
-                _stateFlow.value = ResumableUploadState(fingerprint, UploadStatus.Progress(offset, size), paused)
+                _stateFlow.value = ResumableUploadState(fingerprint, cacheEntry, UploadStatus.Progress(offset, size), paused)
             }
             if(offset != serverOffset) error("Upload offset does not match server offset")
-            _stateFlow.value = ResumableUploadState(fingerprint, UploadStatus.Success(path), false)
+            _stateFlow.value = ResumableUploadState(fingerprint, cacheEntry, UploadStatus.Success(path), false)
             removeFromCache()
             dataStream.cancel()
         }
@@ -146,27 +146,18 @@ class ResumableUploadImpl(
     private suspend fun uploadChunk(): Int {
         val limit = min(chunkSize, size.toInt() - offset)
         val buffer = ByteArray(limit.toInt())
-        var totalRead = 0
-        var read: Int
-
-        while (totalRead < limit.toInt()) { //read data from data stream until we have read the chunk size we want to upload
-            read = dataStream.readAvailable(buffer, totalRead, limit.toInt() - totalRead)
-            if (read == -1) {
-                break
-            }
-            totalRead += read
-        }
+        dataStream.readFully(buffer, 0, limit.toInt())
         val uploadResponse = httpClient.patch(locationUrl) {
             header("Tus-Resumable", TUS_VERSION)
             header("Content-Type", "application/offset+octet-stream")
             header("Upload-Offset", offset)
             bearerAuth(accessTokenOrApiKey())
-            setBody(StreamContent(totalRead.toLong()) {
-                writeFully(buffer, 0, totalRead)
+            setBody(StreamContent(limit) {
+                writeFully(buffer, 0, limit.toInt())
             })
             onUpload { bytesSentTotal, _ ->
                 if(!config.onlyUpdateStateAfterChunk) {
-                    _stateFlow.value = ResumableUploadState(fingerprint, UploadStatus.Progress(offset + bytesSentTotal, size), paused)
+                    _stateFlow.value = ResumableUploadState(fingerprint, cacheEntry, UploadStatus.Progress(offset + bytesSentTotal, size), paused)
                 }
             }
         }
@@ -177,14 +168,14 @@ class ResumableUploadImpl(
             }
             HttpStatusCode.Conflict -> {
                 Napier.w { "Upload conflict, skipping chunk" }
-                serverOffset = offset + totalRead
+                serverOffset = offset + limit
             }
             HttpStatusCode.NoContent -> {
                 Napier.d { "Uploaded chunk" }
             }
             else -> error("Upload failed with status ${uploadResponse.status}. ${uploadResponse.bodyAsText()}")
         }
-        return totalRead
+        return limit.toInt()
     }
 
     private fun accessTokenOrApiKey() = storageApi.supabaseClient.pluginManager.getPluginOrNull(GoTrue)?.currentAccessTokenOrNull() ?: storageApi.supabaseClient.supabaseKey

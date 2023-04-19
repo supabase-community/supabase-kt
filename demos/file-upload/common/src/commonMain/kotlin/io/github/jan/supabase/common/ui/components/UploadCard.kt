@@ -64,8 +64,8 @@ fun UploadCard(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            Image(fileIcon(state.fingerprint.path.substringAfter(".")), contentDescription = null, modifier = Modifier.size(80.dp, 80.dp).padding(8.dp))
-            Text(state.fingerprint.path, maxLines = if(showFullPath) 6 else 1, overflow = TextOverflow.Ellipsis)
+            Image(fileIcon(state.fingerprint.source.substringAfterLast(".")), contentDescription = null, modifier = Modifier.size(80.dp, 80.dp).padding(8.dp))
+            Text(state.path, maxLines = if(showFullPath) 6 else 1, overflow = TextOverflow.Ellipsis)
             Text(state.fingerprint.size.fileSize, fontSize = 12.sp)
             Box(modifier = Modifier.padding(8.dp)) {
                 when {

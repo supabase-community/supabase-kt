@@ -1,8 +1,6 @@
 package io.github.jan.supabase.storage.resumable
 
 import io.github.jan.supabase.storage.UploadStatus
-import io.ktor.utils.io.ByteReadChannel
-import kotlin.jvm.JvmInline
 
 /**
  * Represents the state of a resumable upload
@@ -10,7 +8,11 @@ import kotlin.jvm.JvmInline
  * @param status The current upload status
  * @param paused Whether the upload is paused
  */
-data class ResumableUploadState(val fingerprint: Fingerprint, val status: UploadStatus, val paused: Boolean) {
+data class ResumableUploadState(val fingerprint: Fingerprint, private val cacheEntry: ResumableCacheEntry, val status: UploadStatus, val paused: Boolean) {
+
+    val path = cacheEntry.path
+
+    val bucketId = cacheEntry.bucketId
 
     /**
      * Whether the upload is done

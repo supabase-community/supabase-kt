@@ -34,7 +34,7 @@ class UploadViewModel(
     }
 
     fun queueUpload(file: MPFile, path: String) {
-        val fingerprint = Fingerprint(BUCKET, file.source, path, file.size)
+        val fingerprint = Fingerprint(file.source, file.size)
         if(uploadItems.value.any { it.fingerprint == fingerprint }) {
             return
         }
@@ -127,6 +127,24 @@ class UploadViewModel(
                 if(it.state.status is UploadStatus.Progress && it.state.paused) {
                     startUploading(it.fingerprint)
                 }
+            }
+        }
+    }
+
+    fun loadPreviousUploads() {
+        coroutineScope.launch {
+            resumableClient.continuePreviousPlatformUploads().map {
+                it.await()
+            }.forEach { upload ->
+                uploads[upload.fingerprint] = upload
+                uploadItems.value += UploadState.Loaded(upload.fingerprint, upload.stateFlow.value)
+                upload.stateFlow
+                    .onEach {
+                        uploadItems.value = uploadItems.value.map { state ->
+                            if (state.fingerprint == it.fingerprint) UploadState.Loaded(it.fingerprint, it) else state
+                        }
+                    }
+                    .launchIn(coroutineScope)
             }
         }
     }

@@ -15,7 +15,7 @@ import kotlin.io.path.fileSize
  * @param path The path to upload the data to
  * @param upsert Whether to overwrite existing files
  */
-suspend fun ResumableClient.createOrContinueUpload(file: File, path: String, upsert: Boolean = false) = createOrContinueUpload({ file.readChannel().apply { discard(it) } }, file.absolutePath, file.length(), path, upsert)
+suspend fun ResumableClient.createOrContinueUpload(path: String, file: File, upsert: Boolean = false) = createOrContinueUpload({ file.readChannel().apply { discard(it) } }, file.absolutePath, file.length(), path, upsert)
 
 /**
  * Creates a new resumable upload or continues an existing one.
@@ -24,9 +24,12 @@ suspend fun ResumableClient.createOrContinueUpload(file: File, path: String, ups
  * @param path The path to upload the data to
  * @param upsert Whether to overwrite existing files
  */
-suspend fun ResumableClient.createOrContinueUpload(file: Path, path: String, upsert: Boolean = false) = createOrContinueUpload({ file.readChannel().apply { discard(it) } }, file.absolutePathString(), file.fileSize(), path, upsert)
+suspend fun ResumableClient.createOrContinueUpload(path: String, file: Path, upsert: Boolean = false) = createOrContinueUpload({ file.readChannel().apply { discard(it) } }, file.absolutePathString(), file.fileSize(), path, upsert)
 
 /**
- * Reads pending uploads from the cache and creates a new [ResumableUpload] for each of them. This done in parallel, so you can start the downloads independently.
+ * Reads pending uploads from the cache and creates a new [ResumableUpload] for each of them. This done in parallel, so you can start the uploads independently.
  */
-suspend fun ResumableClient.continuePreviousFileUploads() = continuePreviousUploads { File(it).readChannel() }
+suspend fun ResumableClient.continuePreviousFileUploads() =
+    continuePreviousUploads { source, offset ->
+        File(source).readChannel().apply { discard(offset) }
+    }
