@@ -6,14 +6,14 @@ This is a demo of a file upload demo using Compose Multiplatform, Koin and supab
 
 **Modules used:** Storage
 
-*Video*
+https://user-images.githubusercontent.com/26686035/233154227-ffcb9a27-75ce-4ec0-a8f4-7e11f9e9686a.mp4
 
 
 # Configuration
 
 To run the app, you need to create a supabase project and create a public bucket with the permissions for anonymous users to upload files.
 
-Then you need to specify your bucket id, supabase url and key in [supabaseModule.kt](https://github.com/supabase-community/supabase-kt/blob/master/demos/chat-demo-mpp/common/src/commonMain/kotlin/io/github/jan/supabase/common/di/supabaseModule.kt)
+Then you need to specify your bucket id, supabase url and key in [supabaseModule.kt](https://github.com/supabase-community/supabase-kt/blob/master/demos/file-upload/common/src/commonMain/kotlin/io/github/jan/supabase/common/di/supabaseModule.kt)
 
 # Running
 
