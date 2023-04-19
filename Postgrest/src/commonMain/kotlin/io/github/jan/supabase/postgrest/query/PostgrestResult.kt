@@ -7,9 +7,9 @@ import kotlinx.serialization.json.decodeFromJsonElement
 
 /**
  * Represents the result from a postgrest request
- * @param body The body of the response
+ * @param body The body of the response. Can be null if using an database function.
  */
-data class PostgrestResult(val body: JsonElement, val headers: Headers) {
+data class PostgrestResult(val body: JsonElement?, val headers: Headers) {
 
     private val contentRange = headers["Content-Range"]
 
@@ -29,7 +29,7 @@ data class PostgrestResult(val body: JsonElement, val headers: Headers) {
     /**
      * Decodes [body] as [T] using [json]
      */
-    inline fun <reified T> decodeAs(json: Json = Json): T = json.decodeFromJsonElement(body)
+    inline fun <reified T> decodeAs(json: Json = Json): T = json.decodeFromJsonElement(body ?: error("No body found"))
 
     /**
      * Decodes [body] as [T] using [json]. If there's an error it will return null
