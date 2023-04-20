@@ -1,6 +1,5 @@
 package io.github.jan.supabase.common
 
-import io.github.jan.supabase.storage.continuePreviousUriUploads
 import io.github.jan.supabase.storage.resumable.ResumableClient
 import io.github.jan.supabase.storage.resumable.ResumableUpload
 import kotlinx.coroutines.Deferred

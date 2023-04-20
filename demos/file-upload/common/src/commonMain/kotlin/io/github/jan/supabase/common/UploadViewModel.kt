@@ -4,7 +4,6 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import co.touchlab.stately.collections.IsoMutableMap
 import io.github.aakira.napier.DebugAntilog
 import io.github.aakira.napier.Napier
-import io.github.jan.supabase.common.di.BUCKET
 import io.github.jan.supabase.storage.UploadStatus
 import io.github.jan.supabase.storage.resumable.Fingerprint
 import io.github.jan.supabase.storage.resumable.ResumableClient

@@ -1,6 +1,5 @@
 package io.github.jan.supabase.common.di
 
-import com.russhwolf.settings.Settings
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.annotiations.SupabaseExperimental
 import io.github.jan.supabase.createSupabaseClient

@@ -56,7 +56,6 @@ fun UploadScreen(viewModel: UploadViewModel) {
     val isDragging = remember { mutableStateOf(false) }
     val selected = remember { mutableStateListOf<Fingerprint>() }
     var showFileDialog by remember { mutableStateOf(false) }
-    println(states)
     Column {
         LazyVerticalGrid(
             columns = GridCells.Adaptive(150.dp),
