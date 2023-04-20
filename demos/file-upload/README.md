@@ -6,8 +6,7 @@ This is a demo of a file upload demo using Compose Multiplatform, Koin and supab
 
 **Modules used:** Storage
 
-https://user-images.githubusercontent.com/26686035/233154227-ffcb9a27-75ce-4ec0-a8f4-7e11f9e9686a.mp4
-
+https://user-images.githubusercontent.com/26686035/233403165-26d87217-a0c9-4abd-b677-c367a5f1e4b9.mp4
 
 # Configuration
 
