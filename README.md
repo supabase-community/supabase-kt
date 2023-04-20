@@ -63,6 +63,10 @@ implementation("io.github.jan-tennert.supabase:[module e.g. functions-kt or gotr
 - [Compose Multiplatform Chat Demo (Desktop/Android/Browser)](https://github.com/supabase-community/supabase-kt/tree/master/demos/chat-demo-mpp)
 - [File Upload Demo (Desktop/Android)](https://github.com/supabase-community/supabase-kt/tree/master/demos/file-upload)
 
+# Videos
+
+- [Getting started with Supabase on Android](https://www.youtube.com/watch?v=SGr73sWMX6w)
+
 # Contribution
 
 ### How to contribute
