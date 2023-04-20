@@ -1,6 +1,7 @@
 package io.github.jan.supabase.network
 
 import io.github.aakira.napier.Napier
+import io.github.jan.supabase.annotiations.SupabaseInternal
 import io.github.jan.supabase.exceptions.HttpRequestException
 import io.github.jan.supabase.supabaseJson
 import io.ktor.client.HttpClient
@@ -20,6 +21,7 @@ import io.ktor.serialization.kotlinx.json.json
 /**
  * A [SupabaseHttpClient] that uses ktor to send requests
  */
+@OptIn(SupabaseInternal::class)
 class KtorSupabaseHttpClient(
     private val supabaseKey: String,
     modifiers: List<HttpClientConfig<*>.() -> Unit> = listOf(),
@@ -27,7 +29,8 @@ class KtorSupabaseHttpClient(
     engine: HttpClientEngine? = null,
 ): SupabaseHttpClient() {
 
-    private val httpClient =
+    @SupabaseInternal
+    val httpClient =
         if(engine != null) HttpClient(engine) { applyDefaultConfiguration(modifiers) }
         else HttpClient { applyDefaultConfiguration(modifiers) }
 

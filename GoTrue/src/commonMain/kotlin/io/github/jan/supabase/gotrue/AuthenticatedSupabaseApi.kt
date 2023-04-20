@@ -4,8 +4,9 @@ import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.exceptions.RestException
 import io.github.jan.supabase.network.SupabaseApi
 import io.github.jan.supabase.plugins.MainPlugin
-import io.ktor.client.request.*
-import io.ktor.client.statement.*
+import io.ktor.client.request.HttpRequestBuilder
+import io.ktor.client.request.bearerAuth
+import io.ktor.client.statement.HttpResponse
 
 class AuthenticatedSupabaseApi(
     resolveUrl: (path: String) -> String,
@@ -16,10 +17,8 @@ class AuthenticatedSupabaseApi(
 
     override suspend fun rawRequest(url: String, builder: HttpRequestBuilder.() -> Unit): HttpResponse = super.rawRequest(url) {
         supabaseClient.pluginManager.getPluginOrNull(GoTrue)?.let { gotrue ->
-            val jwtToken = jwtToken ?: gotrue.currentAccessTokenOrNull()
-            jwtToken?.let { token ->
-                bearerAuth(token)
-            }
+            val jwtToken = jwtToken ?: gotrue.currentAccessTokenOrNull() ?: supabaseClient.supabaseKey
+            bearerAuth(jwtToken)
         }
         builder()
     }

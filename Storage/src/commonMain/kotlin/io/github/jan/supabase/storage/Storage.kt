@@ -1,5 +1,10 @@
+@file:OptIn(ExperimentalSettingsApi::class)
+
 package io.github.jan.supabase.storage
 
+import co.touchlab.stately.collections.IsoMutableMap
+import com.russhwolf.settings.ExperimentalSettingsApi
+import io.github.aakira.napier.Napier
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.bodyOrNull
 import io.github.jan.supabase.exceptions.*
@@ -8,12 +13,15 @@ import io.github.jan.supabase.plugins.MainConfig
 import io.github.jan.supabase.plugins.MainPlugin
 import io.github.jan.supabase.plugins.SupabasePluginProvider
 import io.github.jan.supabase.safeBody
-import io.ktor.client.plugins.*
-import io.ktor.client.statement.*
+import io.github.jan.supabase.storage.resumable.ResumableCache
+import io.ktor.client.plugins.HttpRequestTimeoutException
+import io.ktor.client.statement.HttpResponse
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
 
 /**
  * Plugin for interacting with the supabase storage api
@@ -93,7 +101,49 @@ sealed interface Storage : MainPlugin<Storage.Config> {
      */
     fun from(bucketId: String): BucketApi = get(bucketId)
 
-    data class Config(override var customUrl: String? = null, override var jwtToken: String? = null): MainConfig
+    /**
+     * Config for the storage plugin
+     * @param customUrl the custom url to use for the storage api
+     * @param jwtToken the jwt token to use for the storage api
+     */
+    data class Config(
+        override var customUrl: String? = null,
+        override var jwtToken: String? = null,
+        @PublishedApi internal var resumable: Resumable = Resumable()
+    ) : MainConfig {
+
+        /**
+         * @param cache the cache for caching resumable upload urls
+         * @param retryTimeout the timeout for retrying resumable uploads when uploading a chunk fails
+         * @param onlyUpdateStateAfterChunk whether the state should only be updated after a chunk was uploaded successfully or also when the chunk is currently being uploaded
+         */
+        data class Resumable(
+            var cache: ResumableCache = ResumableCache.Memory(),
+            var retryTimeout: Duration = 5.seconds,
+            var onlyUpdateStateAfterChunk: Boolean = false
+        ) {
+
+            /**
+             * The default chunk size for resumable uploads. **Supabase currently only supports a chunk size of 6MB, so be careful when changing this value**
+             */
+            var defaultChunkSize: Long = 6 * 1024 * 1024
+                set(value) {
+                    if(value.toInt() != 6 * 1024 * 1024) {
+                        Napier.w { "supabase currently only supports a chunk size of 6MB" }
+                    }
+                    field = value
+                }
+
+        }
+
+        /**
+         * Config for resumable uploads
+         */
+        inline fun resumable(builder: Resumable.() -> Unit) {
+            resumable = Resumable().apply(builder)
+        }
+
+    }
 
     companion object : SupabasePluginProvider<Config, Storage> {
 
@@ -118,6 +168,7 @@ internal class StorageImpl(override val supabaseClient: SupabaseClient, override
         get() = Storage.API_VERSION
 
     internal val api = supabaseClient.authenticatedSupabaseApi(this)
+    private val resumableClients = IsoMutableMap<String, BucketApi>()
 
     override suspend fun retrieveBuckets(): List<Bucket> = api.get("bucket").safeBody()
 
@@ -154,13 +205,19 @@ internal class StorageImpl(override val supabaseClient: SupabaseClient, override
         api.post("bucket/$bucketId/empty")
     }
 
-    override fun get(bucketId: String): BucketApi = BucketApiImpl(bucketId, this)
+    override fun get(bucketId: String): BucketApi = resumableClients.getOrPut(bucketId) {
+        BucketApiImpl(bucketId, this)
+    }
 
     override suspend fun parseErrorResponse(response: HttpResponse): RestException {
         val statusCode = response.status.value
-        val error = response.bodyOrNull<StorageErrorResponse>() ?: StorageErrorResponse(response.status.value, "Unknown error", "")
-        if(statusCode != 400) return UnknownRestException("Unknown error response", response)
-        when(error.statusCode) {
+        val error = response.bodyOrNull<StorageErrorResponse>() ?: StorageErrorResponse(
+            response.status.value,
+            "Unknown error",
+            ""
+        )
+        if (statusCode != 400) return UnknownRestException("Unknown error response", response)
+        when (error.statusCode) {
             401 -> throw UnauthorizedRestException(error.error, response, error.message)
             400 -> throw BadRequestRestException(error.error, response, error.message)
             404 -> throw NotFoundRestException(error.error, response, error.message)

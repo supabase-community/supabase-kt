@@ -40,6 +40,8 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 api(project(":gotrue-kt"))
+                api(libs.cache4k)
+                api(libs.stately)
             }
         }
         val nonJsMain by creating {
@@ -75,4 +77,7 @@ android {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
     }
+}
+dependencies {
+    implementation("io.ktor:ktor-client-logging-jvm:2.2.4")
 }
