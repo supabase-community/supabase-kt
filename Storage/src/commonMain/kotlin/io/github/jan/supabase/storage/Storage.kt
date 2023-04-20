@@ -118,7 +118,7 @@ sealed interface Storage : MainPlugin<Storage.Config> {
          * @param onlyUpdateStateAfterChunk whether the state should only be updated after a chunk was uploaded successfully or also when the chunk is currently being uploaded
          */
         data class Resumable(
-            var cache: ResumableCache = ResumableCache.Memory(),
+            var cache: ResumableCache = ResumableCache.Disk(),
             var retryTimeout: Duration = 5.seconds,
             var onlyUpdateStateAfterChunk: Boolean = false
         ) {
