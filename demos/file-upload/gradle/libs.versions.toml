@@ -9,7 +9,7 @@ ktor = "2.2.4"
 androidx-core = "1.10.0"
 androidx-compat = "1.6.1"
 androidx-lifecycle = "2.6.1"
-androidx-activity = "1.7.0"
+androidx-activity = "1.7.1"
 
 file-picker = "1.0.0"
 
