@@ -79,5 +79,5 @@ android {
     }
 }
 dependencies {
-    implementation("io.ktor:ktor-client-logging-jvm:2.2.4")
+    implementation("io.ktor:ktor-client-logging-jvm:2.3.0")
 }
