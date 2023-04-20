@@ -78,6 +78,3 @@ android {
         targetCompatibility = JavaVersion.VERSION_1_8
     }
 }
-dependencies {
-    implementation("io.ktor:ktor-client-logging-jvm:2.2.4")
-}
