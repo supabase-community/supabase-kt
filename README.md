@@ -65,7 +65,7 @@ implementation("io.github.jan-tennert.supabase:[module e.g. functions-kt or gotr
 
 # Videos
 
-- [Getting started with Supabase on Android](https://www.youtube.com/watch?v=SGr73sWMX6w)
+- [Getting started with Supabase on Android](https://www.youtube.com/watch?v=SGr73sWMX6w) (by [Eric Ampire](https://www.youtube.com/@eric-ampire))
 
 # Contribution
 
