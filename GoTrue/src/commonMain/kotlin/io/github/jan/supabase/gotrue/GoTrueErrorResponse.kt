@@ -12,7 +12,8 @@ import kotlinx.serialization.json.jsonPrimitive
 
 @Serializable(with = GoTrueErrorResponse.Companion::class)
 internal data class GoTrueErrorResponse(
-    val error: String
+    val error: String,
+    val description: String?
 ) {
 
     companion object : KSerializer<GoTrueErrorResponse> {
@@ -25,7 +26,8 @@ internal data class GoTrueErrorResponse(
             decoder as JsonDecoder
             val json = decoder.decodeJsonElement()
             val error = json.jsonObject["error"]?.jsonPrimitive?.content ?: json.jsonObject["msg"]?.jsonPrimitive?.content ?: json.toString()
-            return GoTrueErrorResponse(error)
+            val description = json.jsonObject["error_description"]?.jsonPrimitive?.content
+            return GoTrueErrorResponse(error, description)
         }
 
         override fun serialize(encoder: Encoder, value: GoTrueErrorResponse) {

@@ -305,11 +305,11 @@ internal class GoTrueImpl(override val supabaseClient: SupabaseClient, override 
     }
 
     override suspend fun parseErrorResponse(response: HttpResponse): RestException {
-        val errorBody = response.bodyOrNull<GoTrueErrorResponse>() ?: GoTrueErrorResponse("Unknown error")
+        val errorBody = response.bodyOrNull<GoTrueErrorResponse>() ?: GoTrueErrorResponse("Unknown error", "")
         return when(response.status) {
-            HttpStatusCode.Unauthorized -> UnauthorizedRestException(errorBody.error, response)
-            HttpStatusCode.BadRequest -> BadRequestRestException(errorBody.error, response)
-            HttpStatusCode.UnprocessableEntity -> BadRequestRestException(errorBody.error, response)
+            HttpStatusCode.Unauthorized -> UnauthorizedRestException(errorBody.error, response, errorBody.description)
+            HttpStatusCode.BadRequest -> BadRequestRestException(errorBody.error, response, errorBody.description)
+            HttpStatusCode.UnprocessableEntity -> BadRequestRestException(errorBody.error, response, errorBody.description)
             else -> UnknownRestException(errorBody.error, response)
         }
     }
