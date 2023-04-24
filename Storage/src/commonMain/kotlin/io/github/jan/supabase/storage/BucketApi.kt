@@ -13,7 +13,6 @@ import io.ktor.client.call.body
 import io.ktor.client.plugins.HttpRequestTimeoutException
 import io.ktor.client.plugins.onDownload
 import io.ktor.client.plugins.onUpload
-import io.ktor.client.plugins.timeout
 import io.ktor.client.request.HttpRequestBuilder
 import io.ktor.client.request.header
 import io.ktor.client.request.parameter
@@ -482,9 +481,6 @@ internal class BucketApiImpl(override val bucketId: String, val storage: Storage
     override suspend fun uploadAsFlow(path: String, data: UploadData, upsert: Boolean): Flow<UploadStatus> {
         return callbackFlow {
             val key = uploadOrUpdate(HttpMethod.Post, bucketId, path, data, upsert) {
-                timeout {
-                    requestTimeoutMillis = 20000000
-                }
                 onUpload { bytesSentTotal, contentLength ->
                     trySend(UploadStatus.Progress(bytesSentTotal, contentLength))
                 }
