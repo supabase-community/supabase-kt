@@ -4,6 +4,13 @@ title: '[Question]: '
 labels: ["question"]
 assignees: jan-tennert
 body:
+  - type: checkboxes
+    id: general
+    attributes:
+      label: General info
+      options:
+        - label: I checked the [troubleshooting](https://github.com/supabase-community/supabase-kt/wiki/Troubleshooting) page for similar problems
+          required: true
   - type: textarea
     id: question
     attributes:
