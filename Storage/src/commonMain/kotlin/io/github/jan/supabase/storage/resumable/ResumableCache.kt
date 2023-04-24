@@ -94,7 +94,7 @@ interface ResumableCache {
      * By default, cached urls expire after 30 minutes. You can change this by passing a custom [Cache] to the constructor
      */
     class Memory(
-        private val cache: Cache<String, String> = Cache.Builder()
+        private val cache: Cache<String, String> = Cache.Builder<String, String>()
             .build()
     ) : ResumableCache {
 
