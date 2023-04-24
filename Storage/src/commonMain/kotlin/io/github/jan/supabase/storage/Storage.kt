@@ -15,6 +15,7 @@ import io.github.jan.supabase.plugins.SupabasePluginProvider
 import io.github.jan.supabase.safeBody
 import io.github.jan.supabase.storage.resumable.ResumableCache
 import io.ktor.client.plugins.HttpRequestTimeoutException
+import io.ktor.client.plugins.timeout
 import io.ktor.client.statement.HttpResponse
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonPrimitive
@@ -105,10 +106,12 @@ sealed interface Storage : MainPlugin<Storage.Config> {
      * Config for the storage plugin
      * @param customUrl the custom url to use for the storage api
      * @param jwtToken the jwt token to use for the storage api
+     * @param transferTimeout the timeout for uploading and downloading files (default: 120 seconds)
      */
     data class Config(
         override var customUrl: String? = null,
         override var jwtToken: String? = null,
+        var transferTimeout: Duration = 120.seconds,
         @PublishedApi internal var resumable: Resumable = Resumable()
     ) : MainConfig {
 
@@ -167,7 +170,11 @@ internal class StorageImpl(override val supabaseClient: SupabaseClient, override
     override val API_VERSION: Int
         get() = Storage.API_VERSION
 
-    internal val api = supabaseClient.authenticatedSupabaseApi(this)
+    internal val api = supabaseClient.authenticatedSupabaseApi(this) {
+        timeout {
+            requestTimeoutMillis = config.transferTimeout.inWholeMilliseconds
+        }
+    }
     private val resumableClients = IsoMutableMap<String, BucketApi>()
 
     override suspend fun retrieveBuckets(): List<Bucket> = api.get("bucket").safeBody()
