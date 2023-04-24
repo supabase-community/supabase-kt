@@ -1,5 +1,6 @@
 package io.github.jan.supabase.storage
 
+import io.ktor.utils.io.ByteWriteChannel
 import kotlin.jvm.JvmInline
 
 /**
@@ -17,10 +18,15 @@ sealed interface DownloadStatus {
 
     /**
      * Represents the success of a download
-     * @param data The downloaded data
+     */
+    object Success : DownloadStatus
+
+    /**
+     * Represents the data of a download. Only sent, when not streaming to a [ByteWriteChannel]
+     * @param data The data of the download
      */
     @JvmInline
-    value class Success(val data: ByteArray) : DownloadStatus
+    value class ByteData(val data: ByteArray) : DownloadStatus
 
 }
 

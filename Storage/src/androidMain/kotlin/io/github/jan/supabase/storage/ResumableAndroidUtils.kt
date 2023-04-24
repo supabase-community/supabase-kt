@@ -22,7 +22,7 @@ private suspend fun Uri.createByteReader(): suspend (Long) -> ByteReadChannel = 
     inputStream.toByteReadChannel().apply { discard(offset) }
 }
 
-private val Uri.contentSize: Long
+internal val Uri.contentSize: Long
     @SuppressLint("Recycle")
     get() {
         return (applicationContext().contentResolver.openAssetFileDescriptor(this, "r") ?: error("Could not open file descriptor")).use(AssetFileDescriptor::getLength)

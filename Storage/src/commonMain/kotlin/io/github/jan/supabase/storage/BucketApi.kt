@@ -70,6 +70,16 @@ sealed interface BucketApi {
      */
     suspend fun upload(path: String, data: ByteArray, upsert: Boolean = false): String = upload(path, UploadData(ByteReadChannel(data), data.size.toLong()), upsert)
 
+    /**
+     * Uploads a file in [bucketId] under [path]
+     * @param path The path to upload the file to
+     * @param data The data to upload
+     * @param upsert Whether to overwrite an existing file
+     * @return the key to the uploaded file
+     * @throws RestException or one of its subclasses if receiving an error response
+     * @throws HttpRequestTimeoutException if the request timed out
+     * @throws HttpRequestException on network related issues
+     */
     suspend fun upload(path: String, data: UploadData, upsert: Boolean = false): String
 
     /**
@@ -85,6 +95,16 @@ sealed interface BucketApi {
     @SupabaseExperimental
     suspend fun uploadAsFlow(path: String, data: ByteArray, upsert: Boolean = false): Flow<UploadStatus> = uploadAsFlow(path, UploadData(ByteReadChannel(data), data.size.toLong()), upsert)
 
+    /**
+     * Uploads a file in [bucketId] under [path]
+     * @param path The path to upload the file to
+     * @param upsert Whether to overwrite an existing file
+     * @param data The data to upload
+     * @return A flow that emits the upload progress and at last the key to the uploaded file
+     * @throws RestException or one of its subclasses if receiving an error response
+     * @throws HttpRequestTimeoutException if the request timed out
+     * @throws HttpRequestException on network related issues
+     */
     @SupabaseExperimental
     suspend fun uploadAsFlow(path: String, data: UploadData, upsert: Boolean = false): Flow<UploadStatus>
 
@@ -98,6 +118,18 @@ sealed interface BucketApi {
      */
     suspend fun uploadToSignedUrl(path: String, token: String, data: ByteArray, upsert: Boolean = false): String = uploadToSignedUrl(path, token, UploadData(ByteReadChannel(data), data.size.toLong()), upsert)
 
+    /**
+     * Uploads a file in [bucketId] under [path] using a presigned url
+     * @param path The path to upload the file to
+     * @param token The presigned url token
+     * @param data The data to upload
+     * @param upsert Whether to overwrite an existing file
+     * @return the key of the uploaded file
+     * @throws RestException or one of its subclasses if receiving an error response
+     * @throws HttpRequestTimeoutException if the request timed out
+     * @throws HttpRequestException on network related issues
+     * @throws HttpRequestException on network related issues
+     */
     suspend fun uploadToSignedUrl(path: String, token: String, data: UploadData, upsert: Boolean = false): String
 
     /**
@@ -111,6 +143,17 @@ sealed interface BucketApi {
     @SupabaseExperimental
     suspend fun uploadToSignedUrlAsFlow(path: String, token: String, data: ByteArray, upsert: Boolean = false): Flow<UploadStatus> = uploadToSignedUrlAsFlow(path, token, UploadData(ByteReadChannel(data), data.size.toLong()), upsert)
 
+    /**
+     * Uploads a file in [bucketId] under [path] using a presigned url
+     * @param path The path to upload the file to
+     * @param token The presigned url token
+     * @param data The data to upload
+     * @param upsert Whether to overwrite an existing file
+     * @return A flow that emits the upload progress and at last the key to the uploaded file
+     * @throws RestException or one of its subclasses if receiving an error response
+     * @throws HttpRequestTimeoutException if the request timed out
+     * @throws HttpRequestException on network related issues
+     */
     @SupabaseExperimental
     suspend fun uploadToSignedUrlAsFlow(path: String, token: String, data: UploadData, upsert: Boolean = false): Flow<UploadStatus>
 
@@ -126,6 +169,16 @@ sealed interface BucketApi {
      */
     suspend fun update(path: String, data: ByteArray, upsert: Boolean = false): String = update(path, UploadData(ByteReadChannel(data), data.size.toLong()), upsert)
 
+    /**
+     * Updates a file in [bucketId] under [path]
+     * @param path The path to update the file to
+     * @param data The new data
+     * @param upsert Whether to overwrite an existing file
+     * @return the key to the updated file
+     * @throws RestException or one of its subclasses if receiving an error response
+     * @throws HttpRequestTimeoutException if the request timed out
+     * @throws HttpRequestException on network related issues
+     */
     suspend fun update(path: String, data: UploadData, upsert: Boolean = false): String
 
     /**
@@ -141,6 +194,16 @@ sealed interface BucketApi {
     @SupabaseExperimental
     suspend fun updateAsFlow(path: String, data: ByteArray, upsert: Boolean = false): Flow<UploadStatus> = updateAsFlow(path, UploadData(ByteReadChannel(data), data.size.toLong()), upsert)
 
+    /**
+     * Updates a file in [bucketId] under [path]
+     * @param path The path to update the file to
+     * @param data The new data
+     * @param upsert Whether to overwrite an existing file
+     * @return A flow that emits the upload progress and at last the key to the uploaded file
+     * @throws RestException or one of its subclasses if receiving an error response
+     * @throws HttpRequestTimeoutException if the request timed out
+     * @throws HttpRequestException on network related issues
+     */
     @SupabaseExperimental
     suspend fun updateAsFlow(path: String, data: UploadData, upsert: Boolean = false): Flow<UploadStatus>
 
@@ -227,6 +290,15 @@ sealed interface BucketApi {
      */
     suspend fun downloadAuthenticated(path: String, transform: ImageTransformation.() -> Unit = {}): ByteArray
 
+    /**
+     * Downloads a file from [bucketId] under [path]
+     * @param path The path to download
+     * @param channel The channel to write the data to
+     * @param transform The transformation to apply to the image
+     * @throws RestException or one of its subclasses if receiving an error response
+     * @throws HttpRequestTimeoutException if the request timed out
+     * @throws HttpRequestException on network related issues
+     */
     suspend fun downloadAuthenticated(path: String, channel: ByteWriteChannel, transform: ImageTransformation.() -> Unit = {})
 
     /**
@@ -241,6 +313,16 @@ sealed interface BucketApi {
     @SupabaseExperimental
     suspend fun downloadAuthenticatedAsFlow(path: String, transform: ImageTransformation.() -> Unit = {}): Flow<DownloadStatus>
 
+    /**
+     * Downloads a file from [bucketId] under [path]
+     * @param path The path to download
+     * @param channel The channel to write the data to
+     * @param transform The transformation to apply to the image
+     * @return A flow that emits the download progress and at last the data as a byte array
+     * @throws RestException or one of its subclasses if receiving an error response
+     * @throws HttpRequestTimeoutException if the request timed out
+     * @throws HttpRequestException on network related issues
+     */
     @SupabaseExperimental
     suspend fun downloadAuthenticatedAsFlow(path: String, channel: ByteWriteChannel, transform: ImageTransformation.() -> Unit = {}): Flow<DownloadStatus>
 
@@ -255,6 +337,15 @@ sealed interface BucketApi {
      */
     suspend fun downloadPublic(path: String, transform: ImageTransformation.() -> Unit = {}): ByteArray
 
+    /**
+     * Downloads a file from [bucketId] under [path] using the public url
+     * @param path The path to download
+     * @param channel The channel to write the data to
+     * @param transform The transformation to apply to the image
+     * @throws RestException or one of its subclasses if receiving an error response
+     * @throws HttpRequestTimeoutException if the request timed out
+     * @throws HttpRequestException on network related issues
+     */
     suspend fun downloadPublic(path: String, channel: ByteWriteChannel, transform: ImageTransformation.() -> Unit = {})
 
     /**
@@ -269,6 +360,16 @@ sealed interface BucketApi {
     @SupabaseExperimental
     suspend fun downloadPublicAsFlow(path: String, transform: ImageTransformation.() -> Unit = {}): Flow<DownloadStatus>
 
+    /**
+     * Downloads a file from [bucketId] under [path] using the public url
+     * @param path The path to download
+     * @param channel The channel to write the data to
+     * @param transform The transformation to apply to the image
+     * @return A flow that emits the download progress and at last the data as a byte array
+     * @throws RestException or one of its subclasses if receiving an error response
+     * @throws HttpRequestTimeoutException if the request timed out
+     * @throws HttpRequestException on network related issues
+     */
     @SupabaseExperimental
     suspend fun downloadPublicAsFlow(path: String, channel: ByteWriteChannel, transform: ImageTransformation.() -> Unit = {}): Flow<DownloadStatus>
 
@@ -463,7 +564,8 @@ internal class BucketApiImpl(override val bucketId: String, val storage: Storage
                     trySend(DownloadStatus.Progress(bytesSentTotal, contentLength))
                 }
             }.body<ByteArray>()
-            trySend(DownloadStatus.Success(data))
+            trySend(DownloadStatus.Success)
+            trySend(DownloadStatus.ByteData(data))
             close()
         }
     }
@@ -483,7 +585,8 @@ internal class BucketApiImpl(override val bucketId: String, val storage: Storage
                     trySend(DownloadStatus.Progress(bytesSentTotal, contentLength))
                 }
             }.body<ByteArray>()
-            trySend(DownloadStatus.Success(data))
+            trySend(DownloadStatus.Success)
+            trySend(DownloadStatus.ByteData(data))
             close()
         }
     }
@@ -493,12 +596,7 @@ internal class BucketApiImpl(override val bucketId: String, val storage: Storage
         channel: ByteWriteChannel,
         transform: ImageTransformation.() -> Unit
     ) {
-        storage.api.prepareRequest {
-            prepareDownloadRequest(path, false, transform)
-        }.execute {
-            it.bodyAsChannel().copyTo(channel)
-        }
-        channel.close()
+        channelDownloadRequest(path, channel, false, transform)
     }
 
     @SupabaseExperimental
@@ -506,19 +604,14 @@ internal class BucketApiImpl(override val bucketId: String, val storage: Storage
         path: String,
         channel: ByteWriteChannel,
         transform: ImageTransformation.() -> Unit
-    ): Flow<DownloadStatus> = flowDownloadRequest(path, channel, false, transform)
+    ): Flow<DownloadStatus> = flowChannelDownloadRequest(path, channel, false, transform)
 
     override suspend fun downloadPublic(
         path: String,
         channel: ByteWriteChannel,
         transform: ImageTransformation.() -> Unit
     ) {
-        storage.api.prepareRequest {
-            prepareDownloadRequest(path, true, transform)
-        }.execute {
-            it.bodyAsChannel().copyTo(channel)
-        }
-        channel.close()
+        channelDownloadRequest(path, channel, true, transform)
     }
 
     @SupabaseExperimental
@@ -526,20 +619,26 @@ internal class BucketApiImpl(override val bucketId: String, val storage: Storage
         path: String,
         channel: ByteWriteChannel,
         transform: ImageTransformation.() -> Unit
-    ): Flow<DownloadStatus> = flowDownloadRequest(path, channel, true, transform)
+    ): Flow<DownloadStatus> = flowChannelDownloadRequest(path, channel, true, transform)
 
-    private fun flowDownloadRequest(path: String, channel: ByteWriteChannel, public: Boolean, transform: ImageTransformation.() -> Unit) = callbackFlow {
-        val data = storage.api.prepareRequest {
-            prepareDownloadRequest(path, public, transform)
+    private fun flowChannelDownloadRequest(path: String, channel: ByteWriteChannel, public: Boolean, transform: ImageTransformation.() -> Unit): Flow<DownloadStatus> = callbackFlow {
+        channelDownloadRequest(path, channel, public, transform) {
             onDownload { bytesSentTotal, contentLength ->
                 trySend(DownloadStatus.Progress(bytesSentTotal, contentLength))
             }
+        }
+        trySend(DownloadStatus.Success)
+        close()
+    }
+
+    private suspend fun channelDownloadRequest(path: String, channel: ByteWriteChannel, public: Boolean, transform: ImageTransformation.() -> Unit, extra: HttpRequestBuilder.() -> Unit = {}) {
+        storage.api.prepareRequest {
+            prepareDownloadRequest(path, public, transform)
+            extra()
         }.execute {
             it.bodyAsChannel().copyTo(channel)
         }
         channel.close()
-        trySend(DownloadStatus.Success(ByteArray(0)))
-        close()
     }
 
     private fun HttpRequestBuilder.prepareDownloadRequest(path: String, public: Boolean, transform: ImageTransformation.() -> Unit) {

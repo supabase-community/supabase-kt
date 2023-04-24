@@ -3,12 +3,10 @@ package io.github.jan.supabase.storage
 import io.github.jan.supabase.annotiations.SupabaseExperimental
 import io.ktor.util.cio.readChannel
 import io.ktor.util.cio.writeChannel
-import kotlinx.coroutines.flow.onEach
 import java.io.File
 import java.nio.file.Path
 import kotlin.io.path.fileSize
 import kotlin.io.path.writeBytes
-import kotlin.io.path.writer
 
 /**
  * Uploads a file in [BucketApi.bucketId] under [path]
@@ -132,6 +130,12 @@ suspend fun BucketApi.updateAsFlow(path: String, file: File, upsert: Boolean = f
  */
 suspend fun BucketApi.downloadAuthenticatedTo(path: String, file: File, transform: ImageTransformation.() -> Unit = {}) = downloadAuthenticated(path, file.writeChannel(), transform)
 
+/**
+ * Downloads a file from [BucketApi.bucketId] under [path] and saves it to [file]
+ * @param path The path to download the file from
+ * @param file The file to save the data to
+ * @return A flow that emits the download progress and at last the key to the downloaded file
+ */
 @SupabaseExperimental
 suspend fun BucketApi.downloadAuthenticatedToAsFlow(path: String, file: File, transform: ImageTransformation.() -> Unit = {}) = downloadAuthenticatedAsFlow(path, file.writeChannel(), transform)
 
@@ -140,15 +144,16 @@ suspend fun BucketApi.downloadAuthenticatedToAsFlow(path: String, file: File, tr
  * @param path The path to download the file from
  * @param file The file to save the data to
  */
-suspend fun BucketApi.downloadAuthenticatedTo(path: String, file: Path, transform: ImageTransformation.() -> Unit = {}) {
-    val bytes = downloadAuthenticated(path, transform)
-    file.writeBytes(bytes)
-}
+suspend fun BucketApi.downloadAuthenticatedTo(path: String, file: Path, transform: ImageTransformation.() -> Unit = {}) = downloadAuthenticated(path, file.toFile().writeChannel(), transform)
 
+/**
+ * Downloads a file from [BucketApi.bucketId] under [path] and saves it to [file]
+ * @param path The path to download the file from
+ * @param file The file to save the data to
+ * @return A flow that emits the download progress and at last the key to the downloaded file
+ */
 @SupabaseExperimental
-suspend fun BucketApi.downloadAuthenticatedToAsFlow(path: String, file: Path, transform: ImageTransformation.() -> Unit = {}) = downloadAuthenticatedAsFlow(path, transform).onEach {
-    if(it is DownloadStatus.Success) file.writeBytes(it.data)
-}
+suspend fun BucketApi.downloadAuthenticatedToAsFlow(path: String, file: Path, transform: ImageTransformation.() -> Unit = {}) = downloadAuthenticatedAsFlow(path, file.toFile().writeChannel(), transform)
 
 /**
  * Downloads a file from [BucketApi.bucketId] under [path] and saves it to [file]
@@ -157,6 +162,12 @@ suspend fun BucketApi.downloadAuthenticatedToAsFlow(path: String, file: Path, tr
  */
 suspend fun BucketApi.downloadPublicTo(path: String, file: File, transform: ImageTransformation.() -> Unit = {}) = downloadPublic(path, file.writeChannel(), transform)
 
+/**
+ * Downloads a file from [BucketApi.bucketId] under [path] and saves it to [file]
+ * @param path The path to download the file from
+ * @param file The file to save the data to
+ * @return A flow that emits the download progress and at last the key to the downloaded file
+ */
 @SupabaseExperimental
 suspend fun BucketApi.downloadPublicToAsFlow(path: String, file: File, transform: ImageTransformation.() -> Unit = {}) = downloadPublicAsFlow(path, file.writeChannel(), transform)
 
@@ -170,5 +181,11 @@ suspend fun BucketApi.downloadPublicTo(path: String, file: Path, transform: Imag
     file.writeBytes(bytes)
 }
 
+/**
+ * Downloads a file from [BucketApi.bucketId] under [path] and saves it to [file]
+ * @param path The path to download the file from
+ * @param file The file to save the data to
+ * @return A flow that emits the download progress and at last the key to the downloaded file
+ */
 @SupabaseExperimental
-suspend fun BucketApi.downloadPublicToAsFlow(path: String, file: Path, transform: ImageTransformation.() -> Unit = {}) = downloadPublicAsFlow(path, transform)
+suspend fun BucketApi.downloadPublicToAsFlow(path: String, file: Path, transform: ImageTransformation.() -> Unit = {}) = downloadPublicAsFlow(path, file.toFile().writeChannel(), transform)
