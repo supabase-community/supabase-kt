@@ -3,6 +3,7 @@ package io.github.jan.supabase.network
 import io.ktor.client.request.HttpRequestBuilder
 import io.ktor.client.request.setBody
 import io.ktor.client.statement.HttpResponse
+import io.ktor.client.statement.HttpStatement
 import io.ktor.http.ContentType
 import io.ktor.http.HttpMethod
 import io.ktor.http.contentType
@@ -13,6 +14,8 @@ import io.ktor.http.contentType
 abstract class SupabaseHttpClient {
 
     abstract suspend fun request(url: String, builder: HttpRequestBuilder.() -> Unit): HttpResponse
+
+    abstract suspend fun prepareRequest(url: String, builder: HttpRequestBuilder.() -> Unit): HttpStatement
 
     suspend inline fun get(url: String, crossinline builder: HttpRequestBuilder.() -> Unit = {}) = request(url) {
         method = HttpMethod.Get

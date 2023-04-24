@@ -5,6 +5,7 @@ import io.github.jan.supabase.exceptions.RestException
 import io.github.jan.supabase.plugins.MainPlugin
 import io.ktor.client.request.HttpRequestBuilder
 import io.ktor.client.statement.HttpResponse
+import io.ktor.client.statement.HttpStatement
 
 open class SupabaseApi(
     private val resolveUrl: (path: String) -> String,
@@ -21,6 +22,13 @@ open class SupabaseApi(
             if(it.status.value in 400..501 && parseErrorResponse != null) throw parseErrorResponse.invoke(it)
         }
     }
+
+    override suspend fun prepareRequest(
+        url: String,
+        builder: HttpRequestBuilder.() -> Unit
+    ): HttpStatement = supabaseClient.httpClient.prepareRequest(resolveUrl(url), builder)
+
+    suspend fun prepareRequest(builder: HttpRequestBuilder.() -> Unit): HttpStatement = prepareRequest("", builder)
 
 }
 

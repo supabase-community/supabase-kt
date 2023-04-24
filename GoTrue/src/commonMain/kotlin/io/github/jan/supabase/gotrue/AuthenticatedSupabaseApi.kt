@@ -7,6 +7,7 @@ import io.github.jan.supabase.plugins.MainPlugin
 import io.ktor.client.request.HttpRequestBuilder
 import io.ktor.client.request.bearerAuth
 import io.ktor.client.statement.HttpResponse
+import io.ktor.client.statement.HttpStatement
 
 class AuthenticatedSupabaseApi(
     resolveUrl: (path: String) -> String,
@@ -24,6 +25,19 @@ class AuthenticatedSupabaseApi(
     }
 
     suspend fun rawRequest(builder: HttpRequestBuilder.() -> Unit): HttpResponse = rawRequest("", builder)
+
+    override suspend fun prepareRequest(
+        url: String,
+        builder: HttpRequestBuilder.() -> Unit
+    ): HttpStatement {
+        return super.prepareRequest(url) {
+            supabaseClient.pluginManager.getPluginOrNull(GoTrue)?.let { gotrue ->
+                val jwtToken = jwtToken ?: gotrue.currentAccessTokenOrNull() ?: supabaseClient.supabaseKey
+                bearerAuth(jwtToken)
+            }
+            builder()
+        }
+    }
 
 }
 
