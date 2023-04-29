@@ -20,12 +20,14 @@ body:
           required: true
         - label: I checked the [troubleshooting](https://github.com/supabase-community/supabase-kt/wiki/Troubleshooting) page for similar problems
           required: true
+        - label: I enabled [logging](https://github.com/supabase-community/supabase-kt/wiki/Logging) and checked the logs
+          required: true
   - type: input
     id: version
     attributes:
       label: Version(s)
       description: which supabase-kt versions are affected
-      placeholder: 0.8.4
+      placeholder: 0.9.3
     validations:
       required: true
   - type: input

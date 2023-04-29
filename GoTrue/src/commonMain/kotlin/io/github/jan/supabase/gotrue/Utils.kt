@@ -9,12 +9,14 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 internal fun SupabaseClient.parseFragment(fragment: String, onSessionSuccess: (UserSession) -> Unit = {}) {
+    Napier.d { "Parsing deeplink fragment" }
     val authPlugin = gotrue
     val map = fragment.split("&").associate {
         it.split("=").let { pair ->
             pair[0] to pair[1]
         }
     }
+    Napier.d { "Fragment parts: $map" }
 
     val accessToken = map["access_token"] ?: return
     val refreshToken = map["refresh_token"] ?: return

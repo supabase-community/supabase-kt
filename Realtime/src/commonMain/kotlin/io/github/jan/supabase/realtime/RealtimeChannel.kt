@@ -133,6 +133,7 @@ internal class RealtimeChannelImpl(
 
     @OptIn(SupabaseInternal::class)
     fun onMessage(message: RealtimeMessage) {
+        println(message)
         when {
             message.event == "system" && message.payload["status"]?.jsonPrimitive?.content == "ok" -> {
                 Napier.d { "Joined channel ${message.topic}" }
@@ -141,6 +142,10 @@ internal class RealtimeChannelImpl(
             message.event == RealtimeChannel.CHANNEL_EVENT_REPLY && message.payload["response"]?.jsonObject?.containsKey("postgres_changes") ?: false -> { //check if the server postgres_changes match with the client's and add the given id to the postgres change objects (to identify them later in the events)
                 val serverPostgresChanges = message.payload["response"]?.jsonObject?.get("postgres_changes")?.jsonArray?.let { Json.decodeFromJsonElement<List<PostgresJoinConfig>>(it) } ?: listOf() //server postgres changes
                 callbackManager.serverChanges = serverPostgresChanges
+                if(status.value != RealtimeChannel.Status.JOINED) {
+                    Napier.d { "Joined channel ${message.topic}" }
+                    _status.value = RealtimeChannel.Status.JOINED
+                }
             }
             message.event == "postgres_changes" -> {
                 val data = message.payload["data"]?.jsonObject ?: return
