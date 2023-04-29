@@ -14,8 +14,11 @@ import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.websocket.webSocketSession
 import io.ktor.client.request.HttpRequestBuilder
 import io.ktor.client.request.headers
+import io.ktor.client.request.prepareDelete
+import io.ktor.client.request.prepareRequest
 import io.ktor.client.request.request
 import io.ktor.client.statement.HttpResponse
+import io.ktor.client.statement.HttpStatement
 import io.ktor.serialization.kotlinx.json.json
 
 /**
@@ -48,7 +51,26 @@ class KtorSupabaseHttpClient(
             Napier.d { "Request failed with ${e.message}" }
             throw HttpRequestException(e.message ?: "", request)
         }
+        return response
+    }
 
+    override suspend fun prepareRequest(
+        url: String,
+        builder: HttpRequestBuilder.() -> Unit
+    ): HttpStatement {
+        val request = HttpRequestBuilder().apply {
+            builder()
+        }
+
+        val response = try {
+            httpClient.prepareRequest(url, builder)
+        } catch(e: HttpRequestTimeoutException) {
+            Napier.d { "Request timed out after $requestTimeout ms" }
+            throw e
+        } catch(e: Exception) {
+            Napier.d { "Request failed with ${e.message}" }
+            throw HttpRequestException(e.message ?: "", request)
+        }
         return response
     }
 
