@@ -161,7 +161,6 @@ class ResumableUploadImpl(
                 }
             }
         }
-        println(uploadResponse.status)
         when(uploadResponse.status) {
             HttpStatusCode.NoContent -> {
                 serverOffset = uploadResponse.headers["Upload-Offset"]?.toLong() ?: error("No upload offset found")

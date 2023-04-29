@@ -133,7 +133,6 @@ internal class RealtimeChannelImpl(
 
     @OptIn(SupabaseInternal::class)
     fun onMessage(message: RealtimeMessage) {
-        println(message)
         when {
             message.event == "system" && message.payload["status"]?.jsonPrimitive?.content == "ok" -> {
                 Napier.d { "Joined channel ${message.topic}" }
