@@ -60,8 +60,9 @@ implementation("io.github.jan-tennert.supabase:[module e.g. functions-kt or gotr
 
 # Demos
 
-- [Compose Multiplatform Chat Demo (Desktop/Android/Browser)](https://github.com/supabase-community/supabase-kt/tree/master/demos/chat-demo-mpp)
+- [Chat Demo (Desktop/Android/Browser)](https://github.com/supabase-community/supabase-kt/tree/master/demos/chat-demo-mpp)
 - [File Upload Demo (Desktop/Android)](https://github.com/supabase-community/supabase-kt/tree/master/demos/file-upload)
+- [Groceries Store App (Android)](https://github.com/hieuwu/android-groceries-store)
 
 # Videos
 
