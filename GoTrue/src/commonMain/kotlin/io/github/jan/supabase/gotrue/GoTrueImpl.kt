@@ -13,6 +13,7 @@ package io.github.jan.supabase.gotrue
  import io.github.jan.supabase.gotrue.mfa.MfaApiImpl
  import io.github.jan.supabase.gotrue.providers.AuthProvider
  import io.github.jan.supabase.gotrue.providers.builtin.DefaultAuthProvider
+ import io.github.jan.supabase.gotrue.providers.builtin.SSO
  import io.github.jan.supabase.gotrue.user.UserInfo
  import io.github.jan.supabase.gotrue.user.UserSession
  import io.github.jan.supabase.putJsonObject
@@ -101,6 +102,26 @@ internal class GoTrueImpl(override val supabaseClient: SupabaseClient, override 
     ): R? = provider.signUp(supabaseClient, {
         startAutoRefresh(it)
     }, redirectUrl, config)
+
+    override suspend fun <Config : SSO.Config> retrieveSSOUrl(
+        type: SSO<Config>,
+        redirectUrl: String?,
+        config: (Config.() -> Unit)?
+    ): SSO.Result {
+        val createdConfig = type.config.apply { config?.invoke(this) }
+        return api.postJson("sso", buildJsonObject {
+            redirectUrl?.let { put("redirect_to", it) }
+            createdConfig.captchaToken?.let {
+                put("gotrue_meta_security", buildJsonObject {
+                    put("captcha_token", it)
+                })
+            }
+            when(createdConfig) {
+                is SSO.Config.Domain -> put("domain", createdConfig.domain)
+                is SSO.Config.Provider -> put("provider_id", createdConfig.providerId)
+            }
+        }).body()
+    }
 
     override suspend fun <Config, Result, Provider : DefaultAuthProvider<Config, Result>> modifyUser(
         provider: Provider,

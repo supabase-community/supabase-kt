@@ -7,7 +7,11 @@ import io.github.jan.supabase.gotrue.user.UserSession
 
 internal fun GoTrue.openOAuth(provider: String, redirectTo: String) {
     this as GoTrueImpl
-    val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(resolveUrl("authorize?provider=${provider}&redirect_to=$redirectTo")))
+    openUrl(Uri.parse(resolveUrl("authorize?provider=${provider}&redirect_to=$redirectTo")))
+}
+
+internal fun openUrl(uri: Uri) {
+    val browserIntent = Intent(Intent.ACTION_VIEW, uri)
     browserIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
     applicationContext().startActivity(browserIntent)
 }

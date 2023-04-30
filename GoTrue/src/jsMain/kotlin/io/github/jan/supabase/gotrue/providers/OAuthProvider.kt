@@ -18,7 +18,7 @@ actual abstract class OAuthProvider actual constructor() : AuthProvider<External
         val authConfig = ExternalAuthConfig().apply {
             config?.invoke(this)
         }
-        window.location.href = supabaseClient.supabaseHttpUrl + "/${GoTrue.key}/v${GoTrue.API_VERSION}/authorize?provider=$name&redirect_to=${authConfig.redirectUrl}"
+        window.location.href = supabaseClient.supabaseHttpUrl + "/${GoTrue.key}/v${GoTrue.API_VERSION}/authorize?provider=$name&redirect_to=${redirectUrl ?: authConfig.redirectUrl}"
     }
 
     actual override suspend fun signUp(
@@ -27,10 +27,7 @@ actual abstract class OAuthProvider actual constructor() : AuthProvider<External
         redirectUrl: String?,
         config: (ExternalAuthConfig.() -> Unit)?
     ) {
-        val authConfig = ExternalAuthConfig().apply {
-            config?.invoke(this)
-        }
-        window.location.href = supabaseClient.supabaseHttpUrl + "/${GoTrue.key}/v${GoTrue.API_VERSION}/authorize?provider=$name&redirect_to=${authConfig.redirectUrl}"
+        login(supabaseClient, onSuccess, redirectUrl, config)
     }
 
     actual companion object

@@ -11,6 +11,7 @@ import io.github.jan.supabase.gotrue.providers.Google
 import io.github.jan.supabase.gotrue.providers.builtin.DefaultAuthProvider
 import io.github.jan.supabase.gotrue.providers.builtin.Email
 import io.github.jan.supabase.gotrue.providers.builtin.Phone
+import io.github.jan.supabase.gotrue.providers.builtin.SSO
 import io.github.jan.supabase.gotrue.user.UserInfo
 import io.github.jan.supabase.gotrue.user.UserSession
 import io.github.jan.supabase.plugins.MainPlugin
@@ -119,6 +120,8 @@ sealed interface GoTrue : MainPlugin<GoTrueConfig> {
         redirectUrl: String? = null,
         config: (C.() -> Unit)? = null
     )
+
+    suspend fun <Config: SSO.Config> retrieveSSOUrl(type: SSO<Config>, redirectUrl: String? = null, config: (Config.() -> Unit)? = null): SSO.Result
 
     /**
      * Modifies a user with the specified [provider]. Extra data can be supplied
