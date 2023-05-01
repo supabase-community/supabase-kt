@@ -30,6 +30,9 @@ open class GoTrueConfigDefaults {
      */
     var sessionManager: SessionManager? = null
 
+    /**
+     * The cache used to store/load the code verifier for the [FlowType.PKCE] flow. When null, the default [SettingsCodeVerifierCache] will be used
+     */
     var codeVerifierCache: CodeVerifierCache? = null
 
     /**
@@ -37,13 +40,28 @@ open class GoTrueConfigDefaults {
      */
     var coroutineDispatcher: CoroutineDispatcher = Dispatchers.Default
 
+    /**
+     * The type of login flow to use. Defaults to [FlowType.IMPLICIT]
+     */
     var flowType: FlowType = FlowType.IMPLICIT
 
     var customUrl: String? = null
     var jwtToken: String? = null
 }
 
+/**
+ * The type of login flow to use
+ */
 enum class FlowType {
+    /**
+     * The implicit flow is the default flow, which is easier to use, but less secure
+     */
     IMPLICIT,
+
+    /**
+     * The PKCE flow is more secure, as it uses a code verifier to exchange the code for a session making it harder to intercept the session
+     *
+     * **Note:** This flow is currently not supported on Desktop. Affected methods are `GoTrue.signUpWith(Email)` and `GoTrue.sendOtpTo(Email)`
+     */
     PKCE
 }

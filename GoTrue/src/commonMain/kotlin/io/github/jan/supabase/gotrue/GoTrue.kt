@@ -8,6 +8,7 @@ import io.github.jan.supabase.gotrue.admin.AdminApi
 import io.github.jan.supabase.gotrue.mfa.MfaApi
 import io.github.jan.supabase.gotrue.providers.AuthProvider
 import io.github.jan.supabase.gotrue.providers.Google
+import io.github.jan.supabase.gotrue.providers.OAuthProvider
 import io.github.jan.supabase.gotrue.providers.builtin.DefaultAuthProvider
 import io.github.jan.supabase.gotrue.providers.builtin.Email
 import io.github.jan.supabase.gotrue.providers.builtin.Phone
@@ -68,6 +69,9 @@ sealed interface GoTrue : MainPlugin<GoTrueConfig> {
      */
     val mfa: MfaApi
 
+    /**
+     * The cache for the code verifier. This is used for PKCE authentication. Can be customized via [GoTrueConfig.codeVerifierCache]
+     */
     val codeVerifierCache: CodeVerifierCache
 
     /**
@@ -123,6 +127,12 @@ sealed interface GoTrue : MainPlugin<GoTrueConfig> {
         config: (C.() -> Unit)? = null
     )
 
+    /**
+     * Retrieves the sso url for the specified [type]
+     * @param type The type of sso to retrieve e.g. [SSO.withDomain] or [SSO.withProvider]
+     * @param redirectUrl The redirect url to use
+     * @param config The configuration to use
+     */
     suspend fun <Config: SSO.Config> retrieveSSOUrl(type: SSO<Config>, redirectUrl: String? = null, config: (Config.() -> Unit)? = null): SSO.Result
 
     /**
@@ -290,6 +300,13 @@ sealed interface GoTrue : MainPlugin<GoTrueConfig> {
      * Starts auto refreshing the current session
      */
     suspend fun startAutoRefreshForCurrentSession()
+
+    /**
+     * Returns the url to use for oAuth
+     * @param provider The provider to use
+     * @param redirectUrl The redirect url to use
+     */
+    fun oAuthUrl(provider: OAuthProvider, redirectUrl: String? = null) = resolveUrl("authorize?provider=${provider.name}&redirect_to=$redirectUrl")
 
     /**
      * Stops auto-refreshing the current session
