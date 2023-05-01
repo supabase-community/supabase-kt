@@ -1,5 +1,6 @@
 package io.github.jan.supabase.gotrue
 
+import io.github.jan.supabase.annotiations.SupabaseExperimental
 import io.github.jan.supabase.plugins.MainConfig
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
@@ -54,14 +55,17 @@ open class GoTrueConfigDefaults {
  */
 enum class FlowType {
     /**
-     * The implicit flow is the default flow, which is easier to use, but less secure
+     * The implicit flow is the default flow, which is easier to use, but less secure.
+     *
+     * Note: OTP's via a link and sign up verification links are not supproted on desktop.
      */
     IMPLICIT,
 
     /**
      * The PKCE flow is more secure, as it uses a code verifier to exchange the code for a session making it harder to intercept the session
      *
-     * **Note:** This flow is currently not supported on Desktop. Affected methods are `GoTrue.signUpWith(Email)` and `GoTrue.sendOtpTo(Email)`
+     * Note: OTP's via a link and sign up verification links are not supproted on desktop.
      */
+    @SupabaseExperimental
     PKCE
 }

@@ -1,6 +1,7 @@
 package io.github.jan.supabase.gotrue.providers.builtin
 
 import io.github.jan.supabase.SupabaseClient
+import io.github.jan.supabase.annotiations.SupabaseExperimental
 import io.github.jan.supabase.gotrue.providers.AuthProvider
 import io.github.jan.supabase.gotrue.providers.builtin.SSO.Companion.withDomain
 import io.github.jan.supabase.gotrue.providers.builtin.SSO.Companion.withProvider
@@ -50,6 +51,7 @@ class SSO<Config: SSO.Config> private constructor(val config: Config): AuthProvi
         /**
          * Create a new SSO instance with a domain
          */
+        @SupabaseExperimental
         fun withDomain(domain: String, config: (Config.() -> Unit)? = null): SSO<Config> = SSO(Config.Domain(domain).apply {
             config?.invoke(this)
         })
@@ -57,6 +59,7 @@ class SSO<Config: SSO.Config> private constructor(val config: Config): AuthProvi
         /**
          * Create a new SSO instance with a provider id
          */
+        @SupabaseExperimental
         fun withProvider(providerId: String, config: (Config.() -> Unit)? = null): SSO<Config> = SSO(Config.Provider(providerId).apply {
             config?.invoke(this)
         })
