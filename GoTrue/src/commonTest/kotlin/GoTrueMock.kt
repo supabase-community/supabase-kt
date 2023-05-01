@@ -10,16 +10,15 @@ import io.ktor.client.engine.mock.respondOk
 import io.ktor.client.engine.mock.toByteArray
 import io.ktor.client.request.HttpRequestData
 import io.ktor.client.request.HttpResponseData
-import io.ktor.http.Headers
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.headersOf
 import kotlinx.datetime.Clock
 import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.contentOrNull
 import kotlinx.serialization.json.jsonPrimitive
 
@@ -168,6 +167,8 @@ class GoTrueMock {
     private fun MockRequestHandleScope.respondValidSession() = respond(UserSession(
         NEW_ACCESS_TOKEN,
         "refresh_token",
+        "",
+        "",
         200,
         "token_type",
         UserInfo(aud = "", appMetadata = AppMetadata("", listOf()), id = "")

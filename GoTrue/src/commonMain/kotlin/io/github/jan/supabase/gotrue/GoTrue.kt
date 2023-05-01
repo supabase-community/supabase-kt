@@ -7,6 +7,7 @@ import io.github.jan.supabase.exceptions.RestException
 import io.github.jan.supabase.gotrue.admin.AdminApi
 import io.github.jan.supabase.gotrue.mfa.MfaApi
 import io.github.jan.supabase.gotrue.providers.AuthProvider
+import io.github.jan.supabase.gotrue.providers.ExternalAuthConfigDefaults
 import io.github.jan.supabase.gotrue.providers.Google
 import io.github.jan.supabase.gotrue.providers.OAuthProvider
 import io.github.jan.supabase.gotrue.providers.builtin.DefaultAuthProvider
@@ -306,7 +307,7 @@ sealed interface GoTrue : MainPlugin<GoTrueConfig> {
      * @param provider The provider to use
      * @param redirectUrl The redirect url to use
      */
-    fun oAuthUrl(provider: OAuthProvider, redirectUrl: String? = null) = resolveUrl("authorize?provider=${provider.name}&redirect_to=$redirectUrl")
+    fun oAuthUrl(provider: OAuthProvider, redirectUrl: String? = null, additionalConfig: ExternalAuthConfigDefaults.() -> Unit = {}): String
 
     /**
      * Stops auto-refreshing the current session

@@ -10,6 +10,7 @@ import io.github.jan.supabase.gotrue.GoTrueConfig
 import io.github.jan.supabase.gotrue.OtpType
 import io.github.jan.supabase.gotrue.SettingsSessionManager
 import io.github.jan.supabase.gotrue.gotrue
+import io.github.jan.supabase.gotrue.providers.Github
 import io.github.jan.supabase.gotrue.providers.builtin.Email
 import io.github.jan.supabase.gotrue.providers.builtin.Phone
 import io.github.jan.supabase.gotrue.user.UserSession
@@ -27,6 +28,7 @@ import kotlin.test.assertNull
 class GoTrueTest {
 
     val mockEngine = GoTrueMock().engine
+
     @OptIn(ExperimentalCoroutinesApi::class)
     val dispatcher = StandardTestDispatcher()
 
@@ -87,7 +89,8 @@ class GoTrueTest {
     fun test_import_session_and_invalidate_session() {
         val client = createSupabaseClient()
         runTest(dispatcher) {
-            val session = UserSession("some_token", "some_refresh_token", 20, "token_type", null)
+            val session =
+                UserSession("some_token", "some_refresh_token", "", "", 20, "token_type", null)
             client.gotrue.importSession(session, false)
             assertEquals("some_token", client.gotrue.currentAccessTokenOrNull())
             assertEquals("some_refresh_token", client.gotrue.currentSessionOrNull()!!.refreshToken)
@@ -103,7 +106,8 @@ class GoTrueTest {
             alwaysAutoRefresh = true
         }
         runTest(dispatcher) {
-            val session = UserSession("old_token", "some_refresh_token", 0, "token_type", null)
+            val session =
+                UserSession("old_token", "some_refresh_token", "", "", 0, "token_type", null)
             client.gotrue.importSession(session, true)
             assertNull(client.gotrue.currentAccessTokenOrNull(), null)
             client.close()
@@ -114,7 +118,15 @@ class GoTrueTest {
     fun test_auto_refresh_with_correct_token() {
         val client = createSupabaseClient()
         runTest(dispatcher) {
-            val session = UserSession("old_token", GoTrueMock.VALID_REFRESH_TOKEN, 0, "token_type", null)
+            val session = UserSession(
+                "old_token",
+                GoTrueMock.VALID_REFRESH_TOKEN,
+                "",
+                "",
+                0,
+                "token_type",
+                null
+            )
             client.gotrue.importSession(session, true)
             assertEquals(GoTrueMock.NEW_ACCESS_TOKEN, client.gotrue.currentAccessTokenOrNull())
             client.close()
@@ -125,9 +137,21 @@ class GoTrueTest {
     @Test
     fun test_loading_session_from_storage() {
         val client = createSupabaseClient {
-            sessionManager = SettingsSessionManager(MapSettings(
-                "session" to Json.encodeToString(UserSession("token", "refresh_token", 1000, "type", null))
-            ))
+            sessionManager = SettingsSessionManager(
+                MapSettings(
+                    "session" to Json.encodeToString(
+                        UserSession(
+                            "token",
+                            "refresh_token",
+                            "",
+                            "",
+                            1000,
+                            "type",
+                            null
+                        )
+                    )
+                )
+            )
         }
         runTest {
             client.gotrue.loadFromStorage()
@@ -165,7 +189,11 @@ class GoTrueTest {
         val client = createSupabaseClient()
         runTest(dispatcher) {
             assertFailsWith<BadRequestRestException>("verifying with a wrong token should fail") {
-                client.gotrue.verifyEmailOtp(OtpType.Email.INVITE, "example@email.com", "wrong_token")
+                client.gotrue.verifyEmailOtp(
+                    OtpType.Email.INVITE,
+                    "example@email.com",
+                    "wrong_token"
+                )
             }
             client.close()
         }
@@ -176,8 +204,16 @@ class GoTrueTest {
     fun test_verifying_with_valid_token() {
         val client = createSupabaseClient()
         runTest(dispatcher) {
-            client.gotrue.verifyEmailOtp(OtpType.Email.INVITE, "example@gmail.com", GoTrueMock.VALID_VERIFY_TOKEN)
-            assertEquals(GoTrueMock.NEW_ACCESS_TOKEN, client.gotrue.currentAccessTokenOrNull(), "verify with valid token should update the user session")
+            client.gotrue.verifyEmailOtp(
+                OtpType.Email.INVITE,
+                "example@gmail.com",
+                GoTrueMock.VALID_VERIFY_TOKEN
+            )
+            assertEquals(
+                GoTrueMock.NEW_ACCESS_TOKEN,
+                client.gotrue.currentAccessTokenOrNull(),
+                "verify with valid token should update the user session"
+            )
         }
     }
 
@@ -222,6 +258,18 @@ class GoTrueTest {
             client.gotrue.sendRecoveryEmail("example@email.com")
             client.close()
         }
+    }
+
+    @Test
+    fun test_oauth_url() {
+        val client = createSupabaseClient()
+        val expected =
+            "https://example.com/auth/v1/authorize?provider=github&redirect_to=https://example.com&scopes=test+test2&custom=value"
+        val actual = client.gotrue.oAuthUrl(Github, "https://example.com") {
+            scopes.addAll(listOf("test", "test2"))
+            queryParams["custom"] = "value"
+        }
+        assertEquals(expected, actual)
     }
 
     private fun createSupabaseClient(additionalGoTrueSettings: GoTrueConfig.() -> Unit = {}): SupabaseClient {

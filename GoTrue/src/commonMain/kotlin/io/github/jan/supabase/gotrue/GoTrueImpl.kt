@@ -2,6 +2,7 @@ package io.github.jan.supabase.gotrue
 
  import io.github.aakira.napier.Napier
  import io.github.jan.supabase.SupabaseClient
+ import io.github.jan.supabase.annotiations.SupabaseExperimental
  import io.github.jan.supabase.bodyOrNull
  import io.github.jan.supabase.exceptions.BadRequestRestException
  import io.github.jan.supabase.exceptions.RestException
@@ -12,6 +13,8 @@ package io.github.jan.supabase.gotrue
  import io.github.jan.supabase.gotrue.mfa.MfaApi
  import io.github.jan.supabase.gotrue.mfa.MfaApiImpl
  import io.github.jan.supabase.gotrue.providers.AuthProvider
+ import io.github.jan.supabase.gotrue.providers.ExternalAuthConfigDefaults
+ import io.github.jan.supabase.gotrue.providers.OAuthProvider
  import io.github.jan.supabase.gotrue.providers.builtin.DefaultAuthProvider
  import io.github.jan.supabase.gotrue.providers.builtin.SSO
  import io.github.jan.supabase.gotrue.user.UserInfo
@@ -138,6 +141,7 @@ internal class GoTrueImpl(override val supabaseClient: SupabaseClient, override 
         return response.safeBody()
     }
 
+    @OptIn(SupabaseExperimental::class)
     override suspend fun <C, R, Provider : DefaultAuthProvider<C, R>> sendOtpTo(
         provider: Provider,
         createUser: Boolean,
@@ -360,6 +364,23 @@ internal class GoTrueImpl(override val supabaseClient: SupabaseClient, override 
             HttpStatusCode.UnprocessableEntity -> BadRequestRestException(errorBody.error, response, errorBody.description)
             else -> UnknownRestException(errorBody.error, response)
         }
+    }
+
+    override fun oAuthUrl(
+        provider: OAuthProvider,
+        redirectUrl: String?,
+        additionalConfig: ExternalAuthConfigDefaults.() -> Unit
+    ): String {
+        val config = ExternalAuthConfigDefaults().apply(additionalConfig)
+        return resolveUrl(buildString {
+            append("authorize?provider=${provider.name}&redirect_to=$redirectUrl")
+            if(config.scopes.isNotEmpty()) append("&scopes=${config.scopes.joinToString("+")}")
+            if(config.queryParams.isNotEmpty()) {
+                for((key, value) in config.queryParams) {
+                    append("&$key=$value")
+                }
+            }
+        })
     }
 
 }

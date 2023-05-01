@@ -1,6 +1,7 @@
 package io.github.jan.supabase.gotrue.providers.builtin
 
 import io.github.jan.supabase.SupabaseClient
+import io.github.jan.supabase.annotiations.SupabaseExperimental
 import io.github.jan.supabase.gotrue.FlowType
 import io.github.jan.supabase.gotrue.GoTrueImpl
 import io.github.jan.supabase.gotrue.generateCodeChallenge
@@ -106,6 +107,7 @@ sealed interface DefaultAuthProvider<C, R> : AuthProvider<C, R> {
         }
     }
 
+    @OptIn(SupabaseExperimental::class)
     override suspend fun signUp(
         supabaseClient: SupabaseClient,
         onSuccess: suspend (UserSession) -> Unit,

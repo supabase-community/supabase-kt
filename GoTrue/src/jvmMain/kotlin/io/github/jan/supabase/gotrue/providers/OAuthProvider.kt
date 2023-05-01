@@ -19,14 +19,23 @@ actual abstract class OAuthProvider : AuthProvider<ExternalAuthConfig, Unit> {
         redirectUrl: String?,
         config: (ExternalAuthConfig.() -> Unit)?
     ) {
+        val externalConfig = ExternalAuthConfig().apply { config?.invoke(this) }
         withContext(Dispatchers.IO) {
             if(redirectUrl != null) {
                 Desktop.getDesktop()
-                    .browse(URI(supabaseClient.gotrue.resolveUrl("authorize?provider=$name&redirect_to=$redirectUrl")))
+                    .browse(URI(supabaseClient.gotrue.oAuthUrl(this@OAuthProvider, redirectUrl) {
+                        scopes.addAll(externalConfig.scopes)
+                        queryParams.putAll(externalConfig.queryParams)
+                    }))
                 return@withContext
             }
             launch {
-                createServer({ supabaseClient.gotrue.resolveUrl("authorize?provider=$name&redirect_to=$it") }, supabaseClient.gotrue, onSuccess)
+                createServer({
+                    supabaseClient.gotrue.oAuthUrl(this@OAuthProvider, it) {
+                        scopes.addAll(externalConfig.scopes)
+                        queryParams.putAll(externalConfig.queryParams)
+                    }
+                }, supabaseClient.gotrue, onSuccess)
             }
         }
     }
