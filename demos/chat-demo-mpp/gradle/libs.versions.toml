@@ -2,7 +2,7 @@
 kotlin = "1.8.20"
 agp = "8.0.0"
 compose = "1.4.0"
-supabase = "0.9.2"
+supabase = "0.9.4"
 koin = "3.4.0"
 ktor = "2.3.0"
 
