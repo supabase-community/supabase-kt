@@ -8,9 +8,11 @@ import io.github.jan.supabase.gotrue.admin.AdminApi
 import io.github.jan.supabase.gotrue.mfa.MfaApi
 import io.github.jan.supabase.gotrue.providers.AuthProvider
 import io.github.jan.supabase.gotrue.providers.Google
+import io.github.jan.supabase.gotrue.providers.OAuthProvider
 import io.github.jan.supabase.gotrue.providers.builtin.DefaultAuthProvider
 import io.github.jan.supabase.gotrue.providers.builtin.Email
 import io.github.jan.supabase.gotrue.providers.builtin.Phone
+import io.github.jan.supabase.gotrue.providers.builtin.SSO
 import io.github.jan.supabase.gotrue.user.UserInfo
 import io.github.jan.supabase.gotrue.user.UserSession
 import io.github.jan.supabase.plugins.MainPlugin
@@ -68,6 +70,11 @@ sealed interface GoTrue : MainPlugin<GoTrueConfig> {
     val mfa: MfaApi
 
     /**
+     * The cache for the code verifier. This is used for PKCE authentication. Can be customized via [GoTrueConfig.codeVerifierCache]
+     */
+    val codeVerifierCache: CodeVerifierCache
+
+    /**
      * Signs up a new user with the specified [provider]
      *
      * Example:
@@ -119,6 +126,14 @@ sealed interface GoTrue : MainPlugin<GoTrueConfig> {
         redirectUrl: String? = null,
         config: (C.() -> Unit)? = null
     )
+
+    /**
+     * Retrieves the sso url for the specified [type]
+     * @param type The type of sso to retrieve e.g. [SSO.withDomain] or [SSO.withProvider]
+     * @param redirectUrl The redirect url to use
+     * @param config The configuration to use
+     */
+    suspend fun <Config: SSO.Config> retrieveSSOUrl(type: SSO<Config>, redirectUrl: String? = null, config: (Config.() -> Unit)? = null): SSO.Result
 
     /**
      * Modifies a user with the specified [provider]. Extra data can be supplied
@@ -242,7 +257,7 @@ sealed interface GoTrue : MainPlugin<GoTrueConfig> {
      * Imports the jwt token and retrieves the user profile.
      * Be aware auto-refreshing is not available when importing **only** a jwt token.
      */
-    suspend fun importAuthToken(jwt: String) = importSession(UserSession(jwt, "", 0L, "", tryToGetUser(jwt)), false)
+    suspend fun importAuthToken(jwt: String) = importSession(UserSession(jwt, "", "", "", 0L, "", tryToGetUser(jwt)), false)
 
     /**
      * Retrieves the latest session from storage and starts auto-refreshing if [autoRefresh] is true or [GoTrue.Config.alwaysAutoRefresh] as the default parameter
@@ -273,6 +288,8 @@ sealed interface GoTrue : MainPlugin<GoTrueConfig> {
      */
     suspend fun updateCurrentUser()
 
+    suspend fun exchangeCodeForSession(code: String, saveSession: Boolean = true): UserSession
+
     /**
      * Starts auto-refreshing [session] for [currentSession]
      * @param session The session to auto-refresh
@@ -283,6 +300,13 @@ sealed interface GoTrue : MainPlugin<GoTrueConfig> {
      * Starts auto refreshing the current session
      */
     suspend fun startAutoRefreshForCurrentSession()
+
+    /**
+     * Returns the url to use for oAuth
+     * @param provider The provider to use
+     * @param redirectUrl The redirect url to use
+     */
+    fun oAuthUrl(provider: OAuthProvider, redirectUrl: String? = null) = resolveUrl("authorize?provider=${provider.name}&redirect_to=$redirectUrl")
 
     /**
      * Stops auto-refreshing the current session

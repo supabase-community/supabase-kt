@@ -43,6 +43,7 @@ kotlin {
                 api(project(":"))
                 api(libs.bundles.multiplatform.settings)
                 implementation(libs.okio)
+                implementation(libs.krypto)
             }
         }
         val commonTest by getting {

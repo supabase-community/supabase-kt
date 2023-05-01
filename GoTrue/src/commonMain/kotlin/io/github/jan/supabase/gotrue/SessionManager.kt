@@ -10,18 +10,30 @@ import io.github.jan.supabase.supabaseJson
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 
+/**
+ * Represents the session manager. Used for saving and restoring the session from storage
+ */
 interface SessionManager {
 
+    /**
+     * Saves the given session.
+     */
     suspend fun saveSession(session: UserSession)
 
+    /**
+     * Loads the saved session from storage.
+     */
     suspend fun loadSession(): UserSession?
 
+    /**
+     * Deletes the saved session from storage.
+     */
     suspend fun deleteSession()
 
 }
 
 /**
- * Represents the session manager. Used for saving and restoring the session from storage
+ * A [SessionManager] that uses the [Settings] API.
  */
 class SettingsSessionManager(settings: Settings = createDefaultSettings()): SessionManager {
 

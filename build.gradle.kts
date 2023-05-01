@@ -37,7 +37,7 @@ configure(allprojects.filter { it.name in modules || it.name == "bom" }) {
     mavenPublishing {
         publishToMavenCentral(com.vanniktech.maven.publish.SonatypeHost.S01)
 
-        signAllPublications()
+     //   signAllPublications()
 
         coordinates("io.github.jan-tennert.supabase", this@configure.name, Versions.PROJECT)
 
