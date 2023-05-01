@@ -11,7 +11,7 @@ version "1.0-SNAPSHOT"
 dependencies {
     implementation(project(":common"))
     implementation(libs.androidx.activity.compose)
-    implementation("com.google.accompanist:accompanist-permissions:0.31.0-alpha")
+    implementation("com.google.accompanist:accompanist-permissions:0.31.1-alpha")
 }
 
 android {
