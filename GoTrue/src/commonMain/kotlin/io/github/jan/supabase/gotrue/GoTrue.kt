@@ -68,6 +68,8 @@ sealed interface GoTrue : MainPlugin<GoTrueConfig> {
      */
     val mfa: MfaApi
 
+    val codeVerifierCache: CodeVerifierCache
+
     /**
      * Signs up a new user with the specified [provider]
      *
@@ -245,7 +247,7 @@ sealed interface GoTrue : MainPlugin<GoTrueConfig> {
      * Imports the jwt token and retrieves the user profile.
      * Be aware auto-refreshing is not available when importing **only** a jwt token.
      */
-    suspend fun importAuthToken(jwt: String) = importSession(UserSession(jwt, "", "", 0L, "", tryToGetUser(jwt)), false)
+    suspend fun importAuthToken(jwt: String) = importSession(UserSession(jwt, "", "", "", 0L, "", tryToGetUser(jwt)), false)
 
     /**
      * Retrieves the latest session from storage and starts auto-refreshing if [autoRefresh] is true or [GoTrue.Config.alwaysAutoRefresh] as the default parameter
@@ -275,6 +277,8 @@ sealed interface GoTrue : MainPlugin<GoTrueConfig> {
      * Updates the current user with the current access token
      */
     suspend fun updateCurrentUser()
+
+    suspend fun exchangeCodeForSession(code: String, saveSession: Boolean = true): UserSession
 
     /**
      * Starts auto-refreshing [session] for [currentSession]

@@ -17,6 +17,7 @@ maven-publish = "0.25.2"
 cache4k = "0.11.0"
 apollo-kotlin = "3.8.1"
 stately = "1.2.5"
+korlibs = "4.0.0-rc2"
 
 [plugins]
 kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
@@ -58,6 +59,8 @@ apollo-kotlin = { module = "com.apollographql.apollo3:apollo-runtime", version.r
 cache4k = { module = "io.github.reactivecircus.cache4k:cache4k", version.ref = "cache4k" }
 
 stately = { module = "co.touchlab:stately-iso-collections", version.ref = "stately" }
+
+krypto = { module = "com.soywiz.korlibs.krypto:krypto", version.ref = "korlibs" }
 
 [bundles]
 ktor-client = ["ktor-client-core", "ktor-client-content-negotiation", "ktor-json"]

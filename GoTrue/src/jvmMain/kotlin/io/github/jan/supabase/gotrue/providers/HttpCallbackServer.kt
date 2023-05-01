@@ -29,10 +29,12 @@ internal suspend fun createServer(
         val refreshToken = ctx.queryParam("refresh_token") ?: return@get
         val expiresIn = ctx.queryParam("expires_in")?.toLong() ?: return@get
         val tokenType = ctx.queryParam("token_type") ?: return@get
+        val providerToken = ctx.queryParam("provider_token")
+        val providerRefreshToken = ctx.queryParam("provider_refresh_token")
         val type = ctx.queryParam("type") ?: ""
         (gotrue as GoTrueImpl).authScope.launch {
             val user = gotrue.retrieveUser(accessToken)
-            onSuccess(UserSession(accessToken, refreshToken, "", expiresIn, tokenType, user, type))
+            onSuccess(UserSession(accessToken, refreshToken, providerRefreshToken, providerToken, expiresIn, tokenType, user, type))
         }
         Napier.d {
             "Successfully received http callback"

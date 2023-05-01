@@ -19,7 +19,6 @@ package io.github.jan.supabase.gotrue
  import io.github.jan.supabase.putJsonObject
  import io.github.jan.supabase.safeBody
  import io.github.jan.supabase.supabaseJson
- import io.github.jan.supabase.toJsonObject
  import io.ktor.client.call.body
  import io.ktor.client.statement.HttpResponse
  import io.ktor.client.statement.bodyAsText
@@ -49,6 +48,7 @@ internal class GoTrueImpl(override val supabaseClient: SupabaseClient, override 
     override val sessionStatus: StateFlow<SessionStatus> = _sessionStatus.asStateFlow()
     internal val authScope = CoroutineScope(config.coroutineDispatcher)
     override val sessionManager = config.sessionManager ?: SettingsSessionManager()
+    override val codeVerifierCache = config.codeVerifierCache ?: SettingsCodeVerifierCache()
     internal val api = supabaseClient.authenticatedSupabaseApi(this)
     override val admin: AdminApi = AdminApiImpl(this)
     override val mfa: MfaApi = MfaApiImpl(this)
@@ -129,7 +129,7 @@ internal class GoTrueImpl(override val supabaseClient: SupabaseClient, override 
         config: Config.() -> Unit
     ): UserInfo {
         val body = buildJsonObject {
-            putJsonObject(provider.encodeCredentials(config).toJsonObject())
+            putJsonObject(provider.encodeCredentials(config))
             extraData?.let {
                 put("data", supabaseJson.encodeToJsonElement(it))
             }
@@ -146,10 +146,22 @@ internal class GoTrueImpl(override val supabaseClient: SupabaseClient, override 
     ) {
         val finalRedirectUrl = generateRedirectUrl(redirectUrl)
         val body = buildJsonObject {
-            putJsonObject(provider.encodeCredentials(config).toJsonObject())
+            putJsonObject(provider.encodeCredentials(config))
             put("create_user", createUser)
-        }.toString()
-        api.postJson("otp", body) {
+        }
+        var codeChallenge: String? = null
+        if(this.config.flowType == FlowType.PKCE) {
+            val codeVerifier = generateCodeVerifier()
+            codeVerifierCache.saveCodeVerifier(codeVerifier)
+            codeChallenge = generateCodeChallenge(codeVerifier)
+        }
+        api.postJson("otp", buildJsonObject {
+            putJsonObject(body)
+            codeChallenge?.let {
+                put("code_challenge", it)
+                put("code_challenge_method", "s256")
+            }
+        }) {
             finalRedirectUrl?.let { url.parameters.append("redirect_to", it) }
         }
     }
@@ -229,6 +241,21 @@ internal class GoTrueImpl(override val supabaseClient: SupabaseClient, override 
         sessionJob?.cancel()
         _sessionStatus.value = SessionStatus.NotAuthenticated
         sessionJob = null
+    }
+
+    override suspend fun exchangeCodeForSession(code: String, saveSession: Boolean): UserSession {
+        val codeVerifier = codeVerifierCache.loadCodeVerifier()
+        val session = api.postJson("token?grant_type=pkce", buildJsonObject {
+            put("auth_code", code)
+            put("code_verifier", codeVerifier)
+        }) {
+            headers.remove("Authorization")
+        }.safeBody<UserSession>()
+        codeVerifierCache.deleteCodeVerifier()
+        if(saveSession) {
+            startAutoRefresh(session)
+        }
+        return session
     }
 
     override suspend fun refreshSession(refreshToken: String): UserSession {

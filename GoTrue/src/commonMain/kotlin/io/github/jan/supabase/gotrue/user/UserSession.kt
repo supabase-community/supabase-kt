@@ -14,6 +14,8 @@ data class UserSession(
     val refreshToken: String,
     @SerialName("provider_refresh_token")
     val providerRefreshToken: String? = null,
+    @SerialName("provider_token")
+    val providerToken: String? = null,
     @SerialName("expires_in")
     val expiresIn: Long,
     @SerialName("token_type")

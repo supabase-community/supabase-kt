@@ -30,11 +30,20 @@ open class GoTrueConfigDefaults {
      */
     var sessionManager: SessionManager? = null
 
+    var codeVerifierCache: CodeVerifierCache? = null
+
     /**
      * The dispatcher used for all gotrue related network requests
      */
     var coroutineDispatcher: CoroutineDispatcher = Dispatchers.Default
 
+    var flowType: FlowType = FlowType.IMPLICIT
+
     var customUrl: String? = null
     var jwtToken: String? = null
+}
+
+enum class FlowType {
+    IMPLICIT,
+    PKCE
 }

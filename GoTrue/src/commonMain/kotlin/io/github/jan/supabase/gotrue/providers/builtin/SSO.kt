@@ -49,8 +49,6 @@ class SSO<Config: SSO.Config> private constructor(val config: Config): AuthProvi
         config
     )
 
-
-
 }
 
 internal expect suspend fun <Config : SSO.Config> SSO<Config>.loginWithSSO(

@@ -1,12 +1,16 @@
 package io.github.jan.supabase.gotrue.providers.builtin
 
 import io.github.jan.supabase.SupabaseClient
+import io.github.jan.supabase.gotrue.FlowType
 import io.github.jan.supabase.gotrue.GoTrueImpl
+import io.github.jan.supabase.gotrue.generateCodeChallenge
+import io.github.jan.supabase.gotrue.generateCodeVerifier
 import io.github.jan.supabase.gotrue.generateRedirectUrl
 import io.github.jan.supabase.gotrue.gotrue
 import io.github.jan.supabase.gotrue.providers.AuthProvider
 import io.github.jan.supabase.gotrue.redirectTo
 import io.github.jan.supabase.gotrue.user.UserSession
+import io.github.jan.supabase.putJsonObject
 import io.github.jan.supabase.supabaseJson
 import io.ktor.client.call.body
 import kotlinx.serialization.KSerializer
@@ -112,12 +116,24 @@ sealed interface DefaultAuthProvider<C, R> : AuthProvider<C, R> {
         val finalRedirectUrl = supabaseClient.gotrue.generateRedirectUrl(redirectUrl)
         val body = encodeCredentials(config)
         val gotrue = supabaseClient.gotrue as GoTrueImpl
+        var codeChallenge: String? = null
+        if(gotrue.config.flowType == FlowType.PKCE) {
+            val codeVerifier = generateCodeVerifier()
+            gotrue.codeVerifierCache.saveCodeVerifier(codeVerifier)
+            codeChallenge = generateCodeChallenge(codeVerifier)
+        }
         val url = when (this) {
             Email -> "signup"
             Phone -> "signup"
             IDToken -> "token?grant_type=id_token"
         }
-        val response = gotrue.api.post(url, body) {
+        val response = gotrue.api.postJson(url, buildJsonObject {
+            putJsonObject(body)
+            codeChallenge?.let {
+                put("code_challenge", it)
+                put("code_challenge_method", "s256")
+            }
+        }) {
             finalRedirectUrl?.let { redirectTo(it) }
         }
         val json = response.body<JsonObject>()
@@ -131,6 +147,6 @@ sealed interface DefaultAuthProvider<C, R> : AuthProvider<C, R> {
 
     fun decodeResult(json: JsonObject): R
 
-    fun encodeCredentials(credentials: C.() -> Unit): String
+    fun encodeCredentials(credentials: C.() -> Unit): JsonObject
 
 }
