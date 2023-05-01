@@ -11,7 +11,7 @@ androidx-compat = "1.6.1"
 androidx-lifecycle = "2.6.1"
 androidx-activity = "1.7.1"
 
-file-picker = "1.0.0"
+file-picker = "1.1.0"
 
 [plugins]
 kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
