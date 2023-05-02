@@ -8,6 +8,7 @@ import io.github.jan.supabase.exceptions.UnauthorizedRestException
 import io.github.jan.supabase.gotrue.GoTrue
 import io.github.jan.supabase.gotrue.GoTrueConfig
 import io.github.jan.supabase.gotrue.OtpType
+import io.github.jan.supabase.gotrue.SettingsCodeVerifierCache
 import io.github.jan.supabase.gotrue.SettingsSessionManager
 import io.github.jan.supabase.gotrue.gotrue
 import io.github.jan.supabase.gotrue.providers.Github
@@ -285,6 +286,7 @@ class GoTrueTest {
                 coroutineDispatcher = dispatcher
 
                 sessionManager = SettingsSessionManager(MapSettings())
+                codeVerifierCache = SettingsCodeVerifierCache(MapSettings())
 
                 platformSettings()
                 additionalGoTrueSettings()
