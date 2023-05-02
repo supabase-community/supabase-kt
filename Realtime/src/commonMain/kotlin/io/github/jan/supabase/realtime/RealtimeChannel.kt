@@ -24,6 +24,7 @@ import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.longOrNull
 import kotlinx.serialization.json.put
+import kotlinx.serialization.json.putJsonObject
 
 /**
  * Represents a realtime channel
@@ -214,7 +215,9 @@ internal class RealtimeChannelImpl(
         val payload = buildJsonObject {
             put("type", "presence")
             put("event", "track")
-            putJsonObject(state)
+            putJsonObject("payload") {
+                putJsonObject(state)
+            }
         }
         realtimeImpl.ws?.sendSerialized(RealtimeMessage(topic, RealtimeChannel.CHANNEL_EVENT_PRESENCE, payload, (++realtimeImpl.ref).toString()))
     }
