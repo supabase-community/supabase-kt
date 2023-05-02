@@ -92,10 +92,10 @@ fun LoginScreen(onLogin: (LoginType) -> Unit) {
             Text(if (signUp) "Register" else "Login")
         }
         GoogleButton(
-            text = if (signUp) "Sign Up with Google" else "Login with Google"
+            text = if (signUp) "Sign Up with Google OneTap" else "Login with Google OneTap"
         ) { onLogin(LoginType.GoogleNative) }
         GoogleButton(
-            text = if (signUp) "Sign Up with Google" else "Login with Google"
+            text = if (signUp) "Sign Up with Spotify using WebView" else "Login with Spotify using WebView"
         ) { onLogin(LoginType.GoogleInApp) }
 
     }

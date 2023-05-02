@@ -35,20 +35,25 @@ fun OAuthScreen(url: String, parseFragment: (url: String) -> Unit, disable: () -
             verticalAlignment = Alignment.CenterVertically
         ) {
             Box {
-                if(state.isLoading) {
-                    CircularProgressIndicator(Modifier.size(24.dp).padding(4.dp))
-                } else {
-                    IconButton(
-                        onClick = {
-                            navigator.reload()
-                        },
-                        modifier = Modifier
-                    ) {
+                IconButton(
+                    onClick = {
+                        if (state.isLoading) navigator.reload() else navigator.stopLoading()
+                    },
+                    modifier = Modifier
+                ) {
+                    if (state.isLoading) {
+                        CircularProgressIndicator()
+                    } else {
                         Icon(Icons.Filled.Refresh, contentDescription = null)
                     }
                 }
             }
-            Text(state.lastLoadedUrl ?: "", modifier = Modifier.weight(1f), maxLines = 1, overflow = TextOverflow.Ellipsis)
+            Text(
+                state.lastLoadedUrl ?: "",
+                modifier = Modifier.weight(1f),
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
             IconButton(
                 onClick = {
                     disable()

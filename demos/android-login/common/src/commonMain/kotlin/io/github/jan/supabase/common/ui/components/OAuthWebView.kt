@@ -1,6 +1,7 @@
 package io.github.jan.supabase.common.ui.components
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import com.google.accompanist.web.WebView
@@ -15,6 +16,7 @@ fun OAuthWebView(state: WebViewState, navigator: WebViewNavigator, modifier: Mod
         state.lastLoadedUrl?.let {
             val url = Url(it)
             if(url.host == "localhost") {
+                navigator.loadUrl("about:blank")
                 parseFragment(url.fragment)
             }
         }

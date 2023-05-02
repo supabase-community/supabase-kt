@@ -99,7 +99,7 @@ sealed interface DefaultAuthProvider<C, R> : AuthProvider<C, R> {
                 IDToken -> "id_token"
             }
         }"
-        val response = gotrue.api.post(url, encodedCredentials) {
+        val response = gotrue.api.postJson(url, encodedCredentials) {
             finalRedirectUrl?.let { redirectTo(it) }
         }
         response.body<UserSession>().also {

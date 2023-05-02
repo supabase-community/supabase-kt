@@ -7,11 +7,13 @@ import org.koin.dsl.module
 
 expect fun GoTrueConfig.platformGoTrueConfig()
 
+const val SERVER_CLIENT_ID = "GOOGLE_WEB_CLIENT_ID" //Don't put in your android client id
+
 val supabaseModule = module {
     single {
         createSupabaseClient(
-            supabaseUrl = "",
-            supabaseKey = ""
+            supabaseUrl = "YOUR_URL",
+            supabaseKey = "YOUR_KEY"
         ) {
             install(GoTrue) {
                 platformGoTrueConfig()
