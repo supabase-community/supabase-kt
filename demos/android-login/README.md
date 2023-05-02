@@ -1,4 +1,4 @@
-# Chat App Demo
+# Android Login Demo
 
 This is a demo of an android app using Google OneTap/Native Sign-In & WebView for authentication
 
