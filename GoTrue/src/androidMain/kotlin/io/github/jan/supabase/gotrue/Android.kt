@@ -28,22 +28,21 @@ internal fun openUrl(uri: Uri) {
 //TODO: Add context receiver 'Activity'
 @OptIn(SupabaseExperimental::class)
 fun SupabaseClient.handleDeeplinks(intent: Intent, onSessionSuccess: (UserSession) -> Unit = {}) {
-    val authPlugin = pluginManager.getPlugin(GoTrue)
     val data = intent.data ?: return
     val scheme = data.scheme ?: return
     val host = data.host ?: return
-    if(scheme != authPlugin.config.scheme || host != authPlugin.config.host) return
-    when(gotrue.config.flowType) {
+    if(scheme != gotrue.config.scheme || host != gotrue.config.host) return
+    when(this.gotrue.config.flowType) {
         FlowType.IMPLICIT -> {
             val fragment = data.fragment ?: return
-            parseFragment(fragment, onSessionSuccess)
+            gotrue.parseFragmentAndImportSession(fragment, onSessionSuccess)
         }
         FlowType.PKCE -> {
             val code = data.getQueryParameter("code") ?: return
             val scope = CoroutineScope(Dispatchers.Default)
             scope.launch {
-                gotrue.exchangeCodeForSession(code)
-                onSessionSuccess(gotrue.currentSessionOrNull() ?: error("No session available"))
+                this@handleDeeplinks.gotrue.exchangeCodeForSession(code)
+                onSessionSuccess(this@handleDeeplinks.gotrue.currentSessionOrNull() ?: error("No session available"))
             }
         }
     }

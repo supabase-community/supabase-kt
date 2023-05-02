@@ -24,7 +24,7 @@ fun SupabaseClient.handleDeeplinks(url: NSURL, onSessionSuccess: (UserSession) -
                 Napier.d { "No fragment for deeplink" }
                 return
             }
-            parseFragment(fragment, onSessionSuccess)
+            gotrue.parseFragmentAndImportSession(fragment, onSessionSuccess)
         }
         FlowType.PKCE -> {
             val components = NSURLComponents(url, false)
