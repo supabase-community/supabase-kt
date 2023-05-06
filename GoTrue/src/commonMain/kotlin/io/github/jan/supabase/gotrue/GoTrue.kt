@@ -173,6 +173,7 @@ sealed interface GoTrue : MainPlugin<GoTrueConfig> {
         provider: Provider,
         createUser: Boolean = false,
         redirectUrl: String? = null,
+        data: JsonObject? = null,
         config: C.() -> Unit
     )
 
@@ -352,6 +353,32 @@ suspend inline fun <C, R, reified D, Provider : DefaultAuthProvider<C, R>> GoTru
     extraData: D? = null,
     noinline config: C.() -> Unit = { }
 ): UserInfo = modifyUser(provider, extraData?.let { Json.encodeToJsonElement(extraData) }?.jsonObject, config)
+
+/**
+ * Sends a one time password to the specified [provider]
+ *
+ * Example:
+ * ```kotlin
+ * gotrue.sendOtpTo(Email) {
+ *    email = "example@email.com"
+ *    password = "password"
+ * }
+ * ```
+ *
+ * @param provider The provider to use. Either [Email] or [Phone]
+ * @param createUser Whether to create a user when a user with the given credentials doesn't exist
+ * @param redirectUrl The redirect url to use. If you don't specify this, the platform specific will be use, like deeplinks on android.
+ * @throws RestException or one of its subclasses if receiving an error response
+ * @throws HttpRequestTimeoutException if the request timed out
+ * @throws HttpRequestException on network related issues
+ */
+suspend inline fun <C, R, reified D, Provider : DefaultAuthProvider<C, R>> GoTrue.sendOtpTo(
+    provider: Provider,
+    data: D,
+    createUser: Boolean = false,
+    redirectUrl: String? = null,
+    noinline config: C.() -> Unit = { }
+): Unit = sendOtpTo(provider, createUser, redirectUrl, Json.encodeToJsonElement(data).jsonObject, config)
 
 /**
  * The Auth plugin handles everything related to supabase's authentication system

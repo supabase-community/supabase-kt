@@ -4,9 +4,14 @@ import io.github.jan.supabase.exceptions.SupabaseEncodingException
 import io.github.jan.supabase.supabaseJson
 import kotlinx.datetime.Instant
 import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.KSerializer
 import kotlinx.serialization.MissingFieldException
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.descriptors.PrimitiveKind
+import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
+import kotlinx.serialization.encoding.Decoder
+import kotlinx.serialization.encoding.Encoder
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.decodeFromJsonElement
 import kotlinx.serialization.json.encodeToJsonElement
@@ -17,8 +22,32 @@ import kotlinx.serialization.json.jsonObject
  */
 object Phone : DefaultAuthProvider<Phone.Config, Phone.Result> {
 
-    @Serializable(with = DefaultAuthProvider.Config.Companion::class)
-    data class Config(var phoneNumber: String = "", var password: String = ""): DefaultAuthProvider.Config()
+    override val grantType: String = "password"
+
+    @Serializable
+    data class Config(var phoneNumber: String = "", var password: String = "", var channel: Channel = Channel.SMS): DefaultAuthProvider.Config()
+
+    @Serializable(with = Channel.Companion::class)
+    enum class Channel(val value: String) {
+        SMS("sms"),
+        WHATSAPP("whatsapp");
+
+        companion object: KSerializer<Channel> {
+
+            override val descriptor = PrimitiveSerialDescriptor("Channel", PrimitiveKind.STRING)
+
+            override fun deserialize(decoder: Decoder): Channel {
+                return Channel.values().first { it.value == decoder.decodeString() }
+            }
+
+            override fun serialize(encoder: Encoder, value: Channel) {
+                encoder.encodeString(value.value)
+            }
+
+
+        }
+    }
+
     @Serializable
     data class Result(
         val id: String,

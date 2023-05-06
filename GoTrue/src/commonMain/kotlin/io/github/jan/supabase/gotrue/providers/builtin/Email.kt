@@ -17,7 +17,9 @@ import kotlinx.serialization.json.jsonObject
  */
 object Email : DefaultAuthProvider<Email.Config, Email.Result> {
 
-    @Serializable(with = DefaultAuthProvider.Config.Companion::class)
+    override val grantType: String = "password"
+
+    @Serializable
     data class Config(var email: String = "", var password: String = ""): DefaultAuthProvider.Config()
     @Serializable
     data class Result(

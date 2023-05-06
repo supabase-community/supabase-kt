@@ -146,12 +146,16 @@ internal class GoTrueImpl(override val supabaseClient: SupabaseClient, override 
         provider: Provider,
         createUser: Boolean,
         redirectUrl: String?,
+        data: JsonObject?,
         config: C.() -> Unit
     ) {
         val finalRedirectUrl = generateRedirectUrl(redirectUrl)
         val body = buildJsonObject {
             putJsonObject(provider.encodeCredentials(config))
             put("create_user", createUser)
+            data?.let {
+                put("data", it)
+            }
         }
         var codeChallenge: String? = null
         if(this.config.flowType == FlowType.PKCE) {
