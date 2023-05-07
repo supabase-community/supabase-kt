@@ -193,6 +193,13 @@ internal class GoTrueImpl(override val supabaseClient: SupabaseClient, override 
         api.get("reauthenticate")
     }
 
+    override suspend fun logout() {
+        sessionManager.deleteSession()
+        sessionJob?.cancel()
+        _sessionStatus.value = SessionStatus.NotAuthenticated
+        sessionJob = null
+    }
+
     private suspend fun verify(type: String, token: String, captchaToken: String?, additionalData: JsonObjectBuilder.() -> Unit) {
         val body = buildJsonObject {
             put("type", type)

@@ -8,6 +8,7 @@ import io.github.jan.supabase.putJsonObject
 import io.github.jan.supabase.safeBody
 import io.github.jan.supabase.supabaseJson
 import io.ktor.client.call.body
+import io.ktor.http.HttpHeaders
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.buildJsonObject
@@ -32,6 +33,11 @@ sealed interface AdminApi {
      * @return the newly created user
      */
     suspend fun createUserWithPhone(builder: UserBuilder.Phone.() -> Unit): UserInfo
+
+    /**
+     * Removes a user session
+     */
+    suspend fun logout(jwt: String)
 
     /**
      * Retrieves all users
@@ -84,6 +90,12 @@ sealed interface AdminApi {
 internal class AdminApiImpl(val gotrue: GoTrue) : AdminApi {
 
     val api = (gotrue as GoTrueImpl).api
+
+    override suspend fun logout(jwt: String) {
+        api.post("logout") {
+            headers[HttpHeaders.Authorization] = "Bearer $jwt"
+        }
+    }
 
     override suspend fun createUserWithEmail(builder: UserBuilder.Email.() -> Unit): UserInfo {
         val userBuilder = UserBuilder.Email().apply(builder) as UserBuilder

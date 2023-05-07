@@ -248,7 +248,16 @@ sealed interface GoTrue : MainPlugin<GoTrueConfig> {
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
+    @Deprecated("Use logout() instead", ReplaceWith("logout()"))
     suspend fun invalidateSession()
+
+    /**
+     * Logs out the current user, which means [sessionStatus] will be [SessionStatus.NotAuthenticated] and the access token will be revoked
+     * @throws RestException or one of its subclasses if receiving an error response
+     * @throws HttpRequestTimeoutException if the request timed out
+     * @throws HttpRequestException on network related issues
+     */
+    suspend fun logout()
 
     /**
      * Imports a user session and starts auto-refreshing if [autoRefresh] is true
@@ -290,6 +299,11 @@ sealed interface GoTrue : MainPlugin<GoTrueConfig> {
      */
     suspend fun updateCurrentUser()
 
+    /**
+     * Exchanges a code for a session. Used when using the [FlowType.PKCE] flow
+     * @param code The code to exchange
+     * @param saveSession Whether to save the session in storage
+     */
     suspend fun exchangeCodeForSession(code: String, saveSession: Boolean = true): UserSession
 
     /**

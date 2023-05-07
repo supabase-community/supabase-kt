@@ -1,5 +1,6 @@
 package io.github.jan.supabase.realtime
 
+import co.touchlab.stately.collections.IsoMutableMap
 import io.github.aakira.napier.Napier
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.SupabaseClientBuilder
@@ -90,8 +91,16 @@ sealed interface Realtime : MainPlugin<Realtime.Config> {
     @SupabaseInternal
     fun RealtimeChannel.addChannel(channel: RealtimeChannel)
 
-    @SupabaseInternal
-    fun RealtimeChannel.removeChannel(topic: String)
+    /**
+     * Removes a channel from the [subscriptions]
+     * @param channel The channel to remove
+     */
+    fun removeChannel(channel: RealtimeChannel)
+
+    /**
+     * Removes all channels from the [subscriptions]
+     */
+    fun removeAllChannels()
 
     /**
      * Blocks your current coroutine until the websocket connection is closed
@@ -150,7 +159,7 @@ internal class RealtimeImpl(override val supabaseClient: SupabaseClient, overrid
     var ws: DefaultClientWebSocketSession? = null
     private val _status = MutableStateFlow(Realtime.Status.DISCONNECTED)
     override val status: StateFlow<Realtime.Status> = _status.asStateFlow()
-    private val _subscriptions = mutableMapOf<String, RealtimeChannel>()
+    private val _subscriptions = IsoMutableMap<String, RealtimeChannel>()
     override val subscriptions: Map<String, RealtimeChannel>
         get() = _subscriptions.toMap()
     private val scope = CoroutineScope(Dispatchers.Default + SupervisorJob())
@@ -294,9 +303,12 @@ internal class RealtimeImpl(override val supabaseClient: SupabaseClient, overrid
         ws?.sendSerialized(RealtimeMessage("phoenix", "heartbeat", buildJsonObject { }, heartbeatRef.toString()))
     }
 
-    @SupabaseInternal
-    override fun RealtimeChannel.removeChannel(topic: String) {
-        _subscriptions.remove(topic)
+    override fun removeChannel(channel: RealtimeChannel) {
+        _subscriptions.remove(channel.topic)
+    }
+
+    override fun removeAllChannels() {
+        _subscriptions.clear()
     }
 
     @SupabaseInternal
