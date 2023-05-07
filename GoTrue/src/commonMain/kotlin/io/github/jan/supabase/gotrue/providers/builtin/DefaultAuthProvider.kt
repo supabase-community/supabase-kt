@@ -29,7 +29,8 @@ sealed interface DefaultAuthProvider<C, R> : AuthProvider<C, R> {
     sealed class Config(
         @Serializable(with = CaptchaTokenSerializer::class)
         @SerialName("gotrue_meta_security")
-        var captchaToken: String? = null
+        var captchaToken: String? = null,
+        var data: JsonObject? = null,
     )
 
     override suspend fun login(
