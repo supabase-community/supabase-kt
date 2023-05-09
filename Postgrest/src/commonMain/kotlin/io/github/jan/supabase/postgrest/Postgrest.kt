@@ -14,6 +14,7 @@ import io.github.jan.supabase.plugins.SupabasePluginProvider
 import io.github.jan.supabase.postgrest.query.Count
 import io.github.jan.supabase.postgrest.query.PostgrestBuilder
 import io.github.jan.supabase.postgrest.query.PostgrestFilterBuilder
+import io.github.jan.supabase.postgrest.query.PostgrestUpdate
 import io.github.jan.supabase.postgrest.request.PostgrestRequest
 import io.ktor.client.statement.HttpResponse
 import io.ktor.http.HttpStatusCode
@@ -51,6 +52,7 @@ sealed interface Postgrest : MainPlugin<Postgrest.Config> {
     /**
      * Config for the Postgrest plugin
      * @param defaultSchema The default schema to use for the requests. Defaults to "public"
+     * @param propertyConversionMethod The method to use to convert the property names to the column names in [PostgrestFilterBuilder] and [PostgrestUpdate]. Defaults to [PropertyConversionMethod.CAMEL_CASE_TO_SNAKE_CASE]
      */
     data class Config(
         override var customUrl: String? = null,

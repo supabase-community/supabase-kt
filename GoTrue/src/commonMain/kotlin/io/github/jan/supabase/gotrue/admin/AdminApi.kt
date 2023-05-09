@@ -42,7 +42,7 @@ sealed interface AdminApi {
     /**
      * Retrieves all users
      */
-    suspend fun retrieveUsers(): List<UserInfo>
+    suspend fun retrieveUsers(page: Int? = null, perPage: Int? = null): List<UserInfo>
 
     /**
      * Retrieves a user by its id
@@ -107,8 +107,11 @@ internal class AdminApiImpl(val gotrue: GoTrue) : AdminApi {
         return api.postJson("admin/users", userBuilder).safeBody()
     }
 
-    override suspend fun retrieveUsers(): List<UserInfo> {
-        return api.get("admin/users").body<JsonObject>().let { supabaseJson.decodeFromJsonElement(it["users"] ?: throw IllegalStateException("Didn't get users json field on method retrieveUsers. Full body: $it")) }
+    override suspend fun retrieveUsers(page: Int?, perPage: Int?): List<UserInfo> {
+        return api.get("admin/users") {
+            page?.let { url.parameters.append("page", it.toString()) }
+            perPage?.let { url.parameters.append("per_page", it.toString()) }
+        }.body<JsonObject>().let { supabaseJson.decodeFromJsonElement(it["users"] ?: throw IllegalStateException("Didn't get users json field on method retrieveUsers. Full body: $it")) }
     }
 
     override suspend fun retrieveUserById(uid: String): UserInfo {
