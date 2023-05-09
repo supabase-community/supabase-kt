@@ -9,6 +9,6 @@ pluginManagement {
     }
 }
 
-rootProject.name = "demo"
+rootProject.name = "file-upload"
 
 include(":android", ":desktop", ":common")
