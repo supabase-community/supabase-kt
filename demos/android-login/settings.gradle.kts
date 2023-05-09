@@ -8,6 +8,6 @@ pluginManagement {
     }
 }
 
-rootProject.name = "demo"
+rootProject.name = "android-login"
 
 include(":android", ":desktop", ":web", ":common")
