@@ -8,6 +8,6 @@ pluginManagement {
     }
 }
 
-rootProject.name = "demo"
+rootProject.name = "chat-demo"
 
 include(":android", ":desktop", ":web", ":common")
