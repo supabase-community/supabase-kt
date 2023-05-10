@@ -1,5 +1,6 @@
 package io.github.jan.supabase.gotrue.admin
 
+import io.github.jan.supabase.annotiations.SupabaseInternal
 import io.github.jan.supabase.gotrue.GoTrue
 import io.github.jan.supabase.gotrue.GoTrueImpl
 import io.github.jan.supabase.gotrue.user.UserInfo
@@ -158,6 +159,7 @@ internal class AdminApiImpl(val gotrue: GoTrue) : AdminApi {
  * @param redirectTo the url to redirect to after the user has clicked the link
  * @param config additional configuration required for [linkType]
  */
+@OptIn(SupabaseInternal::class)
 suspend inline fun <reified C : LinkType.Config> AdminApi.generateLinkFor(
     linkType: LinkType<C>,
     redirectTo: String? = null,

@@ -85,9 +85,9 @@ internal class GoTrueImpl(override val supabaseClient: SupabaseClient, override 
     override val PLUGIN_KEY: String
         get() = GoTrue.key
 
+    @Deprecated("Use logout() instead", replaceWith = ReplaceWith("logout()"))
     override suspend fun invalidateAllRefreshTokens() {
-        api.post("logout")
-        invalidateSession()
+        logout()
     }
 
     override suspend fun <C, R, Provider : AuthProvider<C, R>> loginWith(
@@ -246,7 +246,9 @@ internal class GoTrueImpl(override val supabaseClient: SupabaseClient, override 
         val user = retrieveUser(currentAccessTokenOrNull() ?: throw IllegalStateException("No session found"))
         if(updateSession) {
             val session = currentSessionOrNull() ?: throw IllegalStateException("No session found")
-            _sessionStatus.value = SessionStatus.Authenticated(session.copy(user = user))
+            val newStatus = SessionStatus.Authenticated(session.copy(user = user))
+            _sessionStatus.value = newStatus
+            sessionManager.saveSession(newStatus.session)
         }
         return user
     }

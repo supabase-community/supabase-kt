@@ -201,6 +201,7 @@ sealed interface GoTrue : MainPlugin<GoTrueConfig> {
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
+    @Deprecated("Use logout() instead", ReplaceWith("logout()"))
     suspend fun invalidateAllRefreshTokens()
 
     /**
@@ -297,6 +298,7 @@ sealed interface GoTrue : MainPlugin<GoTrueConfig> {
     /**
      * Updates the current user with the current access token
      */
+    @Deprecated("Use retrieveUserForCurrentSession() instead", ReplaceWith("retrieveUserForCurrentSession(true)"))
     suspend fun updateCurrentUser()
 
     /**

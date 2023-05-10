@@ -24,12 +24,12 @@ sealed interface MfaApi {
     val isMfaEnabledFlow: Flow<Boolean>
 
     /**
-     * Checks whether the current session was authenticated with MFA or the user has a verified MFA factor.
+     * Checks whether the user has a verified MFA factor.
      */
     val isMfaEnabled: Boolean
         get() {
             val mfaLevel = getAuthenticatorAssuranceLevel()
-            return mfaLevel.current == AuthenticatorAssuranceLevel.AAL2 || mfaLevel.next == AuthenticatorAssuranceLevel.AAL2
+            return mfaLevel.next == AuthenticatorAssuranceLevel.AAL2
         }
 
     /**
