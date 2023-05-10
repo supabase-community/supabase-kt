@@ -1,4 +1,4 @@
-# Chat App Demo
+# Multi-Factor Authentication Demo
 
 This is a demo app of integrating multi-factor authentication with supabase in a compose multiplatform app.
 
