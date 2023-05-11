@@ -159,7 +159,7 @@ internal class RealtimeImpl(override val supabaseClient: SupabaseClient, overrid
     override val status: StateFlow<Realtime.Status> = _status.asStateFlow()
     private val _subscriptions = IsoMutableMap<String, RealtimeChannel>()
     override val subscriptions: Map<String, RealtimeChannel>
-        get() = _subscriptions.toMap()
+        get() = _subscriptions //toMap() doesnt work because of stately. May be fixed in a future version
     private val scope = CoroutineScope(Dispatchers.Default + SupervisorJob())
     var heartbeatJob: Job? = null
     var messageJob: Job? = null
