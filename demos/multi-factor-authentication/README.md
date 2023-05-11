@@ -6,6 +6,8 @@ This is a demo app of integrating multi-factor authentication with supabase in a
 
 **Modules used:** GoTrue
 
+https://github.com/supabase-community/supabase-kt/assets/26686035/abe3eb3d-32f4-41f0-95de-6f01468711cb
+
 # Configuration
 
 You need to specify your supabase url and key in [supabaseModule.kt](https://github.com/supabase-community/supabase-kt/blob/master/demos/multi-factor-authentication/common/src/commonMain/kotlin/io/github/jan/supabase/common/di/supabaseModule.kt)
