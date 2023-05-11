@@ -5,19 +5,17 @@ Supported targets:
 - JVM
 - Android
 - JS (Browser) 
-- IOS (experimental as of 0.9.0, see [PR](https://github.com/supabase-community/supabase-kt/pull/53) for more information
+- IOS (experimental)
 
 *Note: WASM planned see [issue](https://github.com/supabase-community/supabase-kt/issues/86)*
 
-Newest stable version: ![stable](https://img.shields.io/github/release/supabase-community/supabase-kt?label=stable)
-
-Newest experimental version: ![experimental](https://img.shields.io/maven-central/v/io.github.jan-tennert.supabase/supabase-kt?label=experimental)
+![](https://img.shields.io/github/release/supabase-community/supabase-kt?label=stable) ![](https://img.shields.io/maven-central/v/io.github.jan-tennert.supabase/supabase-kt?label=experimental)
 
 ### Links
 
 [Dokka documentation for the latest version](https://supabase-community.github.io/supabase-kt/)
 
-[Wiki](https://github.com/supabase-community/supabase-kt/wiki)
+[Documentation](https://supabase.com/docs/reference/kotlin/introduction)
 
 [Troubleshooting](https://github.com/supabase-community/supabase-kt/wiki/Troubleshooting)
 
@@ -39,8 +37,6 @@ If you use multiple modules, you can use the bom dependency to get the correct v
 implementation(platform("io.github.jan-tennert.supabase:bom:VERSION"))
 implementation("io.github.jan-tennert.supabase:[module e.g. functions-kt or gotrue-kt]")
 ```
-
-# [Getting started](https://github.com/supabase-community/supabase-kt/wiki/Getting-Started)
 
 # Main Modules
 
