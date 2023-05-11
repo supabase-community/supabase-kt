@@ -62,8 +62,8 @@ internal class SupabaseClientImpl(
 ) : SupabaseClient {
 
     init {
-        Napier.w {
-            "Warning! You are using a alpha version of SupaCompose. Don't use it in a production environment. Please report any bugs you find."
+        Napier.i {
+            "SupabaseClient created! Please report any bugs you find."
         }
     }
 
