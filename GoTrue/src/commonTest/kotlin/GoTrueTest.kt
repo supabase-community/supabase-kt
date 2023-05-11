@@ -103,10 +103,7 @@ class GoTrueTest {
 
     @Test
     fun test_auto_refresh_with_wrong_token() {
-        val client = createSupabaseClient(
-    supabaseUrl = "https://id.supabase.co",
-    supabaseKey = "apikey"
-) {
+        val client = createSupabaseClient {
             alwaysAutoRefresh = true
         }
         runTest(dispatcher) {
@@ -140,10 +137,7 @@ class GoTrueTest {
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun test_loading_session_from_storage() {
-        val client = createSupabaseClient(
-    supabaseUrl = "https://id.supabase.co",
-    supabaseKey = "apikey"
-) {
+        val client = createSupabaseClient {
             sessionManager = SettingsSessionManager(
                 MapSettings(
                     "session" to Json.encodeToString(
@@ -227,10 +221,7 @@ class GoTrueTest {
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun test_custom_url() {
-        val client = createSupabaseClient(
-    supabaseUrl = "https://id.supabase.co",
-    supabaseKey = "apikey"
-) {
+        val client = createSupabaseClient {
             customUrl = "https://custom.auth.com"
         }
         runTest(dispatcher) {
