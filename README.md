@@ -58,8 +58,8 @@ implementation("io.github.jan-tennert.supabase:[module e.g. functions-kt or gotr
 
 - [Chat Demo (Desktop/Android/Browser)](https://github.com/supabase-community/supabase-kt/tree/master/demos/chat-demo-mpp)
 - [File Upload Demo (Desktop/Android)](https://github.com/supabase-community/supabase-kt/tree/master/demos/file-upload)
-- [Android Native Google login & in-app OAuth (Android)](https://github.com/supabase-community/supabase-kt/tree/master/demos/android-login)
-- [Multi-Factor Authentication (Desktop/Android/Browser)](https://github.com/supabase-community/supabase-kt/tree/master/demos/multi-factor-authentication)
+- [Android Native Google login & in-app OAuth (Android)](https://github.com/supabase-community/supabase-kt/tree/development/demos/android-login)
+- [Multi-Factor Authentication (Desktop/Android/Browser)](https://github.com/supabase-community/supabase-kt/tree/development/demos/multi-factor-authentication)
 - [Groceries Store App (Android)](https://github.com/hieuwu/android-groceries-store)
 
 # Videos
