@@ -12,9 +12,12 @@ dependencies {
 }
 ```
 
-Install plugin in main supabase client. See [Getting started](https://github.com/supabase-community/supabase-kt/wiki/Getting-Started) for more information
+Install plugin in main SupabaseClient. See the [documentation](https://supabase.com/docs/reference/kotlin/initializing) for more information
 ```kotlin
-val client = createSupabaseClient {
+val client = createSupabaseClient(
+    supabaseUrl = "https://id.supabase.co",
+    supabaseKey = "apikey"
+) {
     
     //...
     
@@ -27,4 +30,4 @@ val client = createSupabaseClient {
 
 # Usage
 
-See [Storage docs](https://github.com/supabase-community/supabase-kt/wiki/Storage#usage) for usage
+See [Storage documentation](https://supabase.com/docs/reference/kotlin/storage-createbucket) for usage

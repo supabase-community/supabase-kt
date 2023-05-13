@@ -4,20 +4,18 @@ A Kotlin Multiplatform Client for Supabase.
 Supported targets:
 - JVM
 - Android
-- JS (Browser) 
-- IOS (experimental as of 0.9.0, see [PR](https://github.com/supabase-community/supabase-kt/pull/53) for more information
+- JS (Browser)
+- IOS (experimental)
 
 *Note: WASM planned see [issue](https://github.com/supabase-community/supabase-kt/issues/86)*
 
-Newest stable version: ![stable](https://img.shields.io/github/release/supabase-community/supabase-kt?label=stable)
-
-Newest experimental version: ![experimental](https://img.shields.io/maven-central/v/io.github.jan-tennert.supabase/supabase-kt?label=experimental)
+![](https://img.shields.io/github/release/supabase-community/supabase-kt?label=stable) ![](https://img.shields.io/maven-central/v/io.github.jan-tennert.supabase/supabase-kt?label=experimental)
 
 ### Links
 
 [Dokka documentation for the latest version](https://supabase-community.github.io/supabase-kt/)
 
-[Wiki](https://github.com/supabase-community/supabase-kt/wiki)
+[Documentation](https://supabase.com/docs/reference/kotlin/introduction)
 
 [Troubleshooting](https://github.com/supabase-community/supabase-kt/wiki/Troubleshooting)
 
@@ -40,8 +38,6 @@ implementation(platform("io.github.jan-tennert.supabase:bom:VERSION"))
 implementation("io.github.jan-tennert.supabase:[module e.g. functions-kt or gotrue-kt]")
 ```
 
-# [Getting started](https://github.com/supabase-community/supabase-kt/wiki/Getting-Started)
-
 # Main Modules
 
 #### [Authentication (GoTrue)](/GoTrue)
@@ -62,6 +58,8 @@ implementation("io.github.jan-tennert.supabase:[module e.g. functions-kt or gotr
 
 - [Chat Demo (Desktop/Android/Browser)](https://github.com/supabase-community/supabase-kt/tree/master/demos/chat-demo-mpp)
 - [File Upload Demo (Desktop/Android)](https://github.com/supabase-community/supabase-kt/tree/master/demos/file-upload)
+- [Android Native Google login & in-app OAuth (Android)](https://github.com/supabase-community/supabase-kt/tree/master/demos/android-login)
+- [Multi-Factor Authentication (Desktop/Android/Browser)](https://github.com/supabase-community/supabase-kt/tree/master/demos/multi-factor-authentication)
 - [Groceries Store App (Android)](https://github.com/hieuwu/android-groceries-store)
 
 # Videos
@@ -73,7 +71,7 @@ implementation("io.github.jan-tennert.supabase:[module e.g. functions-kt or gotr
 ### How to contribute
 
 1. Fork the repository
-2. Create a branch 
+2. Create a branch
 3. Make your changes
 4. Submit a pull request with your new branch and add one of the following tags: `fix` or `enhancement`. You might also add one or more label when you are modifying a specific module: `gotrue`, `realtime`, `functions`, `graphql`, `storage`, `postgrest`, `core`
 

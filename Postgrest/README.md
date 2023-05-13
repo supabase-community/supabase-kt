@@ -12,9 +12,12 @@ dependencies {
 }
 ```
 
-Install plugin in main supabase client. See [Getting started](https://github.com/supabase-community/supabase-kt/wiki/Getting-Started) for more information
+Install plugin in main SupabaseClient. See the [documentation](https://supabase.com/docs/reference/kotlin/initializing) for more information
 ```kotlin
-val client = createSupabaseClient {
+val client = createSupabaseClient(
+    supabaseUrl = "https://id.supabase.co",
+    supabaseKey = "apikey"
+) {
     
     //...
     
@@ -32,4 +35,4 @@ val postgrest = standaloneSupabaseModule(Postgrest, url = "https://your.postgres
 
 # Usage
 
-See [Postgrest docs](https://github.com/supabase-community/supabase-kt/wiki/Postgrest#usage) for usage
+See [Postgrest documentation](https://supabase.com/docs/reference/kotlin/select) for usage
