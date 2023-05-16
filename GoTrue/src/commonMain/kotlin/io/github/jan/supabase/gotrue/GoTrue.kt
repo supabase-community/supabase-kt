@@ -268,10 +268,10 @@ sealed interface GoTrue : MainPlugin<GoTrueConfig> {
     /**
      * Imports the jwt token and retrieves the user profile.
      * Be aware auto-refreshing is not available when importing **only** a jwt token.
-     * @param jwt The jwt token to import
+     * @param accessToken The jwt token to import
      * @param retrieveUser Whether to retrieve the user profile or not
      */
-    suspend fun importAuthToken(jwt: String, retrieveUser: Boolean = false) = importSession(UserSession(jwt, "", "", "", 0L, "", if(retrieveUser) tryToGetUser(jwt) else null), false)
+    suspend fun importAuthToken(accessToken: String, refreshToken: String = "", retrieveUser: Boolean = false) = importSession(UserSession(accessToken, refreshToken, "", "", 0L, "", if(retrieveUser) tryToGetUser(accessToken) else null), false)
 
     /**
      * Retrieves the latest session from storage and starts auto-refreshing if [autoRefresh] is true or [GoTrue.Config.alwaysAutoRefresh] as the default parameter
@@ -314,6 +314,7 @@ sealed interface GoTrue : MainPlugin<GoTrueConfig> {
      * Starts auto-refreshing [session] for [currentSession]
      * @param session The session to auto-refresh
      */
+    @Deprecated("Use importSession() instead", ReplaceWith("importSession(session)"))
     suspend fun startAutoRefresh(session: UserSession, autoRefresh: Boolean = config.alwaysAutoRefresh)
 
     /**
@@ -345,6 +346,11 @@ sealed interface GoTrue : MainPlugin<GoTrueConfig> {
         is SessionStatus.Authenticated -> status.session
         else -> null
     }
+
+    /**
+     * Returns the current user or null
+     */
+    fun currentUserOrNull() = currentSessionOrNull()?.user
 
     companion object : SupabasePluginProvider<GoTrueConfig, GoTrue> {
 

@@ -27,6 +27,11 @@ open class GoTrueConfigDefaults {
     var autoLoadFromStorage: Boolean = true
 
     /**
+     * Whether to automatically save the session to [sessionManager], when the session changes
+     */
+    var autoSaveToStorage: Boolean = true
+
+    /**
      * The session manager used to store/load the session. When null, the default [SettingsSessionManager] will be used
      */
     var sessionManager: SessionManager? = null

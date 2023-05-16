@@ -95,7 +95,7 @@ internal class GoTrueImpl(override val supabaseClient: SupabaseClient, override 
         redirectUrl: String?,
         config: (C.() -> Unit)?
     ) = provider.login(supabaseClient, {
-        startAutoRefresh(it)
+        importSession(it)
     }, redirectUrl, config)
 
     override suspend fun <C, R, Provider : AuthProvider<C, R>> signUpWith(
@@ -103,7 +103,7 @@ internal class GoTrueImpl(override val supabaseClient: SupabaseClient, override 
         redirectUrl: String?,
         config: (C.() -> Unit)?
     ): R? = provider.signUp(supabaseClient, {
-        startAutoRefresh(it)
+        importSession(it)
     }, redirectUrl, config)
 
     override suspend fun <Config : SSO.Config> retrieveSSOUrl(
@@ -213,7 +213,7 @@ internal class GoTrueImpl(override val supabaseClient: SupabaseClient, override 
         }
         val response = api.postJson("verify", body)
         val session =  response.body<UserSession>()
-        startAutoRefresh(session)
+        importSession(session)
     }
 
     override suspend fun verifyEmailOtp(
@@ -248,7 +248,7 @@ internal class GoTrueImpl(override val supabaseClient: SupabaseClient, override 
             val session = currentSessionOrNull() ?: throw IllegalStateException("No session found")
             val newStatus = SessionStatus.Authenticated(session.copy(user = user))
             _sessionStatus.value = newStatus
-            sessionManager.saveSession(newStatus.session)
+            if(config.autoSaveToStorage) sessionManager.saveSession(newStatus.session)
         }
         return user
     }
@@ -270,7 +270,7 @@ internal class GoTrueImpl(override val supabaseClient: SupabaseClient, override 
         }.safeBody<UserSession>()
         codeVerifierCache.deleteCodeVerifier()
         if(saveSession) {
-            startAutoRefresh(session)
+            importSession(session)
         }
         return session
     }
@@ -290,20 +290,22 @@ internal class GoTrueImpl(override val supabaseClient: SupabaseClient, override 
 
     override suspend fun refreshCurrentSession() {
         val newSession = refreshSession(currentSessionOrNull()?.refreshToken ?: throw IllegalStateException("No refresh token found in current session"))
-        startAutoRefresh(newSession)
+        importSession(newSession)
     }
 
     override suspend fun updateCurrentUser() {
         val session = currentSessionOrNull() ?: throw IllegalStateException("No session found")
         val user = retrieveUser(session.accessToken)
         _sessionStatus.value = SessionStatus.Authenticated(session.copy(user = user))
-        sessionManager.saveSession(session)
+        if(config.autoSaveToStorage) sessionManager.saveSession(session)
     }
 
-    override suspend fun startAutoRefresh(session: UserSession, autoRefresh: Boolean) {
+    override suspend fun startAutoRefresh(session: UserSession, autoRefresh: Boolean) = importSession(session, autoRefresh)
+
+    override suspend fun importSession(session: UserSession, autoRefresh: Boolean) {
         if(!autoRefresh) {
             _sessionStatus.value = SessionStatus.Authenticated(session)
-            if(session.refreshToken.isNotBlank() && session.expiresIn != 0L) {
+            if(session.refreshToken.isNotBlank() && session.expiresIn != 0L && config.autoSaveToStorage) {
                 sessionManager.saveSession(session)
             }
             return
@@ -314,19 +316,19 @@ internal class GoTrueImpl(override val supabaseClient: SupabaseClient, override 
             }
             try {
                 val newSession = refreshSession(session.refreshToken)
-                startAutoRefresh(newSession, config.alwaysAutoRefresh)
+                importSession(newSession, config.alwaysAutoRefresh)
             } catch(e: RestException) {
-                invalidateSession()
+                logout()
                 Napier.e(e) { "Couldn't refresh session. The refresh token may have been revoked." }
             } catch (e: Exception) {
                 Napier.e(e) { "Couldn't reach supabase. Either the address doesn't exist or the network might not be on. Retrying in ${config.retryDelay}" }
                 _sessionStatus.value = SessionStatus.NetworkError
                 delay(config.retryDelay)
-                startAutoRefresh(session)
+                importSession(session)
             }
         } else {
             _sessionStatus.value = SessionStatus.Authenticated(session)
-            sessionManager.saveSession(session)
+            if(config.autoSaveToStorage) sessionManager.saveSession(session)
             sessionJob?.cancel()
             sessionJob = authScope.launch {
                 delay(session.expiresIn.seconds.inWholeMilliseconds)
@@ -336,9 +338,9 @@ internal class GoTrueImpl(override val supabaseClient: SupabaseClient, override 
                     }
                     try {
                         val newSession = refreshSession(session.refreshToken)
-                        startAutoRefresh(newSession)
+                        importSession(newSession)
                     } catch(e: RestException) {
-                        invalidateSession()
+                        logout()
                         Napier.e(e) { "Couldn't refresh session. The refresh token may have been revoked." }
                     } catch (e: Exception) {
                         Napier.e(e) { "Couldn't reach supabase. Either the address doesn't exist or the network might not be on. Retrying in ${config.retryDelay}" }
@@ -349,20 +351,19 @@ internal class GoTrueImpl(override val supabaseClient: SupabaseClient, override 
         }
     }
 
-    override suspend fun startAutoRefreshForCurrentSession() = startAutoRefresh(currentSessionOrNull() ?: throw IllegalStateException("No session found"), true)
+    override suspend fun startAutoRefreshForCurrentSession() = importSession(currentSessionOrNull() ?: throw IllegalStateException("No session found"), true)
 
     override fun stopAutoRefreshForCurrentSession() {
         sessionJob?.cancel()
         sessionJob = null
     }
 
-    override suspend fun importSession(session: UserSession, autoRefresh: Boolean) = startAutoRefresh(session, autoRefresh)
-
     override suspend fun loadFromStorage(autoRefresh: Boolean): Boolean {
         val session = sessionManager.loadSession()
-        val wasSuccessful = session != null
-        if(wasSuccessful) startAutoRefresh(session!!, autoRefresh)
-        return wasSuccessful
+        session?.let {
+            importSession(it, autoRefresh)
+        }
+        return session != null
     }
 
     override suspend fun close() {
