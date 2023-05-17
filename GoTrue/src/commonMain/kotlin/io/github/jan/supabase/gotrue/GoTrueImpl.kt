@@ -174,6 +174,31 @@ internal class GoTrueImpl(override val supabaseClient: SupabaseClient, override 
         }
     }
 
+    suspend fun resend(type: String, body: JsonObjectBuilder.() -> Unit) {
+        api.postJson("resend", buildJsonObject {
+            put("type", type)
+            putJsonObject(buildJsonObject(body))
+        })
+    }
+
+    override suspend fun resendEmail(type: OtpType.Email, email: String, captchaToken: String?) = resend(type.type) {
+        put("email", email)
+        captchaToken?.let {
+            putJsonObject("gotrue_meta_security") {
+                put("captcha_token", captchaToken)
+            }
+        }
+    }
+
+    override suspend fun resendPhone(type: OtpType.Phone, phoneNumber: String, captchaToken: String?) = resend(type.type) {
+        put("phone", phoneNumber)
+        captchaToken?.let {
+            putJsonObject("gotrue_meta_security") {
+                put("captcha_token", captchaToken)
+            }
+        }
+    }
+
     override suspend fun sendRecoveryEmail(email: String, redirectUrl: String?, captchaToken: String?) {
         val finalRedirectUrl = generateRedirectUrl(redirectUrl)
         val body = buildJsonObject {

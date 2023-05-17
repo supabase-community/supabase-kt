@@ -64,6 +64,38 @@ class PostgrestFilterBuilder(@PublishedApi internal val propertyConversionMethod
     fun like(column: String, pattern: String) = filter(column, FilterOperator.LIKE, pattern)
 
     /**
+     * Finds all rows where the value of the [column] matches all of the specified [patterns]
+     */
+    fun likeAll(column: String, patterns: List<String>) {
+        val columnValue = params[column] ?: emptyList()
+        _params[column] = columnValue + listOf("like(all).{${patterns.joinToString(",")}}")
+    }
+
+    /**
+     * Finds all rows where the value of the [column] matches any of the specified [patterns]
+     */
+    fun likeAny(column: String, patterns: List<String>) {
+        val columnValue = params[column] ?: emptyList()
+        _params[column] = columnValue + listOf("like(any).{${patterns.joinToString(",")}}")
+    }
+
+    /**
+     * Finds all rows where the value of the [column] matches all of the specified [patterns]
+     */
+    fun ilikeAll(column: String, patterns: List<String>) {
+        val columnValue = params[column] ?: emptyList()
+        _params[column] = columnValue + listOf("ilike(all).{${patterns.joinToString(",")}}")
+    }
+
+    /**
+     * Finds all rows where the value of the [column] matches any of the specified [patterns] (case-insensitive)
+     */
+    fun ilikeAny(column: String, patterns: List<String>) {
+        val columnValue = params[column] ?: emptyList()
+        _params[column] = columnValue + listOf("ilike(any).{${patterns.joinToString(",")}}")
+    }
+
+    /**
      * Finds all rows where the value of the [column] matches the specified [pattern] (case-insensitive)
      */
     fun ilike(column: String, pattern: String) = filter(column, FilterOperator.ILIKE, pattern)
