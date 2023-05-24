@@ -7,10 +7,13 @@ import io.github.jan.supabase.exceptions.RestException
 import io.github.jan.supabase.gotrue.admin.AdminApi
 import io.github.jan.supabase.gotrue.mfa.MfaApi
 import io.github.jan.supabase.gotrue.providers.AuthProvider
+import io.github.jan.supabase.gotrue.providers.ExternalAuthConfigDefaults
 import io.github.jan.supabase.gotrue.providers.Google
+import io.github.jan.supabase.gotrue.providers.OAuthProvider
 import io.github.jan.supabase.gotrue.providers.builtin.DefaultAuthProvider
 import io.github.jan.supabase.gotrue.providers.builtin.Email
 import io.github.jan.supabase.gotrue.providers.builtin.Phone
+import io.github.jan.supabase.gotrue.providers.builtin.SSO
 import io.github.jan.supabase.gotrue.user.UserInfo
 import io.github.jan.supabase.gotrue.user.UserSession
 import io.github.jan.supabase.plugins.MainPlugin
@@ -68,6 +71,11 @@ sealed interface GoTrue : MainPlugin<GoTrueConfig> {
     val mfa: MfaApi
 
     /**
+     * The cache for the code verifier. This is used for PKCE authentication. Can be customized via [GoTrueConfig.codeVerifierCache]
+     */
+    val codeVerifierCache: CodeVerifierCache
+
+    /**
      * Signs up a new user with the specified [provider]
      *
      * Example:
@@ -121,6 +129,14 @@ sealed interface GoTrue : MainPlugin<GoTrueConfig> {
     )
 
     /**
+     * Retrieves the sso url for the specified [type]
+     * @param type The type of sso to retrieve e.g. [SSO.withDomain] or [SSO.withProvider]
+     * @param redirectUrl The redirect url to use
+     * @param config The configuration to use
+     */
+    suspend fun <Config: SSO.Config> retrieveSSOUrl(type: SSO<Config>, redirectUrl: String? = null, config: (Config.() -> Unit)? = null): SSO.Result
+
+    /**
      * Modifies a user with the specified [provider]. Extra data can be supplied
      * @param provider The provider to use. Either [Email] or [Phone]
      * @param extraData Extra data to store
@@ -157,8 +173,31 @@ sealed interface GoTrue : MainPlugin<GoTrueConfig> {
         provider: Provider,
         createUser: Boolean = false,
         redirectUrl: String? = null,
+        data: JsonObject? = null,
         config: C.() -> Unit
     )
+
+    /**
+     * Resends an existing signup confirmation email, email change email
+     * @param type The email otp type
+     * @param email The email to resend the otp to
+     * @param captchaToken The captcha token to use
+     * @throws RestException or one of its subclasses if receiving an error response
+     * @throws HttpRequestTimeoutException if the request timed out
+     * @throws HttpRequestException on network related issues
+     */
+    suspend fun resendEmail(type: OtpType.Email, email: String, captchaToken: String? = null)
+
+    /**
+     * Resends an existing SMS OTP or phone change OTP.
+     * @param type The phone otp type
+     * @param phoneNumber The phone to resend the otp to
+     * @param captchaToken The captcha token to use
+     * @throws RestException or one of its subclasses if receiving an error response
+     * @throws HttpRequestTimeoutException if the request timed out
+     * @throws HttpRequestException on network related issues
+     */
+    suspend fun resendPhone(type: OtpType.Phone, phoneNumber: String, captchaToken: String? = null)
 
     /**
      * Sends a password reset email to the user with the specified [email]
@@ -184,6 +223,7 @@ sealed interface GoTrue : MainPlugin<GoTrueConfig> {
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
+    @Deprecated("Use logout() instead", ReplaceWith("logout()"))
     suspend fun invalidateAllRefreshTokens()
 
     /**
@@ -231,7 +271,16 @@ sealed interface GoTrue : MainPlugin<GoTrueConfig> {
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
+    @Deprecated("Use logout() instead", ReplaceWith("logout()"))
     suspend fun invalidateSession()
+
+    /**
+     * Logs out the current user, which means [sessionStatus] will be [SessionStatus.NotAuthenticated] and the access token will be revoked
+     * @throws RestException or one of its subclasses if receiving an error response
+     * @throws HttpRequestTimeoutException if the request timed out
+     * @throws HttpRequestException on network related issues
+     */
+    suspend fun logout()
 
     /**
      * Imports a user session and starts auto-refreshing if [autoRefresh] is true
@@ -241,8 +290,10 @@ sealed interface GoTrue : MainPlugin<GoTrueConfig> {
     /**
      * Imports the jwt token and retrieves the user profile.
      * Be aware auto-refreshing is not available when importing **only** a jwt token.
+     * @param accessToken The jwt token to import
+     * @param retrieveUser Whether to retrieve the user profile or not
      */
-    suspend fun importAuthToken(jwt: String) = importSession(UserSession(jwt, "", 0L, "", tryToGetUser(jwt)), false)
+    suspend fun importAuthToken(accessToken: String, refreshToken: String = "", retrieveUser: Boolean = false) = importSession(UserSession(accessToken, refreshToken, "", "", 0L, "", if(retrieveUser) tryToGetUser(accessToken) else null), false)
 
     /**
      * Retrieves the latest session from storage and starts auto-refreshing if [autoRefresh] is true or [GoTrue.Config.alwaysAutoRefresh] as the default parameter
@@ -271,18 +322,34 @@ sealed interface GoTrue : MainPlugin<GoTrueConfig> {
     /**
      * Updates the current user with the current access token
      */
+    @Deprecated("Use retrieveUserForCurrentSession() instead", ReplaceWith("retrieveUserForCurrentSession(true)"))
     suspend fun updateCurrentUser()
+
+    /**
+     * Exchanges a code for a session. Used when using the [FlowType.PKCE] flow
+     * @param code The code to exchange
+     * @param saveSession Whether to save the session in storage
+     */
+    suspend fun exchangeCodeForSession(code: String, saveSession: Boolean = true): UserSession
 
     /**
      * Starts auto-refreshing [session] for [currentSession]
      * @param session The session to auto-refresh
      */
+    @Deprecated("Use importSession() instead", ReplaceWith("importSession(session)"))
     suspend fun startAutoRefresh(session: UserSession, autoRefresh: Boolean = config.alwaysAutoRefresh)
 
     /**
      * Starts auto refreshing the current session
      */
     suspend fun startAutoRefreshForCurrentSession()
+
+    /**
+     * Returns the url to use for oAuth
+     * @param provider The provider to use
+     * @param redirectUrl The redirect url to use
+     */
+    fun oAuthUrl(provider: OAuthProvider, redirectUrl: String? = null, additionalConfig: ExternalAuthConfigDefaults.() -> Unit = {}): String
 
     /**
      * Stops auto-refreshing the current session
@@ -301,6 +368,11 @@ sealed interface GoTrue : MainPlugin<GoTrueConfig> {
         is SessionStatus.Authenticated -> status.session
         else -> null
     }
+
+    /**
+     * Returns the current user or null
+     */
+    fun currentUserOrNull() = currentSessionOrNull()?.user
 
     companion object : SupabasePluginProvider<GoTrueConfig, GoTrue> {
 
@@ -327,6 +399,32 @@ suspend inline fun <C, R, reified D, Provider : DefaultAuthProvider<C, R>> GoTru
     extraData: D? = null,
     noinline config: C.() -> Unit = { }
 ): UserInfo = modifyUser(provider, extraData?.let { Json.encodeToJsonElement(extraData) }?.jsonObject, config)
+
+/**
+ * Sends a one time password to the specified [provider]
+ *
+ * Example:
+ * ```kotlin
+ * gotrue.sendOtpTo(Email) {
+ *    email = "example@email.com"
+ *    password = "password"
+ * }
+ * ```
+ *
+ * @param provider The provider to use. Either [Email] or [Phone]
+ * @param createUser Whether to create a user when a user with the given credentials doesn't exist
+ * @param redirectUrl The redirect url to use. If you don't specify this, the platform specific will be use, like deeplinks on android.
+ * @throws RestException or one of its subclasses if receiving an error response
+ * @throws HttpRequestTimeoutException if the request timed out
+ * @throws HttpRequestException on network related issues
+ */
+suspend inline fun <C, R, reified D, Provider : DefaultAuthProvider<C, R>> GoTrue.sendOtpTo(
+    provider: Provider,
+    data: D,
+    createUser: Boolean = false,
+    redirectUrl: String? = null,
+    noinline config: C.() -> Unit = { }
+): Unit = sendOtpTo(provider, createUser, redirectUrl, Json.encodeToJsonElement(data).jsonObject, config)
 
 /**
  * The Auth plugin handles everything related to supabase's authentication system

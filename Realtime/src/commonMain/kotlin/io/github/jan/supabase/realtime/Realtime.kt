@@ -1,5 +1,6 @@
 package io.github.jan.supabase.realtime
 
+import co.touchlab.stately.collections.IsoMutableMap
 import io.github.aakira.napier.Napier
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.SupabaseClientBuilder
@@ -90,8 +91,16 @@ sealed interface Realtime : MainPlugin<Realtime.Config> {
     @SupabaseInternal
     fun RealtimeChannel.addChannel(channel: RealtimeChannel)
 
-    @SupabaseInternal
-    fun RealtimeChannel.removeChannel(topic: String)
+    /**
+     * Removes a channel from the [subscriptions]
+     * @param channel The channel to remove
+     */
+    fun removeChannel(channel: RealtimeChannel)
+
+    /**
+     * Removes all channels from the [subscriptions]
+     */
+    fun removeAllChannels()
 
     /**
      * Blocks your current coroutine until the websocket connection is closed
@@ -101,7 +110,6 @@ sealed interface Realtime : MainPlugin<Realtime.Config> {
     /**
      * @property websocketConfig Custom configuration for the ktor websocket
      * @property secure Whether to use wss or ws. Defaults to [SupabaseClient.useHTTPS] when null
-     * @property customRealtimeURL Custom url for the realtime websocket. Uses [SupabaseClient.supabaseUrl] by default
      * @property disconnectOnSessionLoss Whether to disconnect from the websocket when the session is lost. Defaults to true
      * @property reconnectDelay The delay between reconnect attempts. Defaults to 7 seconds
      * @property heartbeatInterval The interval between heartbeat messages. Defaults to 15 seconds
@@ -110,7 +118,6 @@ sealed interface Realtime : MainPlugin<Realtime.Config> {
         var websocketConfig: WebSockets.Config.() -> Unit = {},
         var secure: Boolean? = null,
         var heartbeatInterval: Duration = 15.seconds,
-        var customRealtimeURL: String? = null,
         var reconnectDelay: Duration = 7.seconds,
         override var customUrl: String? = null,
         override var jwtToken: String? = null,
@@ -150,9 +157,9 @@ internal class RealtimeImpl(override val supabaseClient: SupabaseClient, overrid
     var ws: DefaultClientWebSocketSession? = null
     private val _status = MutableStateFlow(Realtime.Status.DISCONNECTED)
     override val status: StateFlow<Realtime.Status> = _status.asStateFlow()
-    private val _subscriptions = mutableMapOf<String, RealtimeChannel>()
+    private val _subscriptions = IsoMutableMap<String, RealtimeChannel>()
     override val subscriptions: Map<String, RealtimeChannel>
-        get() = _subscriptions.toMap()
+        get() = _subscriptions //toMap() doesnt work because of stately. May be fixed in a future version
     private val scope = CoroutineScope(Dispatchers.Default + SupervisorJob())
     var heartbeatJob: Job? = null
     var messageJob: Job? = null
@@ -195,7 +202,7 @@ internal class RealtimeImpl(override val supabaseClient: SupabaseClient, overrid
         if (status.value == Realtime.Status.CONNECTED) throw IllegalStateException("Websocket already connected")
         val prefix = if (config.secure == true) "wss://" else "ws://"
         _status.value = Realtime.Status.CONNECTING
-        val realtimeUrl = config.customRealtimeURL ?: (prefix + supabaseClient.supabaseUrl + ("/realtime/v${Realtime.API_VERSION}/websocket?apikey=${supabaseClient.supabaseKey}&vsn=1.0.0"))
+        val realtimeUrl = config.customUrl ?: (prefix + supabaseClient.supabaseUrl + ("/realtime/v${Realtime.API_VERSION}/websocket?apikey=${supabaseClient.supabaseKey}&vsn=1.0.0"))
         try {
             ws = supabaseClient.httpClient.webSocketSession(realtimeUrl)
             _status.value = Realtime.Status.CONNECTED
@@ -294,9 +301,12 @@ internal class RealtimeImpl(override val supabaseClient: SupabaseClient, overrid
         ws?.sendSerialized(RealtimeMessage("phoenix", "heartbeat", buildJsonObject { }, heartbeatRef.toString()))
     }
 
-    @SupabaseInternal
-    override fun RealtimeChannel.removeChannel(topic: String) {
-        _subscriptions.remove(topic)
+    override fun removeChannel(channel: RealtimeChannel) {
+        _subscriptions.remove(channel.topic)
+    }
+
+    override fun removeAllChannels() {
+        _subscriptions.clear()
     }
 
     @SupabaseInternal

@@ -1,7 +1,7 @@
 package io.github.jan.supabase.gotrue.providers
 
 import io.github.jan.supabase.SupabaseClient
-import io.github.jan.supabase.gotrue.GoTrue
+import io.github.jan.supabase.gotrue.gotrue
 import io.github.jan.supabase.gotrue.user.UserSession
 import kotlinx.browser.window
 
@@ -18,7 +18,10 @@ actual abstract class OAuthProvider actual constructor() : AuthProvider<External
         val authConfig = ExternalAuthConfig().apply {
             config?.invoke(this)
         }
-        window.location.href = supabaseClient.supabaseHttpUrl + "/${GoTrue.key}/v${GoTrue.API_VERSION}/authorize?provider=$name&redirect_to=${authConfig.redirectUrl}"
+        window.location.href = supabaseClient.gotrue.oAuthUrl(this, redirectUrl ?: authConfig.redirectUrl) {
+            scopes.addAll(authConfig.scopes)
+            queryParams.putAll(authConfig.queryParams)
+        }
     }
 
     actual override suspend fun signUp(
@@ -27,10 +30,7 @@ actual abstract class OAuthProvider actual constructor() : AuthProvider<External
         redirectUrl: String?,
         config: (ExternalAuthConfig.() -> Unit)?
     ) {
-        val authConfig = ExternalAuthConfig().apply {
-            config?.invoke(this)
-        }
-        window.location.href = supabaseClient.supabaseHttpUrl + "/${GoTrue.key}/v${GoTrue.API_VERSION}/authorize?provider=$name&redirect_to=${authConfig.redirectUrl}"
+        login(supabaseClient, onSuccess, redirectUrl, config)
     }
 
     actual companion object

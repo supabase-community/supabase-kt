@@ -4,7 +4,7 @@ A Kotlin Multiplatform Client for Supabase.
 Supported targets:
 - JVM
 - Android
-- JS (Browser)
+- JS (Browser) 
 - IOS (experimental)
 
 *Note: WASM planned see [issue](https://github.com/supabase-community/supabase-kt/issues/86)*
@@ -58,8 +58,8 @@ implementation("io.github.jan-tennert.supabase:[module e.g. functions-kt or gotr
 
 - [Chat Demo (Desktop/Android/Browser)](https://github.com/supabase-community/supabase-kt/tree/master/demos/chat-demo-mpp)
 - [File Upload Demo (Desktop/Android)](https://github.com/supabase-community/supabase-kt/tree/master/demos/file-upload)
-- [Android Native Google login & in-app OAuth (Android)](https://github.com/supabase-community/supabase-kt/tree/development/demos/android-login)
-- [Multi-Factor Authentication (Desktop/Android/Browser)](https://github.com/supabase-community/supabase-kt/tree/development/demos/multi-factor-authentication)
+- [Android Native Google login & in-app OAuth (Android)](https://github.com/supabase-community/supabase-kt/tree/master/demos/android-login)
+- [Multi-Factor Authentication (Desktop/Android/Browser)](https://github.com/supabase-community/supabase-kt/tree/master/demos/multi-factor-authentication)
 - [Groceries Store App (Android)](https://github.com/hieuwu/android-groceries-store)
 
 # Videos
@@ -71,7 +71,7 @@ implementation("io.github.jan-tennert.supabase:[module e.g. functions-kt or gotr
 ### How to contribute
 
 1. Fork the repository
-2. Create a branch
+2. Create a branch 
 3. Make your changes
 4. Submit a pull request with your new branch and add one of the following tags: `fix` or `enhancement`. You might also add one or more label when you are modifying a specific module: `gotrue`, `realtime`, `functions`, `graphql`, `storage`, `postgrest`, `core`
 

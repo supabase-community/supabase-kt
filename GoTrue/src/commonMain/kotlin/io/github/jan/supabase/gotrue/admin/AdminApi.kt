@@ -1,5 +1,6 @@
 package io.github.jan.supabase.gotrue.admin
 
+import io.github.jan.supabase.annotiations.SupabaseInternal
 import io.github.jan.supabase.gotrue.GoTrue
 import io.github.jan.supabase.gotrue.GoTrueImpl
 import io.github.jan.supabase.gotrue.user.UserInfo
@@ -8,6 +9,7 @@ import io.github.jan.supabase.putJsonObject
 import io.github.jan.supabase.safeBody
 import io.github.jan.supabase.supabaseJson
 import io.ktor.client.call.body
+import io.ktor.http.HttpHeaders
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.buildJsonObject
@@ -34,9 +36,14 @@ sealed interface AdminApi {
     suspend fun createUserWithPhone(builder: UserBuilder.Phone.() -> Unit): UserInfo
 
     /**
+     * Removes a user session
+     */
+    suspend fun logout(jwt: String)
+
+    /**
      * Retrieves all users
      */
-    suspend fun retrieveUsers(): List<UserInfo>
+    suspend fun retrieveUsers(page: Int? = null, perPage: Int? = null): List<UserInfo>
 
     /**
      * Retrieves a user by its id
@@ -85,6 +92,12 @@ internal class AdminApiImpl(val gotrue: GoTrue) : AdminApi {
 
     val api = (gotrue as GoTrueImpl).api
 
+    override suspend fun logout(jwt: String) {
+        api.post("logout") {
+            headers[HttpHeaders.Authorization] = "Bearer $jwt"
+        }
+    }
+
     override suspend fun createUserWithEmail(builder: UserBuilder.Email.() -> Unit): UserInfo {
         val userBuilder = UserBuilder.Email().apply(builder) as UserBuilder
         return api.postJson("admin/users", userBuilder).safeBody()
@@ -95,8 +108,11 @@ internal class AdminApiImpl(val gotrue: GoTrue) : AdminApi {
         return api.postJson("admin/users", userBuilder).safeBody()
     }
 
-    override suspend fun retrieveUsers(): List<UserInfo> {
-        return api.get("admin/users").body<JsonObject>().let { supabaseJson.decodeFromJsonElement(it["users"] ?: throw IllegalStateException("Didn't get users json field on method retrieveUsers. Full body: $it")) }
+    override suspend fun retrieveUsers(page: Int?, perPage: Int?): List<UserInfo> {
+        return api.get("admin/users") {
+            page?.let { url.parameters.append("page", it.toString()) }
+            perPage?.let { url.parameters.append("per_page", it.toString()) }
+        }.body<JsonObject>().let { supabaseJson.decodeFromJsonElement(it["users"] ?: throw IllegalStateException("Didn't get users json field on method retrieveUsers. Full body: $it")) }
     }
 
     override suspend fun retrieveUserById(uid: String): UserInfo {
@@ -143,6 +159,7 @@ internal class AdminApiImpl(val gotrue: GoTrue) : AdminApi {
  * @param redirectTo the url to redirect to after the user has clicked the link
  * @param config additional configuration required for [linkType]
  */
+@OptIn(SupabaseInternal::class)
 suspend inline fun <reified C : LinkType.Config> AdminApi.generateLinkFor(
     linkType: LinkType<C>,
     redirectTo: String? = null,

@@ -1,0 +1,40 @@
+[versions]
+kotlin = "1.8.20"
+agp = "8.0.0"
+compose = "1.4.0"
+supabase = "0.9.6-local-2"
+koin = "3.4.0"
+ktor = "2.3.0"
+
+androidx-core = "1.10.0"
+androidx-compat = "1.6.1"
+androidx-lifecycle = "2.6.1"
+androidx-activity = "1.7.1"
+
+[plugins]
+kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
+kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+
+kotlinx-plugin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+
+android-application = { id = "com.android.application", version.ref = "agp" }
+android-library = { id = "com.android.library", version.ref = "agp" }
+
+compose = { id = "org.jetbrains.compose", version.ref = "compose" }
+
+[libraries]
+supabase-gotrue = { module = "io.github.jan-tennert.supabase:gotrue-kt", version.ref = "supabase" }
+
+koin-core = { module = "io.insert-koin:koin-core", version.ref = "koin" }
+koin-android = { module = "io.insert-koin:koin-android", version.ref = "koin" }
+
+androidx-core = { module = "androidx.core:core-ktx", version.ref = "androidx-core" }
+androidx-compat = { module = "androidx.appcompat:appcompat", version.ref = "androidx-compat" }
+androidx-lifecycle-viewmodel-ktx = { module = "androidx.lifecycle:lifecycle-viewmodel-ktx", version.ref = "androidx-lifecycle" }
+androidx-lifecycle-viewmodel-compose = { module = "androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "androidx-lifecycle" }
+androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activity" }
+
+ktor-cio = { module = "io.ktor:ktor-client-cio", version.ref = "ktor" }
+
+[bundles]
+supabase = [ "supabase-gotrue" ]

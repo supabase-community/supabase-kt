@@ -19,7 +19,8 @@ actual abstract class OAuthProvider : AuthProvider<ExternalAuthConfig, Unit> {
     ) {
         val gotrue = supabaseClient.gotrue as GoTrueImpl
         val deepLink = "${gotrue.config.scheme}://${gotrue.config.host}"
-        gotrue.openOAuth(name, redirectUrl ?: deepLink)
+        val externalConfig = ExternalAuthConfig().apply { config?.invoke(this) }
+        gotrue.openOAuth(this, redirectUrl ?: deepLink, externalConfig)
     }
 
     actual override suspend fun signUp(
@@ -28,9 +29,7 @@ actual abstract class OAuthProvider : AuthProvider<ExternalAuthConfig, Unit> {
         redirectUrl: String?,
         config: (ExternalAuthConfig.() -> Unit)?
     ) {
-        val gotrue = supabaseClient.gotrue as GoTrueImpl
-        val deepLink = "${gotrue.config.scheme}://${gotrue.config.host}"
-        gotrue.openOAuth(name, redirectUrl ?: deepLink)
+        login(supabaseClient, onSuccess, redirectUrl, config)
     }
 
     actual companion object

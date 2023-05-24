@@ -2,7 +2,6 @@ package io.github.jan.supabase.postgrest.query
 
 import io.github.jan.supabase.postgrest.PropertyConversionMethod
 import io.github.jan.supabase.postgrest.formatJoiningFilter
-import kotlinx.serialization.SerialName
 import kotlin.reflect.KProperty1
 
 /**
@@ -65,6 +64,38 @@ class PostgrestFilterBuilder(@PublishedApi internal val propertyConversionMethod
     fun like(column: String, pattern: String) = filter(column, FilterOperator.LIKE, pattern)
 
     /**
+     * Finds all rows where the value of the [column] matches all of the specified [patterns]
+     */
+    fun likeAll(column: String, patterns: List<String>) {
+        val columnValue = params[column] ?: emptyList()
+        _params[column] = columnValue + listOf("like(all).{${patterns.joinToString(",")}}")
+    }
+
+    /**
+     * Finds all rows where the value of the [column] matches any of the specified [patterns]
+     */
+    fun likeAny(column: String, patterns: List<String>) {
+        val columnValue = params[column] ?: emptyList()
+        _params[column] = columnValue + listOf("like(any).{${patterns.joinToString(",")}}")
+    }
+
+    /**
+     * Finds all rows where the value of the [column] matches all of the specified [patterns]
+     */
+    fun ilikeAll(column: String, patterns: List<String>) {
+        val columnValue = params[column] ?: emptyList()
+        _params[column] = columnValue + listOf("ilike(all).{${patterns.joinToString(",")}}")
+    }
+
+    /**
+     * Finds all rows where the value of the [column] matches any of the specified [patterns] (case-insensitive)
+     */
+    fun ilikeAny(column: String, patterns: List<String>) {
+        val columnValue = params[column] ?: emptyList()
+        _params[column] = columnValue + listOf("ilike(any).{${patterns.joinToString(",")}}")
+    }
+
+    /**
      * Finds all rows where the value of the [column] matches the specified [pattern] (case-insensitive)
      */
     fun ilike(column: String, pattern: String) = filter(column, FilterOperator.ILIKE, pattern)
@@ -82,47 +113,47 @@ class PostgrestFilterBuilder(@PublishedApi internal val propertyConversionMethod
     /**
      * Finds all rows where the value of the [column] is strictly left of [range]
      */
-    fun sl(column: String, range: LongRange) = filter(column, FilterOperator.SL, "(${range.first},${range.last})")
+    fun sl(column: String, range: Pair<Any, Any>) = filter(column, FilterOperator.SL, "(${range.first},${range.second})")
 
     /**
      * Finds all rows where the value of the [column] is strictly right of [range]
      */
-    fun sr(column: String, range: LongRange) = filter(column, FilterOperator.SR, "(${range.first},${range.last})")
+    fun sr(column: String, range: Pair<Any, Any>) = filter(column, FilterOperator.SR, "(${range.first},${range.second})")
 
     /**
      * Finds all rows where the value of the [column] does not extend to the left of [range]
      */
-    fun nxl(column: String, range: LongRange) = filter(column, FilterOperator.NXL, "(${range.first},${range.last})")
+    fun nxl(column: String, range: Pair<Any, Any>) = filter(column, FilterOperator.NXL, "(${range.first},${range.second})")
 
     /**
      * Finds all rows where the value of the [column] does not extend to the right of [range]
      */
-    fun nxr(column: String, range: LongRange) = filter(column, FilterOperator.NXR, "(${range.first},${range.last})")
+    fun nxr(column: String, range: Pair<Any, Any>) = filter(column, FilterOperator.NXR, "(${range.first},${range.second})")
 
     /**
      * Finds all rows where the value of the [column] is strictly left of [range]
      */
-    fun rangeLte(column: String, range: LongRange) = nxr(column, range)
+    fun rangeLte(column: String, range: Pair<Any, Any>) = nxr(column, range)
 
     /**
      * Finds all rows where the value of the [column] is strictly right of [range]
      */
-    fun rangeGte(column: String, range: LongRange) = nxl(column, range)
+    fun rangeGte(column: String, range: Pair<Any, Any>) = nxl(column, range)
 
     /**
      * Finds all rows where the value of the [column] does not extend to the right of [range]
      */
-    fun rangeLt(column: String, range: LongRange) = sl(column, range)
+    fun rangeLt(column: String, range: Pair<Any, Any>) = sl(column, range)
 
     /**
      * Finds all rows where the value of the [column] does not extend to the right of [range]
      */
-    fun rangeGt(column: String, range: LongRange) = sr(column, range)
+    fun rangeGt(column: String, range: Pair<Any, Any>) = sr(column, range)
 
     /**
      * Finds all rows where the value of the [column] is adjacent to [range]
      */
-    fun adjacent(column: String, range: LongRange) = filter(column, FilterOperator.ADJ, "(${range.first},${range.last})")
+    fun adjacent(column: String, range: Pair<Any, Any>) = filter(column, FilterOperator.ADJ, "(${range.first},${range.second})")
 
     inline fun or(negate: Boolean = false, filter: PostgrestFilterBuilder.() -> Unit) {
         val prefix = if(negate) "not." else ""
@@ -229,79 +260,94 @@ class PostgrestFilterBuilder(@PublishedApi internal val propertyConversionMethod
     fun overlaps(column: String, values: List<Any>) = filter(column, FilterOperator.OV, "{${values.joinToString(",")}}")
 
     /**
-     * Finds all rows where the value of the column with the name of the [KProperty1] (or the value of the [SerialName] annotation on JVM) is equal to [value]
+     * Finds all rows where the value of the column with the name of the [KProperty1] converted using [propertyConversionMethod] is equal to [value]
      */
     infix fun <T, V> KProperty1<T, V>.eq(value: V) = filter(FilterOperation(propertyConversionMethod(this), FilterOperator.EQ, value.toString()))
 
     /**
-     * Finds all rows where the value of the column with the name of the [KProperty1] (or the value of the [SerialName] annotation on JVM) is not equal to [value]
+     * Finds all rows where the value of the column with the name of the [KProperty1] converted using [propertyConversionMethod] is not equal to [value]
      */
     infix fun <T, V> KProperty1<T, V>.neq(value: V) = filter(FilterOperation(propertyConversionMethod(this), FilterOperator.NEQ, value.toString()))
 
     /**
-     * Finds all rows where the value of the column with the name of the [KProperty1] (or the value of the [SerialName] annotation on JVM) is greater than [value]
+     * Finds all rows where the value of the column with the name of the [KProperty1] converted using [propertyConversionMethod] is greater than [value]
      */
     infix fun <T, V> KProperty1<T, V>.gt(value: V) = filter(FilterOperation(propertyConversionMethod(this), FilterOperator.GT, value.toString()))
 
     /**
-     * Finds all rows where the value of the column with the name of the [KProperty1] (or the value of the [SerialName] annotation on JVM) is greater than or equal to [value]
+     * Finds all rows where the value of the column with the name of the [KProperty1] converted using [propertyConversionMethod] is greater than or equal to [value]
      */
     infix fun <T, V> KProperty1<T, V>.gte(value: V) = filter(FilterOperation(propertyConversionMethod(this), FilterOperator.GTE, value.toString()))
 
     /**
-     * Finds all rows where the value of the column with the name of the [KProperty1] (or the value of the [SerialName] annotation on JVM) is less than [value]
+     * Finds all rows where the value of the column with the name of the [KProperty1] converted using [propertyConversionMethod] is less than [value]
      */
     infix fun <T, V> KProperty1<T, V>.lt(value: V) = filter(FilterOperation(propertyConversionMethod(this), FilterOperator.LT, value.toString()))
 
     /**
-     * Finds all rows where the value of the column with the name of the [KProperty1] (or the value of the [SerialName] annotation on JVM) is less than or equal to [value]
+     * Finds all rows where the value of the column with the name of the [KProperty1] converted using [propertyConversionMethod] is less than or equal to [value]
      */
     infix fun <T, V> KProperty1<T, V>.lte(value: V) = filter(FilterOperation(propertyConversionMethod(this), FilterOperator.LTE, value.toString()))
 
     /**
-     * Finds all rows where the value of the column with the name of the [KProperty1] (or the value of the [SerialName] annotation on JVM) matches the specified [pattern]
+     * Finds all rows where the value of the column with the name of the [KProperty1] converted using [propertyConversionMethod] matches the specified [pattern]
      */
     infix fun <T, V> KProperty1<T, V>.like(pattern: String) = filter(FilterOperation(propertyConversionMethod(this), FilterOperator.LIKE, pattern))
 
     /**
-     * Finds all rows where the value of the column with the name of the [KProperty1] (or the value of the [SerialName] annotation on JVM) matches the specified [pattern] (case-insensitive)
+     * Finds all rows where the value of the column with the name of the [KProperty1] converted using [propertyConversionMethod] matches the specified [pattern] (case-insensitive)
      */
     infix fun <T, V> KProperty1<T, V>.ilike(pattern: String) = filter(FilterOperation(propertyConversionMethod(this), FilterOperator.ILIKE, pattern))
 
     /**
-     * Finds all rows where the value of the column with the name of the [KProperty1] (or the value of the [SerialName] annotation on JVM) equals to one of these values: null,true,false,unknown
+     * Finds all rows where the value of the column with the name of the [KProperty1] converted using [propertyConversionMethod] equals to one of these values: null,true,false,unknown
      */
     infix fun <T, V> KProperty1<T, V>.isExact(value: Boolean?) = filter(FilterOperation(propertyConversionMethod(this), FilterOperator.IS, value.toString()))
 
     /**
-     * Finds all rows where the value of the column with the name of the [KProperty1] (or the value of the [SerialName] annotation on JVM) is in the specified [list]
+     * Finds all rows where the value of the column with the name of the [KProperty1] converted using [propertyConversionMethod] is in the specified [list]
      */
     infix fun <T, V> KProperty1<T, V>.isIn(list: List<V>) = filter(FilterOperation(propertyConversionMethod(this), FilterOperator.IN, "(${list.joinToString(",")})"))
 
     /**
-     * Finds all rows where the value of the column with the name of the [KProperty1] (or the value of the [SerialName] annotation on JVM) is strictly left of [range]
+     * Finds all rows where the value of the column with the name of the [KProperty1] converted using [propertyConversionMethod] is strictly left of [range]
      */
-    infix fun <T, V> KProperty1<T, V>.rangeLt(range: LongRange) = this@PostgrestFilterBuilder.rangeLt(propertyConversionMethod(this), range)
+    infix fun <T, V> KProperty1<T, V>.rangeLt(range: Pair<Any, Any>) = this@PostgrestFilterBuilder.rangeLt(propertyConversionMethod(this), range)
 
     /**
-     * Finds all rows where the value of the column with the name of the [KProperty1] (or the value of the [SerialName] annotation on JVM) does not extend to the left of [range]
+     * Finds all rows where the value of the column with the name of the [KProperty1] converted using [propertyConversionMethod] does not extend to the left of [range]
      */
-    infix fun <T, V> KProperty1<T, V>.rangeLte(range: LongRange) = this@PostgrestFilterBuilder.rangeLte(propertyConversionMethod(this), range)
+    infix fun <T, V> KProperty1<T, V>.rangeLte(range: Pair<Any, Any>) = this@PostgrestFilterBuilder.rangeLte(propertyConversionMethod(this), range)
 
     /**
-     * Finds all rows where the value of the column with the name of the [KProperty1] (or the value of the [SerialName] annotation on JVM) does not extend to the right of [range]
+     * Finds all rows where the value of the column with the name of the [KProperty1] converted using [propertyConversionMethod] does not extend to the right of [range]
      */
-    infix fun <T, V> KProperty1<T, V>.rangeGt(range: LongRange) = this@PostgrestFilterBuilder.rangeGt(propertyConversionMethod(this), range)
+    infix fun <T, V> KProperty1<T, V>.rangeGt(range: Pair<Any, Any>) = this@PostgrestFilterBuilder.rangeGt(propertyConversionMethod(this), range)
 
     /**
-     * Finds all rows where the value of the column with the name of the [KProperty1] (or the value of the [SerialName] annotation on JVM) does not strictly right of [range]
+     * Finds all rows where the value of the column with the name of the [KProperty1] converted using [propertyConversionMethod] does not strictly right of [range]
      */
-    infix fun <T, V> KProperty1<T, V>.rangeGte(range: LongRange) = this@PostgrestFilterBuilder.rangeGte(propertyConversionMethod(this), range)
+    infix fun <T, V> KProperty1<T, V>.rangeGte(range: Pair<Any, Any>) = this@PostgrestFilterBuilder.rangeGte(propertyConversionMethod(this), range)
 
     /**
-     * Finds all rows where the value of the column with the name of the [KProperty1] (or the value of the [SerialName] annotation on JVM) is adjacent to the specified [range]
+     * Finds all rows where the value of the column with the name of the [KProperty1] converted using [propertyConversionMethod] is adjacent to the specified [range]
      */
-    infix fun <T, V> KProperty1<T, V>.adjacent(range: LongRange) = this@PostgrestFilterBuilder.adjacent(propertyConversionMethod(this), range)
+    infix fun <T, V> KProperty1<T, V>.adjacent(range: Pair<Any, Any>) = this@PostgrestFilterBuilder.adjacent(propertyConversionMethod(this), range)
+
+    /**
+     * Finds all rows where the value of the column with the name of the [KProperty1] converted using [propertyConversionMethod] overlaps with [values]
+     */
+    infix fun <T, V> KProperty1<T, V>.overlaps(values: List<Any>) = this@PostgrestFilterBuilder.overlaps(propertyConversionMethod(this), values)
+
+    /**
+     * Finds all rows where the value of the column with the name of the [KProperty1] converted using [propertyConversionMethod] contains [values]
+     */
+    infix fun <T, V> KProperty1<T, V>.contains(values: List<Any>) = this@PostgrestFilterBuilder.contains(propertyConversionMethod(this), values)
+
+    /**
+     * Finds all rows where the value of the column with the name of the [KProperty1] converted using [propertyConversionMethod] is contained in [values]
+     */
+    infix fun <T, V> KProperty1<T, V>.contained(values: List<Any>) = this@PostgrestFilterBuilder.contained(propertyConversionMethod(this), values)
 
 }
 

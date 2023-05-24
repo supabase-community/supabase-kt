@@ -125,6 +125,7 @@ kotlin {
                 api(libs.napier)
                 api(libs.bundles.ktor.client)
                 api(libs.kotlinx.atomicfu)
+                api(libs.stately)
             }
         }
         val commonTest by getting {

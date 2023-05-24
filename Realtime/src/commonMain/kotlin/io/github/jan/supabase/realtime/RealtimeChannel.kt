@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.buildJsonObject
@@ -40,8 +41,9 @@ sealed interface RealtimeChannel {
 
     /**
      * Joins the channel
+     * @param blockUntilJoined if true, the method will block until the [status] is [Status.JOINED]
      */
-    suspend fun join()
+    suspend fun join(blockUntilJoined: Boolean = false)
 
     /**
      * Updates the JWT token for this client
@@ -113,7 +115,7 @@ internal class RealtimeChannelImpl(
     override val supabaseClient = realtimeImpl.supabaseClient
 
     @OptIn(SupabaseInternal::class)
-    override suspend fun join() {
+    override suspend fun join(blockUntilJoined: Boolean) {
         realtimeImpl.run {
             addChannel(this@RealtimeChannelImpl)
         }
@@ -130,10 +132,14 @@ internal class RealtimeChannelImpl(
         }
         Napier.d { "Joining realtime socket with body $joinConfigObject" }
         realtimeImpl.ws?.sendSerialized(RealtimeMessage(topic, RealtimeChannel.CHANNEL_EVENT_JOIN, joinConfigObject, null))
+        if(blockUntilJoined) {
+            status.first { it == RealtimeChannel.Status.JOINED }
+        }
     }
 
     @OptIn(SupabaseInternal::class)
     fun onMessage(message: RealtimeMessage) {
+        println(message)
         when {
             message.event == "system" && message.payload["status"]?.jsonPrimitive?.content == "ok" -> {
                 Napier.d { "Joined channel ${message.topic}" }
@@ -165,7 +171,7 @@ internal class RealtimeChannelImpl(
             }
             message.event == RealtimeChannel.CHANNEL_EVENT_CLOSE -> {
                 realtimeImpl.run {
-                    removeChannel(topic)
+                    removeChannel(this@RealtimeChannelImpl)
                 }
                 Napier.d { "Left channel ${message.topic}" }
             }

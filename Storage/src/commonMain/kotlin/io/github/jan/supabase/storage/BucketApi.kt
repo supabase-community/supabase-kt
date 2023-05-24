@@ -213,6 +213,7 @@ sealed interface BucketApi {
 
     /**
      * Creates a signed url to upload without authentication.
+     * These urls are valid for 2 hours.
      * @param path The path to create an url for
      */
     suspend fun createUploadSignedUrl(path: String): UploadSignedUrl
@@ -352,7 +353,7 @@ sealed interface BucketApi {
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
-    suspend fun list(prefix: String, filter: BucketListFilter.() -> Unit = {}): List<BucketItem>
+    suspend fun list(prefix: String = "", filter: BucketListFilter.() -> Unit = {}): List<BucketItem>
 
     /**
      * Changes the bucket's public status to [public]

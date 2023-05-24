@@ -8,9 +8,10 @@ import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.MissingFieldException
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.decodeFromJsonElement
+import kotlinx.serialization.json.encodeToJsonElement
+import kotlinx.serialization.json.jsonObject
 
 /**
  * Authentication method with id token, client id, provider and optionally nonce.
@@ -20,8 +21,15 @@ import kotlinx.serialization.json.decodeFromJsonElement
  */
 object IDToken : DefaultAuthProvider<IDToken.Config, IDToken.Result> {
 
-    @Serializable(with = DefaultAuthProvider.Config.Companion::class)
-    data class Config(@SerialName("id_token") var idToken: String = "", @SerialName("client_id") var clientId: String = "", var provider: IDTokenProvider? = null, var nonce: String? = null): DefaultAuthProvider.Config()
+    override val grantType: String = "id_token"
+
+    @Serializable
+    data class Config(
+        @SerialName("id_token") var idToken: String = "",
+        @SerialName("client_id") var clientId: String = "",
+        var provider: IDTokenProvider? = null,
+        var nonce: String? = null
+    ) : DefaultAuthProvider.Config()
 
     @Serializable
     data class Result(
@@ -38,6 +46,6 @@ object IDToken : DefaultAuthProvider<IDToken.Config, IDToken.Result> {
         throw SupabaseEncodingException("Couldn't decode sign up id token result. Input: $json")
     }
 
-    override fun encodeCredentials(credentials: Config.() -> Unit): String = supabaseJson.encodeToString(Config().apply(credentials))
+    override fun encodeCredentials(credentials: Config.() -> Unit): JsonObject = supabaseJson.encodeToJsonElement(Config().apply(credentials)).jsonObject
 
 }

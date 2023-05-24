@@ -41,7 +41,6 @@ kotlin {
             dependencies {
                 api(project(":gotrue-kt"))
                 api(libs.cache4k)
-                api(libs.stately)
             }
         }
         val nonJsMain by creating {
