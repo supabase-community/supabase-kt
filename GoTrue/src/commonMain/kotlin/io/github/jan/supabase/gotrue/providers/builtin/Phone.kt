@@ -31,7 +31,7 @@ object Phone : DefaultAuthProvider<Phone.Config, Phone.Result> {
      * @param channel The channel to send the confirmation to
      */
     @Serializable
-    data class Config(var phoneNumber: String = "", var password: String = "", var channel: Channel = Channel.SMS): DefaultAuthProvider.Config()
+    data class Config(@SerialName("phone") var phoneNumber: String = "", var password: String = "", var channel: Channel = Channel.SMS): DefaultAuthProvider.Config()
 
     /**
      * Represents the phone number confirmation channel
