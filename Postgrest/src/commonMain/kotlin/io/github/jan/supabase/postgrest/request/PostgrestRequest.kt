@@ -1,5 +1,7 @@
+@file:Suppress("UndocumentedPublicClass", "UndocumentedPublicFunction", "UndocumentedPublicProperty")
 package io.github.jan.supabase.postgrest.request
 
+import io.github.jan.supabase.annotiations.SupabaseInternal
 import io.github.jan.supabase.bodyOrNull
 import io.github.jan.supabase.gotrue.GoTrue
 import io.github.jan.supabase.postgrest.Postgrest
@@ -19,6 +21,7 @@ import io.ktor.http.parametersOf
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonElement
 
+@SupabaseInternal
 sealed interface PostgrestRequest {
 
     val body: JsonElement? get() = null

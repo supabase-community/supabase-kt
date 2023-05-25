@@ -6,9 +6,14 @@ import io.github.jan.supabase.gotrue.gotrue
 import io.github.jan.supabase.gotrue.openOAuth
 import io.github.jan.supabase.gotrue.user.UserSession
 
-
+/**
+ * Represents an OAuth provider.
+ */
 actual abstract class OAuthProvider : AuthProvider<ExternalAuthConfig, Unit> {
 
+    /**
+     * The name of the provider.
+     */
     actual abstract val name: String
 
     actual override suspend fun login(

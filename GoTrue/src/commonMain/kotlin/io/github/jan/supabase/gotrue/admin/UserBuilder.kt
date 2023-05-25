@@ -12,10 +12,20 @@ import kotlinx.serialization.json.JsonObjectBuilder
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
 
+/**
+ * A builder for creating a new user when signing up.
+ */
 @Serializable(with = UserBuilder.Companion::class)
 sealed class UserBuilder {
 
+    /**
+     * Extra user metadata
+     */
     var userMetadata: JsonObject? = null
+
+    /**
+     * Extra app metadata
+     */
     var appMetadata: JsonObject? = null
 
     /**
@@ -64,14 +74,14 @@ sealed class UserBuilder {
         }
 
         override fun deserialize(decoder: Decoder): UserBuilder {
-            throw IllegalStateException("This serializer is only used for serialization")
+            error("This serializer is only used for serialization")
         }
 
         override fun serialize(encoder: Encoder, value: UserBuilder) {
             encoder as JsonEncoder
-            if(value.password.isBlank()) throw IllegalArgumentException("Password must not be blank")
-            if(value is Email && value.email.isBlank()) throw IllegalArgumentException("Email must not be blank")
-            if(value is Phone && value.phoneNumber.isBlank()) throw IllegalArgumentException("Phone number must not be blank")
+            require(value.password.isNotBlank()) { "Password must not be blank" }
+            require(!(value is Email && value.email.isBlank())) { "Email must not be blank" }
+            require(!(value is Phone && value.phoneNumber.isBlank())) { "Phone number must not be blank" }
             encoder.encodeJsonElement(buildJsonObject {
                 put("password", value.password)
                 value.userMetadata?.let { put("user_metadata", it) }

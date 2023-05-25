@@ -7,6 +7,9 @@ package io.github.jan.supabase.gotrue
  */
 sealed interface OtpType {
 
+    /**
+     * The type of the OTP
+     */
     val type: String
 
     /**

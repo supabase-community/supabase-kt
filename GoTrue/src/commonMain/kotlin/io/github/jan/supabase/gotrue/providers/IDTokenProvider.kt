@@ -7,6 +7,9 @@ import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 
+/**
+ * Represents an OAuthProvider capable of authenticating via an id token
+ */
 @Serializable(with = IDTokenProvider.Companion::class)
 sealed class IDTokenProvider: OAuthProvider() {
 

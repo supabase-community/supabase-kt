@@ -42,14 +42,15 @@ import io.ktor.http.appendEncodedPathSegments
  */
 class Functions(override val config: Config, override val supabaseClient: SupabaseClient) : MainPlugin<Functions.Config> {
 
-    override val API_VERSION: Int
+    override val apiVersion: Int
         get() = Functions.API_VERSION
 
-    override val PLUGIN_KEY: String
+    override val pluginKey: String
         get() = key
 
     private val baseUrl = supabaseClient.supabaseHttpUrl.replaceFirst(".", ".functions.")
 
+    @OptIn(SupabaseInternal::class)
     @PublishedApi
     internal val api = supabaseClient.authenticatedSupabaseApi(this)
 
@@ -118,6 +119,11 @@ class Functions(override val config: Config, override val supabaseClient: Supaba
         }
     }
 
+    /**
+     * The config for the [Functions] plugin
+     * @param customUrl A custom url to use for the requests. If not provided, the default url will be used
+     * @param jwtToken A jwt token to use for the requests. If not provided, the token from the [GoTrue] plugin, or the supabaseKey will be used
+     */
     data class Config(
         override var customUrl: String? = null,
         override var jwtToken: String? = null,
@@ -126,6 +132,10 @@ class Functions(override val config: Config, override val supabaseClient: Supaba
     companion object : SupabasePluginProvider<Config, Functions> {
 
         override val key = "functions"
+
+        /**
+         * The current functions api version
+         */
         const val API_VERSION = 1
 
         override fun create(supabaseClient: SupabaseClient, config: Config): Functions {

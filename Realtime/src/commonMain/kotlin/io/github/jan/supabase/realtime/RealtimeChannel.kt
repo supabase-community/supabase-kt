@@ -32,8 +32,19 @@ import kotlinx.serialization.json.putJsonObject
  */
 sealed interface RealtimeChannel {
 
+    /**
+     * The status of the channel as a [StateFlow]
+     */
     val status: StateFlow<Status>
+
+    /**
+     * The topic of the channel
+     */
     val topic: String
+
+    /**
+     * The current [SupabaseClient]
+     */
     val supabaseClient: SupabaseClient
 
     @SupabaseInternal
@@ -77,6 +88,9 @@ sealed interface RealtimeChannel {
     @SupabaseInternal
     fun RealtimeChannel.addPostgresChange(data: PostgresJoinConfig)
 
+    /**
+     * Represents the status of a channel
+     */
     enum class Status {
         CLOSED,
         JOINING,
@@ -84,17 +98,20 @@ sealed interface RealtimeChannel {
         LEAVING,
     }
 
+    @Suppress("UndocumentedPublicProperty")
     companion object {
         const val CHANNEL_EVENT_JOIN = "phx_join"
         const val CHANNEL_EVENT_LEAVE = "phx_leave"
         const val CHANNEL_EVENT_CLOSE = "phx_close"
         const val CHANNEL_EVENT_ERROR = "phx_error"
         const val CHANNEL_EVENT_REPLY = "phx_reply"
+        const val CHANNEL_EVENT_SYSTEM = "system"
         const val CHANNEL_EVENT_BROADCAST = "broadcast"
         const val CHANNEL_EVENT_ACCESS_TOKEN = "access_token"
         const val CHANNEL_EVENT_PRESENCE = "presence"
         const val CHANNEL_EVENT_PRESENCE_DIFF = "presence_diff"
         const val CHANNEL_EVENT_PRESENCE_STATE = "presence_state"
+        const val CHANNEL_EVENT_POSTGRES_CHANGES = "postgres_changes"
     }
 
 }
@@ -139,13 +156,16 @@ internal class RealtimeChannelImpl(
 
     @OptIn(SupabaseInternal::class)
     fun onMessage(message: RealtimeMessage) {
-        println(message)
-        when {
-            message.event == "system" && message.payload["status"]?.jsonPrimitive?.content == "ok" -> {
+        if(message.eventType == null) {
+            Napier.e { "Received message without event type: $message" }
+            return
+        }
+        when(message.eventType) {
+            RealtimeMessage.EventType.SYSTEM -> {
                 Napier.d { "Joined channel ${message.topic}" }
                 _status.value = RealtimeChannel.Status.JOINED
             }
-            message.event == RealtimeChannel.CHANNEL_EVENT_REPLY && message.payload["response"]?.jsonObject?.containsKey("postgres_changes") ?: false -> { //check if the server postgres_changes match with the client's and add the given id to the postgres change objects (to identify them later in the events)
+            RealtimeMessage.EventType.POSTGRES_SERVER_CHANGES -> { //check if the server postgres_changes match with the client's and add the given id to the postgres change objects (to identify them later in the events)
                 val serverPostgresChanges = message.payload["response"]?.jsonObject?.get("postgres_changes")?.jsonArray?.let { Json.decodeFromJsonElement<List<PostgresJoinConfig>>(it) } ?: listOf() //server postgres changes
                 callbackManager.serverChanges = serverPostgresChanges
                 if(status.value != RealtimeChannel.Status.JOINED) {
@@ -153,7 +173,7 @@ internal class RealtimeChannelImpl(
                     _status.value = RealtimeChannel.Status.JOINED
                 }
             }
-            message.event == "postgres_changes" -> {
+            RealtimeMessage.EventType.POSTGRES_CHANGES -> {
                 val data = message.payload["data"]?.jsonObject ?: return
                 val ids = message.payload["ids"]?.jsonArray?.mapNotNull { it.jsonPrimitive.longOrNull } ?: emptyList() //the ids of the matching postgres changes
                 val action = when(data["type"]?.jsonPrimitive?.content ?: "") {
@@ -161,29 +181,29 @@ internal class RealtimeChannelImpl(
                     "DELETE" -> supabaseJson.decodeFromJsonElement<PostgresAction.Delete>(data)
                     "INSERT" -> supabaseJson.decodeFromJsonElement<PostgresAction.Insert>(data)
                     "SELECT" -> supabaseJson.decodeFromJsonElement<PostgresAction.Select>(data)
-                    else -> throw IllegalStateException("Unknown event type ${message.event}")
+                    else -> error("Unknown event type ${message.event}")
                 }
                 callbackManager.triggerPostgresChange(ids, action)
             }
-            message.event == RealtimeChannel.CHANNEL_EVENT_BROADCAST -> {
+            RealtimeMessage.EventType.BROADCAST -> {
                 val event = message.payload["event"]?.jsonPrimitive?.content ?: ""
                 callbackManager.triggerBroadcast(event, message.payload["payload"]?.jsonObject ?: JsonObject(mutableMapOf()))
             }
-            message.event == RealtimeChannel.CHANNEL_EVENT_CLOSE -> {
+            RealtimeMessage.EventType.CLOSE -> {
                 realtimeImpl.run {
                     removeChannel(this@RealtimeChannelImpl)
                 }
                 Napier.d { "Left channel ${message.topic}" }
             }
-            message.event == RealtimeChannel.CHANNEL_EVENT_ERROR -> {
+            RealtimeMessage.EventType.ERROR -> {
                 Napier.e { "Received an error in channel ${message.topic}. That could be as a result of an invalid access token" }
             }
-            message.event == RealtimeChannel.CHANNEL_EVENT_PRESENCE_DIFF -> {
+            RealtimeMessage.EventType.PRESENCE_DIFF -> {
                 val joins = message.payload["joins"]?.jsonObject?.decodeIfNotEmptyOrDefault(mapOf<String, Presence>()) ?: emptyMap()
                 val leaves = message.payload["leaves"]?.jsonObject?.decodeIfNotEmptyOrDefault(mapOf<String, Presence>()) ?: emptyMap()
                 callbackManager.triggerPresenceDiff(joins, leaves)
             }
-            message.event == RealtimeChannel.CHANNEL_EVENT_PRESENCE_STATE -> {
+            RealtimeMessage.EventType.PRESENCE_STATE -> {
                 val joins = message.payload.decodeIfNotEmptyOrDefault(mapOf<String, Presence>())
                 callbackManager.triggerPresenceDiff(joins, mapOf())
             }
@@ -204,7 +224,7 @@ internal class RealtimeChannelImpl(
     }
 
     override suspend fun broadcast(event: String, message: JsonObject) {
-        if(status.value != RealtimeChannel.Status.JOINED) throw IllegalStateException("Cannot broadcast to a channel you didn't join. Did you forget to call join()?")
+        if(status.value != RealtimeChannel.Status.JOINED) error("Cannot broadcast to a channel you didn't join. Did you forget to call join()?")
         realtimeImpl.ws?.sendSerialized(RealtimeMessage(topic, "broadcast", buildJsonObject {
             put("type", "broadcast")
             put("event", event)
@@ -277,14 +297,14 @@ fun RealtimeChannel.presenceChangeFlow(): Flow<PresenceAction> {
  */
 @OptIn(SupabaseInternal::class)
 inline fun <reified T : PostgresAction> RealtimeChannel.postgresChangeFlow(schema: String, filter: PostgresChangeFilter.() -> Unit = {}): Flow<T> {
-    if(status.value == RealtimeChannel.Status.JOINED) throw IllegalStateException("You cannot call postgresChangeFlow after joining the channel")
+    if(status.value == RealtimeChannel.Status.JOINED) error("You cannot call postgresChangeFlow after joining the channel")
     val event = when(T::class) {
         PostgresAction.Insert::class -> "INSERT"
         PostgresAction.Update::class -> "UPDATE"
         PostgresAction.Delete::class -> "DELETE"
         PostgresAction.Select::class -> "SELECT"
         PostgresAction::class -> "*"
-        else -> throw IllegalStateException("Unknown event type ${T::class}")
+        else -> error("Unknown event type ${T::class}")
     }
     val postgrestBuilder = PostgresChangeFilter(event, schema).apply(filter)
     val config = postgrestBuilder.buildConfig()

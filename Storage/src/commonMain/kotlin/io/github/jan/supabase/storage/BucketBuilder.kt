@@ -1,6 +1,7 @@
+@file:Suppress("UndocumentedPublicProperty")
 package io.github.jan.supabase.storage
 
-import io.ktor.http.*
+import io.ktor.http.ContentType
 import kotlin.jvm.JvmName
 
 /**

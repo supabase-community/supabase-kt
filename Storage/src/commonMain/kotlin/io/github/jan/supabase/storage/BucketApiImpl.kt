@@ -43,7 +43,7 @@ internal class BucketApiImpl(override val bucketId: String, val storage: Storage
         HttpMethod.Put, bucketId, path, data, upsert)
 
     @SupabaseExperimental
-    override suspend fun updateAsFlow(path: String, data: UploadData, upsert: Boolean): Flow<UploadStatus> = callbackFlow {
+    override fun updateAsFlow(path: String, data: UploadData, upsert: Boolean): Flow<UploadStatus> = callbackFlow {
         val key = uploadOrUpdate(HttpMethod.Put, bucketId, path, data, upsert) {
             onUpload { bytesSentTotal, contentLength ->
                 trySend(UploadStatus.Progress(bytesSentTotal, contentLength))
@@ -58,7 +58,7 @@ internal class BucketApiImpl(override val bucketId: String, val storage: Storage
     }
 
     @SupabaseExperimental
-    override suspend fun uploadToSignedUrlAsFlow(
+    override fun uploadToSignedUrlAsFlow(
         path: String,
         token: String,
         data: UploadData,
@@ -77,12 +77,12 @@ internal class BucketApiImpl(override val bucketId: String, val storage: Storage
 
     override suspend fun createUploadSignedUrl(path: String): UploadSignedUrl {
         val result = storage.api.post("object/upload/sign/$bucketId/$path")
-        val urlPath = result.body<JsonObject>()["url"]?.jsonPrimitive?.content ?: throw IllegalStateException("Expected a url in create upload signed url response")
+        val urlPath = result.body<JsonObject>()["url"]?.jsonPrimitive?.content ?: error("Expected a url in create upload signed url response")
         val url = Url(storage.resolveUrl(urlPath))
         return UploadSignedUrl(
             url = url.toString(),
             path = path,
-            token = url.parameters["token"] ?: throw IllegalStateException("Expected a token in create upload signed url response")
+            token = url.parameters["token"] ?: error("Expected a token in create upload signed url response")
         )
     }
 
@@ -90,7 +90,7 @@ internal class BucketApiImpl(override val bucketId: String, val storage: Storage
         HttpMethod.Post, bucketId, path, data, upsert)
 
     @SupabaseExperimental
-    override suspend fun uploadAsFlow(path: String, data: UploadData, upsert: Boolean): Flow<UploadStatus> {
+    override fun uploadAsFlow(path: String, data: UploadData, upsert: Boolean): Flow<UploadStatus> {
         return callbackFlow {
             val key = uploadOrUpdate(HttpMethod.Post, bucketId, path, data, upsert) {
                 onUpload { bytesSentTotal, contentLength ->
@@ -139,7 +139,7 @@ internal class BucketApiImpl(override val bucketId: String, val storage: Storage
             transformation.resize?.let { put("resize", it.name.lowercase()) }
         }).body<JsonObject>()
         return body["signedURL"]?.jsonPrimitive?.content?.substring(1)
-            ?: throw IllegalStateException("Expected signed url in response")
+            ?: error("Expected signed url in response")
     }
 
     override suspend fun createSignedUrls(expiresIn: Duration, paths: Collection<String>): List<SignedUrl> {
@@ -161,7 +161,7 @@ internal class BucketApiImpl(override val bucketId: String, val storage: Storage
     }
 
     @SupabaseExperimental
-    override suspend fun downloadAuthenticatedAsFlow(
+    override fun downloadAuthenticatedAsFlow(
         path: String,
         transform: ImageTransformation.() -> Unit
     ): Flow<DownloadStatus> {
@@ -185,7 +185,7 @@ internal class BucketApiImpl(override val bucketId: String, val storage: Storage
     }
 
     @SupabaseExperimental
-    override suspend fun downloadPublicAsFlow(path: String, transform: ImageTransformation.() -> Unit): Flow<DownloadStatus> {
+    override fun downloadPublicAsFlow(path: String, transform: ImageTransformation.() -> Unit): Flow<DownloadStatus> {
         return callbackFlow {
             val data = storage.api.rawRequest {
                 prepareDownloadRequest(path, true, transform)
@@ -208,7 +208,7 @@ internal class BucketApiImpl(override val bucketId: String, val storage: Storage
     }
 
     @SupabaseExperimental
-    override suspend fun downloadAuthenticatedAsFlow(
+    override fun downloadAuthenticatedAsFlow(
         path: String,
         channel: ByteWriteChannel,
         transform: ImageTransformation.() -> Unit
@@ -223,7 +223,7 @@ internal class BucketApiImpl(override val bucketId: String, val storage: Storage
     }
 
     @SupabaseExperimental
-    override suspend fun downloadPublicAsFlow(
+    override fun downloadPublicAsFlow(
         path: String,
         channel: ByteWriteChannel,
         transform: ImageTransformation.() -> Unit
@@ -278,7 +278,7 @@ internal class BucketApiImpl(override val bucketId: String, val storage: Storage
             header("x-upsert", upsert.toString())
             extra()
         }.body<JsonObject>()["Key"]?.jsonPrimitive?.content
-            ?: throw IllegalStateException("Expected a key in a upload response")
+            ?: error("Expected a key in a upload response")
     }
 
     private suspend fun uploadToSignedUrl(path: String, token: String, data: UploadData, upsert: Boolean, extra: HttpRequestBuilder.() -> Unit = {}): String {
@@ -292,7 +292,7 @@ internal class BucketApiImpl(override val bucketId: String, val storage: Storage
             header(HttpHeaders.ContentType, ContentType.defaultForFilePath(path))
             header("x-upsert", upsert.toString())
             extra()
-        }.body<JsonObject>()["Key"]?.jsonPrimitive?.content ?: throw IllegalStateException("Expected a key in a upload response")
+        }.body<JsonObject>()["Key"]?.jsonPrimitive?.content ?: error("Expected a key in a upload response")
     }
 
     override suspend fun changePublicStatusTo(public: Boolean) = storage.changePublicStatus(bucketId, public)

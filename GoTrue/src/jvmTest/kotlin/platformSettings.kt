@@ -1,4 +1,3 @@
 import io.github.jan.supabase.gotrue.GoTrueConfig
 
-actual fun GoTrueConfig.platformSettings() {
-}
+actual fun GoTrueConfig.platformSettings() = Unit

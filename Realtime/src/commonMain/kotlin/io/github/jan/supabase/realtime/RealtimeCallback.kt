@@ -1,7 +1,9 @@
 package io.github.jan.supabase.realtime
 
+import io.github.jan.supabase.annotiations.SupabaseInternal
 import kotlinx.serialization.json.JsonObject
 
+@SupabaseInternal
 sealed interface RealtimeCallback <T> {
 
     val callback: (T) -> Unit

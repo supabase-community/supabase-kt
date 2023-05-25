@@ -14,6 +14,8 @@ import kotlinx.serialization.Serializable
  * Check the [docs](https://supabase.com/docs/guides/auth/sso/auth-sso-saml) for more information.
  *
  * Create a new instance with [withDomain] or [withProvider].
+ *
+ * @param config The config for the SSO provider
  */
 class SSO<Config: SSO.Config> private constructor(val config: Config): AuthProvider<Config, Unit> {
 
@@ -29,17 +31,20 @@ class SSO<Config: SSO.Config> private constructor(val config: Config): AuthProvi
 
         /**
          * Config for a SSO provider with a domain
+         * @param domain The domain of the SSO provider
          */
         data class Domain(val domain: String) : Config()
 
         /**
          * Config for a SSO provider with a provider id
+         * @param providerId The provider id of the SSO provider
          */
         data class Provider(val providerId: String) : Config()
     }
 
     /**
      * The result of a SSO login
+     * @param url The url to redirect to
      */
     @Serializable
     data class Result(

@@ -1,5 +1,6 @@
 package io.github.jan.supabase.gotrue.providers.builtin
 
+import io.github.jan.supabase.annotiations.SupabaseInternal
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.descriptors.buildClassSerialDescriptor
@@ -11,6 +12,7 @@ import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
 
+@SupabaseInternal
 object CaptchaTokenSerializer: KSerializer<String> {
     override val descriptor: SerialDescriptor = buildClassSerialDescriptor("CaptchaTokenSerializer") {
         element<JsonObject>("gotrue_meta_security")

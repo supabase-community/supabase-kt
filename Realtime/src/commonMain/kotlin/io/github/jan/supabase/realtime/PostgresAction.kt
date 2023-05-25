@@ -15,6 +15,9 @@ import kotlinx.serialization.json.decodeFromJsonElement
 @Serializable
 data class Column(val name: String, val type: String)
 
+/**
+ * Represents a postgres action, containing a record.
+ */
 interface HasRecord {
 
     /**
@@ -23,6 +26,9 @@ interface HasRecord {
     val record: JsonObject
 }
 
+/**
+ * Represents a postgres action, containing an old record.
+ */
 interface HasOldRecord {
 
     /**
@@ -31,6 +37,9 @@ interface HasOldRecord {
     val oldRecord: JsonObject
 }
 
+/**
+ * Represents a postgres action
+ */
 sealed interface PostgresAction {
 
     /**
@@ -43,6 +52,9 @@ sealed interface PostgresAction {
      */
     val commitTimestamp: Instant
 
+    /**
+     * Represents a postgres insert action
+     */
     @Serializable
     data class Insert(
         override val record: JsonObject,
@@ -51,6 +63,9 @@ sealed interface PostgresAction {
         override val commitTimestamp: Instant,
     ) : PostgresAction, HasRecord
 
+    /**
+     * Represents a postgres update action
+     */
     @Serializable
     data class Update(
         override val record: JsonObject,
@@ -61,6 +76,9 @@ sealed interface PostgresAction {
         override val commitTimestamp: Instant,
     ) : PostgresAction, HasRecord, HasOldRecord
 
+    /**
+     * Represents a postgres delete action
+     */
     @Serializable
     data class Delete(
         @SerialName("old_record")
@@ -70,6 +88,9 @@ sealed interface PostgresAction {
         override val commitTimestamp: Instant,
     ) : PostgresAction, HasOldRecord
 
+    /**
+     * Represents a postgres select action
+     */
     @Serializable
     data class Select(
         override val record: JsonObject,
@@ -82,6 +103,7 @@ sealed interface PostgresAction {
 
 /**
  * Decodes [HasRecord.record] as [T] and returns it or returns null when it cannot be decoded as [T]
+ * @param json the [Json] instance to use for decoding
  */
 inline fun <reified T> HasRecord.decodeRecordOrNull(json: Json = Json): T? {
     return try {
@@ -93,6 +115,7 @@ inline fun <reified T> HasRecord.decodeRecordOrNull(json: Json = Json): T? {
 
 /**
  * Decodes [HasOldRecord.oldRecord] as [T] and returns it or returns null when it cannot be decoded as [T]
+ * @param json the [Json] instance to use for decoding
  */
 inline fun <reified T> HasOldRecord.decodeOldRecordOrNull(json: Json = Json): T? {
     return try {
@@ -104,10 +127,12 @@ inline fun <reified T> HasOldRecord.decodeOldRecordOrNull(json: Json = Json): T?
 
 /**
  * Decodes [HasRecord.record] as [T] and returns it
+ * @param json the [Json] instance to use for decoding
  */
 inline fun <reified T> HasRecord.decodeRecord(json: Json = Json) = json.decodeFromJsonElement<T>(record)
 
 /**
  * Decodes [HasOldRecord.oldRecord] as [T] and returns it
+ * @param json the [Json] instance to use for decoding
  */
 inline fun <reified T> HasOldRecord.decodeOldRecord(json: Json = Json) = json.decodeFromJsonElement<T>(oldRecord)

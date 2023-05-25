@@ -9,8 +9,14 @@ import kotlinx.coroutines.withContext
 import java.awt.Desktop
 import java.net.URI
 
+/**
+ * Represents an OAuth provider.
+ */
 actual abstract class OAuthProvider : AuthProvider<ExternalAuthConfig, Unit> {
 
+    /**
+     * The name of the provider.
+     */
     actual abstract val name: String
 
     actual override suspend fun login(

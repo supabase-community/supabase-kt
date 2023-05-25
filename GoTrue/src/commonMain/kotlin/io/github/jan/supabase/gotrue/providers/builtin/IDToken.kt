@@ -1,6 +1,8 @@
 package io.github.jan.supabase.gotrue.providers.builtin
 
 import io.github.jan.supabase.exceptions.SupabaseEncodingException
+import io.github.jan.supabase.gotrue.providers.Apple
+import io.github.jan.supabase.gotrue.providers.Google
 import io.github.jan.supabase.gotrue.providers.IDTokenProvider
 import io.github.jan.supabase.supabaseJson
 import kotlinx.datetime.Instant
@@ -16,13 +18,20 @@ import kotlinx.serialization.json.jsonObject
 /**
  * Authentication method with id token, client id, provider and optionally nonce.
  *
- * Only Apple and Google are supported as providers.
+ * Only [Apple] and [Google] are supported as providers.
  *
  */
 object IDToken : DefaultAuthProvider<IDToken.Config, IDToken.Result> {
 
     override val grantType: String = "id_token"
 
+    /**
+     * The configuration for the id token authentication method
+     * @param idToken The id token received from the [provider]
+     * @param clientId The oauth client id of the app
+     * @param provider The provider of the id token. Only [Apple] and [Google] are supported
+     * @param nonce The nonce used to verify the id token
+     */
     @Serializable
     data class Config(
         @SerialName("id_token") var idToken: String = "",
@@ -31,6 +40,13 @@ object IDToken : DefaultAuthProvider<IDToken.Config, IDToken.Result> {
         var nonce: String? = null
     ) : DefaultAuthProvider.Config()
 
+    /**
+     * The sign up result of the id token authentication method
+     * @param id The id of the created user
+     * @param confirmationSentAt The time the confirmation was sent
+     * @param createdAt The time the user was created
+     * @param updatedAt The time the user was updated
+     */
     @Serializable
     data class Result(
         val id: String,

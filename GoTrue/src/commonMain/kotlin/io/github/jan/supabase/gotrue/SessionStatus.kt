@@ -25,6 +25,7 @@ sealed interface SessionStatus {
 
     /**
      * This status means that [GoTrue] holds a valid session
+     * @param session The session
      */
     @JvmInline
     value class Authenticated(val session: UserSession) : SessionStatus

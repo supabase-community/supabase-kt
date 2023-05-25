@@ -6,8 +6,13 @@ import co.touchlab.stately.collections.IsoMutableMap
 import com.russhwolf.settings.ExperimentalSettingsApi
 import io.github.aakira.napier.Napier
 import io.github.jan.supabase.SupabaseClient
+import io.github.jan.supabase.annotiations.SupabaseInternal
 import io.github.jan.supabase.bodyOrNull
-import io.github.jan.supabase.exceptions.*
+import io.github.jan.supabase.exceptions.BadRequestRestException
+import io.github.jan.supabase.exceptions.NotFoundRestException
+import io.github.jan.supabase.exceptions.RestException
+import io.github.jan.supabase.exceptions.UnauthorizedRestException
+import io.github.jan.supabase.exceptions.UnknownRestException
 import io.github.jan.supabase.gotrue.authenticatedSupabaseApi
 import io.github.jan.supabase.plugins.MainConfig
 import io.github.jan.supabase.plugins.MainPlugin
@@ -17,6 +22,7 @@ import io.github.jan.supabase.storage.resumable.ResumableCache
 import io.ktor.client.plugins.HttpRequestTimeoutException
 import io.ktor.client.plugins.timeout
 import io.ktor.client.statement.HttpResponse
+import io.ktor.http.HttpStatusCode
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.buildJsonObject
@@ -129,9 +135,9 @@ sealed interface Storage : MainPlugin<Storage.Config> {
             /**
              * The default chunk size for resumable uploads. **Supabase currently only supports a chunk size of 6MB, so be careful when changing this value**
              */
-            var defaultChunkSize: Long = 6 * 1024 * 1024
+            var defaultChunkSize: Long = DEFAULT_CHUNK_SIZE
                 set(value) {
-                    if(value.toInt() != 6 * 1024 * 1024) {
+                    if(value != DEFAULT_CHUNK_SIZE) {
                         Napier.w { "supabase currently only supports a chunk size of 6MB" }
                     }
                     field = value
@@ -151,7 +157,16 @@ sealed interface Storage : MainPlugin<Storage.Config> {
     companion object : SupabasePluginProvider<Config, Storage> {
 
         override val key: String = "storage"
+
+        /**
+         * The api version of the storage plugin
+         */
         const val API_VERSION = 1
+
+        /**
+         * The default chunk size for resumable uploads.
+         */
+        const val DEFAULT_CHUNK_SIZE = 6L * 1024L * 1024L
 
         override fun createConfig(init: Config.() -> Unit) = Config().apply(init)
         override fun create(supabaseClient: SupabaseClient, config: Config): Storage {
@@ -164,12 +179,13 @@ sealed interface Storage : MainPlugin<Storage.Config> {
 
 internal class StorageImpl(override val supabaseClient: SupabaseClient, override val config: Storage.Config) : Storage {
 
-    override val PLUGIN_KEY: String
+    override val pluginKey: String
         get() = Storage.key
 
-    override val API_VERSION: Int
+    override val apiVersion: Int
         get() = Storage.API_VERSION
 
+    @OptIn(SupabaseInternal::class)
     internal val api = supabaseClient.authenticatedSupabaseApi(this) {
         timeout {
             requestTimeoutMillis = config.transferTimeout.inWholeMilliseconds
@@ -217,17 +233,17 @@ internal class StorageImpl(override val supabaseClient: SupabaseClient, override
     }
 
     override suspend fun parseErrorResponse(response: HttpResponse): RestException {
-        val statusCode = response.status.value
+        val statusCode = response.status
         val error = response.bodyOrNull<StorageErrorResponse>() ?: StorageErrorResponse(
             response.status.value,
             "Unknown error",
             ""
         )
-        if (statusCode != 400) return UnknownRestException("Unknown error response $error", response)
+        if (statusCode != HttpStatusCode.BadRequest) return UnknownRestException("Unknown error response $error", response)
         when (error.statusCode) {
-            401 -> throw UnauthorizedRestException(error.error, response, error.message)
-            400 -> throw BadRequestRestException(error.error, response, error.message)
-            404 -> throw NotFoundRestException(error.error, response, error.message)
+            HttpStatusCode.Unauthorized.value -> throw UnauthorizedRestException(error.error, response, error.message)
+            HttpStatusCode.BadRequest.value -> throw BadRequestRestException(error.error, response, error.message)
+            HttpStatusCode.NotFound.value -> throw NotFoundRestException(error.error, response, error.message)
             else -> throw UnknownRestException(error.message, response)
         }
     }

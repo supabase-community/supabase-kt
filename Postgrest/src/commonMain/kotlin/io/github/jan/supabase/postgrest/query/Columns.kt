@@ -2,6 +2,10 @@ package io.github.jan.supabase.postgrest.query
 
 import kotlin.jvm.JvmInline
 
+/**
+ * Represents a list of columns to select
+ * @param value The columns to select, separated by a comma
+ */
 @JvmInline
 value class Columns @PublishedApi internal constructor(val value: String) {
 

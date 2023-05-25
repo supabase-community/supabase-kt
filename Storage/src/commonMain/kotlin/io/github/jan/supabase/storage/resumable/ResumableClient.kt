@@ -59,6 +59,10 @@ sealed interface ResumableClient {
     suspend fun continuePreviousUploads(channelProducer: suspend (source: String, offset: Long) -> ByteReadChannel): List<Deferred<ResumableUpload>>
 
     companion object {
+
+        /**
+         * The TUS (resumable upload protocol) version to use
+         */
         const val TUS_VERSION = "1.0.0"
     }
 

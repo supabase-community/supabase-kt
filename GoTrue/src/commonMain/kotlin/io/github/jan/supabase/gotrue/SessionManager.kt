@@ -5,6 +5,7 @@ import com.russhwolf.settings.ExperimentalSettingsApi
 import com.russhwolf.settings.Settings
 import com.russhwolf.settings.coroutines.toSuspendSettings
 import io.github.aakira.napier.Napier
+import io.github.jan.supabase.annotiations.SupabaseInternal
 import io.github.jan.supabase.gotrue.user.UserSession
 import io.github.jan.supabase.supabaseJson
 import kotlinx.serialization.decodeFromString
@@ -62,14 +63,18 @@ class SettingsSessionManager(settings: Settings = createDefaultSettings()): Sess
 
     companion object {
 
+        /**
+         * The key used for saving the session
+         */
         const val SETTINGS_KEY = "session"
 
     }
 
 }
 
+@SupabaseInternal
 fun createDefaultSettings() = try {
     Settings()
 } catch(e: Exception) {
-    throw IllegalStateException("Failed to create default settings for SettingsSessionManager. You might have to provide a custom settings instance or a custom session manager. Learn more at https://github.com/supabase-community/supabase-kt/wiki/Session-Saving")
+    error("Failed to create default settings for SettingsSessionManager. You might have to provide a custom settings instance or a custom session manager. Learn more at https://github.com/supabase-community/supabase-kt/wiki/Session-Saving")
 }

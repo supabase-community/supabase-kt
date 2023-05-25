@@ -1,6 +1,7 @@
 package io.github.jan.supabase.postgrest
 
 import io.github.jan.supabase.SupabaseClient
+import io.github.jan.supabase.annotiations.SupabaseInternal
 import io.github.jan.supabase.bodyOrNull
 import io.github.jan.supabase.exceptions.BadRequestRestException
 import io.github.jan.supabase.exceptions.NotFoundRestException
@@ -41,12 +42,30 @@ import kotlinx.serialization.json.encodeToJsonElement
  */
 sealed interface Postgrest : MainPlugin<Postgrest.Config> {
 
+    /**
+     * Creates a new [PostgrestBuilder] for the given table
+     * @param table The table to use for the requests
+     */
     fun from(table: String): PostgrestBuilder
 
+    /**
+     * Creates a new [PostgrestBuilder] for the given schema and table
+     * @param schema The schema to use for the requests
+     * @param table The table to use for the requests
+     */
     fun from(schema: String, table: String): PostgrestBuilder
 
+    /**
+     * Creates a new [PostgrestBuilder] for the given table
+     * @param table The table to use for the requests
+     */
     operator fun get(schema: String, table: String): PostgrestBuilder = from(schema, table)
 
+    /**
+     * Creates a new [PostgrestBuilder] for the given schema and table
+     * @param schema The schema to use for the requests
+     * @param table The table to use for the requests
+     */
     operator fun get(table: String): PostgrestBuilder = from(table)
 
     /**
@@ -64,6 +83,10 @@ sealed interface Postgrest : MainPlugin<Postgrest.Config> {
     companion object : SupabasePluginProvider<Config, Postgrest> {
 
         override val key = "rest"
+
+        /**
+         * The current postgrest API version
+         */
         const val API_VERSION = 1
 
         override fun createConfig(init: Config.() -> Unit) = Config().apply(init)
@@ -77,12 +100,13 @@ sealed interface Postgrest : MainPlugin<Postgrest.Config> {
 
 internal class PostgrestImpl(override val supabaseClient: SupabaseClient, override val config: Postgrest.Config) : Postgrest {
 
-    override val API_VERSION: Int
+    override val apiVersion: Int
         get() = Postgrest.API_VERSION
 
-    override val PLUGIN_KEY: String
+    override val pluginKey: String
         get() = Postgrest.key
 
+    @OptIn(SupabaseInternal::class)
     val api = supabaseClient.authenticatedSupabaseApi(this)
 
     override fun from(table: String): PostgrestBuilder {

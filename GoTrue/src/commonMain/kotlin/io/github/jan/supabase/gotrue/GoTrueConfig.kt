@@ -7,8 +7,14 @@ import kotlinx.coroutines.Dispatchers
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
+/**
+ * The configuration for [GoTrue]
+ */
 expect class GoTrueConfig() : MainConfig, GoTrueConfigDefaults
 
+/**
+ * The default values for the [GoTrueConfig]
+ */
 open class GoTrueConfigDefaults {
 
     /**
@@ -51,7 +57,14 @@ open class GoTrueConfigDefaults {
      */
     var flowType: FlowType = FlowType.IMPLICIT
 
+    /**
+     * The custom url to use for the gotrue instance. When null, the default url will be used
+     */
     var customUrl: String? = null
+
+    /**
+     * The custom jwt token to use for the gotrue instance. When null, the jwt token from the GoTrue session or the supabaseKey will be used
+     */
     var jwtToken: String? = null
 }
 

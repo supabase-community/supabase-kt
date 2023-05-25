@@ -23,7 +23,7 @@ suspend fun BucketApi.upload(path: String, uri: Uri, upsert: Boolean = false) = 
  * @return A flow that emits the upload progress and at last the key to the updated file
  */
 @SupabaseExperimental
-suspend fun BucketApi.uploadAsFlow(path: String, uri: Uri, upsert: Boolean = false) = uploadAsFlow(path, UploadData(uri.readChannel(), uri.contentSize), upsert)
+fun BucketApi.uploadAsFlow(path: String, uri: Uri, upsert: Boolean = false) = uploadAsFlow(path, UploadData(uri.readChannel(), uri.contentSize), upsert)
 
 /**
  * Uploads a file in [BucketApi.bucketId] under [path] using a presigned url
@@ -44,7 +44,7 @@ suspend fun BucketApi.uploadToSignedUrl(path: String, token: String, uri: Uri, u
  * @return A flow that emits the upload progress and at last the key to the updated file
  */
 @SupabaseExperimental
-suspend fun BucketApi.uploadToSignedUrlAsFlow(path: String, token: String, uri: Uri, upsert: Boolean = false) = uploadToSignedUrlAsFlow(path, token, UploadData(uri.readChannel(), uri.contentSize), upsert)
+fun BucketApi.uploadToSignedUrlAsFlow(path: String, token: String, uri: Uri, upsert: Boolean = false) = uploadToSignedUrlAsFlow(path, token, UploadData(uri.readChannel(), uri.contentSize), upsert)
 
 /**
  * Updates a file in [BucketApi.bucketId] under [path]
@@ -64,7 +64,7 @@ suspend fun BucketApi.update(path: String, uri: Uri, upsert: Boolean = false) = 
  * @return A flow that emits the upload progress and at last the key to the updated file
  */
 @SupabaseExperimental
-suspend fun BucketApi.updateAsFlow(path: String, uri: Uri, upsert: Boolean = false) = updateAsFlow(path, UploadData(uri.readChannel(), uri.contentSize), upsert)
+fun BucketApi.updateAsFlow(path: String, uri: Uri, upsert: Boolean = false) = updateAsFlow(path, UploadData(uri.readChannel(), uri.contentSize), upsert)
 
 private fun Uri.readChannel(): ByteReadChannel {
     val context = applicationContext()

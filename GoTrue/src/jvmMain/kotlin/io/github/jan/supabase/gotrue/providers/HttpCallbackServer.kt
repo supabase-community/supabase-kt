@@ -12,6 +12,8 @@ import kotlinx.coroutines.withContext
 import java.awt.Desktop
 import java.net.URI
 
+private const val HTTP_SERVER_STOP_DELAY = 1000L
+
 internal suspend fun createServer(
     url: suspend (redirect: String) -> String,
     gotrue: GoTrue,
@@ -31,7 +33,7 @@ internal suspend fun createServer(
         val tokenType = ctx.queryParam("token_type") ?: return@get
         val providerToken = ctx.queryParam("provider_token")
         val providerRefreshToken = ctx.queryParam("provider_refresh_token")
-        val type = ctx.queryParam("type") ?: ""
+        val type = ctx.queryParam("type").orEmpty()
         (gotrue as GoTrueImpl).authScope.launch {
             val user = gotrue.retrieveUser(accessToken)
             onSuccess(UserSession(accessToken, refreshToken, providerRefreshToken, providerToken, expiresIn, tokenType, user, type))
@@ -41,7 +43,7 @@ internal suspend fun createServer(
         }
         ctx.html(HTML.redirectPage(gotrue.config.htmlIconUrl, gotrue.config.htmlTitle, gotrue.config.htmlText))
         gotrue.authScope.launch(Dispatchers.IO) {
-            delay(1000)
+            delay(HTTP_SERVER_STOP_DELAY)
             server.stop()
         }
     }

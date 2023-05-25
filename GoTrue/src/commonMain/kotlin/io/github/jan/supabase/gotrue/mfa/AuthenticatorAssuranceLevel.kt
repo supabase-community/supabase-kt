@@ -16,6 +16,10 @@ enum class AuthenticatorAssuranceLevel {
 
     companion object {
 
+        /**
+         * Creates an [AuthenticatorAssuranceLevel] from a string
+         * @param value The string to create the [AuthenticatorAssuranceLevel] from (either "aal1" or "aal2")
+         */
         fun from(value: String): AuthenticatorAssuranceLevel {
             return when (value) {
                 "aal1" -> AAL1

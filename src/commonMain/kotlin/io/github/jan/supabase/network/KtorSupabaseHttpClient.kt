@@ -1,3 +1,4 @@
+@file:Suppress("UndocumentedPublicFunction")
 package io.github.jan.supabase.network
 
 import io.github.aakira.napier.Napier
@@ -14,18 +15,19 @@ import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.websocket.webSocketSession
 import io.ktor.client.request.HttpRequestBuilder
 import io.ktor.client.request.headers
-import io.ktor.client.request.prepareDelete
 import io.ktor.client.request.prepareRequest
 import io.ktor.client.request.request
 import io.ktor.client.statement.HttpResponse
 import io.ktor.client.statement.HttpStatement
 import io.ktor.serialization.kotlinx.json.json
 
+private const val HTTPS_PORT = 443
+
 /**
  * A [SupabaseHttpClient] that uses ktor to send requests
  */
 @OptIn(SupabaseInternal::class)
-class KtorSupabaseHttpClient(
+class KtorSupabaseHttpClient @SupabaseInternal constructor(
     private val supabaseKey: String,
     modifiers: List<HttpClientConfig<*>.() -> Unit> = listOf(),
     private val requestTimeout: Long,
@@ -85,7 +87,7 @@ class KtorSupabaseHttpClient(
                     append("apikey", supabaseKey)
                 }
             }
-            port = 443
+            port = HTTPS_PORT
         }
         install(ContentNegotiation) {
             json(supabaseJson)

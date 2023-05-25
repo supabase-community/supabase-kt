@@ -100,8 +100,8 @@ class ChatViewModel(
                     when(it) {
                         is PostgresAction.Delete -> messages.value = messages.value.filter { message -> message.id != it.oldRecord["id"]!!.jsonPrimitive.int }
                         is PostgresAction.Insert -> messages.value = messages.value + it.decodeRecord<Message>()
-                        is PostgresAction.Select -> throw IllegalStateException("Select should not be possible")
-                        is PostgresAction.Update -> throw IllegalStateException("Update should not be possible")
+                        is PostgresAction.Select -> error("Select should not be possible")
+                        is PostgresAction.Update -> error("Update should not be possible")
                     }
                 }.launchIn(coroutineScope)
 

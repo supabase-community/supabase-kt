@@ -112,7 +112,7 @@ internal class AdminApiImpl(val gotrue: GoTrue) : AdminApi {
         return api.get("admin/users") {
             page?.let { url.parameters.append("page", it.toString()) }
             perPage?.let { url.parameters.append("per_page", it.toString()) }
-        }.body<JsonObject>().let { supabaseJson.decodeFromJsonElement(it["users"] ?: throw IllegalStateException("Didn't get users json field on method retrieveUsers. Full body: $it")) }
+        }.body<JsonObject>().let { supabaseJson.decodeFromJsonElement(it["users"] ?: error("Didn't get users json field on method retrieveUsers. Full body: $it")) }
     }
 
     override suspend fun retrieveUserById(uid: String): UserInfo {

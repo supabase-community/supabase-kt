@@ -1,10 +1,11 @@
+@file:Suppress("UndocumentedPublicProperty")
 package io.github.jan.supabase.postgrest.query
 
 import io.github.jan.supabase.exceptions.HttpRequestException
 import io.github.jan.supabase.exceptions.RestException
+import io.github.jan.supabase.gotrue.PostgrestFilterDSL
 import io.github.jan.supabase.postgrest.Postgrest
 import io.github.jan.supabase.postgrest.request.PostgrestRequest
-import io.ktor.client.plugins.*
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.encodeToJsonElement
 import kotlinx.serialization.json.jsonArray
@@ -32,7 +33,7 @@ class PostgrestBuilder(val postgrest: Postgrest, val table: String, val schema: 
         head: Boolean = false,
         count: Count? = null,
         single: Boolean = false,
-        filter: PostgrestFilterBuilder.() -> Unit = {}
+        filter: @PostgrestFilterDSL PostgrestFilterBuilder.() -> Unit = {}
     ): PostgrestResult = PostgrestRequest.Select(head, count, single, buildPostgrestFilter(postgrest.config.propertyConversionMethod) { filter(); _params["select"] = listOf(columns.value) }, schema).execute(table, postgrest)
 
     /**

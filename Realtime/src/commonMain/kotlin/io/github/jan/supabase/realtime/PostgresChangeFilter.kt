@@ -1,5 +1,10 @@
 package io.github.jan.supabase.realtime
 
+import io.github.jan.supabase.annotiations.SupabaseInternal
+
+/**
+ * Used to filter postgres changes
+ */
 class PostgresChangeFilter(private val event: String, private val schema: String) {
 
     /**
@@ -13,6 +18,7 @@ class PostgresChangeFilter(private val event: String, private val schema: String
      */
     var filter: String? = null
 
+    @SupabaseInternal
     fun buildConfig() = PostgresJoinConfig(schema, table, filter, event)
 
 }

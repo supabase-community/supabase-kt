@@ -38,7 +38,7 @@ internal class MessageApiImpl(
     override suspend fun retrieveMessages(): List<Message> = table.select().decodeList()
 
     override suspend fun createMessage(content: String): Message {
-        val user = (client.gotrue.currentSessionOrNull() ?: throw IllegalStateException("No session available")).user ?: throw IllegalStateException("No user available")
+        val user = (client.gotrue.currentSessionOrNull() ?: error("No session available")).user ?: error("No user available")
         return table.insert(buildJsonObject {
            put("content", content)
            put("creator_id", user.id)

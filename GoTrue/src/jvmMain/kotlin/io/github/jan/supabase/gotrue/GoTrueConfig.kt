@@ -4,6 +4,9 @@ import io.github.jan.supabase.plugins.MainConfig
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
 
+/**
+ * The configuration for [GoTrue]
+ */
 actual class GoTrueConfig : MainConfig, GoTrueConfigDefaults() {
 
     /**

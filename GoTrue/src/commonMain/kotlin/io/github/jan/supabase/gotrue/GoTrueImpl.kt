@@ -3,6 +3,7 @@ package io.github.jan.supabase.gotrue
  import io.github.aakira.napier.Napier
  import io.github.jan.supabase.SupabaseClient
  import io.github.jan.supabase.annotiations.SupabaseExperimental
+ import io.github.jan.supabase.annotiations.SupabaseInternal
  import io.github.jan.supabase.bodyOrNull
  import io.github.jan.supabase.exceptions.BadRequestRestException
  import io.github.jan.supabase.exceptions.RestException
@@ -52,6 +53,7 @@ internal class GoTrueImpl(override val supabaseClient: SupabaseClient, override 
     internal val authScope = CoroutineScope(config.coroutineDispatcher)
     override val sessionManager = config.sessionManager ?: SettingsSessionManager()
     override val codeVerifierCache = config.codeVerifierCache ?: SettingsCodeVerifierCache()
+    @OptIn(SupabaseInternal::class)
     internal val api = supabaseClient.authenticatedSupabaseApi(this)
     override val admin: AdminApi = AdminApiImpl(this)
     override val mfa: MfaApi = MfaApiImpl(this)
@@ -79,10 +81,10 @@ internal class GoTrueImpl(override val supabaseClient: SupabaseClient, override 
         }
     }
 
-    override val API_VERSION: Int
+    override val apiVersion: Int
         get() = GoTrue.API_VERSION
 
-    override val PLUGIN_KEY: String
+    override val pluginKey: String
         get() = GoTrue.key
 
     @Deprecated("Use logout() instead", replaceWith = ReplaceWith("logout()"))
@@ -268,9 +270,9 @@ internal class GoTrueImpl(override val supabaseClient: SupabaseClient, override 
     }
 
     override suspend fun retrieveUserForCurrentSession(updateSession: Boolean): UserInfo {
-        val user = retrieveUser(currentAccessTokenOrNull() ?: throw IllegalStateException("No session found"))
+        val user = retrieveUser(currentAccessTokenOrNull() ?: error("No session found"))
         if(updateSession) {
-            val session = currentSessionOrNull() ?: throw IllegalStateException("No session found")
+            val session = currentSessionOrNull() ?: error("No session found")
             val newStatus = SessionStatus.Authenticated(session.copy(user = user))
             _sessionStatus.value = newStatus
             if(config.autoSaveToStorage) sessionManager.saveSession(newStatus.session)
@@ -278,6 +280,7 @@ internal class GoTrueImpl(override val supabaseClient: SupabaseClient, override 
         return user
     }
 
+    @Deprecated("Use logout() instead", replaceWith = ReplaceWith("logout()"))
     override suspend fun invalidateSession() {
         sessionManager.deleteSession()
         sessionJob?.cancel()
@@ -314,17 +317,22 @@ internal class GoTrueImpl(override val supabaseClient: SupabaseClient, override 
     }
 
     override suspend fun refreshCurrentSession() {
-        val newSession = refreshSession(currentSessionOrNull()?.refreshToken ?: throw IllegalStateException("No refresh token found in current session"))
+        val newSession = refreshSession(currentSessionOrNull()?.refreshToken ?: error("No refresh token found in current session"))
         importSession(newSession)
     }
 
+    @Deprecated(
+        "Use retrieveUserForCurrentSession() instead",
+        replaceWith = ReplaceWith("retrieveUserForCurrentSession(true)")
+    )
     override suspend fun updateCurrentUser() {
-        val session = currentSessionOrNull() ?: throw IllegalStateException("No session found")
+        val session = currentSessionOrNull() ?: error("No session found")
         val user = retrieveUser(session.accessToken)
         _sessionStatus.value = SessionStatus.Authenticated(session.copy(user = user))
         if(config.autoSaveToStorage) sessionManager.saveSession(session)
     }
 
+    @Deprecated("Use importSession() instead", replaceWith = ReplaceWith("importSession(session)"))
     override suspend fun startAutoRefresh(session: UserSession, autoRefresh: Boolean) = importSession(session, autoRefresh)
 
     override suspend fun importSession(session: UserSession, autoRefresh: Boolean) {
@@ -376,7 +384,7 @@ internal class GoTrueImpl(override val supabaseClient: SupabaseClient, override 
         }
     }
 
-    override suspend fun startAutoRefreshForCurrentSession() = importSession(currentSessionOrNull() ?: throw IllegalStateException("No session found"), true)
+    override suspend fun startAutoRefreshForCurrentSession() = importSession(currentSessionOrNull() ?: error("No session found"), true)
 
     override fun stopAutoRefreshForCurrentSession() {
         sessionJob?.cancel()
@@ -424,4 +432,5 @@ internal class GoTrueImpl(override val supabaseClient: SupabaseClient, override 
 
 }
 
+@SupabaseInternal
 expect fun GoTrue.setupPlatform()

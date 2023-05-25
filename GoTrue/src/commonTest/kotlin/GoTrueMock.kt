@@ -19,8 +19,10 @@ import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.contentOrNull
 import kotlinx.serialization.json.jsonPrimitive
+import kotlinx.serialization.json.put
 
 class GoTrueMock {
 
@@ -179,7 +181,9 @@ class GoTrueMock {
     }
 
     private fun MockRequestHandleScope.respondBadRequest(message: String): HttpResponseData {
-        return respond(message, HttpStatusCode.BadRequest)
+        return respond(buildJsonObject {
+              put("error", message)
+        }.toString(), HttpStatusCode.BadRequest)
     }
 
     private fun MockRequestHandleScope.respondUnauthorized(): HttpResponseData {

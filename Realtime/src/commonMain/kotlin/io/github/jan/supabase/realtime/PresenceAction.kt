@@ -38,8 +38,8 @@ data class Presence(
         override fun deserialize(decoder: Decoder): Presence {
             decoder as JsonDecoder
             val json = decoder.decodeJsonElement().jsonObject
-            val meta = json["metas"]?.jsonArray?.get(0)?.jsonObject ?: throw IllegalStateException("A presence should at least have a phx_ref. Full json: $json")
-            val presenceRef = meta["phx_ref"]?.jsonPrimitive?.contentOrNull ?: throw IllegalStateException("A presence should at least have a phx_ref. Full json: $json")
+            val meta = json["metas"]?.jsonArray?.get(0)?.jsonObject ?: error("A presence should at least have a phx_ref. Full json: $json")
+            val presenceRef = meta["phx_ref"]?.jsonPrimitive?.contentOrNull ?: error("A presence should at least have a phx_ref. Full json: $json")
             return Presence(presenceRef, JsonObject(meta.toMutableMap().apply {
                 remove("phx_ref")
             }))
@@ -77,6 +77,9 @@ data class Presence(
 
 }
 
+/**
+ * Represents a presence action
+ */
 sealed interface PresenceAction {
 
     /**

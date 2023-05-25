@@ -1,3 +1,4 @@
+@file:Suppress("UndocumentedPublicFunction", "UndocumentedPublicClass")
 package io.github.jan.supabase.network
 
 import io.ktor.client.request.HttpRequestBuilder

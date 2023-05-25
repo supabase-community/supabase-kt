@@ -12,6 +12,7 @@ plugins {
     alias(libs.plugins.dokka)
     alias(libs.plugins.kotlinx.plugin.serialization)
     alias(libs.plugins.maven.publish)
+    alias(libs.plugins.detekt)
 }
 
 val modules = listOf("supabase-kt", "gotrue-kt", "postgrest-kt", "storage-kt", "realtime-kt", "functions-kt", "apollo-graphql")
@@ -69,7 +70,39 @@ configure(allprojects.filter { it.name in modules || it.name == "bom" }) {
     }
 }
 
+tasks.register("detektAll") {
+    configure(allprojects.filter { it.name in modules }) {
+        this@register.dependsOn(tasks.withType<io.gitlab.arturbosch.detekt.Detekt>())
+    }
+}
+
 configure(allprojects.filter { it.name in modules }) {
+    apply(plugin = "io.gitlab.arturbosch.detekt")
+
+    detekt {
+        buildUponDefaultConfig = true
+        config.setFrom(files("$rootDir/detekt.yml"))
+        //baseline = file("$rootDir/config/detekt/baseline.xml")
+    }
+
+    tasks.withType<io.gitlab.arturbosch.detekt.Detekt>().configureEach {
+        jvmTarget = "1.8"
+        reports {
+            xml.required.set(true)
+            html.required.set(true)
+            txt.required.set(true)
+            sarif.required.set(true)
+            md.required.set(true)
+        }
+        basePath = rootDir.absolutePath
+        //finalizedBy(detektReportMergeSarif)
+    }
+    /*detektReportMergeSarif {
+        input.from(tasks.withType<Detekt>().map { it.sarifReportFile })
+    }
+    tasks.withType<DetektCreateBaselineTask>().configureEach {
+        jvmTarget = "1.8"
+    }*/
     tasks.withType<org.jetbrains.dokka.gradle.DokkaTaskPartial>().configureEach {
         dokkaSourceSets.configureEach {
             sourceLink {
@@ -79,6 +112,7 @@ configure(allprojects.filter { it.name in modules }) {
                     "postgrest-kt" -> "Postgrest"
                     "realtime-kt" -> "Realtime"
                     "storage-kt" -> "Storage"
+                    "apollo-graphql" -> "plugins/ApolloGraphQL"
                     else -> ""
                 }
                 localDirectory.set(projectDir.resolve("src"))
@@ -117,6 +151,7 @@ kotlin {
     sourceSets {
         all {
             languageSettings.optIn("kotlin.RequiresOptIn")
+            languageSettings.optIn("io.github.jan.supabase.annotiations.SupabaseInternal")
         }
         val commonMain by getting {
             dependencies {
@@ -143,11 +178,7 @@ kotlin {
                 api(libs.android.lifecycle.process)
             }
         }
-        val androidUnitTest by getting {
-            dependencies {
-                implementation("junit:junit:4.13.2")
-            }
-        }
+        val androidUnitTest by getting
         val jsMain by getting {
             dependencies {
               //  api(compose.web.core)

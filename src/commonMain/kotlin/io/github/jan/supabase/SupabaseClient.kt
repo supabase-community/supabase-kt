@@ -1,6 +1,7 @@
 package io.github.jan.supabase
 
 import io.github.aakira.napier.Napier
+import io.github.jan.supabase.annotiations.SupabaseInternal
 import io.github.jan.supabase.network.KtorSupabaseHttpClient
 import io.github.jan.supabase.plugins.PluginManager
 import io.github.jan.supabase.plugins.SupabasePlugin
@@ -79,6 +80,7 @@ internal class SupabaseClientImpl(
         key to value(this)
     })
 
+    @OptIn(SupabaseInternal::class)
     override val httpClient = KtorSupabaseHttpClient(supabaseKey, httpConfigOverrides, requestTimeout, httpEngine)
 
     override suspend fun close() {

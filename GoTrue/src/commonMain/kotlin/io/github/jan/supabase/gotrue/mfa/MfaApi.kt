@@ -16,6 +16,9 @@ import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.put
 import okio.ByteString.Companion.decodeBase64
 
+/**
+ * An interface for interacting with Multi-Factor Authentication Api in GoTrue.
+ */
 sealed interface MfaApi {
 
     /**
@@ -172,17 +175,17 @@ internal class MfaApiImpl(
     }
 
     override fun getAuthenticatorAssuranceLevel(): MfaLevel {
-        val jwt = gotrue.currentAccessTokenOrNull() ?: throw IllegalStateException("Current session is null")
+        val jwt = gotrue.currentAccessTokenOrNull() ?: error("Current session is null")
         val parts = jwt.split(".")
-        val decodedJwt = Json.decodeFromString<JsonObject>(parts[1].decodeBase64()?.utf8() ?: throw IllegalStateException("Could not decode current JWT"))
-        val aal = AuthenticatorAssuranceLevel.from(decodedJwt["aal"]?.jsonPrimitive?.content ?: throw IllegalStateException("No 'aal' claim found in JWT"))
+        val decodedJwt = Json.decodeFromString<JsonObject>(parts[1].decodeBase64()?.utf8() ?: error("Could not decode current JWT"))
+        val aal = AuthenticatorAssuranceLevel.from(decodedJwt["aal"]?.jsonPrimitive?.content ?: error("No 'aal' claim found in JWT"))
         val nextAal = if (verifiedFactors.isNotEmpty()) AuthenticatorAssuranceLevel.AAL2 else AuthenticatorAssuranceLevel.AAL1
         return MfaLevel(aal, nextAal)
     }
 
 
     override suspend fun retrieveFactorsForCurrentUser(): List<UserMfaFactor> {
-        return gotrue.retrieveUser(gotrue.currentAccessTokenOrNull() ?: throw IllegalStateException("Current session is null")).factors
+        return gotrue.retrieveUser(gotrue.currentAccessTokenOrNull() ?: error("Current session is null")).factors
     }
 
 }

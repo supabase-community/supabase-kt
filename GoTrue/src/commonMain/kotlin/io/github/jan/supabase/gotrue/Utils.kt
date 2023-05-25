@@ -1,12 +1,14 @@
 package io.github.jan.supabase.gotrue
 
 import io.github.aakira.napier.Napier
+import io.github.jan.supabase.annotiations.SupabaseInternal
 import io.github.jan.supabase.gotrue.user.UserSession
 import io.ktor.client.request.HttpRequestBuilder
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
+@SupabaseInternal
 fun GoTrue.parseFragmentAndImportSession(fragment: String, onSessionSuccess: (UserSession) -> Unit = {}) {
     Napier.d { "Parsing deeplink fragment" }
     val map = fragment.split("&").associate {
@@ -31,10 +33,11 @@ fun GoTrue.parseFragmentAndImportSession(fragment: String, onSessionSuccess: (Us
         val user = retrieveUser(accessToken)
         val session = UserSession(accessToken, refreshToken, providerRefreshToken, providerToken, expiresIn, tokenType, user, type)
         onSessionSuccess(session)
-        startAutoRefresh(session)
+        importSession(session)
     }
 }
 
+@SupabaseInternal
 fun HttpRequestBuilder.redirectTo(url: String) {
     this.url.parameters["redirect_to"] = url
 }
