@@ -95,7 +95,7 @@ class GoTrueTest {
             client.gotrue.importSession(session, false)
             assertEquals("some_token", client.gotrue.currentAccessTokenOrNull())
             assertEquals("some_refresh_token", client.gotrue.currentSessionOrNull()!!.refreshToken)
-            client.gotrue.invalidateSession()
+            client.gotrue.logout()
             assertEquals(null, client.gotrue.currentAccessTokenOrNull())
             client.close()
         }
