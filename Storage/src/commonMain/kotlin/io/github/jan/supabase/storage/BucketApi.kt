@@ -22,6 +22,9 @@ sealed interface BucketApi {
      */
     val bucketId: String
 
+    /**
+     * The current [SupabaseClient]
+     */
     val supabaseClient: SupabaseClient
 
     /**
@@ -65,7 +68,7 @@ sealed interface BucketApi {
      * @throws HttpRequestException on network related issues
      */
     @SupabaseExperimental
-    suspend fun uploadAsFlow(path: String, data: ByteArray, upsert: Boolean = false): Flow<UploadStatus> = uploadAsFlow(path, UploadData(ByteReadChannel(data), data.size.toLong()), upsert)
+    fun uploadAsFlow(path: String, data: ByteArray, upsert: Boolean = false): Flow<UploadStatus> = uploadAsFlow(path, UploadData(ByteReadChannel(data), data.size.toLong()), upsert)
 
     /**
      * Uploads a file in [bucketId] under [path]
@@ -78,7 +81,7 @@ sealed interface BucketApi {
      * @throws HttpRequestException on network related issues
      */
     @SupabaseExperimental
-    suspend fun uploadAsFlow(path: String, data: UploadData, upsert: Boolean = false): Flow<UploadStatus>
+    fun uploadAsFlow(path: String, data: UploadData, upsert: Boolean = false): Flow<UploadStatus>
 
     /**
      * Uploads a file in [bucketId] under [path] using a presigned url
@@ -113,7 +116,7 @@ sealed interface BucketApi {
      * @return A flow that emits the upload progress and at last the key to the uploaded file
      */
     @SupabaseExperimental
-    suspend fun uploadToSignedUrlAsFlow(path: String, token: String, data: ByteArray, upsert: Boolean = false): Flow<UploadStatus> = uploadToSignedUrlAsFlow(path, token, UploadData(ByteReadChannel(data), data.size.toLong()), upsert)
+    fun uploadToSignedUrlAsFlow(path: String, token: String, data: ByteArray, upsert: Boolean = false): Flow<UploadStatus> = uploadToSignedUrlAsFlow(path, token, UploadData(ByteReadChannel(data), data.size.toLong()), upsert)
 
     /**
      * Uploads a file in [bucketId] under [path] using a presigned url
@@ -127,7 +130,7 @@ sealed interface BucketApi {
      * @throws HttpRequestException on network related issues
      */
     @SupabaseExperimental
-    suspend fun uploadToSignedUrlAsFlow(path: String, token: String, data: UploadData, upsert: Boolean = false): Flow<UploadStatus>
+    fun uploadToSignedUrlAsFlow(path: String, token: String, data: UploadData, upsert: Boolean = false): Flow<UploadStatus>
 
     /**
      * Updates a file in [bucketId] under [path]
@@ -164,7 +167,7 @@ sealed interface BucketApi {
      * @throws HttpRequestException on network related issues
      */
     @SupabaseExperimental
-    suspend fun updateAsFlow(path: String, data: ByteArray, upsert: Boolean = false): Flow<UploadStatus> = updateAsFlow(path, UploadData(ByteReadChannel(data), data.size.toLong()), upsert)
+    fun updateAsFlow(path: String, data: ByteArray, upsert: Boolean = false): Flow<UploadStatus> = updateAsFlow(path, UploadData(ByteReadChannel(data), data.size.toLong()), upsert)
 
     /**
      * Updates a file in [bucketId] under [path]
@@ -177,7 +180,7 @@ sealed interface BucketApi {
      * @throws HttpRequestException on network related issues
      */
     @SupabaseExperimental
-    suspend fun updateAsFlow(path: String, data: UploadData, upsert: Boolean = false): Flow<UploadStatus>
+    fun updateAsFlow(path: String, data: UploadData, upsert: Boolean = false): Flow<UploadStatus>
 
     /**
      * Deletes all files in [bucketId] with in [paths]
@@ -284,7 +287,7 @@ sealed interface BucketApi {
      * @throws HttpRequestException on network related issues
      */
     @SupabaseExperimental
-    suspend fun downloadAuthenticatedAsFlow(path: String, transform: ImageTransformation.() -> Unit = {}): Flow<DownloadStatus>
+    fun downloadAuthenticatedAsFlow(path: String, transform: ImageTransformation.() -> Unit = {}): Flow<DownloadStatus>
 
     /**
      * Downloads a file from [bucketId] under [path]
@@ -297,7 +300,7 @@ sealed interface BucketApi {
      * @throws HttpRequestException on network related issues
      */
     @SupabaseExperimental
-    suspend fun downloadAuthenticatedAsFlow(path: String, channel: ByteWriteChannel, transform: ImageTransformation.() -> Unit = {}): Flow<DownloadStatus>
+    fun downloadAuthenticatedAsFlow(path: String, channel: ByteWriteChannel, transform: ImageTransformation.() -> Unit = {}): Flow<DownloadStatus>
 
     /**
      * Downloads a file from [bucketId] under [path] using the public url
@@ -331,7 +334,7 @@ sealed interface BucketApi {
      * @throws HttpRequestException on network related issues
      */
     @SupabaseExperimental
-    suspend fun downloadPublicAsFlow(path: String, transform: ImageTransformation.() -> Unit = {}): Flow<DownloadStatus>
+    fun downloadPublicAsFlow(path: String, transform: ImageTransformation.() -> Unit = {}): Flow<DownloadStatus>
 
     /**
      * Downloads a file from [bucketId] under [path] using the public url
@@ -344,7 +347,7 @@ sealed interface BucketApi {
      * @throws HttpRequestException on network related issues
      */
     @SupabaseExperimental
-    suspend fun downloadPublicAsFlow(path: String, channel: ByteWriteChannel, transform: ImageTransformation.() -> Unit = {}): Flow<DownloadStatus>
+    fun downloadPublicAsFlow(path: String, channel: ByteWriteChannel, transform: ImageTransformation.() -> Unit = {}): Flow<DownloadStatus>
 
     /**
      * Searches for buckets with the given [prefix] and [filter]

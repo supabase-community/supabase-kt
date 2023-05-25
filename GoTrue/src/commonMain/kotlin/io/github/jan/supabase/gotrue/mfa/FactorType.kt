@@ -1,5 +1,6 @@
 package io.github.jan.supabase.gotrue.mfa
 
+import io.github.jan.supabase.annotiations.SupabaseInternal
 import io.github.jan.supabase.supabaseJson
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -9,9 +10,11 @@ import kotlinx.serialization.json.jsonObject
 
 /**
  * Represents an MFA factor type
+ * @param value The name of the factor type
  */
 sealed class FactorType<T>(val value: String) {
 
+    @SupabaseInternal
     abstract suspend fun decodeResponse(json: JsonObject): T
 
     /**
@@ -20,7 +23,7 @@ sealed class FactorType<T>(val value: String) {
     object TOTP : FactorType<TOTP.Response>("totp") {
 
         override suspend fun decodeResponse(json: JsonObject): Response {
-            return supabaseJson.decodeFromJsonElement(json["totp"]?.jsonObject ?: throw IllegalStateException("No 'totp' object found in factor response"))
+            return supabaseJson.decodeFromJsonElement(json["totp"]?.jsonObject ?: error("No 'totp' object found in factor response"))
         }
 
         /**

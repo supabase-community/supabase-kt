@@ -1,5 +1,6 @@
 package io.github.jan.supabase.storage
 
+import io.github.jan.supabase.annotiations.SupabaseInternal
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
 import kotlinx.serialization.json.putJsonObject
@@ -34,6 +35,7 @@ class BucketListFilter {
         this.order = order
     }
 
+    @SupabaseInternal
     fun build() = buildJsonObject {
         limit?.let {
             put("limit", it)

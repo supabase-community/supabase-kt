@@ -1,9 +1,11 @@
 package io.github.jan.supabase.realtime
 
 import co.touchlab.stately.collections.IsoMutableList
+import io.github.jan.supabase.annotiations.SupabaseInternal
 import kotlinx.atomicfu.atomic
 import kotlinx.serialization.json.JsonObject
 
+@SupabaseInternal
 sealed interface CallbackManager {
 
     fun triggerPostgresChange(ids: List<Long>, data: PostgresAction)

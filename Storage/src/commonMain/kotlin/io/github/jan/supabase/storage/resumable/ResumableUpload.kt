@@ -66,7 +66,7 @@ sealed interface ResumableUpload {
 
 }
 
-class ResumableUploadImpl(
+internal class ResumableUploadImpl(
     override val fingerprint: Fingerprint,
     private val path: String,
     private val cacheEntry: ResumableCacheEntry,

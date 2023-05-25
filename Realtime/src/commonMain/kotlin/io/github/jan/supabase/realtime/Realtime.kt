@@ -127,6 +127,10 @@ sealed interface Realtime : MainPlugin<Realtime.Config> {
     companion object : SupabasePluginProvider<Config, Realtime> {
 
         override val key = "realtime"
+
+        /**
+         * The current realtime api version
+         */
         const val API_VERSION = 1
 
         override fun createConfig(init: Config.() -> Unit) = Config().apply(init)
@@ -143,6 +147,9 @@ sealed interface Realtime : MainPlugin<Realtime.Config> {
 
     }
 
+    /**
+     * The current status of the realtime connection
+     */
     enum class Status {
         DISCONNECTED,
         CONNECTING,
@@ -165,10 +172,10 @@ internal class RealtimeImpl(override val supabaseClient: SupabaseClient, overrid
     var messageJob: Job? = null
     var ref = 0
     var heartbeatRef = 0
-    override val API_VERSION: Int
+    override val apiVersion: Int
         get() = Realtime.API_VERSION
 
-    override val PLUGIN_KEY: String
+    override val pluginKey: String
         get() = Realtime.key
 
     init {
@@ -199,7 +206,7 @@ internal class RealtimeImpl(override val supabaseClient: SupabaseClient, overrid
                 }
             }
         }
-        if (status.value == Realtime.Status.CONNECTED) throw IllegalStateException("Websocket already connected")
+        if (status.value == Realtime.Status.CONNECTED) error("Websocket already connected")
         val prefix = if (config.secure == true) "wss://" else "ws://"
         _status.value = Realtime.Status.CONNECTING
         val realtimeUrl = config.customUrl ?: (prefix + supabaseClient.supabaseUrl + ("/realtime/v${Realtime.API_VERSION}/websocket?apikey=${supabaseClient.supabaseKey}&vsn=1.0.0"))
@@ -319,7 +326,7 @@ internal class RealtimeImpl(override val supabaseClient: SupabaseClient, overrid
     }
 
     override suspend fun block() {
-        ws?.coroutineContext?.job?.join() ?: throw IllegalStateException("No connection available")
+        ws?.coroutineContext?.job?.join() ?: error("No connection available")
     }
 
     override suspend fun parseErrorResponse(response: HttpResponse): RestException {

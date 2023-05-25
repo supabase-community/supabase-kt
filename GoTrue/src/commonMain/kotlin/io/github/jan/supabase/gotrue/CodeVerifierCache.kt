@@ -51,6 +51,9 @@ class SettingsCodeVerifierCache(settings: Settings = createDefaultSettings()): C
 
     companion object {
 
+        /**
+         * The key used to store the code verifier in the [Settings].
+         */
         const val SETTINGS_KEY = "supabase_code_verifier"
 
     }

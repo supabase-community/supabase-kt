@@ -12,9 +12,19 @@ import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
+/**
+ * Represents a cache entry for a resumable upload
+ * @param url The upload url
+ * @param path The storage path
+ * @param bucketId The bucket id
+ * @param expiresAt The time the url expires
+ */
 @Serializable
 data class ResumableCacheEntry(val url: String, val path: String, val bucketId: String, val expiresAt: Instant)
 
+/**
+ * A pair of a [Fingerprint] and a [ResumableCacheEntry]
+ */
 typealias CachePair = Pair<Fingerprint, ResumableCacheEntry>
 
 /**
@@ -50,7 +60,7 @@ interface ResumableCache {
     /**
      * A [ResumableCache] implementation using [com.russhwolf.settings.Settings]. This implementation saves the urls on the disk. If you want a memory only cache, use [Memory]
      */
-    class Disk(settings: com.russhwolf.settings.Settings = Settings()) : ResumableCache {
+    class Disk(settings: Settings = Settings()) : ResumableCache {
 
         @OptIn(ExperimentalSettingsApi::class)
         private val settings = settings.toSuspendSettings()
@@ -75,7 +85,7 @@ interface ResumableCache {
         @OptIn(ExperimentalSettingsApi::class)
         override suspend fun clear() {
             settings.keys().forEach {
-                if(it.split("::").size == 4) remove(Fingerprint(it) ?: error("Invalid fingerprint $it"))
+                if(it.split(Fingerprint.FINGERPRINT_SEPARATOR).size == Fingerprint.FINGERPRINT_PARTS) remove(Fingerprint(it) ?: error("Invalid fingerprint $it"))
             }
         }
 

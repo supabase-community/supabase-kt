@@ -26,12 +26,19 @@ sealed interface GraphQL: MainPlugin<GraphQL.Config> {
      */
     val apolloClient: ApolloClient
 
+    /**
+     * Config for the [GraphQL] plugin
+     * @param apolloConfiguration custom apollo client configuration
+     */
     data class Config(
         override var customUrl: String? = null,
         override var jwtToken: String? = null,
         internal var apolloConfiguration: ApolloClient.Builder.() -> Unit = {}
     ): MainConfig {
 
+        /**
+         * Add custom apollo client configuration
+         */
         fun apolloConfiguration(configuration: ApolloClient.Builder.() -> Unit) {
             apolloConfiguration = configuration
         }
@@ -41,6 +48,10 @@ sealed interface GraphQL: MainPlugin<GraphQL.Config> {
     companion object: SupabasePluginProvider<Config, GraphQL> {
 
         override val key: String = "graphql"
+
+        /**
+         * The current graphql api version
+         */
         const val API_VERSION = 1
 
         override fun create(supabaseClient: SupabaseClient, config: Config): GraphQL {
@@ -57,8 +68,8 @@ sealed interface GraphQL: MainPlugin<GraphQL.Config> {
 
 internal class GraphQLImpl(override val config: GraphQL.Config, override val supabaseClient: SupabaseClient) : GraphQL {
 
-    override val API_VERSION: Int = GraphQL.API_VERSION
-    override val PLUGIN_KEY: String = GraphQL.key
+    override val apiVersion: Int = GraphQL.API_VERSION
+    override val pluginKey: String = GraphQL.key
     override val apolloClient = ApolloClient.Builder().apply {
         serverUrl(config.customUrl ?: resolveUrl())
         addHttpHeader("apikey", supabaseClient.supabaseKey)
@@ -89,5 +100,8 @@ internal class GraphQLImpl(override val config: GraphQL.Config, override val sup
 
 }
 
+/**
+ * With the [GraphQL] plugin installed, you can access a pre-made apollo client via this property
+ */
 val SupabaseClient.graphql: GraphQL
     get() = pluginManager.getPlugin(GraphQL)

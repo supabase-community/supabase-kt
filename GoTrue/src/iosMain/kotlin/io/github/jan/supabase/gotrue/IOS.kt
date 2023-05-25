@@ -11,6 +11,12 @@ import platform.Foundation.NSURL
 import platform.Foundation.NSURLComponents
 import platform.Foundation.NSURLQueryItem
 
+/**
+ * Handle deeplinks for authentication.
+ * This handles the deeplinks for implicit and PKCE flow.
+ * @param url The url from the ios app delegate
+ * @param onSessionSuccess The callback when the session was successfully imported
+ */
 @SupabaseExperimental
 fun SupabaseClient.handleDeeplinks(url: NSURL, onSessionSuccess: (UserSession) -> Unit = {}) {
     if (url.scheme != gotrue.config.scheme || url.host != gotrue.config.host) {

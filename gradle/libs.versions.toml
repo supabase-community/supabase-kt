@@ -18,6 +18,7 @@ cache4k = "0.11.0"
 apollo-kotlin = "3.8.1"
 stately = "1.2.5"
 korlibs = "4.0.0-rc2"
+detekt = "1.23.0"
 
 [plugins]
 kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
@@ -26,6 +27,7 @@ kotlinx-plugin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization
 complete-kotlin = { id = "com.louiscad.complete-kotlin", version.ref = "complete-kotlin" }
 android-library = { id = "com.android.library", version.ref = "agp" }
 maven-publish = { id = "com.vanniktech.maven.publish", version.ref = "maven-publish" }
+detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
 
 [libraries]
 kotlinx-atomicfu-plugin = { module = "org.jetbrains.kotlinx:atomicfu-gradle-plugin", version.ref = "atomicfu" }

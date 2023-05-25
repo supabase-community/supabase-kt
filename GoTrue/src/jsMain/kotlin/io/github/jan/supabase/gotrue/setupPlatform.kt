@@ -1,11 +1,13 @@
 package io.github.jan.supabase.gotrue
 
+import io.github.jan.supabase.annotiations.SupabaseInternal
 import io.github.jan.supabase.gotrue.user.UserSession
 import kotlinx.browser.window
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import org.w3c.dom.url.URL
 
+@SupabaseInternal
 actual fun GoTrue.setupPlatform() {
     this as GoTrueImpl
 
@@ -16,19 +18,17 @@ actual fun GoTrue.setupPlatform() {
                 pair[0] to pair[1]
             }
         }
-        val accessToken = map["access_token"]
-        val refreshToken = map["refresh_token"]
-        val expiresIn = map["expires_in"]?.toLong()
-        val tokenType = map["token_type"]
+        val accessToken = map["access_token"] ?: return
+        val refreshToken = map["refresh_token"] ?: return
+        val expiresIn = map["expires_in"]?.toLong() ?: return
+        val tokenType = map["token_type"] ?: return
         val type = map["type"]
         val providerToken = map["provider_token"]
         val providerRefreshToken = map["provider_refresh_token"]
         val scope = CoroutineScope(config.coroutineDispatcher)
-        if(accessToken != null && refreshToken != null && expiresIn != null && tokenType != null) {
-            scope.launch {
-                val user = retrieveUser(accessToken)
-                startAutoRefresh(UserSession(accessToken, refreshToken, providerRefreshToken, providerToken, expiresIn, tokenType, user, type ?: ""))
-            }
+        scope.launch {
+            val user = retrieveUser(accessToken)
+            importSession(UserSession(accessToken, refreshToken, providerRefreshToken, providerToken, expiresIn, tokenType, user, type ?: ""))
         }
     }
 
@@ -38,7 +38,7 @@ actual fun GoTrue.setupPlatform() {
         val scope = CoroutineScope(config.coroutineDispatcher)
         scope.launch {
             val session = exchangeCodeForSession(code)
-            startAutoRefresh(session)
+            importSession(session)
         }
     }
 

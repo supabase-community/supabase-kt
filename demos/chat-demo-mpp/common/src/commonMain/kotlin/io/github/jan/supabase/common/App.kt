@@ -28,7 +28,7 @@ fun App(viewModel: ChatViewModel) {
     Surface {
         when(sessionStatus) {
             is SessionStatus.Authenticated -> {
-                ChatScreen(viewModel, (sessionStatus as SessionStatus.Authenticated).session.user ?: throw IllegalStateException("User is null"))
+                ChatScreen(viewModel, (sessionStatus as SessionStatus.Authenticated).session.user ?: error("User is null"))
             }
             is SessionStatus.NotAuthenticated -> {
                 LoginScreen(viewModel)

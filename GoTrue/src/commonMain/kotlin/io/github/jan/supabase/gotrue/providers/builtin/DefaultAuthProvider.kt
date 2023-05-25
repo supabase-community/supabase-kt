@@ -2,6 +2,7 @@ package io.github.jan.supabase.gotrue.providers.builtin
 
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.annotiations.SupabaseExperimental
+import io.github.jan.supabase.annotiations.SupabaseInternal
 import io.github.jan.supabase.gotrue.FlowType
 import io.github.jan.supabase.gotrue.GoTrueImpl
 import io.github.jan.supabase.gotrue.generateCodeChallenge
@@ -21,10 +22,24 @@ import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.decodeFromJsonElement
 import kotlinx.serialization.json.put
 
+/**
+ * A default authentication provider
+ * @see Email
+ * @see Phone
+ * @see IDToken
+ */
 sealed interface DefaultAuthProvider<C, R> : AuthProvider<C, R> {
 
+    /**
+     * The grant type of the provider.
+     */
     val grantType: String
 
+    /**
+     * The default configuration for the provider.
+     * @param captchaToken The captcha token when having captcha enabled
+     * @param data Extra data for the user
+     */
     @Serializable
     sealed class Config(
         @Serializable(with = CaptchaTokenSerializer::class)
@@ -39,7 +54,7 @@ sealed interface DefaultAuthProvider<C, R> : AuthProvider<C, R> {
         redirectUrl: String?,
         config: (C.() -> Unit)?
     ) {
-        if(config == null) throw IllegalArgumentException("Credentials are required")
+        require(config != null) { "Credentials are required" }
         val encodedCredentials = encodeCredentials(config)
         val finalRedirectUrl = supabaseClient.gotrue.generateRedirectUrl(redirectUrl)
         val gotrue = supabaseClient.gotrue as GoTrueImpl
@@ -59,7 +74,7 @@ sealed interface DefaultAuthProvider<C, R> : AuthProvider<C, R> {
         redirectUrl: String?,
         config: (C.() -> Unit)?
     ): R? {
-        if (config == null) throw IllegalArgumentException("Credentials are required")
+        require(config != null) { "Credentials are required" }
         val finalRedirectUrl = supabaseClient.gotrue.generateRedirectUrl(redirectUrl)
         val body = encodeCredentials(config)
         val gotrue = supabaseClient.gotrue as GoTrueImpl
@@ -92,8 +107,10 @@ sealed interface DefaultAuthProvider<C, R> : AuthProvider<C, R> {
         return decodeResult(json)
     }
 
+    @SupabaseInternal
     fun decodeResult(json: JsonObject): R
 
+    @SupabaseInternal
     fun encodeCredentials(credentials: C.() -> Unit): JsonObject
 
 }

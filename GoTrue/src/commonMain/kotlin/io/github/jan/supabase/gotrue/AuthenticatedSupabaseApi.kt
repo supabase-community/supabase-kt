@@ -1,6 +1,8 @@
+@file:Suppress("UndocumentedPublicClass", "UndocumentedPublicFunction")
 package io.github.jan.supabase.gotrue
 
 import io.github.jan.supabase.SupabaseClient
+import io.github.jan.supabase.annotiations.SupabaseInternal
 import io.github.jan.supabase.exceptions.RestException
 import io.github.jan.supabase.network.SupabaseApi
 import io.github.jan.supabase.plugins.MainPlugin
@@ -9,7 +11,8 @@ import io.ktor.client.request.bearerAuth
 import io.ktor.client.statement.HttpResponse
 import io.ktor.client.statement.HttpStatement
 
-class AuthenticatedSupabaseApi(
+@OptIn(SupabaseInternal::class)
+class AuthenticatedSupabaseApi @SupabaseInternal constructor(
     resolveUrl: (path: String) -> String,
     parseErrorResponse: (suspend (response: HttpResponse) -> RestException)? = null,
     private val defaultRequest: (HttpRequestBuilder.() -> Unit)? = null,
@@ -48,16 +51,19 @@ class AuthenticatedSupabaseApi(
  * Creates a [AuthenticatedSupabaseApi] with the given [baseUrl]. Requires [GoTrue] to authenticate requests
  * All requests will be resolved relative to this url
  */
+@SupabaseInternal
 fun SupabaseClient.authenticatedSupabaseApi(baseUrl: String, parseErrorResponse: (suspend (response: HttpResponse) -> RestException)? = null) = authenticatedSupabaseApi({ baseUrl + it }, parseErrorResponse)
 
 /**
  * Creates a [AuthenticatedSupabaseApi] for the given [plugin]. Requires [GoTrue] to authenticate requests
  * All requests will be resolved using the [MainPlugin.resolveUrl] function
  */
+@SupabaseInternal
 fun SupabaseClient.authenticatedSupabaseApi(plugin: MainPlugin<*>, defaultRequest: (HttpRequestBuilder.() -> Unit)? = null) = authenticatedSupabaseApi(plugin::resolveUrl, plugin::parseErrorResponse, defaultRequest, plugin.config.jwtToken)
 
 /**
  * Creates a [AuthenticatedSupabaseApi] with the given [resolveUrl] function. Requires [GoTrue] to authenticate requests
  * All requests will be resolved using this function
  */
+@SupabaseInternal
 fun SupabaseClient.authenticatedSupabaseApi(resolveUrl: (path: String) -> String, parseErrorResponse: (suspend (response: HttpResponse) -> RestException)? = null, defaultRequest: (HttpRequestBuilder.() -> Unit)? = null, jwtToken: String? = null) = AuthenticatedSupabaseApi(resolveUrl, parseErrorResponse, defaultRequest, this, jwtToken)

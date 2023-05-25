@@ -1,31 +1,52 @@
 package io.github.jan.supabase.storage
 
+import io.github.jan.supabase.annotiations.SupabaseInternal
 import io.github.jan.supabase.storage.ImageTransformation.Resize
-import io.ktor.http.*
+import io.ktor.http.ParametersBuilder
+import io.ktor.http.formUrlEncode
 
 /**
- * Represents a transformation for an image. Used for [Storage] objects-
- * @property width The width of the image
- * @property height The height of the image
- * @property resize The resize mode
- * @property quality The quality of the image. (Percentage 1-100, defaults to 80)
- * @property format Specify in which format you want the image to receive. (Defaults to 'origin', which means the original format
+ * Represents a transformation for an image. Used for [Storage] objects
  * @see Resize
  * @see BucketApi.downloadAuthenticated
  * @see BucketApi.downloadPublic
  */
 class ImageTransformation {
 
+    /**
+     * The width of the image
+     */
     var width: Int? = null
+
+    /**
+     * The height of the image
+     */
     var height: Int? = null
+
+    /**
+     * The quality of the image. (Percentage 1-100, defaults to 80)
+     */
     var quality: Int? = null
         set(value) {
-            if(value !in 1..100) throw IllegalArgumentException("Quality must be between 1 and 100")
+            require(value in VALID_QUALITY_RANGE) { "Quality must be between 1 and 100"}
             field = value
         }
+
+    /**
+     * Specify in which format you want the image to receive. (Defaults to 'origin', which means the original format)
+     */
     var format: String? = null
+
+    /**
+     * The resize mode
+     */
     var resize: Resize? = null
 
+    /**
+     * Changes the size of the image
+     * @param width The width of the image
+     * @param height The height of the image
+     */
     fun size(width: Int, height: Int) {
         this.width = width
         this.height = height
@@ -62,6 +83,9 @@ class ImageTransformation {
         return builder.build().formUrlEncode()
     }
 
+    /**
+     * The resize mode
+     */
     enum class Resize {
         /**
          * Resizes the image while keeping the aspect ratio to fill a given size and crops projecting parts
@@ -77,6 +101,11 @@ class ImageTransformation {
          * Resizes the image without keeping the aspect ratio.
          */
         FILL
+    }
+
+    companion object {
+        @SupabaseInternal
+        val VALID_QUALITY_RANGE = 1..100
     }
 
 }

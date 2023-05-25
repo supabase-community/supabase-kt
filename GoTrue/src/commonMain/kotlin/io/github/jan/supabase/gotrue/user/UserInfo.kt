@@ -1,3 +1,4 @@
+@file:Suppress("UndocumentedPublicClass", "UndocumentedPublicFunction", "UndocumentedPublicProperty")
 package io.github.jan.supabase.gotrue.user
 
 import kotlinx.datetime.Instant

@@ -1,16 +1,16 @@
 package io.github.jan.supabase.realtime
 
+import io.github.jan.supabase.annotiations.SupabaseInternal
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
-/**
- * Represents the payload sent when joining a channel
- */
+@SupabaseInternal
 @Serializable
 data class RealtimeJoinPayload(
     val config: RealtimeJoinConfig
 )
 
+@SupabaseInternal
 @Serializable
 data class RealtimeJoinConfig(
     val broadcast: BroadcastJoinConfig,
@@ -32,6 +32,7 @@ data class BroadcastJoinConfig(@SerialName("ack") var acknowledgeBroadcasts: Boo
 @Serializable
 data class PresenceJoinConfig(var key: String)
 
+@SupabaseInternal
 @Serializable
 data class PostgresJoinConfig(val schema: String, val table: String? = null, val filter: String? = null, val event: String, val id: Long = 0L) {
 

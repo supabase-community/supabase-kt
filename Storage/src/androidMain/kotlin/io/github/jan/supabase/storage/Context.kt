@@ -12,4 +12,4 @@ internal class SupabaseInitializer : Initializer<Context> {
 
 }
 
-internal fun applicationContext(): Context = appContext ?: throw IllegalStateException("Application context not initialized")
+internal fun applicationContext(): Context = appContext ?: error("Application context not initialized")

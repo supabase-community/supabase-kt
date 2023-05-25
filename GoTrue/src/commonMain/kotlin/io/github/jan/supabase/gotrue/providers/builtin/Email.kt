@@ -19,8 +19,22 @@ object Email : DefaultAuthProvider<Email.Config, Email.Result> {
 
     override val grantType: String = "password"
 
+    /**
+     * The configuration for the email authentication method
+     * @param email The email of the user
+     * @param password The password of the user
+     */
     @Serializable
     data class Config(var email: String = "", var password: String = ""): DefaultAuthProvider.Config()
+
+    /**
+     * The sign up result of the email authentication method
+     * @param id The id of the created user
+     * @param email The email of the created user
+     * @param confirmationSentAt The time the confirmation was sent
+     * @param createdAt The time the user was created
+     * @param updatedAt The time the user was updated
+     */
     @Serializable
     data class Result(
         val id: String,

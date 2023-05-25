@@ -18,17 +18,31 @@ sealed interface LinkType<C: LinkType.Config> {
     @SupabaseInternal
     fun createConfig(config: C.() -> Unit): C
 
+    /**
+     * The default configuration for a [LinkType]
+     */
     @Serializable
     open class Config {
 
+        /**
+         * The email of the user
+         */
         var email: String = ""
 
     }
 
+    /**
+     * The signup link type
+     */
     object Signup: LinkType<Signup.Config> {
 
         override val type = "signup"
 
+        /**
+         * The configuration for the [Signup] link type
+         * @param password The password for the new user
+         * @param data Custom data for the new user
+         */
         @Serializable
         data class Config(
             var password: String = "",
@@ -40,6 +54,9 @@ sealed interface LinkType<C: LinkType.Config> {
 
     }
 
+    /**
+     * The invite link type
+     */
     object Invite : LinkType<Config> {
 
         override val type = "invite"
@@ -49,6 +66,9 @@ sealed interface LinkType<C: LinkType.Config> {
 
     }
 
+    /**
+     * The magic link type
+     */
     object MagicLink : LinkType<Config> {
 
         override val type: String = "magiclink"
@@ -58,6 +78,9 @@ sealed interface LinkType<C: LinkType.Config> {
 
     }
 
+    /**
+     * The recovery link type
+     */
     object RecoveryLink : LinkType<Config> {
 
         override val type: String = "recovery"
@@ -67,10 +90,17 @@ sealed interface LinkType<C: LinkType.Config> {
 
     }
 
+    /**
+     * The email change link type
+     */
     object EmailChangeCurrent : LinkType<EmailChangeCurrent.Config> {
 
         override val type: String = "email_change_current"
 
+        /**
+         * The configuration for the [EmailChangeCurrent] and [EmailChangeNew] link type
+         * @param newEmail The new email of the user
+         */
         @Serializable
         data class Config(
             @SerialName("new_email")
@@ -82,6 +112,9 @@ sealed interface LinkType<C: LinkType.Config> {
 
     }
 
+    /**
+     * The email change link type
+     */
     object EmailChangeNew : LinkType<EmailChangeCurrent.Config> {
 
         override val type: String = "email_change_new"

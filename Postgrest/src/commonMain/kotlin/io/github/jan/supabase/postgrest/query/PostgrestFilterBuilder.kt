@@ -1,5 +1,8 @@
+@file:Suppress("UndocumentedPublicProperty")
 package io.github.jan.supabase.postgrest.query
 
+import io.github.jan.supabase.annotiations.SupabaseInternal
+import io.github.jan.supabase.gotrue.PostgrestFilterDSL
 import io.github.jan.supabase.postgrest.PropertyConversionMethod
 import io.github.jan.supabase.postgrest.formatJoiningFilter
 import kotlin.reflect.KProperty1
@@ -7,6 +10,7 @@ import kotlin.reflect.KProperty1
 /**
  * A filter builder for a postgrest query
  */
+@PostgrestFilterDSL
 class PostgrestFilterBuilder(@PublishedApi internal val propertyConversionMethod: PropertyConversionMethod) {
 
     @PublishedApi
@@ -14,18 +18,30 @@ class PostgrestFilterBuilder(@PublishedApi internal val propertyConversionMethod
     val params: Map<String, List<String>>
         get() = _params.toMap()
 
+    /**
+     * Adds a negated filter to the query
+     */
     fun filterNot(column: String, operator: FilterOperator, value: Any?) {
         val columnValue = params[column] ?: emptyList()
         _params[column] = columnValue + listOf("not.${operator.identifier}.$value")
     }
 
+    /**
+     * Adds a negated filter to the query
+     */
     fun filterNot(operation: FilterOperation) = filterNot(operation.column, operation.operator, operation.value)
 
+    /**
+     * Adds a filter to the query
+     */
     fun filter(column: String, operator: FilterOperator, value: Any?) {
         val columnValue = params[column] ?: emptyList()
         _params[column] = columnValue + listOf("${operator.identifier}.$value")
     }
 
+    /**
+     * Adds a filter to the query
+     */
     fun filter(operation: FilterOperation) = filter(operation.column, operation.operator, operation.value)
 
     /**
@@ -155,12 +171,20 @@ class PostgrestFilterBuilder(@PublishedApi internal val propertyConversionMethod
      */
     fun adjacent(column: String, range: Pair<Any, Any>) = filter(column, FilterOperator.ADJ, "(${range.first},${range.second})")
 
-    inline fun or(negate: Boolean = false, filter: PostgrestFilterBuilder.() -> Unit) {
+    /**
+     * Adds an `or` condition to the query
+     */
+    @PostgrestFilterDSL
+    inline fun or(negate: Boolean = false, filter: @PostgrestFilterDSL PostgrestFilterBuilder.() -> Unit) {
         val prefix = if(negate) "not." else ""
         _params[prefix + "or"] = listOf(formatJoiningFilter(filter))
     }
 
-    inline fun and(negate: Boolean = false, filter: PostgrestFilterBuilder.() -> Unit) {
+    /**
+     * Adds an `and` condition to the query
+     */
+    @PostgrestFilterDSL
+    inline fun and(negate: Boolean = false, filter: @PostgrestFilterDSL PostgrestFilterBuilder.() -> Unit) {
         val prefix = if (negate) "not." else ""
         _params[prefix + "and"] = listOf(formatJoiningFilter(filter))
     }
@@ -351,6 +375,7 @@ class PostgrestFilterBuilder(@PublishedApi internal val propertyConversionMethod
 
 }
 
+@SupabaseInternal
 inline fun buildPostgrestFilter(propertyConversionMethod: PropertyConversionMethod = PropertyConversionMethod.CAMEL_CASE_TO_SNAKE_CASE, block: PostgrestFilterBuilder.() -> Unit): Map<String, List<String>> {
     val filter = PostgrestFilterBuilder(propertyConversionMethod)
     filter.block()

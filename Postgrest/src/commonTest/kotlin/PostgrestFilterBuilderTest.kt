@@ -137,7 +137,7 @@ class PostgrestFilterBuilderTest {
     @Test
     fun sl() {
         val filter = filterToString {
-            sl("id", 1L..10L)
+            sl("id", 1L to 10L)
         }
         assertEquals("id=sl.(1,10)", filter)
     }
@@ -145,7 +145,7 @@ class PostgrestFilterBuilderTest {
     @Test
     fun sr() {
         val filter = filterToString {
-            sr("id", 1L..10L)
+            sr("id", 1L to 10L)
         }
         assertEquals("id=sr.(1,10)", filter)
     }
@@ -153,7 +153,7 @@ class PostgrestFilterBuilderTest {
     @Test
     fun nxl() {
         val filter = filterToString {
-            nxl("id", 1L..10L)
+            nxl("id", 1L to 10L)
         }
         assertEquals("id=nxl.(1,10)", filter)
     }
@@ -161,7 +161,7 @@ class PostgrestFilterBuilderTest {
     @Test
     fun nxr() {
         val filter = filterToString {
-            nxr("id", 1L..10L)
+            nxr("id", 1L to 10L)
         }
         assertEquals("id=nxr.(1,10)", filter)
     }
@@ -169,7 +169,7 @@ class PostgrestFilterBuilderTest {
     @Test
     fun adj() {
         val filter = filterToString {
-            adjacent("id", 1L..10L)
+            adjacent("id", 1L to 10L)
         }
         assertEquals("id=adj.(1,10)", filter)
     }

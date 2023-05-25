@@ -5,9 +5,11 @@ import korlibs.crypto.SecureRandom
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
 
+private const val VERIFIER_LENGTH = 64
+
 @OptIn(ExperimentalEncodingApi::class)
 internal fun generateCodeVerifier(): String {
-    val bytes = ByteArray(64)
+    val bytes = ByteArray(VERIFIER_LENGTH)
     SecureRandom.nextBytes(bytes)
     return Base64.UrlSafe.encode(bytes)
 }

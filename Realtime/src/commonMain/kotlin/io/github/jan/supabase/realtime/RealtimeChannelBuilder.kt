@@ -1,7 +1,11 @@
 package io.github.jan.supabase.realtime
 
+import io.github.jan.supabase.annotiations.SupabaseInternal
 import io.github.jan.supabase.realtime.annotiations.ChannelDsl
 
+/**
+ * Used to build a realtime channel
+ */
 @ChannelDsl
 class RealtimeChannelBuilder @PublishedApi internal constructor(private val topic: String, private val realtimeImpl: RealtimeImpl) {
 
@@ -17,11 +21,13 @@ class RealtimeChannelBuilder @PublishedApi internal constructor(private val topi
 
     /**
      * Sets the presence join config
+     * @param block The presence join config
      */
     fun presence(block: PresenceJoinConfig.() -> Unit) {
         presenceJoinConfig = PresenceJoinConfig("").apply(block)
     }
 
+    @SupabaseInternal
     fun build(): RealtimeChannel {
         return RealtimeChannelImpl(
             realtimeImpl,

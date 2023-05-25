@@ -1,4 +1,6 @@
 package io.github.jan.supabase.gotrue
 
-actual fun GoTrue.setupPlatform() {
-}
+import io.github.jan.supabase.annotiations.SupabaseInternal
+
+@SupabaseInternal
+actual fun GoTrue.setupPlatform() = Unit

@@ -1,3 +1,4 @@
+@file:Suppress("UndocumentedPublicClass")
 package io.github.jan.supabase.gotrue.providers
 
 object Google : IDTokenProvider() {
@@ -96,6 +97,9 @@ object Spotify : OAuthProvider() {
 
 }
 
+/**
+ * Creates a new [OAuthProvider] with the given name
+ */
 operator fun OAuthProvider.Companion.invoke(provider: String) = object : OAuthProvider() {
 
     override val name = provider

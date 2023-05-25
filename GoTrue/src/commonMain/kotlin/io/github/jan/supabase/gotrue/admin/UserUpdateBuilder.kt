@@ -4,6 +4,16 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonObject
 
+/**
+ * A builder for updating a user.
+ * @property email The user's email address
+ * @property password The user's password
+ * @property appMetadata Extra app metadata
+ * @property userMetadata Extra user metadata
+ * @property emailConfirm Automatically confirms the email address
+ * @property phoneConfirm Automatically confirms the phone number
+ * @property phone The user's phone number
+ */
 @Serializable
 data class UserUpdateBuilder(
     var email: String? = null,

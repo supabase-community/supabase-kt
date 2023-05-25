@@ -1,6 +1,7 @@
 package io.github.jan.supabase.plugins
 
 import io.github.jan.supabase.SupabaseClient
+import io.github.jan.supabase.annotiations.SupabaseInternal
 import io.github.jan.supabase.buildUrl
 import io.github.jan.supabase.createSupabaseClient
 import io.github.jan.supabase.exceptions.RestException
@@ -42,21 +43,22 @@ interface MainPlugin <Config : MainConfig> : SupabasePlugin {
     /**
      * The version for the api the plugin is using
      */
-    val API_VERSION: Int
+    val apiVersion: Int
 
     /**
      * The unique key for this plugin
      */
-    val PLUGIN_KEY: String
+    val pluginKey: String
 
     /**
      * Gets the auth url from either [config.customUrl] or [SupabaseClient.supabaseHttpUrl] and adds [path] to it
      */
+    @OptIn(SupabaseInternal::class)
     fun resolveUrl(path: String = ""): String {
         val isBase = config.customUrl == null
         return buildUrl(config.customUrl ?: supabaseClient.supabaseHttpUrl) {
             if(isBase) {
-                appendEncodedPathSegments(PLUGIN_KEY, "v${API_VERSION}")
+                appendEncodedPathSegments(pluginKey, "v${apiVersion}")
             }
             if(path.isNotBlank()) {
                 appendEncodedPathSegments(path)

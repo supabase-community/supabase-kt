@@ -56,7 +56,7 @@ class SupabaseClientBuilder @PublishedApi internal constructor(private val supab
             else -> null
         }
         if(!ignoreModulesInUrl && module != null) {
-            throw IllegalStateException("The supabase url should not contain ($module), supabase-kt handles the url endpoints. If you want to use a custom url for a module, specify it within their builder but that's not necessary for normal supabase projects")
+            error("The supabase url should not contain ($module), supabase-kt handles the url endpoints. If you want to use a custom url for a module, specify it within their builder but that's not necessary for normal supabase projects")
         }
         if(supabaseUrl.startsWith("http://")) {
             useHTTPS = false

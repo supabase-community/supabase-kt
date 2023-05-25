@@ -24,12 +24,29 @@ object Phone : DefaultAuthProvider<Phone.Config, Phone.Result> {
 
     override val grantType: String = "password"
 
+    /**
+     * The configuration for the phone authentication method
+     * @param phoneNumber The phone number of the user
+     * @param password The password of the user
+     * @param channel The channel to send the confirmation to
+     */
     @Serializable
     data class Config(var phoneNumber: String = "", var password: String = "", var channel: Channel = Channel.SMS): DefaultAuthProvider.Config()
 
+    /**
+     * Represents the phone number confirmation channel
+     * @param value The short name of the channel
+     */
     @Serializable(with = Channel.Companion::class)
     enum class Channel(val value: String) {
+        /**
+         * Send the confirmation via SMS
+         */
         SMS("sms"),
+
+        /**
+         * Send the confirmation via WhatsApp. **Note:** WhatsApp is only supported by Twilio
+         */
         WHATSAPP("whatsapp");
 
         companion object: KSerializer<Channel> {
@@ -48,6 +65,14 @@ object Phone : DefaultAuthProvider<Phone.Config, Phone.Result> {
         }
     }
 
+    /**
+     * The sign up result of the phone authentication method
+     * @param id The id of the created user
+     * @param phone The phone number of the created user
+     * @param confirmationSentAt The time the confirmation was sent
+     * @param createdAt The time the user was created
+     * @param updatedAt The time the user was updated
+     */
     @Serializable
     data class Result(
         val id: String,
@@ -56,6 +81,7 @@ object Phone : DefaultAuthProvider<Phone.Config, Phone.Result> {
         @SerialName("created_at") val createdAt: Instant,
         @SerialName("updated_at") val updatedAt: Instant,
     )
+
     @OptIn(ExperimentalSerializationApi::class)
     override fun decodeResult(json: JsonObject): Result = try {
         supabaseJson.decodeFromJsonElement(json)

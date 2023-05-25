@@ -1,5 +1,6 @@
 package io.github.jan.supabase.postgrest.query
 
+import io.github.jan.supabase.annotiations.SupabaseInternal
 import io.github.jan.supabase.postgrest.PropertyConversionMethod
 import io.github.jan.supabase.supabaseJson
 import kotlinx.serialization.json.JsonElement
@@ -112,6 +113,7 @@ class PostgrestUpdate(@PublishedApi internal val propertyConversionMethod: Prope
 
 }
 
+@SupabaseInternal
 inline fun buildPostgrestUpdate(propertyConversionMethod: PropertyConversionMethod = PropertyConversionMethod.SERIAL_NAME, block: PostgrestUpdate.() -> Unit): JsonObject {
     val update = PostgrestUpdate(propertyConversionMethod)
     update.block()

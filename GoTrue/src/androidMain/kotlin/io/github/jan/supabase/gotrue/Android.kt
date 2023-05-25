@@ -7,8 +7,6 @@ import io.github.jan.supabase.annotiations.SupabaseExperimental
 import io.github.jan.supabase.gotrue.providers.ExternalAuthConfigDefaults
 import io.github.jan.supabase.gotrue.providers.OAuthProvider
 import io.github.jan.supabase.gotrue.user.UserSession
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 internal fun GoTrue.openOAuth(provider: OAuthProvider, redirectTo: String, config: ExternalAuthConfigDefaults) {
@@ -26,6 +24,12 @@ internal fun openUrl(uri: Uri) {
 }
 
 //TODO: Add context receiver 'Activity'
+/**
+ * Handle deeplinks for authentication.
+ * This handles the deeplinks for implicit and PKCE flow.
+ * @param intent The intent from the activity
+ * @param onSessionSuccess The callback when the session was successfully imported
+ */
 @OptIn(SupabaseExperimental::class)
 fun SupabaseClient.handleDeeplinks(intent: Intent, onSessionSuccess: (UserSession) -> Unit = {}) {
     val data = intent.data ?: return
@@ -39,8 +43,7 @@ fun SupabaseClient.handleDeeplinks(intent: Intent, onSessionSuccess: (UserSessio
         }
         FlowType.PKCE -> {
             val code = data.getQueryParameter("code") ?: return
-            val scope = CoroutineScope(Dispatchers.Default)
-            scope.launch {
+            (gotrue as GoTrueImpl).authScope.launch {
                 this@handleDeeplinks.gotrue.exchangeCodeForSession(code)
                 onSessionSuccess(this@handleDeeplinks.gotrue.currentSessionOrNull() ?: error("No session available"))
             }

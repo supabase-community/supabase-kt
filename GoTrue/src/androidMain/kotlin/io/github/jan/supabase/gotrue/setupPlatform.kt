@@ -6,8 +6,7 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ProcessLifecycleOwner
 import androidx.startup.Initializer
 import io.github.aakira.napier.Napier
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
+import io.github.jan.supabase.annotiations.SupabaseInternal
 import kotlinx.coroutines.launch
 
 private var appContext: Context? = null
@@ -19,8 +18,9 @@ internal class SupabaseInitializer : Initializer<Context> {
 
 }
 
-internal fun applicationContext(): Context = appContext ?: throw IllegalStateException("Application context not initialized")
+internal fun applicationContext(): Context = appContext ?: error("Application context not initialized")
 
+@SupabaseInternal
 actual fun GoTrue.setupPlatform() {
     addLifecycleCallbacks(this)
 }
@@ -28,7 +28,8 @@ actual fun GoTrue.setupPlatform() {
 private fun addLifecycleCallbacks(gotrue: GoTrue) {
     if(!gotrue.config.enableLifecycleCallbacks) return
     val lifecycle = ProcessLifecycleOwner.get().lifecycle
-    val scope = CoroutineScope(Dispatchers.IO)
+    gotrue as GoTrueImpl
+    val scope = gotrue.authScope
     lifecycle.addObserver(
         object : DefaultLifecycleObserver {
 
