@@ -293,7 +293,7 @@ sealed interface GoTrue : MainPlugin<GoTrueConfig> {
      * @param accessToken The jwt token to import
      * @param retrieveUser Whether to retrieve the user profile or not
      */
-    suspend fun importAuthToken(accessToken: String, refreshToken: String = "", retrieveUser: Boolean = false) = importSession(UserSession(accessToken, refreshToken, "", "", 0L, "", if(retrieveUser) tryToGetUser(accessToken) else null), false)
+    suspend fun importAuthToken(accessToken: String, refreshToken: String = "", retrieveUser: Boolean = false, autoRefresh: Boolean = if(refreshToken.isNotBlank()) config.alwaysAutoRefresh else false) = importSession(UserSession(accessToken, refreshToken, "", "", 0L, "", if(retrieveUser) tryToGetUser(accessToken) else null), autoRefresh)
 
     /**
      * Retrieves the latest session from storage and starts auto-refreshing if [autoRefresh] is true or [GoTrue.Config.alwaysAutoRefresh] as the default parameter
