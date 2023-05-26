@@ -30,6 +30,8 @@ actual fun GoTrue.setupPlatform() {
             val user = retrieveUser(accessToken)
             importSession(UserSession(accessToken, refreshToken, providerRefreshToken, providerToken, expiresIn, tokenType, user, type ?: ""))
         }
+        val newURL = window.location.href.split("?")[0];
+        window.history.replaceState({}, window.document.title, newURL);
     }
 
     fun checkForPCKECode() {
@@ -40,6 +42,8 @@ actual fun GoTrue.setupPlatform() {
             val session = exchangeCodeForSession(code)
             importSession(session)
         }
+        val newURL = window.location.href.split("?")[0];
+        window.history.replaceState({}, window.document.title, newURL);
     }
 
     window.onhashchange = {

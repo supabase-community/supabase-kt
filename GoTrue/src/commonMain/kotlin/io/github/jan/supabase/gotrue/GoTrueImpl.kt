@@ -413,12 +413,21 @@ internal class GoTrueImpl(override val supabaseClient: SupabaseClient, override 
         }
     }
 
+    @OptIn(SupabaseExperimental::class)
     override fun oAuthUrl(
         provider: OAuthProvider,
         redirectUrl: String?,
         additionalConfig: ExternalAuthConfigDefaults.() -> Unit
     ): String {
         val config = ExternalAuthConfigDefaults().apply(additionalConfig)
+        if(this.config.flowType == FlowType.PKCE) {
+            val codeVerifier = generateCodeVerifier()
+            authScope.launch {
+                supabaseClient.gotrue.codeVerifierCache.saveCodeVerifier(codeVerifier)
+            }
+            config.queryParams["code_challenge"] = generateCodeChallenge(codeVerifier)
+            config.queryParams["code_challenge_method"] = "S256"
+        }
         return resolveUrl(buildString {
             append("authorize?provider=${provider.name}&redirect_to=$redirectUrl")
             if(config.scopes.isNotEmpty()) append("&scopes=${config.scopes.joinToString("+")}")

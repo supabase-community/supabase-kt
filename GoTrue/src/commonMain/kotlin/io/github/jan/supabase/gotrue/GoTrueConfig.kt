@@ -75,14 +75,14 @@ enum class FlowType {
     /**
      * The implicit flow is the default flow, which is easier to use, but less secure.
      *
-     * Note: OTP's via a link and sign up verification links are not supproted on desktop.
+     * Note: OTP's via a link and sign up verification links are not supported on desktop. Replace your email template to send the token instead.
      */
     IMPLICIT,
 
     /**
      * The PKCE flow is more secure, as it uses a code verifier to exchange the code for a session making it harder to intercept the session
      *
-     * Note: OTP's via a link and sign up verification links are not supproted on desktop.
+     * Note: OTP's via a link and sign up verification links are not supported on desktop. Replace your email template to send the token instead.
      */
     @SupabaseExperimental
     PKCE

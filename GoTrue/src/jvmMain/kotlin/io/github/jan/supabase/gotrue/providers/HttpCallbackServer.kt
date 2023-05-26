@@ -1,6 +1,7 @@
 package io.github.jan.supabase.gotrue.providers
 
 import io.github.aakira.napier.Napier
+import io.github.jan.supabase.annotiations.SupabaseExperimental
 import io.github.jan.supabase.gotrue.GoTrue
 import io.github.jan.supabase.gotrue.GoTrueImpl
 import io.github.jan.supabase.gotrue.user.UserSession
@@ -14,6 +15,7 @@ import java.net.URI
 
 private const val HTTP_SERVER_STOP_DELAY = 1000L
 
+@OptIn(SupabaseExperimental::class)
 internal suspend fun createServer(
     url: suspend (redirect: String) -> String,
     gotrue: GoTrue,
@@ -21,7 +23,16 @@ internal suspend fun createServer(
 ) {
     val server = Javalin.create()
         .get("/") { ctx ->
-            ctx.html(HTML.landingPage(gotrue.config.htmlTitle))
+            if(ctx.queryParam("code") != null) {
+                val code = ctx.queryParam("code") ?: return@get
+                (gotrue as GoTrueImpl).authScope.launch {
+                    val session = gotrue.exchangeCodeForSession(code, false)
+                    onSuccess(session)
+                }
+                ctx.html(HTML.redirectPage(gotrue.config.htmlIconUrl, gotrue.config.htmlTitle, gotrue.config.htmlText))
+            } else {
+                ctx.html(HTML.landingPage(gotrue.config.htmlTitle))
+            }
         }
     server.get("/callback") { ctx ->
         Napier.d {
@@ -55,7 +66,6 @@ internal suspend fun createServer(
         server.stop()
     }
 }
-
 internal object HTML {
 
     fun landingPage(title: String) = """
@@ -97,6 +107,10 @@ internal object HTML {
                     transform: translateX(-50%) translateY(-50%);
                     font-family: Uni Sans, sans-serif;
                 ">$text</p>
+                <script>
+                    const newURL = location.href.split("?")[0];
+                    window.history.replaceState({}, document.title, newURL);
+                </script>
             </body>
         </html>
     """.trimIndent()
