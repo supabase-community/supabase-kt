@@ -56,7 +56,14 @@ sealed interface Storage : MainPlugin<Storage.Config> {
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
-    suspend fun createBucket(name: String, id: String, builder: BucketBuilder.() -> Unit = {})
+    suspend fun createBucket(id: String, builder: BucketBuilder.() -> Unit = {})
+
+    /**
+     * Updates a bucket in the storage
+     * @param id the id of the bucket
+     * @param builder the builder for the bucket
+     */
+    suspend fun updateBucket(id: String, builder: BucketBuilder.() -> Unit = {})
 
     /**
      * Returns all buckets in the storage
@@ -80,6 +87,7 @@ sealed interface Storage : MainPlugin<Storage.Config> {
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
+    @Deprecated("use updateBucket instead", ReplaceWith("updateBucket(bucketId) { \nthis@updateBucket.public = public\n }"))
     suspend fun changePublicStatus(bucketId: String, public: Boolean)
 
     /**
@@ -201,12 +209,12 @@ internal class StorageImpl(override val supabaseClient: SupabaseClient, override
         api.delete("bucket/$bucketId")
     }
 
-    override suspend fun createBucket(name: String, id: String, builder: BucketBuilder.() -> Unit) {
+    override suspend fun createBucket(id: String, builder: BucketBuilder.() -> Unit) {
         val bucketBuilder = BucketBuilder().apply(builder)
         val body = buildJsonObject {
-            put("name", name)
+            put("name", id)
             put("id", id)
-            put("public", bucketBuilder.public)
+            put("public", bucketBuilder.public ?: false)
             bucketBuilder.allowedMimeTypes?.let {
                 put("allowed_mime_types", JsonArray(it.map { type -> JsonPrimitive(type) }))
             }
@@ -215,6 +223,24 @@ internal class StorageImpl(override val supabaseClient: SupabaseClient, override
             }
         }
         api.postJson("bucket", body)
+    }
+
+    override suspend fun updateBucket(id: String, builder: BucketBuilder.() -> Unit) {
+        val bucketBuilder = BucketBuilder().apply(builder)
+        val body = buildJsonObject {
+            put("name", id)
+            put("id", id)
+            bucketBuilder.public?.let {
+                put("public", bucketBuilder.public)
+            }
+            bucketBuilder.allowedMimeTypes?.let {
+                put("allowed_mime_types", JsonArray(it.map { type -> JsonPrimitive(type) }))
+            }
+            bucketBuilder.fileSizeLimit?.let {
+                put("file_size_limit", it.value)
+            }
+        }
+        api.putJson("bucket/$id", body)
     }
 
     override suspend fun changePublicStatus(bucketId: String, public: Boolean) {

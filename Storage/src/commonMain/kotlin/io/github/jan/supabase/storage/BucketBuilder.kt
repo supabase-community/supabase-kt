@@ -12,7 +12,7 @@ class BucketBuilder {
     /**
      * Whether the bucket should be public
      */
-    var public = false
+    var public: Boolean? = null
 
     /**
      * The file size limit for the bucket. E.g. **10.megabytes**

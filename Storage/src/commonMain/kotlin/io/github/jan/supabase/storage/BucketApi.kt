@@ -219,7 +219,7 @@ sealed interface BucketApi {
      * These urls are valid for 2 hours.
      * @param path The path to create an url for
      */
-    suspend fun createUploadSignedUrl(path: String): UploadSignedUrl
+    suspend fun createSignedUploadUrl(path: String): UploadSignedUrl
 
     /**
      * Creates a signed url to download without authentication. The url will expire after [expiresIn]
