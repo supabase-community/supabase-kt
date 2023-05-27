@@ -4,7 +4,7 @@ package io.github.jan.supabase.gotrue.user
 import kotlinx.datetime.Instant
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.JsonObject
 
 @Serializable
 data class UserInfo(
@@ -36,7 +36,7 @@ data class UserInfo(
     @SerialName("updated_at")
     val updatedAt: Instant? = null,
     @SerialName("user_metadata")
-    val userMetadata: Map<String, JsonPrimitive> = emptyMap(),
+    val userMetadata: JsonObject? = null,
     @SerialName("phone_change_sent_at")
     val phoneChangeSentAt: Instant? = null,
     @SerialName("new_phone")

@@ -15,7 +15,7 @@ import kotlinx.serialization.json.JsonObject
  * @property phone The user's phone number
  */
 @Serializable
-data class UserUpdateBuilder(
+data class AdminUserUpdateBuilder(
     var email: String? = null,
     var password: String? = null,
     @SerialName("app_metadata")

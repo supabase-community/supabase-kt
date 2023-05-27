@@ -27,13 +27,13 @@ sealed interface AdminApi {
      * Creates a new user using an email and password
      * @return the newly created user
      */
-    suspend fun createUserWithEmail(builder: UserBuilder.Email.() -> Unit): UserInfo
+    suspend fun createUserWithEmail(builder: AdminUserBuilder.Email.() -> Unit): UserInfo
 
     /**
      * Creates a new user using a phone number and password
      * @return the newly created user
      */
-    suspend fun createUserWithPhone(builder: UserBuilder.Phone.() -> Unit): UserInfo
+    suspend fun createUserWithPhone(builder: AdminUserBuilder.Phone.() -> Unit): UserInfo
 
     /**
      * Removes a user session
@@ -69,7 +69,7 @@ sealed interface AdminApi {
      * Updates a user by its id
      * @param uid the id of the user
      */
-    suspend fun updateUserById(uid: String, builder: UserUpdateBuilder.() -> Unit): UserInfo
+    suspend fun updateUserById(uid: String, builder: AdminUserUpdateBuilder.() -> Unit): UserInfo
 
     /**
      * Retrieves all MFA factors of a user
@@ -98,13 +98,13 @@ internal class AdminApiImpl(val gotrue: GoTrue) : AdminApi {
         }
     }
 
-    override suspend fun createUserWithEmail(builder: UserBuilder.Email.() -> Unit): UserInfo {
-        val userBuilder = UserBuilder.Email().apply(builder) as UserBuilder
+    override suspend fun createUserWithEmail(builder: AdminUserBuilder.Email.() -> Unit): UserInfo {
+        val userBuilder = AdminUserBuilder.Email().apply(builder) as AdminUserBuilder
         return api.postJson("admin/users", userBuilder).safeBody()
     }
 
-    override suspend fun createUserWithPhone(builder: UserBuilder.Phone.() -> Unit): UserInfo {
-        val userBuilder = UserBuilder.Phone().apply(builder) as UserBuilder
+    override suspend fun createUserWithPhone(builder: AdminUserBuilder.Phone.() -> Unit): UserInfo {
+        val userBuilder = AdminUserBuilder.Phone().apply(builder) as AdminUserBuilder
         return api.postJson("admin/users", userBuilder).safeBody()
     }
 
@@ -131,8 +131,8 @@ internal class AdminApiImpl(val gotrue: GoTrue) : AdminApi {
         api.postJson("invite", body) { redirectTo?.let { url.parameters.append("redirect_to", it) }}
     }
 
-    override suspend fun updateUserById(uid: String, builder: UserUpdateBuilder.() -> Unit): UserInfo {
-        val updateBuilder = UserUpdateBuilder().apply(builder)
+    override suspend fun updateUserById(uid: String, builder: AdminUserUpdateBuilder.() -> Unit): UserInfo {
+        val updateBuilder = AdminUserUpdateBuilder().apply(builder)
         return api.putJson("admin/users/$uid", updateBuilder).safeBody()
     }
 

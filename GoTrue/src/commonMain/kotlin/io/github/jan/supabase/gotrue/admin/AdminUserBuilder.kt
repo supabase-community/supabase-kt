@@ -15,8 +15,8 @@ import kotlinx.serialization.json.put
 /**
  * A builder for creating a new user when signing up.
  */
-@Serializable(with = UserBuilder.Companion::class)
-sealed class UserBuilder {
+@Serializable(with = AdminUserBuilder.Companion::class)
+sealed class AdminUserBuilder {
 
     /**
      * Extra user metadata
@@ -55,14 +55,14 @@ sealed class UserBuilder {
     /**
      * @property email The user's email address
      */
-    data class Email(var email: String = "") : UserBuilder()
+    data class Email(var email: String = "") : AdminUserBuilder()
 
     /**
      * @property phoneNumber The user's phone number
      */
-    data class Phone(var phoneNumber: String = "") : UserBuilder()
+    data class Phone(var phoneNumber: String = "") : AdminUserBuilder()
 
-    companion object : KSerializer<UserBuilder> {
+    companion object : KSerializer<AdminUserBuilder> {
 
         override val descriptor = buildClassSerialDescriptor("io.github.jan.supabase.gotrue.admin.UserBuilder") {
             element("password", String.serializer().descriptor)
@@ -73,11 +73,11 @@ sealed class UserBuilder {
             element("user_metadata", JsonObject.serializer().descriptor, isOptional = true)
         }
 
-        override fun deserialize(decoder: Decoder): UserBuilder {
+        override fun deserialize(decoder: Decoder): AdminUserBuilder {
             error("This serializer is only used for serialization")
         }
 
-        override fun serialize(encoder: Encoder, value: UserBuilder) {
+        override fun serialize(encoder: Encoder, value: AdminUserBuilder) {
             encoder as JsonEncoder
             require(value.password.isNotBlank()) { "Password must not be blank" }
             require(!(value is Email && value.email.isBlank())) { "Email must not be blank" }

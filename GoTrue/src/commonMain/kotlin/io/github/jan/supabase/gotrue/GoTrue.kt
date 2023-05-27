@@ -16,6 +16,7 @@ import io.github.jan.supabase.gotrue.providers.builtin.Phone
 import io.github.jan.supabase.gotrue.providers.builtin.SSO
 import io.github.jan.supabase.gotrue.user.UserInfo
 import io.github.jan.supabase.gotrue.user.UserSession
+import io.github.jan.supabase.gotrue.user.UserUpdateBuilder
 import io.github.jan.supabase.plugins.MainPlugin
 import io.github.jan.supabase.plugins.SupabasePluginProvider
 import io.ktor.client.plugins.HttpRequestTimeoutException
@@ -137,18 +138,16 @@ sealed interface GoTrue : MainPlugin<GoTrueConfig> {
     suspend fun <Config: SSO.Config> retrieveSSOUrl(type: SSO<Config>, redirectUrl: String? = null, config: (Config.() -> Unit)? = null): SSO.Result
 
     /**
-     * Modifies a user with the specified [provider]. Extra data can be supplied
-     * @param provider The provider to use. Either [Email] or [Phone]
-     * @param extraData Extra data to store
+     * Modifies the current user
+     * @param updateCurrentUser Whether to update the current user in the [SupabaseClient]
      * @param config The configuration to use
      * @throws RestException or one of its subclasses if receiving an error response
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
-    suspend fun <C, R, Provider : DefaultAuthProvider<C, R>> modifyUser(
-        provider: Provider,
-        extraData: JsonObject? = null,
-        config: C.() -> Unit = {}
+    suspend fun modifyUser(
+        updateCurrentUser: Boolean = true,
+        config: UserUpdateBuilder.() -> Unit
     ): UserInfo
 
     /**
@@ -389,20 +388,6 @@ sealed interface GoTrue : MainPlugin<GoTrueConfig> {
     }
 
 }
-
-
-/**
- * Modifies a user with the specified [provider]. Extra data can be supplied
- * @param provider The provider to use
- * @param config The configuration to use
- * @param extraData The extra data to use
- * @throws RestException If the current session is invalid
- */
-suspend inline fun <C, R, reified D, Provider : DefaultAuthProvider<C, R>> GoTrue.modifyUser(
-    provider: Provider,
-    extraData: D? = null,
-    noinline config: C.() -> Unit = { }
-): UserInfo = modifyUser(provider, extraData?.let { Json.encodeToJsonElement(extraData) }?.jsonObject, config)
 
 /**
  * Sends a one time password to the specified [provider]
