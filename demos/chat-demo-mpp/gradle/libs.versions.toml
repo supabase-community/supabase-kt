@@ -1,6 +1,6 @@
 [versions]
 kotlin = "1.8.20"
-agp = "8.0.1"
+agp = "8.0.2"
 compose = "1.4.0"
 supabase = "1.0.0"
 koin = "3.4.0"
