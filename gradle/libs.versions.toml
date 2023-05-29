@@ -17,7 +17,7 @@ maven-publish = "0.25.2"
 cache4k = "0.11.0"
 apollo-kotlin = "3.8.1"
 stately = "1.2.5"
-korlibs = "4.0.0-rc2"
+korlibs = "4.0.3"
 detekt = "1.23.0"
 
 [plugins]
