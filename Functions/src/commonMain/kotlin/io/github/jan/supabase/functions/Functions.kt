@@ -2,7 +2,6 @@ package io.github.jan.supabase.functions
 
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.annotiations.SupabaseInternal
-import io.github.jan.supabase.buildUrl
 import io.github.jan.supabase.exceptions.BadRequestRestException
 import io.github.jan.supabase.exceptions.NotFoundRestException
 import io.github.jan.supabase.exceptions.RestException
@@ -20,7 +19,6 @@ import io.ktor.client.statement.bodyAsText
 import io.ktor.http.Headers
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
-import io.ktor.http.appendEncodedPathSegments
 
 /**
  * Plugin to interact with the supabase Edge Functions API
@@ -47,8 +45,6 @@ class Functions(override val config: Config, override val supabaseClient: Supaba
 
     override val pluginKey: String
         get() = key
-
-    private val baseUrl = supabaseClient.supabaseHttpUrl.replaceFirst(".", ".functions.")
 
     @OptIn(SupabaseInternal::class)
     @PublishedApi
@@ -102,12 +98,6 @@ class Functions(override val config: Config, override val supabaseClient: Supaba
      */
     @OptIn(SupabaseInternal::class)
     fun buildEdgeFunction(function: String, headers: Headers = Headers.Empty) = EdgeFunction(function, headers, supabaseClient)
-
-    override fun resolveUrl(path: String): String {
-        return buildUrl(config.customUrl ?: baseUrl) {
-            appendEncodedPathSegments(path)
-        }
-    }
 
     override suspend fun parseErrorResponse(response: HttpResponse): RestException {
         val error = response.bodyAsText()
