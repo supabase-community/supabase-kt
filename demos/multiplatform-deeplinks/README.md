@@ -3,7 +3,7 @@
 This is a demo of integrating deeplink authentication with Supabase on Desktop and Android.
 
 On Desktop it uses [Conveyor](https://conveyor.hydraulic.dev/9.2/) to create an installer and register the url protocol.
-To allow the app to have a single instance running, it uses [unique4j](https://github.com/prat-man/unique4j). See [Main.kt](https://github.com/supabase-community/supabase-kt/blob/master/demos/desktop-deeplinks/desktop/src/main/kotlin/Main.kt) to learn more.
+To allow the app to have a single instance running, it uses [unique4j](https://github.com/prat-man/unique4j). See [Main.kt](https://github.com/supabase-community/supabase-kt/blob/master/demos/multiplatform-deeplinks/desktop/src/main/kotlin/Main.kt) to learn more.
 
 **Available platforms:** Android, Desktop
 
@@ -11,7 +11,7 @@ To allow the app to have a single instance running, it uses [unique4j](https://g
 
 # Configuration
 
-You need to specify your supabase url and key in [supabaseModule.kt](https://github.com/supabase-community/supabase-kt/blob/master/demos/desktop-deeplinks/common/src/commonMain/kotlin/io/github/jan/supabase/common/di/supabaseModule.kt)
+You need to specify your supabase url and key in [supabaseModule.kt](https://github.com/supabase-community/supabase-kt/blob/master/demos/multiplatform-deeplinks/common/src/commonMain/kotlin/io/github/jan/supabase/common/di/supabaseModule.kt)
 If you want Google login to work, set it up in the supabase dashboard.
 
 ### Building

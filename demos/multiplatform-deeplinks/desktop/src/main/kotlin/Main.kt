@@ -48,5 +48,5 @@ fun main(args: Array<String>) {
             App(root.viewModel)
         }
     }
-    val releaseFlag = unique4j.freeLock()
+    unique4j.freeLock()
 }

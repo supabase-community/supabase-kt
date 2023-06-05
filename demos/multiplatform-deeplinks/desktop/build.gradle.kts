@@ -17,7 +17,7 @@ kotlin {
 dependencies {
     implementation(project(":common"))
     implementation(compose.desktop.currentOs)
-    implementation("tk.pratanumandal:unique4j:1.4")
+    implementation(libs.unique4j)
 }
 
 dependencies {

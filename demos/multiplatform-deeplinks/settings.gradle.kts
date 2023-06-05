@@ -9,6 +9,6 @@ pluginManagement {
     }
 }
 
-rootProject.name = "desktop-deeplinks"
+rootProject.name = "multiplatform-deeplinks"
 
 include(":desktop", ":common", ":android")

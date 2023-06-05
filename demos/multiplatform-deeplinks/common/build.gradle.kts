@@ -39,7 +39,6 @@ kotlin {
                 api(libs.koin.android)
                 api(libs.androidx.lifecycle.viewmodel.ktx)
                 api(libs.androidx.lifecycle.viewmodel.compose)
-                api(libs.bundles.coil)
             }
         }
         val desktopMain by getting {
