@@ -30,13 +30,13 @@ fun main(args: Array<String>) {
     initKoin()
     val root = RootComponent()
     val unique4j = Unique4jImpl(args.toList()) {
-        if(it.startsWith(URL_PROTOCOL)) { // if we are the second instance
+        if(it.startsWith(URL_PROTOCOL)) { // handle received message
             val fragment = it.substringAfter("#")
             root.viewModel.importSession(fragment)
         }
     }
     val lockFlag = unique4j.acquireLock()
-    if(lockFlag) { // if we are the first instance
+    if(lockFlag) { // if there is no other instance running and we acquired the lock, we check for a deeplink in the args
         val protocol = args.firstOrNull { it.startsWith(URL_PROTOCOL) }
         if(protocol != null) {
             val fragment = protocol.substringAfter("#")
