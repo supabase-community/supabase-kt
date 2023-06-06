@@ -1,4 +1,4 @@
-# Multi-Factor Authentication Demo
+# Multiplatform Deeplinking Demo
 
 This is a demo of integrating deeplink authentication with Supabase on Desktop and Android.
 
