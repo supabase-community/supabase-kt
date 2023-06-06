@@ -11,7 +11,7 @@ https://github.com/supabase-community/supabase-kt/assets/26686035/abe3eb3d-32f4-
 # Configuration
 
 You need to specify your supabase url and key in [supabaseModule.kt](https://github.com/supabase-community/supabase-kt/blob/master/demos/multi-factor-authentication/common/src/commonMain/kotlin/io/github/jan/supabase/common/di/supabaseModule.kt)
-If you want Google login to work, set it up in the supabase dashboard.
+If you want Google login to work, set it up in the supabase dashboard and add `io.jan.supabase://login` to the registered urls.
 
 # Running
 
