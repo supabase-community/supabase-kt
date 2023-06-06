@@ -11,13 +11,11 @@ Supported targets:
 
 [![](https://img.shields.io/github/release/supabase-community/supabase-kt?label=stable)](https://github.com/supabase-community/supabase-kt/releases) [![](https://img.shields.io/maven-central/v/io.github.jan-tennert.supabase/supabase-kt?label=experimental)](https://central.sonatype.com/search?q=io.github.jan.supabase&smo=true)
 
-[![](https://img.shields.io/github/release/ktorio/ktor?label=ktor)]((https://github.com/ktorio/ktor/releases))
-
 ### Links
 
 [Documentation](https://supabase.com/docs/reference/kotlin/introduction)
 
-[Dokka reference for the latest version](https://supabase-community.github.io/supabase-kt/)
+[Dokka documentation for the latest version](https://supabase-community.github.io/supabase-kt/)
 
 [Troubleshooting](https://github.com/supabase-community/supabase-kt/wiki/Troubleshooting)
 
