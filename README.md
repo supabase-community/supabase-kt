@@ -9,21 +9,25 @@ Supported targets:
 
 *Note: WASM planned see [issue](https://github.com/supabase-community/supabase-kt/issues/86)*
 
-![](https://img.shields.io/github/release/supabase-community/supabase-kt?label=stable) ![](https://img.shields.io/maven-central/v/io.github.jan-tennert.supabase/supabase-kt?label=experimental)
+[![](https://img.shields.io/github/release/supabase-community/supabase-kt?label=stable)](https://github.com/supabase-community/supabase-kt/releases) [![](https://img.shields.io/maven-central/v/io.github.jan-tennert.supabase/supabase-kt?label=experimental)](https://central.sonatype.com/search?q=io.github.jan.supabase&smo=true)
+
+[![](https://img.shields.io/github/release/ktorio/ktor?label=ktor)]((https://github.com/ktorio/ktor/releases))
 
 ### Links
 
-[Dokka documentation for the latest version](https://supabase-community.github.io/supabase-kt/)
-
 [Documentation](https://supabase.com/docs/reference/kotlin/introduction)
+
+[Dokka reference for the latest version](https://supabase-community.github.io/supabase-kt/)
 
 [Troubleshooting](https://github.com/supabase-community/supabase-kt/wiki/Troubleshooting)
 
 # Installation
 
+**Available modules**: `gotrue-kt`, `postgrest-kt`, `functions-kt`, `storage-kt`, `realtime-kt`, `apollo-graphql`
+
 ```kotlin
 dependencies {
-    implementation("io.github.jan-tennert.supabase:[module e.g. functions-kt or gotrue-kt]:VERSION")
+    implementation("io.github.jan-tennert.supabase:[module]:VERSION")
 
     //add ktor client engine (if you don't already have one, see https://ktor.io/docs/http-client-engines.html for all engines)
     //e.g. the CIO engine
@@ -35,7 +39,7 @@ If you use multiple modules, you can use the bom dependency to get the correct v
 
 ```kotlin
 implementation(platform("io.github.jan-tennert.supabase:bom:VERSION"))
-implementation("io.github.jan-tennert.supabase:[module e.g. functions-kt or gotrue-kt]")
+implementation("io.github.jan-tennert.supabase:[module]")
 ```
 
 # Main Modules
