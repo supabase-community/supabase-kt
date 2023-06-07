@@ -16,7 +16,6 @@ env:
 jobs:
   create-staging-repository:
     runs-on: ubuntu-latest
-    needs: [create-staging-repo]
     steps:
       - uses: actions/checkout@v2
       - name: Setup JDK
