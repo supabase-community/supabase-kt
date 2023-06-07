@@ -37,7 +37,7 @@ jobs:
         run: ./gradlew createStagingRepository
   publishJvmAndroid:
     runs-on: ubuntu-latest
-    needs: [create-staging-repo]
+    needs: [create-staging-repository]
     steps:
       - uses: actions/checkout@v2
       - name: Setup JDK
@@ -59,7 +59,7 @@ jobs:
         run: ./gradlew publishAndroidDebugPublicationToMavenCentralRepository publishAndroidReleasePublicationToMavenCentralRepository publishJvmPublicationToMavenCentralRepository
   publishJsKotlinMultiplatform:
     runs-on: ubuntu-latest
-    needs: [create-staging-repo]
+    needs: [create-staging-repository]
     steps:
       - uses: actions/checkout@v2
       - name: Setup JDK
@@ -81,7 +81,7 @@ jobs:
         run: ./gradlew publishJsPublicationToMavenCentralRepository publishKotlinMultiplatformPublicationToMavenCentralRepository publishMavenPublicationToMavenCentralRepository
   publishIos:
     runs-on: macos-latest
-    needs: [create-staging-repo]
+    needs: [create-staging-repository]
     steps:
       - uses: actions/checkout@v2
       - name: Setup JDK
