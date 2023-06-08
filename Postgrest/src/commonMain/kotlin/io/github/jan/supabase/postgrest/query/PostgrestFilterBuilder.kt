@@ -332,7 +332,7 @@ class PostgrestFilterBuilder(@PublishedApi internal val propertyConversionMethod
      * Finds all rows where the value of the column with the name of the [KProperty1] converted using [propertyConversionMethod] matches the specified [pattern]
      * using pattern matching
      */
-    infix fun <T, V> KProperty1<T, V>.matches(pattern: String) = filter(FilterOperation(propertyConversionMethod(this), FilterOperator.MATCH, pattern))
+    infix fun <T, V> KProperty1<T, V>.match(pattern: String) = filter(FilterOperation(propertyConversionMethod(this), FilterOperator.MATCH, pattern))
 
     /**
      * Finds all rows where the value of the column with the name of the [KProperty1] converted using [propertyConversionMethod] matches the specified [pattern] (case-insensitive)
