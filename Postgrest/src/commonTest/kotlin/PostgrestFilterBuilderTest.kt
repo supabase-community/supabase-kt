@@ -73,6 +73,22 @@ class PostgrestFilterBuilderTest {
     }
 
     @Test
+    fun match() {
+        val filter = filterToString {
+            match("name", "person")
+        }
+        assertEquals("name=match.person", filter)
+    }
+
+    @Test
+    fun imatch() {
+        val filter = filterToString {
+            imatch("name", "person")
+        }
+        assertEquals("name=imatch.person", filter)
+    }
+
+    @Test
     fun ilike() {
         val filter = filterToString {
             ilike("name", "_n_")
