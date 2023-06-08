@@ -117,6 +117,16 @@ class PostgrestFilterBuilder(@PublishedApi internal val propertyConversionMethod
     fun ilike(column: String, pattern: String) = filter(column, FilterOperator.ILIKE, pattern)
 
     /**
+     * Finds all rows where the value of the [column] matches the specified [pattern] using pattern matching
+     */
+    fun match(column: String, pattern: String) = filter(column, FilterOperator.MATCH, pattern)
+
+    /**
+     * Finds all rows where the value of the [column] matches the specified [pattern] using pattern matching (case-insensitive)
+     */
+    fun imatch(column: String, pattern: String) = filter(column, FilterOperator.IMATCH, pattern)
+
+    /**
      * Finds all rows where the value of the [column] equals to one of these values: null,true,false,unknown
      */
     fun exact(column: String, value: Boolean?) = filter(column, FilterOperator.IS, value)
@@ -319,9 +329,21 @@ class PostgrestFilterBuilder(@PublishedApi internal val propertyConversionMethod
     infix fun <T, V> KProperty1<T, V>.like(pattern: String) = filter(FilterOperation(propertyConversionMethod(this), FilterOperator.LIKE, pattern))
 
     /**
+     * Finds all rows where the value of the column with the name of the [KProperty1] converted using [propertyConversionMethod] matches the specified [pattern]
+     * using pattern matching
+     */
+    infix fun <T, V> KProperty1<T, V>.matches(pattern: String) = filter(FilterOperation(propertyConversionMethod(this), FilterOperator.MATCH, pattern))
+
+    /**
      * Finds all rows where the value of the column with the name of the [KProperty1] converted using [propertyConversionMethod] matches the specified [pattern] (case-insensitive)
      */
     infix fun <T, V> KProperty1<T, V>.ilike(pattern: String) = filter(FilterOperation(propertyConversionMethod(this), FilterOperator.ILIKE, pattern))
+
+    /**
+     * Finds all rows where the value of the column with the name of the [KProperty1] converted using [propertyConversionMethod] matches the specified [pattern]
+     * using pattern matching
+     */
+    infix fun <T, V> KProperty1<T, V>.imatch(pattern: String) = filter(FilterOperation(propertyConversionMethod(this), FilterOperator.IMATCH, pattern))
 
     /**
      * Finds all rows where the value of the column with the name of the [KProperty1] converted using [propertyConversionMethod] equals to one of these values: null,true,false,unknown
@@ -398,7 +420,9 @@ enum class FilterOperator(val identifier: String) {
     LT("lt"),
     LTE("lte"),
     LIKE("like"),
+    MATCH("match"),
     ILIKE("ilike"),
+    IMATCH("imatch"),
     IS("is"),
     IN("in"),
     CS("cs"),
