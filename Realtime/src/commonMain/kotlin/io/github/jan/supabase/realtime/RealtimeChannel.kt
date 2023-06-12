@@ -1,6 +1,6 @@
 package io.github.jan.supabase.realtime
 
-import io.github.aakira.napier.Napier
+import co.touchlab.kermit.Logger
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.annotiations.SupabaseInternal
 import io.github.jan.supabase.decodeIfNotEmptyOrDefault
@@ -137,7 +137,7 @@ internal class RealtimeChannelImpl(
             addChannel(this@RealtimeChannelImpl)
         }
         _status.value = RealtimeChannel.Status.JOINING
-        Napier.d { "Joining channel $topic" }
+        Logger.d { "Joining channel $topic" }
         val currentJwt = realtimeImpl.config.jwtToken ?: supabaseClient.pluginManager.getPluginOrNull(GoTrue)?.currentAccessTokenOrNull()
         val postgrestChanges = clientChanges.toList()
         val joinConfig = RealtimeJoinPayload(RealtimeJoinConfig(broadcastJoinConfig, presenceJoinConfig, postgrestChanges))
@@ -147,7 +147,7 @@ internal class RealtimeChannelImpl(
                 put("access_token", currentJwt)
             }
         }
-        Napier.d { "Joining realtime socket with body $joinConfigObject" }
+        Logger.d { "Joining realtime socket with body $joinConfigObject" }
         realtimeImpl.ws?.sendSerialized(RealtimeMessage(topic, RealtimeChannel.CHANNEL_EVENT_JOIN, joinConfigObject, null))
         if(blockUntilJoined) {
             status.first { it == RealtimeChannel.Status.JOINED }
@@ -157,19 +157,19 @@ internal class RealtimeChannelImpl(
     @OptIn(SupabaseInternal::class)
     fun onMessage(message: RealtimeMessage) {
         if(message.eventType == null) {
-            Napier.e { "Received message without event type: $message" }
+            Logger.e { "Received message without event type: $message" }
             return
         }
         when(message.eventType) {
             RealtimeMessage.EventType.SYSTEM -> {
-                Napier.d { "Joined channel ${message.topic}" }
+                Logger.d { "Joined channel ${message.topic}" }
                 _status.value = RealtimeChannel.Status.JOINED
             }
             RealtimeMessage.EventType.POSTGRES_SERVER_CHANGES -> { //check if the server postgres_changes match with the client's and add the given id to the postgres change objects (to identify them later in the events)
                 val serverPostgresChanges = message.payload["response"]?.jsonObject?.get("postgres_changes")?.jsonArray?.let { Json.decodeFromJsonElement<List<PostgresJoinConfig>>(it) } ?: listOf() //server postgres changes
                 callbackManager.serverChanges = serverPostgresChanges
                 if(status.value != RealtimeChannel.Status.JOINED) {
-                    Napier.d { "Joined channel ${message.topic}" }
+                    Logger.d { "Joined channel ${message.topic}" }
                     _status.value = RealtimeChannel.Status.JOINED
                 }
             }
@@ -193,10 +193,10 @@ internal class RealtimeChannelImpl(
                 realtimeImpl.run {
                     removeChannel(this@RealtimeChannelImpl)
                 }
-                Napier.d { "Left channel ${message.topic}" }
+                Logger.d { "Left channel ${message.topic}" }
             }
             RealtimeMessage.EventType.ERROR -> {
-                Napier.e { "Received an error in channel ${message.topic}. That could be as a result of an invalid access token" }
+                Logger.e { "Received an error in channel ${message.topic}. That could be as a result of an invalid access token" }
             }
             RealtimeMessage.EventType.PRESENCE_DIFF -> {
                 val joins = message.payload["joins"]?.jsonObject?.decodeIfNotEmptyOrDefault(mapOf<String, Presence>()) ?: emptyMap()
@@ -212,12 +212,12 @@ internal class RealtimeChannelImpl(
 
     override suspend fun leave() {
         _status.value = RealtimeChannel.Status.LEAVING
-        Napier.d { "Leaving channel $topic" }
+        Logger.d { "Leaving channel $topic" }
         realtimeImpl.ws?.sendSerialized(RealtimeMessage(topic, RealtimeChannel.CHANNEL_EVENT_LEAVE, buildJsonObject {}, null))
     }
 
     override suspend fun updateAuth(jwt: String) {
-        Napier.d { "Updating auth token for channel $topic" }
+        Logger.d { "Updating auth token for channel $topic" }
         realtimeImpl.ws?.sendSerialized(RealtimeMessage(topic, RealtimeChannel.CHANNEL_EVENT_ACCESS_TOKEN, buildJsonObject {
             put("access_token", "test")
         }, (++realtimeImpl.ref).toString()))
@@ -340,7 +340,7 @@ inline fun <reified T> RealtimeChannel.broadcastFlow(event: String, json: Json =
         val decodedValue = try {
             json.decodeFromJsonElement<T>(it)
         } catch(e: Exception) {
-            Napier.e(e) { "Couldn't decode $this as ${T::class.simpleName}. The corresponding handler wasn't called" }
+            Logger.e(e) { "Couldn't decode $this as ${T::class.simpleName}. The corresponding handler wasn't called" }
             null
         }
         decodedValue?.let { value -> trySend(value) }

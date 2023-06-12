@@ -3,7 +3,7 @@ kotlin = "1.8.22"
 dokka = "1.8.20"
 ktor = "2.3.1"
 kotlinx-datetime = "0.4.0"
-napir = "2.6.1"
+kermit = "2.0.0-RC4"
 atomicfu = "0.20.2"
 coroutines = "1.7.1"
 android-lifecycle = "2.6.1"
@@ -44,7 +44,7 @@ ktor-client-websockets = { module = "io.ktor:ktor-client-websockets", version.re
 ktor-client-mock = { module = "io.ktor:ktor-client-mock", version.ref = "ktor" }
 ktor-json = { module = "io.ktor:ktor-serialization-kotlinx-json", version.ref = "ktor" }
 
-napier = { module = "io.github.aakira:napier", version.ref = "napir" }
+kermit = { module = "co.touchlab:kermit", version.ref = "kermit" }
 
 android-lifecycle-process = { module = "androidx.lifecycle:lifecycle-process", version.ref = "android-lifecycle" }
 androidx-startup-runtime = { module = "androidx.startup:startup-runtime", version.ref = "androidx-startup" }

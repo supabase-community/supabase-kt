@@ -1,6 +1,6 @@
 package io.github.jan.supabase.gotrue
 
-import io.github.aakira.napier.Napier
+import co.touchlab.kermit.Logger
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.exceptions.HttpRequestException
 import io.github.jan.supabase.exceptions.RestException
@@ -424,6 +424,6 @@ val SupabaseClient.gotrue: GoTrue
 private suspend fun GoTrue.tryToGetUser(jwt: String) = try {
     retrieveUser(jwt)
 } catch (e: Exception) {
-    Napier.e(e) { "Couldn't retrieve user using your custom jwt token. If you use the project secret ignore this message" }
+    Logger.e(e) { "Couldn't retrieve user using your custom jwt token. If you use the project secret ignore this message" }
     null
 }

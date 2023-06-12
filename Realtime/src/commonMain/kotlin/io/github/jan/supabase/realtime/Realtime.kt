@@ -1,7 +1,7 @@
 package io.github.jan.supabase.realtime
 
+import co.touchlab.kermit.Logger
 import co.touchlab.stately.collections.IsoMutableMap
-import io.github.aakira.napier.Napier
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.SupabaseClientBuilder
 import io.github.jan.supabase.annotiations.SupabaseInternal
@@ -32,7 +32,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.job
 import kotlinx.coroutines.launch
-import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.buildJsonObject
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
@@ -189,7 +188,7 @@ internal class RealtimeImpl(override val supabaseClient: SupabaseClient, overrid
     suspend fun connect(reconnect: Boolean) {
         if (reconnect) {
             delay(config.reconnectDelay)
-            Napier.d { "Reconnecting..." }
+            Logger.d { "Reconnecting..." }
         } else {
             scope.launch {
                 supabaseClient.pluginManager.getPluginOrNull(GoTrue)?.sessionStatus?.collect {
@@ -197,7 +196,7 @@ internal class RealtimeImpl(override val supabaseClient: SupabaseClient, overrid
                         is SessionStatus.Authenticated -> updateJwt(it.session.accessToken)
                         is SessionStatus.NotAuthenticated -> {
                             if(config.disconnectOnSessionLoss) {
-                                Napier.w { "No auth session found, disconnecting from realtime websocket"}
+                                Logger.w { "No auth session found, disconnecting from realtime websocket"}
                                 disconnect()
                             }
                         }
@@ -213,14 +212,14 @@ internal class RealtimeImpl(override val supabaseClient: SupabaseClient, overrid
         try {
             ws = supabaseClient.httpClient.webSocketSession(realtimeUrl)
             _status.value = Realtime.Status.CONNECTED
-            Napier.i { "Connected to realtime websocket!" }
+            Logger.i { "Connected to realtime websocket!" }
             listenForMessages()
             startHeartbeating()
              if(reconnect) {
                  rejoinChannels()
              }
         } catch(e: Exception) {
-             Napier.e(e) { "Error while trying to connect to realtime websocket. Trying again in ${config.reconnectDelay}" }
+             Logger.e(e) { "Error while trying to connect to realtime websocket. Trying again in ${config.reconnectDelay}" }
              disconnect()
              connect(true)
         }
@@ -245,7 +244,7 @@ internal class RealtimeImpl(override val supabaseClient: SupabaseClient, overrid
                 }
             } catch(e: Exception) {
                 if(!isActive) return@launch
-                Napier.e(e) { "Error while listening for messages. Trying again in ${config.reconnectDelay}" }
+                Logger.e(e) { "Error while listening for messages. Trying again in ${config.reconnectDelay}" }
                 disconnect()
                 connect(true)
             }
@@ -265,7 +264,7 @@ internal class RealtimeImpl(override val supabaseClient: SupabaseClient, overrid
     }
 
     override fun disconnect() {
-        Napier.d { "Closing websocket connection" }
+        Logger.d { "Closing websocket connection" }
         messageJob?.cancel()
         ws?.cancel()
         ws = null
@@ -275,13 +274,13 @@ internal class RealtimeImpl(override val supabaseClient: SupabaseClient, overrid
 
     private fun onMessage(stringMessage: String) {
         val message = supabaseJson.decodeFromString<RealtimeMessage>(stringMessage)
-        Napier.d { "Received message $stringMessage" }
+        Logger.d { "Received message $stringMessage" }
         val channel = subscriptions[message.topic] as? RealtimeChannelImpl
         if(message.ref?.toIntOrNull() == heartbeatRef) {
-            Napier.i { "Heartbeat received" }
+            Logger.i { "Heartbeat received" }
             heartbeatRef = 0
         } else {
-            Napier.d { "Received event ${message.event} for channel ${channel?.topic}" }
+            Logger.d { "Received event ${message.event} for channel ${channel?.topic}" }
             channel?.onMessage(message)
         }
     }
@@ -296,14 +295,14 @@ internal class RealtimeImpl(override val supabaseClient: SupabaseClient, overrid
         if (heartbeatRef != 0) {
             heartbeatRef = 0
             ref = 0
-            Napier.e { "Heartbeat timeout. Trying to reconnect in ${config.reconnectDelay}" }
+            Logger.e { "Heartbeat timeout. Trying to reconnect in ${config.reconnectDelay}" }
             scope.launch {
                 disconnect()
                 connect(true)
             }
             return
         }
-        Napier.d { "Sending heartbeat" }
+        Logger.d { "Sending heartbeat" }
         heartbeatRef = ++ref
         ws?.sendSerialized(RealtimeMessage("phoenix", "heartbeat", buildJsonObject { }, heartbeatRef.toString()))
     }

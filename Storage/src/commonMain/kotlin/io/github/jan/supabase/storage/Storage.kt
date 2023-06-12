@@ -2,9 +2,9 @@
 
 package io.github.jan.supabase.storage
 
+import co.touchlab.kermit.Logger
 import co.touchlab.stately.collections.IsoMutableMap
 import com.russhwolf.settings.ExperimentalSettingsApi
-import io.github.aakira.napier.Napier
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.annotiations.SupabaseInternal
 import io.github.jan.supabase.bodyOrNull
@@ -146,7 +146,7 @@ sealed interface Storage : MainPlugin<Storage.Config> {
             var defaultChunkSize: Long = DEFAULT_CHUNK_SIZE
                 set(value) {
                     if(value != DEFAULT_CHUNK_SIZE) {
-                        Napier.w { "supabase currently only supports a chunk size of 6MB" }
+                        Logger.w { "supabase currently only supports a chunk size of 6MB" }
                     }
                     field = value
                 }

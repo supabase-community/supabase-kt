@@ -1,6 +1,6 @@
 package io.github.jan.supabase.gotrue
 
-import io.github.aakira.napier.Napier
+import co.touchlab.kermit.Logger
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.annotiations.SupabaseExperimental
 import io.github.jan.supabase.annotiations.SupabaseInternal
@@ -37,7 +37,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
-import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonObjectBuilder
 import kotlinx.serialization.json.buildJsonObject
@@ -72,12 +71,12 @@ internal class GoTrueImpl(
         if (config.autoLoadFromStorage) {
             _sessionStatus.value = SessionStatus.LoadingFromStorage
             authScope.launch {
-                Napier.d {
+                Logger.d {
                     "Trying to load latest session"
                 }
                 val successful = loadFromStorage()
                 if (successful) {
-                    Napier.d {
+                    Logger.d {
                         "Successfully loaded session from storage"
                     }
                 } else {
@@ -330,7 +329,7 @@ internal class GoTrueImpl(
     }
 
     override suspend fun refreshSession(refreshToken: String): UserSession {
-        Napier.d {
+        Logger.d {
             "Refreshing session"
         }
         val body = buildJsonObject {
@@ -374,7 +373,7 @@ internal class GoTrueImpl(
             return
         }
         if (session.expiresAt <= Clock.System.now()) {
-            Napier.d {
+            Logger.d {
                 "Session expired. Refreshing session..."
             }
             try {
@@ -382,9 +381,9 @@ internal class GoTrueImpl(
                 importSession(newSession, config.alwaysAutoRefresh)
             } catch (e: RestException) {
                 logout()
-                Napier.e(e) { "Couldn't refresh session. The refresh token may have been revoked." }
+                Logger.e(e) { "Couldn't refresh session. The refresh token may have been revoked." }
             } catch (e: Exception) {
-                Napier.e(e) { "Couldn't reach supabase. Either the address doesn't exist or the network might not be on. Retrying in ${config.retryDelay}" }
+                Logger.e(e) { "Couldn't reach supabase. Either the address doesn't exist or the network might not be on. Retrying in ${config.retryDelay}" }
                 _sessionStatus.value = SessionStatus.NetworkError
                 delay(config.retryDelay)
                 importSession(session)
@@ -396,7 +395,7 @@ internal class GoTrueImpl(
             sessionJob = authScope.launch {
                 delay(session.expiresIn.seconds.inWholeMilliseconds)
                 launch {
-                    Napier.d {
+                    Logger.d {
                         "Session expired. Refreshing session..."
                     }
                     try {
@@ -404,9 +403,9 @@ internal class GoTrueImpl(
                         importSession(newSession)
                     } catch (e: RestException) {
                         logout()
-                        Napier.e(e) { "Couldn't refresh session. The refresh token may have been revoked." }
+                        Logger.e(e) { "Couldn't refresh session. The refresh token may have been revoked." }
                     } catch (e: Exception) {
-                        Napier.e(e) { "Couldn't reach supabase. Either the address doesn't exist or the network might not be on. Retrying in ${config.retryDelay}" }
+                        Logger.e(e) { "Couldn't reach supabase. Either the address doesn't exist or the network might not be on. Retrying in ${config.retryDelay}" }
                         _sessionStatus.value = SessionStatus.NetworkError
                     }
                 }

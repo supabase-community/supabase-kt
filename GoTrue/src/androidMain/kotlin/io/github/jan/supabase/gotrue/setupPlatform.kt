@@ -5,7 +5,7 @@ import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ProcessLifecycleOwner
 import androidx.startup.Initializer
-import io.github.aakira.napier.Napier
+import co.touchlab.kermit.Logger
 import io.github.jan.supabase.annotiations.SupabaseInternal
 import kotlinx.coroutines.launch
 
@@ -35,14 +35,14 @@ private fun addLifecycleCallbacks(gotrue: GoTrue) {
 
             override fun onStart(owner: LifecycleOwner) {
                 if(!gotrue.isAutoRefreshRunning && gotrue.config.alwaysAutoRefresh) {
-                    Napier.d {
+                    Logger.d {
                         "Starting auto refresh"
                     }
                     scope.launch {
                         try {
                             gotrue.startAutoRefreshForCurrentSession()
                         } catch(e: IllegalStateException) {
-                            Napier.d {
+                            Logger.d {
                                 "No session found for auto refresh"
                             }
                         }
@@ -51,7 +51,7 @@ private fun addLifecycleCallbacks(gotrue: GoTrue) {
             }
             override fun onStop(owner: LifecycleOwner) {
                 if(gotrue.isAutoRefreshRunning) {
-                    Napier.d { "Cancelling auto refresh because app is switching to the background" }
+                    Logger.d { "Cancelling auto refresh because app is switching to the background" }
                     scope.launch {
                         gotrue.stopAutoRefreshForCurrentSession()
                     }

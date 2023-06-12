@@ -1,6 +1,6 @@
 package io.github.jan.supabase
 
-import io.github.aakira.napier.Napier
+import co.touchlab.kermit.Logger
 import io.github.jan.supabase.annotiations.SupabaseDsl
 import io.github.jan.supabase.plugins.PluginManager
 import io.github.jan.supabase.plugins.SupabasePlugin
@@ -60,7 +60,7 @@ class SupabaseClientBuilder @PublishedApi internal constructor(private val supab
         }
         if(supabaseUrl.startsWith("http://")) {
             useHTTPS = false
-            Napier.w { "You are using a non https supabase url ($supabaseUrl)."}
+            Logger.w { "You are using a non https supabase url ($supabaseUrl)."}
         }
     }
 
