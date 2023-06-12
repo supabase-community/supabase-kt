@@ -5,8 +5,6 @@ import io.github.jan.supabase.putJsonObject
 import io.github.jan.supabase.safeBody
 import io.github.jan.supabase.storage.resumable.ResumableClientImpl
 import io.ktor.client.call.body
-import io.ktor.client.plugins.onDownload
-import io.ktor.client.plugins.onUpload
 import io.ktor.client.request.HttpRequestBuilder
 import io.ktor.client.request.header
 import io.ktor.client.request.parameter
@@ -23,8 +21,6 @@ import io.ktor.utils.io.ByteReadChannel
 import io.ktor.utils.io.ByteWriteChannel
 import io.ktor.utils.io.close
 import io.ktor.utils.io.copyTo
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.add
 import kotlinx.serialization.json.buildJsonObject
@@ -36,71 +32,41 @@ import kotlin.time.Duration
 internal class BucketApiImpl(override val bucketId: String, val storage: StorageImpl) : BucketApi {
 
     override val supabaseClient = storage.supabaseClient
+
     @SupabaseExperimental
     override val resumable = ResumableClientImpl(this, storage.config.resumable.cache)
 
-    override suspend fun update(path: String, data: UploadData, upsert: Boolean): String = uploadOrUpdate(
-        HttpMethod.Put, bucketId, path, data, upsert)
+    override suspend fun update(path: String, data: UploadData, upsert: Boolean): String =
+        uploadOrUpdate(
+            HttpMethod.Put, bucketId, path, data, upsert
+        )
 
-    @SupabaseExperimental
-    override fun updateAsFlow(path: String, data: UploadData, upsert: Boolean): Flow<UploadStatus> = callbackFlow {
-        val key = uploadOrUpdate(HttpMethod.Put, bucketId, path, data, upsert) {
-            onUpload { bytesSentTotal, contentLength ->
-                trySend(UploadStatus.Progress(bytesSentTotal, contentLength))
-            }
-        }
-        trySend(UploadStatus.Success(key))
-        close()
-    }
-
-    override suspend fun uploadToSignedUrl(path: String, token: String, data: UploadData, upsert: Boolean): String {
-        return uploadToSignedUrl(path, token, data, upsert) {}
-    }
-
-    @SupabaseExperimental
-    override fun uploadToSignedUrlAsFlow(
+    override suspend fun uploadToSignedUrl(
         path: String,
         token: String,
         data: UploadData,
         upsert: Boolean
-    ): Flow<UploadStatus> {
-        return callbackFlow {
-            val key = uploadToSignedUrl(path, token, data, upsert) {
-                onUpload { bytesSentTotal, contentLength ->
-                    trySend(UploadStatus.Progress(bytesSentTotal, contentLength))
-                }
-            }
-            trySend(UploadStatus.Success(key))
-            close()
-        }
+    ): String {
+        return uploadToSignedUrl(path, token, data, upsert) {}
     }
 
     override suspend fun createSignedUploadUrl(path: String): UploadSignedUrl {
         val result = storage.api.post("object/upload/sign/$bucketId/$path")
-        val urlPath = result.body<JsonObject>()["url"]?.jsonPrimitive?.content ?: error("Expected a url in create upload signed url response")
+        val urlPath = result.body<JsonObject>()["url"]?.jsonPrimitive?.content
+            ?: error("Expected a url in create upload signed url response")
         val url = Url(storage.resolveUrl(urlPath))
         return UploadSignedUrl(
             url = url.toString(),
             path = path,
-            token = url.parameters["token"] ?: error("Expected a token in create upload signed url response")
+            token = url.parameters["token"]
+                ?: error("Expected a token in create upload signed url response")
         )
     }
 
-    override suspend fun upload(path: String, data: UploadData, upsert: Boolean): String = uploadOrUpdate(
-        HttpMethod.Post, bucketId, path, data, upsert)
-
-    @SupabaseExperimental
-    override fun uploadAsFlow(path: String, data: UploadData, upsert: Boolean): Flow<UploadStatus> {
-        return callbackFlow {
-            val key = uploadOrUpdate(HttpMethod.Post, bucketId, path, data, upsert) {
-                onUpload { bytesSentTotal, contentLength ->
-                    trySend(UploadStatus.Progress(bytesSentTotal, contentLength))
-                }
-            }
-            trySend(UploadStatus.Success(key))
-            close()
-        }
-    }
+    override suspend fun upload(path: String, data: UploadData, upsert: Boolean): String =
+        uploadOrUpdate(
+            HttpMethod.Post, bucketId, path, data, upsert
+        )
 
     override suspend fun delete(paths: Collection<String>) {
         storage.api.deleteJson("object/$bucketId", buildJsonObject {
@@ -142,7 +108,10 @@ internal class BucketApiImpl(override val bucketId: String, val storage: Storage
             ?: error("Expected signed url in response")
     }
 
-    override suspend fun createSignedUrls(expiresIn: Duration, paths: Collection<String>): List<SignedUrl> {
+    override suspend fun createSignedUrls(
+        expiresIn: Duration,
+        paths: Collection<String>
+    ): List<SignedUrl> {
         val body = storage.api.postJson("object/sign/$bucketId", buildJsonObject {
             putJsonArray("paths") {
                 paths.forEach(this::add)
@@ -154,50 +123,25 @@ internal class BucketApiImpl(override val bucketId: String, val storage: Storage
         return body
     }
 
-    override suspend fun downloadAuthenticated(path: String, transform: ImageTransformation.() -> Unit): ByteArray {
+    override suspend fun downloadAuthenticated(
+        path: String,
+        transform: ImageTransformation.() -> Unit
+    ): ByteArray {
         return storage.api.rawRequest {
             prepareDownloadRequest(path, false, transform)
         }.body()
     }
 
-    @SupabaseExperimental
-    override fun downloadAuthenticatedAsFlow(
+
+    override suspend fun downloadPublic(
         path: String,
         transform: ImageTransformation.() -> Unit
-    ): Flow<DownloadStatus> {
-        return callbackFlow {
-            val data = storage.api.rawRequest {
-                prepareDownloadRequest(path, false, transform)
-                onDownload { bytesSentTotal, contentLength ->
-                    trySend(DownloadStatus.Progress(bytesSentTotal, contentLength))
-                }
-            }.body<ByteArray>()
-            trySend(DownloadStatus.Success)
-            trySend(DownloadStatus.ByteData(data))
-            close()
-        }
-    }
-
-    override suspend fun downloadPublic(path: String, transform: ImageTransformation.() -> Unit): ByteArray {
+    ): ByteArray {
         return storage.api.rawRequest {
             prepareDownloadRequest(path, true, transform)
         }.body()
     }
 
-    @SupabaseExperimental
-    override fun downloadPublicAsFlow(path: String, transform: ImageTransformation.() -> Unit): Flow<DownloadStatus> {
-        return callbackFlow {
-            val data = storage.api.rawRequest {
-                prepareDownloadRequest(path, true, transform)
-                onDownload { bytesSentTotal, contentLength ->
-                    trySend(DownloadStatus.Progress(bytesSentTotal, contentLength))
-                }
-            }.body<ByteArray>()
-            trySend(DownloadStatus.Success)
-            trySend(DownloadStatus.ByteData(data))
-            close()
-        }
-    }
 
     override suspend fun downloadAuthenticated(
         path: String,
@@ -207,12 +151,6 @@ internal class BucketApiImpl(override val bucketId: String, val storage: Storage
         channelDownloadRequest(path, channel, false, transform)
     }
 
-    @SupabaseExperimental
-    override fun downloadAuthenticatedAsFlow(
-        path: String,
-        channel: ByteWriteChannel,
-        transform: ImageTransformation.() -> Unit
-    ): Flow<DownloadStatus> = flowChannelDownloadRequest(path, channel, false, transform)
 
     override suspend fun downloadPublic(
         path: String,
@@ -222,24 +160,13 @@ internal class BucketApiImpl(override val bucketId: String, val storage: Storage
         channelDownloadRequest(path, channel, true, transform)
     }
 
-    @SupabaseExperimental
-    override fun downloadPublicAsFlow(
+    internal suspend fun channelDownloadRequest(
         path: String,
         channel: ByteWriteChannel,
-        transform: ImageTransformation.() -> Unit
-    ): Flow<DownloadStatus> = flowChannelDownloadRequest(path, channel, true, transform)
-
-    private fun flowChannelDownloadRequest(path: String, channel: ByteWriteChannel, public: Boolean, transform: ImageTransformation.() -> Unit): Flow<DownloadStatus> = callbackFlow {
-        channelDownloadRequest(path, channel, public, transform) {
-            onDownload { bytesSentTotal, contentLength ->
-                trySend(DownloadStatus.Progress(bytesSentTotal, contentLength))
-            }
-        }
-        trySend(DownloadStatus.Success)
-        close()
-    }
-
-    private suspend fun channelDownloadRequest(path: String, channel: ByteWriteChannel, public: Boolean, transform: ImageTransformation.() -> Unit, extra: HttpRequestBuilder.() -> Unit = {}) {
+        public: Boolean,
+        transform: ImageTransformation.() -> Unit,
+        extra: HttpRequestBuilder.() -> Unit = {}
+    ) {
         storage.api.prepareRequest {
             prepareDownloadRequest(path, public, transform)
             extra()
@@ -249,24 +176,45 @@ internal class BucketApiImpl(override val bucketId: String, val storage: Storage
         channel.close()
     }
 
-    private fun HttpRequestBuilder.prepareDownloadRequest(path: String, public: Boolean, transform: ImageTransformation.() -> Unit) {
+    internal fun HttpRequestBuilder.prepareDownloadRequest(
+        path: String,
+        public: Boolean,
+        transform: ImageTransformation.() -> Unit
+    ) {
         val transformation = ImageTransformation().apply(transform).queryString()
-        val url = when(public) {
-            true -> if(transformation.isBlank()) publicUrl(path) else publicRenderUrl(path, transform)
-            false -> if(transformation.isBlank()) authenticatedUrl(path) else authenticatedRenderUrl(path, transform)
+        val url = when (public) {
+            true -> if (transformation.isBlank()) publicUrl(path) else publicRenderUrl(
+                path,
+                transform
+            )
+
+            false -> if (transformation.isBlank()) authenticatedUrl(path) else authenticatedRenderUrl(
+                path,
+                transform
+            )
         }
         method = HttpMethod.Get
         url(url)
     }
 
-    override suspend fun list(prefix: String, filter: BucketListFilter.() -> Unit): List<BucketItem> {
+    override suspend fun list(
+        prefix: String,
+        filter: BucketListFilter.() -> Unit
+    ): List<BucketItem> {
         return storage.api.postJson("object/list/$bucketId", buildJsonObject {
             put("prefix", prefix)
             putJsonObject(BucketListFilter().apply(filter).build())
         }).safeBody()
     }
 
-    private suspend fun uploadOrUpdate(method: HttpMethod, bucket: String, path: String, data: UploadData, upsert: Boolean, extra: HttpRequestBuilder.() -> Unit = {}): String {
+    internal suspend fun uploadOrUpdate(
+        method: HttpMethod,
+        bucket: String,
+        path: String,
+        data: UploadData,
+        upsert: Boolean,
+        extra: HttpRequestBuilder.() -> Unit = {}
+    ): String {
         return storage.api.request("object/$bucket/$path") {
             this.method = method
             setBody(object : OutgoingContent.ReadChannelContent() {
@@ -281,7 +229,13 @@ internal class BucketApiImpl(override val bucketId: String, val storage: Storage
             ?: error("Expected a key in a upload response")
     }
 
-    private suspend fun uploadToSignedUrl(path: String, token: String, data: UploadData, upsert: Boolean, extra: HttpRequestBuilder.() -> Unit = {}): String {
+    internal suspend fun uploadToSignedUrl(
+        path: String,
+        token: String,
+        data: UploadData,
+        upsert: Boolean,
+        extra: HttpRequestBuilder.() -> Unit = {}
+    ): String {
         return storage.api.put("object/upload/sign/$bucketId/$path") {
             parameter("token", token)
             setBody(object : OutgoingContent.ReadChannelContent() {
@@ -292,25 +246,31 @@ internal class BucketApiImpl(override val bucketId: String, val storage: Storage
             header(HttpHeaders.ContentType, ContentType.defaultForFilePath(path))
             header("x-upsert", upsert.toString())
             extra()
-        }.body<JsonObject>()["Key"]?.jsonPrimitive?.content ?: error("Expected a key in a upload response")
+        }.body<JsonObject>()["Key"]?.jsonPrimitive?.content
+            ?: error("Expected a key in a upload response")
     }
 
     override suspend fun changePublicStatusTo(public: Boolean) = storage.updateBucket(bucketId) {
         this@updateBucket.public = public
     }
 
-    override fun authenticatedUrl(path: String): String = storage.resolveUrl("object/authenticated/$bucketId/$path")
+    override fun authenticatedUrl(path: String): String =
+        storage.resolveUrl("object/authenticated/$bucketId/$path")
 
-    override fun publicUrl(path: String): String = storage.resolveUrl("object/public/$bucketId/$path")
+    override fun publicUrl(path: String): String =
+        storage.resolveUrl("object/public/$bucketId/$path")
 
-    override fun authenticatedRenderUrl(path: String, transform: ImageTransformation.() -> Unit): String {
+    override fun authenticatedRenderUrl(
+        path: String,
+        transform: ImageTransformation.() -> Unit
+    ): String {
         val transformation = ImageTransformation().apply(transform).queryString()
-        return storage.resolveUrl("render/image/authenticated/$bucketId/$path${if(transformation.isNotBlank()) "?$transformation" else ""}")
+        return storage.resolveUrl("render/image/authenticated/$bucketId/$path${if (transformation.isNotBlank()) "?$transformation" else ""}")
     }
 
     override fun publicRenderUrl(path: String, transform: ImageTransformation.() -> Unit): String {
         val transformation = ImageTransformation().apply(transform).queryString()
-        return storage.resolveUrl("render/image/public/$bucketId/$path${if(transformation.isNotBlank()) "?$transformation" else ""}")
+        return storage.resolveUrl("render/image/public/$bucketId/$path${if (transformation.isNotBlank()) "?$transformation" else ""}")
     }
 
 }
