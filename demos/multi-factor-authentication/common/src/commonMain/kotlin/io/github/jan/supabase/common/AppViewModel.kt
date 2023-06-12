@@ -1,7 +1,7 @@
 package io.github.jan.supabase.common
 
 import io.github.aakira.napier.DebugAntilog
-import io.github.aakira.napier.Napier
+import co.touchlab.kermit.Logger
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.exceptions.RestException
 import io.github.jan.supabase.gotrue.gotrue
@@ -24,7 +24,7 @@ class AppViewModel(
 ) : MPViewModel() {
 
     init {
-        Napier.base(DebugAntilog())
+        Logger.base(DebugAntilog())
     }
 
     val sessionStatus = supabaseClient.gotrue.sessionStatus

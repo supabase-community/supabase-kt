@@ -157,7 +157,7 @@ kotlin {
             dependencies {
                 api(libs.kotlinx.datetime)
                 api(libs.kotlinx.coroutines.core)
-                api(libs.napier)
+                api(libs.kermit)
                 api(libs.bundles.ktor.client)
                 api(libs.kotlinx.atomicfu)
                 api(libs.stately)

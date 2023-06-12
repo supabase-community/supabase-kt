@@ -1,7 +1,7 @@
 @file:Suppress("UndocumentedPublicFunction")
 package io.github.jan.supabase.network
 
-import io.github.aakira.napier.Napier
+import co.touchlab.kermit.Logger
 import io.github.jan.supabase.annotiations.SupabaseInternal
 import io.github.jan.supabase.exceptions.HttpRequestException
 import io.github.jan.supabase.supabaseJson
@@ -47,10 +47,10 @@ class KtorSupabaseHttpClient @SupabaseInternal constructor(
         val response = try {
             httpClient.request(url, builder)
         } catch(e: HttpRequestTimeoutException) {
-            Napier.d { "Request timed out after $requestTimeout ms" }
+            Logger.d { "Request timed out after $requestTimeout ms" }
             throw e
         } catch(e: Exception) {
-            Napier.d { "Request failed with ${e.message}" }
+            Logger.d { "Request failed with ${e.message}" }
             throw HttpRequestException(e.message ?: "", request)
         }
         return response
@@ -67,10 +67,10 @@ class KtorSupabaseHttpClient @SupabaseInternal constructor(
         val response = try {
             httpClient.prepareRequest(url, builder)
         } catch(e: HttpRequestTimeoutException) {
-            Napier.d { "Request timed out after $requestTimeout ms" }
+            Logger.d { "Request timed out after $requestTimeout ms" }
             throw e
         } catch(e: Exception) {
-            Napier.d { "Request failed with ${e.message}" }
+            Logger.d { "Request failed with ${e.message}" }
             throw HttpRequestException(e.message ?: "", request)
         }
         return response

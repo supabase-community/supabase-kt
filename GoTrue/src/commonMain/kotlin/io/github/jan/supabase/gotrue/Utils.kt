@@ -1,6 +1,6 @@
 package io.github.jan.supabase.gotrue
 
-import io.github.aakira.napier.Napier
+import co.touchlab.kermit.Logger
 import io.github.jan.supabase.annotiations.SupabaseInternal
 import io.github.jan.supabase.gotrue.user.UserSession
 import io.ktor.client.request.HttpRequestBuilder
@@ -10,13 +10,13 @@ import kotlinx.coroutines.launch
 
 @SupabaseInternal
 fun GoTrue.parseFragmentAndImportSession(fragment: String, onSessionSuccess: (UserSession) -> Unit = {}) {
-    Napier.d { "Parsing deeplink fragment" }
+    Logger.d { "Parsing deeplink fragment" }
     val map = fragment.split("&").associate {
         it.split("=").let { pair ->
             pair[0] to pair[1]
         }
     }
-    Napier.d { "Fragment parts: $map" }
+    Logger.d { "Fragment parts: $map" }
 
     val accessToken = map["access_token"] ?: return
     val refreshToken = map["refresh_token"] ?: return
@@ -26,7 +26,7 @@ fun GoTrue.parseFragmentAndImportSession(fragment: String, onSessionSuccess: (Us
     val providerToken = map["provider_token"]
     val providerRefreshToken = map["provider_refresh_token"]
     val scope = CoroutineScope(Dispatchers.Default)
-    Napier.d {
+    Logger.d {
         "Received session deeplink"
     }
     scope.launch {

@@ -1,14 +1,13 @@
 @file:OptIn(ExperimentalSettingsApi::class)
 package io.github.jan.supabase.gotrue
 
+import co.touchlab.kermit.Logger
 import com.russhwolf.settings.ExperimentalSettingsApi
 import com.russhwolf.settings.Settings
 import com.russhwolf.settings.coroutines.toSuspendSettings
-import io.github.aakira.napier.Napier
 import io.github.jan.supabase.annotiations.SupabaseInternal
 import io.github.jan.supabase.gotrue.user.UserSession
 import io.github.jan.supabase.supabaseJson
-import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 
 /**
@@ -51,7 +50,7 @@ class SettingsSessionManager(settings: Settings = createDefaultSettings()): Sess
         return try {
             supabaseJson.decodeFromString(session)
         } catch(e: Exception) {
-            Napier.e(e) { "Failed to load session" }
+            Logger.e(e) { "Failed to load session" }
             null
         }
     }

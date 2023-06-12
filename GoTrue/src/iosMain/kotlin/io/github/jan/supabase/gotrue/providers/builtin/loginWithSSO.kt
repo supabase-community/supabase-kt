@@ -1,6 +1,6 @@
 package io.github.jan.supabase.gotrue.providers.builtin
 
-import io.github.aakira.napier.Napier
+import co.touchlab.kermit.Logger
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.gotrue.gotrue
 import io.github.jan.supabase.gotrue.user.UserSession
@@ -18,6 +18,6 @@ internal actual suspend fun <Config : SSO.Config> SSO<Config>.loginWithSSO(
     val result = supabaseClient.gotrue.retrieveSSOUrl(this@loginWithSSO, deepLink, config)
     val url = NSURL(string = result.url)
     UIApplication.sharedApplication.openURL(url, emptyMap<Any?, Any>()) {
-        if(it) Napier.d { "Successfully opened provider url in safari" } else Napier.e { "Failed to open provider url in safari" }
+        if(it) Logger.d { "Successfully opened provider url in safari" } else Logger.e { "Failed to open provider url in safari" }
     }
 }

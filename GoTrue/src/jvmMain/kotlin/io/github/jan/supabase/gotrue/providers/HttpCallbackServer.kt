@@ -1,6 +1,6 @@
 package io.github.jan.supabase.gotrue.providers
 
-import io.github.aakira.napier.Napier
+import co.touchlab.kermit.Logger
 import io.github.jan.supabase.annotiations.SupabaseExperimental
 import io.github.jan.supabase.gotrue.GoTrue
 import io.github.jan.supabase.gotrue.GoTrueImpl
@@ -35,7 +35,7 @@ internal suspend fun createServer(
             }
         }
     server.get("/callback") { ctx ->
-        Napier.d {
+        Logger.d {
             "Received callback on oauth callback"
         }
         val accessToken = ctx.queryParam("access_token") ?: return@get
@@ -49,7 +49,7 @@ internal suspend fun createServer(
             val user = gotrue.retrieveUser(accessToken)
             onSuccess(UserSession(accessToken, refreshToken, providerRefreshToken, providerToken, expiresIn, tokenType, user, type))
         }
-        Napier.d {
+        Logger.d {
             "Successfully received http callback"
         }
         ctx.html(HTML.redirectPage(gotrue.config.htmlIconUrl, gotrue.config.htmlTitle, gotrue.config.htmlText))

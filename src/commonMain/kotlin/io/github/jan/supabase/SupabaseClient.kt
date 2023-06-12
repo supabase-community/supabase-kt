@@ -1,6 +1,6 @@
 package io.github.jan.supabase
 
-import io.github.aakira.napier.Napier
+import co.touchlab.kermit.Logger
 import io.github.jan.supabase.annotiations.SupabaseInternal
 import io.github.jan.supabase.network.KtorSupabaseHttpClient
 import io.github.jan.supabase.plugins.PluginManager
@@ -63,7 +63,7 @@ internal class SupabaseClientImpl(
 ) : SupabaseClient {
 
     init {
-        Napier.i {
+        Logger.i {
             "SupabaseClient created! Please report any bugs you find."
         }
     }
