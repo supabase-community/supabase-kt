@@ -1,5 +1,5 @@
 [versions]
-kotlin = "1.8.20"
+kotlin = "1.8.22"
 agp = "8.0.2"
 compose = "1.4.0"
 supabase = "1.0.2"
