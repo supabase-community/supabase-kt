@@ -243,6 +243,7 @@ internal class StorageImpl(override val supabaseClient: SupabaseClient, override
         api.putJson("bucket/$id", body)
     }
 
+    @Deprecated("use updateBucket instead", ReplaceWith("updateBucket(bucketId) { \nthis@updateBucket.public = public\n }"))
     override suspend fun changePublicStatus(bucketId: String, public: Boolean) {
         val body = buildJsonObject {
             put("public", public)

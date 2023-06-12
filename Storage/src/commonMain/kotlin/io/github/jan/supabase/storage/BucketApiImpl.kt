@@ -295,7 +295,9 @@ internal class BucketApiImpl(override val bucketId: String, val storage: Storage
         }.body<JsonObject>()["Key"]?.jsonPrimitive?.content ?: error("Expected a key in a upload response")
     }
 
-    override suspend fun changePublicStatusTo(public: Boolean) = storage.changePublicStatus(bucketId, public)
+    override suspend fun changePublicStatusTo(public: Boolean) = storage.updateBucket(bucketId) {
+        this@updateBucket.public = public
+    }
 
     override fun authenticatedUrl(path: String): String = storage.resolveUrl("object/authenticated/$bucketId/$path")
 
