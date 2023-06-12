@@ -165,9 +165,7 @@ kotlin {
         }
         val commonTest by getting {
             dependencies {
-                implementation(kotlin("test"))
-                implementation(libs.ktor.client.mock)
-                implementation(libs.kotlinx.coroutines.test)
+                implementation(libs.bundles.testing)
             }
         }
         val jvmMain by getting {
