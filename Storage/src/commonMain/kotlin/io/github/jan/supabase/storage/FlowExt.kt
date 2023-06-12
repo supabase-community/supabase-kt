@@ -1,6 +1,5 @@
 package io.github.jan.supabase.storage
 
-import io.github.jan.supabase.annotiations.SupabaseExperimental
 import io.github.jan.supabase.exceptions.HttpRequestException
 import io.github.jan.supabase.exceptions.RestException
 import io.ktor.client.call.body
@@ -23,7 +22,6 @@ import kotlinx.coroutines.flow.callbackFlow
  * @throws HttpRequestTimeoutException if the request timed out
  * @throws HttpRequestException on network related issues
  */
-@SupabaseExperimental
 fun BucketApi.updateAsFlow(path: String, data: UploadData, upsert: Boolean): Flow<UploadStatus> = callbackFlow {
     this@updateAsFlow as BucketApiImpl
     val key = uploadOrUpdate(HttpMethod.Put, bucketId, path, data, upsert) {
@@ -45,7 +43,6 @@ fun BucketApi.updateAsFlow(path: String, data: UploadData, upsert: Boolean): Flo
  * @throws HttpRequestTimeoutException if the request timed out
  * @throws HttpRequestException on network related issues
  */
-@SupabaseExperimental
 fun BucketApi.uploadAsFlow(path: String, data: ByteArray, upsert: Boolean = false): Flow<UploadStatus> = uploadAsFlow(path, UploadData(
     ByteReadChannel(data), data.size.toLong()), upsert)
 
@@ -60,7 +57,6 @@ fun BucketApi.uploadAsFlow(path: String, data: ByteArray, upsert: Boolean = fals
  * @throws HttpRequestTimeoutException if the request timed out
  * @throws HttpRequestException on network related issues
  */
-@SupabaseExperimental
 fun BucketApi.uploadToSignedUrlAsFlow(
     path: String,
     token: String,
@@ -87,7 +83,6 @@ fun BucketApi.uploadToSignedUrlAsFlow(
  * @param upsert Whether to overwrite an existing file
  * @return A flow that emits the upload progress and at last the key to the uploaded file
  */
-@SupabaseExperimental
 fun BucketApi.uploadToSignedUrlAsFlow(path: String, token: String, data: ByteArray, upsert: Boolean = false): Flow<UploadStatus> = uploadToSignedUrlAsFlow(path, token, UploadData(ByteReadChannel(data), data.size.toLong()), upsert)
 
 /**
@@ -100,7 +95,6 @@ fun BucketApi.uploadToSignedUrlAsFlow(path: String, token: String, data: ByteArr
  * @throws HttpRequestTimeoutException if the request timed out
  * @throws HttpRequestException on network related issues
  */
-@SupabaseExperimental
 fun BucketApi.uploadAsFlow(path: String, data: UploadData, upsert: Boolean): Flow<UploadStatus> {
     return callbackFlow {
         this@callbackFlow as BucketApiImpl
@@ -124,7 +118,6 @@ fun BucketApi.uploadAsFlow(path: String, data: UploadData, upsert: Boolean): Flo
  * @throws HttpRequestTimeoutException if the request timed out
  * @throws HttpRequestException on network related issues
  */
-@SupabaseExperimental
 fun BucketApi.updateAsFlow(path: String, data: ByteArray, upsert: Boolean = false): Flow<UploadStatus> = updateAsFlow(path, UploadData(ByteReadChannel(data), data.size.toLong()), upsert)
 
 /**
@@ -136,7 +129,6 @@ fun BucketApi.updateAsFlow(path: String, data: ByteArray, upsert: Boolean = fals
  * @throws HttpRequestTimeoutException if the request timed out
  * @throws HttpRequestException on network related issues
  */
-@SupabaseExperimental
 fun BucketApi.downloadAuthenticatedAsFlow(
     path: String,
     transform: ImageTransformation.() -> Unit
@@ -165,7 +157,6 @@ fun BucketApi.downloadAuthenticatedAsFlow(
  * @throws HttpRequestTimeoutException if the request timed out
  * @throws HttpRequestException on network related issues
  */
-@SupabaseExperimental
 fun BucketApi.downloadAuthenticatedAsFlow(
     path: String,
     channel: ByteWriteChannel,
@@ -184,7 +175,6 @@ fun BucketApi.downloadAuthenticatedAsFlow(
  * @throws HttpRequestTimeoutException if the request timed out
  * @throws HttpRequestException on network related issues
  */
-@SupabaseExperimental
 fun BucketApi.downloadPublicAsFlow(path: String, transform: ImageTransformation.() -> Unit): Flow<DownloadStatus> {
     return callbackFlow {
         this@downloadPublicAsFlow as BucketApiImpl
@@ -210,7 +200,6 @@ fun BucketApi.downloadPublicAsFlow(path: String, transform: ImageTransformation.
  * @throws HttpRequestTimeoutException if the request timed out
  * @throws HttpRequestException on network related issues
  */
-@SupabaseExperimental
 fun BucketApi.downloadPublicAsFlow(
     path: String,
     channel: ByteWriteChannel,
