@@ -1,7 +1,7 @@
 package io.github.jan.supabase.common
 
 import io.github.aakira.napier.DebugAntilog
-import co.touchlab.kermit.Logger
+import io.github.aakira.napier.Napier
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.gotrue.gotrue
 import io.github.jan.supabase.gotrue.parseFragmentAndImportSession
