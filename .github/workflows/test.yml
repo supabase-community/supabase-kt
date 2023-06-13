@@ -53,7 +53,7 @@ jobs:
         run: chmod +x gradlew
       - name: Test supabase-kt
         run: ./gradlew jsTest --stacktrace
-  testIos:
+  testApple:
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v2
@@ -74,7 +74,7 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
       - name: Test supabase-kt
-        run: ./gradlew iosX64Test iosSimulatorArm64Test --stacktrace
+        run: ./gradlew iosX64Test iosSimulatorArm64Test macosArm64Test macosX64Test --stacktrace
   testWindows:
     runs-on: windows-latest
     steps:
