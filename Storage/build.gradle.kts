@@ -11,7 +11,9 @@ repositories {
     mavenCentral()
 }
 
+@OptIn(org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi::class)
 kotlin {
+    targetHierarchy.default()
     jvm {
         jvmToolchain(8)
         compilations.all {
