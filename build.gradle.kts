@@ -76,6 +76,27 @@ tasks.register("detektAll") {
     }
 }
 
+val buildConfigGenerator by tasks.registering(Sync::class) {
+
+    from(
+        resources.text.fromString(
+            """
+        |package io.github.jan.supabase
+        |
+        |object BuildConfig {
+        |  const val PROJECT_VERSION = "${project.version}"
+        |}
+        |
+      """.trimMargin()
+        )
+    ) {
+        rename { "BuildConfig.kt" } // set the file name
+        into("io/jan/github/jan/supabase/") // change the directory to match the package
+    }
+
+    into(layout.buildDirectory.dir("generated-src/kotlin/"))
+}
+
 configure(allprojects.filter { it.name in modules }) {
     apply(plugin = "io.gitlab.arturbosch.detekt")
 
@@ -155,6 +176,10 @@ kotlin {
             languageSettings.optIn("io.github.jan.supabase.annotiations.SupabaseInternal")
         }
         val commonMain by getting {
+            kotlin.srcDir(
+                // convert the task to a file-provider
+                buildConfigGenerator.map { it.destinationDir }
+            )
             dependencies {
                 api(libs.kotlinx.datetime)
                 api(libs.kotlinx.coroutines.core)
