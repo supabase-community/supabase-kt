@@ -11,7 +11,9 @@ repositories {
     mavenCentral()
 }
 
+@OptIn(org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi::class)
 kotlin {
+    targetHierarchy.default()
     jvm {
         jvmToolchain(8)
         compilations.all {
@@ -34,6 +36,8 @@ kotlin {
     ios()
     iosSimulatorArm64()
     mingwX64()
+    macosX64()
+    macosArm64()
     sourceSets {
         all {
             languageSettings.optIn("kotlin.RequiresOptIn")

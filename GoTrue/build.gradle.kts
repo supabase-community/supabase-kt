@@ -12,7 +12,9 @@ repositories {
     mavenCentral()
 }
 
+@OptIn(org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi::class)
 kotlin {
+    targetHierarchy.default()
     jvm {
         jvmToolchain(8)
         compilations.all {
@@ -35,6 +37,8 @@ kotlin {
     ios()
     iosSimulatorArm64()
     mingwX64()
+    macosX64()
+    macosArm64()
     sourceSets {
         all {
             languageSettings.optIn("kotlin.RequiresOptIn")
@@ -62,15 +66,6 @@ kotlin {
             dependencies {
                 api(libs.androidx.startup.runtime)
             }
-        }
-        val jsMain by getting
-        val iosMain by getting
-        val iosTest by getting
-        val iosSimulatorArm64Main by getting {
-            dependsOn(iosMain)
-        }
-        val iosSimulatorArm64Test by getting {
-            dependsOn(iosTest)
         }
     }
 }

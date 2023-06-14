@@ -150,7 +150,9 @@ configure(allprojects.filter { it.name in modules }) {
 group = "io.github.jan-tennert.supabase"
 version = Versions.PROJECT
 
+@OptIn(org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi::class)
 kotlin {
+    targetHierarchy.default()
     jvm {
         jvmToolchain(8)
         compilations.all {
@@ -173,6 +175,8 @@ kotlin {
     ios()
     iosSimulatorArm64()
     mingwX64()
+    macosX64()
+    macosArm64()
     sourceSets {
         all {
             languageSettings.optIn("kotlin.RequiresOptIn")
@@ -197,28 +201,13 @@ kotlin {
                 implementation(libs.bundles.testing)
             }
         }
-        val jvmMain by getting {
-        }
-        val jvmTest by getting
         val androidMain by getting {
             dependencies {
                 api(libs.android.lifecycle.process)
             }
         }
-        val androidUnitTest by getting
-        val jsMain by getting {
-            dependencies {
-              //  api(compose.web.core)
-            }
-        }
-        val iosTest by getting
-        val iosMain by getting
-        val iosSimulatorArm64Main by getting {
-            dependsOn(iosMain)
-        }
-        val iosSimulatorArm64Test by getting {
-            dependsOn(iosTest)
-        }
+        val appleMain by getting
+        val macosMain by getting
     }
 }
 

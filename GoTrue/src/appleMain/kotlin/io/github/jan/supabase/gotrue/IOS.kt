@@ -13,7 +13,7 @@ import platform.Foundation.NSURLQueryItem
 
 /**
  * Handle deeplinks for authentication.
- * This handles the deeplinks for implicit and PKCE flow.
+ * This handles the deeplinks for the implicit and the PKCE flow.
  * @param url The url from the ios app delegate
  * @param onSessionSuccess The callback when the session was successfully imported
  */
