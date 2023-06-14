@@ -7,7 +7,7 @@ actual class PlatformTargetTest {
 
     @Test
     actual fun testPlatformTarget() {
-        assertEquals(PlatformTarget.MACOS, CurrentPlatformTarget, "The current platform target should be IOS")
+        assertEquals(PlatformTarget.MACOS, CurrentPlatformTarget, "The current platform target should be MACOS")
     }
 
 }
