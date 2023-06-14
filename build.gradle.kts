@@ -91,7 +91,7 @@ val buildConfigGenerator by tasks.registering(Sync::class) {
         )
     ) {
         rename { "BuildConfig.kt" } // set the file name
-        into("io/jan/github/jan/supabase/") // change the directory to match the package
+        into("io/github/jan/supabase/") // change the directory to match the package
     }
 
     into(layout.buildDirectory.dir("generated-src/kotlin/"))
