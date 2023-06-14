@@ -37,7 +37,7 @@ kotlin {
     sourceSets {
         all {
             languageSettings.optIn("kotlin.RequiresOptIn")
-            languageSettings.optIn("io.github.jan.supabase.annotiations.SupabaseInternal")
+            languageSettings.optIn("io.github.jan.supabase.annotations.SupabaseInternal")
         }
         val commonMain by getting {
             dependencies {
