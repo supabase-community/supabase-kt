@@ -83,6 +83,9 @@ val buildConfigGenerator by tasks.registering(Sync::class) {
             """
         |package io.github.jan.supabase
         |
+        |import io.github.jan.supabase.annotiations.SupabaseInternal
+        |
+        |@SupabaseInternal
         |object BuildConfig {
         |  const val PROJECT_VERSION = "${project.version}"
         |}
