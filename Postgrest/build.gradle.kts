@@ -57,6 +57,8 @@ kotlin {
         val jvmMain by getting
         val androidMain by getting
         val jsMain by getting
+        val appleMain by getting
+        val macosMain by getting
         val iosMain by getting
         val iosSimulatorArm64Main by getting {
             dependsOn(iosMain)
