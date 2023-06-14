@@ -3,7 +3,7 @@ package io.github.jan.supabase.network
 
 import co.touchlab.kermit.Logger
 import io.github.jan.supabase.BuildConfig
-import io.github.jan.supabase.annotiations.SupabaseInternal
+import io.github.jan.supabase.annotations.SupabaseInternal
 import io.github.jan.supabase.exceptions.HttpRequestException
 import io.github.jan.supabase.supabaseJson
 import io.ktor.client.HttpClient

@@ -6,7 +6,7 @@ import co.touchlab.kermit.Logger
 import co.touchlab.stately.collections.IsoMutableMap
 import com.russhwolf.settings.ExperimentalSettingsApi
 import io.github.jan.supabase.SupabaseClient
-import io.github.jan.supabase.annotiations.SupabaseInternal
+import io.github.jan.supabase.annotations.SupabaseInternal
 import io.github.jan.supabase.bodyOrNull
 import io.github.jan.supabase.exceptions.BadRequestRestException
 import io.github.jan.supabase.exceptions.NotFoundRestException

@@ -1,6 +1,6 @@
 package io.github.jan.supabase.postgrest
 
-import io.github.jan.supabase.annotiations.SupabaseInternal
+import io.github.jan.supabase.annotations.SupabaseInternal
 import io.github.jan.supabase.postgrest.query.PostgrestFilterBuilder
 import io.github.jan.supabase.postgrest.query.buildPostgrestFilter
 import kotlinx.serialization.ExperimentalSerializationApi

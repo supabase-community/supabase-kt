@@ -1,4 +1,4 @@
-package io.github.jan.supabase.annotiations
+package io.github.jan.supabase.annotations
 
 /**
  * Used to mark internal APIs
