@@ -14,11 +14,8 @@
 /Postgrest/build/
 /Storage/build/
 /Realtime/build/
-/Realtime/src/jvmMain/kotlin/Test.kt
-/Functions/src/jvmMain/kotlin/Test.kt
-/Auth/src/jvmMain/kotlin/Test.kt
+/GoTrue/build/
+/Functions/build/
 /plugins/ApolloGraphQL/build
 .idea
 local.properties
-/test/
-/test-w/
