@@ -26,7 +26,7 @@ actual abstract class OAuthProvider : AuthProvider<ExternalAuthConfig, Unit> {
             scopes.addAll(externalConfig.scopes)
             queryParams.putAll(externalConfig.queryParams)
         }
-        system("xdg-open $url");
+        system("xdg-open $url")
     }
 
     actual override suspend fun signUp(
