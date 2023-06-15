@@ -49,9 +49,14 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 api(project(":"))
-                api(libs.bundles.multiplatform.settings)
-                implementation(libs.okio)
                 implementation(libs.krypto)
+                api(libs.cache4k)
+            }
+        }
+        val nonLinuxMain by creating {
+            dependsOn(commonMain)
+            dependencies {
+                api(libs.bundles.multiplatform.settings)
             }
         }
         val commonTest by getting {
@@ -60,15 +65,27 @@ kotlin {
             }
         }
         val jvmMain by getting {
+            dependsOn(nonLinuxMain)
             dependencies {
                 implementation(libs.javalin)
             }
         }
         val androidMain by getting {
+            dependsOn(nonLinuxMain)
             dependencies {
                 api(libs.androidx.startup.runtime)
             }
         }
+        val mingwX64Main by getting {
+            dependsOn(nonLinuxMain)
+        }
+        val appleMain by getting {
+            dependsOn(nonLinuxMain)
+        }
+        val jsMain by getting {
+            dependsOn(nonLinuxMain)
+        }
+        val linuxMain by getting
     }
 }
 
