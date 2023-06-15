@@ -36,6 +36,8 @@ kotlin {
     mingwX64()
     macosX64()
     macosArm64()
+    linuxX64()
+    linuxArm64()
     sourceSets {
         all {
             languageSettings.optIn("kotlin.RequiresOptIn")

@@ -3,7 +3,7 @@ package io.github.jan.supabase.gotrue.providers
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.gotrue.gotrue
 import io.github.jan.supabase.gotrue.user.UserSession
-import platform.Foundation.NSURL
+import platform.posix.system
 
 /**
  * Represents an OAuth provider.
@@ -21,8 +21,12 @@ actual abstract class OAuthProvider : AuthProvider<ExternalAuthConfig, Unit> {
         redirectUrl: String?,
         config: (ExternalAuthConfig.() -> Unit)?
     ) {
-        val externalConfig = ExternalAuthConfig().apply(config ?: {})
-        openOAuth(redirectUrl, supabaseClient, externalConfig)
+        val externalConfig = ExternalAuthConfig().apply { config?.invoke(this) }
+        val url = supabaseClient.gotrue.oAuthUrl(this@OAuthProvider, redirectUrl) {
+            scopes.addAll(externalConfig.scopes)
+            queryParams.putAll(externalConfig.queryParams)
+        }
+        system("xdg-open $url");
     }
 
     actual override suspend fun signUp(
@@ -32,22 +36,6 @@ actual abstract class OAuthProvider : AuthProvider<ExternalAuthConfig, Unit> {
         config: (ExternalAuthConfig.() -> Unit)?
     ) = login(supabaseClient, onSuccess, redirectUrl, config = config)
 
-    private fun openOAuth(
-        redirectUrl: String? = null,
-        supabaseClient: SupabaseClient,
-        externalConfig: ExternalAuthConfig
-    ) {
-        val gotrue = supabaseClient.gotrue
-        val deepLink = "${gotrue.config.scheme}://${gotrue.config.host}"
-        val url = NSURL(string = supabaseClient.gotrue.oAuthUrl(this, redirectUrl ?: deepLink) {
-            scopes.addAll(externalConfig.scopes)
-            queryParams.putAll(externalConfig.queryParams)
-        })
-        openUrl(url)
-    }
-
     actual companion object
 
 }
-
-internal expect fun openUrl(url: NSURL)
