@@ -16,6 +16,7 @@ import io.github.jan.supabase.plugins.MainPlugin
 import io.github.jan.supabase.plugins.SupabasePluginProvider
 import io.github.jan.supabase.safeBody
 import io.github.jan.supabase.storage.resumable.ResumableCache
+import io.github.jan.supabase.storage.resumable.createDefaultResumableCache
 import io.ktor.client.plugins.HttpRequestTimeoutException
 import io.ktor.client.plugins.timeout
 import io.ktor.client.statement.HttpResponse
@@ -132,7 +133,7 @@ sealed interface Storage : MainPlugin<Storage.Config> {
          * @param onlyUpdateStateAfterChunk whether the state should only be updated after a chunk was uploaded successfully or also when the chunk is currently being uploaded
          */
         data class Resumable(
-            var cache: ResumableCache = ResumableCache.Disk(),
+            var cache: ResumableCache = createDefaultResumableCache(),
             var retryTimeout: Duration = 5.seconds,
             var onlyUpdateStateAfterChunk: Boolean = false
         ) {

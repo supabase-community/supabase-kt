@@ -53,19 +53,37 @@ kotlin {
         val nonJsMain by creating {
             dependsOn(commonMain)
         }
+        val nonLinuxMain by creating {
+            dependsOn(commonMain)
+            dependencies {
+                api(libs.bundles.multiplatform.settings)
+            }
+        }
         val jvmMain by getting {
             dependsOn(nonJsMain)
+            dependsOn(nonLinuxMain)
         }
         val androidMain by getting {
             dependsOn(nonJsMain)
+            dependsOn(nonLinuxMain)
         }
         val commonTest by getting {
             dependencies {
                 implementation(libs.bundles.testing)
             }
         }
-        val jsMain by getting
-        val iosMain by getting
+        val jsMain by getting {
+            dependsOn(nonLinuxMain)
+        }
+        val appleMain by getting {
+            dependsOn(nonLinuxMain)
+        }
+        val iosMain by getting {
+            dependsOn(appleMain)
+        }
+        val mingwX64Main by getting {
+            dependsOn(nonLinuxMain)
+        }
         val iosSimulatorArm64Main by getting {
             dependsOn(iosMain)
         }
