@@ -32,6 +32,7 @@ kotlin {
                 enabled = false
             }
         }
+        nodejs()
     }
     ios()
     iosSimulatorArm64()
