@@ -1,13 +1,10 @@
-@file:OptIn(ExperimentalSettingsApi::class)
-
 package io.github.jan.supabase.storage
 
 import co.touchlab.kermit.Logger
-import co.touchlab.stately.collections.IsoMutableMap
-import com.russhwolf.settings.ExperimentalSettingsApi
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.annotations.SupabaseInternal
 import io.github.jan.supabase.bodyOrNull
+import io.github.jan.supabase.collections.AtomicMutableMap
 import io.github.jan.supabase.exceptions.BadRequestRestException
 import io.github.jan.supabase.exceptions.NotFoundRestException
 import io.github.jan.supabase.exceptions.RestException
@@ -199,7 +196,7 @@ internal class StorageImpl(override val supabaseClient: SupabaseClient, override
             requestTimeoutMillis = config.transferTimeout.inWholeMilliseconds
         }
     }
-    private val resumableClients = IsoMutableMap<String, BucketApi>()
+    private val resumableClients = AtomicMutableMap<String, BucketApi>()
 
     override suspend fun retrieveBuckets(): List<Bucket> = api.get("bucket").safeBody()
 

@@ -37,7 +37,7 @@ kotlin {
     iosSimulatorArm64()
     macosX64()
     macosArm64()
-    linuxX64()
+//    linuxX64()
     sourceSets {
         all {
             languageSettings.optIn("kotlin.RequiresOptIn")

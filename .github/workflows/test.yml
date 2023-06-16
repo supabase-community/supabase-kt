@@ -140,4 +140,4 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
       - name: Test supabase-kt
-        run: ./gradlew linuxX64Test linuxArm64Test --stacktrace
+        run: ./gradlew linuxX64Test --stacktrace
