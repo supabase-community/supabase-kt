@@ -2,10 +2,22 @@
 
 A Kotlin Multiplatform Client for Supabase.
 Supported targets:
-- JVM
-- Android
-- JS (Browser) 
-- IOS (experimental)
+
+| Module                               | GoTrue | Realtime | Postgrest | Storage | Functions | Apollo-GraphQL |
+|--------------------------------------|--------|----------|-----------|---------|-----------|----------------|
+| **JVM**                              | ✅      | ✅        | ✅         | ✅       | ✅         | ✅              |
+| **Android**                          | ✅      | ✅        | ✅         | ✅       | ✅         | ✅              |
+| **JS** *(Browser)*                   | ✅      | ✅        | ✅         | ✅       | ✅         | ✅              |
+| **IOS**                              | ✅      | ✅        | ✅         | ✅       | ✅         | ✅              |
+| **MacOS**  *(macosX64 & macosArm64)* | ✅      | ✅        | ✅         | ✅       | ✅         | ✅              |
+| **Windows** *(mingwX64)*             | ☑️     | ✅        | ✅         | ✅       | ✅         | ❌              |
+| **Linux** *(linuxX64)*               | ☑️     | ✅        | ✅         | ✅       | ✅         | ❌              |
+
+✅ = full support 
+
+☑️ = partial support: no built-in OAuth/OTP link handling.
+
+❌ = not supported
 
 *Note: WASM planned see [issue](https://github.com/supabase-community/supabase-kt/issues/86)*
 
