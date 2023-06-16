@@ -1,6 +1,7 @@
 @file:OptIn(ExperimentalCoroutinesApi::class)
 
 import io.github.jan.supabase.SupabaseClient
+import io.github.jan.supabase.collections.AtomicMutableMap
 import io.github.jan.supabase.createSupabaseClient
 import io.github.jan.supabase.exceptions.BadRequestRestException
 import io.github.jan.supabase.exceptions.UnauthorizedRestException
@@ -14,7 +15,6 @@ import io.github.jan.supabase.gotrue.providers.Github
 import io.github.jan.supabase.gotrue.providers.builtin.Email
 import io.github.jan.supabase.gotrue.providers.builtin.Phone
 import io.github.jan.supabase.gotrue.user.UserSession
-import io.github.reactivecircus.cache4k.Cache
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
@@ -139,21 +139,17 @@ class GoTrueTest {
     fun test_loading_session_from_storage() {
         val client = createSupabaseClient {
             sessionManager = MemorySessionManager(
-                Cache.Builder<String, String>().build().apply {
-                    put(
-                        "session", Json.encodeToString(
-                            UserSession(
-                                "token",
-                                "refresh_token",
-                                "",
-                                "",
-                                1000,
-                                "type",
-                                null
-                            )
-                        )
+                AtomicMutableMap("session" to Json.encodeToString(
+                    UserSession(
+                        "token",
+                        "refresh_token",
+                        "",
+                        "",
+                        1000,
+                        "type",
+                        null
                     )
-                }
+                ))
             )
         }
         runTest {
