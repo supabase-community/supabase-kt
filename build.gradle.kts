@@ -177,6 +177,7 @@ kotlin {
     mingwX64()
     macosX64()
     macosArm64()
+    linuxX64()
     sourceSets {
         all {
             languageSettings.optIn("kotlin.RequiresOptIn")
@@ -193,7 +194,7 @@ kotlin {
                 api(libs.kermit)
                 api(libs.bundles.ktor.client)
                 api(libs.kotlinx.atomicfu)
-                api(libs.stately)
+         //       api(libs.stately)
             }
         }
         val commonTest by getting {

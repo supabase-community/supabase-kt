@@ -6,15 +6,14 @@ import io.github.jan.supabase.gotrue.user.UserMfaFactor
 import io.github.jan.supabase.gotrue.user.UserSession
 import io.github.jan.supabase.safeBody
 import io.ktor.client.call.body
+import io.ktor.util.decodeBase64String
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.put
-import okio.ByteString.Companion.decodeBase64
 
 /**
  * An interface for interacting with Multi-Factor Authentication Api in GoTrue.
@@ -177,7 +176,7 @@ internal class MfaApiImpl(
     override fun getAuthenticatorAssuranceLevel(): MfaLevel {
         val jwt = gotrue.currentAccessTokenOrNull() ?: error("Current session is null")
         val parts = jwt.split(".")
-        val decodedJwt = Json.decodeFromString<JsonObject>(parts[1].decodeBase64()?.utf8() ?: error("Could not decode current JWT"))
+        val decodedJwt = Json.decodeFromString<JsonObject>(parts[1].decodeBase64String())
         val aal = AuthenticatorAssuranceLevel.from(decodedJwt["aal"]?.jsonPrimitive?.content ?: error("No 'aal' claim found in JWT"))
         val nextAal = if (verifiedFactors.isNotEmpty()) AuthenticatorAssuranceLevel.AAL2 else AuthenticatorAssuranceLevel.AAL1
         return MfaLevel(aal, nextAal)

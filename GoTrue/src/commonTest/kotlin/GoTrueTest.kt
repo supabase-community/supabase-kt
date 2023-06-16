@@ -1,20 +1,20 @@
 @file:OptIn(ExperimentalCoroutinesApi::class)
 
-import com.russhwolf.settings.MapSettings
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.createSupabaseClient
 import io.github.jan.supabase.exceptions.BadRequestRestException
 import io.github.jan.supabase.exceptions.UnauthorizedRestException
 import io.github.jan.supabase.gotrue.GoTrue
 import io.github.jan.supabase.gotrue.GoTrueConfig
+import io.github.jan.supabase.gotrue.MemoryCodeVerifierCache
+import io.github.jan.supabase.gotrue.MemorySessionManager
 import io.github.jan.supabase.gotrue.OtpType
-import io.github.jan.supabase.gotrue.SettingsCodeVerifierCache
-import io.github.jan.supabase.gotrue.SettingsSessionManager
 import io.github.jan.supabase.gotrue.gotrue
 import io.github.jan.supabase.gotrue.providers.Github
 import io.github.jan.supabase.gotrue.providers.builtin.Email
 import io.github.jan.supabase.gotrue.providers.builtin.Phone
 import io.github.jan.supabase.gotrue.user.UserSession
+import io.github.reactivecircus.cache4k.Cache
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
@@ -138,20 +138,22 @@ class GoTrueTest {
     @Test
     fun test_loading_session_from_storage() {
         val client = createSupabaseClient {
-            sessionManager = SettingsSessionManager(
-                MapSettings(
-                    "session" to Json.encodeToString(
-                        UserSession(
-                            "token",
-                            "refresh_token",
-                            "",
-                            "",
-                            1000,
-                            "type",
-                            null
+            sessionManager = MemorySessionManager(
+                Cache.Builder<String, String>().build().apply {
+                    put(
+                        "session", Json.encodeToString(
+                            UserSession(
+                                "token",
+                                "refresh_token",
+                                "",
+                                "",
+                                1000,
+                                "type",
+                                null
+                            )
                         )
                     )
-                )
+                }
             )
         }
         runTest {
@@ -285,8 +287,8 @@ class GoTrueTest {
                 alwaysAutoRefresh = false
                 coroutineDispatcher = dispatcher
 
-                sessionManager = SettingsSessionManager(MapSettings())
-                codeVerifierCache = SettingsCodeVerifierCache(MapSettings())
+                sessionManager = MemorySessionManager()
+                codeVerifierCache = MemoryCodeVerifierCache()
 
                 platformSettings()
                 additionalGoTrueSettings()

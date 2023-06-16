@@ -30,10 +30,7 @@ actual abstract class OAuthProvider : AuthProvider<ExternalAuthConfig, Unit> {
         onSuccess: suspend (UserSession) -> Unit,
         redirectUrl: String?,
         config: (ExternalAuthConfig.() -> Unit)?
-    ) {
-        val externalConfig = ExternalAuthConfig().apply(config ?: {})
-        openOAuth(redirectUrl, supabaseClient, externalConfig)
-    }
+    ) = login(supabaseClient, onSuccess, redirectUrl, config = config)
 
     private fun openOAuth(
         redirectUrl: String? = null,
