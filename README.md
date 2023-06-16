@@ -35,8 +35,7 @@ Supported targets:
 
 # Installation
 
-**Available modules
-**: `gotrue-kt`, `postgrest-kt`, `functions-kt`, `storage-kt`, `realtime-kt`, `apollo-graphql`
+**Available modules**: `gotrue-kt`, `postgrest-kt`, `functions-kt`, `storage-kt`, `realtime-kt`, `apollo-graphql`
 
 ```kotlin
 dependencies {
