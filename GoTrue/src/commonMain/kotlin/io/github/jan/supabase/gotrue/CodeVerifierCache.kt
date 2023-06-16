@@ -1,6 +1,6 @@
 package io.github.jan.supabase.gotrue
 
-import io.github.reactivecircus.cache4k.Cache
+import io.github.jan.supabase.collections.AtomicMutableMap
 
 /**
  * A cache for the code verifier used in the PKCE flow.
@@ -25,20 +25,20 @@ interface CodeVerifierCache {
 }
 
 /**
- * A [CodeVerifierCache] that uses the [Cache] API.
+ * A [CodeVerifierCache] that uses the [AtomicMutableMap] API.
  */
-class MemoryCodeVerifierCache(private val cache: Cache<String, String> = Cache.Builder<String, String>().build()): CodeVerifierCache {
+class MemoryCodeVerifierCache(private val map: MutableMap<String, String> = AtomicMutableMap()): CodeVerifierCache {
 
     override suspend fun saveCodeVerifier(codeVerifier: String) {
-        cache.put(SETTINGS_KEY, codeVerifier)
+        map.put(SETTINGS_KEY, codeVerifier)
     }
 
     override suspend fun loadCodeVerifier(): String? {
-        return cache.get(SETTINGS_KEY)
+        return map.get(SETTINGS_KEY)
     }
 
     override suspend fun deleteCodeVerifier() {
-        cache.invalidate(SETTINGS_KEY)
+        map.remove(SETTINGS_KEY)
     }
 
     companion object {

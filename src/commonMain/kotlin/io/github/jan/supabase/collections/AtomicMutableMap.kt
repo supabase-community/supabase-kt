@@ -5,7 +5,7 @@ import kotlinx.atomicfu.atomic
 import kotlinx.atomicfu.update
 
 /**
- * A multiplatform, thread-safe [MutableMap], implemented using AtomicFU.
+ * A multiplatform, thread-safe [MutableMap], implemented using AtomicFU. Thanks to the author of [klogging](https://github.com/klogging/klogging)!
  */
 @SupabaseInternal
 class AtomicMutableMap<K, V>(

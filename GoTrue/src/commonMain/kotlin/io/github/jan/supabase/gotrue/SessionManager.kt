@@ -1,9 +1,9 @@
 package io.github.jan.supabase.gotrue
 
 import co.touchlab.kermit.Logger
+import io.github.jan.supabase.collections.AtomicMutableMap
 import io.github.jan.supabase.gotrue.user.UserSession
 import io.github.jan.supabase.supabaseJson
-import io.github.reactivecircus.cache4k.Cache
 import kotlinx.serialization.encodeToString
 
 /**
@@ -29,16 +29,16 @@ interface SessionManager {
 }
 
 /**
- * A [SessionManager] that uses the [Cache] API.
+ * A [SessionManager] that uses the [AtomicMutableMap] API.
  */
-class MemorySessionManager(private val cache: Cache<String, String> = Cache.Builder<String, String>().build()): SessionManager {
+class MemorySessionManager(private val map: MutableMap<String, String> = AtomicMutableMap()): SessionManager {
 
     override suspend fun saveSession(session: UserSession) {
-        cache.put(SETTINGS_KEY, supabaseJson.encodeToString(session))
+        map[SETTINGS_KEY] = supabaseJson.encodeToString(session)
     }
 
     override suspend fun loadSession(): UserSession? {
-        val session = cache.get(SETTINGS_KEY) ?: return null
+        val session = map[SETTINGS_KEY] ?: return null
         return try {
             supabaseJson.decodeFromString(session)
         } catch(e: Exception) {
@@ -48,7 +48,7 @@ class MemorySessionManager(private val cache: Cache<String, String> = Cache.Buil
     }
 
     override suspend fun deleteSession() {
-        cache.invalidate(SETTINGS_KEY)
+        map.remove(SETTINGS_KEY)
     }
 
     companion object {

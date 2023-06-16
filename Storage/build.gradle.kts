@@ -47,7 +47,7 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 api(project(":gotrue-kt"))
-                api(libs.cache4k)
+             //   api(libs.cache4k)
             }
         }
         val nonJsMain by creating {

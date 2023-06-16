@@ -49,7 +49,7 @@ kotlin {
             dependencies {
                 api(project(":"))
                 implementation(libs.krypto)
-                api(libs.cache4k)
+         //       api(libs.cache4k)
             }
         }
         val nonLinuxMain by creating {
