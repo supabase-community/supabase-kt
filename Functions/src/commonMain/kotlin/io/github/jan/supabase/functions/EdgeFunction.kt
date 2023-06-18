@@ -29,7 +29,7 @@ class EdgeFunction @SupabaseInternal constructor(
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
-    suspend inline operator fun <reified T> invoke(body: T, headerOverride: HeadersBuilder.() -> Unit = {}): HttpResponse {
+    suspend inline operator fun <reified T : Any> invoke(body: T, headerOverride: HeadersBuilder.() -> Unit = {}): HttpResponse {
         val headers = HeadersBuilder().apply {
             appendAll(this@EdgeFunction.headers)
             headerOverride()

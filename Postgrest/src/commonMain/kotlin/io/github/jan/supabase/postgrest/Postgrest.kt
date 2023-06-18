@@ -1,6 +1,8 @@
 package io.github.jan.supabase.postgrest
 
+import io.github.jan.supabase.KotlinXSupabaseSerializer
 import io.github.jan.supabase.SupabaseClient
+import io.github.jan.supabase.SupabaseSerializer
 import io.github.jan.supabase.annotations.SupabaseInternal
 import io.github.jan.supabase.bodyOrNull
 import io.github.jan.supabase.exceptions.BadRequestRestException
@@ -9,6 +11,7 @@ import io.github.jan.supabase.exceptions.RestException
 import io.github.jan.supabase.exceptions.UnauthorizedRestException
 import io.github.jan.supabase.exceptions.UnknownRestException
 import io.github.jan.supabase.gotrue.authenticatedSupabaseApi
+import io.github.jan.supabase.plugins.CustomSerializationPlugin
 import io.github.jan.supabase.plugins.MainConfig
 import io.github.jan.supabase.plugins.MainPlugin
 import io.github.jan.supabase.plugins.SupabasePluginProvider
@@ -77,8 +80,9 @@ sealed interface Postgrest : MainPlugin<Postgrest.Config> {
         override var customUrl: String? = null,
         override var jwtToken: String? = null,
         var defaultSchema: String = "public",
-        var propertyConversionMethod: PropertyConversionMethod = PropertyConversionMethod.CAMEL_CASE_TO_SNAKE_CASE
-    ): MainConfig
+        var propertyConversionMethod: PropertyConversionMethod = PropertyConversionMethod.CAMEL_CASE_TO_SNAKE_CASE,
+        override var serializer: SupabaseSerializer = KotlinXSupabaseSerializer()
+    ): MainConfig, CustomSerializationPlugin
 
     companion object : SupabasePluginProvider<Config, Postgrest> {
 

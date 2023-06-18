@@ -66,6 +66,7 @@ open class GoTrueConfigDefaults {
      * The custom jwt token to use for the gotrue instance. When null, the jwt token from the GoTrue session or the supabaseKey will be used
      */
     var jwtToken: String? = null
+
 }
 
 /**
