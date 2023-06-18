@@ -1,4 +1,4 @@
-package io.github.jan.supabase.realtime.annotiations
+package io.github.jan.supabase.realtime.annotations
 
 /**
  * Used to mark Channel DSL functions
