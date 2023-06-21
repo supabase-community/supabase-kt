@@ -18,7 +18,7 @@ import androidx.compose.ui.Modifier
 import com.stevdzasan.onetap.OneTapSignInWithGoogle
 import com.stevdzasan.onetap.rememberOneTapSignInState
 import io.github.aakira.napier.DebugAntilog
-import co.touchlab.kermit.Logger
+import io.github.aakira.napier.Napier
 import io.github.jan.supabase.common.AppViewModel
 import io.github.jan.supabase.common.di.SERVER_CLIENT_ID
 import io.github.jan.supabase.common.ui.screen.LoginScreen
