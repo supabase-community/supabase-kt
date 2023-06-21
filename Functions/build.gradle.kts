@@ -30,11 +30,7 @@ kotlin {
                 enabled = false
             }
         }
-        nodejs {
-            testTask {
-                enabled = false
-            }
-        }
+        
     }
     ios()
     iosSimulatorArm64()
