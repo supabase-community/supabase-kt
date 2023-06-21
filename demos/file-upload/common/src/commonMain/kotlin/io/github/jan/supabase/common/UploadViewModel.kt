@@ -3,7 +3,7 @@ package io.github.jan.supabase.common
 import androidx.compose.ui.ExperimentalComposeUiApi
 import co.touchlab.stately.collections.IsoMutableMap
 import io.github.aakira.napier.DebugAntilog
-import co.touchlab.kermit.Logger
+import io.github.aakira.napier.Napier
 import io.github.jan.supabase.storage.UploadStatus
 import io.github.jan.supabase.storage.resumable.Fingerprint
 import io.github.jan.supabase.storage.resumable.ResumableClient
@@ -29,7 +29,7 @@ class UploadViewModel(
     private val uploads = IsoMutableMap<Fingerprint, ResumableUpload>()
 
     init {
-        Logger.base(DebugAntilog())
+        Napier.base(DebugAntilog())
     }
 
     fun queueUpload(file: MPFile, path: String) {

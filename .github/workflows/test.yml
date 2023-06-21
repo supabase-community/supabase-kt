@@ -10,7 +10,7 @@ on:
       - '*'
 
 jobs:
-  testJvm:
+  testJvmAndroid:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
@@ -31,7 +31,7 @@ jobs:
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
     - name: Test supabase-kt
-      run: ./gradlew jvmTest --stacktrace
+      run: ./gradlew jvmTest testDebugUnitTest testReleaseUnitTest --stacktrace
   testJs:
     runs-on: ubuntu-latest
     steps:
