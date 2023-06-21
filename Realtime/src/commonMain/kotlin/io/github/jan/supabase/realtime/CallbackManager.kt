@@ -29,7 +29,7 @@ sealed interface CallbackManager {
 internal class CallbackManagerImpl : CallbackManager {
 
     private var nextId by atomic(0L)
-    private var serverChanges by atomic(listOf<PostgresJoinConfig>())
+    private var _serverChanges by atomic(listOf<PostgresJoinConfig>())
     private val callbacks = AtomicMutableList<RealtimeCallback<*>>()
 
     override fun addBroadcastCallback(event: String, callback: (JsonObject) -> Unit): Long {
@@ -45,7 +45,7 @@ internal class CallbackManagerImpl : CallbackManager {
     }
 
     override fun triggerPostgresChange(ids: List<Long>, data: PostgresAction) {
-        val filter = serverChanges.filter { it.id in ids }
+        val filter = _serverChanges.filter { it.id in ids }
         val postgresCallbacks = callbacks.filterIsInstance<RealtimeCallback.PostgresCallback>()
         val callbacks =
             postgresCallbacks.filter { cc -> filter.any { sc -> cc.filter == sc } }
@@ -74,7 +74,7 @@ internal class CallbackManagerImpl : CallbackManager {
     }
 
     override fun setServerChanges(changes: List<PostgresJoinConfig>) {
-        serverChanges = changes
+        _serverChanges = changes
     }
 
 }
