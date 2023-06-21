@@ -12,7 +12,7 @@ import io.github.jan.supabase.exceptions.RestException
 import io.github.jan.supabase.exceptions.UnauthorizedRestException
 import io.github.jan.supabase.exceptions.UnknownRestException
 import io.github.jan.supabase.gotrue.authenticatedSupabaseApi
-import io.github.jan.supabase.plugins.CustomSerializationPlugin
+import io.github.jan.supabase.plugins.CustomSerializationConfig
 import io.github.jan.supabase.plugins.MainConfig
 import io.github.jan.supabase.plugins.MainPlugin
 import io.github.jan.supabase.plugins.SupabasePluginProvider
@@ -81,7 +81,7 @@ sealed interface Postgrest : MainPlugin<Postgrest.Config> {
         var defaultSchema: String = "public",
         var propertyConversionMethod: PropertyConversionMethod = PropertyConversionMethod.CAMEL_CASE_TO_SNAKE_CASE,
         override var serializer: SupabaseSerializer = KotlinXSupabaseSerializer()
-    ): MainConfig, CustomSerializationPlugin
+    ): MainConfig, CustomSerializationConfig
 
     companion object : SupabasePluginProvider<Config, Postgrest> {
 

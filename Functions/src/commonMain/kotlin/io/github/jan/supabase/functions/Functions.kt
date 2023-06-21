@@ -11,7 +11,7 @@ import io.github.jan.supabase.exceptions.RestException
 import io.github.jan.supabase.exceptions.UnauthorizedRestException
 import io.github.jan.supabase.gotrue.GoTrue
 import io.github.jan.supabase.gotrue.authenticatedSupabaseApi
-import io.github.jan.supabase.plugins.CustomSerializationPlugin
+import io.github.jan.supabase.plugins.CustomSerializationConfig
 import io.github.jan.supabase.plugins.MainConfig
 import io.github.jan.supabase.plugins.MainPlugin
 import io.github.jan.supabase.plugins.SupabasePluginProvider
@@ -120,7 +120,7 @@ class Functions(override val config: Config, override val supabaseClient: Supaba
         override var customUrl: String? = null,
         override var jwtToken: String? = null,
         override var serializer: SupabaseSerializer = KotlinXSupabaseSerializer()
-    ) : MainConfig, CustomSerializationPlugin
+    ) : MainConfig, CustomSerializationConfig
 
     companion object : SupabasePluginProvider<Config, Functions> {
 

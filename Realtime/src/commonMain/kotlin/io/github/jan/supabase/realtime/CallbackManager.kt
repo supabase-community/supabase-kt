@@ -26,7 +26,9 @@ sealed interface CallbackManager {
 
 }
 
-internal class CallbackManagerImpl : CallbackManager {
+internal class CallbackManagerImpl(
+    private val realtime: Realtime
+) : CallbackManager {
 
     private var nextId by atomic(0L)
     private var _serverChanges by atomic(listOf<PostgresJoinConfig>())
@@ -60,7 +62,7 @@ internal class CallbackManagerImpl : CallbackManager {
 
     override fun triggerPresenceDiff(joins: Map<String, Presence>, leaves: Map<String, Presence>) {
         val presenceCallbacks = callbacks.filterIsInstance<RealtimeCallback.PresenceCallback>()
-        presenceCallbacks.forEach { it.callback(PresenceActionImpl(joins, leaves)) }
+        presenceCallbacks.forEach { it.callback(PresenceActionImpl(realtime.config.serializer, joins, leaves)) }
     }
 
     override fun addPresenceCallback(callback: (PresenceAction) -> Unit): Long {

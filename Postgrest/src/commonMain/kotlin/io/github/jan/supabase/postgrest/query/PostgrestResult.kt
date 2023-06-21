@@ -28,12 +28,12 @@ class PostgrestResult(val body: JsonElement?, val headers: Headers, @PublishedAp
     }
 
     /**
-     * Decodes [body] as [T] using [json]
+     * Decodes [body] as [T] using
      */
     inline fun <reified T : Any> decodeAs(): T = postgrest.config.serializer.decode(body?.toString() ?: error("No body found"))
 
     /**
-     * Decodes [body] as [T] using [json]. If there's an error it will return null
+     * Decodes [body] as [T] using. If there's an error it will return null
      */
     inline fun <reified T : Any> decodeAsOrNull(): T? = try {
         decodeAs()
@@ -44,16 +44,16 @@ class PostgrestResult(val body: JsonElement?, val headers: Headers, @PublishedAp
     /**
      * Decodes [body] as a list of [T]
      */
-    inline fun <reified T> decodeList(): List<T> = decodeAs()
+    inline fun <reified T : Any> decodeList(): List<T> = decodeAs()
 
     /**
      * Decodes [body] as a list of [T] and returns the first item found
      */
-    inline fun <reified T> decodeSingle(): T = decodeList<T>().first()
+    inline fun <reified T : Any> decodeSingle(): T = decodeList<T>().first()
 
     /**
      * Decodes [body] as a list of [T] and returns the first item found or null
      */
-    inline fun <reified T> decodeSingleOrNull(): T? = decodeList<T>().firstOrNull()
+    inline fun <reified T : Any> decodeSingleOrNull(): T? = decodeList<T>().firstOrNull()
 
 }

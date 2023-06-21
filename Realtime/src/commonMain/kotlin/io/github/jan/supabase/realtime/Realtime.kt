@@ -11,7 +11,7 @@ import io.github.jan.supabase.exceptions.RestException
 import io.github.jan.supabase.exceptions.UnknownRestException
 import io.github.jan.supabase.gotrue.GoTrue
 import io.github.jan.supabase.gotrue.SessionStatus
-import io.github.jan.supabase.plugins.CustomSerializationPlugin
+import io.github.jan.supabase.plugins.CustomSerializationConfig
 import io.github.jan.supabase.plugins.MainConfig
 import io.github.jan.supabase.plugins.MainPlugin
 import io.github.jan.supabase.plugins.SupabasePluginProvider
@@ -116,6 +116,7 @@ sealed interface Realtime : MainPlugin<Realtime.Config> {
      * @property disconnectOnSessionLoss Whether to disconnect from the websocket when the session is lost. Defaults to true
      * @property reconnectDelay The delay between reconnect attempts. Defaults to 7 seconds
      * @property heartbeatInterval The interval between heartbeat messages. Defaults to 15 seconds
+     * @property
      */
     data class Config(
         var websocketConfig: WebSockets.Config.() -> Unit = {},
@@ -126,7 +127,7 @@ sealed interface Realtime : MainPlugin<Realtime.Config> {
         override var jwtToken: String? = null,
         var disconnectOnSessionLoss: Boolean = true,
         override var serializer: SupabaseSerializer = KotlinXSupabaseSerializer()
-    ): MainConfig, CustomSerializationPlugin
+    ): MainConfig, CustomSerializationConfig
 
     companion object : SupabasePluginProvider<Config, Realtime> {
 
