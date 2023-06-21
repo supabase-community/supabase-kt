@@ -7,7 +7,6 @@ import io.github.jan.supabase.exceptions.RestException
 import io.github.jan.supabase.gotrue.PostgrestFilterDSL
 import io.github.jan.supabase.postgrest.Postgrest
 import io.github.jan.supabase.postgrest.request.PostgrestRequest
-import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.jsonArray
 
 /**
@@ -99,7 +98,7 @@ class PostgrestBuilder(val postgrest: Postgrest, val table: String, val schema: 
         returning: Returning = Returning.REPRESENTATION,
         count: Count? = null,
         filter: PostgrestFilterBuilder.() -> Unit = {}
-    ): PostgrestResult = update(buildPostgrestUpdate(postgrest.config.propertyConversionMethod, update), returning, count, Json, filter)
+    ): PostgrestResult = update(buildPostgrestUpdate(postgrest.config.propertyConversionMethod, update), returning, count, filter)
 
     /**
      * Executes an update operation on the [table].
@@ -116,7 +115,6 @@ class PostgrestBuilder(val postgrest: Postgrest, val table: String, val schema: 
         value: T,
         returning: Returning = Returning.REPRESENTATION,
         count: Count? = null,
-        json: Json = Json,
         filter: PostgrestFilterBuilder.() -> Unit = {}
     ): PostgrestResult = PostgrestRequest.Update(returning, count, buildPostgrestFilter(postgrest.config.propertyConversionMethod, filter), postgrest.config.serializer.encodeToJsonElement(value), schema).execute(table, postgrest)
 
