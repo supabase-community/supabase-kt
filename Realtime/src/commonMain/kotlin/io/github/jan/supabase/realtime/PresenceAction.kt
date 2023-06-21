@@ -104,7 +104,7 @@ internal class PresenceActionImpl(
 /**
  * Decodes all [PresenceAction.joins] values as [T]
  * @param json The [Json] instance to use for decoding
- * @param ignoreOtherTypes Whether to ignore presences which cannot be decoded as [T]
+ * @param ignoreOtherTypes Whether to ignore presences which cannot be decoded as [T] such as your own presence
  */
 inline fun <reified T> PresenceAction.decodeJoinsAs(json: Json = Json, ignoreOtherTypes: Boolean = true): List<T> = joins.values.mapNotNull {
     if (ignoreOtherTypes) {
@@ -117,7 +117,7 @@ inline fun <reified T> PresenceAction.decodeJoinsAs(json: Json = Json, ignoreOth
 /**
  * Decodes all [PresenceAction.leaves] values as [T]
  * @param json The [Json] instance to use for decoding
- * @param ignoreOtherTypes Whether to ignore presences which cannot be decoded as [T]
+ * @param ignoreOtherTypes Whether to ignore presences which cannot be decoded as [T] such as your own presence
  */
 inline fun <reified T> PresenceAction.decodeLeavesAs(json: Json = Json, ignoreOtherTypes: Boolean = true): List<T> = leaves.values.mapNotNull {
     if (ignoreOtherTypes) {

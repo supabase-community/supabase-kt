@@ -22,12 +22,14 @@ sealed interface CallbackManager {
 
     fun removeCallbackById(id: Long)
 
+    fun setServerChanges(changes: List<PostgresJoinConfig>)
+
 }
 
 internal class CallbackManagerImpl : CallbackManager {
 
     private var nextId by atomic(0L)
-    var serverChanges by atomic(listOf<PostgresJoinConfig>())
+    private var serverChanges by atomic(listOf<PostgresJoinConfig>())
     private val callbacks = AtomicMutableList<RealtimeCallback<*>>()
 
     override fun addBroadcastCallback(event: String, callback: (JsonObject) -> Unit): Long {
@@ -69,6 +71,10 @@ internal class CallbackManagerImpl : CallbackManager {
 
     override fun removeCallbackById(id: Long) {
         callbacks.removeAll { it.id == id }
+    }
+
+    override fun setServerChanges(changes: List<PostgresJoinConfig>) {
+        serverChanges = changes
     }
 
 }

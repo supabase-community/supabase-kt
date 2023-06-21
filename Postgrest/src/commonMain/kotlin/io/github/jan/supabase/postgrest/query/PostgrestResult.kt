@@ -1,16 +1,16 @@
 package io.github.jan.supabase.postgrest.query
 
+import io.github.jan.supabase.decode
+import io.github.jan.supabase.postgrest.Postgrest
 import io.ktor.http.Headers
-import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
-import kotlinx.serialization.json.decodeFromJsonElement
 
 /**
  * Represents the result from a postgrest request
  * @param body The body of the response. Can be null if using an database function.
  * @param headers The headers of the response
  */
-data class PostgrestResult(val body: JsonElement?, val headers: Headers) {
+class PostgrestResult(val body: JsonElement?, val headers: Headers, @PublishedApi internal val postgrest: Postgrest) {
 
     private val contentRange = headers["Content-Range"]
 
@@ -30,13 +30,13 @@ data class PostgrestResult(val body: JsonElement?, val headers: Headers) {
     /**
      * Decodes [body] as [T] using [json]
      */
-    inline fun <reified T> decodeAs(json: Json = Json): T = json.decodeFromJsonElement(body ?: error("No body found"))
+    inline fun <reified T : Any> decodeAs(): T = postgrest.config.serializer.decode(body?.toString() ?: error("No body found"))
 
     /**
      * Decodes [body] as [T] using [json]. If there's an error it will return null
      */
-    inline fun <reified T> decodeAsOrNull(json: Json = Json): T? = try {
-        decodeAs<T>(json)
+    inline fun <reified T : Any> decodeAsOrNull(): T? = try {
+        decodeAs()
     } catch (e: Exception) {
         null
     }
@@ -44,16 +44,16 @@ data class PostgrestResult(val body: JsonElement?, val headers: Headers) {
     /**
      * Decodes [body] as a list of [T]
      */
-    inline fun <reified T> decodeList(json: Json = Json): List<T> = decodeAs(json)
+    inline fun <reified T> decodeList(): List<T> = decodeAs()
 
     /**
      * Decodes [body] as a list of [T] and returns the first item found
      */
-    inline fun <reified T> decodeSingle(json: Json = Json): T = decodeList<T>(json).first()
+    inline fun <reified T> decodeSingle(): T = decodeList<T>().first()
 
     /**
      * Decodes [body] as a list of [T] and returns the first item found or null
      */
-    inline fun <reified T> decodeSingleOrNull(json: Json = Json): T? = decodeList<T>(json).firstOrNull()
+    inline fun <reified T> decodeSingleOrNull(): T? = decodeList<T>().firstOrNull()
 
 }
