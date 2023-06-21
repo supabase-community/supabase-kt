@@ -5,6 +5,7 @@ import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.SupabaseSerializer
 import io.github.jan.supabase.annotations.SupabaseInternal
 import io.github.jan.supabase.bodyOrNull
+import io.github.jan.supabase.encodeToJsonElement
 import io.github.jan.supabase.exceptions.BadRequestRestException
 import io.github.jan.supabase.exceptions.NotFoundRestException
 import io.github.jan.supabase.exceptions.RestException
@@ -22,9 +23,7 @@ import io.github.jan.supabase.postgrest.query.PostgrestUpdate
 import io.github.jan.supabase.postgrest.request.PostgrestRequest
 import io.ktor.client.statement.HttpResponse
 import io.ktor.http.HttpStatusCode
-import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
-import kotlinx.serialization.json.encodeToJsonElement
 
 /**
  * Plugin to interact with the supabase Postgrest API
@@ -149,14 +148,13 @@ val SupabaseClient.postgrest: Postgrest
  * @param filter Filter the result
  * @throws RestException or one of its subclasses if the request failed
  */
-suspend inline fun <reified T> Postgrest.rpc(
+suspend inline fun <reified T : Any> Postgrest.rpc(
     function: String,
     parameters: T,
     head: Boolean = false,
     count: Count? = null,
-    json: Json = Json,
     filter: PostgrestFilterBuilder.() -> Unit = {}
-) = PostgrestRequest.RPC(head, count, PostgrestFilterBuilder(config.propertyConversionMethod).apply(filter).params, if(parameters is JsonElement) parameters else json.encodeToJsonElement(parameters)).execute("rpc/$function", this)
+) = PostgrestRequest.RPC(head, count, PostgrestFilterBuilder(config.propertyConversionMethod).apply(filter).params, if(parameters is JsonElement) parameters else config.serializer.encodeToJsonElement(parameters)).execute("rpc/$function", this)
 
 /**
  * Executes a database function
