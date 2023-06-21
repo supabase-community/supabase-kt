@@ -30,27 +30,28 @@ kotlin {
                 enabled = false
             }
         }
+        nodejs {
+            testTask {
+                enabled = false
+            }
+        }
     }
     ios()
     iosSimulatorArm64()
+    mingwX64()
+    macosX64()
+    macosArm64()
+    linuxX64()
     sourceSets {
         all {
             languageSettings.optIn("kotlin.RequiresOptIn")
-            languageSettings.optIn("io.github.jan.supabase.annotiations.SupabaseInternal")
+            languageSettings.optIn("io.github.jan.supabase.annotations.SupabaseInternal")
         }
         val commonMain by getting {
             dependencies {
                 api(project(":"))
                 api(project(":gotrue-kt"))
             }
-        }
-        val commonTest by getting
-        val jvmMain by getting
-        val androidMain by getting
-        val jsMain by getting
-        val iosMain by getting
-        val iosSimulatorArm64Main by getting {
-            dependsOn(iosMain)
         }
     }
 }

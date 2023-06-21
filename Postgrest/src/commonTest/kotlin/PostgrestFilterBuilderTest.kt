@@ -197,7 +197,7 @@ class PostgrestFilterBuilderTest {
 
     @Test
     fun propertyConversionWithSerialName() {
-        if(CurrentPlatformTarget in listOf(PlatformTarget.DESKTOP, PlatformTarget.ANDROID)) {
+        if(CurrentPlatformTarget in listOf(PlatformTarget.JVM, PlatformTarget.ANDROID)) {
             assertEquals("created_at", PropertyConversionMethod.SERIAL_NAME(TestData::createdAt))
         } else {
             assertFails { PropertyConversionMethod.SERIAL_NAME(TestData::createdAt) }

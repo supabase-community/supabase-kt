@@ -1,6 +1,6 @@
 package io.github.jan.supabase.storage
 
-import io.github.jan.supabase.annotiations.SupabaseExperimental
+import io.github.jan.supabase.annotations.SupabaseExperimental
 import io.ktor.util.cio.readChannel
 import io.ktor.util.cio.writeChannel
 import java.io.File

@@ -1,7 +1,7 @@
 package io.github.jan.supabase
 
 import co.touchlab.kermit.Logger
-import io.github.jan.supabase.annotiations.SupabaseDsl
+import io.github.jan.supabase.annotations.SupabaseDsl
 import io.github.jan.supabase.plugins.PluginManager
 import io.github.jan.supabase.plugins.SupabasePlugin
 import io.github.jan.supabase.plugins.SupabasePluginProvider

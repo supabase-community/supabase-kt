@@ -4,7 +4,7 @@ package io.github.jan.supabase
  * Represents a target platform
  */
 enum class PlatformTarget {
-    DESKTOP, ANDROID, WEB, IOS;
+    JVM, ANDROID, JS, WASM, IOS, WINDOWS, MACOS, LINUX;
 }
 
 /**

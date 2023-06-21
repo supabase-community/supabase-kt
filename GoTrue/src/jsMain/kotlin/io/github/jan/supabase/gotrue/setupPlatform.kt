@@ -1,6 +1,6 @@
 package io.github.jan.supabase.gotrue
 
-import io.github.jan.supabase.annotiations.SupabaseInternal
+import io.github.jan.supabase.annotations.SupabaseInternal
 import io.github.jan.supabase.gotrue.user.UserSession
 import kotlinx.browser.window
 import kotlinx.coroutines.CoroutineScope

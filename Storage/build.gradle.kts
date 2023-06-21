@@ -11,7 +11,9 @@ repositories {
     mavenCentral()
 }
 
+@OptIn(org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi::class)
 kotlin {
+    targetHierarchy.default()
     jvm {
         jvmToolchain(8)
         compilations.all {
@@ -30,36 +32,63 @@ kotlin {
                 enabled = false
             }
         }
+        nodejs {
+            testTask {
+                enabled = false
+            }
+        }
     }
     ios()
     iosSimulatorArm64()
+    mingwX64()
+    macosX64()
+    macosArm64()
+    linuxX64()
     sourceSets {
         all {
             languageSettings.optIn("kotlin.RequiresOptIn")
-            languageSettings.optIn("io.github.jan.supabase.annotiations.SupabaseInternal")
+            languageSettings.optIn("io.github.jan.supabase.annotations.SupabaseInternal")
         }
         val commonMain by getting {
             dependencies {
                 api(project(":gotrue-kt"))
-                api(libs.cache4k)
+             //   api(libs.cache4k)
             }
         }
         val nonJsMain by creating {
             dependsOn(commonMain)
         }
+        val nonLinuxMain by creating {
+            dependsOn(commonMain)
+            dependencies {
+                api(libs.bundles.multiplatform.settings)
+            }
+        }
         val jvmMain by getting {
             dependsOn(nonJsMain)
+            dependsOn(nonLinuxMain)
         }
         val androidMain by getting {
             dependsOn(nonJsMain)
+            dependsOn(nonLinuxMain)
         }
         val commonTest by getting {
             dependencies {
                 implementation(libs.bundles.testing)
             }
         }
-        val jsMain by getting
-        val iosMain by getting
+        val jsMain by getting {
+            dependsOn(nonLinuxMain)
+        }
+        val appleMain by getting {
+            dependsOn(nonLinuxMain)
+        }
+        val iosMain by getting {
+            dependsOn(appleMain)
+        }
+        val mingwX64Main by getting {
+            dependsOn(nonLinuxMain)
+        }
         val iosSimulatorArm64Main by getting {
             dependsOn(iosMain)
         }

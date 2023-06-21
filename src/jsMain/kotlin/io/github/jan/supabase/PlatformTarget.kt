@@ -3,4 +3,4 @@ package io.github.jan.supabase
 /**
  * The current target platform
  */
-actual val CurrentPlatformTarget: PlatformTarget = PlatformTarget.WEB
+actual val CurrentPlatformTarget: PlatformTarget = PlatformTarget.JS

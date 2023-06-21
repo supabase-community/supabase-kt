@@ -1,10 +1,10 @@
 package io.github.jan.supabase.realtime
 
 import co.touchlab.kermit.Logger
-import co.touchlab.stately.collections.IsoMutableMap
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.SupabaseClientBuilder
-import io.github.jan.supabase.annotiations.SupabaseInternal
+import io.github.jan.supabase.annotations.SupabaseInternal
+import io.github.jan.supabase.collections.AtomicMutableMap
 import io.github.jan.supabase.exceptions.RestException
 import io.github.jan.supabase.exceptions.UnknownRestException
 import io.github.jan.supabase.gotrue.GoTrue
@@ -20,6 +20,7 @@ import io.ktor.client.statement.HttpResponse
 import io.ktor.serialization.kotlinx.KotlinxWebsocketSerializationConverter
 import io.ktor.websocket.Frame
 import io.ktor.websocket.readText
+import kotlinx.atomicfu.atomic
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -163,14 +164,14 @@ internal class RealtimeImpl(override val supabaseClient: SupabaseClient, overrid
     var ws: DefaultClientWebSocketSession? = null
     private val _status = MutableStateFlow(Realtime.Status.DISCONNECTED)
     override val status: StateFlow<Realtime.Status> = _status.asStateFlow()
-    private val _subscriptions = IsoMutableMap<String, RealtimeChannel>()
+    private val _subscriptions = AtomicMutableMap<String, RealtimeChannel>()
     override val subscriptions: Map<String, RealtimeChannel>
-        get() = _subscriptions //toMap() doesnt work because of stately. May be fixed in a future version
+        get() = _subscriptions.toMap()
     private val scope = CoroutineScope(Dispatchers.Default + SupervisorJob())
     var heartbeatJob: Job? = null
     var messageJob: Job? = null
-    var ref = 0
-    var heartbeatRef = 0
+    var ref by atomic(0)
+    var heartbeatRef by atomic(0)
     override val apiVersion: Int
         get() = Realtime.API_VERSION
 

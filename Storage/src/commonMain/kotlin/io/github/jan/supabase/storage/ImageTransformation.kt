@@ -1,6 +1,6 @@
 package io.github.jan.supabase.storage
 
-import io.github.jan.supabase.annotiations.SupabaseInternal
+import io.github.jan.supabase.annotations.SupabaseInternal
 import io.github.jan.supabase.storage.ImageTransformation.Resize
 import io.ktor.http.ParametersBuilder
 import io.ktor.http.formUrlEncode

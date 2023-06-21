@@ -76,6 +76,30 @@ tasks.register("detektAll") {
     }
 }
 
+val buildConfigGenerator by tasks.registering(Sync::class) {
+
+    from(
+        resources.text.fromString(
+            """
+        |package io.github.jan.supabase
+        |
+        |import io.github.jan.supabase.annotations.SupabaseInternal
+        |
+        |@SupabaseInternal
+        |object BuildConfig {
+        |  const val PROJECT_VERSION = "${project.version}"
+        |}
+        |
+      """.trimMargin()
+        )
+    ) {
+        rename { "BuildConfig.kt" } // set the file name
+        into("io/github/jan/supabase/") // change the directory to match the package
+    }
+
+    into(layout.buildDirectory.dir("generated-src/kotlin/"))
+}
+
 configure(allprojects.filter { it.name in modules }) {
     apply(plugin = "io.gitlab.arturbosch.detekt")
 
@@ -126,7 +150,9 @@ configure(allprojects.filter { it.name in modules }) {
 group = "io.github.jan-tennert.supabase"
 version = Versions.PROJECT
 
+@OptIn(org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi::class)
 kotlin {
+    targetHierarchy.default()
     jvm {
         jvmToolchain(8)
         compilations.all {
@@ -145,22 +171,35 @@ kotlin {
                 enabled = false
             }
         }
+        nodejs {
+            testTask {
+                enabled = false
+            }
+        }
     }
     ios()
     iosSimulatorArm64()
+    mingwX64()
+    macosX64()
+    macosArm64()
+    linuxX64()
     sourceSets {
         all {
             languageSettings.optIn("kotlin.RequiresOptIn")
-            languageSettings.optIn("io.github.jan.supabase.annotiations.SupabaseInternal")
+            languageSettings.optIn("io.github.jan.supabase.annotations.SupabaseInternal")
         }
         val commonMain by getting {
+            kotlin.srcDir(
+                // convert the task to a file-provider
+                buildConfigGenerator.map { it.destinationDir }
+            )
             dependencies {
                 api(libs.kotlinx.datetime)
                 api(libs.kotlinx.coroutines.core)
                 api(libs.kermit)
                 api(libs.bundles.ktor.client)
                 api(libs.kotlinx.atomicfu)
-                api(libs.stately)
+         //       api(libs.stately)
             }
         }
         val commonTest by getting {
@@ -168,28 +207,13 @@ kotlin {
                 implementation(libs.bundles.testing)
             }
         }
-        val jvmMain by getting {
-        }
-        val jvmTest by getting
         val androidMain by getting {
             dependencies {
                 api(libs.android.lifecycle.process)
             }
         }
-        val androidUnitTest by getting
-        val jsMain by getting {
-            dependencies {
-              //  api(compose.web.core)
-            }
-        }
-        val iosTest by getting
-        val iosMain by getting
-        val iosSimulatorArm64Main by getting {
-            dependsOn(iosMain)
-        }
-        val iosSimulatorArm64Test by getting {
-            dependsOn(iosTest)
-        }
+        val appleMain by getting
+        val macosMain by getting
     }
 }
 

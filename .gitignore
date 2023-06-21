@@ -1,11 +1,5 @@
 # Project exclude paths
 /.gradle/
-/androidDemo/build/
-/androidDemo/build/intermediates/javac/debug/classes/
-/Auth/build/
-/Auth/build/classes/kotlin/jvm/main/
-/webDemo/build/
-/webDemo/build/intermediates/javac/debug/classes/
 /build/
 /build/classes/kotlin/desktop/main/
 /buildSrc/.gradle/
@@ -14,10 +8,8 @@
 /Postgrest/build/
 /Storage/build/
 /Realtime/build/
-/Realtime/src/jvmMain/kotlin/Test.kt
-/Functions/src/jvmMain/kotlin/Test.kt
-/Auth/src/jvmMain/kotlin/Test.kt
+/GoTrue/build/
+/Functions/build/
 /plugins/ApolloGraphQL/build
 .idea
 local.properties
-/test/
