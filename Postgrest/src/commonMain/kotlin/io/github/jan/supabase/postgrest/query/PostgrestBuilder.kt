@@ -1,13 +1,13 @@
 @file:Suppress("UndocumentedPublicProperty")
 package io.github.jan.supabase.postgrest.query
 
+import io.github.jan.supabase.encodeToJsonElement
 import io.github.jan.supabase.exceptions.HttpRequestException
 import io.github.jan.supabase.exceptions.RestException
 import io.github.jan.supabase.gotrue.PostgrestFilterDSL
 import io.github.jan.supabase.postgrest.Postgrest
 import io.github.jan.supabase.postgrest.request.PostgrestRequest
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.encodeToJsonElement
 import kotlinx.serialization.json.jsonArray
 
 /**
@@ -55,9 +55,8 @@ class PostgrestBuilder(val postgrest: Postgrest, val table: String, val schema: 
         onConflict: String? = null,
         returning: Returning = Returning.REPRESENTATION,
         count: Count? = null,
-        json: Json = Json,
         filter: PostgrestFilterBuilder.() -> Unit = {}
-    ): PostgrestResult = PostgrestRequest.Insert(json.encodeToJsonElement(values).jsonArray, upsert, onConflict, returning, count, buildPostgrestFilter(postgrest.config.propertyConversionMethod) {
+    ): PostgrestResult = PostgrestRequest.Insert(postgrest.config.serializer.encodeToJsonElement(values).jsonArray, upsert, onConflict, returning, count, buildPostgrestFilter(postgrest.config.propertyConversionMethod) {
         filter()
         if (upsert && onConflict != null) _params["on_conflict"] = listOf(onConflict)
     }, schema).execute(table, postgrest)
@@ -81,9 +80,8 @@ class PostgrestBuilder(val postgrest: Postgrest, val table: String, val schema: 
         onConflict: String? = null,
         returning: Returning = Returning.REPRESENTATION,
         count: Count? = null,
-        json: Json = Json,
         filter: PostgrestFilterBuilder.() -> Unit = {}
-    ) = insert(listOf(value), upsert, onConflict, returning, count, json, filter)
+    ) = insert(listOf(value), upsert, onConflict, returning, count, filter)
 
     /**
      * Executes an update operation on the [table].
@@ -120,7 +118,7 @@ class PostgrestBuilder(val postgrest: Postgrest, val table: String, val schema: 
         count: Count? = null,
         json: Json = Json,
         filter: PostgrestFilterBuilder.() -> Unit = {}
-    ): PostgrestResult = PostgrestRequest.Update(returning, count, buildPostgrestFilter(postgrest.config.propertyConversionMethod, filter), json.encodeToJsonElement(value), schema).execute(table, postgrest)
+    ): PostgrestResult = PostgrestRequest.Update(returning, count, buildPostgrestFilter(postgrest.config.propertyConversionMethod, filter), postgrest.config.serializer.encodeToJsonElement(value), schema).execute(table, postgrest)
 
     /**
      * Executes a delete operation on the [table].

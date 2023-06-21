@@ -178,11 +178,12 @@ internal class RealtimeChannelImpl(
             RealtimeMessage.EventType.POSTGRES_CHANGES -> {
                 val data = message.payload["data"]?.jsonObject ?: return
                 val ids = message.payload["ids"]?.jsonArray?.mapNotNull { it.jsonPrimitive.longOrNull } ?: emptyList() //the ids of the matching postgres changes
+                val postgresAction = supabaseJson.decodeFromJsonElement<PostgresActionData>(data)
                 val action = when(data["type"]?.jsonPrimitive?.content ?: "") {
-                    "UPDATE" -> supabaseJson.decodeFromJsonElement<PostgresAction.Update>(data)
-                    "DELETE" -> supabaseJson.decodeFromJsonElement<PostgresAction.Delete>(data)
-                    "INSERT" -> supabaseJson.decodeFromJsonElement<PostgresAction.Insert>(data)
-                    "SELECT" -> supabaseJson.decodeFromJsonElement<PostgresAction.Select>(data)
+                    "UPDATE" -> PostgresAction.Update(postgresAction.record ?: error("Received no record on update event"), postgresAction.oldRecord ?: error("Received no old record on update event"), postgresAction.columns, postgresAction.commitTimestamp, realtimeImpl.config.serializer)
+                    "DELETE" -> PostgresAction.Delete(postgresAction.oldRecord ?: error("Received no old record on delete event"), postgresAction.columns, postgresAction.commitTimestamp, realtimeImpl.config.serializer)
+                    "INSERT" -> PostgresAction.Insert(postgresAction.record ?: error("Received no record on update event"), postgresAction.columns, postgresAction.commitTimestamp, realtimeImpl.config.serializer)
+                    "SELECT" -> PostgresAction.Select(postgresAction.record ?: error("Received no record on update event"), postgresAction.columns, postgresAction.commitTimestamp, realtimeImpl.config.serializer)
                     else -> error("Unknown event type ${message.event}")
                 }
                 callbackManager.triggerPostgresChange(ids, action)
