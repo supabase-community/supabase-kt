@@ -30,6 +30,9 @@ interface SupabaseSerializer {
  */
 inline fun <reified T : Any> SupabaseSerializer.encode(value: T): String = encode(typeOf<T>(), value)
 
+/**
+ * Encodes the given [value] to a [JsonElement]
+ */
 inline fun <reified T : Any> SupabaseSerializer.encodeToJsonElement(value: T): JsonElement = Json.encodeToJsonElement(encode(value))
 
 /**
