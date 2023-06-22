@@ -1,13 +1,17 @@
 package io.github.jan.supabase.functions
 
+import io.github.jan.supabase.KotlinXSupabaseSerializer
 import io.github.jan.supabase.SupabaseClient
+import io.github.jan.supabase.SupabaseSerializer
 import io.github.jan.supabase.annotations.SupabaseInternal
+import io.github.jan.supabase.encode
 import io.github.jan.supabase.exceptions.BadRequestRestException
 import io.github.jan.supabase.exceptions.NotFoundRestException
 import io.github.jan.supabase.exceptions.RestException
 import io.github.jan.supabase.exceptions.UnauthorizedRestException
 import io.github.jan.supabase.gotrue.GoTrue
 import io.github.jan.supabase.gotrue.authenticatedSupabaseApi
+import io.github.jan.supabase.plugins.CustomSerializationConfig
 import io.github.jan.supabase.plugins.MainConfig
 import io.github.jan.supabase.plugins.MainPlugin
 import io.github.jan.supabase.plugins.SupabasePluginProvider
@@ -72,11 +76,9 @@ class Functions(override val config: Config, override val supabaseClient: Supaba
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
-    suspend inline operator fun <reified T> invoke(function: String, body: T, headers: Headers = Headers.Empty): HttpResponse = invoke(function) {
+    suspend inline operator fun <reified T : Any> invoke(function: String, body: T, headers: Headers = Headers.Empty): HttpResponse = invoke(function) {
         this.headers.appendAll(headers)
-        body?.let {
-            setBody(body)
-        }
+        setBody(config.serializer.encode(body))
     }
 
     /**
@@ -117,7 +119,8 @@ class Functions(override val config: Config, override val supabaseClient: Supaba
     data class Config(
         override var customUrl: String? = null,
         override var jwtToken: String? = null,
-    ) : MainConfig
+        override var serializer: SupabaseSerializer = KotlinXSupabaseSerializer()
+    ) : MainConfig, CustomSerializationConfig
 
     companion object : SupabasePluginProvider<Config, Functions> {
 
