@@ -73,6 +73,7 @@ open class GoTrueConfigDefaults {
     /**
      * A serializer used for serializing/deserializing objects e.g. in [GoTrue.sendOtpTo]. Defaults to [KotlinXSupabaseSerializer]
      */
+    @SupabaseExperimental
     var serializer: SupabaseSerializer = KotlinXSupabaseSerializer()
 
 }

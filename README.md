@@ -8,7 +8,7 @@ Supported targets:
 | **JVM**                                 | ✅          | ✅            | ✅             | ✅           | ✅             | ✅                  |
 | **Android**                             | ✅          | ✅            | ✅             | ✅           | ✅             | ✅                  |
 | **JS** *(Browser)*                      | ✅          | ✅            | ✅             | ✅           | ✅             | ✅                  |
-| **IOS**               🚧                | ✅          | ✅            | ✅             | ✅           | ✅             | ✅                  |
+| **IOS**                                 | ✅          | ✅            | ✅             | ✅           | ✅             | ✅                  |
 | **MacOS**  *(macosX64 & macosArm64)* 🚧 | ✅          | ✅            | ✅             | ✅           | ✅             | ✅                  |
 | **Windows** *(mingwX64)*   🚧           | ☑️         | ✅            | ✅             | ✅           | ✅             | ❌                  |
 | **Linux** *(linuxX64)*  🚧              | ☑️         | ✅            | ✅             | ✅           | ✅             | ❌                  |
@@ -17,7 +17,7 @@ Supported targets:
 
 ☑️ = partial support: no built-in OAuth/OTP link handling.
 
-🚧 = experimental
+🚧 = experimental/needs feedback
 
 ❌ = not supported
 

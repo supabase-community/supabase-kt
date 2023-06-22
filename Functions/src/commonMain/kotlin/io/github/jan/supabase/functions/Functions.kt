@@ -3,6 +3,7 @@ package io.github.jan.supabase.functions
 import io.github.jan.supabase.KotlinXSupabaseSerializer
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.SupabaseSerializer
+import io.github.jan.supabase.annotations.SupabaseExperimental
 import io.github.jan.supabase.annotations.SupabaseInternal
 import io.github.jan.supabase.encode
 import io.github.jan.supabase.exceptions.BadRequestRestException
@@ -115,12 +116,17 @@ class Functions(override val config: Config, override val supabaseClient: Supaba
      * The config for the [Functions] plugin
      * @param customUrl A custom url to use for the requests. If not provided, the default url will be used
      * @param jwtToken A jwt token to use for the requests. If not provided, the token from the [GoTrue] plugin, or the supabaseKey will be used
+     * @property serializer A serializer used for serializing/deserializing objects e.g. in [Functions.invoke] or [EdgeFunction.invoke]. Defaults to [KotlinXSupabaseSerializer]
      */
     data class Config(
         override var customUrl: String? = null,
         override var jwtToken: String? = null,
+    ) : MainConfig, CustomSerializationConfig {
+
+        @SupabaseExperimental
         override var serializer: SupabaseSerializer = KotlinXSupabaseSerializer()
-    ) : MainConfig, CustomSerializationConfig
+
+    }
 
     companion object : SupabasePluginProvider<Config, Functions> {
 

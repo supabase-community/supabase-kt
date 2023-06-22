@@ -5,12 +5,14 @@ import io.github.jan.supabase.KotlinXSupabaseSerializer
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.SupabaseClientBuilder
 import io.github.jan.supabase.SupabaseSerializer
+import io.github.jan.supabase.annotations.SupabaseExperimental
 import io.github.jan.supabase.annotations.SupabaseInternal
 import io.github.jan.supabase.collections.AtomicMutableMap
 import io.github.jan.supabase.exceptions.RestException
 import io.github.jan.supabase.exceptions.UnknownRestException
 import io.github.jan.supabase.gotrue.GoTrue
 import io.github.jan.supabase.gotrue.SessionStatus
+import io.github.jan.supabase.gotrue.sendOtpTo
 import io.github.jan.supabase.plugins.CustomSerializationConfig
 import io.github.jan.supabase.plugins.MainConfig
 import io.github.jan.supabase.plugins.MainPlugin
@@ -116,7 +118,7 @@ sealed interface Realtime : MainPlugin<Realtime.Config> {
      * @property disconnectOnSessionLoss Whether to disconnect from the websocket when the session is lost. Defaults to true
      * @property reconnectDelay The delay between reconnect attempts. Defaults to 7 seconds
      * @property heartbeatInterval The interval between heartbeat messages. Defaults to 15 seconds
-     * @property
+     * @property serializer A serializer used for serializing/deserializing objects e.g. in [PresenceAction.decodeJoinsAs] or [RealtimeChannel.broadcast]. Defaults to [KotlinXSupabaseSerializer]
      */
     data class Config(
         var websocketConfig: WebSockets.Config.() -> Unit = {},
@@ -126,8 +128,12 @@ sealed interface Realtime : MainPlugin<Realtime.Config> {
         override var customUrl: String? = null,
         override var jwtToken: String? = null,
         var disconnectOnSessionLoss: Boolean = true,
+    ): MainConfig, CustomSerializationConfig {
+
+        @SupabaseExperimental
         override var serializer: SupabaseSerializer = KotlinXSupabaseSerializer()
-    ): MainConfig, CustomSerializationConfig
+
+    }
 
     companion object : SupabasePluginProvider<Config, Realtime> {
 

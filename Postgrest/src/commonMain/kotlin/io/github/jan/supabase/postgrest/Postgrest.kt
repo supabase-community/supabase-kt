@@ -3,6 +3,7 @@ package io.github.jan.supabase.postgrest
 import io.github.jan.supabase.KotlinXSupabaseSerializer
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.SupabaseSerializer
+import io.github.jan.supabase.annotations.SupabaseExperimental
 import io.github.jan.supabase.annotations.SupabaseInternal
 import io.github.jan.supabase.bodyOrNull
 import io.github.jan.supabase.encodeToJsonElement
@@ -80,8 +81,12 @@ sealed interface Postgrest : MainPlugin<Postgrest.Config> {
         override var jwtToken: String? = null,
         var defaultSchema: String = "public",
         var propertyConversionMethod: PropertyConversionMethod = PropertyConversionMethod.CAMEL_CASE_TO_SNAKE_CASE,
+    ): MainConfig, CustomSerializationConfig {
+
+        @SupabaseExperimental
         override var serializer: SupabaseSerializer = KotlinXSupabaseSerializer()
-    ): MainConfig, CustomSerializationConfig
+
+    }
 
     companion object : SupabasePluginProvider<Config, Postgrest> {
 
