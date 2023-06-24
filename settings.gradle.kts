@@ -18,6 +18,8 @@ include("test-w")
 
 include(":serializers:KotlinX")
 project(":serializers:KotlinX").name = "serializer-kotlinx"
+include(":serializers:Moshi")
+project(":serializers:Moshi").name = "serializer-moshi"
 
 include(":plugins:ApolloGraphQL")
 project(":GoTrue").name = "gotrue-kt"

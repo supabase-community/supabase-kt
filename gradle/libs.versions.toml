@@ -9,16 +9,14 @@ coroutines = "1.7.1"
 android-lifecycle = "2.6.1"
 androidx-startup = "1.1.1"
 multiplatform-settings = "1.0.0"
-#okio = "3.3.0"
 javalin = "5.6.0"
 complete-kotlin = "1.1.0"
 agp = "8.0.2"
 maven-publish = "0.25.2"
-#cache4k = "0.11.0"
 apollo-kotlin = "3.8.2"
-#stately = "1.2.5"
 korlibs = "4.0.6"
 detekt = "1.23.0"
+moshi = "1.15.0"
 
 [plugins]
 kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
@@ -53,19 +51,17 @@ multiplatform-settings-no-arg = { module = "com.russhwolf:multiplatform-settings
 multiplatform-settings-coroutines = { module = "com.russhwolf:multiplatform-settings-coroutines", version.ref = "multiplatform-settings" }
 multiplatform-settings-test = { module = "com.russhwolf:multiplatform-settings-test", version.ref = "multiplatform-settings" }
 
-#okio = { module = "com.squareup.okio:okio", version.ref = "okio" }
-
 javalin = { module = "io.javalin:javalin", version.ref = "javalin" }
 
 apollo-kotlin = { module = "com.apollographql.apollo3:apollo-runtime", version.ref = "apollo-kotlin" }
 
-# cache4k = { module = "io.github.reactivecircus.cache4k:cache4k", version.ref = "cache4k" }
-
-#stately = { module = "co.touchlab:stately-iso-collections", version.ref = "stately" }
-
 krypto = { module = "com.soywiz.korlibs.krypto:krypto", version.ref = "korlibs" }
+
+moshi = { module = "com.squareup.moshi:moshi", version.ref = "moshi" }
+moshi-kotlin = { module = "com.squareup.moshi:moshi-kotlin", version.ref = "moshi" }
 
 [bundles]
 ktor-client = ["ktor-client-core", "ktor-client-content-negotiation", "ktor-json"]
 multiplatform-settings = ["multiplatform-settings-no-arg", "multiplatform-settings-coroutines"]
 testing = ["kotlinx-coroutines-test", "multiplatform-settings-test", "ktor-client-mock", "kotlin-test"]
+moshi = ["moshi", "moshi-kotlin"]
