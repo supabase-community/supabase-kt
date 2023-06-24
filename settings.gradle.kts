@@ -20,6 +20,8 @@ include(":serializers:KotlinX")
 project(":serializers:KotlinX").name = "serializer-kotlinx"
 include(":serializers:Moshi")
 project(":serializers:Moshi").name = "serializer-moshi"
+include(":serializers:Jackson")
+project(":serializers:Jackson").name = "serializer-jackson"
 
 include(":plugins:ApolloGraphQL")
 project(":GoTrue").name = "gotrue-kt"
