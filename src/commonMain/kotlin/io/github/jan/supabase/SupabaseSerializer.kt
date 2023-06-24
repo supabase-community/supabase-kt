@@ -3,7 +3,6 @@ package io.github.jan.supabase
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.encodeToJsonElement
-import kotlinx.serialization.serializer
 import kotlin.reflect.KType
 import kotlin.reflect.typeOf
 
@@ -39,16 +38,3 @@ inline fun <reified T : Any> SupabaseSerializer.encodeToJsonElement(value: T): J
  * Decodes the given [value] to an object of type [T]
  */
 inline fun <reified T : Any> SupabaseSerializer.decode(value: String): T = decode(typeOf<T>(), value)
-
-/**
- * A [SupabaseSerializer] that uses kotlinx.serialization
- */
-class KotlinXSupabaseSerializer(private val json: Json = Json) : SupabaseSerializer {
-
-    override fun <T : Any> encode(type: KType, value: T): String = json.encodeToString(serializer(type), value)
-
-    @Suppress("UNCHECKED_CAST")
-    override fun <T : Any> decode(type: KType, value: String): T =
-        json.decodeFromString(serializer(type), value) as T
-
-}

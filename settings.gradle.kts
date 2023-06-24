@@ -16,6 +16,9 @@ include("bom")
 include("test")
 include("test-w")
 
+include(":serializers:KotlinX")
+project(":serializers:KotlinX").name = "serializer-kotlinx"
+
 include(":plugins:ApolloGraphQL")
 project(":GoTrue").name = "gotrue-kt"
 project(":Postgrest").name = "postgrest-kt"

@@ -46,6 +46,11 @@ sealed interface SupabaseClient {
     val useHTTPS: Boolean
 
     /**
+     * The default serializer used to serialize and deserialize custom data types.
+     */
+    val defaultSerializer: SupabaseSerializer
+
+    /**
      * Releases all resources held by the [httpClient] and all plugins the [pluginManager]
      */
     suspend fun close()
@@ -60,6 +65,7 @@ internal class SupabaseClientImpl(
     override val useHTTPS: Boolean,
     requestTimeout: Long,
     httpEngine: HttpClientEngine?,
+    override val defaultSerializer: SupabaseSerializer,
 ) : SupabaseClient {
 
     init {

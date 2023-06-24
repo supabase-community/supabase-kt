@@ -1,7 +1,7 @@
 package io.github.jan.supabase.functions
 
-import io.github.jan.supabase.KotlinXSupabaseSerializer
 import io.github.jan.supabase.SupabaseClient
+import io.github.jan.supabase.SupabaseClientBuilder
 import io.github.jan.supabase.SupabaseSerializer
 import io.github.jan.supabase.annotations.SupabaseExperimental
 import io.github.jan.supabase.annotations.SupabaseInternal
@@ -16,6 +16,7 @@ import io.github.jan.supabase.plugins.CustomSerializationConfig
 import io.github.jan.supabase.plugins.MainConfig
 import io.github.jan.supabase.plugins.MainPlugin
 import io.github.jan.supabase.plugins.SupabasePluginProvider
+import io.github.jan.supabase.serializer.KotlinXSupabaseSerializer
 import io.ktor.client.plugins.HttpRequestTimeoutException
 import io.ktor.client.request.HttpRequestBuilder
 import io.ktor.client.request.setBody
@@ -142,6 +143,10 @@ class Functions(override val config: Config, override val supabaseClient: Supaba
         }
 
         override fun createConfig(init: Config.() -> Unit) = Config().apply(init)
+
+        override fun setup(builder: SupabaseClientBuilder, config: Config) {
+            config.serializer = builder.defaultSerializer
+        }
 
     }
 

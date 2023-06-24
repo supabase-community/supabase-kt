@@ -1,9 +1,9 @@
 package io.github.jan.supabase.gotrue.user
 
-import io.github.jan.supabase.KotlinXSupabaseSerializer
 import io.github.jan.supabase.SupabaseSerializer
 import io.github.jan.supabase.encodeToJsonElement
 import io.github.jan.supabase.gotrue.GoTrue
+import io.github.jan.supabase.serializer.KotlinXSupabaseSerializer
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient

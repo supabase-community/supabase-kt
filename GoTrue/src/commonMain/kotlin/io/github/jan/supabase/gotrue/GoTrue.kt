@@ -2,6 +2,7 @@ package io.github.jan.supabase.gotrue
 
 import co.touchlab.kermit.Logger
 import io.github.jan.supabase.SupabaseClient
+import io.github.jan.supabase.SupabaseClientBuilder
 import io.github.jan.supabase.encodeToJsonElement
 import io.github.jan.supabase.exceptions.HttpRequestException
 import io.github.jan.supabase.exceptions.RestException
@@ -383,6 +384,9 @@ sealed interface GoTrue : MainPlugin<GoTrueConfig> {
 
         override fun createConfig(init: GoTrueConfig.() -> Unit) = GoTrueConfig().apply(init)
         override fun create(supabaseClient: SupabaseClient, config: GoTrueConfig): GoTrue = GoTrueImpl(supabaseClient, config)
+        override fun setup(builder: SupabaseClientBuilder, config: GoTrueConfig) {
+            config.serializer = builder.defaultSerializer
+        }
 
     }
 

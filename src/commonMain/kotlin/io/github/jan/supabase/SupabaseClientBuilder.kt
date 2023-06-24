@@ -44,6 +44,14 @@ class SupabaseClientBuilder @PublishedApi internal constructor(private val supab
      * Default: 10 seconds
      */
     var requestTimeout = 10.seconds
+
+    /**
+     * The default serializer used to serialize and deserialize custom data types.
+     *
+     * Default: [KotlinXSupabaseSerializer]
+     */
+    var defaultSerializer: SupabaseSerializer = KotlinXSupabaseSerializer()
+
     private val httpConfigOverrides = mutableListOf<HttpClientConfig<*>.() -> Unit>()
     private val plugins = mutableMapOf<String, ((SupabaseClient) -> SupabasePlugin)>()
 
@@ -66,7 +74,7 @@ class SupabaseClientBuilder @PublishedApi internal constructor(private val supab
 
     @PublishedApi
     internal fun build(): SupabaseClient {
-        return SupabaseClientImpl(supabaseUrl.split("//").last(), supabaseKey, plugins, httpConfigOverrides, useHTTPS, requestTimeout.inWholeMilliseconds, httpEngine)
+        return SupabaseClientImpl(supabaseUrl.split("//").last(), supabaseKey, plugins, httpConfigOverrides, useHTTPS, requestTimeout.inWholeMilliseconds, httpEngine, defaultSerializer)
     }
 
     /**

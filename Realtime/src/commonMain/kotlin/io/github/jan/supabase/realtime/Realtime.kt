@@ -1,7 +1,6 @@
 package io.github.jan.supabase.realtime
 
 import co.touchlab.kermit.Logger
-import io.github.jan.supabase.KotlinXSupabaseSerializer
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.SupabaseClientBuilder
 import io.github.jan.supabase.SupabaseSerializer
@@ -12,11 +11,11 @@ import io.github.jan.supabase.exceptions.RestException
 import io.github.jan.supabase.exceptions.UnknownRestException
 import io.github.jan.supabase.gotrue.GoTrue
 import io.github.jan.supabase.gotrue.SessionStatus
-import io.github.jan.supabase.gotrue.sendOtpTo
 import io.github.jan.supabase.plugins.CustomSerializationConfig
 import io.github.jan.supabase.plugins.MainConfig
 import io.github.jan.supabase.plugins.MainPlugin
 import io.github.jan.supabase.plugins.SupabasePluginProvider
+import io.github.jan.supabase.serializer.KotlinXSupabaseSerializer
 import io.github.jan.supabase.supabaseJson
 import io.ktor.client.plugins.websocket.DefaultClientWebSocketSession
 import io.ktor.client.plugins.websocket.WebSockets
@@ -152,6 +151,7 @@ sealed interface Realtime : MainPlugin<Realtime.Config> {
                     config.websocketConfig(this)
                 }
             }
+            config.serializer = builder.defaultSerializer
         }
 
         override fun create(supabaseClient: SupabaseClient, config: Config): Realtime = RealtimeImpl(supabaseClient, config)

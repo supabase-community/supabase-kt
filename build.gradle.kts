@@ -14,9 +14,6 @@ plugins {
     alias(libs.plugins.maven.publish)
     alias(libs.plugins.detekt)
 }
-
-val modules = listOf("supabase-kt", "gotrue-kt", "postgrest-kt", "storage-kt", "realtime-kt", "functions-kt", "apollo-graphql")
-
 allprojects {
     repositories {
         google()
@@ -29,7 +26,7 @@ allprojects {
     }
 }
 
-configure(allprojects.filter { it.name in modules || it.name == "bom" }) {
+allprojects {
     apply(plugin = "org.jetbrains.dokka")
     apply(plugin = "org.jetbrains.kotlin.plugin.serialization")
     apply(plugin = "kotlinx-atomicfu")
@@ -42,11 +39,11 @@ configure(allprojects.filter { it.name in modules || it.name == "bom" }) {
         publishToMavenCentral(com.vanniktech.maven.publish.SonatypeHost.S01)
 
         signAllPublications()
-        coordinates("io.github.jan-tennert.supabase", this@configure.name, extra["supabase-version"].toString())
+        coordinates("io.github.jan-tennert.supabase", this@allprojects.name, extra["supabase-version"].toString())
 
         pom {
-            name.set(this@configure.name)
-            description.set(this@configure.description ?: "A Kotlin Multiplatform Supabase SDK")
+            name.set(this@allprojects.name)
+            description.set(this@allprojects.description ?: "A Kotlin Multiplatform Supabase SDK")
             inceptionYear.set("2023")
             url.set("https://github.com/supabase-community/supabase-kt/")
             licenses {
@@ -73,7 +70,7 @@ configure(allprojects.filter { it.name in modules || it.name == "bom" }) {
 }
 
 tasks.register("detektAll") {
-    configure(allprojects.filter { it.name in modules }) {
+    configure(allprojects.filter { it.name != "bom" }) {
         this@register.dependsOn(tasks.withType<io.gitlab.arturbosch.detekt.Detekt>())
     }
 }
@@ -102,7 +99,7 @@ val buildConfigGenerator by tasks.registering(Sync::class) {
     into(layout.buildDirectory.dir("generated-src/kotlin/"))
 }
 
-configure(allprojects.filter { it.name in modules }) {
+configure(allprojects.filter { it.name != "bom" }) {
     apply(plugin = "io.gitlab.arturbosch.detekt")
 
     detekt {
@@ -195,6 +192,7 @@ kotlin {
                 api(libs.kermit)
                 api(libs.bundles.ktor.client)
                 api(libs.kotlinx.atomicfu)
+                api(project(":serializers:serializer-kotlinx"))
          //       api(libs.stately)
             }
         }
