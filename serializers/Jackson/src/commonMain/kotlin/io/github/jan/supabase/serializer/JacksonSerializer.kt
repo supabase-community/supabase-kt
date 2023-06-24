@@ -7,7 +7,7 @@ import kotlin.reflect.KType
 import kotlin.reflect.javaType
 
 /**
- * A [SupabaseSerializer] that uses kotlinx.serialization
+ * A [SupabaseSerializer] that uses jackson-module-kotlin
  */
 class JacksonSerializer(private val mapper: ObjectMapper = jacksonObjectMapper()) : SupabaseSerializer {
 
