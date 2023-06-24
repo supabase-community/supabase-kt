@@ -55,7 +55,7 @@ class PostgrestBuilder(val postgrest: Postgrest, val table: String, val schema: 
         returning: Returning = Returning.REPRESENTATION,
         count: Count? = null,
         filter: PostgrestFilterBuilder.() -> Unit = {}
-    ): PostgrestResult = PostgrestRequest.Insert(postgrest.config.serializer.encodeToJsonElement(values).jsonArray, upsert, onConflict, returning, count, buildPostgrestFilter(postgrest.config.propertyConversionMethod) {
+    ): PostgrestResult = PostgrestRequest.Insert(postgrest.serializer.encodeToJsonElement(values).jsonArray, upsert, onConflict, returning, count, buildPostgrestFilter(postgrest.config.propertyConversionMethod) {
         filter()
         if (upsert && onConflict != null) _params["on_conflict"] = listOf(onConflict)
     }, schema).execute(table, postgrest)
@@ -116,7 +116,7 @@ class PostgrestBuilder(val postgrest: Postgrest, val table: String, val schema: 
         returning: Returning = Returning.REPRESENTATION,
         count: Count? = null,
         filter: PostgrestFilterBuilder.() -> Unit = {}
-    ): PostgrestResult = PostgrestRequest.Update(returning, count, buildPostgrestFilter(postgrest.config.propertyConversionMethod, filter), postgrest.config.serializer.encodeToJsonElement(value), schema).execute(table, postgrest)
+    ): PostgrestResult = PostgrestRequest.Update(returning, count, buildPostgrestFilter(postgrest.config.propertyConversionMethod, filter), postgrest.serializer.encodeToJsonElement(value), schema).execute(table, postgrest)
 
     /**
      * Executes a delete operation on the [table].

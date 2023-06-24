@@ -30,7 +30,7 @@ class PostgrestResult(val body: JsonElement?, val headers: Headers, @PublishedAp
     /**
      * Decodes [body] as [T] using
      */
-    inline fun <reified T : Any> decodeAs(): T = postgrest.config.serializer.decode(body?.toString() ?: error("No body found"))
+    inline fun <reified T : Any> decodeAs(): T = postgrest.serializer.decode(body?.toString() ?: error("No body found"))
 
     /**
      * Decodes [body] as [T] using. If there's an error it will return null

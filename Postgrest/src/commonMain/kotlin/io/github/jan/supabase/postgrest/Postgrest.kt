@@ -1,7 +1,6 @@
 package io.github.jan.supabase.postgrest
 
 import io.github.jan.supabase.SupabaseClient
-import io.github.jan.supabase.SupabaseClientBuilder
 import io.github.jan.supabase.SupabaseSerializer
 import io.github.jan.supabase.annotations.SupabaseExperimental
 import io.github.jan.supabase.annotations.SupabaseInternal
@@ -14,6 +13,7 @@ import io.github.jan.supabase.exceptions.UnauthorizedRestException
 import io.github.jan.supabase.exceptions.UnknownRestException
 import io.github.jan.supabase.gotrue.authenticatedSupabaseApi
 import io.github.jan.supabase.plugins.CustomSerializationConfig
+import io.github.jan.supabase.plugins.CustomSerializationPlugin
 import io.github.jan.supabase.plugins.MainConfig
 import io.github.jan.supabase.plugins.MainPlugin
 import io.github.jan.supabase.plugins.SupabasePluginProvider
@@ -22,7 +22,6 @@ import io.github.jan.supabase.postgrest.query.PostgrestBuilder
 import io.github.jan.supabase.postgrest.query.PostgrestFilterBuilder
 import io.github.jan.supabase.postgrest.query.PostgrestUpdate
 import io.github.jan.supabase.postgrest.request.PostgrestRequest
-import io.github.jan.supabase.serializer.KotlinXSupabaseSerializer
 import io.ktor.client.statement.HttpResponse
 import io.ktor.http.HttpStatusCode
 import kotlinx.serialization.json.JsonElement
@@ -44,7 +43,7 @@ import kotlinx.serialization.json.JsonElement
  * }.decodeSingle<Product>()
  * ```
  */
-sealed interface Postgrest : MainPlugin<Postgrest.Config> {
+sealed interface Postgrest : MainPlugin<Postgrest.Config>, CustomSerializationPlugin {
 
     /**
      * Creates a new [PostgrestBuilder] for the given table
@@ -85,7 +84,7 @@ sealed interface Postgrest : MainPlugin<Postgrest.Config> {
     ): MainConfig, CustomSerializationConfig {
 
         @SupabaseExperimental
-        override var serializer: SupabaseSerializer = KotlinXSupabaseSerializer()
+        override var serializer: SupabaseSerializer? = null
 
     }
 
@@ -103,10 +102,6 @@ sealed interface Postgrest : MainPlugin<Postgrest.Config> {
             return PostgrestImpl(supabaseClient, config)
         }
 
-        override fun setup(builder: SupabaseClientBuilder, config: Config) {
-            config.serializer = builder.defaultSerializer
-        }
-
     }
 
 }
@@ -118,6 +113,8 @@ internal class PostgrestImpl(override val supabaseClient: SupabaseClient, overri
 
     override val pluginKey: String
         get() = Postgrest.key
+    
+    override var serializer = config.serializer ?: supabaseClient.defaultSerializer
 
     @OptIn(SupabaseInternal::class)
     val api = supabaseClient.authenticatedSupabaseApi(this)
@@ -164,7 +161,7 @@ suspend inline fun <reified T : Any> Postgrest.rpc(
     head: Boolean = false,
     count: Count? = null,
     filter: PostgrestFilterBuilder.() -> Unit = {}
-) = PostgrestRequest.RPC(head, count, PostgrestFilterBuilder(config.propertyConversionMethod).apply(filter).params, if(parameters is JsonElement) parameters else config.serializer.encodeToJsonElement(parameters)).execute("rpc/$function", this)
+) = PostgrestRequest.RPC(head, count, PostgrestFilterBuilder(config.propertyConversionMethod).apply(filter).params, if(parameters is JsonElement) parameters else serializer.encodeToJsonElement(parameters)).execute("rpc/$function", this)
 
 /**
  * Executes a database function

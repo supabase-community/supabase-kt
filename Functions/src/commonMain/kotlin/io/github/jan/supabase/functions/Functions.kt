@@ -1,7 +1,6 @@
 package io.github.jan.supabase.functions
 
 import io.github.jan.supabase.SupabaseClient
-import io.github.jan.supabase.SupabaseClientBuilder
 import io.github.jan.supabase.SupabaseSerializer
 import io.github.jan.supabase.annotations.SupabaseExperimental
 import io.github.jan.supabase.annotations.SupabaseInternal
@@ -13,6 +12,7 @@ import io.github.jan.supabase.exceptions.UnauthorizedRestException
 import io.github.jan.supabase.gotrue.GoTrue
 import io.github.jan.supabase.gotrue.authenticatedSupabaseApi
 import io.github.jan.supabase.plugins.CustomSerializationConfig
+import io.github.jan.supabase.plugins.CustomSerializationPlugin
 import io.github.jan.supabase.plugins.MainConfig
 import io.github.jan.supabase.plugins.MainPlugin
 import io.github.jan.supabase.plugins.SupabasePluginProvider
@@ -44,13 +44,15 @@ import io.ktor.http.HttpStatusCode
  * val response = function()
  * ```
  */
-class Functions(override val config: Config, override val supabaseClient: SupabaseClient) : MainPlugin<Functions.Config> {
+class Functions(override val config: Config, override val supabaseClient: SupabaseClient) : MainPlugin<Functions.Config>, CustomSerializationPlugin {
 
     override val apiVersion: Int
         get() = Functions.API_VERSION
 
     override val pluginKey: String
         get() = key
+
+    override val serializer = config.serializer ?: supabaseClient.defaultSerializer
 
     @OptIn(SupabaseInternal::class)
     @PublishedApi
@@ -80,7 +82,7 @@ class Functions(override val config: Config, override val supabaseClient: Supaba
      */
     suspend inline operator fun <reified T : Any> invoke(function: String, body: T, headers: Headers = Headers.Empty): HttpResponse = invoke(function) {
         this.headers.appendAll(headers)
-        setBody(config.serializer.encode(body))
+        setBody(serializer.encode(body))
     }
 
     /**
@@ -125,7 +127,7 @@ class Functions(override val config: Config, override val supabaseClient: Supaba
     ) : MainConfig, CustomSerializationConfig {
 
         @SupabaseExperimental
-        override var serializer: SupabaseSerializer = KotlinXSupabaseSerializer()
+        override var serializer: SupabaseSerializer? = null
 
     }
 
@@ -144,9 +146,6 @@ class Functions(override val config: Config, override val supabaseClient: Supaba
 
         override fun createConfig(init: Config.() -> Unit) = Config().apply(init)
 
-        override fun setup(builder: SupabaseClientBuilder, config: Config) {
-            config.serializer = builder.defaultSerializer
-        }
 
     }
 

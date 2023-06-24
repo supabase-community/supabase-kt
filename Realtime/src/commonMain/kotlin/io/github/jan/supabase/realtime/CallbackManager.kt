@@ -62,7 +62,7 @@ internal class CallbackManagerImpl(
 
     override fun triggerPresenceDiff(joins: Map<String, Presence>, leaves: Map<String, Presence>) {
         val presenceCallbacks = callbacks.filterIsInstance<RealtimeCallback.PresenceCallback>()
-        presenceCallbacks.forEach { it.callback(PresenceActionImpl(realtime.config.serializer, joins, leaves)) }
+        presenceCallbacks.forEach { it.callback(PresenceActionImpl(realtime.serializer, joins, leaves)) }
     }
 
     override fun addPresenceCallback(callback: (PresenceAction) -> Unit): Long {

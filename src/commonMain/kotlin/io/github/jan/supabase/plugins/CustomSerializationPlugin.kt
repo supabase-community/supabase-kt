@@ -4,13 +4,13 @@ import io.github.jan.supabase.SupabaseClientBuilder
 import io.github.jan.supabase.SupabaseSerializer
 
 /**
- * A configuration for a plugin, which allows to customize the serialization
+ * A plugin, which allows to customize the serialization
  */
-interface CustomSerializationConfig {
+interface CustomSerializationPlugin {
 
     /**
      * The serializer used for this module. Defaults to [SupabaseClientBuilder.defaultSerializer], when null.
      */
-    var serializer: SupabaseSerializer?
+    val serializer: SupabaseSerializer
 
 }

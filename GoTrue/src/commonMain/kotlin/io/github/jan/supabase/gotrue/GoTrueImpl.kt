@@ -66,6 +66,8 @@ internal class GoTrueImpl(
     override val isAutoRefreshRunning: Boolean
         get() = sessionJob?.isActive == true
 
+    override val serializer = config.serializer ?: supabaseClient.defaultSerializer
+
     init {
         setupPlatform()
         if (config.autoLoadFromStorage) {

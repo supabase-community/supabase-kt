@@ -2,7 +2,6 @@ package io.github.jan.supabase.gotrue
 
 import co.touchlab.kermit.Logger
 import io.github.jan.supabase.SupabaseClient
-import io.github.jan.supabase.SupabaseClientBuilder
 import io.github.jan.supabase.encodeToJsonElement
 import io.github.jan.supabase.exceptions.HttpRequestException
 import io.github.jan.supabase.exceptions.RestException
@@ -19,6 +18,7 @@ import io.github.jan.supabase.gotrue.providers.builtin.SSO
 import io.github.jan.supabase.gotrue.user.UserInfo
 import io.github.jan.supabase.gotrue.user.UserSession
 import io.github.jan.supabase.gotrue.user.UserUpdateBuilder
+import io.github.jan.supabase.plugins.CustomSerializationPlugin
 import io.github.jan.supabase.plugins.MainPlugin
 import io.github.jan.supabase.plugins.SupabasePluginProvider
 import io.ktor.client.plugins.HttpRequestTimeoutException
@@ -44,7 +44,7 @@ import kotlinx.serialization.json.jsonObject
  * }
  * ```
  */
-sealed interface GoTrue : MainPlugin<GoTrueConfig> {
+sealed interface GoTrue : MainPlugin<GoTrueConfig>, CustomSerializationPlugin {
 
     /**
      * Returns the current session status
@@ -384,9 +384,6 @@ sealed interface GoTrue : MainPlugin<GoTrueConfig> {
 
         override fun createConfig(init: GoTrueConfig.() -> Unit) = GoTrueConfig().apply(init)
         override fun create(supabaseClient: SupabaseClient, config: GoTrueConfig): GoTrue = GoTrueImpl(supabaseClient, config)
-        override fun setup(builder: SupabaseClientBuilder, config: GoTrueConfig) {
-            config.serializer = builder.defaultSerializer
-        }
 
     }
 
@@ -416,7 +413,7 @@ suspend inline fun <C, R, reified D : Any, Provider : DefaultAuthProvider<C, R>>
     createUser: Boolean = false,
     redirectUrl: String? = null,
     noinline config: C.() -> Unit = { }
-): Unit = sendOtpTo(provider, createUser, redirectUrl, this.config.serializer.encodeToJsonElement(data).jsonObject, config)
+): Unit = sendOtpTo(provider, createUser, redirectUrl, this.serializer.encodeToJsonElement(data).jsonObject, config)
 
 /**
  * The Auth plugin handles everything related to supabase's authentication system

@@ -1,10 +1,10 @@
 package io.github.jan.supabase.gotrue
 
+import io.github.jan.supabase.SupabaseClientBuilder
 import io.github.jan.supabase.SupabaseSerializer
 import io.github.jan.supabase.annotations.SupabaseExperimental
 import io.github.jan.supabase.plugins.CustomSerializationConfig
 import io.github.jan.supabase.plugins.MainConfig
-import io.github.jan.supabase.serializer.KotlinXSupabaseSerializer
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlin.time.Duration
@@ -71,10 +71,9 @@ open class GoTrueConfigDefaults {
     var jwtToken: String? = null
 
     /**
-     * A serializer used for serializing/deserializing objects e.g. in [GoTrue.sendOtpTo]. Defaults to [KotlinXSupabaseSerializer]
+     * A serializer used for serializing/deserializing objects e.g. in [GoTrue.sendOtpTo]. Defaults to [SupabaseClientBuilder.defaultSerializer], when null.
      */
-    @SupabaseExperimental
-    var serializer: SupabaseSerializer = KotlinXSupabaseSerializer()
+    var serializer: SupabaseSerializer? = null
 
 }
 

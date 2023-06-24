@@ -4,7 +4,6 @@ import co.touchlab.kermit.Logger
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.SupabaseClientBuilder
 import io.github.jan.supabase.SupabaseSerializer
-import io.github.jan.supabase.annotations.SupabaseExperimental
 import io.github.jan.supabase.annotations.SupabaseInternal
 import io.github.jan.supabase.collections.AtomicMutableMap
 import io.github.jan.supabase.exceptions.RestException
@@ -12,6 +11,7 @@ import io.github.jan.supabase.exceptions.UnknownRestException
 import io.github.jan.supabase.gotrue.GoTrue
 import io.github.jan.supabase.gotrue.SessionStatus
 import io.github.jan.supabase.plugins.CustomSerializationConfig
+import io.github.jan.supabase.plugins.CustomSerializationPlugin
 import io.github.jan.supabase.plugins.MainConfig
 import io.github.jan.supabase.plugins.MainPlugin
 import io.github.jan.supabase.plugins.SupabasePluginProvider
@@ -70,7 +70,7 @@ import kotlin.time.Duration.Companion.seconds
  * channel.join()
  * ```
  */
-sealed interface Realtime : MainPlugin<Realtime.Config> {
+sealed interface Realtime : MainPlugin<Realtime.Config>, CustomSerializationPlugin {
 
     /**
      * The current status of the realtime connection
@@ -129,8 +129,7 @@ sealed interface Realtime : MainPlugin<Realtime.Config> {
         var disconnectOnSessionLoss: Boolean = true,
     ): MainConfig, CustomSerializationConfig {
 
-        @SupabaseExperimental
-        override var serializer: SupabaseSerializer = KotlinXSupabaseSerializer()
+        override var serializer: SupabaseSerializer? = null
 
     }
 
@@ -151,7 +150,6 @@ sealed interface Realtime : MainPlugin<Realtime.Config> {
                     config.websocketConfig(this)
                 }
             }
-            config.serializer = builder.defaultSerializer
         }
 
         override fun create(supabaseClient: SupabaseClient, config: Config): Realtime = RealtimeImpl(supabaseClient, config)
@@ -169,8 +167,7 @@ sealed interface Realtime : MainPlugin<Realtime.Config> {
 
 }
 
-internal class RealtimeImpl(override val supabaseClient: SupabaseClient, override val config: Realtime.Config) :
-    Realtime {
+internal class RealtimeImpl(override val supabaseClient: SupabaseClient, override val config: Realtime.Config) : Realtime {
 
     var ws: DefaultClientWebSocketSession? = null
     private val _status = MutableStateFlow(Realtime.Status.DISCONNECTED)
@@ -188,6 +185,8 @@ internal class RealtimeImpl(override val supabaseClient: SupabaseClient, overrid
 
     override val pluginKey: String
         get() = Realtime.key
+
+    override var serializer = config.serializer ?: supabaseClient.defaultSerializer
 
     init {
         if(config.secure == null) {
