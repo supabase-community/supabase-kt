@@ -17,7 +17,6 @@ apollo-kotlin = "3.8.2"
 korlibs = "4.0.6"
 detekt = "1.23.0"
 moshi = "1.15.0"
-jackson-kotlin = "2.15.1"
 jackson = "2.15.2"
 
 [plugins]
@@ -63,7 +62,7 @@ moshi = { module = "com.squareup.moshi:moshi", version.ref = "moshi" }
 moshi-kotlin = { module = "com.squareup.moshi:moshi-kotlin", version.ref = "moshi" }
 
 jackson = { module = "com.fasterxml.jackson.core:jackson-core", version.ref = "jackson" }
-jackson-kotlin = { module = "com.fasterxml.jackson.module:jackson-module-kotlin", version.ref = "jackson-kotlin" }
+jackson-kotlin = { module = "com.fasterxml.jackson.module:jackson-module-kotlin", version.ref = "jackson" }
 
 [bundles]
 ktor-client = ["ktor-client-core", "ktor-client-content-negotiation", "ktor-json"]

@@ -33,7 +33,7 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 implementation(project(":"))
-                implementation(libs.bundles.jackson)
+                api(libs.bundles.jackson)
             }
         }
     }

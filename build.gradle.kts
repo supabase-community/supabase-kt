@@ -192,8 +192,6 @@ kotlin {
                 api(libs.kermit)
                 api(libs.bundles.ktor.client)
                 api(libs.kotlinx.atomicfu)
-                api(project(":serializers:serializer-kotlinx"))
-         //       api(libs.stately)
             }
         }
         val commonTest by getting {

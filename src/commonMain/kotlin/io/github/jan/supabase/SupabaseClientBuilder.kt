@@ -5,6 +5,7 @@ import io.github.jan.supabase.annotations.SupabaseDsl
 import io.github.jan.supabase.plugins.PluginManager
 import io.github.jan.supabase.plugins.SupabasePlugin
 import io.github.jan.supabase.plugins.SupabasePluginProvider
+import io.github.jan.supabase.serializer.KotlinXSupabaseSerializer
 import io.ktor.client.HttpClientConfig
 import io.ktor.client.engine.HttpClientEngine
 import io.ktor.client.plugins.HttpRequestTimeoutException
