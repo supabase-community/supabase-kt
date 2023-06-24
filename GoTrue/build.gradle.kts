@@ -4,8 +4,6 @@ plugins {
     alias(libs.plugins.complete.kotlin)
 }
 
-group = "io.github.jan-tennert.supabase"
-version = Versions.PROJECT
 description = "Extends supabase-kt with a Auth Client"
 
 repositories {

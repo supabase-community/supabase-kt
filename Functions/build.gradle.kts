@@ -3,8 +3,6 @@ plugins {
     id("com.android.library")
 }
 
-group = "io.github.jan-tennert.supabase"
-version = Versions.PROJECT
 description = "Extends supabase-kt with a Edge Functions Client"
 
 repositories {

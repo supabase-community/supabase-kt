@@ -31,7 +31,7 @@ class MemoryResumableCache(
     }
 
     override suspend fun entries(): List<CachePair> {
-        return map.mapNotNull { (key, value) ->
+        return map.mapNotNull { (key, _) ->
             Fingerprint(key)
         }.map {
             it to Json.decodeFromString(it.value)

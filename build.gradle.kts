@@ -35,12 +35,14 @@ configure(allprojects.filter { it.name in modules || it.name == "bom" }) {
     apply(plugin = "kotlinx-atomicfu")
     apply(plugin = "com.vanniktech.maven.publish")
 
+    group = "io.github.jan-tennert.supabase"
+    version = extra["supabase-version"].toString()
+
     mavenPublishing {
         publishToMavenCentral(com.vanniktech.maven.publish.SonatypeHost.S01)
 
         signAllPublications()
-
-        coordinates("io.github.jan-tennert.supabase", this@configure.name, Versions.PROJECT)
+        coordinates("io.github.jan-tennert.supabase", this@configure.name, extra["supabase-version"].toString())
 
         pom {
             name.set(this@configure.name)
@@ -146,9 +148,6 @@ configure(allprojects.filter { it.name in modules }) {
         }
     }
 }
-
-group = "io.github.jan-tennert.supabase"
-version = Versions.PROJECT
 
 @OptIn(org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi::class)
 kotlin {
