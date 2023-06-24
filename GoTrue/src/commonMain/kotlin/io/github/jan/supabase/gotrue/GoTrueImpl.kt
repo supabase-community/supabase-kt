@@ -139,7 +139,7 @@ internal class GoTrueImpl(
         updateCurrentUser: Boolean,
         config: UserUpdateBuilder.() -> Unit
     ): UserInfo {
-        val updateBuilder = UserUpdateBuilder().apply(config)
+        val updateBuilder = UserUpdateBuilder(serializer = serializer).apply(config)
         val body = buildJsonObject {
             putJsonObject(supabaseJson.encodeToJsonElement(updateBuilder).jsonObject)
         }.toString()

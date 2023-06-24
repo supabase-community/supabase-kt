@@ -38,7 +38,7 @@ allprojects {
     mavenPublishing {
         publishToMavenCentral(com.vanniktech.maven.publish.SonatypeHost.S01)
 
-        signAllPublications()
+     //   signAllPublications()
         coordinates("io.github.jan-tennert.supabase", this@allprojects.name, extra["supabase-version"].toString())
 
         pom {

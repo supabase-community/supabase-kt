@@ -5,7 +5,7 @@ import io.github.jan.supabase.annotations.SupabaseDsl
 import io.github.jan.supabase.plugins.PluginManager
 import io.github.jan.supabase.plugins.SupabasePlugin
 import io.github.jan.supabase.plugins.SupabasePluginProvider
-import io.github.jan.supabase.serializer.KotlinXSupabaseSerializer
+import io.github.jan.supabase.serializer.KotlinXSerializer
 import io.ktor.client.HttpClientConfig
 import io.ktor.client.engine.HttpClientEngine
 import io.ktor.client.plugins.HttpRequestTimeoutException
@@ -49,9 +49,9 @@ class SupabaseClientBuilder @PublishedApi internal constructor(private val supab
     /**
      * The default serializer used to serialize and deserialize custom data types.
      *
-     * Default: [KotlinXSupabaseSerializer]
+     * Default: [KotlinXSerializer]
      */
-    var defaultSerializer: SupabaseSerializer = KotlinXSupabaseSerializer()
+    var defaultSerializer: SupabaseSerializer = KotlinXSerializer()
 
     private val httpConfigOverrides = mutableListOf<HttpClientConfig<*>.() -> Unit>()
     private val plugins = mutableMapOf<String, ((SupabaseClient) -> SupabasePlugin)>()

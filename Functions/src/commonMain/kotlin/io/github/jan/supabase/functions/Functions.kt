@@ -16,7 +16,7 @@ import io.github.jan.supabase.plugins.CustomSerializationPlugin
 import io.github.jan.supabase.plugins.MainConfig
 import io.github.jan.supabase.plugins.MainPlugin
 import io.github.jan.supabase.plugins.SupabasePluginProvider
-import io.github.jan.supabase.serializer.KotlinXSupabaseSerializer
+import io.github.jan.supabase.serializer.KotlinXSerializer
 import io.ktor.client.plugins.HttpRequestTimeoutException
 import io.ktor.client.request.HttpRequestBuilder
 import io.ktor.client.request.setBody
@@ -119,7 +119,7 @@ class Functions(override val config: Config, override val supabaseClient: Supaba
      * The config for the [Functions] plugin
      * @param customUrl A custom url to use for the requests. If not provided, the default url will be used
      * @param jwtToken A jwt token to use for the requests. If not provided, the token from the [GoTrue] plugin, or the supabaseKey will be used
-     * @property serializer A serializer used for serializing/deserializing objects e.g. in [Functions.invoke] or [EdgeFunction.invoke]. Defaults to [KotlinXSupabaseSerializer]
+     * @property serializer A serializer used for serializing/deserializing objects e.g. in [Functions.invoke] or [EdgeFunction.invoke]. Defaults to [KotlinXSerializer]
      */
     data class Config(
         override var customUrl: String? = null,

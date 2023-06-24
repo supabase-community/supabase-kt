@@ -3,7 +3,7 @@ package io.github.jan.supabase.gotrue.user
 import io.github.jan.supabase.SupabaseSerializer
 import io.github.jan.supabase.encodeToJsonElement
 import io.github.jan.supabase.gotrue.GoTrue
-import io.github.jan.supabase.serializer.KotlinXSupabaseSerializer
+import io.github.jan.supabase.serializer.KotlinXSerializer
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
@@ -28,7 +28,7 @@ data class UserUpdateBuilder(
     var phoneNumber: String? = null,
     var nonce: String? = null,
     var data: JsonObject? = null,
-    @Transient @PublishedApi internal var serializer: SupabaseSerializer = KotlinXSupabaseSerializer()
+    @Transient @PublishedApi internal var serializer: SupabaseSerializer = KotlinXSerializer()
 ) {
 
     /**
