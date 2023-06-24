@@ -42,7 +42,7 @@ kotlin {
 android {
     compileSdk = 33
     sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
-    namespace = "io.github.jan.supabase.graphql.library"
+    namespace = "io.github.jan.supabase.serializer.jackson.library"
     defaultConfig {
         minSdk = 21
     }
