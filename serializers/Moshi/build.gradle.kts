@@ -3,7 +3,7 @@ plugins {
     id("com.android.library")
 }
 
-description = "Extends supabase-kt with a KotlinX Serialization Serializer"
+description = "Extends supabase-kt with a Moshi Serializer"
 
 repositories {
     mavenCentral()
