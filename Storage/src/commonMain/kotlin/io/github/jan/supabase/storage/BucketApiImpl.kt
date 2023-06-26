@@ -1,6 +1,6 @@
 package io.github.jan.supabase.storage
 
-import io.github.jan.supabase.annotiations.SupabaseExperimental
+import io.github.jan.supabase.annotations.SupabaseExperimental
 import io.github.jan.supabase.putJsonObject
 import io.github.jan.supabase.safeBody
 import io.github.jan.supabase.storage.resumable.ResumableClientImpl

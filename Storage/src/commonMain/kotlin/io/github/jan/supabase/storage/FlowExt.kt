@@ -97,7 +97,7 @@ fun BucketApi.uploadToSignedUrlAsFlow(path: String, token: String, data: ByteArr
  */
 fun BucketApi.uploadAsFlow(path: String, data: UploadData, upsert: Boolean): Flow<UploadStatus> {
     return callbackFlow {
-        this@callbackFlow as BucketApiImpl
+        this@uploadAsFlow as BucketApiImpl
         val key = uploadOrUpdate(HttpMethod.Post, bucketId, path, data, upsert) {
             onUpload { bytesSentTotal, contentLength ->
                 trySend(UploadStatus.Progress(bytesSentTotal, contentLength))

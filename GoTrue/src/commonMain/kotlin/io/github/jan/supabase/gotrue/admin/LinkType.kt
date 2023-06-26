@@ -1,6 +1,6 @@
 package io.github.jan.supabase.gotrue.admin
 
-import io.github.jan.supabase.annotiations.SupabaseInternal
+import io.github.jan.supabase.annotations.SupabaseInternal
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonObject

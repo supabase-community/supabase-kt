@@ -1,8 +1,8 @@
 package io.github.jan.supabase.gotrue.providers.builtin
 
 import io.github.jan.supabase.SupabaseClient
-import io.github.jan.supabase.annotiations.SupabaseExperimental
-import io.github.jan.supabase.annotiations.SupabaseInternal
+import io.github.jan.supabase.annotations.SupabaseExperimental
+import io.github.jan.supabase.annotations.SupabaseInternal
 import io.github.jan.supabase.gotrue.FlowType
 import io.github.jan.supabase.gotrue.GoTrueImpl
 import io.github.jan.supabase.gotrue.generateCodeChallenge

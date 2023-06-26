@@ -1,6 +1,6 @@
 package io.github.jan.supabase.postgrest.query
 
-import io.github.jan.supabase.annotiations.SupabaseInternal
+import io.github.jan.supabase.annotations.SupabaseInternal
 import io.github.jan.supabase.postgrest.PropertyConversionMethod
 import io.github.jan.supabase.supabaseJson
 import kotlinx.serialization.json.JsonElement

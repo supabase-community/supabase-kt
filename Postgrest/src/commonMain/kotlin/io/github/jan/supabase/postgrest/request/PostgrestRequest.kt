@@ -1,7 +1,7 @@
 @file:Suppress("UndocumentedPublicClass", "UndocumentedPublicFunction", "UndocumentedPublicProperty")
 package io.github.jan.supabase.postgrest.request
 
-import io.github.jan.supabase.annotiations.SupabaseInternal
+import io.github.jan.supabase.annotations.SupabaseInternal
 import io.github.jan.supabase.bodyOrNull
 import io.github.jan.supabase.gotrue.GoTrue
 import io.github.jan.supabase.postgrest.Postgrest
@@ -56,10 +56,10 @@ sealed interface PostgrestRequest {
                     header("Content-Profile", schema)
                 }
             }
-        }.asPostgrestResult()
+        }.asPostgrestResult(postgrest)
     }
 
-    private suspend fun HttpResponse.asPostgrestResult(): PostgrestResult = PostgrestResult(bodyOrNull(), headers)
+    private suspend fun HttpResponse.asPostgrestResult(postgrest: Postgrest): PostgrestResult = PostgrestResult(bodyOrNull(), headers, postgrest)
 
     class RPC(
         head: Boolean = false,

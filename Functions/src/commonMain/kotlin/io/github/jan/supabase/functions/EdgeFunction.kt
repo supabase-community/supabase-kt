@@ -1,7 +1,7 @@
 package io.github.jan.supabase.functions
 
 import io.github.jan.supabase.SupabaseClient
-import io.github.jan.supabase.annotiations.SupabaseInternal
+import io.github.jan.supabase.annotations.SupabaseInternal
 import io.ktor.client.plugins.HttpRequestTimeoutException
 import io.ktor.client.statement.HttpResponse
 import io.ktor.http.Headers
@@ -29,7 +29,7 @@ class EdgeFunction @SupabaseInternal constructor(
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
-    suspend inline operator fun <reified T> invoke(body: T, headerOverride: HeadersBuilder.() -> Unit = {}): HttpResponse {
+    suspend inline operator fun <reified T : Any> invoke(body: T, headerOverride: HeadersBuilder.() -> Unit = {}): HttpResponse {
         val headers = HeadersBuilder().apply {
             appendAll(this@EdgeFunction.headers)
             headerOverride()

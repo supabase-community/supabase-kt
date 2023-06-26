@@ -2,10 +2,24 @@
 
 A Kotlin Multiplatform Client for Supabase.
 Supported targets:
-- JVM
-- Android
-- JS (Browser) 
-- IOS (experimental)
+
+| **Module**                              | **GoTrue** | **Realtime** | **Postgrest** | **Storage** | **Functions** | **Apollo-GraphQL** |
+|-----------------------------------------|------------|--------------|---------------|-------------|---------------|--------------------|
+| **JVM**                                 | ✅          | ✅            | ✅             | ✅           | ✅             | ✅                  |
+| **Android**                             | ✅          | ✅            | ✅             | ✅           | ✅             | ✅                  |
+| **JS** *(Browser)*                      | ✅          | ✅            | ✅             | ✅           | ✅             | ✅                  |
+| **IOS**                                 | ✅          | ✅            | ✅             | ✅           | ✅             | ✅                  |
+| **MacOS**  *(macosX64 & macosArm64)* 🚧 | ✅          | ✅            | ✅             | ✅           | ✅             | ✅                  |
+| **Windows** *(mingwX64)*   🚧           | ☑️         | ✅            | ✅             | ✅           | ✅             | ❌                  |
+| **Linux** *(linuxX64)*  🚧              | ☑️         | ✅            | ✅             | ✅           | ✅             | ❌                  |
+
+✅ = full support
+
+☑️ = partial support: no built-in OAuth/OTP link handling.
+
+🚧 = experimental/needs feedback
+
+❌ = not supported
 
 *Note: WASM planned see [issue](https://github.com/supabase-community/supabase-kt/issues/86)*
 
@@ -33,7 +47,8 @@ dependencies {
 }
 ```
 
-If you use multiple modules, you can use the bom dependency to get the correct versions for all modules:
+If you use multiple modules, you can use the bom dependency to get the correct versions for all
+modules:
 
 ```kotlin
 implementation(platform("io.github.jan-tennert.supabase:bom:VERSION"))
@@ -67,16 +82,19 @@ implementation("io.github.jan-tennert.supabase:[module]")
 
 # Videos
 
-- [Getting started with Supabase on Android](https://www.youtube.com/watch?v=SGr73sWMX6w) (by [Eric Ampire](https://www.youtube.com/@eric-ampire))
+- [Getting started with Supabase on Android](https://www.youtube.com/watch?v=SGr73sWMX6w) (
+  by [Eric Ampire](https://www.youtube.com/@eric-ampire))
 
 # Contribution
 
 ### How to contribute
 
 1. Fork the repository
-2. Create a branch 
+2. Create a branch
 3. Make your changes
-4. Submit a pull request with your new branch and add one of the following tags: `fix` or `enhancement`. You might also add one or more label when you are modifying a specific module: `gotrue`, `realtime`, `functions`, `graphql`, `storage`, `postgrest`, `core`
+4. Submit a pull request with your new branch and add one of the following tags: `fix`
+   or `enhancement`. You might also add one or more label when you are modifying a specific
+   module: `gotrue`, `realtime`, `functions`, `graphql`, `storage`, `postgrest`, `core`
 
 # Credits
 

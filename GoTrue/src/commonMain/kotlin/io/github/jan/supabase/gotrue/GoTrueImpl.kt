@@ -2,8 +2,8 @@ package io.github.jan.supabase.gotrue
 
 import co.touchlab.kermit.Logger
 import io.github.jan.supabase.SupabaseClient
-import io.github.jan.supabase.annotiations.SupabaseExperimental
-import io.github.jan.supabase.annotiations.SupabaseInternal
+import io.github.jan.supabase.annotations.SupabaseExperimental
+import io.github.jan.supabase.annotations.SupabaseInternal
 import io.github.jan.supabase.bodyOrNull
 import io.github.jan.supabase.exceptions.BadRequestRestException
 import io.github.jan.supabase.exceptions.RestException
@@ -55,8 +55,8 @@ internal class GoTrueImpl(
     private val _sessionStatus = MutableStateFlow<SessionStatus>(SessionStatus.NotAuthenticated)
     override val sessionStatus: StateFlow<SessionStatus> = _sessionStatus.asStateFlow()
     internal val authScope = CoroutineScope(config.coroutineDispatcher)
-    override val sessionManager = config.sessionManager ?: SettingsSessionManager()
-    override val codeVerifierCache = config.codeVerifierCache ?: SettingsCodeVerifierCache()
+    override val sessionManager = config.sessionManager ?: createDefaultSessionManager()
+    override val codeVerifierCache = config.codeVerifierCache ?: createDefaultCodeVerifierCache()
 
     @OptIn(SupabaseInternal::class)
     internal val api = supabaseClient.authenticatedSupabaseApi(this)
@@ -65,6 +65,8 @@ internal class GoTrueImpl(
     var sessionJob: Job? = null
     override val isAutoRefreshRunning: Boolean
         get() = sessionJob?.isActive == true
+
+    override val serializer = config.serializer ?: supabaseClient.defaultSerializer
 
     init {
         setupPlatform()
@@ -137,7 +139,7 @@ internal class GoTrueImpl(
         updateCurrentUser: Boolean,
         config: UserUpdateBuilder.() -> Unit
     ): UserInfo {
-        val updateBuilder = UserUpdateBuilder().apply(config)
+        val updateBuilder = UserUpdateBuilder(serializer = serializer).apply(config)
         val body = buildJsonObject {
             putJsonObject(supabaseJson.encodeToJsonElement(updateBuilder).jsonObject)
         }.toString()
@@ -489,3 +491,9 @@ internal class GoTrueImpl(
 
 @SupabaseInternal
 expect fun GoTrue.setupPlatform()
+
+@SupabaseInternal
+expect fun GoTrue.createDefaultSessionManager(): SessionManager
+
+@SupabaseInternal
+expect fun GoTrue.createDefaultCodeVerifierCache(): CodeVerifierCache

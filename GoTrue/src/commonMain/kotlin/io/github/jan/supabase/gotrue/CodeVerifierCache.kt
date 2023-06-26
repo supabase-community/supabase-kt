@@ -1,8 +1,6 @@
 package io.github.jan.supabase.gotrue
 
-import com.russhwolf.settings.ExperimentalSettingsApi
-import com.russhwolf.settings.Settings
-import com.russhwolf.settings.coroutines.toSuspendSettings
+import io.github.jan.supabase.collections.AtomicMutableMap
 
 /**
  * A cache for the code verifier used in the PKCE flow.
@@ -27,26 +25,20 @@ interface CodeVerifierCache {
 }
 
 /**
- * A [CodeVerifierCache] that uses the [Settings] API.
+ * A [CodeVerifierCache] that uses the [AtomicMutableMap] API.
  */
-class SettingsCodeVerifierCache(settings: Settings = createDefaultSettings()): CodeVerifierCache {
+class MemoryCodeVerifierCache(private val map: MutableMap<String, String> = AtomicMutableMap()): CodeVerifierCache {
 
-    @OptIn(ExperimentalSettingsApi::class)
-    private val suspendSettings = settings.toSuspendSettings()
-
-    @OptIn(ExperimentalSettingsApi::class, ExperimentalSettingsApi::class)
     override suspend fun saveCodeVerifier(codeVerifier: String) {
-        suspendSettings.putString(SETTINGS_KEY, codeVerifier)
+        map.put(SETTINGS_KEY, codeVerifier)
     }
 
-    @OptIn(ExperimentalSettingsApi::class)
     override suspend fun loadCodeVerifier(): String? {
-        return suspendSettings.getStringOrNull(SETTINGS_KEY)
+        return map.get(SETTINGS_KEY)
     }
 
-    @OptIn(ExperimentalSettingsApi::class)
     override suspend fun deleteCodeVerifier() {
-        suspendSettings.remove(SETTINGS_KEY)
+        map.remove(SETTINGS_KEY)
     }
 
     companion object {

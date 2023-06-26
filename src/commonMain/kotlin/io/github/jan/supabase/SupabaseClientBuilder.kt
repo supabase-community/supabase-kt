@@ -1,10 +1,11 @@
 package io.github.jan.supabase
 
 import co.touchlab.kermit.Logger
-import io.github.jan.supabase.annotiations.SupabaseDsl
+import io.github.jan.supabase.annotations.SupabaseDsl
 import io.github.jan.supabase.plugins.PluginManager
 import io.github.jan.supabase.plugins.SupabasePlugin
 import io.github.jan.supabase.plugins.SupabasePluginProvider
+import io.github.jan.supabase.serializer.KotlinXSerializer
 import io.ktor.client.HttpClientConfig
 import io.ktor.client.engine.HttpClientEngine
 import io.ktor.client.plugins.HttpRequestTimeoutException
@@ -44,6 +45,14 @@ class SupabaseClientBuilder @PublishedApi internal constructor(private val supab
      * Default: 10 seconds
      */
     var requestTimeout = 10.seconds
+
+    /**
+     * The default serializer used to serialize and deserialize custom data types.
+     *
+     * Default: [KotlinXSerializer]
+     */
+    var defaultSerializer: SupabaseSerializer = KotlinXSerializer()
+
     private val httpConfigOverrides = mutableListOf<HttpClientConfig<*>.() -> Unit>()
     private val plugins = mutableMapOf<String, ((SupabaseClient) -> SupabasePlugin)>()
 
@@ -66,7 +75,7 @@ class SupabaseClientBuilder @PublishedApi internal constructor(private val supab
 
     @PublishedApi
     internal fun build(): SupabaseClient {
-        return SupabaseClientImpl(supabaseUrl.split("//").last(), supabaseKey, plugins, httpConfigOverrides, useHTTPS, requestTimeout.inWholeMilliseconds, httpEngine)
+        return SupabaseClientImpl(supabaseUrl.split("//").last(), supabaseKey, plugins, httpConfigOverrides, useHTTPS, requestTimeout.inWholeMilliseconds, httpEngine, defaultSerializer)
     }
 
     /**

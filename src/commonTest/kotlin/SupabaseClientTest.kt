@@ -1,3 +1,4 @@
+import io.github.jan.supabase.BuildConfig
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.SupabaseClientBuilder
 import io.github.jan.supabase.createSupabaseClient
@@ -5,9 +6,10 @@ import io.github.jan.supabase.plugins.SupabasePlugin
 import io.github.jan.supabase.plugins.SupabasePluginProvider
 import io.ktor.client.engine.mock.MockEngine
 import io.ktor.client.engine.mock.respond
+import io.ktor.http.HttpStatusCode
+import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertIs
 import kotlin.test.assertNotNull
 
 class TestPlugin(private val config: Config) : SupabasePlugin {
@@ -36,8 +38,26 @@ class TestPlugin(private val config: Config) : SupabasePlugin {
 
 class SupabaseClientTest {
 
-    private val mockEngine = MockEngine { _ ->
+    private val mockEngine = MockEngine { data ->
+        val headers = data.headers
+        if("X-Client-Info" !in headers) return@MockEngine respond("Missing X-Client-Info header", HttpStatusCode.BadRequest)
+        val clientInfo = headers["X-Client-Info"]!!
+        if(clientInfo != "supabase-kt/${BuildConfig.PROJECT_VERSION}") return@MockEngine respond("Invalid X-Client-Info header", HttpStatusCode.BadRequest)
         respond("") //ignore for this test
+    }
+
+    @Test
+    fun testClientHeader() {
+        runTest {
+            val client = createMockedSupabaseClient(
+                supabaseUrl = "https://example.supabase.co",
+                supabaseKey = "somekey"
+            ) {
+
+            }
+            val response = client.httpClient.get("")
+            assertEquals(HttpStatusCode.OK, response.status, "Status code should be OK")
+        }
     }
 
     @Test
