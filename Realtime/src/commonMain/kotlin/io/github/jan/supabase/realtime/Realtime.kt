@@ -83,7 +83,7 @@ sealed interface Realtime : MainPlugin<Realtime.Config>, CustomSerializationPlug
     val subscriptions: Map<String, RealtimeChannel>
 
     /**
-     * Connects to the realtime websocket. The url will be taken from the custom provided [Realtime.Config.customRealtimeURL] or [SupabaseClient]
+     * Connects to the realtime websocket. The url will be taken from the custom provided [Realtime.Config.customUrl] or [SupabaseClient]
      */
     suspend fun connect()
 
@@ -96,15 +96,15 @@ sealed interface Realtime : MainPlugin<Realtime.Config>, CustomSerializationPlug
     fun RealtimeChannel.addChannel(channel: RealtimeChannel)
 
     /**
-     * Removes a channel from the [subscriptions]
+     * Unsubscribes and removes a channel from the [subscriptions]
      * @param channel The channel to remove
      */
-    fun removeChannel(channel: RealtimeChannel)
+    suspend fun removeChannel(channel: RealtimeChannel)
 
     /**
-     * Removes all channels from the [subscriptions]
+     * Unsubscribes and removes all channels from the [subscriptions]
      */
-    fun removeAllChannels()
+    suspend fun removeAllChannels()
 
     /**
      * Blocks your current coroutine until the websocket connection is closed
@@ -318,11 +318,15 @@ internal class RealtimeImpl(override val supabaseClient: SupabaseClient, overrid
         ws?.sendSerialized(RealtimeMessage("phoenix", "heartbeat", buildJsonObject { }, heartbeatRef.toString()))
     }
 
-    override fun removeChannel(channel: RealtimeChannel) {
+    override suspend fun removeChannel(channel: RealtimeChannel) {
+        channel.leave()
         _subscriptions.remove(channel.topic)
     }
 
-    override fun removeAllChannels() {
+    override suspend fun removeAllChannels() {
+        _subscriptions.forEach { (_, it) ->
+            it.leave()
+        }
         _subscriptions.clear()
     }
 
