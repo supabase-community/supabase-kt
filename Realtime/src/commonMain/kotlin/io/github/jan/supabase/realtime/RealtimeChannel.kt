@@ -195,7 +195,7 @@ internal class RealtimeChannelImpl(
             }
             RealtimeMessage.EventType.CLOSE -> {
                 realtimeImpl.run {
-                    removeChannel(this@RealtimeChannelImpl)
+                    deleteChannel(this@RealtimeChannelImpl)
                 }
                 Logger.d { "Left channel ${message.topic}" }
             }

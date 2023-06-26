@@ -95,6 +95,9 @@ sealed interface Realtime : MainPlugin<Realtime.Config>, CustomSerializationPlug
     @SupabaseInternal
     fun RealtimeChannel.addChannel(channel: RealtimeChannel)
 
+    @SupabaseInternal
+    fun RealtimeChannel.deleteChannel(channel: RealtimeChannel)
+
     /**
      * Unsubscribes and removes a channel from the [subscriptions]
      * @param channel The channel to remove
@@ -320,6 +323,10 @@ internal class RealtimeImpl(override val supabaseClient: SupabaseClient, overrid
 
     override suspend fun removeChannel(channel: RealtimeChannel) {
         channel.leave()
+        _subscriptions.remove(channel.topic)
+    }
+
+    override fun RealtimeChannel.deleteChannel(channel: RealtimeChannel) {
         _subscriptions.remove(channel.topic)
     }
 
