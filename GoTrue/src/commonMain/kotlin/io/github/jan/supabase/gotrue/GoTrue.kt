@@ -2,6 +2,7 @@ package io.github.jan.supabase.gotrue
 
 import co.touchlab.kermit.Logger
 import io.github.jan.supabase.SupabaseClient
+import io.github.jan.supabase.encodeToJsonElement
 import io.github.jan.supabase.exceptions.HttpRequestException
 import io.github.jan.supabase.exceptions.RestException
 import io.github.jan.supabase.gotrue.admin.AdminApi
@@ -17,13 +18,12 @@ import io.github.jan.supabase.gotrue.providers.builtin.SSO
 import io.github.jan.supabase.gotrue.user.UserInfo
 import io.github.jan.supabase.gotrue.user.UserSession
 import io.github.jan.supabase.gotrue.user.UserUpdateBuilder
+import io.github.jan.supabase.plugins.CustomSerializationPlugin
 import io.github.jan.supabase.plugins.MainPlugin
 import io.github.jan.supabase.plugins.SupabasePluginProvider
 import io.ktor.client.plugins.HttpRequestTimeoutException
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
-import kotlinx.serialization.json.encodeToJsonElement
 import kotlinx.serialization.json.jsonObject
 
 /**
@@ -44,7 +44,7 @@ import kotlinx.serialization.json.jsonObject
  * }
  * ```
  */
-sealed interface GoTrue : MainPlugin<GoTrueConfig> {
+sealed interface GoTrue : MainPlugin<GoTrueConfig>, CustomSerializationPlugin {
 
     /**
      * Returns the current session status
@@ -407,13 +407,13 @@ sealed interface GoTrue : MainPlugin<GoTrueConfig> {
  * @throws HttpRequestTimeoutException if the request timed out
  * @throws HttpRequestException on network related issues
  */
-suspend inline fun <C, R, reified D, Provider : DefaultAuthProvider<C, R>> GoTrue.sendOtpTo(
+suspend inline fun <C, R, reified D : Any, Provider : DefaultAuthProvider<C, R>> GoTrue.sendOtpTo(
     provider: Provider,
     data: D,
     createUser: Boolean = false,
     redirectUrl: String? = null,
     noinline config: C.() -> Unit = { }
-): Unit = sendOtpTo(provider, createUser, redirectUrl, Json.encodeToJsonElement(data).jsonObject, config)
+): Unit = sendOtpTo(provider, createUser, redirectUrl, this.serializer.encodeToJsonElement(data).jsonObject, config)
 
 /**
  * The Auth plugin handles everything related to supabase's authentication system

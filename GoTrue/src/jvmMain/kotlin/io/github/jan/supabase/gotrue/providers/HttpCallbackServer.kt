@@ -1,7 +1,7 @@
 package io.github.jan.supabase.gotrue.providers
 
 import co.touchlab.kermit.Logger
-import io.github.jan.supabase.annotiations.SupabaseExperimental
+import io.github.jan.supabase.annotations.SupabaseExperimental
 import io.github.jan.supabase.gotrue.GoTrue
 import io.github.jan.supabase.gotrue.GoTrueImpl
 import io.github.jan.supabase.gotrue.user.UserSession

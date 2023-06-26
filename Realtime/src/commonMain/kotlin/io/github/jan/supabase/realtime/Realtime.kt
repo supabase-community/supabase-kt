@@ -1,17 +1,21 @@
 package io.github.jan.supabase.realtime
 
 import co.touchlab.kermit.Logger
-import co.touchlab.stately.collections.IsoMutableMap
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.SupabaseClientBuilder
-import io.github.jan.supabase.annotiations.SupabaseInternal
+import io.github.jan.supabase.SupabaseSerializer
+import io.github.jan.supabase.annotations.SupabaseInternal
+import io.github.jan.supabase.collections.AtomicMutableMap
 import io.github.jan.supabase.exceptions.RestException
 import io.github.jan.supabase.exceptions.UnknownRestException
 import io.github.jan.supabase.gotrue.GoTrue
 import io.github.jan.supabase.gotrue.SessionStatus
+import io.github.jan.supabase.plugins.CustomSerializationConfig
+import io.github.jan.supabase.plugins.CustomSerializationPlugin
 import io.github.jan.supabase.plugins.MainConfig
 import io.github.jan.supabase.plugins.MainPlugin
 import io.github.jan.supabase.plugins.SupabasePluginProvider
+import io.github.jan.supabase.serializer.KotlinXSerializer
 import io.github.jan.supabase.supabaseJson
 import io.ktor.client.plugins.websocket.DefaultClientWebSocketSession
 import io.ktor.client.plugins.websocket.WebSockets
@@ -20,6 +24,7 @@ import io.ktor.client.statement.HttpResponse
 import io.ktor.serialization.kotlinx.KotlinxWebsocketSerializationConverter
 import io.ktor.websocket.Frame
 import io.ktor.websocket.readText
+import kotlinx.atomicfu.atomic
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -65,7 +70,7 @@ import kotlin.time.Duration.Companion.seconds
  * channel.join()
  * ```
  */
-sealed interface Realtime : MainPlugin<Realtime.Config> {
+sealed interface Realtime : MainPlugin<Realtime.Config>, CustomSerializationPlugin {
 
     /**
      * The current status of the realtime connection
@@ -112,6 +117,7 @@ sealed interface Realtime : MainPlugin<Realtime.Config> {
      * @property disconnectOnSessionLoss Whether to disconnect from the websocket when the session is lost. Defaults to true
      * @property reconnectDelay The delay between reconnect attempts. Defaults to 7 seconds
      * @property heartbeatInterval The interval between heartbeat messages. Defaults to 15 seconds
+     * @property serializer A serializer used for serializing/deserializing objects e.g. in [PresenceAction.decodeJoinsAs] or [RealtimeChannel.broadcast]. Defaults to [KotlinXSerializer]
      */
     data class Config(
         var websocketConfig: WebSockets.Config.() -> Unit = {},
@@ -120,8 +126,12 @@ sealed interface Realtime : MainPlugin<Realtime.Config> {
         var reconnectDelay: Duration = 7.seconds,
         override var customUrl: String? = null,
         override var jwtToken: String? = null,
-        var disconnectOnSessionLoss: Boolean = true
-    ): MainConfig
+        var disconnectOnSessionLoss: Boolean = true,
+    ): MainConfig, CustomSerializationConfig {
+
+        override var serializer: SupabaseSerializer? = null
+
+    }
 
     companion object : SupabasePluginProvider<Config, Realtime> {
 
@@ -157,25 +167,26 @@ sealed interface Realtime : MainPlugin<Realtime.Config> {
 
 }
 
-internal class RealtimeImpl(override val supabaseClient: SupabaseClient, override val config: Realtime.Config) :
-    Realtime {
+internal class RealtimeImpl(override val supabaseClient: SupabaseClient, override val config: Realtime.Config) : Realtime {
 
     var ws: DefaultClientWebSocketSession? = null
     private val _status = MutableStateFlow(Realtime.Status.DISCONNECTED)
     override val status: StateFlow<Realtime.Status> = _status.asStateFlow()
-    private val _subscriptions = IsoMutableMap<String, RealtimeChannel>()
+    private val _subscriptions = AtomicMutableMap<String, RealtimeChannel>()
     override val subscriptions: Map<String, RealtimeChannel>
-        get() = _subscriptions //toMap() doesnt work because of stately. May be fixed in a future version
+        get() = _subscriptions.toMap()
     private val scope = CoroutineScope(Dispatchers.Default + SupervisorJob())
     var heartbeatJob: Job? = null
     var messageJob: Job? = null
-    var ref = 0
-    var heartbeatRef = 0
+    var ref by atomic(0)
+    var heartbeatRef by atomic(0)
     override val apiVersion: Int
         get() = Realtime.API_VERSION
 
     override val pluginKey: String
         get() = Realtime.key
+
+    override var serializer = config.serializer ?: supabaseClient.defaultSerializer
 
     init {
         if(config.secure == null) {

@@ -12,7 +12,15 @@ include("Storage")
 include("Realtime")
 include("Functions")
 include("bom")
+
 include("test")
+include("test-w")
+
+include(":serializers:Moshi")
+project(":serializers:Moshi").name = "serializer-moshi"
+include(":serializers:Jackson")
+project(":serializers:Jackson").name = "serializer-jackson"
+
 include(":plugins:ApolloGraphQL")
 project(":GoTrue").name = "gotrue-kt"
 project(":Postgrest").name = "postgrest-kt"

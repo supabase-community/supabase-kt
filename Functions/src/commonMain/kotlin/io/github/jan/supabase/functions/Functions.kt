@@ -1,16 +1,22 @@
 package io.github.jan.supabase.functions
 
 import io.github.jan.supabase.SupabaseClient
-import io.github.jan.supabase.annotiations.SupabaseInternal
+import io.github.jan.supabase.SupabaseSerializer
+import io.github.jan.supabase.annotations.SupabaseExperimental
+import io.github.jan.supabase.annotations.SupabaseInternal
+import io.github.jan.supabase.encode
 import io.github.jan.supabase.exceptions.BadRequestRestException
 import io.github.jan.supabase.exceptions.NotFoundRestException
 import io.github.jan.supabase.exceptions.RestException
 import io.github.jan.supabase.exceptions.UnauthorizedRestException
 import io.github.jan.supabase.gotrue.GoTrue
 import io.github.jan.supabase.gotrue.authenticatedSupabaseApi
+import io.github.jan.supabase.plugins.CustomSerializationConfig
+import io.github.jan.supabase.plugins.CustomSerializationPlugin
 import io.github.jan.supabase.plugins.MainConfig
 import io.github.jan.supabase.plugins.MainPlugin
 import io.github.jan.supabase.plugins.SupabasePluginProvider
+import io.github.jan.supabase.serializer.KotlinXSerializer
 import io.ktor.client.plugins.HttpRequestTimeoutException
 import io.ktor.client.request.HttpRequestBuilder
 import io.ktor.client.request.setBody
@@ -38,13 +44,15 @@ import io.ktor.http.HttpStatusCode
  * val response = function()
  * ```
  */
-class Functions(override val config: Config, override val supabaseClient: SupabaseClient) : MainPlugin<Functions.Config> {
+class Functions(override val config: Config, override val supabaseClient: SupabaseClient) : MainPlugin<Functions.Config>, CustomSerializationPlugin {
 
     override val apiVersion: Int
         get() = Functions.API_VERSION
 
     override val pluginKey: String
         get() = key
+
+    override val serializer = config.serializer ?: supabaseClient.defaultSerializer
 
     @OptIn(SupabaseInternal::class)
     @PublishedApi
@@ -72,11 +80,9 @@ class Functions(override val config: Config, override val supabaseClient: Supaba
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
-    suspend inline operator fun <reified T> invoke(function: String, body: T, headers: Headers = Headers.Empty): HttpResponse = invoke(function) {
+    suspend inline operator fun <reified T : Any> invoke(function: String, body: T, headers: Headers = Headers.Empty): HttpResponse = invoke(function) {
         this.headers.appendAll(headers)
-        body?.let {
-            setBody(body)
-        }
+        setBody(serializer.encode(body))
     }
 
     /**
@@ -113,11 +119,17 @@ class Functions(override val config: Config, override val supabaseClient: Supaba
      * The config for the [Functions] plugin
      * @param customUrl A custom url to use for the requests. If not provided, the default url will be used
      * @param jwtToken A jwt token to use for the requests. If not provided, the token from the [GoTrue] plugin, or the supabaseKey will be used
+     * @property serializer A serializer used for serializing/deserializing objects e.g. in [Functions.invoke] or [EdgeFunction.invoke]. Defaults to [KotlinXSerializer]
      */
     data class Config(
         override var customUrl: String? = null,
         override var jwtToken: String? = null,
-    ) : MainConfig
+    ) : MainConfig, CustomSerializationConfig {
+
+        @SupabaseExperimental
+        override var serializer: SupabaseSerializer? = null
+
+    }
 
     companion object : SupabasePluginProvider<Config, Functions> {
 
@@ -133,6 +145,7 @@ class Functions(override val config: Config, override val supabaseClient: Supaba
         }
 
         override fun createConfig(init: Config.() -> Unit) = Config().apply(init)
+
 
     }
 

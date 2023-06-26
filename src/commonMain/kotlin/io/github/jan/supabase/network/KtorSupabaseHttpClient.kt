@@ -2,7 +2,8 @@
 package io.github.jan.supabase.network
 
 import co.touchlab.kermit.Logger
-import io.github.jan.supabase.annotiations.SupabaseInternal
+import io.github.jan.supabase.BuildConfig
+import io.github.jan.supabase.annotations.SupabaseInternal
 import io.github.jan.supabase.exceptions.HttpRequestException
 import io.github.jan.supabase.supabaseJson
 import io.ktor.client.HttpClient
@@ -86,6 +87,7 @@ class KtorSupabaseHttpClient @SupabaseInternal constructor(
                 if(supabaseKey.isNotBlank()) {
                     append("apikey", supabaseKey)
                 }
+                append("X-Client-Info", "supabase-kt/${BuildConfig.PROJECT_VERSION}")
             }
             port = HTTPS_PORT
         }

@@ -7,7 +7,7 @@ actual class PlatformTargetTest {
 
     @Test
     actual fun testPlatformTarget() {
-        assertEquals(PlatformTarget.WEB, CurrentPlatformTarget, "The current platform target should be WEB")
+        assertEquals(PlatformTarget.JS, CurrentPlatformTarget, "The current platform target should be WEB")
     }
 
 }

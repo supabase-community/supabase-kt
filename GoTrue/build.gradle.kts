@@ -4,15 +4,15 @@ plugins {
     alias(libs.plugins.complete.kotlin)
 }
 
-group = "io.github.jan-tennert.supabase"
-version = Versions.PROJECT
 description = "Extends supabase-kt with a Auth Client"
 
 repositories {
     mavenCentral()
 }
 
+@OptIn(org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi::class)
 kotlin {
+    targetHierarchy.default()
     jvm {
         jvmToolchain(8)
         compilations.all {
@@ -31,20 +31,31 @@ kotlin {
                 enabled = false
             }
         }
+        
     }
     ios()
     iosSimulatorArm64()
+    mingwX64()
+    macosX64()
+    macosArm64()
+    linuxX64()
     sourceSets {
         all {
             languageSettings.optIn("kotlin.RequiresOptIn")
-            languageSettings.optIn("io.github.jan.supabase.annotiations.SupabaseInternal")
+            languageSettings.optIn("io.github.jan.supabase.annotations.SupabaseInternal")
+            languageSettings.optIn("io.github.jan.supabase.annotations.SupabaseExperimental")
         }
         val commonMain by getting {
             dependencies {
                 api(project(":"))
-                api(libs.bundles.multiplatform.settings)
-                implementation(libs.okio)
                 implementation(libs.krypto)
+         //       api(libs.cache4k)
+            }
+        }
+        val nonLinuxMain by creating {
+            dependsOn(commonMain)
+            dependencies {
+                api(libs.bundles.multiplatform.settings)
             }
         }
         val commonTest by getting {
@@ -53,24 +64,27 @@ kotlin {
             }
         }
         val jvmMain by getting {
+            dependsOn(nonLinuxMain)
             dependencies {
                 implementation(libs.javalin)
             }
         }
         val androidMain by getting {
+            dependsOn(nonLinuxMain)
             dependencies {
                 api(libs.androidx.startup.runtime)
             }
         }
-        val jsMain by getting
-        val iosMain by getting
-        val iosTest by getting
-        val iosSimulatorArm64Main by getting {
-            dependsOn(iosMain)
+        val mingwX64Main by getting {
+            dependsOn(nonLinuxMain)
         }
-        val iosSimulatorArm64Test by getting {
-            dependsOn(iosTest)
+        val appleMain by getting {
+            dependsOn(nonLinuxMain)
         }
+        val jsMain by getting {
+            dependsOn(nonLinuxMain)
+        }
+        val linuxMain by getting
     }
 }
 

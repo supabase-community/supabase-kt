@@ -1,6 +1,6 @@
 package io.github.jan.supabase.postgrest
 
-import io.github.jan.supabase.annotiations.SupabaseInternal
+import io.github.jan.supabase.annotations.SupabaseInternal
 import kotlinx.serialization.SerialName
 import kotlin.reflect.KProperty1
 import kotlin.reflect.full.findAnnotation

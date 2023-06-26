@@ -1,13 +1,10 @@
-@file:OptIn(ExperimentalSettingsApi::class)
-
 package io.github.jan.supabase.storage
 
 import co.touchlab.kermit.Logger
-import co.touchlab.stately.collections.IsoMutableMap
-import com.russhwolf.settings.ExperimentalSettingsApi
 import io.github.jan.supabase.SupabaseClient
-import io.github.jan.supabase.annotiations.SupabaseInternal
+import io.github.jan.supabase.annotations.SupabaseInternal
 import io.github.jan.supabase.bodyOrNull
+import io.github.jan.supabase.collections.AtomicMutableMap
 import io.github.jan.supabase.exceptions.BadRequestRestException
 import io.github.jan.supabase.exceptions.NotFoundRestException
 import io.github.jan.supabase.exceptions.RestException
@@ -19,6 +16,7 @@ import io.github.jan.supabase.plugins.MainPlugin
 import io.github.jan.supabase.plugins.SupabasePluginProvider
 import io.github.jan.supabase.safeBody
 import io.github.jan.supabase.storage.resumable.ResumableCache
+import io.github.jan.supabase.storage.resumable.createDefaultResumableCache
 import io.ktor.client.plugins.HttpRequestTimeoutException
 import io.ktor.client.plugins.timeout
 import io.ktor.client.statement.HttpResponse
@@ -135,7 +133,7 @@ sealed interface Storage : MainPlugin<Storage.Config> {
          * @param onlyUpdateStateAfterChunk whether the state should only be updated after a chunk was uploaded successfully or also when the chunk is currently being uploaded
          */
         data class Resumable(
-            var cache: ResumableCache = ResumableCache.Disk(),
+            var cache: ResumableCache = createDefaultResumableCache(),
             var retryTimeout: Duration = 5.seconds,
             var onlyUpdateStateAfterChunk: Boolean = false
         ) {
@@ -199,7 +197,7 @@ internal class StorageImpl(override val supabaseClient: SupabaseClient, override
             requestTimeoutMillis = config.transferTimeout.inWholeMilliseconds
         }
     }
-    private val resumableClients = IsoMutableMap<String, BucketApi>()
+    private val resumableClients = AtomicMutableMap<String, BucketApi>()
 
     override suspend fun retrieveBuckets(): List<Bucket> = api.get("bucket").safeBody()
 
