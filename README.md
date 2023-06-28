@@ -15,7 +15,7 @@ Supported targets:
 
 ✅ = full support
 
-☑️ = partial support: no built-in OAuth/OTP link handling.
+☑️ = partial support: no built-in OAuth/OTP link handling. Linux also has no support for persistent storage.
 
 🚧 = experimental/needs feedback
 
