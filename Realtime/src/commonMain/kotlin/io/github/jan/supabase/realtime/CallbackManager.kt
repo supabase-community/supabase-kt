@@ -1,7 +1,7 @@
 package io.github.jan.supabase.realtime
 
-import co.touchlab.stately.collections.IsoMutableList
-import io.github.jan.supabase.annotiations.SupabaseInternal
+import io.github.jan.supabase.annotations.SupabaseInternal
+import io.github.jan.supabase.collections.AtomicMutableList
 import kotlinx.atomicfu.atomic
 import kotlinx.serialization.json.JsonObject
 
@@ -22,13 +22,17 @@ sealed interface CallbackManager {
 
     fun removeCallbackById(id: Long)
 
+    fun setServerChanges(changes: List<PostgresJoinConfig>)
+
 }
 
-internal class CallbackManagerImpl : CallbackManager {
+internal class CallbackManagerImpl(
+    private val realtime: Realtime
+) : CallbackManager {
 
     private var nextId by atomic(0L)
-    var serverChanges = listOf<PostgresJoinConfig>()
-    private val callbacks = IsoMutableList<RealtimeCallback<*>>()
+    private var _serverChanges by atomic(listOf<PostgresJoinConfig>())
+    private val callbacks = AtomicMutableList<RealtimeCallback<*>>()
 
     override fun addBroadcastCallback(event: String, callback: (JsonObject) -> Unit): Long {
         val id = nextId++
@@ -43,7 +47,7 @@ internal class CallbackManagerImpl : CallbackManager {
     }
 
     override fun triggerPostgresChange(ids: List<Long>, data: PostgresAction) {
-        val filter = serverChanges.filter { it.id in ids }
+        val filter = _serverChanges.filter { it.id in ids }
         val postgresCallbacks = callbacks.filterIsInstance<RealtimeCallback.PostgresCallback>()
         val callbacks =
             postgresCallbacks.filter { cc -> filter.any { sc -> cc.filter == sc } }
@@ -58,7 +62,7 @@ internal class CallbackManagerImpl : CallbackManager {
 
     override fun triggerPresenceDiff(joins: Map<String, Presence>, leaves: Map<String, Presence>) {
         val presenceCallbacks = callbacks.filterIsInstance<RealtimeCallback.PresenceCallback>()
-        presenceCallbacks.forEach { it.callback(PresenceActionImpl(joins, leaves)) }
+        presenceCallbacks.forEach { it.callback(PresenceActionImpl(realtime.serializer, joins, leaves)) }
     }
 
     override fun addPresenceCallback(callback: (PresenceAction) -> Unit): Long {
@@ -69,6 +73,10 @@ internal class CallbackManagerImpl : CallbackManager {
 
     override fun removeCallbackById(id: Long) {
         callbacks.removeAll { it.id == id }
+    }
+
+    override fun setServerChanges(changes: List<PostgresJoinConfig>) {
+        _serverChanges = changes
     }
 
 }

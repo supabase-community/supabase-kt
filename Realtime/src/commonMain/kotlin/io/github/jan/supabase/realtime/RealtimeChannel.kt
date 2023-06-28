@@ -2,8 +2,11 @@ package io.github.jan.supabase.realtime
 
 import co.touchlab.kermit.Logger
 import io.github.jan.supabase.SupabaseClient
-import io.github.jan.supabase.annotiations.SupabaseInternal
+import io.github.jan.supabase.annotations.SupabaseInternal
+import io.github.jan.supabase.collections.AtomicMutableList
+import io.github.jan.supabase.decode
 import io.github.jan.supabase.decodeIfNotEmptyOrDefault
+import io.github.jan.supabase.encodeToJsonElement
 import io.github.jan.supabase.gotrue.GoTrue
 import io.github.jan.supabase.putJsonObject
 import io.github.jan.supabase.supabaseJson
@@ -123,9 +126,9 @@ internal class RealtimeChannelImpl(
     private val presenceJoinConfig: PresenceJoinConfig,
 ) : RealtimeChannel {
 
-    private val clientChanges = mutableListOf<PostgresJoinConfig>()
+    private val clientChanges = AtomicMutableList<PostgresJoinConfig>()
     @SupabaseInternal
-    override val callbackManager = CallbackManagerImpl()
+    override val callbackManager = CallbackManagerImpl(realtimeImpl)
     private val _status = MutableStateFlow(RealtimeChannel.Status.CLOSED)
     override val status = _status.asStateFlow()
 
@@ -167,7 +170,7 @@ internal class RealtimeChannelImpl(
             }
             RealtimeMessage.EventType.POSTGRES_SERVER_CHANGES -> { //check if the server postgres_changes match with the client's and add the given id to the postgres change objects (to identify them later in the events)
                 val serverPostgresChanges = message.payload["response"]?.jsonObject?.get("postgres_changes")?.jsonArray?.let { Json.decodeFromJsonElement<List<PostgresJoinConfig>>(it) } ?: listOf() //server postgres changes
-                callbackManager.serverChanges = serverPostgresChanges
+                callbackManager.setServerChanges(serverPostgresChanges)
                 if(status.value != RealtimeChannel.Status.JOINED) {
                     Logger.d { "Joined channel ${message.topic}" }
                     _status.value = RealtimeChannel.Status.JOINED
@@ -176,11 +179,12 @@ internal class RealtimeChannelImpl(
             RealtimeMessage.EventType.POSTGRES_CHANGES -> {
                 val data = message.payload["data"]?.jsonObject ?: return
                 val ids = message.payload["ids"]?.jsonArray?.mapNotNull { it.jsonPrimitive.longOrNull } ?: emptyList() //the ids of the matching postgres changes
+                val postgresAction = supabaseJson.decodeFromJsonElement<PostgresActionData>(data)
                 val action = when(data["type"]?.jsonPrimitive?.content ?: "") {
-                    "UPDATE" -> supabaseJson.decodeFromJsonElement<PostgresAction.Update>(data)
-                    "DELETE" -> supabaseJson.decodeFromJsonElement<PostgresAction.Delete>(data)
-                    "INSERT" -> supabaseJson.decodeFromJsonElement<PostgresAction.Insert>(data)
-                    "SELECT" -> supabaseJson.decodeFromJsonElement<PostgresAction.Select>(data)
+                    "UPDATE" -> PostgresAction.Update(postgresAction.record ?: error("Received no record on update event"), postgresAction.oldRecord ?: error("Received no old record on update event"), postgresAction.columns, postgresAction.commitTimestamp, realtimeImpl.serializer)
+                    "DELETE" -> PostgresAction.Delete(postgresAction.oldRecord ?: error("Received no old record on delete event"), postgresAction.columns, postgresAction.commitTimestamp, realtimeImpl.serializer)
+                    "INSERT" -> PostgresAction.Insert(postgresAction.record ?: error("Received no record on update event"), postgresAction.columns, postgresAction.commitTimestamp, realtimeImpl.serializer)
+                    "SELECT" -> PostgresAction.Select(postgresAction.record ?: error("Received no record on update event"), postgresAction.columns, postgresAction.commitTimestamp, realtimeImpl.serializer)
                     else -> error("Unknown event type ${message.event}")
                 }
                 callbackManager.triggerPostgresChange(ids, action)
@@ -191,7 +195,7 @@ internal class RealtimeChannelImpl(
             }
             RealtimeMessage.EventType.CLOSE -> {
                 realtimeImpl.run {
-                    removeChannel(this@RealtimeChannelImpl)
+                    deleteChannel(this@RealtimeChannelImpl)
                 }
                 Logger.d { "Left channel ${message.topic}" }
             }
@@ -335,10 +339,10 @@ inline fun <reified T : PostgresAction> RealtimeChannel.postgresChangeFlow(schem
  * @param event When a message is sent by another client, it will be sent under a specific event. This is the event that you want to listen to
  */
 @OptIn(SupabaseInternal::class)
-inline fun <reified T> RealtimeChannel.broadcastFlow(event: String, json: Json = Json): Flow<T> = callbackFlow {
+inline fun <reified T : Any> RealtimeChannel.broadcastFlow(event: String): Flow<T> = callbackFlow {
     val id = callbackManager.addBroadcastCallback(event) {
         val decodedValue = try {
-            json.decodeFromJsonElement<T>(it)
+            supabaseClient.realtime.serializer.decode<T>(it.toString())
         } catch(e: Exception) {
             Logger.e(e) { "Couldn't decode $this as ${T::class.simpleName}. The corresponding handler wasn't called" }
             null
@@ -353,7 +357,7 @@ inline fun <reified T> RealtimeChannel.broadcastFlow(event: String, json: Json =
  * @param event the broadcast event. Example: mouse_cursor
  * @param message the message to send as [T] (can only be something that can be encoded as a json object)
  */
-suspend inline fun <reified T> RealtimeChannel.broadcast(event: String, message: T, json: Json = Json) = broadcast(event, json.encodeToJsonElement(message).jsonObject)
+suspend inline fun <reified T : Any> RealtimeChannel.broadcast(event: String, message: T) = broadcast(event, supabaseClient.realtime.serializer.encodeToJsonElement(message).jsonObject)
 
 /**
  * Store an object in your presence's state. Other clients can get this data when you either join or leave the channel.
@@ -369,4 +373,4 @@ suspend inline fun <reified T> RealtimeChannel.broadcast(event: String, message:
  *
  * @param state the data to store (can only be something that can be encoded as a json object)
  */
-suspend inline fun <reified T> RealtimeChannel.track(state: T, json: Json = Json) = track(json.encodeToJsonElement(state).jsonObject)
+suspend inline fun <reified T : Any> RealtimeChannel.track(state: T) = track(supabaseClient.realtime.serializer.encodeToJsonElement(state).jsonObject)

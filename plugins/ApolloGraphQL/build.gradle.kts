@@ -3,19 +3,15 @@ plugins {
     id("com.android.library")
 }
 
-group = "io.github.jan-tennert.supabase"
-version = Versions.PROJECT
 description = "Extends supabase-kt with a Apollo GraphQL Client"
 
 repositories {
     mavenCentral()
 }
 
+@OptIn(org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi::class)
 kotlin {
-    /** Targets configuration omitted. 
-    *  To find out how to configure the targets, please follow the link:
-    *  https://kotlinlang.org/docs/reference/building-mpp-with-gradle.html#setting-up-targets */
-
+    targetHierarchy.default()
     jvm {
         jvmToolchain(8)
         compilations.all {
@@ -34,13 +30,18 @@ kotlin {
                 enabled = false
             }
         }
+        
     }
     ios()
     iosSimulatorArm64()
+    macosX64()
+    macosArm64()
+//    linuxX64()
     sourceSets {
         all {
             languageSettings.optIn("kotlin.RequiresOptIn")
-            languageSettings.optIn("io.github.jan.supabase.annotiations.SupabaseInternal")
+            languageSettings.optIn("io.github.jan.supabase.annotations.SupabaseInternal")
+            languageSettings.optIn("io.github.jan.supabase.annotations.SupabaseExperimental")
         }
         val commonMain by getting {
             dependencies {
@@ -48,14 +49,6 @@ kotlin {
                 api(project(":gotrue-kt"))
                 api(libs.apollo.kotlin)
             }
-        }
-        val commonTest by getting
-        val jvmMain by getting
-        val androidMain by getting
-        val jsMain by getting
-        val iosMain by getting
-        val iosSimulatorArm64Main by getting {
-            dependsOn(iosMain)
         }
     }
 }

@@ -1,6 +1,6 @@
 package io.github.jan.supabase.realtime
 
-import io.github.jan.supabase.annotiations.SupabaseInternal
+import io.github.jan.supabase.annotations.SupabaseInternal
 
 /**
  * Used to filter postgres changes

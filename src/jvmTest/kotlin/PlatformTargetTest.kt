@@ -7,7 +7,7 @@ actual class PlatformTargetTest {
 
     @Test
     actual fun testPlatformTarget() {
-        assertEquals(PlatformTarget.DESKTOP, CurrentPlatformTarget, "The current platform target should be DESKTOP")
+        assertEquals(PlatformTarget.JVM, CurrentPlatformTarget, "The current platform target should be DESKTOP")
     }
 
 }

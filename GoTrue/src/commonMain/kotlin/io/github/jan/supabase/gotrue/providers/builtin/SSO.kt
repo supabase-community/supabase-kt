@@ -1,7 +1,7 @@
 package io.github.jan.supabase.gotrue.providers.builtin
 
 import io.github.jan.supabase.SupabaseClient
-import io.github.jan.supabase.annotiations.SupabaseExperimental
+import io.github.jan.supabase.annotations.SupabaseExperimental
 import io.github.jan.supabase.gotrue.providers.AuthProvider
 import io.github.jan.supabase.gotrue.providers.builtin.SSO.Companion.withDomain
 import io.github.jan.supabase.gotrue.providers.builtin.SSO.Companion.withProvider

@@ -1,11 +1,11 @@
 package io.github.jan.supabase.realtime
 
+import io.github.jan.supabase.SupabaseSerializer
+import io.github.jan.supabase.decode
+import io.github.jan.supabase.plugins.SerializableData
 import kotlinx.datetime.Instant
-import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
-import kotlinx.serialization.json.decodeFromJsonElement
 
 /**
  * Contains information about a column
@@ -18,7 +18,7 @@ data class Column(val name: String, val type: String)
 /**
  * Represents a postgres action, containing a record.
  */
-interface HasRecord {
+interface HasRecord: SerializableData {
 
     /**
      * The new record, if the action has one
@@ -29,7 +29,7 @@ interface HasRecord {
 /**
  * Represents a postgres action, containing an old record.
  */
-interface HasOldRecord {
+interface HasOldRecord: SerializableData {
 
     /**
      * The old record, if the action has one
@@ -40,7 +40,7 @@ interface HasOldRecord {
 /**
  * Represents a postgres action
  */
-sealed interface PostgresAction {
+sealed interface PostgresAction: SerializableData {
 
     /**
      * Contains data of the row's columns
@@ -55,59 +55,52 @@ sealed interface PostgresAction {
     /**
      * Represents a postgres insert action
      */
-    @Serializable
     data class Insert(
         override val record: JsonObject,
         override val columns: List<Column>,
-        @SerialName("commit_timestamp")
         override val commitTimestamp: Instant,
+        override val serializer: SupabaseSerializer,
     ) : PostgresAction, HasRecord
 
     /**
      * Represents a postgres update action
      */
-    @Serializable
     data class Update(
         override val record: JsonObject,
-        @SerialName("old_record")
         override val oldRecord: JsonObject,
         override val columns: List<Column>,
-        @SerialName("commit_timestamp")
         override val commitTimestamp: Instant,
+        override val serializer: SupabaseSerializer,
     ) : PostgresAction, HasRecord, HasOldRecord
 
     /**
      * Represents a postgres delete action
      */
-    @Serializable
     data class Delete(
-        @SerialName("old_record")
         override val oldRecord: JsonObject,
         override val columns: List<Column>,
-        @SerialName("commit_timestamp")
         override val commitTimestamp: Instant,
+        override val serializer: SupabaseSerializer,
     ) : PostgresAction, HasOldRecord
 
     /**
      * Represents a postgres select action
      */
-    @Serializable
     data class Select(
         override val record: JsonObject,
         override val columns: List<Column>,
-        @SerialName("commit_timestamp")
         override val commitTimestamp: Instant,
+        override val serializer: SupabaseSerializer,
     ) : PostgresAction, HasRecord
 
 }
 
 /**
  * Decodes [HasRecord.record] as [T] and returns it or returns null when it cannot be decoded as [T]
- * @param json the [Json] instance to use for decoding
  */
-inline fun <reified T> HasRecord.decodeRecordOrNull(json: Json = Json): T? {
+inline fun <reified T : Any> HasRecord.decodeRecordOrNull(): T? {
     return try {
-        json.decodeFromJsonElement<T>(record)
+        serializer.decode(record.toString())
     } catch (e: Exception) {
         null
     }
@@ -115,11 +108,10 @@ inline fun <reified T> HasRecord.decodeRecordOrNull(json: Json = Json): T? {
 
 /**
  * Decodes [HasOldRecord.oldRecord] as [T] and returns it or returns null when it cannot be decoded as [T]
- * @param json the [Json] instance to use for decoding
  */
-inline fun <reified T> HasOldRecord.decodeOldRecordOrNull(json: Json = Json): T? {
+inline fun <reified T : Any> HasOldRecord.decodeOldRecordOrNull(): T? {
     return try {
-        json.decodeFromJsonElement<T>(oldRecord)
+        serializer.decode(oldRecord.toString())
     } catch (e: Exception) {
         null
     }
@@ -127,12 +119,10 @@ inline fun <reified T> HasOldRecord.decodeOldRecordOrNull(json: Json = Json): T?
 
 /**
  * Decodes [HasRecord.record] as [T] and returns it
- * @param json the [Json] instance to use for decoding
  */
-inline fun <reified T> HasRecord.decodeRecord(json: Json = Json) = json.decodeFromJsonElement<T>(record)
+inline fun <reified T : Any> HasRecord.decodeRecord() = serializer.decode<T>(record.toString())
 
 /**
  * Decodes [HasOldRecord.oldRecord] as [T] and returns it
- * @param json the [Json] instance to use for decoding
  */
-inline fun <reified T> HasOldRecord.decodeOldRecord(json: Json = Json) = json.decodeFromJsonElement<T>(oldRecord)
+inline fun <reified T : Any> HasOldRecord.decodeOldRecord() = serializer.decode<T>(oldRecord.toString())
