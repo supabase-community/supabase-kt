@@ -1,7 +1,7 @@
 [versions]
 kotlin = "1.8.22"
 dokka = "1.8.20"
-ktor = "2.3.2-eap-692"
+ktor = "2.3.2"
 kotlinx-datetime = "0.4.0"
 kermit = "2.0.0-RC4"
 atomicfu = "0.21.0"
