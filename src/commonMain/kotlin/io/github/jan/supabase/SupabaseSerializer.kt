@@ -2,7 +2,6 @@ package io.github.jan.supabase
 
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
-import kotlinx.serialization.json.encodeToJsonElement
 import kotlin.reflect.KType
 import kotlin.reflect.typeOf
 
@@ -32,7 +31,7 @@ inline fun <reified T : Any> SupabaseSerializer.encode(value: T): String = encod
 /**
  * Encodes the given [value] to a [JsonElement]
  */
-inline fun <reified T : Any> SupabaseSerializer.encodeToJsonElement(value: T): JsonElement = Json.encodeToJsonElement(encode(value))
+inline fun <reified T : Any> SupabaseSerializer.encodeToJsonElement(value: T): JsonElement = Json.decodeFromString(encode(value))
 
 /**
  * Decodes the given [value] to an object of type [T]
