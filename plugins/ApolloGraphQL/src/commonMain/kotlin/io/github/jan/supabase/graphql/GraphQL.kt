@@ -4,14 +4,15 @@ import com.apollographql.apollo3.ApolloClient
 import com.apollographql.apollo3.api.http.HttpRequest
 import com.apollographql.apollo3.network.http.HttpInterceptor
 import com.apollographql.apollo3.network.http.HttpInterceptorChain
+import io.github.jan.supabase.BuildConfig
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.exceptions.RestException
 import io.github.jan.supabase.gotrue.GoTrue
 import io.github.jan.supabase.plugins.MainConfig
 import io.github.jan.supabase.plugins.MainPlugin
 import io.github.jan.supabase.plugins.SupabasePluginProvider
-import io.ktor.client.statement.HttpResponse
-import io.ktor.http.HttpHeaders
+import io.ktor.client.statement.*
+import io.ktor.http.*
 
 /**
  * Adds an apollo graphql client to supabase-kt with all necessary headers automatically managed.
@@ -73,6 +74,7 @@ internal class GraphQLImpl(override val config: GraphQL.Config, override val sup
     override val apolloClient = ApolloClient.Builder().apply {
         serverUrl(config.customUrl ?: resolveUrl())
         addHttpHeader("apikey", supabaseClient.supabaseKey)
+        addHttpHeader("X-Client-Info", "supabase-kt/${BuildConfig.PROJECT_VERSION}")
         addHttpInterceptor(ApolloHttpInterceptor())
         apply(config.apolloConfiguration)
     }.build()
