@@ -1,10 +1,10 @@
 package io.github.jan.supabase.common.di
 
 import io.github.jan.supabase.SupabaseClient
-import io.github.jan.supabase.annotiations.SupabaseExperimental
+import io.github.jan.supabase.annotations.SupabaseExperimental
 import io.github.jan.supabase.createSupabaseClient
 import io.github.jan.supabase.storage.Storage
-import io.github.jan.supabase.storage.resumable.ResumableCache
+import io.github.jan.supabase.storage.resumable.SettingsResumableCache
 import io.github.jan.supabase.storage.storage
 import org.koin.dsl.module
 
@@ -19,7 +19,7 @@ val supabaseModule = module {
         ) {
             install(Storage) {
                 resumable {
-                    cache = ResumableCache.Disk()
+                    cache = SettingsResumableCache()
                 }
             }
         }

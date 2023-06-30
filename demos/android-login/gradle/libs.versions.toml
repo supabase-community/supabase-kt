@@ -2,14 +2,14 @@
 kotlin = "1.8.20"
 agp = "8.0.0"
 compose = "1.4.0"
-supabase = "0.9.6-local-2"
-koin = "3.4.0"
-ktor = "2.3.0"
+supabase = "1.1.0"
+koin = "3.4.1"
+ktor = "2.3.2"
 
-androidx-core = "1.10.0"
+androidx-core = "1.10.1"
 androidx-compat = "1.6.1"
 androidx-lifecycle = "2.6.1"
-androidx-activity = "1.7.1"
+androidx-activity = "1.7.2"
 
 [plugins]
 kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }

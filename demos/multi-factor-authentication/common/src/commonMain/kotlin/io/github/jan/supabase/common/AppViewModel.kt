@@ -1,7 +1,7 @@
 package io.github.jan.supabase.common
 
-import io.github.aakira.napier.DebugAntilog
-import io.github.aakira.napier.Napier
+
+import co.touchlab.kermit.Logger
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.exceptions.RestException
 import io.github.jan.supabase.gotrue.gotrue
@@ -22,10 +22,6 @@ expect open class MPViewModel() {
 class AppViewModel(
     val supabaseClient: SupabaseClient
 ) : MPViewModel() {
-
-    init {
-        Logger.base(DebugAntilog())
-    }
 
     val sessionStatus = supabaseClient.gotrue.sessionStatus
     val loginAlert = MutableStateFlow<String?>(null)

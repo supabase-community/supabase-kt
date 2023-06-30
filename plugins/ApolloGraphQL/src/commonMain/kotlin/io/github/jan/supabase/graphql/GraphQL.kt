@@ -11,8 +11,8 @@ import io.github.jan.supabase.gotrue.GoTrue
 import io.github.jan.supabase.plugins.MainConfig
 import io.github.jan.supabase.plugins.MainPlugin
 import io.github.jan.supabase.plugins.SupabasePluginProvider
-import io.ktor.client.statement.*
-import io.ktor.http.*
+import io.ktor.client.statement.HttpResponse
+import io.ktor.http.HttpHeaders
 
 /**
  * Adds an apollo graphql client to supabase-kt with all necessary headers automatically managed.

@@ -4,8 +4,8 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.material3.MaterialTheme
-import io.github.aakira.napier.DebugAntilog
-import io.github.aakira.napier.Napier
+
+import co.touchlab.kermit.Logger
 import io.github.jan.supabase.common.App
 import io.github.jan.supabase.common.AppViewModel
 import io.github.jan.supabase.gotrue.handleDeeplinks

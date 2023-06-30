@@ -1,12 +1,13 @@
 package io.github.jan.supabase.common
 
-import io.github.aakira.napier.DebugAntilog
-import io.github.aakira.napier.Napier
+
+import co.touchlab.kermit.Logger
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.gotrue.gotrue
 import io.github.jan.supabase.gotrue.parseFragmentAndImportSession
 import io.github.jan.supabase.gotrue.providers.Google
 import io.github.jan.supabase.gotrue.providers.builtin.Email
+import io.github.jan.supabase.annotations.SupabaseInternal
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
@@ -22,10 +23,6 @@ expect open class MPViewModel() {
 class AppViewModel(
     val supabaseClient: SupabaseClient
 ) : MPViewModel() {
-
-    init {
-        Logger.base(DebugAntilog())
-    }
 
     val sessionStatus = supabaseClient.gotrue.sessionStatus
     val loginAlert = MutableStateFlow<String?>(null)
@@ -61,6 +58,7 @@ class AppViewModel(
         }
     }
 
+    @OptIn(SupabaseInternal::class)
     fun importSession(fragment: String) {
         coroutineScope.launch {
             kotlin.runCatching {

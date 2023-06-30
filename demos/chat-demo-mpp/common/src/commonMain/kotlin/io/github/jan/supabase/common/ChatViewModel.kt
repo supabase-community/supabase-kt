@@ -1,7 +1,7 @@
 package io.github.jan.supabase.common
 
-import io.github.aakira.napier.DebugAntilog
-import io.github.aakira.napier.Napier
+
+import co.touchlab.kermit.Logger
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.common.net.Message
 import io.github.jan.supabase.common.net.MessageApi
@@ -32,10 +32,6 @@ class ChatViewModel(
     private val realtimeChannel: RealtimeChannel,
     private val messageApi: MessageApi
 ) : MPViewModel() {
-
-    init {
-        Napier.base(DebugAntilog())
-    }
 
     val sessionStatus = supabaseClient.gotrue.sessionStatus
     val loginAlert = MutableStateFlow<String?>(null)
@@ -127,7 +123,7 @@ class ChatViewModel(
             kotlin.runCatching {
                 messageApi.createMessage(message)
             }.onFailure {
-                Napier.e(it) { "Error while creating message" }
+                Logger.e(it) { "Error while creating message" }
             }
         }
     }
@@ -137,7 +133,7 @@ class ChatViewModel(
             kotlin.runCatching {
                 messageApi.deleteMessage(id)
             }.onFailure {
-                Napier.e(it) { "Error while deleting message" }
+                Logger.e(it) { "Error while deleting message" }
             }
         }
     }
@@ -149,7 +145,7 @@ class ChatViewModel(
             }.onSuccess {
                 messages.value = it
             }.onFailure {
-                Napier.e(it) { "Error while retrieving messages" }
+                Logger.e(it) { "Error while retrieving messages" }
             }
         }
     }

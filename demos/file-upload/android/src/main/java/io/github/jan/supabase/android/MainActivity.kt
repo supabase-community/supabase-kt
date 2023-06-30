@@ -8,8 +8,8 @@ import androidx.compose.runtime.SideEffect
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.PermissionStatus
 import com.google.accompanist.permissions.rememberPermissionState
-import io.github.aakira.napier.DebugAntilog
-import io.github.aakira.napier.Napier
+
+import co.touchlab.kermit.Logger
 import io.github.jan.supabase.common.App
 import io.github.jan.supabase.common.UploadViewModel
 import org.koin.android.ext.android.inject
@@ -21,7 +21,6 @@ class MainActivity : ComponentActivity() {
     @OptIn(ExperimentalPermissionsApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        Napier.base(DebugAntilog())
         setContent {
             val permissions = rememberPermissionState(android.Manifest.permission.READ_EXTERNAL_STORAGE)
             when(permissions.status) {

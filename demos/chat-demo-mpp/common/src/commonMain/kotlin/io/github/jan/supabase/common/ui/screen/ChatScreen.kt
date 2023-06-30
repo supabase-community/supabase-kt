@@ -41,7 +41,7 @@ fun ChatScreen(viewModel: ChatViewModel, user: UserInfo) {
     val ownId = user.id
 
     LaunchedEffect(Unit) {
-        if(CurrentPlatformTarget in listOf(PlatformTarget.DESKTOP, PlatformTarget.WEB, PlatformTarget.ANDROID)) {
+        if(CurrentPlatformTarget in listOf(PlatformTarget.JVM, PlatformTarget.JS, PlatformTarget.ANDROID)) {
             viewModel.retrieveMessages()
             viewModel.connectToRealtime()
         }

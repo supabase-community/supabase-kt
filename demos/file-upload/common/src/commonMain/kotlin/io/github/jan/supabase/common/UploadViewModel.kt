@@ -1,13 +1,13 @@
 package io.github.jan.supabase.common
 
 import androidx.compose.ui.ExperimentalComposeUiApi
-import co.touchlab.stately.collections.IsoMutableMap
-import io.github.aakira.napier.DebugAntilog
-import io.github.aakira.napier.Napier
+import co.touchlab.kermit.Logger
+import io.github.jan.supabase.annotations.SupabaseInternal
 import io.github.jan.supabase.storage.UploadStatus
 import io.github.jan.supabase.storage.resumable.Fingerprint
 import io.github.jan.supabase.storage.resumable.ResumableClient
 import io.github.jan.supabase.storage.resumable.ResumableUpload
+import io.github.jan.supabase.collections.AtomicMutableMap
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -21,16 +21,13 @@ expect open class MPViewModel() {
 
 }
 
+@OptIn(SupabaseInternal::class)
 class UploadViewModel(
     private val resumableClient: ResumableClient,
 ) : MPViewModel() {
 
     val uploadItems = MutableStateFlow<List<UploadState>>(emptyList())
-    private val uploads = IsoMutableMap<Fingerprint, ResumableUpload>()
-
-    init {
-        Napier.base(DebugAntilog())
-    }
+    private val uploads = AtomicMutableMap<Fingerprint, ResumableUpload>()
 
     fun queueUpload(file: MPFile, path: String) {
         val fingerprint = Fingerprint(file.source, file.size)
