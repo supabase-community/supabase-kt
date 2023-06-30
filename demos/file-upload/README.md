@@ -1,6 +1,6 @@
 # File Upload Demo
 
-This is a demo of a file upload demo using Compose Multiplatform, Koin and supabase-kt.
+This is a demo of a file upload application using Compose Multiplatform, Koin and supabase-kt.
 
 **Available platforms:** Android, Desktop
 
