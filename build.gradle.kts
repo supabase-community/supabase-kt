@@ -24,9 +24,6 @@ allprojects {
             name = "ktor-eap"
         }
     }
-}
-
-allprojects {
     apply(plugin = "org.jetbrains.dokka")
     apply(plugin = "org.jetbrains.kotlin.plugin.serialization")
     apply(plugin = "kotlinx-atomicfu")
@@ -48,22 +45,22 @@ allprojects {
             url.set("https://github.com/supabase-community/supabase-kt/")
             licenses {
                 license {
-                    name.set("MIT License")
-                    url.set("https://mit-license.org/")
-                    distribution.set("https://mit-license.org/")
+                    name = "MIT License"
+                    url = "https://mit-license.org/"
+                    distribution = "https://mit-license.org/"
                 }
             }
             developers {
                 developer {
-                    id.set("TheRealJan")
-                    name.set("Jan Tennert")
-                    url.set("https://github.com/jan-tennert/")
+                    id = "TheRealJan"
+                    name = "Jan Tennert"
+                    url = "https://github.com/jan-tennert/"
                 }
             }
             scm {
-                url.set("https://github.com/supabase-community/supabase-kt/")
-                connection.set("scm:git:git://github.com/supabase-community/supabase-kt.git")
-                developerConnection.set("scm:git:ssh://git@github.com/supabase-community/supabase-kt.git")
+                url = "https://github.com/supabase-community/supabase-kt/"
+                connection = "scm:git:git://github.com/supabase-community/supabase-kt.git"
+                developerConnection = "scm:git:ssh://git@github.com/supabase-community/supabase-kt.git"
             }
         }
     }
@@ -111,21 +108,14 @@ configure(allprojects.filter { it.name != "bom" }) {
     tasks.withType<io.gitlab.arturbosch.detekt.Detekt>().configureEach {
         jvmTarget = "1.8"
         reports {
-            xml.required.set(true)
-            html.required.set(true)
-            txt.required.set(true)
-            sarif.required.set(true)
-            md.required.set(true)
+            xml.required = true
+            html.required = true
+            txt.required = true
+            sarif.required = true
+            md.required = true
         }
         basePath = rootDir.absolutePath
-        //finalizedBy(detektReportMergeSarif)
     }
-    /*detektReportMergeSarif {
-        input.from(tasks.withType<Detekt>().map { it.sarifReportFile })
-    }
-    tasks.withType<DetektCreateBaselineTask>().configureEach {
-        jvmTarget = "1.8"
-    }*/
     tasks.withType<org.jetbrains.dokka.gradle.DokkaTaskPartial>().configureEach {
         dokkaSourceSets.configureEach {
             sourceLink {
@@ -138,9 +128,9 @@ configure(allprojects.filter { it.name != "bom" }) {
                     "apollo-graphql" -> "plugins/ApolloGraphQL"
                     else -> ""
                 }
-                localDirectory.set(projectDir.resolve("src"))
-                remoteUrl.set(URL("https://github.com/supabase-community/supabase-kt/tree/master/$name/src"))
-                remoteLineSuffix.set("#L")
+                localDirectory = projectDir.resolve("src")
+                remoteUrl = URL("https://github.com/supabase-community/supabase-kt/tree/master/$name/src")
+                remoteLineSuffix = "#L"
             }
         }
     }
