@@ -1,5 +1,9 @@
 import java.net.URL
 
+val excludedModules = listOf("plugins", "serializers")
+
+fun allprojects(init: Project.() -> Unit) = configure(allprojects.filter { it.name !in excludedModules }, init)
+
 buildscript {
     dependencies {
         classpath(libs.kotlinx.atomicfu.plugin)
@@ -24,6 +28,8 @@ allprojects {
             name = "ktor-eap"
         }
     }
+}
+allprojects {
     apply(plugin = "org.jetbrains.dokka")
     apply(plugin = "org.jetbrains.kotlin.plugin.serialization")
     apply(plugin = "kotlinx-atomicfu")
@@ -67,7 +73,7 @@ allprojects {
 }
 
 tasks.register("detektAll") {
-    configure(allprojects.filter { it.name != "bom" }) {
+    configure(allprojects.filter { it.name != "bom" && it.name !in excludedModules }) {
         this@register.dependsOn(tasks.withType<io.gitlab.arturbosch.detekt.Detekt>())
     }
 }
@@ -96,7 +102,7 @@ val buildConfigGenerator by tasks.registering(Sync::class) {
     into(layout.buildDirectory.dir("generated-src/kotlin/"))
 }
 
-configure(allprojects.filter { it.name != "bom" }) {
+configure(allprojects.filter { it.name != "bom" && it.name !in excludedModules }) {
     apply(plugin = "io.gitlab.arturbosch.detekt")
 
     detekt {
