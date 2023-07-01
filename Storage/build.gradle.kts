@@ -21,7 +21,7 @@ kotlin {
             )
         }
     }
-    android {
+    androidTarget {
         publishLibraryVariants("release", "debug")
     }
     js(IR) {
