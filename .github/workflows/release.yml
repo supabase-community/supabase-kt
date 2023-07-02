@@ -33,7 +33,7 @@ jobs:
             ~/.gradle/caches
             ~/.gradle/wrapper
             ~/.konan
-          key: ${{ runner.os }}-gradle-v3-${{ hashFiles('gradle.properties', 'gradle/libs.versions.toml', 'gradle/wrapper/gradle-wrapper.properties') }}
+          key: ${{ runner.os }}-gradle-v3-${{ hashFiles('gradle.properties', 'gradle/libs.versions.toml', 'gradle/wrapper/gradle-wrapper.properties', 'yarn.lock') }}
           restore-keys: |
             ${{ runner.os }}-gradle-v3-
       - name: Publish
