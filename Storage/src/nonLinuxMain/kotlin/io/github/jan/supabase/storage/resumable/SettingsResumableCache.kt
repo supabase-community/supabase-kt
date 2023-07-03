@@ -4,6 +4,7 @@ import com.russhwolf.settings.ExperimentalSettingsApi
 import com.russhwolf.settings.Settings
 import com.russhwolf.settings.coroutines.toSuspendSettings
 import io.github.jan.supabase.annotations.SupabaseInternal
+import io.ktor.util.PlatformUtils.IS_NODE
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
@@ -51,4 +52,4 @@ class SettingsResumableCache(settings: Settings = Settings()) : ResumableCache {
 }
 
 @SupabaseInternal
-actual fun createDefaultResumableCache(): ResumableCache = SettingsResumableCache()
+actual fun createDefaultResumableCache(): ResumableCache = if(!IS_NODE) SettingsResumableCache() else MemoryResumableCache()

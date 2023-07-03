@@ -2,6 +2,7 @@ package io.github.jan.supabase.gotrue
 
 import io.github.jan.supabase.annotations.SupabaseInternal
 import io.github.jan.supabase.gotrue.user.UserSession
+import io.ktor.util.PlatformUtils.IS_BROWSER
 import kotlinx.browser.window
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -46,11 +47,13 @@ actual fun GoTrue.setupPlatform() {
         window.history.replaceState({}, window.document.title, newURL);
     }
 
-    window.onhashchange = {
-        checkForHash()
-    }
-    window.onload = {
-        checkForHash()
-        checkForPCKECode()
+    if(IS_BROWSER) {
+        window.onhashchange = {
+            checkForHash()
+        }
+        window.onload = {
+            checkForHash()
+            checkForPCKECode()
+        }
     }
 }
