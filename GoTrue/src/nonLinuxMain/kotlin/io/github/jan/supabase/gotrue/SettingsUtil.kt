@@ -2,6 +2,7 @@ package io.github.jan.supabase.gotrue
 
 import com.russhwolf.settings.Settings
 import io.github.jan.supabase.annotations.SupabaseInternal
+import io.ktor.util.PlatformUtils.IS_NODE
 
 
 @SupabaseInternal
@@ -12,7 +13,6 @@ fun createDefaultSettings() = try {
 }
 
 @SupabaseInternal
-actual fun GoTrue.createDefaultSessionManager(): SessionManager = SettingsSessionManager()
-
+actual fun GoTrue.createDefaultSessionManager(): SessionManager = if(!IS_NODE) SettingsSessionManager() else MemorySessionManager()
 @SupabaseInternal
-actual fun GoTrue.createDefaultCodeVerifierCache(): CodeVerifierCache = SettingsCodeVerifierCache()
+actual fun GoTrue.createDefaultCodeVerifierCache(): CodeVerifierCache = if(!IS_NODE) SettingsCodeVerifierCache() else MemoryCodeVerifierCache()
