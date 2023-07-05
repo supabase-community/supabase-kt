@@ -40,7 +40,12 @@ kotlin {
     iosSimulatorArm64()
     macosX64()
     macosArm64()
-//    linuxX64()
+    //watchos()
+    watchosArm32()
+    watchosArm64()
+    watchosSimulatorArm64()
+    tvos()
+    tvosSimulatorArm64()
     sourceSets {
         all {
             languageSettings.optIn("kotlin.RequiresOptIn")
