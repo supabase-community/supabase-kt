@@ -97,6 +97,12 @@ object Spotify : OAuthProvider() {
 
 }
 
+object Kakao : OAuthProvider() {
+
+    override val name = "kakao"
+
+}
+
 /**
  * Creates a new [OAuthProvider] with the given name
  */
