@@ -25,6 +25,7 @@ import io.github.jan.supabase.putJsonObject
 import io.github.jan.supabase.safeBody
 import io.github.jan.supabase.supabaseJson
 import io.ktor.client.call.body
+import io.ktor.client.request.parameter
 import io.ktor.client.statement.HttpResponse
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.HttpStatusCode
@@ -237,11 +238,17 @@ internal class GoTrueImpl(
         api.get("reauthenticate")
     }
 
-    override suspend fun logout() {
-        sessionManager.deleteSession()
-        sessionJob?.cancel()
-        _sessionStatus.value = SessionStatus.NotAuthenticated
-        sessionJob = null
+    override suspend fun logout(scope: LogoutScope) {
+        api.post("logout") {
+            parameter("scope", scope.name.lowercase())
+        }
+        if(scope != LogoutScope.OTHERS) {
+            codeVerifierCache.deleteCodeVerifier()
+            sessionManager.deleteSession()
+            sessionJob?.cancel()
+            _sessionStatus.value = SessionStatus.NotAuthenticated
+            sessionJob = null
+        }
     }
 
     private suspend fun verify(

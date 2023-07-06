@@ -15,7 +15,6 @@ import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.headersOf
 import kotlinx.datetime.Clock
-import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
@@ -40,8 +39,15 @@ class GoTrueMock {
             urlWithoutQuery.endsWith("verify") -> handleVerify(request)
             urlWithoutQuery.endsWith("otp") -> handleOtp(request)
             urlWithoutQuery.endsWith("recover") -> handleRecovery(request)
+            urlWithoutQuery.endsWith("logout") -> handleLogout(request)
             else -> null
         }
+    }
+
+    private suspend fun MockRequestHandleScope.handleLogout(request: HttpRequestData): HttpResponseData {
+        if(request.method != HttpMethod.Post) return respondBadRequest("Invalid method")
+        if(!request.headers.contains("Authorization")) return respondBadRequest("access token missing")
+        return respondOk()
     }
 
     private suspend fun MockRequestHandleScope.handleRecovery(request: HttpRequestData): HttpResponseData {
