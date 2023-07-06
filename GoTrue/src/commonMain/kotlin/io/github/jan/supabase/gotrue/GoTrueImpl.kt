@@ -94,11 +94,6 @@ internal class GoTrueImpl(
     override val pluginKey: String
         get() = GoTrue.key
 
-    @Deprecated("Use logout() instead", replaceWith = ReplaceWith("logout()"))
-    override suspend fun invalidateAllRefreshTokens() {
-        logout()
-    }
-
     override suspend fun <C, R, Provider : AuthProvider<C, R>> loginWith(
         provider: Provider,
         redirectUrl: String?,
@@ -307,14 +302,6 @@ internal class GoTrueImpl(
         return user
     }
 
-    @Deprecated("Use logout() instead", replaceWith = ReplaceWith("logout()"))
-    override suspend fun invalidateSession() {
-        sessionManager.deleteSession()
-        sessionJob?.cancel()
-        _sessionStatus.value = SessionStatus.NotAuthenticated
-        sessionJob = null
-    }
-
     override suspend fun exchangeCodeForSession(code: String, saveSession: Boolean): UserSession {
         val codeVerifier = codeVerifierCache.loadCodeVerifier()
         val session = api.postJson("token?grant_type=pkce", buildJsonObject {
@@ -350,21 +337,6 @@ internal class GoTrueImpl(
         )
         importSession(newSession)
     }
-
-    @Deprecated(
-        "Use retrieveUserForCurrentSession() instead",
-        replaceWith = ReplaceWith("retrieveUserForCurrentSession(true)")
-    )
-    override suspend fun updateCurrentUser() {
-        val session = currentSessionOrNull() ?: error("No session found")
-        val user = retrieveUser(session.accessToken)
-        _sessionStatus.value = SessionStatus.Authenticated(session.copy(user = user))
-        if (config.autoSaveToStorage) sessionManager.saveSession(session)
-    }
-
-    @Deprecated("Use importSession() instead", replaceWith = ReplaceWith("importSession(session)"))
-    override suspend fun startAutoRefresh(session: UserSession, autoRefresh: Boolean) =
-        importSession(session, autoRefresh)
 
     override suspend fun importSession(session: UserSession, autoRefresh: Boolean) {
         if (!autoRefresh) {
