@@ -257,11 +257,13 @@ sealed interface GoTrue : MainPlugin<GoTrueConfig>, CustomSerializationPlugin {
 
     /**
      * Logs out the current user, which means [sessionStatus] will be [SessionStatus.NotAuthenticated] and the access token will be revoked
+     * @param scope The scope of the logout.
      * @throws RestException or one of its subclasses if receiving an error response
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
+     * @see LogoutScope
      */
-    suspend fun logout()
+    suspend fun logout(scope: LogoutScope = LogoutScope.LOCAL)
 
     /**
      * Imports a user session and starts auto-refreshing if [autoRefresh] is true
