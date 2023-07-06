@@ -243,6 +243,7 @@ internal class GoTrueImpl(
             parameter("scope", scope.name.lowercase())
         }
         if(scope != LogoutScope.OTHERS) {
+            codeVerifierCache.deleteCodeVerifier()
             sessionManager.deleteSession()
             sessionJob?.cancel()
             _sessionStatus.value = SessionStatus.NotAuthenticated
