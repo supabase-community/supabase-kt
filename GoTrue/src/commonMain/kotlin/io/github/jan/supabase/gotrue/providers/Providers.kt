@@ -79,7 +79,7 @@ object Bitbucket : OAuthProvider() {
 
 }
 
-object Azure : OAuthProvider() {
+object Azure : IDTokenProvider() {
 
     override val name = "azure"
 
@@ -103,6 +103,12 @@ object Kakao : OAuthProvider() {
 
 }
 
+object Facebook : IDTokenProvider() {
+
+    override val name = "facebook"
+  
+}
+  
 object Figma : OAuthProvider() {
 
     override val name = "figma"
