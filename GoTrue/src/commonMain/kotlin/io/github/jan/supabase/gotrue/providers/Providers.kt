@@ -97,6 +97,18 @@ object Spotify : OAuthProvider() {
 
 }
 
+object Kakao : OAuthProvider() {
+
+    override val name = "kakao"
+
+}
+
+object Figma : OAuthProvider() {
+
+    override val name = "figma"
+
+}
+
 /**
  * Creates a new [OAuthProvider] with the given name
  */
