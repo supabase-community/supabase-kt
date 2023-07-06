@@ -103,6 +103,12 @@ object Kakao : OAuthProvider() {
 
 }
 
+object Figma : OAuthProvider() {
+
+    override val name = "figma"
+
+}
+
 /**
  * Creates a new [OAuthProvider] with the given name
  */
