@@ -22,7 +22,7 @@ kotlin {
             )
         }
     }
-    android {
+    androidTarget {
         publishLibraryVariants("release", "debug")
     }
     js(IR) {
@@ -43,7 +43,8 @@ kotlin {
     macosX64()
     macosArm64()
     linuxX64()
-    watchos()
+    watchosArm64()
+    watchosX64()
     watchosSimulatorArm64()
     tvos()
     tvosSimulatorArm64()
