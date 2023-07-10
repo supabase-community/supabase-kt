@@ -10,7 +10,7 @@ https://user-images.githubusercontent.com/26686035/235766941-6a62c415-e07e-4d18-
 
 # Configuration
 
-Then you need to specify your supabase url and key in [supabaseModule.kt](https://github.com/supabase-community/supabase-kt/blob/master/demos/chat-demo-mpp/common/src/commonMain/kotlin/io/github/jan/supabase/common/di/supabaseModule.kt)
+Then you need to specify your supabase url and key in [supabaseModule.kt](https://github.com/supabase-community/supabase-kt/blob/master/demos/android-login/common/src/commonMain/kotlin/io/github/jan/supabase/common/di/supabaseModule.kt)
 
 If you want the Native Google Sign In, create a OAuth-Client Id for a web application wit the redirect url `https://arnyfaeuskyqfxkvotgj.supabase.co/auth/v1/callback` and a OAuth-Client Id for a android app with the packageName `io.github.jan.supabase.android` and your SHA1 fingerprint (you can get the fingerprint via the gradle task `signingReport`)
 then also put in the `web` client id `supabaseModule.kt` (not the android one)
