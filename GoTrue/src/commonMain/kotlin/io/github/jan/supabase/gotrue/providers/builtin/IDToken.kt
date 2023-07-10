@@ -2,6 +2,8 @@ package io.github.jan.supabase.gotrue.providers.builtin
 
 import io.github.jan.supabase.exceptions.SupabaseEncodingException
 import io.github.jan.supabase.gotrue.providers.Apple
+import io.github.jan.supabase.gotrue.providers.Azure
+import io.github.jan.supabase.gotrue.providers.Facebook
 import io.github.jan.supabase.gotrue.providers.Google
 import io.github.jan.supabase.gotrue.providers.IDTokenProvider
 import io.github.jan.supabase.supabaseJson
@@ -16,9 +18,9 @@ import kotlinx.serialization.json.encodeToJsonElement
 import kotlinx.serialization.json.jsonObject
 
 /**
- * Authentication method with id token, client id, provider and optionally nonce.
+ * Allows signing in with an OIDC ID token. The authentication provider used should be enabled and configured.
  *
- * Only [Apple] and [Google] are supported as providers.
+ * Only [Apple], [Google], [Facebook] and [Azure] are supported as providers.
  *
  */
 object IDToken : DefaultAuthProvider<IDToken.Config, IDToken.Result> {
@@ -27,21 +29,21 @@ object IDToken : DefaultAuthProvider<IDToken.Config, IDToken.Result> {
 
     /**
      * The configuration for the id token authentication method
-     * @param idToken The id token received from the [provider]
-     * @param clientId The oauth client id of the app
-     * @param provider The provider of the id token. Only [Apple] and [Google] are supported
-     * @param nonce The nonce used to verify the id token
+     * @param idToken OIDC ID token issued by the specified provider. The `iss` claim in the ID token must match the supplied provider. Some ID tokens contain an `at_hash` which require that you provide an `access_token` value to be accepted properly. If the token contains a `nonce` claim you must supply the nonce used to obtain the ID token.
+     * @param provider The provider of the id token. Only [Apple], [Google], [Facebook] and [Azure] are supported
+     * @param accessToken If the ID token contains an `at_hash` claim, then the hash of this value is compared to the value in the ID token.
+     * @param nonce If the ID token contains a `nonce` claim, then the hash of this value is compared to the value in the ID token.
      */
     @Serializable
     data class Config(
         @SerialName("id_token") var idToken: String = "",
-        @SerialName("client_id") var clientId: String = "",
         var provider: IDTokenProvider? = null,
+        @SerialName("access_token") var accessToken: String? = null,
         var nonce: String? = null
     ) : DefaultAuthProvider.Config()
 
     /**
-     * The sign up result of the id token authentication method
+     * The sign-up result of the id token authentication method
      * @param id The id of the created user
      * @param confirmationSentAt The time the confirmation was sent
      * @param createdAt The time the user was created

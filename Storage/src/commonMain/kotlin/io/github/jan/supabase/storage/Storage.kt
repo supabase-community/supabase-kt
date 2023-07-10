@@ -80,15 +80,6 @@ sealed interface Storage : MainPlugin<Storage.Config> {
     suspend fun retrieveBucketById(bucketId: String): Bucket?
 
     /**
-     * Changes a bucket's public status to [public]
-     * @throws RestException or one of its subclasses if receiving an error response
-     * @throws HttpRequestTimeoutException if the request timed out
-     * @throws HttpRequestException on network related issues
-     */
-    @Deprecated("use updateBucket instead", ReplaceWith("updateBucket(bucketId) { \nthis@updateBucket.public = public\n }"))
-    suspend fun changePublicStatus(bucketId: String, public: Boolean)
-
-    /**
      * Empties a bucket by its [bucketId]
      * @throws RestException or one of its subclasses if receiving an error response
      * @throws HttpRequestTimeoutException if the request timed out
@@ -239,14 +230,6 @@ internal class StorageImpl(override val supabaseClient: SupabaseClient, override
             }
         }
         api.putJson("bucket/$id", body)
-    }
-
-    @Deprecated("use updateBucket instead", ReplaceWith("updateBucket(bucketId) { \nthis@updateBucket.public = public\n }"))
-    override suspend fun changePublicStatus(bucketId: String, public: Boolean) {
-        val body = buildJsonObject {
-            put("public", public)
-        }
-        api.putJson("bucket/$bucketId", body)
     }
 
     override suspend fun emptyBucket(bucketId: String) {

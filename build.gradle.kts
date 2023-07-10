@@ -154,7 +154,7 @@ kotlin {
             )
         }
     }
-    android {
+    androidTarget {
         publishLibraryVariants("release", "debug")
     }
     js(IR) {
@@ -163,7 +163,11 @@ kotlin {
                 enabled = false
             }
         }
-        
+        nodejs {
+            testTask {
+                enabled = false
+            }
+        }
     }
     ios()
     iosSimulatorArm64()
@@ -171,6 +175,11 @@ kotlin {
     macosX64()
     macosArm64()
     linuxX64()
+    watchosArm64()
+    watchosX64()
+    watchosSimulatorArm64()
+    tvos()
+    tvosSimulatorArm64()
     sourceSets {
         all {
             languageSettings.optIn("kotlin.RequiresOptIn")
