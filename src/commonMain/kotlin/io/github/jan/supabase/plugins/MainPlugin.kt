@@ -71,6 +71,9 @@ interface MainPlugin <Config : MainConfig> : SupabasePlugin {
      */
     suspend fun parseErrorResponse(response: HttpResponse): RestException
 
+    @SupabaseInternal
+    fun init() {}
+
 }
 
 /**

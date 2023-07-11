@@ -68,7 +68,18 @@ internal class GoTrueImpl(
 
     override val serializer = config.serializer ?: supabaseClient.defaultSerializer
 
-    init {
+    override val apiVersion: Int
+        get() = GoTrue.API_VERSION
+
+    override val pluginKey: String
+        get() = GoTrue.key
+
+    @Deprecated("Use logout() instead", replaceWith = ReplaceWith("logout()"))
+    override suspend fun invalidateAllRefreshTokens() {
+        logout()
+    }
+
+    override fun init() {
         setupPlatform()
         if (config.autoLoadFromStorage) {
             _sessionStatus.value = SessionStatus.LoadingFromStorage
@@ -86,17 +97,6 @@ internal class GoTrueImpl(
                 }
             }
         }
-    }
-
-    override val apiVersion: Int
-        get() = GoTrue.API_VERSION
-
-    override val pluginKey: String
-        get() = GoTrue.key
-
-    @Deprecated("Use logout() instead", replaceWith = ReplaceWith("logout()"))
-    override suspend fun invalidateAllRefreshTokens() {
-        logout()
     }
 
     override suspend fun <C, R, Provider : AuthProvider<C, R>> loginWith(

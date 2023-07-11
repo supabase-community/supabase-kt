@@ -3,6 +3,7 @@ package io.github.jan.supabase
 import co.touchlab.kermit.Logger
 import io.github.jan.supabase.annotations.SupabaseInternal
 import io.github.jan.supabase.network.KtorSupabaseHttpClient
+import io.github.jan.supabase.plugins.MainPlugin
 import io.github.jan.supabase.plugins.PluginManager
 import io.github.jan.supabase.plugins.SupabasePlugin
 import io.ktor.client.HttpClientConfig
@@ -88,6 +89,14 @@ internal class SupabaseClientImpl(
     override val pluginManager = PluginManager(plugins.toList().associate { (key, value) ->
         key to value(this)
     })
+
+    init {
+        pluginManager.installedPlugins.values.forEach {
+            if(it is MainPlugin<*>) {
+                it.init()
+            }
+        }
+    }
 
     override suspend fun close() {
         httpClient.close()
