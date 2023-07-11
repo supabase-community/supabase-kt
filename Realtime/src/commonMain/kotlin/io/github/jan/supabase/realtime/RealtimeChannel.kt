@@ -226,7 +226,7 @@ internal class RealtimeChannelImpl(
     override suspend fun updateAuth(jwt: String) {
         Logger.d { "Updating auth token for channel $topic" }
         realtimeImpl.ws?.sendSerialized(RealtimeMessage(topic, RealtimeChannel.CHANNEL_EVENT_ACCESS_TOKEN, buildJsonObject {
-            put("access_token", "test")
+            put("access_token", jwt)
         }, (++realtimeImpl.ref).toString()))
     }
 
