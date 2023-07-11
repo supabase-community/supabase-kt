@@ -3,7 +3,7 @@
 A Kotlin Multiplatform Client for Supabase.
 Supported targets:
 
-| **Module**                                                         | **GoTrue** | **Realtime** | **Postgrest** | **Storage** | **Functions** | **Apollo-GraphQL** |
+|                                                                    | **GoTrue** | **Realtime** | **Postgrest** | **Storage** | **Functions** | **Apollo-GraphQL** |
 |--------------------------------------------------------------------|------------|--------------|---------------|-------------|---------------|--------------------|
 | **JVM**                                                            | ✅          | ✅            | ✅             | ✅           | ✅             | ✅                  |
 | **Android**                                                        | ✅          | ✅            | ✅             | ✅           | ✅             | ✅                  |
