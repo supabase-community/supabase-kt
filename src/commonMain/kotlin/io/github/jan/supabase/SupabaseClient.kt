@@ -82,12 +82,12 @@ internal class SupabaseClientImpl(
 
  //   override val coroutineContext = Dispatchers.Default + SupervisorJob()
 
+    @OptIn(SupabaseInternal::class)
+    override val httpClient = KtorSupabaseHttpClient(supabaseKey, httpConfigOverrides, requestTimeout, httpEngine)
+
     override val pluginManager = PluginManager(plugins.toList().associate { (key, value) ->
         key to value(this)
     })
-
-    @OptIn(SupabaseInternal::class)
-    override val httpClient = KtorSupabaseHttpClient(supabaseKey, httpConfigOverrides, requestTimeout, httpEngine)
 
     override suspend fun close() {
         httpClient.close()

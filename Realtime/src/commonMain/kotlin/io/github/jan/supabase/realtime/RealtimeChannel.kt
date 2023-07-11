@@ -136,6 +136,9 @@ internal class RealtimeChannelImpl(
 
     @OptIn(SupabaseInternal::class)
     override suspend fun join(blockUntilJoined: Boolean) {
+        if(realtimeImpl.status.value != Realtime.Status.CONNECTED) {
+            error("Not connected to the realtime websocket. Try calling `supabaseClient.realtime.connect()` before attempting to join a channel.")
+        }
         realtimeImpl.run {
             addChannel(this@RealtimeChannelImpl)
         }
