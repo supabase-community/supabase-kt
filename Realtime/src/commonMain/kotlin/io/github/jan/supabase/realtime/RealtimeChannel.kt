@@ -18,6 +18,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.first
+import kotlinx.datetime.Clock
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.buildJsonObject
@@ -144,7 +145,9 @@ internal class RealtimeChannelImpl(
         }
         _status.value = RealtimeChannel.Status.JOINING
         Logger.d { "Joining channel $topic" }
-        val currentJwt = realtimeImpl.config.jwtToken ?: supabaseClient.pluginManager.getPluginOrNull(GoTrue)?.currentAccessTokenOrNull()
+        val currentJwt = realtimeImpl.config.jwtToken ?: supabaseClient.pluginManager.getPluginOrNull(GoTrue)?.currentSessionOrNull()?.let {
+            if(it.expiresAt > Clock.System.now()) it.accessToken else null
+        }
         val postgrestChanges = clientChanges.toList()
         val joinConfig = RealtimeJoinPayload(RealtimeJoinConfig(broadcastJoinConfig, presenceJoinConfig, postgrestChanges))
         val joinConfigObject = buildJsonObject {
@@ -167,6 +170,9 @@ internal class RealtimeChannelImpl(
             return
         }
         when(message.eventType) {
+            RealtimeMessage.EventType.TOKEN_EXPIRED -> {
+                Logger.w { "Received token expired event. This should not happen, please report this warning." }
+            }
             RealtimeMessage.EventType.SYSTEM -> {
                 Logger.d { "Joined channel ${message.topic}" }
                 _status.value = RealtimeChannel.Status.JOINED

@@ -44,6 +44,7 @@ import kotlinx.serialization.json.encodeToJsonElement
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.put
 import kotlinx.serialization.json.putJsonObject
+import kotlin.math.floor
 
 @PublishedApi
 internal class GoTrueImpl(
@@ -394,7 +395,9 @@ internal class GoTrueImpl(
             if (config.autoSaveToStorage) sessionManager.saveSession(session)
             sessionJob?.cancel()
             sessionJob = authScope.launch {
-                delay(session.expiresAt - Clock.System.now())
+                val expiresIn = session.expiresAt - Clock.System.now()
+                val delay = floor(expiresIn.inWholeMilliseconds * 4.0f / 5.0f).toLong() //always refresh 20% before expiry
+                delay(delay)
                 launch {
                     Logger.d {
                         "Session expired. Refreshing session..."
