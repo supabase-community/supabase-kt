@@ -24,11 +24,12 @@ data class RealtimeMessage(val topic: String, val event: String, val payload: Js
         event == RealtimeChannel.CHANNEL_EVENT_ERROR -> EventType.ERROR
         event == RealtimeChannel.CHANNEL_EVENT_PRESENCE_DIFF -> EventType.PRESENCE_DIFF
         event == RealtimeChannel.CHANNEL_EVENT_PRESENCE_STATE -> EventType.PRESENCE_STATE
+        event == RealtimeChannel.CHANNEL_EVENT_SYSTEM && payload["message"]?.jsonPrimitive?.content?.contains("access token has expired") ?: false -> EventType.TOKEN_EXPIRED
         else -> null
     }
 
     enum class EventType {
-        SYSTEM, POSTGRES_SERVER_CHANGES, POSTGRES_CHANGES, BROADCAST, CLOSE, ERROR, PRESENCE_DIFF, PRESENCE_STATE
+        SYSTEM, POSTGRES_SERVER_CHANGES, POSTGRES_CHANGES, BROADCAST, CLOSE, ERROR, PRESENCE_DIFF, PRESENCE_STATE, TOKEN_EXPIRED
     }
 
 }

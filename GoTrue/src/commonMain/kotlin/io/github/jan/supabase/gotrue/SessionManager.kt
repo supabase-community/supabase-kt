@@ -40,7 +40,7 @@ class MemorySessionManager(private val map: MutableMap<String, String> = AtomicM
     override suspend fun loadSession(): UserSession? {
         val session = map[SETTINGS_KEY] ?: return null
         return try {
-            supabaseJson.decodeFromString(session)
+            supabaseJson.decodeFromString<UserSession>(session)
         } catch(e: Exception) {
             Logger.e(e) { "Failed to load session" }
             null

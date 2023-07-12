@@ -24,5 +24,5 @@ data class UserSession(
     val user: UserInfo?,
     @SerialName("type")
     val type: String = "",
-    val expiresAt: Instant = Clock.System.now() + expiresIn.seconds,
+    val expiresAt: Instant = Clock.System.now() + (expiresIn.seconds),
 )

@@ -45,7 +45,7 @@ import kotlinx.serialization.json.encodeToJsonElement
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.put
 import kotlinx.serialization.json.putJsonObject
-import kotlin.time.Duration.Companion.seconds
+import kotlin.math.floor
 
 @PublishedApi
 internal class GoTrueImpl(
@@ -69,7 +69,13 @@ internal class GoTrueImpl(
 
     override val serializer = config.serializer ?: supabaseClient.defaultSerializer
 
-    init {
+    override val apiVersion: Int
+        get() = GoTrue.API_VERSION
+
+    override val pluginKey: String
+        get() = GoTrue.key
+
+    override fun init() {
         setupPlatform()
         if (config.autoLoadFromStorage) {
             _sessionStatus.value = SessionStatus.LoadingFromStorage
@@ -88,13 +94,6 @@ internal class GoTrueImpl(
             }
         }
     }
-
-    override val apiVersion: Int
-        get() = GoTrue.API_VERSION
-
-    override val pluginKey: String
-        get() = GoTrue.key
-
     override suspend fun <C, R, Provider : AuthProvider<C, R>> loginWith(
         provider: Provider,
         redirectUrl: String?,
@@ -374,7 +373,10 @@ internal class GoTrueImpl(
             if (config.autoSaveToStorage) sessionManager.saveSession(session)
             sessionJob?.cancel()
             sessionJob = authScope.launch {
-                delay(session.expiresIn.seconds.inWholeMilliseconds)
+                val expiresIn = session.expiresAt - Clock.System.now()
+                @Suppress("MagicNumber")
+                val delay = floor(expiresIn.inWholeMilliseconds * 4.0f / 5.0f).toLong() //always refresh 20% before expiry
+                delay(delay)
                 launch {
                     Logger.d {
                         "Session expired. Refreshing session..."
@@ -388,6 +390,8 @@ internal class GoTrueImpl(
                     } catch (e: Exception) {
                         Logger.e(e) { "Couldn't reach supabase. Either the address doesn't exist or the network might not be on. Retrying in ${config.retryDelay}" }
                         _sessionStatus.value = SessionStatus.NetworkError
+                        delay(config.retryDelay)
+                        importSession(session)
                     }
                 }
             }

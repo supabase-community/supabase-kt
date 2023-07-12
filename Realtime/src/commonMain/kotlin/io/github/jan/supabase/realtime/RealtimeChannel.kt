@@ -18,6 +18,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.first
+import kotlinx.datetime.Clock
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.buildJsonObject
@@ -144,12 +145,16 @@ internal class RealtimeChannelImpl(
         }
         _status.value = RealtimeChannel.Status.JOINING
         Logger.d { "Joining channel $topic" }
-        val currentJwt = realtimeImpl.config.jwtToken ?: supabaseClient.pluginManager.getPluginOrNull(GoTrue)?.currentAccessTokenOrNull() ?: supabaseClient.supabaseKey
+        val currentJwt = realtimeImpl.config.jwtToken ?: supabaseClient.pluginManager.getPluginOrNull(GoTrue)?.currentSessionOrNull()?.let {
+            if(it.expiresAt > Clock.System.now()) it.accessToken else null
+        }
         val postgrestChanges = clientChanges.toList()
         val joinConfig = RealtimeJoinPayload(RealtimeJoinConfig(broadcastJoinConfig, presenceJoinConfig, postgrestChanges))
         val joinConfigObject = buildJsonObject {
             putJsonObject(Json.encodeToJsonElement(joinConfig).jsonObject)
-            put("access_token", currentJwt)
+            currentJwt?.let {
+                put("access_token", currentJwt)
+            }
         }
         Logger.d { "Joining realtime socket with body $joinConfigObject" }
         realtimeImpl.ws?.sendSerialized(RealtimeMessage(topic, RealtimeChannel.CHANNEL_EVENT_JOIN, joinConfigObject, null))
@@ -165,6 +170,9 @@ internal class RealtimeChannelImpl(
             return
         }
         when(message.eventType) {
+            RealtimeMessage.EventType.TOKEN_EXPIRED -> {
+                Logger.w { "Received token expired event. This should not happen, please report this warning." }
+            }
             RealtimeMessage.EventType.SYSTEM -> {
                 Logger.d { "Joined channel ${message.topic}" }
                 _status.value = RealtimeChannel.Status.JOINED
@@ -224,7 +232,7 @@ internal class RealtimeChannelImpl(
     override suspend fun updateAuth(jwt: String) {
         Logger.d { "Updating auth token for channel $topic" }
         realtimeImpl.ws?.sendSerialized(RealtimeMessage(topic, RealtimeChannel.CHANNEL_EVENT_ACCESS_TOKEN, buildJsonObject {
-            put("access_token", "test")
+            put("access_token", jwt)
         }, (++realtimeImpl.ref).toString()))
     }
 
