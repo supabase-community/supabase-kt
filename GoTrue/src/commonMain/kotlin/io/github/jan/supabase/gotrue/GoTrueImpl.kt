@@ -412,6 +412,8 @@ internal class GoTrueImpl(
                     } catch (e: Exception) {
                         Logger.e(e) { "Couldn't reach supabase. Either the address doesn't exist or the network might not be on. Retrying in ${config.retryDelay}" }
                         _sessionStatus.value = SessionStatus.NetworkError
+                        delay(config.retryDelay)
+                        importSession(session)
                     }
                 }
             }
