@@ -396,6 +396,7 @@ internal class GoTrueImpl(
             sessionJob?.cancel()
             sessionJob = authScope.launch {
                 val expiresIn = session.expiresAt - Clock.System.now()
+                @Suppress("MagicNumber")
                 val delay = floor(expiresIn.inWholeMilliseconds * 4.0f / 5.0f).toLong() //always refresh 20% before expiry
                 delay(delay)
                 launch {
