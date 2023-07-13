@@ -15,7 +15,7 @@ import io.ktor.client.statement.HttpResponse
 import io.ktor.http.HttpHeaders
 
 /**
- * Adds an apollo graphql client to supabase-kt with all necessary headers automatically managed.
+ * Adds an Apollo GraphQL client to supabase-kt with all necessary headers automatically managed.
  *
  *
  * This plugin uses the default GraphQL endpoint for supabase projects and adds the `apikey` and `Authorization` headers automatically
@@ -23,7 +23,7 @@ import io.ktor.http.HttpHeaders
 sealed interface GraphQL: MainPlugin<GraphQL.Config> {
 
     /**
-     * The apollo client. Customizable via [Config.apolloConfiguration]
+     * The Apollo client. Customizable via [Config.apolloConfiguration]
      */
     val apolloClient: ApolloClient
 
@@ -88,11 +88,9 @@ internal class GraphQLImpl(override val config: GraphQL.Config, override val sup
             request: HttpRequest,
             chain: HttpInterceptorChain
         ): com.apollographql.apollo3.api.http.HttpResponse {
-            val accessToken = supabaseClient.pluginManager.getPluginOrNull(GoTrue)?.currentAccessTokenOrNull()
+            val accessToken = config.jwtToken ?: supabaseClient.pluginManager.getPluginOrNull(GoTrue)?.currentAccessTokenOrNull() ?: supabaseClient.supabaseKey
             val newRequest = request.newBuilder().apply {
-                accessToken?.let {
-                    addHeader(HttpHeaders.Authorization, "Bearer $it")
-                }
+                addHeader(HttpHeaders.Authorization, "Bearer $accessToken")
             }
             return chain.proceed(newRequest.build())
         }
