@@ -1,7 +1,6 @@
 package io.github.jan.supabase.graphql
 
 import com.apollographql.apollo3.ApolloClient
-import com.apollographql.apollo3.api.http.HttpRequest
 import com.apollographql.apollo3.network.http.HttpInterceptor
 import com.apollographql.apollo3.network.http.HttpInterceptorChain
 import io.github.jan.supabase.BuildConfig
@@ -13,6 +12,8 @@ import io.github.jan.supabase.plugins.MainPlugin
 import io.github.jan.supabase.plugins.SupabasePluginProvider
 import io.ktor.client.statement.HttpResponse
 import io.ktor.http.HttpHeaders
+import com.apollographql.apollo3.api.http.HttpRequest as ApolloHttpRequest
+import com.apollographql.apollo3.api.http.HttpResponse as ApolloHttpResponse
 
 /**
  * Adds an Apollo GraphQL client to supabase-kt with all necessary headers automatically managed.
@@ -80,14 +81,14 @@ internal class GraphQLImpl(override val config: GraphQL.Config, override val sup
     }.build()
 
     override suspend fun parseErrorResponse(response: HttpResponse): RestException {
-        throw UnsupportedOperationException("Use apolloClient for graphql requests")
+        throw UnsupportedOperationException("Use apolloClient for GraphQL requests")
     }
 
     inner class ApolloHttpInterceptor: HttpInterceptor {
         override suspend fun intercept(
-            request: HttpRequest,
+            request: ApolloHttpRequest,
             chain: HttpInterceptorChain
-        ): com.apollographql.apollo3.api.http.HttpResponse {
+        ): ApolloHttpResponse {
             val accessToken = config.jwtToken ?: supabaseClient.pluginManager.getPluginOrNull(GoTrue)?.currentAccessTokenOrNull() ?: supabaseClient.supabaseKey
             val newRequest = request.newBuilder().apply {
                 addHeader(HttpHeaders.Authorization, "Bearer $accessToken")
@@ -101,7 +102,7 @@ internal class GraphQLImpl(override val config: GraphQL.Config, override val sup
 }
 
 /**
- * With the [GraphQL] plugin installed, you can access a pre-made apollo client via this property
+ * With the [GraphQL] plugin installed, you can access a pre-made Apollo GraphQL client via this property
  */
 val SupabaseClient.graphql: GraphQL
     get() = pluginManager.getPlugin(GraphQL)
