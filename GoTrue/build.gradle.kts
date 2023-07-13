@@ -1,7 +1,7 @@
 plugins {
-    kotlin("multiplatform")
-    id("com.android.library")
     alias(libs.plugins.complete.kotlin)
+    alias(libs.plugins.kotlin.multiplatform)
+    alias(libs.plugins.android.library)
 }
 
 description = "Extends supabase-kt with a Auth Client"
