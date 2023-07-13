@@ -43,7 +43,7 @@ class SSO<Config: SSO.Config> private constructor(val config: Config): AuthProvi
     }
 
     /**
-     * The result of a SSO login
+     * The result of an SSO login
      * @param url The url to redirect to
      */
     @Serializable

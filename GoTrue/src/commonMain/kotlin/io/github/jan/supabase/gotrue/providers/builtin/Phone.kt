@@ -54,7 +54,7 @@ object Phone : DefaultAuthProvider<Phone.Config, Phone.Result> {
             override val descriptor = PrimitiveSerialDescriptor("Channel", PrimitiveKind.STRING)
 
             override fun deserialize(decoder: Decoder): Channel {
-                return Channel.values().first { it.value == decoder.decodeString() }
+                return entries.first { it.value == decoder.decodeString() }
             }
 
             override fun serialize(encoder: Encoder, value: Channel) {
