@@ -12,10 +12,6 @@ value class Columns @PublishedApi internal constructor(val value: String) {
 
     companion object {
 
-        init {
-            println("hello")
-        }
-
         /**
          * Select all columns
          */
