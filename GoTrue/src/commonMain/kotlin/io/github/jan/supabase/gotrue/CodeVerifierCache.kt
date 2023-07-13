@@ -1,6 +1,6 @@
 package io.github.jan.supabase.gotrue
 
-import io.github.jan.supabase.collections.AtomicMutableMap
+import kotlinx.atomicfu.AtomicRef
 import kotlinx.atomicfu.atomic
 
 /**
@@ -26,7 +26,7 @@ interface CodeVerifierCache {
 }
 
 /**
- * A [CodeVerifierCache] that uses the [AtomicMutableMap] API.
+ * A [CodeVerifierCache] that uses the [AtomicRef] API.
  */
 class MemoryCodeVerifierCache: CodeVerifierCache {
 

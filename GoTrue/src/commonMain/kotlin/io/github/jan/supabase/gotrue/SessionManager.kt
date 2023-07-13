@@ -1,7 +1,7 @@
 package io.github.jan.supabase.gotrue
 
-import io.github.jan.supabase.collections.AtomicMutableMap
 import io.github.jan.supabase.gotrue.user.UserSession
+import kotlinx.atomicfu.AtomicRef
 import kotlinx.atomicfu.atomic
 
 /**
@@ -27,11 +27,11 @@ interface SessionManager {
 }
 
 /**
- * A [SessionManager] that uses the [AtomicMutableMap] API.
+ * A [SessionManager] that uses the [AtomicRef] API.
  */
-class MemorySessionManager: SessionManager {
+class MemorySessionManager(session: UserSession? = null): SessionManager {
 
-    private var session by atomic<UserSession?>(null)
+    private var session by atomic(session)
 
     override suspend fun saveSession(session: UserSession) {
         this.session = session
