@@ -3,9 +3,10 @@ package io.github.jan.supabase.functions
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.annotations.SupabaseInternal
 import io.ktor.client.plugins.HttpRequestTimeoutException
+import io.ktor.client.request.HttpRequestBuilder
+import io.ktor.client.request.setBody
 import io.ktor.client.statement.HttpResponse
 import io.ktor.http.Headers
-import io.ktor.http.HeadersBuilder
 import io.ktor.http.HttpHeaders
 
 /**
@@ -24,31 +25,30 @@ class EdgeFunction @SupabaseInternal constructor(
      * Invokes the edge function
      * Note, if you want to serialize [body] to json, you need to add the [HttpHeaders.ContentType] header yourself.
      * @param body The body to send
-     * @param headerOverride Overrides [headers] and adds additional headers
+     * @param requestOverride Overrides the HTTP request
      * @throws RestException or one of its subclasses if receiving an error response
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
-    suspend inline operator fun <reified T : Any> invoke(body: T, headerOverride: HeadersBuilder.() -> Unit = {}): HttpResponse {
-        val headers = HeadersBuilder().apply {
-            appendAll(this@EdgeFunction.headers)
-            headerOverride()
+    suspend inline operator fun <reified T : Any> invoke(body: T, crossinline requestOverride: HttpRequestBuilder.() -> Unit = {}): HttpResponse {
+        return supabaseClient.functions.invoke(functionName) {
+            headers.appendAll(this@EdgeFunction.headers)
+            requestOverride()
+            setBody(body)
         }
-        return supabaseClient.functions.invoke(functionName, body, headers.build())
     }
 
     /**
      * Invokes the edge function
-     * @param headerOverride Overrides [headers] and adds additional headers
+     * @param requestOverride Overrides the HTTP request
      * @throws RestException or one of its subclasses if receiving an error response
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
-    suspend inline operator fun invoke(headerOverride: HeadersBuilder.() -> Unit = {}): HttpResponse {
-        val headers = HeadersBuilder().apply {
-            appendAll(this@EdgeFunction.headers)
-            headerOverride()
+    suspend inline operator fun invoke(crossinline requestOverride: HttpRequestBuilder.() -> Unit = {}): HttpResponse {
+        return supabaseClient.functions.invoke(functionName) {
+            headers.appendAll(this@EdgeFunction.headers)
+            requestOverride()
         }
-        return supabaseClient.functions.invoke(function = functionName, headers = headers.build())
     }
 }
