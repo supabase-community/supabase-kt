@@ -217,15 +217,6 @@ sealed interface GoTrue : MainPlugin<GoTrueConfig>, CustomSerializationPlugin {
     suspend fun reauthenticate()
 
     /**
-     * Revokes all refresh tokens for the user, and invalidates the session
-     * @throws RestException or one of its subclasses if receiving an error response
-     * @throws HttpRequestTimeoutException if the request timed out
-     * @throws HttpRequestException on network related issues
-     */
-    @Deprecated("Use logout() instead", ReplaceWith("logout()"))
-    suspend fun invalidateAllRefreshTokens()
-
-    /**
      * Verifies a email otp
      * @param type The type of the verification
      * @param email The email to verify
@@ -265,21 +256,14 @@ sealed interface GoTrue : MainPlugin<GoTrueConfig>, CustomSerializationPlugin {
     suspend fun retrieveUserForCurrentSession(updateSession: Boolean = false): UserInfo
 
     /**
-     * Invalidates the current session, which means [sessionStatus] will be [SessionStatus.NotAuthenticated]
-     * @throws RestException or one of its subclasses if receiving an error response
-     * @throws HttpRequestTimeoutException if the request timed out
-     * @throws HttpRequestException on network related issues
-     */
-    @Deprecated("Use logout() instead", ReplaceWith("logout()"))
-    suspend fun invalidateSession()
-
-    /**
      * Logs out the current user, which means [sessionStatus] will be [SessionStatus.NotAuthenticated] and the access token will be revoked
+     * @param scope The scope of the logout.
      * @throws RestException or one of its subclasses if receiving an error response
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
+     * @see LogoutScope
      */
-    suspend fun logout()
+    suspend fun logout(scope: LogoutScope = LogoutScope.LOCAL)
 
     /**
      * Imports a user session and starts auto-refreshing if [autoRefresh] is true
@@ -319,24 +303,11 @@ sealed interface GoTrue : MainPlugin<GoTrueConfig>, CustomSerializationPlugin {
     suspend fun refreshCurrentSession()
 
     /**
-     * Updates the current user with the current access token
-     */
-    @Deprecated("Use retrieveUserForCurrentSession() instead", ReplaceWith("retrieveUserForCurrentSession(true)"))
-    suspend fun updateCurrentUser()
-
-    /**
      * Exchanges a code for a session. Used when using the [FlowType.PKCE] flow
      * @param code The code to exchange
      * @param saveSession Whether to save the session in storage
      */
     suspend fun exchangeCodeForSession(code: String, saveSession: Boolean = true): UserSession
-
-    /**
-     * Starts auto-refreshing [session] for [currentSession]
-     * @param session The session to auto-refresh
-     */
-    @Deprecated("Use importSession() instead", ReplaceWith("importSession(session)"))
-    suspend fun startAutoRefresh(session: UserSession, autoRefresh: Boolean = config.alwaysAutoRefresh)
 
     /**
      * Starts auto refreshing the current session

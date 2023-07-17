@@ -21,7 +21,7 @@ fun interface PropertyConversionMethod {
          */
         val SERIAL_NAME = PropertyConversionMethod { getSerialName(it) }
             get() {
-                if(CurrentPlatformTarget !in listOf(PlatformTarget.JVM, PlatformTarget.ANDROID)) error("SerialName PropertyConversionMethod is only available on the JVM and Desktop. Use CAMEL_CASE_TO_SNAKE_CASE instead.")
+                if(CurrentPlatformTarget !in listOf(PlatformTarget.JVM, PlatformTarget.ANDROID)) error("SerialName PropertyConversionMethod is only available on the JVM and ANDROID due to limited reflection on other targets. Use CAMEL_CASE_TO_SNAKE_CASE instead.")
                 return field
             }
 
