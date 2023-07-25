@@ -18,6 +18,7 @@ korlibs = "4.0.9"
 detekt = "1.23.0"
 moshi = "1.15.0"
 jackson = "2.15.2"
+compose = "1.5.0-dev1114"
 
 [plugins]
 kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
@@ -27,6 +28,7 @@ complete-kotlin = { id = "com.louiscad.complete-kotlin", version.ref = "complete
 android-library = { id = "com.android.library", version.ref = "agp" }
 maven-publish = { id = "com.vanniktech.maven.publish", version.ref = "maven-publish" }
 detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
+compose = { id = "org.jetbrains.compose", version.ref = "compose" }
 
 [libraries]
 kotlinx-atomicfu-plugin = { module = "org.jetbrains.kotlinx:atomicfu-gradle-plugin", version.ref = "atomicfu" }

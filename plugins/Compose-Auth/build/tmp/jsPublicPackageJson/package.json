@@ -1,0 +1,17 @@
+{
+  "name": "supabase-kt-plugins-apollo-graphql",
+  "version": "1.2.0-alpha-2",
+  "main": "supabase-kt-plugins-apollo-graphql.js",
+  "types": "supabase-kt-plugins-apollo-graphql.d.ts",
+  "devDependencies": {},
+  "dependencies": {
+    "node-fetch": "2.6.7",
+    "abort-controller": "3.0.0",
+    "ws": "8.5.0",
+    "format-util": "^1.0.5",
+    "@js-joda/core": "3.2.0"
+  },
+  "peerDependencies": {},
+  "optionalDependencies": {},
+  "bundledDependencies": []
+}
