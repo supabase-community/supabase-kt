@@ -1,5 +1,6 @@
 package io.github.jan.supabase.postgrest.query
 
+import io.github.jan.supabase.postgrest.classPropertyNames
 import kotlin.jvm.JvmInline
 
 /**
@@ -38,7 +39,7 @@ value class Columns @PublishedApi internal constructor(val value: String) {
          * Select all columns of type [T]'s class properties. Example: If you specify a class 'User' with the fields 'id' and 'name', this will select 'id,name'
          * @param T The type of the columns to select
          */
-        inline fun <reified T> type() = Columns(T::class.simpleName!!)
+        inline fun <reified T> type() = list(classPropertyNames<T>())
 
     }
 

@@ -1,7 +1,6 @@
 package io.github.jan.supabase.graphql
 
 import com.apollographql.apollo3.ApolloClient
-import com.apollographql.apollo3.api.http.HttpRequest
 import com.apollographql.apollo3.network.http.HttpInterceptor
 import com.apollographql.apollo3.network.http.HttpInterceptorChain
 import io.github.jan.supabase.BuildConfig
@@ -13,9 +12,11 @@ import io.github.jan.supabase.plugins.MainPlugin
 import io.github.jan.supabase.plugins.SupabasePluginProvider
 import io.ktor.client.statement.HttpResponse
 import io.ktor.http.HttpHeaders
+import com.apollographql.apollo3.api.http.HttpRequest as ApolloHttpRequest
+import com.apollographql.apollo3.api.http.HttpResponse as ApolloHttpResponse
 
 /**
- * Adds an apollo graphql client to supabase-kt with all necessary headers automatically managed.
+ * Adds an Apollo GraphQL client to supabase-kt with all necessary headers automatically managed.
  *
  *
  * This plugin uses the default GraphQL endpoint for supabase projects and adds the `apikey` and `Authorization` headers automatically
@@ -23,7 +24,7 @@ import io.ktor.http.HttpHeaders
 sealed interface GraphQL: MainPlugin<GraphQL.Config> {
 
     /**
-     * The apollo client. Customizable via [Config.apolloConfiguration]
+     * The Apollo client. Customizable via [Config.apolloConfiguration]
      */
     val apolloClient: ApolloClient
 
@@ -80,19 +81,17 @@ internal class GraphQLImpl(override val config: GraphQL.Config, override val sup
     }.build()
 
     override suspend fun parseErrorResponse(response: HttpResponse): RestException {
-        throw UnsupportedOperationException("Use apolloClient for graphql requests")
+        throw UnsupportedOperationException("Use apolloClient for GraphQL requests")
     }
 
     inner class ApolloHttpInterceptor: HttpInterceptor {
         override suspend fun intercept(
-            request: HttpRequest,
+            request: ApolloHttpRequest,
             chain: HttpInterceptorChain
-        ): com.apollographql.apollo3.api.http.HttpResponse {
-            val accessToken = supabaseClient.pluginManager.getPluginOrNull(GoTrue)?.currentAccessTokenOrNull()
+        ): ApolloHttpResponse {
+            val accessToken = config.jwtToken ?: supabaseClient.pluginManager.getPluginOrNull(GoTrue)?.currentAccessTokenOrNull() ?: supabaseClient.supabaseKey
             val newRequest = request.newBuilder().apply {
-                accessToken?.let {
-                    addHeader(HttpHeaders.Authorization, "Bearer $it")
-                }
+                addHeader(HttpHeaders.Authorization, "Bearer $accessToken")
             }
             return chain.proceed(newRequest.build())
         }
@@ -103,7 +102,7 @@ internal class GraphQLImpl(override val config: GraphQL.Config, override val sup
 }
 
 /**
- * With the [GraphQL] plugin installed, you can access a pre-made apollo client via this property
+ * With the [GraphQL] plugin installed, you can access a pre-made Apollo GraphQL client via this property
  */
 val SupabaseClient.graphql: GraphQL
     get() = pluginManager.getPlugin(GraphQL)

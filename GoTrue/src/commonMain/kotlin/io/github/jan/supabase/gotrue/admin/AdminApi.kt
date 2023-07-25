@@ -3,12 +3,14 @@ package io.github.jan.supabase.gotrue.admin
 import io.github.jan.supabase.annotations.SupabaseInternal
 import io.github.jan.supabase.gotrue.GoTrue
 import io.github.jan.supabase.gotrue.GoTrueImpl
+import io.github.jan.supabase.gotrue.LogoutScope
 import io.github.jan.supabase.gotrue.user.UserInfo
 import io.github.jan.supabase.gotrue.user.UserMfaFactor
 import io.github.jan.supabase.putJsonObject
 import io.github.jan.supabase.safeBody
 import io.github.jan.supabase.supabaseJson
 import io.ktor.client.call.body
+import io.ktor.client.request.parameter
 import io.ktor.http.HttpHeaders
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
@@ -37,8 +39,10 @@ sealed interface AdminApi {
 
     /**
      * Removes a user session
+     * @param jwt the jwt of the session
+     * @param scope the scope of the logout action
      */
-    suspend fun logout(jwt: String)
+    suspend fun logout(jwt: String, scope: LogoutScope = LogoutScope.LOCAL)
 
     /**
      * Retrieves all users
@@ -92,8 +96,9 @@ internal class AdminApiImpl(val gotrue: GoTrue) : AdminApi {
 
     val api = (gotrue as GoTrueImpl).api
 
-    override suspend fun logout(jwt: String) {
+    override suspend fun logout(jwt: String, scope: LogoutScope) {
         api.post("logout") {
+            parameter("scope", scope.name.lowercase())
             headers[HttpHeaders.Authorization] = "Bearer $jwt"
         }
     }

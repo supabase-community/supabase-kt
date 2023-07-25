@@ -1,10 +1,8 @@
 package io.github.jan.supabase.gotrue
 
-import co.touchlab.kermit.Logger
-import io.github.jan.supabase.collections.AtomicMutableMap
 import io.github.jan.supabase.gotrue.user.UserSession
-import io.github.jan.supabase.supabaseJson
-import kotlinx.serialization.encodeToString
+import kotlinx.atomicfu.AtomicRef
+import kotlinx.atomicfu.atomic
 
 /**
  * Represents the session manager. Used for saving and restoring the session from storage
@@ -29,35 +27,22 @@ interface SessionManager {
 }
 
 /**
- * A [SessionManager] that uses the [AtomicMutableMap] API.
+ * A [SessionManager] that uses the [AtomicRef] API.
  */
-class MemorySessionManager(private val map: MutableMap<String, String> = AtomicMutableMap()): SessionManager {
+class MemorySessionManager(session: UserSession? = null): SessionManager {
+
+    private var session by atomic(session)
 
     override suspend fun saveSession(session: UserSession) {
-        map[SETTINGS_KEY] = supabaseJson.encodeToString(session)
+        this.session = session
     }
 
     override suspend fun loadSession(): UserSession? {
-        val session = map[SETTINGS_KEY] ?: return null
-        return try {
-            supabaseJson.decodeFromString<UserSession>(session)
-        } catch(e: Exception) {
-            Logger.e(e) { "Failed to load session" }
-            null
-        }
+        return session
     }
 
     override suspend fun deleteSession() {
-        map.remove(SETTINGS_KEY)
-    }
-
-    companion object {
-
-        /**
-         * The key used for saving the session
-         */
-        const val SETTINGS_KEY = "session"
-
+        session = null
     }
 
 }
