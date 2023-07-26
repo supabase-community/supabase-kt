@@ -31,6 +31,10 @@ Supported targets:
 
 [Documentation](https://supabase.com/docs/reference/kotlin/introduction)
 
+[Quickstart](https://supabase.com/docs/guides/getting-started/quickstarts/kotlin)
+
+[Tutorial: Build a Product Management Android App with Jetpack Compose](https://supabase.com/docs/guides/getting-started/tutorials/with-kotlin)
+
 [Dokka documentation for the latest version](https://supabase-community.github.io/supabase-kt/)
 
 [Troubleshooting](https://github.com/supabase-community/supabase-kt/wiki/Troubleshooting)
