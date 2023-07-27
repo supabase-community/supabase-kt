@@ -8,8 +8,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 import com.google.android.gms.auth.api.identity.BeginSignInRequest
 import com.google.android.gms.auth.api.identity.Identity
+import io.github.jan.supabase.createSupabaseClient
 import io.github.temk0.supabase.authui.AuthUI
 import io.github.temk0.supabase.authui.AuthUIImpl
+import io.github.temk0.supabase.authui.GoogleLoginConfig
+import io.github.temk0.supabase.authui.googleNativeLogin
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -19,17 +22,19 @@ import kotlinx.coroutines.tasks.await
 actual fun AuthUI.loginWithGoogle(): () -> Unit {
     this as AuthUIImpl
 
+    val config = config.loginConfig as GoogleLoginConfig?
+
     val scope = CoroutineScope(Dispatchers.IO)
 
     val tokenIdRequestOptions = BeginSignInRequest.GoogleIdTokenRequestOptions.builder()
-    config.idTokenRequest?.let { options ->
+    config?.let { options ->
         tokenIdRequestOptions
-            .setServerClientId(options.serverCliendId)
+            .setServerClientId(options.serverClientId)
             .setSupported(options.isSupported)
             .setFilterByAuthorizedAccounts(options.filterByAuthorizedAccounts)
             .setNonce(options.nonce)
     }
-    config.idTokenRequest?.associateLinkedAccounts?.let {
+    config?.associateLinkedAccounts?.let {
         tokenIdRequestOptions.associateLinkedAccounts(it.first, it.second)
     }
 
