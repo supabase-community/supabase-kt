@@ -7,18 +7,16 @@ import io.github.jan.supabase.gotrue.providers.Google
 import io.github.jan.supabase.gotrue.providers.builtin.IDToken
 import io.github.jan.supabase.plugins.MainConfig
 import io.github.jan.supabase.plugins.MainPlugin
+import io.github.jan.supabase.plugins.SupabasePlugin
 import io.github.jan.supabase.plugins.SupabasePluginProvider
 import io.ktor.client.statement.HttpResponse
 
 
-
-sealed interface AuthUI : MainPlugin<AuthUI.Config> {
+sealed interface AuthUI : SupabasePlugin {
 
     data class Config(
-        override var customUrl: String? = null,
-        override var jwtToken: String? = null,
         var idTokenRequest: GoogleIDTokenRequest? = null
-    ) : MainConfig {
+    ) : SupabasePlugin {
 
         data class GoogleIDTokenRequest(
             val isSupported: Boolean = true,
@@ -48,17 +46,13 @@ sealed interface AuthUI : MainPlugin<AuthUI.Config> {
 }
 
 class AuthUIImpl(
-    override val config: AuthUI.Config,
-    override val supabaseClient: SupabaseClient,
+    val config: AuthUI.Config,
+    val supabaseClient: SupabaseClient,
 ) : AuthUI {
 
-    override val apiVersion = AuthUI.API_VERSION
+    val apiVersion = AuthUI.API_VERSION
 
-    override val pluginKey = AuthUI.key
-
-    override suspend fun parseErrorResponse(response: HttpResponse): RestException {
-        return supabaseClient.gotrue.parseErrorResponse(response)
-    }
+    val pluginKey = AuthUI.key
 
     override suspend fun loginWithGoogle(idToken: String) {
         supabaseClient.gotrue.loginWith(IDToken) {
