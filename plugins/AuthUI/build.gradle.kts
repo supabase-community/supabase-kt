@@ -14,6 +14,7 @@ repositories {
 @OptIn(org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi::class)
 kotlin {
     targetHierarchy.default()
+    jvmToolchain(8)
     androidTarget {
         publishLibraryVariants("release", "debug")
     }
