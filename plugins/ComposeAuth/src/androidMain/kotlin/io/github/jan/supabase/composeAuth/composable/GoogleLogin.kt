@@ -1,4 +1,4 @@
-package io.github.temk0.supabase.authui.ui
+package io.github.jan.supabase.composeAuth.composable
 
 import android.app.Activity
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -11,31 +11,25 @@ import androidx.compose.ui.platform.LocalContext
 import com.google.android.gms.auth.api.identity.Identity
 import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.common.api.CommonStatusCodes
-import io.github.temk0.supabase.authui.AuthUI
-import io.github.temk0.supabase.authui.AuthUIImpl
-import io.github.temk0.supabase.authui.GoogleLoginConfig
-import io.github.temk0.supabase.authui.getSignInRequest
+import io.github.jan.supabase.composeAuth.ComposeAuth
+import io.github.jan.supabase.composeAuth.ComposeAuthImpl
+import io.github.jan.supabase.composeAuth.GoogleLoginConfig
+import io.github.jan.supabase.composeAuth.getSignInRequest
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 
+
 @Composable
-actual fun AuthUI.rememberLoginWithGoogle(
+actual fun ComposeAuth.rememberLoginWithGoogle(
     onResult: (NativeSignInResult) -> Unit,
     fallback: () -> Unit
 ): NativeSignInState {
-    this as AuthUIImpl
+    this as ComposeAuthImpl
 
     val state = remember { NativeSignInState() }
     val context = LocalContext.current
-
-    // init signInRequest options
-    if (config.loginConfig == null || config.loginConfig !is GoogleLoginConfig) {
-        fallback.invoke()
-        state.reset()
-        return state
-    }
 
     val request = rememberLauncherForActivityResult(
         ActivityResultContracts.StartIntentSenderForResult()
@@ -59,7 +53,15 @@ actual fun AuthUI.rememberLoginWithGoogle(
     }
 
     LaunchedEffect(key1 = state.started) {
+        // init signInRequest options
         if (state.started) {
+
+            if (config.loginConfig == null || config.loginConfig !is GoogleLoginConfig) {
+                fallback.invoke()
+                state.reset()
+                return@LaunchedEffect
+            }
+
             val config = config.loginConfig as GoogleLoginConfig?
             val signInRequest = getSignInRequest(config)
             val oneTapResult = Identity.getSignInClient(context).beginSignIn(signInRequest).await()
