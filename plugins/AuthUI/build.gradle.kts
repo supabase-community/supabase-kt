@@ -29,6 +29,7 @@ kotlin {
                 api(project(":"))
                 api(project(":gotrue-kt"))
                 implementation(compose.ui)
+                implementation(compose.runtime)
             }
         }
         val androidMain by getting {

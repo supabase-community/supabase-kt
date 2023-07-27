@@ -5,63 +5,70 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
-import com.google.android.gms.auth.api.identity.BeginSignInRequest
 import com.google.android.gms.auth.api.identity.Identity
-import io.github.jan.supabase.createSupabaseClient
+import com.google.android.gms.common.api.ApiException
+import com.google.android.gms.common.api.CommonStatusCodes
 import io.github.temk0.supabase.authui.AuthUI
 import io.github.temk0.supabase.authui.AuthUIImpl
 import io.github.temk0.supabase.authui.GoogleLoginConfig
-import io.github.temk0.supabase.authui.googleNativeLogin
+import io.github.temk0.supabase.authui.getSignInRequest
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 
 @Composable
-actual fun AuthUI.loginWithGoogle(): () -> Unit {
+actual fun AuthUI.rememberLoginWithGoogle(
+    onResult: (NativeSignInResult) -> Unit,
+    fallback: () -> Unit
+): NativeSignInState {
     this as AuthUIImpl
 
+    val state = remember { NativeSignInState() }
+
+    // init signInRequest options
+    if (config.loginConfig == null || config.loginConfig !is GoogleLoginConfig) {
+        fallback.invoke()
+        state.reset()
+        return state
+    }
+
     val config = config.loginConfig as GoogleLoginConfig?
-
-    val scope = CoroutineScope(Dispatchers.IO)
-
-    val tokenIdRequestOptions = BeginSignInRequest.GoogleIdTokenRequestOptions.builder()
-    config?.let { options ->
-        tokenIdRequestOptions
-            .setServerClientId(options.serverClientId)
-            .setSupported(options.isSupported)
-            .setFilterByAuthorizedAccounts(options.filterByAuthorizedAccounts)
-            .setNonce(options.nonce)
-    }
-    config?.associateLinkedAccounts?.let {
-        tokenIdRequestOptions.associateLinkedAccounts(it.first, it.second)
-    }
-
-    val signInRequest = BeginSignInRequest.builder()
-        .setGoogleIdTokenRequestOptions(tokenIdRequestOptions.build())
-        .build()
-
+    val signInRequest = getSignInRequest(config)
     val oneTabClient = Identity.getSignInClient(LocalContext.current)
-
 
     val request = rememberLauncherForActivityResult(
         ActivityResultContracts.StartIntentSenderForResult()
     ) { result ->
-        if (result.resultCode == Activity.RESULT_OK && result.data != null) {
-            scope.launch {
-                val credential = oneTabClient.getSignInCredentialFromIntent(result.data)
-                loginWithGoogle(credential.googleIdToken ?: "")
+        CoroutineScope(Dispatchers.IO).launch {
+            if (result.resultCode == Activity.RESULT_OK && result.data != null) {
+                try {
+                    val credential = oneTabClient.getSignInCredentialFromIntent(result.data)
+                    loginWithGoogle(credential.googleIdToken ?: "")
+                    onResult.invoke(NativeSignInResult.Success)
+                } catch (apiE: ApiException) {
+                    when (apiE.statusCode) {
+                        CommonStatusCodes.CANCELED -> onResult.invoke(NativeSignInResult.ClosedByUser)
+                        CommonStatusCodes.NETWORK_ERROR -> onResult.invoke(NativeSignInResult.NetworkError(apiE.localizedMessage ?: "error"))
+                        else -> onResult.invoke(NativeSignInResult.Error(apiE.localizedMessage ?: "error"))
+                    }
+                } catch (e: Exception) { onResult.invoke(NativeSignInResult.Error(e.localizedMessage ?: "error")) }
             }
+            state.reset()
         }
     }
 
-    return {
-        scope.launch {
+    LaunchedEffect(key1 = state.started) {
+        if (state.started) {
             val oneTapResult = oneTabClient.beginSignIn(signInRequest).await()
             request.launch(
                 IntentSenderRequest.Builder(oneTapResult.pendingIntent.intentSender).build()
             )
         }
     }
+
+    return state
 }
