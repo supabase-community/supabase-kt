@@ -28,6 +28,7 @@ actual fun AuthUI.rememberLoginWithGoogle(
     this as AuthUIImpl
 
     val state = remember { NativeSignInState() }
+    val context = LocalContext.current
 
     // init signInRequest options
     if (config.loginConfig == null || config.loginConfig !is GoogleLoginConfig) {
@@ -36,17 +37,13 @@ actual fun AuthUI.rememberLoginWithGoogle(
         return state
     }
 
-    val config = config.loginConfig as GoogleLoginConfig?
-    val signInRequest = getSignInRequest(config)
-    val oneTabClient = Identity.getSignInClient(LocalContext.current)
-
     val request = rememberLauncherForActivityResult(
         ActivityResultContracts.StartIntentSenderForResult()
     ) { result ->
         CoroutineScope(Dispatchers.IO).launch {
             if (result.resultCode == Activity.RESULT_OK && result.data != null) {
                 try {
-                    val credential = oneTabClient.getSignInCredentialFromIntent(result.data)
+                    val credential = Identity.getSignInClient(context).getSignInCredentialFromIntent(result.data)
                     loginWithGoogle(credential.googleIdToken ?: "")
                     onResult.invoke(NativeSignInResult.Success)
                 } catch (apiE: ApiException) {
@@ -63,7 +60,9 @@ actual fun AuthUI.rememberLoginWithGoogle(
 
     LaunchedEffect(key1 = state.started) {
         if (state.started) {
-            val oneTapResult = oneTabClient.beginSignIn(signInRequest).await()
+            val config = config.loginConfig as GoogleLoginConfig?
+            val signInRequest = getSignInRequest(config)
+            val oneTapResult = Identity.getSignInClient(context).beginSignIn(signInRequest).await()
             request.launch(
                 IntentSenderRequest.Builder(oneTapResult.pendingIntent.intentSender).build()
             )
