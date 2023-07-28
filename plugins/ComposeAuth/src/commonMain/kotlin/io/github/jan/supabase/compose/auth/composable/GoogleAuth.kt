@@ -2,6 +2,7 @@ package io.github.jan.supabase.compose.auth.composable
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import io.github.jan.supabase.compose.auth.ComposeAuth
 
 @Composable
@@ -9,7 +10,7 @@ expect fun ComposeAuth.rememberLoginWithGoogle(onResult: (NativeSignInResult) ->
 
 @Composable
 fun defaultLoginBehavior(fallback: suspend () -> Unit):NativeSignInState{
-    val state = NativeSignInState()
+    val state = remember { NativeSignInState() }
     LaunchedEffect(key1 = state.started) {
         if (state.started) {
             fallback.invoke()
