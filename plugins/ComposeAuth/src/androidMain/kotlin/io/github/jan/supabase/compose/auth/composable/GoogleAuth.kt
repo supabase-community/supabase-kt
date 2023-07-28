@@ -24,7 +24,7 @@ import kotlinx.coroutines.tasks.await
 @Composable
 actual fun ComposeAuth.rememberLoginWithGoogle(
     onResult: (NativeSignInResult) -> Unit,
-    fallback: () -> Unit
+    fallback: suspend () -> Unit
 ): NativeSignInState {
     this as ComposeAuthImpl
 
