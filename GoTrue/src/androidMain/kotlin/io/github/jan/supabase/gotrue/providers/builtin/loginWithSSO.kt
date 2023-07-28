@@ -14,5 +14,5 @@ internal actual suspend fun <Config : SSO.Config> SSO<Config>.loginWithSSO(
 ) {
     val gotrueConfig = supabaseClient.gotrue.config
     val result = supabaseClient.gotrue.retrieveSSOUrl(this, redirectUrl ?: "${gotrueConfig.scheme}://${gotrueConfig.host}", config)
-    openUrl(Uri.parse(result.url))
+    openUrl(Uri.parse(result.url), gotrueConfig.defaultOAuthAction)
 }
