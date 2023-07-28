@@ -41,7 +41,9 @@ class ComposeAuthImpl(
 
     val pluginKey = ComposeAuth.key
 
-    suspend fun loginWithGoogle(idToken: String, nonce: String? = null) {
+    suspend fun loginWithGoogle(idToken: String) {
+        val nonce = if(config.loginConfig == null || config.loginConfig !is GoogleLoginConfig) null else (config.loginConfig as GoogleLoginConfig).nonce
+
         supabaseClient.gotrue.loginWith(IDToken) {
             provider = Google
             this.idToken = idToken

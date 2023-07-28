@@ -31,7 +31,6 @@ actual fun ComposeAuth.rememberLoginWithGoogle(
     val state = remember { NativeSignInState() }
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
-    var nonce:String? = null
 
     val request = rememberLauncherForActivityResult(
         ActivityResultContracts.StartIntentSenderForResult()
@@ -40,8 +39,12 @@ actual fun ComposeAuth.rememberLoginWithGoogle(
             if (result.resultCode == Activity.RESULT_OK && result.data != null) {
                 try {
                     val credential = Identity.getSignInClient(context).getSignInCredentialFromIntent(result.data)
-                    loginWithGoogle(credential.googleIdToken ?: "", nonce)
-                    onResult.invoke(NativeSignInResult.Success)
+                    credential.googleIdToken?.let {
+                        loginWithGoogle(it)
+                        onResult.invoke(NativeSignInResult.Success)
+                    }?:run {
+                        onResult.invoke(NativeSignInResult.Error("error: idToken is missing"))
+                    }
                 } catch (apiE: ApiException) {
                     when (apiE.statusCode) {
                         CommonStatusCodes.CANCELED -> onResult.invoke(NativeSignInResult.ClosedByUser)
@@ -66,7 +69,6 @@ actual fun ComposeAuth.rememberLoginWithGoogle(
 
             val config = config.loginConfig as GoogleLoginConfig?
             val signInRequest = getSignInRequest(config)
-            nonce = config?.nonce
             val oneTapResult = Identity.getSignInClient(context).beginSignIn(signInRequest).await()
             request.launch(
                 IntentSenderRequest.Builder(oneTapResult.pendingIntent.intentSender).build()
