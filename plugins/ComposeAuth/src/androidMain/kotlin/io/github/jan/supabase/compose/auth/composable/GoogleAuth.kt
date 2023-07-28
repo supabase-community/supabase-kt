@@ -7,6 +7,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalContext
 import com.google.android.gms.auth.api.identity.Identity
 import com.google.android.gms.common.api.ApiException
@@ -15,7 +16,6 @@ import io.github.jan.supabase.compose.auth.ComposeAuth
 import io.github.jan.supabase.compose.auth.ComposeAuthImpl
 import io.github.jan.supabase.compose.auth.GoogleLoginConfig
 import io.github.jan.supabase.compose.auth.getSignInRequest
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
@@ -29,13 +29,14 @@ actual fun ComposeAuth.rememberLoginWithGoogle(
     this as ComposeAuthImpl
 
     val state = remember { NativeSignInState() }
+    val scope = rememberCoroutineScope()
     val context = LocalContext.current
     var nonce:String? = null
 
     val request = rememberLauncherForActivityResult(
         ActivityResultContracts.StartIntentSenderForResult()
     ) { result ->
-        CoroutineScope(Dispatchers.IO).launch {
+        scope.launch(Dispatchers.IO) {
             if (result.resultCode == Activity.RESULT_OK && result.data != null) {
                 try {
                     val credential = Identity.getSignInClient(context).getSignInCredentialFromIntent(result.data)
