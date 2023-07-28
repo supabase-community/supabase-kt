@@ -28,6 +28,8 @@ sealed interface ComposeAuth : SupabasePlugin {
             return Config().apply(init)
         }
     }
+
+    suspend fun fallbackLogin()
 }
 
 class ComposeAuthImpl(
@@ -45,6 +47,10 @@ class ComposeAuthImpl(
             this.idToken = idToken
             this.nonce = nonce
         }
+    }
+
+    override suspend fun fallbackLogin() {
+        supabaseClient.gotrue.loginWith(Google)
     }
 }
 
