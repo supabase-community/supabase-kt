@@ -14,10 +14,32 @@ repositories {
 @OptIn(org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi::class)
 kotlin {
     targetHierarchy.default()
-    jvmToolchain(8)
+    jvm {
+        jvmToolchain(8)
+        compilations.all {
+            kotlinOptions.freeCompilerArgs = listOf(
+                "-Xjvm-default=all",  // use default methods in interfaces,
+                "-Xlambdas=indy"      // use invokedynamic lambdas instead of synthetic classes
+            )
+        }
+    }
     androidTarget {
         publishLibraryVariants("release", "debug")
     }
+    js(IR) {
+        browser {
+            testTask {
+                enabled = false
+            }
+        }
+        nodejs {
+            testTask {
+                enabled = false
+            }
+        }
+    }
+    ios()
+    iosSimulatorArm64()
 
     sourceSets {
         all {
@@ -40,6 +62,16 @@ kotlin {
                 implementation(libs.kotlinx.coroutines.play.services)
                 implementation(libs.androidx.activity.compose)
             }
+        }
+        val jvmMain by getting {
+            dependsOn(commonMain)
+        }
+
+        val appleMain by getting {
+            dependsOn(commonMain)
+        }
+        val jsMain by getting {
+            dependsOn(commonMain)
         }
     }
 }
