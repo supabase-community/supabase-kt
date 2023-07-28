@@ -4,12 +4,13 @@ import co.touchlab.kermit.Logger
 import io.github.jan.supabase.gotrue.user.UserSession
 
 internal fun noDeeplinkMessage(arg: String) = """
-        Trying to generate a redirect url, but neither a fallback url was provided nor a deeplink $arg is set in the GoTrueConfig.
+        Trying to use a deeplink as a redirect url, but no deeplink $arg is set in the GoTrueConfig.
         If you want to use deep linking, set the scheme and host in the GoTrueConfig:
         install(GoTrue) {
             scheme = "YOUR_SCHEME"
             host = "YOUR_HOST"
         }
+        You can also provide a custom redirect url.
     """.trimIndent()
 
 /**
