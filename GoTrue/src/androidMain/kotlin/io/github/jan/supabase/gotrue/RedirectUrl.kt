@@ -13,7 +13,7 @@ actual fun GoTrue.generateRedirectUrl(fallbackUrl: String?): String? {
 
 internal val GoTrueConfig.deepLink: String
     get() {
-        val scheme = scheme ?: return noDeeplinkMessage("scheme")
-        val host = host ?: return noDeeplinkMessage("host")
+        val scheme = scheme ?: noDeeplinkError("scheme")
+        val host = host ?: noDeeplinkError("host")
         return "${scheme}://${host}"
     }

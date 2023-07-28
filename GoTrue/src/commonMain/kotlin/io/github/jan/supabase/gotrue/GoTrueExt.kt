@@ -3,7 +3,7 @@ package io.github.jan.supabase.gotrue
 import co.touchlab.kermit.Logger
 import io.github.jan.supabase.gotrue.user.UserSession
 
-internal fun noDeeplinkMessage(arg: String) = """
+internal fun noDeeplinkError(arg: String): Nothing = error("""
         Trying to use a deeplink as a redirect url, but no deeplink $arg is set in the GoTrueConfig.
         If you want to use deep linking, set the scheme and host in the GoTrueConfig:
         install(GoTrue) {
@@ -11,7 +11,7 @@ internal fun noDeeplinkMessage(arg: String) = """
             host = "YOUR_HOST"
         }
         You can also provide a custom redirect url.
-    """.trimIndent()
+    """.trimIndent())
 
 /**
  * Parses a session from a fragment.
