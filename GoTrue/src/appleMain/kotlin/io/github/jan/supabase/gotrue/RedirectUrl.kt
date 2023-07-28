@@ -5,6 +5,8 @@ import io.github.jan.supabase.annotations.SupabaseInternal
 @SupabaseInternal
 actual fun GoTrue.generateRedirectUrl(fallbackUrl: String?): String? {
     if(fallbackUrl != null) return fallbackUrl
+    val scheme = config.scheme ?: error(noDeeplinkMessage("scheme"))
+    val host = config.host ?: error(noDeeplinkMessage("host"))
     this as GoTrueImpl
     return "${config.scheme}://${config.host}"
 }
