@@ -14,8 +14,7 @@ internal actual suspend fun <Config : SSO.Config> SSO<Config>.loginWithSSO(
     config: (Config.() -> Unit)?
 ) {
     val gotrue = supabaseClient.gotrue
-    val deepLink = redirectUrl ?: gotrue.config.deepLink
-    val result = supabaseClient.gotrue.retrieveSSOUrl(this@loginWithSSO, deepLink, config)
+    val result = supabaseClient.gotrue.retrieveSSOUrl(this@loginWithSSO, redirectUrl ?: gotrue.config.deepLink, config)
     val url = NSURL(string = result.url)
     openUrl(url)
 }
