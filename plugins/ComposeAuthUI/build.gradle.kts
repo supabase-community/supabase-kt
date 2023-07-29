@@ -60,7 +60,7 @@ kotlin {
 android {
     compileSdk = 33
     sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
-    namespace = "io.github.jan.supabase.compose.captcha.library"
+    namespace = "io.github.jan.supabase.compose.auth.ui.library"
     defaultConfig {
         minSdk = 21
     }
