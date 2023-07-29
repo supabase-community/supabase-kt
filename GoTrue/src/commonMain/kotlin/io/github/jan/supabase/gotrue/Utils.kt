@@ -13,8 +13,9 @@ fun GoTrue.parseFragmentAndImportSession(fragment: String, onSessionSuccess: (Us
     this as GoTrueImpl
     authScope.launch {
         val user = retrieveUser(session.accessToken)
-        onSessionSuccess(session.copy(user = user))
-        importSession(session)
+        val newSession = session.copy(user = user)
+        onSessionSuccess(newSession)
+        importSession(newSession)
     }
 }
 

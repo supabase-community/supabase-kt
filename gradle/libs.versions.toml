@@ -18,6 +18,7 @@ korlibs = "4.0.9"
 detekt = "1.23.0"
 moshi = "1.15.0"
 jackson = "2.15.2"
+browser = "1.5.0"
 
 [plugins]
 kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
@@ -46,6 +47,7 @@ ktor-json = { module = "io.ktor:ktor-serialization-kotlinx-json", version.ref = 
 kermit = { module = "co.touchlab:kermit", version.ref = "kermit" }
 
 android-lifecycle-process = { module = "androidx.lifecycle:lifecycle-process", version.ref = "android-lifecycle" }
+androidx-browser = { module = "androidx.browser:browser", version.ref = "browser" }
 androidx-startup-runtime = { module = "androidx.startup:startup-runtime", version.ref = "androidx-startup" }
 
 multiplatform-settings-no-arg = { module = "com.russhwolf:multiplatform-settings-no-arg", version.ref = "multiplatform-settings" }
