@@ -13,12 +13,9 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldColors
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.text.TextStyle
@@ -90,10 +87,7 @@ fun PasswordField(
     placeholder: @Composable (() -> Unit)? = null,
 ) {
     val showPassword = remember { mutableStateOf(false) }
-    var errorMessage by remember { mutableStateOf<String?>(null) }
-    LaunchedEffect(value) {
-        errorMessage = rules.firstOrNull { !it.predicate(value) }?.description
-    }
+    val errorMessage = remember(value, rules) { rules.firstOrNull { !it.predicate(value) }?.description }
     TextField(
         value = value,
         onValueChange = onValueChange,
@@ -145,10 +139,7 @@ fun PasswordField(
     placeholder: @Composable (() -> Unit)? = null,
 ) {
     val showPassword = remember { mutableStateOf(false) }
-    var errorMessage by remember { mutableStateOf<String?>(null) }
-    LaunchedEffect(value) {
-        errorMessage = rules.firstOrNull { !it.predicate(value.text) }?.description
-    }
+    val errorMessage = remember(value, rules) { rules.firstOrNull { !it.predicate(value.text) }?.description }
     TextField(
         value = value,
         onValueChange = onValueChange,
@@ -200,10 +191,7 @@ fun OutlinedPasswordField(
     placeholder: @Composable (() -> Unit)? = null,
 ) {
     val showPassword = remember { mutableStateOf(false) }
-    var errorMessage by remember { mutableStateOf<String?>(null) }
-    LaunchedEffect(value) {
-        errorMessage = rules.firstOrNull { !it.predicate(value) }?.description
-    }
+    val errorMessage = remember(value, rules) { rules.firstOrNull { !it.predicate(value) }?.description }
     OutlinedTextField(
         value = value,
         onValueChange = onValueChange,
@@ -255,10 +243,7 @@ fun OutlinedPasswordField(
     placeholder: @Composable (() -> Unit)? = null,
 ) {
     val showPassword = remember { mutableStateOf(false) }
-    var errorMessage by remember { mutableStateOf<String?>(null) }
-    LaunchedEffect(value) {
-        errorMessage = rules.firstOrNull { !it.predicate(value.text) }?.description
-    }
+    val errorMessage = remember(value, rules) { rules.firstOrNull { !it.predicate(value.text) }?.description }
     TextField(
         value = value,
         onValueChange = onValueChange,
