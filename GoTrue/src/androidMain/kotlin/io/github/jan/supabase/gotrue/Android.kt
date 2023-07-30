@@ -5,8 +5,8 @@ import android.net.Uri
 import androidx.browser.customtabs.CustomTabsIntent
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.annotations.SupabaseExperimental
-import io.github.jan.supabase.gotrue.OAuthAction.CUSTOM_TABS
-import io.github.jan.supabase.gotrue.OAuthAction.EXTERNAL_BROWSER
+import io.github.jan.supabase.gotrue.ExternalAuthAction.CUSTOM_TABS
+import io.github.jan.supabase.gotrue.ExternalAuthAction.EXTERNAL_BROWSER
 import io.github.jan.supabase.gotrue.providers.ExternalAuthConfigDefaults
 import io.github.jan.supabase.gotrue.providers.OAuthProvider
 import io.github.jan.supabase.gotrue.user.UserSession
@@ -20,11 +20,11 @@ internal fun GoTrue.openOAuth(provider: OAuthProvider, redirectTo: String, confi
             scopes.addAll(config.scopes)
             queryParams.putAll(config.queryParams)
         }),
-        action = this.config.defaultOAuthAction
+        action = this.config.defaultExternalAuthAction
     )
 }
 
-internal fun openUrl(uri: Uri, action: OAuthAction) {
+internal fun openUrl(uri: Uri, action: ExternalAuthAction) {
     when(action) {
         EXTERNAL_BROWSER -> {
             val browserIntent = Intent(Intent.ACTION_VIEW, uri)
