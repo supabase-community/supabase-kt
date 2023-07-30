@@ -1,4 +1,4 @@
-package io.github.jan.supabase.compose.auth.ui
+package io.github.jan.supabase.compose.auth.ui.password
 
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.text.KeyboardActions
@@ -23,41 +23,10 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.VisualTransformation
-
-class PasswordRule(val description: String, val predicate: (password: String) -> Boolean) {
-
-    companion object {
-
-        fun minLength(length: Int, description: String = "Password must be at least $length characters long") = PasswordRule(description) {
-            it.length >= length
-        }
-
-        fun containsLowercase(description: String = "Password must contain at least one lowercase character") = PasswordRule(description) {
-            it.any { char -> char.isLowerCase() }
-        }
-
-        fun containsUppercase(description: String = "Password must contain at least one uppercase character") = PasswordRule(description) {
-            it.any { char -> char.isUpperCase() }
-        }
-
-        fun containsDigit(description: String = "Password must contain at least one digit") = PasswordRule(description) {
-            it.any { char -> char.isDigit() }
-        }
-
-        fun containsSpecialCharacter(description: String = "Password must contain at least one special character") = PasswordRule(description) {
-            it.any { char -> char.isLetterOrDigit().not() }
-        }
-
-        fun maxLength(length: Int, description: String = "Password must be at most $length characters long") = PasswordRule(description) {
-            it.length <= length
-        }
-
-    }
-
-}
-
-@Composable
-fun rememberPasswordRuleList(vararg rules: PasswordRule) = remember { rules.toList() }
+import io.github.jan.supabase.compose.auth.ui.AuthIcons
+import io.github.jan.supabase.compose.auth.ui.rememberLockIcon
+import io.github.jan.supabase.compose.auth.ui.rememberVisibilityIcon
+import io.github.jan.supabase.compose.auth.ui.rememberVisibilityOffIcon
 
 @ExperimentalMaterial3Api
 @Composable
@@ -78,7 +47,7 @@ fun PasswordField(
     colors: TextFieldColors = TextFieldDefaults.textFieldColors(),
     label: @Composable (() -> Unit)? = null,
     leadingIcon: @Composable (() -> Unit)? = { Icon(AuthIcons.rememberLockIcon(), "Lock") },
-    supportingText: @Composable ((description: String?) -> Unit)? = { it?.let { Text(it) } },
+    supportingText: @Composable ((rules: List<PasswordRuleResult>) -> Unit)? = { it.firstUnfulfilled()?.let { rule -> Text(rule.description) } },
     trailingIcon: @Composable ((showPassword: MutableState<Boolean>) -> Unit)? = { showPassword ->
         IconButton(onClick = { showPassword.value = !showPassword.value }) {
             Icon(if(showPassword.value) AuthIcons.rememberVisibilityIcon() else AuthIcons.rememberVisibilityOffIcon(), "Visibility")
@@ -87,7 +56,7 @@ fun PasswordField(
     placeholder: @Composable (() -> Unit)? = null,
 ) {
     val showPassword = remember { mutableStateOf(false) }
-    val errorMessage = remember(value, rules) { rules.firstOrNull { !it.predicate(value) }?.description }
+    val ruleResults = remember(value, rules) { rules.map { PasswordRuleResult(it.description, it.predicate(value)) } }
     TextField(
         value = value,
         onValueChange = onValueChange,
@@ -96,11 +65,11 @@ fun PasswordField(
         keyboardOptions = keyboardOptions,
         keyboardActions = keyboardActions,
         singleLine = singleLine,
-        isError = errorMessage != null,
+        isError = ruleResults.firstUnfulfilled() != null,
         modifier = modifier,
         leadingIcon = leadingIcon,
         trailingIcon = { trailingIcon?.invoke(showPassword) },
-        supportingText = { supportingText?.invoke(errorMessage) },
+        supportingText = { supportingText?.invoke(ruleResults) },
         readOnly = readOnly,
         enabled = enabled,
         interactionSource = interactionSource,
@@ -130,7 +99,7 @@ fun PasswordField(
     colors: TextFieldColors = TextFieldDefaults.textFieldColors(),
     label: @Composable (() -> Unit)? = null,
     leadingIcon: @Composable (() -> Unit)? = { Icon(AuthIcons.rememberLockIcon(), "Lock") },
-    supportingText: @Composable ((description: String?) -> Unit)? = { it?.let { Text(it) } },
+    supportingText: @Composable ((rules: List<PasswordRuleResult>) -> Unit)? = { it.firstUnfulfilled()?.let { rule -> Text(rule.description) } },
     trailingIcon: @Composable ((showPassword: MutableState<Boolean>) -> Unit)? = { showPassword ->
         IconButton(onClick = { showPassword.value = !showPassword.value }) {
             Icon(if(showPassword.value) AuthIcons.rememberVisibilityIcon() else AuthIcons.rememberVisibilityOffIcon(), "Visibility")
@@ -139,7 +108,7 @@ fun PasswordField(
     placeholder: @Composable (() -> Unit)? = null,
 ) {
     val showPassword = remember { mutableStateOf(false) }
-    val errorMessage = remember(value, rules) { rules.firstOrNull { !it.predicate(value.text) }?.description }
+    val ruleResults = remember(value, rules) { rules.map { PasswordRuleResult(it.description, it.predicate(value.text)) } }
     TextField(
         value = value,
         onValueChange = onValueChange,
@@ -148,11 +117,11 @@ fun PasswordField(
         keyboardOptions = keyboardOptions,
         keyboardActions = keyboardActions,
         singleLine = singleLine,
-        isError = errorMessage != null,
+        isError = ruleResults.firstUnfulfilled() != null,
         modifier = modifier,
         leadingIcon = leadingIcon,
         trailingIcon = { trailingIcon?.invoke(showPassword) },
-        supportingText = { supportingText?.invoke(errorMessage) },
+        supportingText = { supportingText?.invoke(ruleResults) },
         readOnly = readOnly,
         enabled = enabled,
         interactionSource = interactionSource,
@@ -182,7 +151,7 @@ fun OutlinedPasswordField(
     colors: TextFieldColors = TextFieldDefaults.textFieldColors(),
     label: @Composable (() -> Unit)? = null,
     leadingIcon: @Composable (() -> Unit)? = { Icon(AuthIcons.rememberLockIcon(), "Lock") },
-    supportingText: @Composable ((description: String?) -> Unit)? = { it?.let { Text(it) } },
+    supportingText: @Composable ((rules: List<PasswordRuleResult>) -> Unit)? = { it.firstUnfulfilled()?.let { rule -> Text(rule.description) } },
     trailingIcon: @Composable ((showPassword: MutableState<Boolean>) -> Unit)? = { showPassword ->
         IconButton(onClick = { showPassword.value = !showPassword.value }) {
             Icon(if(showPassword.value) AuthIcons.rememberVisibilityIcon() else AuthIcons.rememberVisibilityOffIcon(), "Visibility")
@@ -191,7 +160,7 @@ fun OutlinedPasswordField(
     placeholder: @Composable (() -> Unit)? = null,
 ) {
     val showPassword = remember { mutableStateOf(false) }
-    val errorMessage = remember(value, rules) { rules.firstOrNull { !it.predicate(value) }?.description }
+    val ruleResults = remember(value, rules) { rules.map { PasswordRuleResult(it.description, it.predicate(value)) } }
     OutlinedTextField(
         value = value,
         onValueChange = onValueChange,
@@ -200,11 +169,11 @@ fun OutlinedPasswordField(
         keyboardOptions = keyboardOptions,
         keyboardActions = keyboardActions,
         singleLine = singleLine,
-        isError = errorMessage != null,
+        isError = ruleResults.firstUnfulfilled() != null,
         modifier = modifier,
         leadingIcon = leadingIcon,
         trailingIcon = { trailingIcon?.invoke(showPassword) },
-        supportingText = { supportingText?.invoke(errorMessage) },
+        supportingText = { supportingText?.invoke(ruleResults) },
         readOnly = readOnly,
         enabled = enabled,
         interactionSource = interactionSource,
@@ -234,7 +203,7 @@ fun OutlinedPasswordField(
     colors: TextFieldColors = TextFieldDefaults.textFieldColors(),
     label: @Composable (() -> Unit)? = null,
     leadingIcon: @Composable (() -> Unit)? = { Icon(AuthIcons.rememberLockIcon(), "Lock") },
-    supportingText: @Composable ((description: String?) -> Unit)? = { it?.let { Text(it) } },
+    supportingText: @Composable ((rules: List<PasswordRuleResult>) -> Unit)? = { it.firstUnfulfilled()?.let { rule -> Text(rule.description) } },
     trailingIcon: @Composable ((showPassword: MutableState<Boolean>) -> Unit)? = { showPassword ->
         IconButton(onClick = { showPassword.value = !showPassword.value }) {
             Icon(if(showPassword.value) AuthIcons.rememberVisibilityIcon() else AuthIcons.rememberVisibilityOffIcon(), "Visibility")
@@ -243,7 +212,7 @@ fun OutlinedPasswordField(
     placeholder: @Composable (() -> Unit)? = null,
 ) {
     val showPassword = remember { mutableStateOf(false) }
-    val errorMessage = remember(value, rules) { rules.firstOrNull { !it.predicate(value.text) }?.description }
+    val ruleResults = remember(value, rules) { rules.map { PasswordRuleResult(it.description, it.predicate(value.text)) } }
     TextField(
         value = value,
         onValueChange = onValueChange,
@@ -252,11 +221,11 @@ fun OutlinedPasswordField(
         keyboardOptions = keyboardOptions,
         keyboardActions = keyboardActions,
         singleLine = singleLine,
-        isError = errorMessage != null,
+        isError = ruleResults.firstUnfulfilled() != null,
         modifier = modifier,
         leadingIcon = leadingIcon,
         trailingIcon = { trailingIcon?.invoke(showPassword) },
-        supportingText = { supportingText?.invoke(errorMessage) },
+        supportingText = { supportingText?.invoke(ruleResults) },
         readOnly = readOnly,
         enabled = enabled,
         interactionSource = interactionSource,
@@ -266,3 +235,5 @@ fun OutlinedPasswordField(
         placeholder = placeholder,
     )
 }
+
+private fun List<PasswordRuleResult>.firstUnfulfilled(): PasswordRuleResult? = firstOrNull { !it.isFulfilled }
