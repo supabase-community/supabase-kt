@@ -1,6 +1,7 @@
 package io.github.jan.supabase.compose.auth
 
 import io.github.jan.supabase.SupabaseClient
+import io.github.jan.supabase.gotrue.LogoutScope
 import io.github.jan.supabase.gotrue.gotrue
 import io.github.jan.supabase.gotrue.providers.Google
 import io.github.jan.supabase.gotrue.providers.builtin.IDToken
@@ -30,6 +31,8 @@ sealed interface ComposeAuth : SupabasePlugin {
     }
 
     suspend fun fallbackLogin()
+
+    suspend fun signOut(scope: LogoutScope = LogoutScope.LOCAL)
 }
 
 class ComposeAuthImpl(
@@ -53,6 +56,10 @@ class ComposeAuthImpl(
 
     override suspend fun fallbackLogin() {
         supabaseClient.gotrue.loginWith(Google)
+    }
+
+    override suspend fun signOut(scope: LogoutScope) {
+        supabaseClient.gotrue.logout(scope)
     }
 }
 
