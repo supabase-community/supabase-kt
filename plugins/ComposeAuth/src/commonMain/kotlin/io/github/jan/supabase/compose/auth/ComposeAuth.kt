@@ -29,10 +29,6 @@ sealed interface ComposeAuth : SupabasePlugin {
             return Config().apply(init)
         }
     }
-
-    suspend fun fallbackLogin()
-
-    suspend fun signOut(scope: LogoutScope = LogoutScope.LOCAL)
 }
 
 class ComposeAuthImpl(
@@ -44,23 +40,27 @@ class ComposeAuthImpl(
 
     val pluginKey = ComposeAuth.key
 
-    suspend fun loginWithGoogle(idToken: String) {
-        val nonce = (config.loginConfig as? GoogleLoginConfig)?.nonce
+}
 
-        supabaseClient.gotrue.loginWith(IDToken) {
-            provider = Google
-            this.idToken = idToken
-            this.nonce = nonce
-        }
-    }
+internal suspend fun ComposeAuth.loginWithGoogle(idToken: String) {
+    this as ComposeAuthImpl
+    val nonce = (config.loginConfig as? GoogleLoginConfig)?.nonce
 
-    override suspend fun fallbackLogin() {
-        supabaseClient.gotrue.loginWith(Google)
+    supabaseClient.gotrue.loginWith(IDToken) {
+        provider = Google
+        this.idToken = idToken
+        this.nonce = nonce
     }
+}
 
-    override suspend fun signOut(scope: LogoutScope) {
-        supabaseClient.gotrue.logout(scope)
-    }
+internal suspend fun ComposeAuth.fallbackLogin() {
+    this as ComposeAuthImpl
+    supabaseClient.gotrue.loginWith(Google)
+}
+
+internal suspend fun ComposeAuth.signOut(scope: LogoutScope = LogoutScope.LOCAL) {
+    this as ComposeAuthImpl
+    supabaseClient.gotrue.logout(scope)
 }
 
 

@@ -4,10 +4,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import io.github.jan.supabase.compose.auth.ComposeAuth
+import io.github.jan.supabase.compose.auth.fallbackLogin
+import io.github.jan.supabase.compose.auth.signOut
 import io.github.jan.supabase.gotrue.LogoutScope
 
 @Composable
-expect fun ComposeAuth.rememberLoginWithGoogle(onResult: (NativeSignInResult) -> Unit = {}, fallback: suspend () -> Unit = { this.fallbackLogin() }): NativeSignInState
+expect fun ComposeAuth.rememberLoginWithGoogle(onResult: (NativeSignInResult) -> Unit = {}, fallback: suspend () -> Unit = { fallbackLogin() }): NativeSignInState
 
 @Composable
 fun defaultLoginBehavior(fallback: suspend () -> Unit): NativeSignInState {
@@ -31,7 +33,7 @@ fun ComposeAuth.defaultSignOutBehavior(logoutScope: LogoutScope, nativeSignOut: 
     LaunchedEffect(key1 = state.started) {
         if (state.started) {
             nativeSignOut.invoke()
-            this@defaultSignOutBehavior.signOut(logoutScope)
+            signOut(logoutScope)
             state.reset()
         }
     }

@@ -16,6 +16,7 @@ import io.github.jan.supabase.compose.auth.ComposeAuth
 import io.github.jan.supabase.compose.auth.ComposeAuthImpl
 import io.github.jan.supabase.compose.auth.GoogleLoginConfig
 import io.github.jan.supabase.compose.auth.getSignInRequest
+import io.github.jan.supabase.compose.auth.loginWithGoogle
 import io.github.jan.supabase.gotrue.LogoutScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
