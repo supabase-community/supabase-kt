@@ -2,25 +2,40 @@ package io.github.jan.supabase.gotrue
 
 import android.content.Intent
 import android.net.Uri
+import androidx.browser.customtabs.CustomTabsIntent
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.annotations.SupabaseExperimental
+import io.github.jan.supabase.gotrue.ExternalAuthAction.CUSTOM_TABS
+import io.github.jan.supabase.gotrue.ExternalAuthAction.EXTERNAL_BROWSER
 import io.github.jan.supabase.gotrue.providers.ExternalAuthConfigDefaults
 import io.github.jan.supabase.gotrue.providers.OAuthProvider
 import io.github.jan.supabase.gotrue.user.UserSession
 import kotlinx.coroutines.launch
 
+
 internal fun GoTrue.openOAuth(provider: OAuthProvider, redirectTo: String, config: ExternalAuthConfigDefaults) {
     this as GoTrueImpl
-    openUrl(Uri.parse(oAuthUrl(provider, redirectTo) {
-        scopes.addAll(config.scopes)
-        queryParams.putAll(config.queryParams)
-    }))
+    openUrl(
+        uri = Uri.parse(oAuthUrl(provider, redirectTo) {
+            scopes.addAll(config.scopes)
+            queryParams.putAll(config.queryParams)
+        }),
+        action = this.config.defaultExternalAuthAction
+    )
 }
 
-internal fun openUrl(uri: Uri) {
-    val browserIntent = Intent(Intent.ACTION_VIEW, uri)
-    browserIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-    applicationContext().startActivity(browserIntent)
+internal fun openUrl(uri: Uri, action: ExternalAuthAction) {
+    when(action) {
+        EXTERNAL_BROWSER -> {
+            val browserIntent = Intent(Intent.ACTION_VIEW, uri)
+            browserIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+            applicationContext().startActivity(browserIntent)
+        }
+        CUSTOM_TABS -> {
+            val intent = CustomTabsIntent.Builder().build()
+            intent.launchUrl(applicationContext(), uri)
+        }
+    }
 }
 
 //TODO: Add context receiver 'Activity'

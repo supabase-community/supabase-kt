@@ -5,7 +5,7 @@ ktor = "2.3.2"
 kotlinx-datetime = "0.4.0"
 kermit = "2.0.0-RC4"
 atomicfu = "0.21.0"
-coroutines = "1.7.2"
+coroutines = "1.7.3"
 android-lifecycle = "2.6.1"
 androidx-startup = "1.1.1"
 androidx-activity-compose = "1.7.2"
@@ -20,6 +20,7 @@ korlibs = "4.0.9"
 detekt = "1.23.0"
 moshi = "1.15.0"
 jackson = "2.15.2"
+browser = "1.5.0"
 compose = "1.4.3"
 
 [plugins]
@@ -52,6 +53,7 @@ ktor-json = { module = "io.ktor:ktor-serialization-kotlinx-json", version.ref = 
 kermit = { module = "co.touchlab:kermit", version.ref = "kermit" }
 
 android-lifecycle-process = { module = "androidx.lifecycle:lifecycle-process", version.ref = "android-lifecycle" }
+androidx-browser = { module = "androidx.browser:browser", version.ref = "browser" }
 androidx-startup-runtime = { module = "androidx.startup:startup-runtime", version.ref = "androidx-startup" }
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activity-compose" }
 android-play-store-auth = { module = "com.google.android.gms:play-services-auth", version.ref = "android-play-store" }

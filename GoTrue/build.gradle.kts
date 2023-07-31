@@ -82,6 +82,7 @@ kotlin {
             dependsOn(nonLinuxMain)
             dependencies {
                 api(libs.androidx.startup.runtime)
+                api(libs.androidx.browser)
             }
         }
         val mingwX64Main by getting {
