@@ -7,6 +7,8 @@ import io.github.jan.supabase.gotrue.providers.Google
 import io.github.jan.supabase.gotrue.providers.builtin.IDToken
 import io.github.jan.supabase.plugins.SupabasePlugin
 import io.github.jan.supabase.plugins.SupabasePluginProvider
+import io.github.jan.supabase.toJsonObject
+import kotlinx.serialization.json.buildJsonObject
 
 
 sealed interface ComposeAuth : SupabasePlugin {
@@ -46,13 +48,18 @@ class ComposeAuthImpl(
 
 }
 
-internal suspend fun ComposeAuth.loginWithGoogle(idToken: String) {
+internal suspend fun ComposeAuth.loginWithGoogle(idToken: String, extraData:List<LoginConfig.ExtraData> = emptyList()) {
     val nonce = (config.loginConfig as? GoogleLoginConfig)?.nonce
 
     supabaseClient.gotrue.loginWith(IDToken) {
         provider = Google
         this.idToken = idToken
         this.nonce = nonce
+        data = buildJsonObject{
+            extraData.forEach {
+                it.value?.toJsonObject()?.let { it1 -> this.put(it.key, it1) }
+            }
+        }
     }
 }
 
