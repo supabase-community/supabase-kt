@@ -11,6 +11,10 @@ import io.github.jan.supabase.plugins.SupabasePluginProvider
 
 sealed interface ComposeAuth : SupabasePlugin {
 
+    val config: Config
+
+    val supabaseClient: SupabaseClient
+
     data class Config(
         var loginConfig: LoginConfig? = null
     ) : SupabasePlugin
@@ -32,8 +36,8 @@ sealed interface ComposeAuth : SupabasePlugin {
 }
 
 class ComposeAuthImpl(
-    val config: ComposeAuth.Config,
-    val supabaseClient: SupabaseClient,
+    override val config: ComposeAuth.Config,
+    override val supabaseClient: SupabaseClient,
 ) : ComposeAuth {
 
     val apiVersion = ComposeAuth.API_VERSION
@@ -43,7 +47,6 @@ class ComposeAuthImpl(
 }
 
 internal suspend fun ComposeAuth.loginWithGoogle(idToken: String) {
-    this as ComposeAuthImpl
     val nonce = (config.loginConfig as? GoogleLoginConfig)?.nonce
 
     supabaseClient.gotrue.loginWith(IDToken) {
@@ -54,12 +57,10 @@ internal suspend fun ComposeAuth.loginWithGoogle(idToken: String) {
 }
 
 internal suspend fun ComposeAuth.fallbackLogin() {
-    this as ComposeAuthImpl
     supabaseClient.gotrue.loginWith(Google)
 }
 
 internal suspend fun ComposeAuth.signOut(scope: LogoutScope = LogoutScope.LOCAL) {
-    this as ComposeAuthImpl
     supabaseClient.gotrue.logout(scope)
 }
 

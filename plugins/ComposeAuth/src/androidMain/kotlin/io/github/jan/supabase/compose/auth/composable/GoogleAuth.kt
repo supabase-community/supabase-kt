@@ -28,7 +28,6 @@ actual fun ComposeAuth.rememberLoginWithGoogle(
     onResult: (NativeSignInResult) -> Unit,
     fallback: suspend () -> Unit
 ): NativeSignInState {
-    this as ComposeAuthImpl
 
     val state = remember { NativeSignInState() }
     val scope = rememberCoroutineScope()
