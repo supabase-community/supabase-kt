@@ -3,6 +3,7 @@ package io.github.jan.supabase.compose.auth
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.gotrue.LogoutScope
 import io.github.jan.supabase.gotrue.gotrue
+import io.github.jan.supabase.gotrue.providers.Apple
 import io.github.jan.supabase.gotrue.providers.Google
 import io.github.jan.supabase.gotrue.providers.builtin.IDToken
 import io.github.jan.supabase.plugins.SupabasePlugin
@@ -48,12 +49,21 @@ class ComposeAuthImpl(
 
 internal suspend fun ComposeAuth.loginWithGoogle(idToken: String) {
     val googleConfig = (config.loginConfig as? GoogleLoginConfig)
-
     supabaseClient.gotrue.loginWith(IDToken) {
         provider = Google
         this.idToken = idToken
-        this.nonce = googleConfig?.nonce
+        nonce = googleConfig?.nonce
         data = googleConfig?.extraData
+    }
+}
+
+internal suspend fun ComposeAuth.loginWithApple(idToken: String){
+    val appleLoginConfig = (config.loginConfig as? AppleLoginConfig)
+    supabaseClient.gotrue.loginWith(IDToken){
+        provider = Apple
+        this.idToken = idToken
+        nonce = appleLoginConfig?.nonce
+        data = appleLoginConfig?.extraData
     }
 }
 

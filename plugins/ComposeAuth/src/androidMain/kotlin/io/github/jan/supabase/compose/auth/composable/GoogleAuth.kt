@@ -49,17 +49,8 @@ actual fun ComposeAuth.rememberLoginWithGoogle(
                 } catch (apiE: ApiException) {
                     when (apiE.statusCode) {
                         CommonStatusCodes.CANCELED -> onResult.invoke(NativeSignInResult.ClosedByUser)
-                        CommonStatusCodes.NETWORK_ERROR -> onResult.invoke(
-                            NativeSignInResult.NetworkError(
-                                apiE.localizedMessage ?: "error"
-                            )
-                        )
-
-                        else -> onResult.invoke(
-                            NativeSignInResult.Error(
-                                apiE.localizedMessage ?: "error"
-                            )
-                        )
+                        CommonStatusCodes.NETWORK_ERROR -> onResult.invoke(NativeSignInResult.NetworkError(apiE.localizedMessage ?: "error"))
+                        else -> onResult.invoke(NativeSignInResult.Error(apiE.localizedMessage ?: "error"))
                     }
                 } catch (e: Exception) {
                     onResult.invoke(NativeSignInResult.Error(e.localizedMessage ?: "error"))
