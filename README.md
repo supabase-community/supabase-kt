@@ -98,9 +98,7 @@ implementation("io.github.jan-tennert.supabase:[module]")
 1. Fork the repository
 2. Create a branch
 3. Make your changes
-4. Submit a pull request with your new branch and add one of the following tags: `fix`
-   or `enhancement`. You might also add one or more label when you are modifying a specific
-   module: `gotrue`, `realtime`, `functions`, `graphql`, `storage`, `postgrest`, `core`
+4. Submit a pull request with your new branch
 
 # Credits
 
