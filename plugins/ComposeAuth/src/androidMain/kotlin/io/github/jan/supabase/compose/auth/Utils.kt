@@ -3,7 +3,7 @@ package io.github.jan.supabase.compose.auth
 import com.google.android.gms.auth.api.identity.BeginSignInRequest
 
 
-fun getSignInRequest(config: GoogleLoginConfig?): BeginSignInRequest {
+internal fun getSignInRequest(config: GoogleLoginConfig?): BeginSignInRequest {
     val tokenIdRequestOptions = BeginSignInRequest.GoogleIdTokenRequestOptions.builder()
     config?.let { options ->
         tokenIdRequestOptions

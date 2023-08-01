@@ -69,7 +69,7 @@ actual fun ComposeAuth.rememberLoginWithApple(
 }
 
 
-fun authorizationController(
+internal fun authorizationController(
     onResult: (NativeSignInResult) -> Unit
 ): ASAuthorizationControllerDelegateProtocol {
     return object : NSObject(), ASAuthorizationControllerDelegateProtocol {
@@ -102,7 +102,7 @@ fun authorizationController(
     }
 }
 
-fun presentationAnchor(): ASAuthorizationControllerPresentationContextProvidingProtocol {
+internal fun presentationAnchor(): ASAuthorizationControllerPresentationContextProvidingProtocol {
     return object : NSObject(), ASAuthorizationControllerPresentationContextProvidingProtocol {
         override fun presentationAnchorForAuthorizationController(controller: ASAuthorizationController): ASPresentationAnchor {
             val x = 0.toUInt()
