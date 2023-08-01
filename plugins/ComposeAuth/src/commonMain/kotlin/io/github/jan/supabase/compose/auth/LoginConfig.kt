@@ -39,7 +39,7 @@ data class AppleLoginConfig(
 
 
 fun ComposeAuth.Config.appleNativeLogin(
-    serverClientId: String,
-    nonce: String?,
-    extraData: JsonObject?
+    serverClientId: String = "",
+    nonce: String? = null,
+    extraData: JsonObject? = null
 ) = AppleLoginConfig(serverClientId, nonce, extraData)
