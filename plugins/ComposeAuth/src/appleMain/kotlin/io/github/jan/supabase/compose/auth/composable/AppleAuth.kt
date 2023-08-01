@@ -22,7 +22,7 @@ import platform.Foundation.base64EncodedStringWithOptions
 import platform.darwin.NSObject
 
 @Composable
-fun ComposeAuth.rememberLoginWithApple(
+actual fun ComposeAuth.rememberLoginWithApple(
     onResult: (NativeSignInResult) -> Unit,
     fallback: suspend () -> Unit
 ): NativeSignInState {

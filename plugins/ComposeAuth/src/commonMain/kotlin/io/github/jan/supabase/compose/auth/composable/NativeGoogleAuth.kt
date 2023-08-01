@@ -7,9 +7,10 @@ import io.github.jan.supabase.compose.auth.ComposeAuth
 import io.github.jan.supabase.compose.auth.fallbackLogin
 import io.github.jan.supabase.compose.auth.signOut
 import io.github.jan.supabase.gotrue.LogoutScope
+import io.github.jan.supabase.gotrue.providers.Google
 
 @Composable
-expect fun ComposeAuth.rememberLoginWithGoogle(onResult: (NativeSignInResult) -> Unit = {}, fallback: suspend () -> Unit = { fallbackLogin() }): NativeSignInState
+expect fun ComposeAuth.rememberLoginWithGoogle(onResult: (NativeSignInResult) -> Unit = {}, fallback: suspend () -> Unit = { fallbackLogin(Google) }): NativeSignInState
 
 @Composable
 fun defaultLoginBehavior(fallback: suspend () -> Unit): NativeSignInState {
@@ -25,7 +26,6 @@ fun defaultLoginBehavior(fallback: suspend () -> Unit): NativeSignInState {
 
 @Composable
 expect fun ComposeAuth.rememberSignOut(logoutScope: LogoutScope = LogoutScope.LOCAL): NativeSignInState
-
 
 @Composable
 fun ComposeAuth.defaultSignOutBehavior(logoutScope: LogoutScope, nativeSignOut: suspend () -> Unit = {}): NativeSignInState {

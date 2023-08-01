@@ -5,6 +5,7 @@ import io.github.jan.supabase.gotrue.LogoutScope
 import io.github.jan.supabase.gotrue.gotrue
 import io.github.jan.supabase.gotrue.providers.Apple
 import io.github.jan.supabase.gotrue.providers.Google
+import io.github.jan.supabase.gotrue.providers.IDTokenProvider
 import io.github.jan.supabase.gotrue.providers.builtin.IDToken
 import io.github.jan.supabase.plugins.SupabasePlugin
 import io.github.jan.supabase.plugins.SupabasePluginProvider
@@ -67,8 +68,8 @@ internal suspend fun ComposeAuth.loginWithApple(idToken: String){
     }
 }
 
-internal suspend fun ComposeAuth.fallbackLogin() {
-    supabaseClient.gotrue.loginWith(Google)
+internal suspend fun ComposeAuth.fallbackLogin(provider: IDTokenProvider) {
+    supabaseClient.gotrue.loginWith(provider)
 }
 
 internal suspend fun ComposeAuth.signOut(scope: LogoutScope = LogoutScope.LOCAL) {
@@ -78,5 +79,6 @@ internal suspend fun ComposeAuth.signOut(scope: LogoutScope = LogoutScope.LOCAL)
 
 val SupabaseClient.composeAuth: ComposeAuth
     get() = pluginManager.getPlugin(ComposeAuth)
+
 
 
