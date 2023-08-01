@@ -42,7 +42,7 @@ actual fun ComposeAuth.rememberLoginWithGoogle(
                         Identity.getSignInClient(context).getSignInCredentialFromIntent(result.data)
                     credential.googleIdToken?.let {
                         loginWithGoogle(it)
-                        onResult.invoke(NativeSignInResult.Success)
+                        onResult.invoke(NativeSignInResult.Success())
                     } ?: run {
                         onResult.invoke(NativeSignInResult.Error("error: idToken is missing"))
                     }
