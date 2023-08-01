@@ -14,7 +14,6 @@ import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.common.api.CommonStatusCodes
 import io.github.jan.supabase.compose.auth.ComposeAuth
 import io.github.jan.supabase.compose.auth.GoogleLoginConfig
-import io.github.jan.supabase.compose.auth.fetchExtraData
 import io.github.jan.supabase.compose.auth.getSignInRequest
 import io.github.jan.supabase.compose.auth.loginWithGoogle
 import io.github.jan.supabase.gotrue.LogoutScope
@@ -39,20 +38,32 @@ actual fun ComposeAuth.rememberLoginWithGoogle(
         scope.launch(Dispatchers.IO) {
             if (result.resultCode == Activity.RESULT_OK && result.data != null) {
                 try {
-                    val credential = Identity.getSignInClient(context).getSignInCredentialFromIntent(result.data)
+                    val credential =
+                        Identity.getSignInClient(context).getSignInCredentialFromIntent(result.data)
                     credential.googleIdToken?.let {
-                        loginWithGoogle(it,credential.fetchExtraData(config.loginConfig as GoogleLoginConfig))
+                        loginWithGoogle(it)
                         onResult.invoke(NativeSignInResult.Success)
-                    }?:run {
+                    } ?: run {
                         onResult.invoke(NativeSignInResult.Error("error: idToken is missing"))
                     }
                 } catch (apiE: ApiException) {
                     when (apiE.statusCode) {
                         CommonStatusCodes.CANCELED -> onResult.invoke(NativeSignInResult.ClosedByUser)
-                        CommonStatusCodes.NETWORK_ERROR -> onResult.invoke(NativeSignInResult.NetworkError(apiE.localizedMessage ?: "error"))
-                        else -> onResult.invoke(NativeSignInResult.Error(apiE.localizedMessage ?: "error"))
+                        CommonStatusCodes.NETWORK_ERROR -> onResult.invoke(
+                            NativeSignInResult.NetworkError(
+                                apiE.localizedMessage ?: "error"
+                            )
+                        )
+
+                        else -> onResult.invoke(
+                            NativeSignInResult.Error(
+                                apiE.localizedMessage ?: "error"
+                            )
+                        )
                     }
-                } catch (e: Exception) { onResult.invoke(NativeSignInResult.Error(e.localizedMessage ?: "error")) }
+                } catch (e: Exception) {
+                    onResult.invoke(NativeSignInResult.Error(e.localizedMessage ?: "error"))
+                }
             }
             state.reset()
         }
