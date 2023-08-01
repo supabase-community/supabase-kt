@@ -90,7 +90,6 @@ fun authorizationController(
             } catch (e: Exception) {
                 onResult.invoke(NativeSignInResult.Error(e.message ?: "error"))
             }
-            super.authorizationController(controller, didCompleteWithAuthorization)
         }
 
         override fun authorizationController(
@@ -101,14 +100,13 @@ fun authorizationController(
                 1001.toUInt() -> onResult.invoke(NativeSignInResult.ClosedByUser)
                 else -> onResult.invoke(NativeSignInResult.Error(didCompleteWithError.localizedDescription))
             }
-            super.authorizationController(controller, didCompleteWithError)
         }
     }
 }
 
 fun presentationAnchor(): ASAuthorizationControllerPresentationContextProvidingProtocol {
     return object : NSObject(), ASAuthorizationControllerPresentationContextProvidingProtocol {
-        override fun presentationAnchorForAuthorizationController(controller: ASAuthorizationController): ASPresentationAnchor? {
+        override fun presentationAnchorForAuthorizationController(controller: ASAuthorizationController): ASPresentationAnchor {
             val x = 0.toUInt()
             val first = UIApplication
                 .sharedApplication
