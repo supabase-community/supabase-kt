@@ -13,7 +13,6 @@ import com.google.android.gms.auth.api.identity.Identity
 import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.common.api.CommonStatusCodes
 import io.github.jan.supabase.compose.auth.ComposeAuth
-import io.github.jan.supabase.compose.auth.GoogleLoginConfig
 import io.github.jan.supabase.compose.auth.getSignInRequest
 import io.github.jan.supabase.compose.auth.loginWithGoogle
 import io.github.jan.supabase.gotrue.LogoutScope
@@ -64,13 +63,13 @@ actual fun ComposeAuth.rememberLoginWithGoogle(
         // init signInRequest options
         if (state.started) {
 
-            if (config.loginConfig == null || config.loginConfig !is GoogleLoginConfig) {
+            if (config.googleLoginConfig == null) {
                 fallback.invoke()
                 state.reset()
                 return@LaunchedEffect
             }
 
-            val config = config.loginConfig as GoogleLoginConfig?
+            val config = config.googleLoginConfig
             val signInRequest = getSignInRequest(config)
             val oneTapResult = Identity.getSignInClient(context).beginSignIn(signInRequest).await()
             request.launch(

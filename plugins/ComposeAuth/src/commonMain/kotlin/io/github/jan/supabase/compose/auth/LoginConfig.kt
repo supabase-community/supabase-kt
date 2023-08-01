@@ -31,4 +31,15 @@ fun ComposeAuth.Config.googleNativeLogin(
 )
 
 
-data class AppleLoginConfig(override val serverClientId: String = "",val nonce: String? = null, var extraData: JsonObject? = null) : LoginConfig(serverClientId)
+data class AppleLoginConfig(
+    override val serverClientId: String = "",
+    val nonce: String? = null,
+    var extraData: JsonObject? = null
+) : LoginConfig(serverClientId)
+
+
+fun ComposeAuth.Config.appleNativeLogin(
+    serverClientId: String,
+    nonce: String?,
+    extraData: JsonObject?
+) = AppleLoginConfig(serverClientId, nonce, extraData)

@@ -4,7 +4,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import io.github.jan.supabase.compose.auth.AppleLoginConfig
 import io.github.jan.supabase.compose.auth.ComposeAuth
 import io.github.jan.supabase.compose.auth.loginWithApple
 import kotlinx.coroutines.Dispatchers
@@ -35,10 +34,9 @@ actual fun ComposeAuth.rememberLoginWithApple(
     val state = remember { NativeSignInState() }
     val scope = rememberCoroutineScope()
 
-
     LaunchedEffect(key1 = state.started) {
 
-        if (config.loginConfig == null || config.loginConfig !is AppleLoginConfig) {
+        if (config.appleLoginConfig == null) {
             fallback.invoke()
             state.reset()
             return@LaunchedEffect
@@ -47,7 +45,7 @@ actual fun ComposeAuth.rememberLoginWithApple(
         val appleIDProvider = ASAuthorizationAppleIDProvider()
         val request = appleIDProvider.createRequest().apply {
             requestedScopes = listOf(ASAuthorizationScopeFullName, ASAuthorizationScopeEmail)
-            nonce = (config.loginConfig as? AppleLoginConfig)?.nonce
+            nonce = config.appleLoginConfig?.nonce
         }
 
         val controller = ASAuthorizationController(listOf(request)).apply {

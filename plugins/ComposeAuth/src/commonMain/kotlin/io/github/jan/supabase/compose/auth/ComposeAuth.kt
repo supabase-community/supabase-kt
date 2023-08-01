@@ -18,7 +18,8 @@ sealed interface ComposeAuth : SupabasePlugin {
     val supabaseClient: SupabaseClient
 
     data class Config(
-        var loginConfig: LoginConfig? = null
+        val googleLoginConfig: GoogleLoginConfig? = null,
+        val appleLoginConfig: AppleLoginConfig? = null
     ) : SupabasePlugin
 
     companion object : SupabasePluginProvider<Config, ComposeAuth> {
@@ -37,7 +38,7 @@ sealed interface ComposeAuth : SupabasePlugin {
     }
 }
 
-class ComposeAuthImpl(
+internal class ComposeAuthImpl(
     override val config: ComposeAuth.Config,
     override val supabaseClient: SupabaseClient,
 ) : ComposeAuth {
@@ -49,22 +50,20 @@ class ComposeAuthImpl(
 }
 
 internal suspend fun ComposeAuth.loginWithGoogle(idToken: String) {
-    val googleConfig = (config.loginConfig as? GoogleLoginConfig)
     supabaseClient.gotrue.loginWith(IDToken) {
         provider = Google
         this.idToken = idToken
-        nonce = googleConfig?.nonce
-        data = googleConfig?.extraData
+        nonce = config.googleLoginConfig?.nonce
+        data = config.googleLoginConfig?.extraData
     }
 }
 
 internal suspend fun ComposeAuth.loginWithApple(idToken: String){
-    val appleLoginConfig = (config.loginConfig as? AppleLoginConfig)
     supabaseClient.gotrue.loginWith(IDToken){
         provider = Apple
         this.idToken = idToken
-        nonce = appleLoginConfig?.nonce
-        data = appleLoginConfig?.extraData
+        nonce = config.appleLoginConfig?.nonce
+        data = config.appleLoginConfig?.extraData
     }
 }
 
@@ -79,6 +78,3 @@ internal suspend fun ComposeAuth.signOut(scope: LogoutScope = LogoutScope.LOCAL)
 
 val SupabaseClient.composeAuth: ComposeAuth
     get() = pluginManager.getPlugin(ComposeAuth)
-
-
-
