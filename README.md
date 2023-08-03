@@ -3,17 +3,17 @@
 A Kotlin Multiplatform Client for Supabase.
 Supported targets:
 
-|                                                                    | **GoTrue** | **Realtime** | **Postgrest** | **Storage** | **Functions** | **Apollo-GraphQL** |
-|--------------------------------------------------------------------|------------|--------------|---------------|-------------|---------------|--------------------|
-| **JVM**                                                            | ✅          | ✅            | ✅             | ✅           | ✅             | ✅                  |
-| **Android**                                                        | ✅          | ✅            | ✅             | ✅           | ✅             | ✅                  |
-| **JS** *(Browser, NodeJS)*                                         | ✅          | ✅            | ✅             | ✅           | ✅             | ✅                  |
-| **IOS**                                                            | ✅          | ✅            | ✅             | ✅           | ✅             | ✅                  |
-| **tvOS** *(tvosArm64, tvosX64, tvosSimulatorArm64)* 🚧             | ☑️         | ✅            | ✅             | ✅           | ✅             | ✅                  |
-| **watchOS** *(watchosArm64, watchosX64, watchosSimulatorArm64)* 🚧 | ☑️         | ✅            | ✅             | ✅           | ✅             | ✅                  |
-| **MacOS**  *(macosX64 & macosArm64)* 🚧                            | ✅          | ✅            | ✅             | ✅           | ✅             | ✅                  |
-| **Windows** *(mingwX64)*   🚧                                      | ☑️         | ✅            | ✅             | ✅           | ✅             | ❌                  |
-| **Linux** *(linuxX64)*  🚧                                         | ☑️         | ✅            | ✅             | ✅           | ✅             | ❌                  |
+|                                                                    | **GoTrue** | **Realtime** | **Postgrest** | **Storage** | **Functions** | **Apollo-GraphQL** | **ComposeAuth 🚧** |
+|--------------------------------------------------------------------|------------|--------------|---------------|-------------|---------------|--------------------|--------------------|
+| **JVM**                                                            | ✅          | ✅            | ✅             | ✅           | ✅             | ✅                  | ❌                  |
+| **Android**                                                        | ✅          | ✅            | ✅             | ✅           | ✅             | ✅                  | ✅                  |
+| **JS** *(Browser, NodeJS)*                                         | ✅          | ✅            | ✅             | ✅           | ✅             | ✅                  | ❌                  |
+| **IOS**                                                            | ✅          | ✅            | ✅             | ✅           | ✅             | ✅                  | 🚧                 |
+| **tvOS** *(tvosArm64, tvosX64, tvosSimulatorArm64)* 🚧             | ☑️         | ✅            | ✅             | ✅           | ✅             | ✅                  | ❌                  |
+| **watchOS** *(watchosArm64, watchosX64, watchosSimulatorArm64)* 🚧 | ☑️         | ✅            | ✅             | ✅           | ✅             | ✅                  | ❌                  |
+| **MacOS**  *(macosX64 & macosArm64)* 🚧                            | ✅          | ✅            | ✅             | ✅           | ✅             | ✅                  | ❌                  |
+| **Windows** *(mingwX64)*   🚧                                      | ☑️         | ✅            | ✅             | ✅           | ✅             | ❌                  | ❌                  |
+| **Linux** *(linuxX64)*  🚧                                         | ☑️         | ✅            | ✅             | ✅           | ✅             | ❌                  | ❌                  |
 
 ✅ = full support
 
@@ -41,7 +41,7 @@ Supported targets:
 
 # Installation
 
-**Available modules**: `gotrue-kt`, `postgrest-kt`, `functions-kt`, `storage-kt`, `realtime-kt`, `apollo-graphql`
+**Available modules**: `gotrue-kt`, `postgrest-kt`, `functions-kt`, `storage-kt`, `realtime-kt`, `apollo-graphql`, `compose-auth`
 
 ```kotlin
 dependencies {
@@ -76,6 +76,8 @@ implementation("io.github.jan-tennert.supabase:[module]")
 ### Plugins
 
 #### [Apollo GraphQL integration](/plugins/ApolloGraphQL)
+
+#### [ComposeAuth](/plugins/ComposeAuth)
 
 # Demos
 
