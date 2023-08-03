@@ -60,7 +60,7 @@ actual fun ComposeAuth.rememberLoginWithGoogle(
     }
 
     LaunchedEffect(key1 = state.started) {
-        // init signInRequest options
+
         if (state.started) {
 
             if (config.googleLoginConfig == null) {

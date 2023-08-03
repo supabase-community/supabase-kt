@@ -3,8 +3,20 @@ package io.github.jan.supabase.compose.auth
 import kotlinx.serialization.json.JsonObject
 
 
-open class LoginConfig(open val serverClientId: String)
+/**
+ * Config for [ComposeAuth]
+ */
+interface LoginConfig {
+    /**
+     * Returns clientId for native login
+     */
+    val serverClientId: String
+}
 
+
+/**
+ * Config for requesting IDToken from play-auth API
+ */
 data class GoogleLoginConfig(
     override val serverClientId: String,
     val isSupported: Boolean = true,
@@ -12,8 +24,20 @@ data class GoogleLoginConfig(
     val associateLinkedAccounts: Pair<String, List<String>>? = null,
     val nonce: String? = null,
     var extraData: JsonObject? = null
-) : LoginConfig(serverClientId)
+) : LoginConfig
 
+/**
+ * Config for Apple's Authorization API
+ */
+data class AppleLoginConfig(
+    override val serverClientId: String = "",
+    val nonce: String? = null,
+    var extraData: JsonObject? = null
+) : LoginConfig
+
+/**
+ * Helper functions that return native configs
+ */
 fun ComposeAuth.Config.googleNativeLogin(
     serverClientId: String,
     isSupported: Boolean = true,
@@ -29,14 +53,6 @@ fun ComposeAuth.Config.googleNativeLogin(
     nonce,
     extraData
 )
-
-
-data class AppleLoginConfig(
-    override val serverClientId: String = "",
-    val nonce: String? = null,
-    var extraData: JsonObject? = null
-) : LoginConfig(serverClientId)
-
 
 fun ComposeAuth.Config.appleNativeLogin(
     serverClientId: String = "",
