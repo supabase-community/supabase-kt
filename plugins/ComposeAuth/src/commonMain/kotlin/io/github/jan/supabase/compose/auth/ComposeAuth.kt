@@ -64,8 +64,8 @@ sealed interface ComposeAuth : SupabasePlugin {
      * Config for [ComposeAuth]
      */
     data class Config(
-        val googleLoginConfig: GoogleLoginConfig? = null,
-        val appleLoginConfig: AppleLoginConfig? = null
+        var googleLoginConfig: GoogleLoginConfig? = null,
+        var appleLoginConfig: AppleLoginConfig? = null
     ) : SupabasePlugin
 
     companion object : SupabasePluginProvider<Config, ComposeAuth> {
