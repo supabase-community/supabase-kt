@@ -4,7 +4,7 @@ plugins {
     alias(libs.plugins.compose)
 }
 
-description = "Extends gotrue-kt with composables"
+description = "Extends gotrue-kt with composable"
 
 repositories {
     mavenCentral()
