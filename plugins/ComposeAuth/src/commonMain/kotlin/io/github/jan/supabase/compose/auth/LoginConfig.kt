@@ -16,6 +16,11 @@ interface LoginConfig {
 
 /**
  * Config for requesting IDToken from play-auth API
+ * @param isSupported Sets whether Google ID token-backed credentials should be returned by the API.
+ * @param filterByAuthorizedAccounts Sets whether to only allow the user to select from Google accounts that are already authorized to sign in to your application.
+ * @param associateLinkedAccounts Sets whether to support sign-in using Google accounts that are linked to your users' accounts.
+ * @param nonce Sets the nonce to use when generating a Google ID token.
+ * @param extraData Add extra data for user on sign-in
  */
 data class GoogleLoginConfig(
     override val serverClientId: String,
@@ -28,6 +33,8 @@ data class GoogleLoginConfig(
 
 /**
  * Config for Apple's Authorization API
+ * @param nonce A string value to pass to the identity provider.
+ * @param extraData Add extra data for user on sign-in
  */
 data class AppleLoginConfig(
     override val serverClientId: String = "",
@@ -36,7 +43,7 @@ data class AppleLoginConfig(
 ) : LoginConfig
 
 /**
- * Helper functions that return native configs
+ * Helper function that return native configs
  */
 fun ComposeAuth.Config.googleNativeLogin(
     serverClientId: String,
@@ -54,6 +61,9 @@ fun ComposeAuth.Config.googleNativeLogin(
     extraData
 )
 
+/**
+ * Helper function that return native configs
+ */
 fun ComposeAuth.Config.appleNativeLogin(
     serverClientId: String = "",
     nonce: String? = null,

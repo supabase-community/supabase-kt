@@ -62,6 +62,8 @@ sealed interface ComposeAuth : SupabasePlugin {
 
     /**
      * Config for [ComposeAuth]
+     * @param googleLoginConfig provide [GoogleLoginConfig]
+     * @param appleLoginConfig provide [AppleLoginConfig]
      */
     data class Config(
         var googleLoginConfig: GoogleLoginConfig? = null,

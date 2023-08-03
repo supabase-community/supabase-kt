@@ -25,6 +25,11 @@ import platform.UIKit.UIWindow
 import platform.UIKit.UIWindowScene
 import platform.darwin.NSObject
 
+
+
+/**
+ * Composable for Apple login with native behavior
+ */
 @Composable
 actual fun ComposeAuth.rememberLoginWithApple(
     onResult: (NativeSignInResult) -> Unit,

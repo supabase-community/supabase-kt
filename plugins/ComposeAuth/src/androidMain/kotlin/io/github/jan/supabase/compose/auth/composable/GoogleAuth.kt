@@ -21,11 +21,13 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 
 
+
+/**
+ * Composable for Google login with native behavior
+ */
 @Composable
 actual fun ComposeAuth.rememberLoginWithGoogle(
-    onResult: (NativeSignInResult) -> Unit,
-    fallback: suspend () -> Unit
-): NativeSignInState {
+    onResult: (NativeSignInResult) -> Unit, fallback: suspend () -> Unit): NativeSignInState {
 
     val state = remember { NativeSignInState() }
     val scope = rememberCoroutineScope()
@@ -81,6 +83,10 @@ actual fun ComposeAuth.rememberLoginWithGoogle(
     return state
 }
 
+
+/**
+ * Composable for Google SignOut with native behavior
+ */
 @Composable
 actual fun ComposeAuth.rememberSignOut(logoutScope: LogoutScope): NativeSignInState {
     val context = LocalContext.current
