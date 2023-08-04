@@ -1,6 +1,5 @@
 package io.github.jan.supabase.compose.auth.composable
 
-
 /**
  * Response of Native SignIn
  */

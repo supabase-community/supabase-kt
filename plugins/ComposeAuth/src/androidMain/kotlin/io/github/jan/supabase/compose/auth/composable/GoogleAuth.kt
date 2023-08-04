@@ -30,7 +30,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 
-
 /**
  * Composable for Google login with native behavior
  *
@@ -153,7 +152,6 @@ internal fun ComposeAuth.oneTapSignIn(onResult: (NativeSignInResult) -> Unit, fa
 
     return state
 }
-
 
 /**
  * Composable for Google SignOut with native behavior

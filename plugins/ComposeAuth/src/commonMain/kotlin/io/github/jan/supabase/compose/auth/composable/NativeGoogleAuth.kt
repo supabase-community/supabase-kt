@@ -31,7 +31,6 @@ fun defaultLoginBehavior(fallback: suspend () -> Unit): NativeSignInState {
     return state
 }
 
-
 /**
  * Composable for sign out flow
  * @return [NativeSignInState]
