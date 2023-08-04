@@ -3,17 +3,17 @@
 A Kotlin Multiplatform Client for Supabase.
 Supported targets:
 
-|                                                                    | **GoTrue** | **Realtime** | **Postgrest** | **Storage** | **Functions** | **Apollo-GraphQL** | **ComposeAuth 🚧** |
-|--------------------------------------------------------------------|------------|--------------|---------------|-------------|---------------|--------------------|--------------------|
-| **JVM**                                                            | ✅          | ✅            | ✅             | ✅           | ✅             | ✅                  | ❌                  |
-| **Android**                                                        | ✅          | ✅            | ✅             | ✅           | ✅             | ✅                  | ✅                  |
-| **JS** *(Browser, NodeJS)*                                         | ✅          | ✅            | ✅             | ✅           | ✅             | ✅                  | ❌                  |
-| **IOS**                                                            | ✅          | ✅            | ✅             | ✅           | ✅             | ✅                  | 🚧                 |
-| **tvOS** *(tvosArm64, tvosX64, tvosSimulatorArm64)* 🚧             | ☑️         | ✅            | ✅             | ✅           | ✅             | ✅                  | ❌                  |
-| **watchOS** *(watchosArm64, watchosX64, watchosSimulatorArm64)* 🚧 | ☑️         | ✅            | ✅             | ✅           | ✅             | ✅                  | ❌                  |
-| **MacOS**  *(macosX64 & macosArm64)* 🚧                            | ✅          | ✅            | ✅             | ✅           | ✅             | ✅                  | ❌                  |
-| **Windows** *(mingwX64)*   🚧                                      | ☑️         | ✅            | ✅             | ✅           | ✅             | ❌                  | ❌                  |
-| **Linux** *(linuxX64)*  🚧                                         | ☑️         | ✅            | ✅             | ✅           | ✅             | ❌                  | ❌                  |
+|                                                                    | **GoTrue** | **Realtime** | **Postgrest** | **Storage** | **Functions** | **Apollo-GraphQL** | **Compose Auth 🚧** |
+|--------------------------------------------------------------------|------------|--------------|---------------|-------------|---------------|--------------------|---------------------|
+| **JVM**                                                            | ✅          | ✅            | ✅             | ✅           | ✅             | ✅                  | 🟡                  |
+| **Android**                                                        | ✅          | ✅            | ✅             | ✅           | ✅             | ✅                  | ✅                   |
+| **JS** *(Browser, NodeJS)*                                         | ✅          | ✅            | ✅             | ✅           | ✅             | ✅                  | 🟡                  |
+| **IOS**                                                            | ✅          | ✅            | ✅             | ✅           | ✅             | ✅                  | 🚧                  |
+| **tvOS** *(tvosArm64, tvosX64, tvosSimulatorArm64)* 🚧             | ☑️         | ✅            | ✅             | ✅           | ✅             | ✅                  | ❌                   |
+| **watchOS** *(watchosArm64, watchosX64, watchosSimulatorArm64)* 🚧 | ☑️         | ✅            | ✅             | ✅           | ✅             | ✅                  | ❌                   |
+| **MacOS**  *(macosX64 & macosArm64)* 🚧                            | ✅          | ✅            | ✅             | ✅           | ✅             | ✅                  | ❌                   |
+| **Windows** *(mingwX64)*   🚧                                      | ☑️         | ✅            | ✅             | ✅           | ✅             | ❌                  | ❌                   |
+| **Linux** *(linuxX64)*  🚧                                         | ☑️         | ✅            | ✅             | ✅           | ✅             | ❌                  | ❌                   |
 
 ✅ = full support
 
@@ -22,6 +22,9 @@ Supported targets:
 🚧 = experimental/needs feedback
 
 ❌ = not supported
+
+🟡 = supported, relays on (fallback)OAuth as main flow
+
 
 *Note: WASM planned see [issue](https://github.com/supabase-community/supabase-kt/issues/86)*
 
@@ -77,7 +80,7 @@ implementation("io.github.jan-tennert.supabase:[module]")
 
 #### [Apollo GraphQL integration](/plugins/ApolloGraphQL)
 
-#### [ComposeAuth](/plugins/ComposeAuth)
+#### [Compose Auth](/plugins/ComposeAuth)
 
 # Demos
 
