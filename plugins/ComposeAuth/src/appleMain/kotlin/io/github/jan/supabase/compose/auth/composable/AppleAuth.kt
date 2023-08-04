@@ -6,7 +6,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import io.github.jan.supabase.compose.auth.ComposeAuth
 import io.github.jan.supabase.compose.auth.loginWithApple
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import platform.AuthenticationServices.ASAuthorization
 import platform.AuthenticationServices.ASAuthorizationAppleIDCredential
@@ -24,8 +24,6 @@ import platform.UIKit.UIApplication
 import platform.UIKit.UIWindow
 import platform.UIKit.UIWindowScene
 import platform.darwin.NSObject
-
-
 
 /**
  * Composable for Apple login with native behavior
@@ -54,14 +52,9 @@ actual fun ComposeAuth.rememberLoginWithApple(
         }
 
         val controller = ASAuthorizationController(listOf(request)).apply {
-            delegate = authorizationController {
-                scope.launch(Dispatchers.Main) {
-                    if (it is NativeSignInResult.Success && it.idToken != null) {
-                        loginWithApple(it.idToken)
-                    }
-                    onResult.invoke(it)
-                    state.reset()
-                }
+            delegate = authorizationController(scope) {
+                onResult.invoke(it)
+                state.reset()
             }
 
             presentationContextProvider = presentationAnchor()
@@ -73,8 +66,8 @@ actual fun ComposeAuth.rememberLoginWithApple(
     return state
 }
 
-
-internal fun authorizationController(
+internal fun ComposeAuth.authorizationController(
+    scope:CoroutineScope,
     onResult: (NativeSignInResult) -> Unit
 ): ASAuthorizationControllerDelegateProtocol {
     return object : NSObject(), ASAuthorizationControllerDelegateProtocol {
@@ -88,7 +81,10 @@ internal fun authorizationController(
                 credentials?.identityToken?.base64EncodedStringWithOptions(
                     NSUTF8StringEncoding
                 )?.let { idToken ->
-                    onResult.invoke(NativeSignInResult.Success(idToken))
+                    scope.launch {
+                        loginWithApple(idToken)
+                        onResult.invoke(NativeSignInResult.Success)
+                    }
                 }
             } catch (e: Exception) {
                 onResult.invoke(NativeSignInResult.Error(e.message ?: "error"))

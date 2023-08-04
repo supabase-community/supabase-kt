@@ -71,7 +71,7 @@ internal fun ComposeAuth.signInWithCM(onResult: (NativeSignInResult) -> Unit, fa
                             val googleIdTokenCredential = GoogleIdTokenCredential.createFrom(result.credential.data)
 
                             loginWithGoogle(googleIdTokenCredential.idToken)
-                            onResult.invoke(NativeSignInResult.Success(googleIdTokenCredential.idToken))
+                            onResult.invoke(NativeSignInResult.Success)
                         } catch (e: GoogleIdTokenParsingException) {
                             onResult.invoke(
                                 NativeSignInResult.Error(
@@ -114,7 +114,7 @@ internal fun ComposeAuth.oneTapSignIn(onResult: (NativeSignInResult) -> Unit, fa
                         Identity.getSignInClient(context).getSignInCredentialFromIntent(result.data)
                     credential.googleIdToken?.let {
                         loginWithGoogle(it)
-                        onResult.invoke(NativeSignInResult.Success())
+                        onResult.invoke(NativeSignInResult.Success)
                     } ?: run {
                         onResult.invoke(NativeSignInResult.Error("error: idToken is missing"))
                     }

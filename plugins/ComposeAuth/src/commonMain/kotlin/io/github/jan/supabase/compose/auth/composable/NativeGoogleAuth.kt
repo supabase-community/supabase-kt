@@ -9,14 +9,12 @@ import io.github.jan.supabase.compose.auth.signOut
 import io.github.jan.supabase.gotrue.LogoutScope
 import io.github.jan.supabase.gotrue.providers.Google
 
-
 /**
  * Composable function what implements Native Google Login flow with default fallback
  * @return [NativeSignInState]
  */
 @Composable
 expect fun ComposeAuth.rememberLoginWithGoogle(onResult: (NativeSignInResult) -> Unit = {}, fallback: suspend () -> Unit = { fallbackLogin(Google) }): NativeSignInState
-
 
 /**
  * Composable of default behavior if Native Login is not supported on the platform
@@ -40,7 +38,6 @@ fun defaultLoginBehavior(fallback: suspend () -> Unit): NativeSignInState {
  */
 @Composable
 expect fun ComposeAuth.rememberSignOut(logoutScope: LogoutScope = LogoutScope.LOCAL): NativeSignInState
-
 
 /**
  * Composable used to Sign Out from GoTrue

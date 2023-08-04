@@ -26,5 +26,4 @@ class NativeSignInState {
     internal fun reset() {
         started = false
     }
-
 }

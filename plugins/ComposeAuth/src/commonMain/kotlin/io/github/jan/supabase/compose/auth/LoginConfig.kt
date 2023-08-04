@@ -2,7 +2,6 @@ package io.github.jan.supabase.compose.auth
 
 import kotlinx.serialization.json.JsonObject
 
-
 /**
  * Config for [ComposeAuth]
  */

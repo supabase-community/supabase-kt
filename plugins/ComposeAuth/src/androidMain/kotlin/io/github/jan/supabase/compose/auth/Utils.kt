@@ -6,12 +6,10 @@ import android.content.ContextWrapper
 import com.google.android.gms.auth.api.identity.BeginSignInRequest
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 
-
 internal fun getSignInRequest(config: GoogleLoginConfig?): BeginSignInRequest {
     val tokenIdRequestOptions = BeginSignInRequest.GoogleIdTokenRequestOptions.builder()
     config?.let { options ->
-        tokenIdRequestOptions
-            .setServerClientId(options.serverClientId)
+        tokenIdRequestOptions.setServerClientId(options.serverClientId)
             .setSupported(options.isSupported)
             .setFilterByAuthorizedAccounts(options.filterByAuthorizedAccounts)
             .setNonce(options.nonce)
@@ -36,7 +34,6 @@ internal fun getGoogleIDOptions(config: GoogleLoginConfig?): GetGoogleIdOption {
     }
     return googleIdOption.build()
 }
-
 
 internal fun Context.getActivity(): Activity? = when (this) {
     is Activity -> this

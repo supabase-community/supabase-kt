@@ -131,4 +131,3 @@ internal suspend fun ComposeAuth.fallbackLogin(provider: IDTokenProvider) {
 internal suspend fun ComposeAuth.signOut(scope: LogoutScope = LogoutScope.LOCAL) {
     supabaseClient.gotrue.logout(scope)
 }
-
