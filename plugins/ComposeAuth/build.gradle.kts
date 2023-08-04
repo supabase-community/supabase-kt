@@ -59,6 +59,7 @@ kotlin {
             dependsOn(commonMain)
             dependencies {
                 api(libs.android.play.store.auth)
+                implementation(libs.android.google.id)
                 implementation(libs.kotlinx.coroutines.play.services)
                 implementation(libs.androidx.activity.compose)
             }

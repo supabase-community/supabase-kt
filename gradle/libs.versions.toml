@@ -22,6 +22,7 @@ moshi = "1.15.0"
 jackson = "2.15.2"
 browser = "1.5.0"
 compose = "1.4.3"
+googleid = "1.0.1"
 
 [plugins]
 kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
@@ -57,6 +58,7 @@ androidx-browser = { module = "androidx.browser:browser", version.ref = "browser
 androidx-startup-runtime = { module = "androidx.startup:startup-runtime", version.ref = "androidx-startup" }
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activity-compose" }
 android-play-store-auth = { module = "com.google.android.gms:play-services-auth", version.ref = "android-play-store" }
+android-google-id = { module = "com.google.android.libraries.identity.googleid:googleid", version.ref = "googleid" }
 
 multiplatform-settings-no-arg = { module = "com.russhwolf:multiplatform-settings-no-arg", version.ref = "multiplatform-settings" }
 multiplatform-settings-coroutines = { module = "com.russhwolf:multiplatform-settings-coroutines", version.ref = "multiplatform-settings" }
