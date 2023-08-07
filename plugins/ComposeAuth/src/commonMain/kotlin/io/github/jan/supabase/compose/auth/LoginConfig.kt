@@ -12,7 +12,6 @@ interface LoginConfig {
     val serverClientId: String
 }
 
-
 /**
  * Config for requesting IDToken from play-auth API
  * @param isSupported Sets whether Google ID token-backed credentials should be returned by the API.
@@ -51,14 +50,18 @@ fun ComposeAuth.Config.googleNativeLogin(
     associateLinkedAccounts: Pair<String, List<String>>? = null,
     nonce: String? = null,
     extraData: JsonObject? = null
-) = GoogleLoginConfig(
-    serverClientId,
-    isSupported,
-    filterByAuthorizedAccounts,
-    associateLinkedAccounts,
-    nonce,
-    extraData
-)
+) {
+    loginConfig["google"].apply {
+        GoogleLoginConfig(
+            serverClientId,
+            isSupported,
+            filterByAuthorizedAccounts,
+            associateLinkedAccounts,
+            nonce,
+            extraData
+        )
+    }
+}
 
 /**
  * Helper function that return native configs
@@ -67,4 +70,6 @@ fun ComposeAuth.Config.appleNativeLogin(
     serverClientId: String = "",
     nonce: String? = null,
     extraData: JsonObject? = null
-) = AppleLoginConfig(serverClientId, nonce, extraData)
+) {
+    loginConfig["apple"].apply { AppleLoginConfig(serverClientId, nonce, extraData) }
+}

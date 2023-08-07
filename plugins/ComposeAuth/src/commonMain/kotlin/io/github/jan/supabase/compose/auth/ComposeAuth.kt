@@ -22,8 +22,8 @@ import io.github.jan.supabase.plugins.SupabasePluginProvider
  *      //your config here
  *    }
  *    install(ComposeAuth){
- *       googleLoginConfig = googleNativeLogin(/* your config parameters here */),
- *       appleLoginConfig = appleNativeLogin(/* your config parameters here */)
+ *      googleNativeLogin(/* your config parameters here */)
+ *      appleNativeLogin(/* your config parameters here */)
  *    }
  * }
  * ```
@@ -53,21 +53,18 @@ sealed interface ComposeAuth : SupabasePlugin {
      */
     val config: Config
 
-
     /**
      * The corresponding [SupabaseClient] instance
      */
     val supabaseClient: SupabaseClient
 
-
     /**
      * Config for [ComposeAuth]
-     * @param googleLoginConfig provide [GoogleLoginConfig]
-     * @param appleLoginConfig provide [AppleLoginConfig]
+     * @param loginConfig provide [LoginConfig]
+     *
      */
     data class Config(
-        var googleLoginConfig: GoogleLoginConfig? = null,
-        var appleLoginConfig: AppleLoginConfig? = null
+        val loginConfig: MutableMap<String, LoginConfig> = mutableMapOf()
     ) : SupabasePlugin
 
     companion object : SupabasePluginProvider<Config, ComposeAuth> {
@@ -107,20 +104,24 @@ internal class ComposeAuthImpl(
 }
 
 internal suspend fun ComposeAuth.loginWithGoogle(idToken: String) {
+    val config = config.loginConfig["google"] as? GoogleLoginConfig
+
     supabaseClient.gotrue.loginWith(IDToken) {
         provider = Google
         this.idToken = idToken
-        nonce = config.googleLoginConfig?.nonce
-        data = config.googleLoginConfig?.extraData
+        nonce = config?.nonce
+        data = config?.extraData
     }
 }
 
 internal suspend fun ComposeAuth.loginWithApple(idToken: String) {
+    val config = config.loginConfig["apple"] as? GoogleLoginConfig
+
     supabaseClient.gotrue.loginWith(IDToken) {
         provider = Apple
         this.idToken = idToken
-        nonce = config.appleLoginConfig?.nonce
-        data = config.appleLoginConfig?.extraData
+        nonce = config?.nonce
+        data = config?.extraData
     }
 }
 
