@@ -2,8 +2,15 @@
 
 Extends GoTrue-kt with auth composable
 
+Newest version: [![Maven Central](https://img.shields.io/maven-central/v/io.github.jan-tennert.supabase/supabase-kt)](https://search.maven.org/search?q=g%3Aio.github.jan-tennert.supabase)
+
 # Installation
 
+```kotlin
+dependencies {
+    implementation("io.github.jan-tennert.supabase:compose-auth:VERSION")
+}
+```
 
 Install plugin in main SupabaseClient. See the [documentation](https://supabase.com/docs/reference/kotlin/initializing) for more information
 ```kotlin
