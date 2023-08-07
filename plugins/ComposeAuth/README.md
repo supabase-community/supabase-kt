@@ -1,4 +1,4 @@
-# Supabase-kt ComposeAuth
+# Supabase-kt Compose Auth
 
 Extends GoTrue-kt with auth composable
 
