@@ -13,6 +13,7 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldColors
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -24,6 +25,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.VisualTransformation
 import io.github.jan.supabase.compose.auth.ui.AuthIcons
+import io.github.jan.supabase.compose.auth.ui.LocalAuthState
 import io.github.jan.supabase.compose.auth.ui.rememberLockIcon
 import io.github.jan.supabase.compose.auth.ui.rememberVisibilityIcon
 import io.github.jan.supabase.compose.auth.ui.rememberVisibilityOffIcon
@@ -47,8 +49,11 @@ fun PasswordField(
     colors: TextFieldColors = TextFieldDefaults.textFieldColors(),
     label: @Composable (() -> Unit)? = null,
     leadingIcon: @Composable (() -> Unit)? = { Icon(AuthIcons.rememberLockIcon(), "Lock") },
-    supportingText: @Composable ((rules: List<PasswordRuleResult>) -> Unit)? = { it.firstUnfulfilled()?.let { rule -> Text(rule.description) } },
-    trailingIcon: @Composable ((showPassword: MutableState<Boolean>) -> Unit)? = { showPassword ->
+    supportingText: @Composable ((rules: List<PasswordRuleResult>) -> Unit)? = {
+        if (value.isNotEmpty()) it.firstUnfulfilled()?.let { rule ->
+            Text(rule.description)
+        }
+    },    trailingIcon: @Composable ((showPassword: MutableState<Boolean>) -> Unit)? = { showPassword ->
         IconButton(onClick = { showPassword.value = !showPassword.value }) {
             Icon(if(showPassword.value) AuthIcons.rememberVisibilityIcon() else AuthIcons.rememberVisibilityOffIcon(), "Visibility")
         }
@@ -57,6 +62,10 @@ fun PasswordField(
 ) {
     val showPassword = remember { mutableStateOf(false) }
     val ruleResults = remember(value, rules) { rules.map { PasswordRuleResult(it.description, it.predicate(value)) } }
+    val state = LocalAuthState.current
+    LaunchedEffect(value, state) {
+        state.validPassword = ruleResults.all { it.isFulfilled }
+    }
     TextField(
         value = value,
         onValueChange = onValueChange,
@@ -65,7 +74,7 @@ fun PasswordField(
         keyboardOptions = keyboardOptions,
         keyboardActions = keyboardActions,
         singleLine = singleLine,
-        isError = ruleResults.firstUnfulfilled() != null,
+        isError = ruleResults.firstUnfulfilled() != null && value.isNotEmpty(),
         modifier = modifier,
         leadingIcon = leadingIcon,
         trailingIcon = { trailingIcon?.invoke(showPassword) },
@@ -87,7 +96,7 @@ fun PasswordField(
     onValueChange: (TextFieldValue) -> Unit,
     rules: List<PasswordRule> = rememberPasswordRuleList(),
     modifier: Modifier = Modifier,
-    visualTransformation: (showPassword: Boolean) -> VisualTransformation = { if(it) PasswordVisualTransformation() else VisualTransformation.None },
+    visualTransformation: (showPassword: Boolean) -> VisualTransformation = { if(it) VisualTransformation.None else PasswordVisualTransformation() },
     keyboardActions: KeyboardActions = KeyboardActions(),
     keyboardOptions: KeyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
     readOnly: Boolean = false,
@@ -99,7 +108,11 @@ fun PasswordField(
     colors: TextFieldColors = TextFieldDefaults.textFieldColors(),
     label: @Composable (() -> Unit)? = null,
     leadingIcon: @Composable (() -> Unit)? = { Icon(AuthIcons.rememberLockIcon(), "Lock") },
-    supportingText: @Composable ((rules: List<PasswordRuleResult>) -> Unit)? = { it.firstUnfulfilled()?.let { rule -> Text(rule.description) } },
+    supportingText: @Composable ((rules: List<PasswordRuleResult>) -> Unit)? = {
+        if (value.text.isNotEmpty()) it.firstUnfulfilled()?.let { rule ->
+            Text(rule.description)
+        }
+    },
     trailingIcon: @Composable ((showPassword: MutableState<Boolean>) -> Unit)? = { showPassword ->
         IconButton(onClick = { showPassword.value = !showPassword.value }) {
             Icon(if(showPassword.value) AuthIcons.rememberVisibilityIcon() else AuthIcons.rememberVisibilityOffIcon(), "Visibility")
@@ -109,6 +122,10 @@ fun PasswordField(
 ) {
     val showPassword = remember { mutableStateOf(false) }
     val ruleResults = remember(value, rules) { rules.map { PasswordRuleResult(it.description, it.predicate(value.text)) } }
+    val state = LocalAuthState.current
+    LaunchedEffect(value, state) {
+        state.validPassword = ruleResults.all { it.isFulfilled }
+    }
     TextField(
         value = value,
         onValueChange = onValueChange,
@@ -117,7 +134,7 @@ fun PasswordField(
         keyboardOptions = keyboardOptions,
         keyboardActions = keyboardActions,
         singleLine = singleLine,
-        isError = ruleResults.firstUnfulfilled() != null,
+        isError = ruleResults.firstUnfulfilled() != null && value.text.isNotEmpty(),
         modifier = modifier,
         leadingIcon = leadingIcon,
         trailingIcon = { trailingIcon?.invoke(showPassword) },
@@ -139,7 +156,7 @@ fun OutlinedPasswordField(
     onValueChange: (String) -> Unit,
     rules: List<PasswordRule> = rememberPasswordRuleList(),
     modifier: Modifier = Modifier,
-    visualTransformation: (showPassword: Boolean) -> VisualTransformation = { if(it) PasswordVisualTransformation() else VisualTransformation.None },
+    visualTransformation: (showPassword: Boolean) -> VisualTransformation = { if(it) VisualTransformation.None else PasswordVisualTransformation() },
     keyboardActions: KeyboardActions = KeyboardActions(),
     keyboardOptions: KeyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
     readOnly: Boolean = false,
@@ -148,11 +165,14 @@ fun OutlinedPasswordField(
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     textStyle: TextStyle = LocalTextStyle.current,
     shape: Shape = TextFieldDefaults.filledShape,
-    colors: TextFieldColors = TextFieldDefaults.textFieldColors(),
+    colors: TextFieldColors = TextFieldDefaults.outlinedTextFieldColors(),
     label: @Composable (() -> Unit)? = null,
     leadingIcon: @Composable (() -> Unit)? = { Icon(AuthIcons.rememberLockIcon(), "Lock") },
-    supportingText: @Composable ((rules: List<PasswordRuleResult>) -> Unit)? = { it.firstUnfulfilled()?.let { rule -> Text(rule.description) } },
-    trailingIcon: @Composable ((showPassword: MutableState<Boolean>) -> Unit)? = { showPassword ->
+    supportingText: @Composable ((rules: List<PasswordRuleResult>) -> Unit)? = {
+        if (value.isNotEmpty()) it.firstUnfulfilled()?.let { rule ->
+            Text(rule.description)
+        }
+    },    trailingIcon: @Composable ((showPassword: MutableState<Boolean>) -> Unit)? = { showPassword ->
         IconButton(onClick = { showPassword.value = !showPassword.value }) {
             Icon(if(showPassword.value) AuthIcons.rememberVisibilityIcon() else AuthIcons.rememberVisibilityOffIcon(), "Visibility")
         }
@@ -161,6 +181,10 @@ fun OutlinedPasswordField(
 ) {
     val showPassword = remember { mutableStateOf(false) }
     val ruleResults = remember(value, rules) { rules.map { PasswordRuleResult(it.description, it.predicate(value)) } }
+    val state = LocalAuthState.current
+    LaunchedEffect(value, state) {
+        state.validPassword = ruleResults.all { it.isFulfilled }
+    }
     OutlinedTextField(
         value = value,
         onValueChange = onValueChange,
@@ -169,7 +193,7 @@ fun OutlinedPasswordField(
         keyboardOptions = keyboardOptions,
         keyboardActions = keyboardActions,
         singleLine = singleLine,
-        isError = ruleResults.firstUnfulfilled() != null,
+        isError = ruleResults.firstUnfulfilled() != null && value.isNotEmpty(),
         modifier = modifier,
         leadingIcon = leadingIcon,
         trailingIcon = { trailingIcon?.invoke(showPassword) },
@@ -191,7 +215,7 @@ fun OutlinedPasswordField(
     onValueChange: (TextFieldValue) -> Unit,
     rules: List<PasswordRule> = rememberPasswordRuleList(),
     modifier: Modifier = Modifier,
-    visualTransformation: (showPassword: Boolean) -> VisualTransformation = { if(it) PasswordVisualTransformation() else VisualTransformation.None },
+    visualTransformation: (showPassword: Boolean) -> VisualTransformation = { if(it) VisualTransformation.None else PasswordVisualTransformation() },
     keyboardActions: KeyboardActions = KeyboardActions(),
     keyboardOptions: KeyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
     readOnly: Boolean = false,
@@ -200,11 +224,14 @@ fun OutlinedPasswordField(
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     textStyle: TextStyle = LocalTextStyle.current,
     shape: Shape = TextFieldDefaults.filledShape,
-    colors: TextFieldColors = TextFieldDefaults.textFieldColors(),
+    colors: TextFieldColors = TextFieldDefaults.outlinedTextFieldColors(),
     label: @Composable (() -> Unit)? = null,
     leadingIcon: @Composable (() -> Unit)? = { Icon(AuthIcons.rememberLockIcon(), "Lock") },
-    supportingText: @Composable ((rules: List<PasswordRuleResult>) -> Unit)? = { it.firstUnfulfilled()?.let { rule -> Text(rule.description) } },
-    trailingIcon: @Composable ((showPassword: MutableState<Boolean>) -> Unit)? = { showPassword ->
+    supportingText: @Composable ((rules: List<PasswordRuleResult>) -> Unit)? = {
+        if (value.text.isNotEmpty()) it.firstUnfulfilled()?.let { rule ->
+            Text(rule.description)
+        }
+    },    trailingIcon: @Composable ((showPassword: MutableState<Boolean>) -> Unit)? = { showPassword ->
         IconButton(onClick = { showPassword.value = !showPassword.value }) {
             Icon(if(showPassword.value) AuthIcons.rememberVisibilityIcon() else AuthIcons.rememberVisibilityOffIcon(), "Visibility")
         }
@@ -213,6 +240,10 @@ fun OutlinedPasswordField(
 ) {
     val showPassword = remember { mutableStateOf(false) }
     val ruleResults = remember(value, rules) { rules.map { PasswordRuleResult(it.description, it.predicate(value.text)) } }
+    val state = LocalAuthState.current
+    LaunchedEffect(value, state) {
+        state.validPassword = ruleResults.all { it.isFulfilled }
+    }
     TextField(
         value = value,
         onValueChange = onValueChange,
@@ -221,7 +252,7 @@ fun OutlinedPasswordField(
         keyboardOptions = keyboardOptions,
         keyboardActions = keyboardActions,
         singleLine = singleLine,
-        isError = ruleResults.firstUnfulfilled() != null,
+        isError = ruleResults.firstUnfulfilled() != null && value.text.isNotEmpty(),
         modifier = modifier,
         leadingIcon = leadingIcon,
         trailingIcon = { trailingIcon?.invoke(showPassword) },
