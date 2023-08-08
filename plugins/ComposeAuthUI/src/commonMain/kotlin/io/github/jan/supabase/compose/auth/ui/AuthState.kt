@@ -10,6 +10,7 @@ import androidx.compose.runtime.setValue
 
 class AuthState {
 
+    //TODO: Make this more extensible
     internal var validPassword by mutableStateOf(false)
 
     internal var validEmail by mutableStateOf(false)
@@ -19,8 +20,8 @@ class AuthState {
 
 }
 
-val LocalAuthState = compositionLocalOf<AuthState> {
-    AuthState()
+val LocalAuthState = compositionLocalOf {
+    AuthState() //possibly to throw an error here
 }
 
 @Composable
