@@ -23,8 +23,8 @@ val client = createSupabaseClient(
         //your config
     }
     install(ComposeAuth) {
-        googleLoginConfig = googleNativeLogin(serverClientId = "google-client-id")
-        appleLoginConfig = appleNativeLogin()
+        googleNativeLogin(serverClientId = "google-client-id")
+        appleNativeLogin()
     }
 }
 ```
@@ -34,11 +34,26 @@ val client = createSupabaseClient(
 The composable can be accessed trough `composeAuth` property from `client`
 
 ```kotlin
-val action = client.composeAuth.rememberLoginWithGoogle(onResult = {})
-
-//...
-
-Button(onClick = { action.startFlow() }) { Text(text = "Google Login") }
+val action = client.composeAuth.rememberLoginWithGoogle(
+    onResult = { result ->
+        when (result) {
+            is NativeSignInResult.Success -> {}
+            is NativeSignInResult.ClosedByUser -> {}
+            is NativeSignInResult.Error -> {}
+            is NativeSignInResult.NetworkError -> {}
+        } 
+               },
+    fallback = {
+    // optional: only add fallback if you like to use custom fallback
+    }
+                            
+Button(onClick = { action.startFlow() }) { Text(text = "Google Login") })
 ```
 
-To learn how you can use this plugin, visit [Compose Multiplatform](https://github.com/JetBrains/compose-multiplatform/#readme)
+# Support
+
+Currently, Compose Auth only supports native login for
+Android with Google and iOS with Apple, other variations such as JS relay on fallback which
+by default is GoTrue-kt OAuth flow.
+
+To learn how you can use this plugin in your compose project, visit [Compose Multiplatform](https://github.com/JetBrains/compose-multiplatform/#readme)

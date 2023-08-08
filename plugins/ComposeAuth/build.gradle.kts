@@ -49,7 +49,6 @@ kotlin {
         }
         val commonMain by getting {
             dependencies {
-                api(project(":"))
                 api(project(":gotrue-kt"))
                 implementation(compose.ui)
                 implementation(compose.runtime)
@@ -78,7 +77,7 @@ kotlin {
 }
 
 android {
-    namespace = "io.github.jan.supabase.composeauth"
+    namespace = "io.github.jan.supabase.compose.auth"
     compileSdk = 33
     sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
     defaultConfig {
