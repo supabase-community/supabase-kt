@@ -2,6 +2,7 @@ package io.github.jan.supabase
 
 import co.touchlab.kermit.Logger
 import io.github.jan.supabase.annotations.SupabaseDsl
+import io.github.jan.supabase.annotations.SupabaseInternal
 import io.github.jan.supabase.plugins.PluginManager
 import io.github.jan.supabase.plugins.SupabasePlugin
 import io.github.jan.supabase.plugins.SupabasePluginProvider
@@ -69,7 +70,7 @@ class SupabaseClientBuilder @PublishedApi internal constructor(private val supab
         }
         if(supabaseUrl.startsWith("http://")) {
             useHTTPS = false
-            Logger.w { "You are using a non https supabase url ($supabaseUrl)."}
+            Logger.w { "You are using a non HTTPS supabase url ($supabaseUrl)."}
         }
     }
 
@@ -80,7 +81,10 @@ class SupabaseClientBuilder @PublishedApi internal constructor(private val supab
 
     /**
      * Add your own http configuration to [SupabaseClient.httpClient]
+     *
+     * **Warning:** This is an internal function and should only be used if you know what you are doing. You don't have to specify the HTTP client engine, it will be automatically set by Ktor.
      */
+    @SupabaseInternal
     fun httpConfig(block: HttpClientConfig<*>.() -> Unit) {
         httpConfigOverrides.add(block)
     }
