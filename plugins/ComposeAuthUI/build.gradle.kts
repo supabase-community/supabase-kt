@@ -47,9 +47,6 @@ kotlin {
         }
         val commonMain by getting {
             dependencies {
-                api(project(":"))
-                api(project(":gotrue-kt"))
-                api(libs.apollo.kotlin)
                 implementation(compose.ui)
                 implementation(compose.material3)
             }
