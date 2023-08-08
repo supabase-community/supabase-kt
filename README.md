@@ -23,7 +23,7 @@ Supported targets:
 
 ❌ = not supported
 
-🟡 = supported, relays on (fallback)OAuth as main flow
+🟡 = supported, relies on (fallback) OAuth as main flow
 
 
 *Note: WASM planned see [issue](https://github.com/supabase-community/supabase-kt/issues/86)*

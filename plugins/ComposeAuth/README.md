@@ -1,6 +1,6 @@
 # Supabase-kt Compose Auth
 
-Extends GoTrue-kt with auth composable
+Extends gotrue-kt with auth composable
 
 Newest version: [![Maven Central](https://img.shields.io/maven-central/v/io.github.jan-tennert.supabase/supabase-kt)](https://search.maven.org/search?q=g%3Aio.github.jan-tennert.supabase)
 
@@ -42,7 +42,7 @@ val action = client.composeAuth.rememberLoginWithGoogle(
             is NativeSignInResult.Error -> {}
             is NativeSignInResult.NetworkError -> {}
         } 
-               },
+    },
     fallback = {
     // optional: only add fallback if you like to use custom fallback
     }
@@ -53,7 +53,7 @@ Button(onClick = { action.startFlow() }) { Text(text = "Google Login") })
 # Support
 
 Currently, Compose Auth only supports native login for
-Android with Google and iOS with Apple, other variations such as JS relay on fallback which
+Android with Google and iOS with Apple, other variations such as JS rely on fallback which
 by default is GoTrue-kt OAuth flow.
 
 To learn how you can use this plugin in your compose project, visit [Compose Multiplatform](https://github.com/JetBrains/compose-multiplatform/#readme)

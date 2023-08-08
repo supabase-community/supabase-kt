@@ -35,6 +35,8 @@ detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
 
 compose = { id = "org.jetbrains.compose", version.ref = "compose" }
 
+native-cocoapods = { id = "org.jetbrains.kotlin.native.cocoapods", version.ref = "kotlin" }
+
 [libraries]
 kotlinx-atomicfu-plugin = { module = "org.jetbrains.kotlinx:atomicfu-gradle-plugin", version.ref = "atomicfu" }
 kotlinx-atomicfu = { module = "org.jetbrains.kotlinx:atomicfu", version.ref = "atomicfu" }
