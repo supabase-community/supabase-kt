@@ -51,7 +51,7 @@ fun ComposeAuth.Config.googleNativeLogin(
     nonce: String? = null,
     extraData: JsonObject? = null
 ) {
-    loginConfig["google"].apply {
+    loginConfig["google"] =
         GoogleLoginConfig(
             serverClientId,
             isSupported,
@@ -60,7 +60,6 @@ fun ComposeAuth.Config.googleNativeLogin(
             nonce,
             extraData
         )
-    }
 }
 
 /**
@@ -71,5 +70,5 @@ fun ComposeAuth.Config.appleNativeLogin(
     nonce: String? = null,
     extraData: JsonObject? = null
 ) {
-    loginConfig["apple"].apply { AppleLoginConfig(serverClientId, nonce, extraData) }
+    loginConfig["apple"] = AppleLoginConfig(serverClientId, nonce, extraData)
 }
