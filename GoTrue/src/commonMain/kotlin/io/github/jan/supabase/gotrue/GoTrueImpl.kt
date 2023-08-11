@@ -238,6 +238,10 @@ internal class GoTrueImpl(
     }
 
     override suspend fun logout(scope: LogoutScope) {
+        if(currentSessionOrNull() == null) {
+            Logger.w { "Trying to logout without a valid session" }
+            return
+        }
         api.post("logout") {
             parameter("scope", scope.name.lowercase())
         }
