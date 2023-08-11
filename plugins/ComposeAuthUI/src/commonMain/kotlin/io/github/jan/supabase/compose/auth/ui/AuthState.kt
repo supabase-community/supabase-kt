@@ -3,20 +3,42 @@ package io.github.jan.supabase.compose.auth.ui
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.compositionLocalOf
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.mutableStateMapOf
+import androidx.compose.runtime.saveable.mapSaver
+import androidx.compose.runtime.saveable.rememberSaveable
 
-class AuthState {
+class AuthState(
+    states: Map<String, Boolean> = emptyMap()
+) {
 
-    //TODO: Make this more extensible
-    internal var validPassword by mutableStateOf(false)
-
-    internal var validEmail by mutableStateOf(false)
+    private val _states = mutableStateMapOf(*states.toList().toTypedArray())
+    val states: Map<String, Boolean> get() = _states.toMap()
 
     val validForm: Boolean
-        get() = validEmail && validPassword
+        get() = states.values.all { it }
+
+    operator fun set(key: String, value: Boolean) {
+        _states[key] = value
+    }
+
+    fun remove(key: String) {
+        _states.remove(key)
+    }
+
+    operator fun get(key: String): Boolean? {
+        return _states[key]
+    }
+
+    fun clear() {
+        _states.clear()
+    }
+
+    companion object {
+        val SAVER = mapSaver(
+            save = { it.states.toMap() },
+            restore = { AuthState(it.mapValues { (_, value) ->  (value as? Boolean) ?: error("Invalid state value") }) }
+        )
+    }
 
 }
 
@@ -26,7 +48,7 @@ val LocalAuthState = compositionLocalOf {
 
 @Composable
 fun AuthForm(
-    state: AuthState = remember { AuthState() },
+    state: AuthState = rememberSaveable(saver = AuthState.SAVER) { AuthState() },
     content: @Composable () -> Unit,
 ) {
     CompositionLocalProvider(LocalAuthState provides state) {

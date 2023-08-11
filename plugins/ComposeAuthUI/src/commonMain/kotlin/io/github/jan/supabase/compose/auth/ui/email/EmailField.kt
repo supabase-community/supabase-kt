@@ -50,11 +50,12 @@ fun EmailField(
     supportingText: @Composable ((validEmail: Boolean) -> Unit)? = { if(!it) Text("Please enter a valid email address") },
     trailingIcon: @Composable (() -> Unit)? = null,
     placeholder: @Composable (() -> Unit)? = null,
+    formKey: String = "EMAIL",
 ) {
     val isValidEmail = remember(value) { validator.validate(value) }
     val state = LocalAuthState.current
     LaunchedEffect(isValidEmail, state) {
-        state.validEmail = isValidEmail
+        state[formKey] = isValidEmail
     }
     TextField(
         value = value,
@@ -106,11 +107,12 @@ fun EmailField(
     supportingText: @Composable ((validEmail: Boolean) -> Unit)? = { if(!it) Text("Please enter a valid email address") },
     trailingIcon: @Composable (() -> Unit)? = null,
     placeholder: @Composable (() -> Unit)? = null,
+    formKey: String = "EMAIL",
 ) {
     val isValidEmail = remember(value) { validator.validate(value.text) }
     val state = LocalAuthState.current
     LaunchedEffect(isValidEmail, state) {
-        state.validEmail = isValidEmail
+        state[formKey] = isValidEmail
     }
     TextField(
         value = value,
@@ -162,11 +164,12 @@ fun OutlinedEmailField(
     supportingText: @Composable ((validEmail: Boolean) -> Unit)? = { if(!it) Text("Please enter a valid email address") },
     trailingIcon: @Composable (() -> Unit)? = null,
     placeholder: @Composable (() -> Unit)? = null,
+    formKey: String = "EMAIL",
 ) {
     val isValidEmail = remember(value) { validator.validate(value) }
     val state = LocalAuthState.current
     LaunchedEffect(isValidEmail, state) {
-        state.validEmail = isValidEmail
+        state[formKey] = isValidEmail
     }
     OutlinedTextField(
         value = value,
@@ -218,11 +221,12 @@ fun OutlinedEmailField(
     supportingText: @Composable ((validEmail: Boolean) -> Unit)? = { if(!it) Text("Please enter a valid email address") },
     trailingIcon: @Composable (() -> Unit)? = null,
     placeholder: @Composable (() -> Unit)? = null,
+    formKey: String = "EMAIL",
 ) {
     val isValidEmail = remember(value) { validator.validate(value.text) }
     val state = LocalAuthState.current
     LaunchedEffect(isValidEmail, state) {
-        state.validEmail = isValidEmail
+        state[formKey] = isValidEmail
     }
     TextField(
         value = value,

@@ -59,12 +59,13 @@ fun PasswordField(
         }
     },
     placeholder: @Composable (() -> Unit)? = null,
+    formKey: String = "PASSWORD"
 ) {
     val showPassword = remember { mutableStateOf(false) }
     val ruleResults = remember(value, rules) { rules.map { PasswordRuleResult(it.description, it.predicate(value)) } }
     val state = LocalAuthState.current
     LaunchedEffect(value, state) {
-        state.validPassword = ruleResults.all { it.isFulfilled }
+        state[formKey] = ruleResults.all { it.isFulfilled }
     }
     TextField(
         value = value,
@@ -119,12 +120,13 @@ fun PasswordField(
         }
     },
     placeholder: @Composable (() -> Unit)? = null,
+    formKey: String = "PASSWORD"
 ) {
     val showPassword = remember { mutableStateOf(false) }
     val ruleResults = remember(value, rules) { rules.map { PasswordRuleResult(it.description, it.predicate(value.text)) } }
     val state = LocalAuthState.current
     LaunchedEffect(value, state) {
-        state.validPassword = ruleResults.all { it.isFulfilled }
+        state[formKey] = ruleResults.all { it.isFulfilled }
     }
     TextField(
         value = value,
@@ -178,12 +180,13 @@ fun OutlinedPasswordField(
         }
     },
     placeholder: @Composable (() -> Unit)? = null,
+    formKey: String = "PASSWORD"
 ) {
     val showPassword = remember { mutableStateOf(false) }
     val ruleResults = remember(value, rules) { rules.map { PasswordRuleResult(it.description, it.predicate(value)) } }
     val state = LocalAuthState.current
     LaunchedEffect(value, state) {
-        state.validPassword = ruleResults.all { it.isFulfilled }
+        state[formKey] = ruleResults.all { it.isFulfilled }
     }
     OutlinedTextField(
         value = value,
@@ -237,12 +240,13 @@ fun OutlinedPasswordField(
         }
     },
     placeholder: @Composable (() -> Unit)? = null,
+    formKey: String = "PASSWORD"
 ) {
     val showPassword = remember { mutableStateOf(false) }
     val ruleResults = remember(value, rules) { rules.map { PasswordRuleResult(it.description, it.predicate(value.text)) } }
     val state = LocalAuthState.current
     LaunchedEffect(value, state) {
-        state.validPassword = ruleResults.all { it.isFulfilled }
+        state[formKey] = ruleResults.all { it.isFulfilled }
     }
     TextField(
         value = value,
