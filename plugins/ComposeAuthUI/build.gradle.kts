@@ -13,8 +13,8 @@ repositories {
 @OptIn(org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi::class)
 kotlin {
     targetHierarchy.default()
+    jvmToolchain(8)
     jvm {
-        jvmToolchain(8)
         compilations.all {
             kotlinOptions.freeCompilerArgs = listOf(
                 "-Xjvm-default=all",  // use default methods in interfaces,
@@ -47,10 +47,24 @@ kotlin {
         }
         val commonMain by getting {
             dependencies {
-                implementation(compose.ui)
-                implementation(project(":"))
+                api(compose.ui)
+                implementation(project(":gotrue-kt"))
+                //kamel
+                implementation("com.soywiz.korlibs.korio:korio:4.0.9")
                 implementation(compose.material3)
             }
+        }
+        val nonJvmMain by creating {
+            dependsOn(commonMain)
+        }
+        val androidMain by getting {
+            dependsOn(nonJvmMain)
+        }
+        val iosMain by getting {
+            dependsOn(nonJvmMain)
+        }
+        val jsMain by getting {
+            dependsOn(nonJvmMain)
         }
     }
 }

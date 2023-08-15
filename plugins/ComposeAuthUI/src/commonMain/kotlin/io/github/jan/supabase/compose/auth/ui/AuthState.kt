@@ -36,7 +36,7 @@ class AuthState(
     companion object {
         val SAVER = mapSaver(
             save = { it.states.toMap() },
-            restore = { AuthState(it.mapValues { (_, value) ->  (value as? Boolean) ?: error("Invalid state value") }) }
+            restore = { AuthState(it.mapValues { (_, value) -> (value as? Boolean) ?: error("Invalid state value") }) }
         )
     }
 
