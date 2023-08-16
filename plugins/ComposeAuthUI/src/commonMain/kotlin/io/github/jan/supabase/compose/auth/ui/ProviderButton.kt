@@ -16,11 +16,11 @@ import io.github.jan.supabase.gotrue.providers.OAuthProvider
 val DEFAULT_ICON_SIZE = 24.dp //from Material3
 
 @Composable
-fun ProviderIcon(provider: OAuthProvider, modifier: Modifier = Modifier) {
+fun ProviderIcon(provider: OAuthProvider, contentDescription: String?, modifier: Modifier = Modifier) {
     providerPainter(provider, LocalDensity.current)?.let {
         Icon(
             painter = it,
-            contentDescription = "Sign in with ${provider.name}",
+            contentDescription = contentDescription,
             tint = Color.Unspecified,
             modifier = modifier
         )
@@ -29,7 +29,7 @@ fun ProviderIcon(provider: OAuthProvider, modifier: Modifier = Modifier) {
 
 @Composable
 fun RowScope.ProviderButtonContent(provider: OAuthProvider, text: String = "Login in with ${provider.name.capitalize()}") {
-    ProviderIcon(provider, Modifier.size(DEFAULT_ICON_SIZE))
+    ProviderIcon(provider, "Login in with ${provider.name}", Modifier.size(DEFAULT_ICON_SIZE))
     Spacer(Modifier.width(8.dp))
     Text(text)
 }
