@@ -13,16 +13,23 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import io.github.jan.supabase.gotrue.providers.OAuthProvider
 
+val DEFAULT_ICON_SIZE = 24.dp //from Material3
+
 @Composable
-fun RowScope.ProviderButtonContent(provider: OAuthProvider, text: String = "Login in with ${provider.name.capitalize()}") {
+fun ProviderIcon(provider: OAuthProvider, modifier: Modifier = Modifier) {
     providerPainter(provider, LocalDensity.current)?.let {
         Icon(
             painter = it,
             contentDescription = "Sign in with ${provider.name}",
             tint = Color.Unspecified,
-            modifier = Modifier.size(24.dp)
+            modifier = modifier
         )
     }
+}
+
+@Composable
+fun RowScope.ProviderButtonContent(provider: OAuthProvider, text: String = "Login in with ${provider.name.capitalize()}") {
+    ProviderIcon(provider, Modifier.size(DEFAULT_ICON_SIZE))
     Spacer(Modifier.width(8.dp))
     Text(text)
 }
