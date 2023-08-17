@@ -14,6 +14,76 @@ import androidx.compose.ui.unit.dp
 object AuthIcons
 
 @Composable
+fun AuthIcons.rememberCallIcon(): ImageVector {
+    return remember {
+        ImageVector.Builder(
+            name = "call",
+            defaultWidth = 24.0.dp,
+            defaultHeight = 24.0.dp,
+            viewportWidth = 40.0f,
+            viewportHeight = 40.0f
+        ).apply {
+            path(
+                fill = SolidColor(Color.Black),
+                fillAlpha = 1f,
+                stroke = null,
+                strokeAlpha = 1f,
+                strokeLineWidth = 1.0f,
+                strokeLineCap = StrokeCap.Butt,
+                strokeLineJoin = StrokeJoin.Miter,
+                strokeLineMiter = 1f,
+                pathFillType = PathFillType.NonZero
+            ) {
+                moveTo(32.958f, 34.708f)
+                quadToRelative(-5.041f, 0f, -10.02f, -2.416f)
+                quadToRelative(-4.98f, -2.417f, -8.896f, -6.354f)
+                quadTo(10.125f, 22f, 7.688f, 17.062f)
+                quadTo(5.25f, 12.125f, 5.25f, 7.042f)
+                quadToRelative(0f, -0.75f, 0.521f, -1.271f)
+                quadToRelative(0.521f, -0.521f, 1.271f, -0.521f)
+                horizontalLineTo(13f)
+                quadToRelative(0.583f, 0f, 1f, 0.375f)
+                quadToRelative(0.417f, 0.375f, 0.542f, 1f)
+                lineToRelative(1.125f, 5.333f)
+                quadToRelative(0.083f, 0.542f, -0.042f, 1.021f)
+                quadToRelative(-0.125f, 0.479f, -0.417f, 0.813f)
+                lineToRelative(-4.083f, 4.083f)
+                quadToRelative(2.167f, 3.583f, 4.937f, 6.354f)
+                quadTo(18.833f, 27f, 22.375f, 29f)
+                lineToRelative(3.958f, -4.042f)
+                quadToRelative(0.375f, -0.375f, 0.875f, -0.562f)
+                quadToRelative(0.5f, -0.188f, 1f, -0.063f)
+                lineToRelative(5.125f, 1.084f)
+                quadToRelative(0.625f, 0.125f, 1.021f, 0.604f)
+                quadToRelative(0.396f, 0.479f, 0.396f, 1.104f)
+                verticalLineToRelative(5.792f)
+                quadToRelative(0f, 0.791f, -0.521f, 1.291f)
+                quadToRelative(-0.521f, 0.5f, -1.271f, 0.5f)
+                close()
+                moveTo(9.833f, 15.458f)
+                lineTo(13f, 12.25f)
+                lineToRelative(-0.875f, -4.375f)
+                horizontalLineTo(7.917f)
+                quadToRelative(0.041f, 1.625f, 0.521f, 3.5f)
+                quadToRelative(0.479f, 1.875f, 1.395f, 4.083f)
+                close()
+                moveToRelative(22.292f, 16.584f)
+                verticalLineToRelative(-4.167f)
+                lineTo(28f, 27f)
+                lineToRelative(-3.167f, 3.25f)
+                quadToRelative(1.667f, 0.75f, 3.563f, 1.229f)
+                quadToRelative(1.896f, 0.479f, 3.729f, 0.563f)
+                close()
+                moveToRelative(-7.292f, -1.792f)
+                close()
+                moveToRelative(-15f, -14.792f)
+                close()
+            }
+        }.build()
+    }
+}
+
+@Composable
 fun AuthIcons.rememberMailIcon(): ImageVector {
     return remember {
         ImageVector.Builder(

@@ -1,9 +1,8 @@
-package io.github.jan.supabase.compose.auth.ui.email
+package io.github.jan.supabase.compose.auth.ui.phone
 
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.OutlinedTextField
@@ -23,24 +22,25 @@ import androidx.compose.ui.text.input.TextFieldValue
 import io.github.jan.supabase.compose.auth.ui.AuthIcons
 import io.github.jan.supabase.compose.auth.ui.FormValidator
 import io.github.jan.supabase.compose.auth.ui.LocalAuthState
-import io.github.jan.supabase.compose.auth.ui.rememberMailIcon
+import io.github.jan.supabase.compose.auth.ui.rememberCallIcon
 
-@ExperimentalMaterial3Api
 @Composable
-fun EmailField(
+fun PhoneField(
     value: String,
     onValueChange: (String) -> Unit,
-    validator: FormValidator = FormValidator.EMAIL,
+    validator: FormValidator = remember { FormValidator.PHONE },
+    mask: String = "(+##) ### ### ###",
+    maskChar: Char = '#',
     modifier: Modifier = Modifier,
     label: (@Composable () -> Unit)? = null,
     keyboardOptions: KeyboardOptions = KeyboardOptions(
-        keyboardType = KeyboardType.Email
+        keyboardType = KeyboardType.Phone
     ),
     keyboardActions: KeyboardActions = KeyboardActions.Default,
     leadingIcon: (@Composable () -> Unit)? = {
         Icon(
-            imageVector = AuthIcons.rememberMailIcon(),
-            contentDescription = "Email",
+            imageVector = AuthIcons.rememberCallIcon(),
+            contentDescription = "Phone",
         )
     },
     singleLine: Boolean = true,
@@ -49,55 +49,58 @@ fun EmailField(
     textStyle: TextStyle = LocalTextStyle.current,
     shape: Shape = TextFieldDefaults.shape,
     colors: TextFieldColors = TextFieldDefaults.colors(),
-    supportingText: @Composable ((validEmail: Boolean) -> Unit)? = { if(!it) Text("Please enter a valid email address") },
+    visualTransformation: PhoneVisualTransformation = PhoneVisualTransformation(mask, maskChar),
+    supportingText: @Composable ((validEmail: Boolean) -> Unit)? = { if(!it) Text("Please enter a valid phone number") },
     trailingIcon: @Composable (() -> Unit)? = null,
-    placeholder: @Composable (() -> Unit)? = null,
-    formKey: String = "EMAIL",
+    placeholder: @Composable (() -> Unit)? = { Text(mask.mapMaskToNumbers(maskChar)) },
+    formKey: String = "PHONE",
 ) {
-    val isValidEmail = remember(value) { validator.validate(value) }
+    val isValidPhone = remember(value) { validator.validate(value) }
     val state = LocalAuthState.current
-    LaunchedEffect(isValidEmail, state) {
-        state[formKey] = isValidEmail
+    LaunchedEffect(isValidPhone, state) {
+        state[formKey] = isValidPhone
     }
     TextField(
         value = value,
-        onValueChange = onValueChange,
+        onValueChange = { onValueChange(it.filter { char -> char.isDigit() }.take(mask.count { it == maskChar })) },
         modifier = modifier,
         label = label,
         keyboardOptions = keyboardOptions,
         keyboardActions = keyboardActions,
         leadingIcon = leadingIcon,
         singleLine = singleLine,
-        isError = !isValidEmail && value.isNotEmpty(),
+        isError = !isValidPhone && value.isNotEmpty(),
         interactionSource = interactionSource,
         textStyle = textStyle,
         shape = shape,
         colors = colors,
         supportingText = {
-            supportingText?.invoke(isValidEmail || value.isBlank())
+            supportingText?.invoke(isValidPhone || value.isBlank())
         },
+        visualTransformation = visualTransformation,
         trailingIcon = trailingIcon,
         placeholder = placeholder,
         enabled = enabled,
     )
 }
 
-@ExperimentalMaterial3Api
 @Composable
-fun EmailField(
+fun PhoneField(
     value: TextFieldValue,
     onValueChange: (TextFieldValue) -> Unit,
-    validator: FormValidator = FormValidator.EMAIL,
+    validator: FormValidator = remember { FormValidator.PHONE },
+    mask: String = "(+##) ### ### ###",
+    maskChar: Char = '#',
     modifier: Modifier = Modifier,
     label: (@Composable () -> Unit)? = null,
     keyboardOptions: KeyboardOptions = KeyboardOptions(
-        keyboardType = KeyboardType.Email
+        keyboardType = KeyboardType.Phone
     ),
     keyboardActions: KeyboardActions = KeyboardActions.Default,
     leadingIcon: (@Composable () -> Unit)? = {
         Icon(
-            imageVector = AuthIcons.rememberMailIcon(),
-            contentDescription = "Email",
+            imageVector = AuthIcons.rememberCallIcon(),
+            contentDescription = "Phone",
         )
     },
     singleLine: Boolean = true,
@@ -106,55 +109,58 @@ fun EmailField(
     textStyle: TextStyle = LocalTextStyle.current,
     shape: Shape = TextFieldDefaults.shape,
     colors: TextFieldColors = TextFieldDefaults.colors(),
-    supportingText: @Composable ((validEmail: Boolean) -> Unit)? = { if(!it) Text("Please enter a valid email address") },
+    visualTransformation: PhoneVisualTransformation = PhoneVisualTransformation(mask, maskChar),
+    supportingText: @Composable ((validEmail: Boolean) -> Unit)? = { if(!it) Text("Please enter a valid phone number") },
     trailingIcon: @Composable (() -> Unit)? = null,
-    placeholder: @Composable (() -> Unit)? = null,
-    formKey: String = "EMAIL",
+    placeholder: @Composable (() -> Unit)? = { Text(mask.mapMaskToNumbers(maskChar)) },
+    formKey: String = "PHONE",
 ) {
-    val isValidEmail = remember(value) { validator.validate(value.text) }
+    val isValidPhone = remember(value) { validator.validate(value.text) }
     val state = LocalAuthState.current
-    LaunchedEffect(isValidEmail, state) {
-        state[formKey] = isValidEmail
+    LaunchedEffect(isValidPhone, state) {
+        state[formKey] = isValidPhone
     }
     TextField(
         value = value,
-        onValueChange = onValueChange,
+        onValueChange = { onValueChange(it.copy(it.text.filter { char -> char.isDigit() }.take(mask.count { it == maskChar }))) },
         modifier = modifier,
         label = label,
         keyboardOptions = keyboardOptions,
         keyboardActions = keyboardActions,
         leadingIcon = leadingIcon,
         singleLine = singleLine,
-        isError = !isValidEmail && value.text.isNotEmpty(),
+        isError = !isValidPhone && value.text.isNotEmpty(),
         interactionSource = interactionSource,
         textStyle = textStyle,
         shape = shape,
         colors = colors,
         supportingText = {
-            supportingText?.invoke(isValidEmail || value.text.isBlank())
+            supportingText?.invoke(isValidPhone || value.text.isBlank())
         },
+        visualTransformation = visualTransformation,
         trailingIcon = trailingIcon,
         placeholder = placeholder,
         enabled = enabled,
     )
 }
 
-@ExperimentalMaterial3Api
 @Composable
-fun OutlinedEmailField(
-    value: String,
-    onValueChange: (String) -> Unit,
-    validator: FormValidator = FormValidator.EMAIL,
+fun OutlinedPhoneField(
+    value: TextFieldValue,
+    onValueChange: (TextFieldValue) -> Unit,
+    validator: FormValidator = remember { FormValidator.PHONE },
+    mask: String = "(+##) ### ### ###",
+    maskChar: Char = '#',
     modifier: Modifier = Modifier,
     label: (@Composable () -> Unit)? = null,
     keyboardOptions: KeyboardOptions = KeyboardOptions(
-        keyboardType = KeyboardType.Email
+        keyboardType = KeyboardType.Phone
     ),
     keyboardActions: KeyboardActions = KeyboardActions.Default,
     leadingIcon: (@Composable () -> Unit)? = {
         Icon(
-            imageVector = AuthIcons.rememberMailIcon(),
-            contentDescription = "Email",
+            imageVector = AuthIcons.rememberCallIcon(),
+            contentDescription = "Phone",
         )
     },
     singleLine: Boolean = true,
@@ -163,55 +169,58 @@ fun OutlinedEmailField(
     textStyle: TextStyle = LocalTextStyle.current,
     shape: Shape = OutlinedTextFieldDefaults.shape,
     colors: TextFieldColors = OutlinedTextFieldDefaults.colors(),
-    supportingText: @Composable ((validEmail: Boolean) -> Unit)? = { if(!it) Text("Please enter a valid email address") },
+    visualTransformation: PhoneVisualTransformation = PhoneVisualTransformation(mask, maskChar),
+    supportingText: @Composable ((validEmail: Boolean) -> Unit)? = { if(!it) Text("Please enter a valid phone number") },
     trailingIcon: @Composable (() -> Unit)? = null,
-    placeholder: @Composable (() -> Unit)? = null,
-    formKey: String = "EMAIL",
+    placeholder: @Composable (() -> Unit)? = { Text(mask.mapMaskToNumbers(maskChar)) },
+    formKey: String = "PHONE",
 ) {
-    val isValidEmail = remember(value) { validator.validate(value) }
+    val isValidPhone = remember(value) { validator.validate(value.text) }
     val state = LocalAuthState.current
-    LaunchedEffect(isValidEmail, state) {
-        state[formKey] = isValidEmail
+    LaunchedEffect(isValidPhone, state) {
+        state[formKey] = isValidPhone
     }
     OutlinedTextField(
         value = value,
-        onValueChange = onValueChange,
+        onValueChange = { onValueChange(it.copy(it.text.filter { char -> char.isDigit() }.take(mask.count { it == maskChar }))) },
         modifier = modifier,
         label = label,
         keyboardOptions = keyboardOptions,
         keyboardActions = keyboardActions,
         leadingIcon = leadingIcon,
         singleLine = singleLine,
-        isError = !isValidEmail && value.isNotEmpty(),
+        isError = !isValidPhone && value.text.isNotEmpty(),
         interactionSource = interactionSource,
         textStyle = textStyle,
         shape = shape,
         colors = colors,
         supportingText = {
-            supportingText?.invoke(isValidEmail || value.isBlank())
+            supportingText?.invoke(isValidPhone || value.text.isBlank())
         },
+        visualTransformation = visualTransformation,
         trailingIcon = trailingIcon,
         placeholder = placeholder,
         enabled = enabled,
     )
 }
 
-@ExperimentalMaterial3Api
 @Composable
-fun OutlinedEmailField(
-    value: TextFieldValue,
-    onValueChange: (TextFieldValue) -> Unit,
-    validator: FormValidator = FormValidator.EMAIL,
+fun OutlinedPhoneField(
+    value: String,
+    onValueChange: (String) -> Unit,
+    validator: FormValidator = remember { FormValidator.PHONE },
+    mask: String = "(+##) ### ### ###",
+    maskChar: Char = '#',
     modifier: Modifier = Modifier,
     label: (@Composable () -> Unit)? = null,
     keyboardOptions: KeyboardOptions = KeyboardOptions(
-        keyboardType = KeyboardType.Email
+        keyboardType = KeyboardType.Phone
     ),
     keyboardActions: KeyboardActions = KeyboardActions.Default,
     leadingIcon: (@Composable () -> Unit)? = {
         Icon(
-            imageVector = AuthIcons.rememberMailIcon(),
-            contentDescription = "Email",
+            imageVector = AuthIcons.rememberCallIcon(),
+            contentDescription = "Phone",
         )
     },
     singleLine: Boolean = true,
@@ -220,35 +229,39 @@ fun OutlinedEmailField(
     textStyle: TextStyle = LocalTextStyle.current,
     shape: Shape = OutlinedTextFieldDefaults.shape,
     colors: TextFieldColors = OutlinedTextFieldDefaults.colors(),
-    supportingText: @Composable ((validEmail: Boolean) -> Unit)? = { if(!it) Text("Please enter a valid email address") },
+    visualTransformation: PhoneVisualTransformation = PhoneVisualTransformation(mask, maskChar),
+    supportingText: @Composable ((validEmail: Boolean) -> Unit)? = { if(!it) Text("Please enter a valid phone number") },
     trailingIcon: @Composable (() -> Unit)? = null,
-    placeholder: @Composable (() -> Unit)? = null,
-    formKey: String = "EMAIL",
+    placeholder: @Composable (() -> Unit)? = { Text(mask.mapMaskToNumbers(maskChar)) },
+    formKey: String = "PHONE",
 ) {
-    val isValidEmail = remember(value) { validator.validate(value.text) }
+    val isValidPhone = remember(value) { validator.validate(value) }
     val state = LocalAuthState.current
-    LaunchedEffect(isValidEmail, state) {
-        state[formKey] = isValidEmail
+    LaunchedEffect(isValidPhone, state) {
+        state[formKey] = isValidPhone
     }
-    TextField(
+    OutlinedTextField(
         value = value,
-        onValueChange = onValueChange,
+        onValueChange = { onValueChange(it.filter { char -> char.isDigit() }.take(mask.count { it == maskChar })) },
         modifier = modifier,
         label = label,
         keyboardOptions = keyboardOptions,
         keyboardActions = keyboardActions,
         leadingIcon = leadingIcon,
         singleLine = singleLine,
-        isError = !isValidEmail && value.text.isNotEmpty(),
+        isError = !isValidPhone && value.isNotEmpty(),
         interactionSource = interactionSource,
         textStyle = textStyle,
         shape = shape,
         colors = colors,
         supportingText = {
-            supportingText?.invoke(isValidEmail || value.text.isBlank())
+            supportingText?.invoke(isValidPhone || value.isBlank())
         },
+        visualTransformation = visualTransformation,
         trailingIcon = trailingIcon,
         placeholder = placeholder,
         enabled = enabled,
     )
 }
+
+private fun String.mapMaskToNumbers(maskChar: Char) = mapIndexed { index, char -> if(char == maskChar) (index - 1) % 9 + 1 else char }.joinToString("")
