@@ -32,6 +32,8 @@ import io.github.jan.supabase.compose.auth.ui.rememberCallIcon
  * @param value The current value of the phone field.
  * @param onValueChange The callback function for when the value of the phone field changes.
  * @param validator The form validator used to validate the phone field value. Defaults to [FormValidator.PHONE].
+ * @param mask The mask for the phone field. This changes how the phone number gets displayed. The value will still be the raw number. Defaults to "+## ### #########".
+ * @param maskChar The mask character for the phone field. Defaults to '#'.
  * @param modifier The modifier for styling the phone field. Defaults to Modifier.
  * @param label The label for the phone field. Defaults to null.
  * @param keyboardOptions The keyboard options for the phone field. Defaults to KeyboardOptions(keyboardType = KeyboardType.Email).
@@ -115,6 +117,8 @@ fun PhoneField(
  * @param value The current value of the phone field.
  * @param onValueChange The callback function for when the value of the phone field changes.
  * @param validator The form validator used to validate the phone field value. Defaults to [FormValidator.PHONE].
+ * @param mask The mask for the phone field. This changes how the phone number gets displayed. The value will still be the raw number. Defaults to "+## ### #########".
+ * @param maskChar The mask character for the phone field. Defaults to '#'.
  * @param modifier The modifier for styling the phone field. Defaults to Modifier.
  * @param label The label for the phone field. Defaults to null.
  * @param keyboardOptions The keyboard options for the phone field. Defaults to KeyboardOptions(keyboardType = KeyboardType.Email).
@@ -199,6 +203,8 @@ fun PhoneField(
  * @param value The current value of the phone field.
  * @param onValueChange The callback function for when the value of the phone field changes.
  * @param validator The form validator used to validate the phone field value. Defaults to [FormValidator.PHONE].
+ * @param mask The mask for the phone field. This changes how the phone number gets displayed. The value will still be the raw number. Defaults to "+## ### #########".
+ * @param maskChar The mask character for the phone field. Defaults to '#'.
  * @param modifier The modifier for styling the phone field. Defaults to Modifier.
  * @param label The label for the phone field. Defaults to null.
  * @param keyboardOptions The keyboard options for the phone field. Defaults to KeyboardOptions(keyboardType = KeyboardType.Email).
@@ -282,6 +288,8 @@ fun OutlinedPhoneField(
  * @param value The current value of the phone field.
  * @param onValueChange The callback function for when the value of the phone field changes.
  * @param validator The form validator used to validate the phone field value. Defaults to [FormValidator.PHONE].
+ * @param mask The mask for the phone field. This changes how the phone number gets displayed. The value will still be the raw number. Defaults to "+## ### #########".
+ * @param maskChar The mask character for the phone field. Defaults to '#'.
  * @param modifier The modifier for styling the phone field. Defaults to Modifier.
  * @param label The label for the phone field. Defaults to null.
  * @param keyboardOptions The keyboard options for the phone field. Defaults to KeyboardOptions(keyboardType = KeyboardType.Email).
