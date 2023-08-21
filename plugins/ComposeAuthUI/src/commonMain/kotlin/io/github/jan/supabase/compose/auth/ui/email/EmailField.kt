@@ -56,7 +56,7 @@ fun EmailField(
 ) {
     val isValidEmail = remember(value) { validator.validate(value) }
     val state = LocalAuthState.current
-    LaunchedEffect(isValidEmail, state) {
+    LaunchedEffect(isValidEmail) {
         state[formKey] = isValidEmail
     }
     TextField(
@@ -113,7 +113,7 @@ fun EmailField(
 ) {
     val isValidEmail = remember(value) { validator.validate(value.text) }
     val state = LocalAuthState.current
-    LaunchedEffect(isValidEmail, state) {
+    LaunchedEffect(isValidEmail) {
         state[formKey] = isValidEmail
     }
     TextField(
@@ -170,7 +170,7 @@ fun OutlinedEmailField(
 ) {
     val isValidEmail = remember(value) { validator.validate(value) }
     val state = LocalAuthState.current
-    LaunchedEffect(isValidEmail, state) {
+    LaunchedEffect(isValidEmail) {
         state[formKey] = isValidEmail
     }
     OutlinedTextField(
@@ -227,7 +227,7 @@ fun OutlinedEmailField(
 ) {
     val isValidEmail = remember(value) { validator.validate(value.text) }
     val state = LocalAuthState.current
-    LaunchedEffect(isValidEmail, state) {
+    LaunchedEffect(isValidEmail) {
         state[formKey] = isValidEmail
     }
     TextField(

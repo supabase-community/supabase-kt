@@ -65,7 +65,7 @@ fun PasswordField(
     val showPassword = remember { mutableStateOf(false) }
     val ruleResults = remember(value, rules) { rules.map { PasswordRuleResult(it.description, it.predicate(value)) } }
     val state = LocalAuthState.current
-    LaunchedEffect(value, state) {
+    LaunchedEffect(value) {
         state[formKey] = ruleResults.all { it.isFulfilled }
     }
     TextField(
@@ -126,7 +126,7 @@ fun PasswordField(
     val showPassword = remember { mutableStateOf(false) }
     val ruleResults = remember(value, rules) { rules.map { PasswordRuleResult(it.description, it.predicate(value.text)) } }
     val state = LocalAuthState.current
-    LaunchedEffect(value, state) {
+    LaunchedEffect(value) {
         state[formKey] = ruleResults.all { it.isFulfilled }
     }
     TextField(
@@ -186,7 +186,7 @@ fun OutlinedPasswordField(
     val showPassword = remember { mutableStateOf(false) }
     val ruleResults = remember(value, rules) { rules.map { PasswordRuleResult(it.description, it.predicate(value)) } }
     val state = LocalAuthState.current
-    LaunchedEffect(value, state) {
+    LaunchedEffect(value) {
         state[formKey] = ruleResults.all { it.isFulfilled }
     }
     OutlinedTextField(
@@ -246,7 +246,7 @@ fun OutlinedPasswordField(
     val showPassword = remember { mutableStateOf(false) }
     val ruleResults = remember(value, rules) { rules.map { PasswordRuleResult(it.description, it.predicate(value.text)) } }
     val state = LocalAuthState.current
-    LaunchedEffect(value, state) {
+    LaunchedEffect(value) {
         state[formKey] = ruleResults.all { it.isFulfilled }
     }
     TextField(

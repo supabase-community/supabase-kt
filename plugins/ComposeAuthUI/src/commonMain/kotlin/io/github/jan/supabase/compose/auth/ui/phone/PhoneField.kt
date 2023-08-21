@@ -19,6 +19,7 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.input.VisualTransformation
 import io.github.jan.supabase.compose.auth.ui.AuthIcons
 import io.github.jan.supabase.compose.auth.ui.FormValidator
 import io.github.jan.supabase.compose.auth.ui.LocalAuthState
@@ -29,7 +30,7 @@ fun PhoneField(
     value: String,
     onValueChange: (String) -> Unit,
     validator: FormValidator = remember { FormValidator.PHONE },
-    mask: String = "(+##) ### ### ###",
+    mask: String? = "+## ### #########",
     maskChar: Char = '#',
     modifier: Modifier = Modifier,
     label: (@Composable () -> Unit)? = null,
@@ -49,20 +50,20 @@ fun PhoneField(
     textStyle: TextStyle = LocalTextStyle.current,
     shape: Shape = TextFieldDefaults.shape,
     colors: TextFieldColors = TextFieldDefaults.colors(),
-    visualTransformation: PhoneVisualTransformation = PhoneVisualTransformation(mask, maskChar),
-    supportingText: @Composable ((validEmail: Boolean) -> Unit)? = { if(!it) Text("Please enter a valid phone number") },
+    visualTransformation: VisualTransformation = mask?.let { PhoneVisualTransformation(it, maskChar) } ?: VisualTransformation.None,
+    supportingText: @Composable ((validPhone: Boolean) -> Unit)? = { if(!it) Text("Please enter a valid phone number") },
     trailingIcon: @Composable (() -> Unit)? = null,
-    placeholder: @Composable (() -> Unit)? = { Text(mask.mapMaskToNumbers(maskChar)) },
+    placeholder: @Composable (() -> Unit)? = null,
     formKey: String = "PHONE",
 ) {
     val isValidPhone = remember(value) { validator.validate(value) }
     val state = LocalAuthState.current
-    LaunchedEffect(isValidPhone, state) {
+    LaunchedEffect(isValidPhone) {
         state[formKey] = isValidPhone
     }
     TextField(
         value = value,
-        onValueChange = { onValueChange(it.filter { char -> char.isDigit() }.take(mask.count { it == maskChar })) },
+        onValueChange = { onValueChange(it.filter { char -> char.isDigit() }.take(mask?.count { c -> c == maskChar } ?: it.length)) },
         modifier = modifier,
         label = label,
         keyboardOptions = keyboardOptions,
@@ -89,7 +90,7 @@ fun PhoneField(
     value: TextFieldValue,
     onValueChange: (TextFieldValue) -> Unit,
     validator: FormValidator = remember { FormValidator.PHONE },
-    mask: String = "(+##) ### ### ###",
+    mask: String? = "+## ### #########",
     maskChar: Char = '#',
     modifier: Modifier = Modifier,
     label: (@Composable () -> Unit)? = null,
@@ -109,20 +110,21 @@ fun PhoneField(
     textStyle: TextStyle = LocalTextStyle.current,
     shape: Shape = TextFieldDefaults.shape,
     colors: TextFieldColors = TextFieldDefaults.colors(),
-    visualTransformation: PhoneVisualTransformation = PhoneVisualTransformation(mask, maskChar),
-    supportingText: @Composable ((validEmail: Boolean) -> Unit)? = { if(!it) Text("Please enter a valid phone number") },
+    visualTransformation: VisualTransformation = mask?.let { PhoneVisualTransformation(it, maskChar) } ?: VisualTransformation.None,
+    supportingText: @Composable ((validPhone: Boolean) -> Unit)? = { if(!it) Text("Please enter a valid phone number") },
     trailingIcon: @Composable (() -> Unit)? = null,
-    placeholder: @Composable (() -> Unit)? = { Text(mask.mapMaskToNumbers(maskChar)) },
+    placeholder: @Composable (() -> Unit)? = null,
     formKey: String = "PHONE",
 ) {
     val isValidPhone = remember(value) { validator.validate(value.text) }
     val state = LocalAuthState.current
-    LaunchedEffect(isValidPhone, state) {
+    LaunchedEffect(isValidPhone) {
         state[formKey] = isValidPhone
     }
     TextField(
         value = value,
-        onValueChange = { onValueChange(it.copy(it.text.filter { char -> char.isDigit() }.take(mask.count { it == maskChar }))) },
+        onValueChange = { onValueChange(it.copy(it.text.filter { char -> char.isDigit() }.take(mask?.count { c -> c == maskChar }
+            ?: it.text.length))) },
         modifier = modifier,
         label = label,
         keyboardOptions = keyboardOptions,
@@ -149,7 +151,7 @@ fun OutlinedPhoneField(
     value: TextFieldValue,
     onValueChange: (TextFieldValue) -> Unit,
     validator: FormValidator = remember { FormValidator.PHONE },
-    mask: String = "(+##) ### ### ###",
+    mask: String? = "+## ### #########",
     maskChar: Char = '#',
     modifier: Modifier = Modifier,
     label: (@Composable () -> Unit)? = null,
@@ -169,20 +171,20 @@ fun OutlinedPhoneField(
     textStyle: TextStyle = LocalTextStyle.current,
     shape: Shape = OutlinedTextFieldDefaults.shape,
     colors: TextFieldColors = OutlinedTextFieldDefaults.colors(),
-    visualTransformation: PhoneVisualTransformation = PhoneVisualTransformation(mask, maskChar),
-    supportingText: @Composable ((validEmail: Boolean) -> Unit)? = { if(!it) Text("Please enter a valid phone number") },
+    visualTransformation: VisualTransformation = mask?.let { PhoneVisualTransformation(it, maskChar) } ?: VisualTransformation.None,
+    supportingText: @Composable ((validPhone: Boolean) -> Unit)? = { if(!it) Text("Please enter a valid phone number") },
     trailingIcon: @Composable (() -> Unit)? = null,
-    placeholder: @Composable (() -> Unit)? = { Text(mask.mapMaskToNumbers(maskChar)) },
+    placeholder: @Composable (() -> Unit)? = null,
     formKey: String = "PHONE",
 ) {
     val isValidPhone = remember(value) { validator.validate(value.text) }
     val state = LocalAuthState.current
-    LaunchedEffect(isValidPhone, state) {
+    LaunchedEffect(isValidPhone) {
         state[formKey] = isValidPhone
     }
     OutlinedTextField(
         value = value,
-        onValueChange = { onValueChange(it.copy(it.text.filter { char -> char.isDigit() }.take(mask.count { it == maskChar }))) },
+        onValueChange = { onValueChange(it.copy(it.text.filter { char -> char.isDigit() }.take(mask?.count { c -> c == maskChar } ?: it.text.length))) },
         modifier = modifier,
         label = label,
         keyboardOptions = keyboardOptions,
@@ -209,7 +211,7 @@ fun OutlinedPhoneField(
     value: String,
     onValueChange: (String) -> Unit,
     validator: FormValidator = remember { FormValidator.PHONE },
-    mask: String = "(+##) ### ### ###",
+    mask: String? = "+## ### #########",
     maskChar: Char = '#',
     modifier: Modifier = Modifier,
     label: (@Composable () -> Unit)? = null,
@@ -229,20 +231,20 @@ fun OutlinedPhoneField(
     textStyle: TextStyle = LocalTextStyle.current,
     shape: Shape = OutlinedTextFieldDefaults.shape,
     colors: TextFieldColors = OutlinedTextFieldDefaults.colors(),
-    visualTransformation: PhoneVisualTransformation = PhoneVisualTransformation(mask, maskChar),
-    supportingText: @Composable ((validEmail: Boolean) -> Unit)? = { if(!it) Text("Please enter a valid phone number") },
+    visualTransformation: VisualTransformation = mask?.let { PhoneVisualTransformation(it, maskChar) } ?: VisualTransformation.None,
+    supportingText: @Composable ((validPhone: Boolean) -> Unit)? = { if(!it) Text("Please enter a valid phone number") },
     trailingIcon: @Composable (() -> Unit)? = null,
-    placeholder: @Composable (() -> Unit)? = { Text(mask.mapMaskToNumbers(maskChar)) },
+    placeholder: @Composable (() -> Unit)? = null,
     formKey: String = "PHONE",
 ) {
     val isValidPhone = remember(value) { validator.validate(value) }
     val state = LocalAuthState.current
-    LaunchedEffect(isValidPhone, state) {
+    LaunchedEffect(isValidPhone) {
         state[formKey] = isValidPhone
     }
     OutlinedTextField(
         value = value,
-        onValueChange = { onValueChange(it.filter { char -> char.isDigit() }.take(mask.count { it == maskChar })) },
+        onValueChange = { onValueChange(it.filter { char -> char.isDigit() }.take(mask?.count { it == maskChar } ?: it.length)) },
         modifier = modifier,
         label = label,
         keyboardOptions = keyboardOptions,
@@ -263,5 +265,3 @@ fun OutlinedPhoneField(
         enabled = enabled,
     )
 }
-
-private fun String.mapMaskToNumbers(maskChar: Char) = mapIndexed { index, char -> if(char == maskChar) (index - 1) % 9 + 1 else char }.joinToString("")
