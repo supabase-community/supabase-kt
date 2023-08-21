@@ -25,12 +25,37 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.VisualTransformation
+import io.github.jan.supabase.annotations.SupabaseExperimental
 import io.github.jan.supabase.compose.auth.ui.AuthIcons
 import io.github.jan.supabase.compose.auth.ui.LocalAuthState
 import io.github.jan.supabase.compose.auth.ui.rememberLockIcon
 import io.github.jan.supabase.compose.auth.ui.rememberVisibilityIcon
 import io.github.jan.supabase.compose.auth.ui.rememberVisibilityOffIcon
 
+/**
+ * A custom password input field with custom rules and pre-defined styling.
+ *
+ * @param value The current value of the password field.
+ * @param onValueChange The callback function for when the value of the password field changes.
+ * @param rules The rules for the password field.
+ * @param modifier The modifier for styling the password field. Defaults to Modifier.
+ * @param label The label for the password field. Defaults to null.
+ * @param keyboardOptions The keyboard options for the password field. Defaults to KeyboardOptions(keyboardType = KeyboardType.Password).
+ * @param keyboardActions The keyboard actions for the password field. Defaults to KeyboardActions.Default.
+ * @param leadingIcon The leading icon for the password field. Defaults to an email icon.
+ * @param singleLine Whether the password field should be a single line or multiline. Defaults to true.
+ * @param enabled Whether the password field should be enabled for user interaction. Defaults to true.
+ * @param interactionSource The interaction source for the password field. Defaults to MutableInteractionSource.
+ * @param textStyle The text style for the password field. Defaults to LocalTextStyle.current.
+ * @param shape The shape of the password field. Defaults to TextFieldDefaults.shape.
+ * @param colors The colors for the password field. Defaults to TextFieldDefaults.colors().
+ * @param supportingText A composable function to display supporting text based on the validity of the password field value. Defaults to displaying "Please enter a valid email address" if the value is not a valid email.
+ * @param trailingIcon The trailing icon for the password field. Defaults to null.
+ * @param placeholder The placeholder for the password field. Defaults to null.
+ * @param formKey The key to store the validity of the password field in the AuthState. Defaults to "EMAIL".
+ * @see PasswordRule
+ */
+@SupabaseExperimental
 @ExperimentalMaterial3Api
 @Composable
 fun PasswordField(
@@ -91,6 +116,30 @@ fun PasswordField(
     )
 }
 
+/**
+ * A custom password input field with custom rules and pre-defined styling.
+ *
+ * @param value The current value of the password field.
+ * @param onValueChange The callback function for when the value of the password field changes.
+ * @param rules The rules for the password field.
+ * @param modifier The modifier for styling the password field. Defaults to Modifier.
+ * @param label The label for the password field. Defaults to null.
+ * @param keyboardOptions The keyboard options for the password field. Defaults to KeyboardOptions(keyboardType = KeyboardType.Password).
+ * @param keyboardActions The keyboard actions for the password field. Defaults to KeyboardActions.Default.
+ * @param leadingIcon The leading icon for the password field. Defaults to an email icon.
+ * @param singleLine Whether the password field should be a single line or multiline. Defaults to true.
+ * @param enabled Whether the password field should be enabled for user interaction. Defaults to true.
+ * @param interactionSource The interaction source for the password field. Defaults to MutableInteractionSource.
+ * @param textStyle The text style for the password field. Defaults to LocalTextStyle.current.
+ * @param shape The shape of the password field. Defaults to TextFieldDefaults.shape.
+ * @param colors The colors for the password field. Defaults to TextFieldDefaults.colors().
+ * @param supportingText A composable function to display supporting text based on the validity of the password field value. Defaults to displaying "Please enter a valid email address" if the value is not a valid email.
+ * @param trailingIcon The trailing icon for the password field. Defaults to null.
+ * @param placeholder The placeholder for the password field. Defaults to null.
+ * @param formKey The key to store the validity of the password field in the AuthState. Defaults to "EMAIL".
+ * @see PasswordRule
+ */
+@SupabaseExperimental
 @ExperimentalMaterial3Api
 @Composable
 fun PasswordField(
@@ -152,6 +201,30 @@ fun PasswordField(
     )
 }
 
+/**
+ * A custom password input field with custom rules and pre-defined styling.
+ *
+ * @param value The current value of the password field.
+ * @param onValueChange The callback function for when the value of the password field changes.
+ * @param rules The rules for the password field.
+ * @param modifier The modifier for styling the password field. Defaults to Modifier.
+ * @param label The label for the password field. Defaults to null.
+ * @param keyboardOptions The keyboard options for the password field. Defaults to KeyboardOptions(keyboardType = KeyboardType.Password).
+ * @param keyboardActions The keyboard actions for the password field. Defaults to KeyboardActions.Default.
+ * @param leadingIcon The leading icon for the password field. Defaults to an email icon.
+ * @param singleLine Whether the password field should be a single line or multiline. Defaults to true.
+ * @param enabled Whether the password field should be enabled for user interaction. Defaults to true.
+ * @param interactionSource The interaction source for the password field. Defaults to MutableInteractionSource.
+ * @param textStyle The text style for the password field. Defaults to LocalTextStyle.current.
+ * @param shape The shape of the password field. Defaults to TextFieldDefaults.shape.
+ * @param colors The colors for the password field. Defaults to TextFieldDefaults.colors().
+ * @param supportingText A composable function to display supporting text based on the validity of the password field value. Defaults to displaying "Please enter a valid email address" if the value is not a valid email.
+ * @param trailingIcon The trailing icon for the password field. Defaults to null.
+ * @param placeholder The placeholder for the password field. Defaults to null.
+ * @param formKey The key to store the validity of the password field in the AuthState. Defaults to "EMAIL".
+ * @see PasswordRule
+ */
+@SupabaseExperimental
 @ExperimentalMaterial3Api
 @Composable
 fun OutlinedPasswordField(
@@ -212,6 +285,30 @@ fun OutlinedPasswordField(
     )
 }
 
+/**
+ * A custom password input field with custom rules and pre-defined styling.
+ *
+ * @param value The current value of the password field.
+ * @param onValueChange The callback function for when the value of the password field changes.
+ * @param rules The rules for the password field.
+ * @param modifier The modifier for styling the password field. Defaults to Modifier.
+ * @param label The label for the password field. Defaults to null.
+ * @param keyboardOptions The keyboard options for the password field. Defaults to KeyboardOptions(keyboardType = KeyboardType.Password).
+ * @param keyboardActions The keyboard actions for the password field. Defaults to KeyboardActions.Default.
+ * @param leadingIcon The leading icon for the password field. Defaults to an email icon.
+ * @param singleLine Whether the password field should be a single line or multiline. Defaults to true.
+ * @param enabled Whether the password field should be enabled for user interaction. Defaults to true.
+ * @param interactionSource The interaction source for the password field. Defaults to MutableInteractionSource.
+ * @param textStyle The text style for the password field. Defaults to LocalTextStyle.current.
+ * @param shape The shape of the password field. Defaults to TextFieldDefaults.shape.
+ * @param colors The colors for the password field. Defaults to TextFieldDefaults.colors().
+ * @param supportingText A composable function to display supporting text based on the validity of the password field value. Defaults to displaying "Please enter a valid email address" if the value is not a valid email.
+ * @param trailingIcon The trailing icon for the password field. Defaults to null.
+ * @param placeholder The placeholder for the password field. Defaults to null.
+ * @param formKey The key to store the validity of the password field in the AuthState. Defaults to "EMAIL".
+ * @see PasswordRule
+ */
+@SupabaseExperimental
 @ExperimentalMaterial3Api
 @Composable
 fun OutlinedPasswordField(

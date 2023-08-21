@@ -6,7 +6,13 @@ import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.saveable.mapSaver
 import androidx.compose.runtime.saveable.rememberSaveable
+import io.github.jan.supabase.annotations.SupabaseExperimental
+import io.github.jan.supabase.annotations.SupabaseInternal
 
+/**
+ * Represents the state of auth forms.
+ */
+@SupabaseExperimental
 class AuthState(
     states: Map<String, Boolean> = emptyMap()
 ) {
@@ -17,23 +23,30 @@ class AuthState(
     val validForm: Boolean
         get() = states.values.all { it }
 
+    @SupabaseInternal
     operator fun set(key: String, value: Boolean) {
         _states[key] = value
     }
 
+    @SupabaseInternal
     fun remove(key: String) {
         _states.remove(key)
     }
 
+    @SupabaseInternal
     operator fun get(key: String): Boolean? {
         return _states[key]
     }
 
+    @SupabaseInternal
     fun clear() {
         _states.clear()
     }
 
     companion object {
+        /**
+         * A [Saver] implementation for [AuthState].
+         */
         val SAVER = mapSaver(
             save = { it.states.toMap() },
             restore = { AuthState(it.mapValues { (_, value) -> (value as? Boolean) ?: error("Invalid state value") }) }
@@ -42,6 +55,9 @@ class AuthState(
 
 }
 
+/**
+ * Local composition for [AuthState]. Use [AuthForm] for automatic saving and restoring.
+ */
 val LocalAuthState = compositionLocalOf {
     AuthState() //possibly to throw an error here
 }

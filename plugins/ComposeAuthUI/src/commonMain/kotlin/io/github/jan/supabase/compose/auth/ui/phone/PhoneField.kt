@@ -20,11 +20,35 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.VisualTransformation
+import io.github.jan.supabase.annotations.SupabaseExperimental
 import io.github.jan.supabase.compose.auth.ui.AuthIcons
 import io.github.jan.supabase.compose.auth.ui.FormValidator
 import io.github.jan.supabase.compose.auth.ui.LocalAuthState
 import io.github.jan.supabase.compose.auth.ui.rememberCallIcon
 
+/**
+ * A custom email input field with validation and pre-defined styling.
+ *
+ * @param value The current value of the phone field.
+ * @param onValueChange The callback function for when the value of the phone field changes.
+ * @param validator The form validator used to validate the phone field value. Defaults to [FormValidator.PHONE].
+ * @param modifier The modifier for styling the phone field. Defaults to Modifier.
+ * @param label The label for the phone field. Defaults to null.
+ * @param keyboardOptions The keyboard options for the phone field. Defaults to KeyboardOptions(keyboardType = KeyboardType.Email).
+ * @param keyboardActions The keyboard actions for the phone field. Defaults to KeyboardActions.Default.
+ * @param leadingIcon The leading icon for the phone field. Defaults to an email icon.
+ * @param singleLine Whether the phone field should be a single line or multiline. Defaults to true.
+ * @param enabled Whether the phone field should be enabled for user interaction. Defaults to true.
+ * @param interactionSource The interaction source for the phone field. Defaults to MutableInteractionSource.
+ * @param textStyle The text style for the phone field. Defaults to LocalTextStyle.current.
+ * @param shape The shape of the phone field. Defaults to TextFieldDefaults.shape.
+ * @param colors The colors for the phone field. Defaults to TextFieldDefaults.colors().
+ * @param supportingText A composable function to display supporting text based on the validity of the phone field value. Defaults to displaying "Please enter a valid email address" if the value is not a valid email.
+ * @param trailingIcon The trailing icon for the phone field. Defaults to null.
+ * @param placeholder The placeholder for the phone field. Defaults to null.
+ * @param formKey The key to store the validity of the phone field in the AuthState. Defaults to "EMAIL".
+ */
+@SupabaseExperimental
 @Composable
 fun PhoneField(
     value: String,
@@ -85,6 +109,29 @@ fun PhoneField(
     )
 }
 
+/**
+ * A custom email input field with validation and pre-defined styling.
+ *
+ * @param value The current value of the phone field.
+ * @param onValueChange The callback function for when the value of the phone field changes.
+ * @param validator The form validator used to validate the phone field value. Defaults to [FormValidator.PHONE].
+ * @param modifier The modifier for styling the phone field. Defaults to Modifier.
+ * @param label The label for the phone field. Defaults to null.
+ * @param keyboardOptions The keyboard options for the phone field. Defaults to KeyboardOptions(keyboardType = KeyboardType.Email).
+ * @param keyboardActions The keyboard actions for the phone field. Defaults to KeyboardActions.Default.
+ * @param leadingIcon The leading icon for the phone field. Defaults to an email icon.
+ * @param singleLine Whether the phone field should be a single line or multiline. Defaults to true.
+ * @param enabled Whether the phone field should be enabled for user interaction. Defaults to true.
+ * @param interactionSource The interaction source for the phone field. Defaults to MutableInteractionSource.
+ * @param textStyle The text style for the phone field. Defaults to LocalTextStyle.current.
+ * @param shape The shape of the phone field. Defaults to TextFieldDefaults.shape.
+ * @param colors The colors for the phone field. Defaults to TextFieldDefaults.colors().
+ * @param supportingText A composable function to display supporting text based on the validity of the phone field value. Defaults to displaying "Please enter a valid email address" if the value is not a valid email.
+ * @param trailingIcon The trailing icon for the phone field. Defaults to null.
+ * @param placeholder The placeholder for the phone field. Defaults to null.
+ * @param formKey The key to store the validity of the phone field in the AuthState. Defaults to "EMAIL".
+ */
+@SupabaseExperimental
 @Composable
 fun PhoneField(
     value: TextFieldValue,
@@ -146,6 +193,29 @@ fun PhoneField(
     )
 }
 
+/**
+ * A custom email input field with validation and pre-defined styling.
+ *
+ * @param value The current value of the phone field.
+ * @param onValueChange The callback function for when the value of the phone field changes.
+ * @param validator The form validator used to validate the phone field value. Defaults to [FormValidator.PHONE].
+ * @param modifier The modifier for styling the phone field. Defaults to Modifier.
+ * @param label The label for the phone field. Defaults to null.
+ * @param keyboardOptions The keyboard options for the phone field. Defaults to KeyboardOptions(keyboardType = KeyboardType.Email).
+ * @param keyboardActions The keyboard actions for the phone field. Defaults to KeyboardActions.Default.
+ * @param leadingIcon The leading icon for the phone field. Defaults to an email icon.
+ * @param singleLine Whether the phone field should be a single line or multiline. Defaults to true.
+ * @param enabled Whether the phone field should be enabled for user interaction. Defaults to true.
+ * @param interactionSource The interaction source for the phone field. Defaults to MutableInteractionSource.
+ * @param textStyle The text style for the phone field. Defaults to LocalTextStyle.current.
+ * @param shape The shape of the phone field. Defaults to TextFieldDefaults.shape.
+ * @param colors The colors for the phone field. Defaults to TextFieldDefaults.colors().
+ * @param supportingText A composable function to display supporting text based on the validity of the phone field value. Defaults to displaying "Please enter a valid email address" if the value is not a valid email.
+ * @param trailingIcon The trailing icon for the phone field. Defaults to null.
+ * @param placeholder The placeholder for the phone field. Defaults to null.
+ * @param formKey The key to store the validity of the phone field in the AuthState. Defaults to "EMAIL".
+ */
+@SupabaseExperimental
 @Composable
 fun OutlinedPhoneField(
     value: TextFieldValue,
@@ -206,6 +276,29 @@ fun OutlinedPhoneField(
     )
 }
 
+/**
+ * A custom email input field with validation and pre-defined styling.
+ *
+ * @param value The current value of the phone field.
+ * @param onValueChange The callback function for when the value of the phone field changes.
+ * @param validator The form validator used to validate the phone field value. Defaults to [FormValidator.PHONE].
+ * @param modifier The modifier for styling the phone field. Defaults to Modifier.
+ * @param label The label for the phone field. Defaults to null.
+ * @param keyboardOptions The keyboard options for the phone field. Defaults to KeyboardOptions(keyboardType = KeyboardType.Email).
+ * @param keyboardActions The keyboard actions for the phone field. Defaults to KeyboardActions.Default.
+ * @param leadingIcon The leading icon for the phone field. Defaults to an email icon.
+ * @param singleLine Whether the phone field should be a single line or multiline. Defaults to true.
+ * @param enabled Whether the phone field should be enabled for user interaction. Defaults to true.
+ * @param interactionSource The interaction source for the phone field. Defaults to MutableInteractionSource.
+ * @param textStyle The text style for the phone field. Defaults to LocalTextStyle.current.
+ * @param shape The shape of the phone field. Defaults to TextFieldDefaults.shape.
+ * @param colors The colors for the phone field. Defaults to TextFieldDefaults.colors().
+ * @param supportingText A composable function to display supporting text based on the validity of the phone field value. Defaults to displaying "Please enter a valid email address" if the value is not a valid email.
+ * @param trailingIcon The trailing icon for the phone field. Defaults to null.
+ * @param placeholder The placeholder for the phone field. Defaults to null.
+ * @param formKey The key to store the validity of the phone field in the AuthState. Defaults to "EMAIL".
+ */
+@SupabaseExperimental
 @Composable
 fun OutlinedPhoneField(
     value: String,
