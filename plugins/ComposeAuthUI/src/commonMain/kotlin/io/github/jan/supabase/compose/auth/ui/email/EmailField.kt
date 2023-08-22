@@ -22,8 +22,8 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import io.github.jan.supabase.annotations.SupabaseExperimental
 import io.github.jan.supabase.compose.auth.ui.AuthIcons
+import io.github.jan.supabase.compose.auth.ui.FormComponent
 import io.github.jan.supabase.compose.auth.ui.FormValidator
-import io.github.jan.supabase.compose.auth.ui.LocalAuthState
 import io.github.jan.supabase.compose.auth.ui.rememberMailIcon
 
 /**
@@ -77,33 +77,33 @@ fun EmailField(
     trailingIcon: @Composable (() -> Unit)? = null,
     placeholder: @Composable (() -> Unit)? = null,
     formKey: String = "EMAIL",
+    mandatory: Boolean = true,
 ) {
-    val isValidEmail = remember(value) { validator.validate(value) }
-    val state = LocalAuthState.current
-    LaunchedEffect(isValidEmail) {
-        state[formKey] = isValidEmail
+    FormComponent(formKey, mandatory) {
+        val isValidEmail = remember(value) { validator.validate(value) }
+        LaunchedEffect(isValidEmail) {
+            it.value = isValidEmail
+        }
+        TextField(
+            value = value,
+            onValueChange = onValueChange,
+            modifier = modifier,
+            label = label,
+            keyboardOptions = keyboardOptions,
+            keyboardActions = keyboardActions,
+            leadingIcon = leadingIcon,
+            singleLine = singleLine,
+            isError = !isValidEmail && value.isNotEmpty(),
+            interactionSource = interactionSource,
+            textStyle = textStyle,
+            shape = shape,
+            colors = colors,
+            supportingText = if(isValidEmail || value.isBlank()) null else { { supportingText?.invoke(isValidEmail) } },
+            trailingIcon = trailingIcon,
+            placeholder = placeholder,
+            enabled = enabled,
+        )
     }
-    TextField(
-        value = value,
-        onValueChange = onValueChange,
-        modifier = modifier,
-        label = label,
-        keyboardOptions = keyboardOptions,
-        keyboardActions = keyboardActions,
-        leadingIcon = leadingIcon,
-        singleLine = singleLine,
-        isError = !isValidEmail && value.isNotEmpty(),
-        interactionSource = interactionSource,
-        textStyle = textStyle,
-        shape = shape,
-        colors = colors,
-        supportingText = {
-            supportingText?.invoke(isValidEmail || value.isBlank())
-        },
-        trailingIcon = trailingIcon,
-        placeholder = placeholder,
-        enabled = enabled,
-    )
 }
 
 /**
@@ -157,33 +157,33 @@ fun EmailField(
     trailingIcon: @Composable (() -> Unit)? = null,
     placeholder: @Composable (() -> Unit)? = null,
     formKey: String = "EMAIL",
+    mandatory: Boolean = true,
 ) {
-    val isValidEmail = remember(value) { validator.validate(value.text) }
-    val state = LocalAuthState.current
-    LaunchedEffect(isValidEmail) {
-        state[formKey] = isValidEmail
+    FormComponent(formKey, mandatory) {
+        val isValidEmail = remember(value) { validator.validate(value.text) }
+        LaunchedEffect(isValidEmail) {
+            it.value = isValidEmail
+        }
+        TextField(
+            value = value,
+            onValueChange = onValueChange,
+            modifier = modifier,
+            label = label,
+            keyboardOptions = keyboardOptions,
+            keyboardActions = keyboardActions,
+            leadingIcon = leadingIcon,
+            singleLine = singleLine,
+            isError = !isValidEmail && value.text.isNotEmpty(),
+            interactionSource = interactionSource,
+            textStyle = textStyle,
+            shape = shape,
+            colors = colors,
+            supportingText = if(isValidEmail || value.text.isBlank()) null else { { supportingText?.invoke(isValidEmail) } },
+            trailingIcon = trailingIcon,
+            placeholder = placeholder,
+            enabled = enabled,
+        )
     }
-    TextField(
-        value = value,
-        onValueChange = onValueChange,
-        modifier = modifier,
-        label = label,
-        keyboardOptions = keyboardOptions,
-        keyboardActions = keyboardActions,
-        leadingIcon = leadingIcon,
-        singleLine = singleLine,
-        isError = !isValidEmail && value.text.isNotEmpty(),
-        interactionSource = interactionSource,
-        textStyle = textStyle,
-        shape = shape,
-        colors = colors,
-        supportingText = {
-            supportingText?.invoke(isValidEmail || value.text.isBlank())
-        },
-        trailingIcon = trailingIcon,
-        placeholder = placeholder,
-        enabled = enabled,
-    )
 }
 
 /**
@@ -237,33 +237,34 @@ fun OutlinedEmailField(
     trailingIcon: @Composable (() -> Unit)? = null,
     placeholder: @Composable (() -> Unit)? = null,
     formKey: String = "EMAIL",
+    mandatory: Boolean = true,
 ) {
-    val isValidEmail = remember(value) { validator.validate(value) }
-    val state = LocalAuthState.current
-    LaunchedEffect(isValidEmail) {
-        state[formKey] = isValidEmail
+    FormComponent(formKey, mandatory) {
+        val isValidEmail = remember(value) { validator.validate(value) }
+        LaunchedEffect(isValidEmail) {
+            println(isValidEmail)
+            it.value = isValidEmail
+        }
+        OutlinedTextField(
+            value = value,
+            onValueChange = onValueChange,
+            modifier = modifier,
+            label = label,
+            keyboardOptions = keyboardOptions,
+            keyboardActions = keyboardActions,
+            leadingIcon = leadingIcon,
+            singleLine = singleLine,
+            isError = !isValidEmail && value.isNotEmpty(),
+            interactionSource = interactionSource,
+            textStyle = textStyle,
+            shape = shape,
+            colors = colors,
+            supportingText = if(isValidEmail || value.isBlank()) null else { { supportingText?.invoke(isValidEmail) } },
+            trailingIcon = trailingIcon,
+            placeholder = placeholder,
+            enabled = enabled,
+        )
     }
-    OutlinedTextField(
-        value = value,
-        onValueChange = onValueChange,
-        modifier = modifier,
-        label = label,
-        keyboardOptions = keyboardOptions,
-        keyboardActions = keyboardActions,
-        leadingIcon = leadingIcon,
-        singleLine = singleLine,
-        isError = !isValidEmail && value.isNotEmpty(),
-        interactionSource = interactionSource,
-        textStyle = textStyle,
-        shape = shape,
-        colors = colors,
-        supportingText = {
-            supportingText?.invoke(isValidEmail || value.isBlank())
-        },
-        trailingIcon = trailingIcon,
-        placeholder = placeholder,
-        enabled = enabled,
-    )
 }
 
 /**
@@ -317,31 +318,31 @@ fun OutlinedEmailField(
     trailingIcon: @Composable (() -> Unit)? = null,
     placeholder: @Composable (() -> Unit)? = null,
     formKey: String = "EMAIL",
+    mandatory: Boolean = true,
 ) {
-    val isValidEmail = remember(value) { validator.validate(value.text) }
-    val state = LocalAuthState.current
-    LaunchedEffect(isValidEmail) {
-        state[formKey] = isValidEmail
+    FormComponent(formKey, mandatory) {
+        val isValidEmail = remember(value) { validator.validate(value.text) }
+        LaunchedEffect(isValidEmail) {
+            it.value = isValidEmail
+        }
+        OutlinedTextField(
+            value = value,
+            onValueChange = onValueChange,
+            modifier = modifier,
+            label = label,
+            keyboardOptions = keyboardOptions,
+            keyboardActions = keyboardActions,
+            leadingIcon = leadingIcon,
+            singleLine = singleLine,
+            isError = !isValidEmail && value.text.isNotEmpty(),
+            interactionSource = interactionSource,
+            textStyle = textStyle,
+            shape = shape,
+            colors = colors,
+            supportingText = if(isValidEmail || value.text.isBlank()) null else { { supportingText?.invoke(isValidEmail) } },
+            trailingIcon = trailingIcon,
+            placeholder = placeholder,
+            enabled = enabled,
+        )
     }
-    TextField(
-        value = value,
-        onValueChange = onValueChange,
-        modifier = modifier,
-        label = label,
-        keyboardOptions = keyboardOptions,
-        keyboardActions = keyboardActions,
-        leadingIcon = leadingIcon,
-        singleLine = singleLine,
-        isError = !isValidEmail && value.text.isNotEmpty(),
-        interactionSource = interactionSource,
-        textStyle = textStyle,
-        shape = shape,
-        colors = colors,
-        supportingText = {
-            supportingText?.invoke(isValidEmail || value.text.isBlank())
-        },
-        trailingIcon = trailingIcon,
-        placeholder = placeholder,
-        enabled = enabled,
-    )
 }

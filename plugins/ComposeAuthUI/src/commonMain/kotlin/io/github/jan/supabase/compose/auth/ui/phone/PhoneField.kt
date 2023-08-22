@@ -22,10 +22,13 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.VisualTransformation
 import io.github.jan.supabase.annotations.SupabaseExperimental
 import io.github.jan.supabase.compose.auth.ui.AuthIcons
+import io.github.jan.supabase.compose.auth.ui.FormComponent
 import io.github.jan.supabase.compose.auth.ui.FormValidator
-import io.github.jan.supabase.compose.auth.ui.LocalAuthState
 import io.github.jan.supabase.compose.auth.ui.rememberCallIcon
 
+const val DEFAULT_MASK = "+## ### #########"
+const val DEFAULT_MASK_CHAR = '#'
+
 /**
  * A custom email input field with validation and pre-defined styling.
  *
@@ -56,8 +59,8 @@ fun PhoneField(
     value: String,
     onValueChange: (String) -> Unit,
     validator: FormValidator = remember { FormValidator.PHONE },
-    mask: String? = "+## ### #########",
-    maskChar: Char = '#',
+    mask: String? = DEFAULT_MASK,
+    maskChar: Char = DEFAULT_MASK_CHAR,
     modifier: Modifier = Modifier,
     label: (@Composable () -> Unit)? = null,
     keyboardOptions: KeyboardOptions = KeyboardOptions(
@@ -81,34 +84,39 @@ fun PhoneField(
     trailingIcon: @Composable (() -> Unit)? = null,
     placeholder: @Composable (() -> Unit)? = null,
     formKey: String = "PHONE",
+    mandatory: Boolean = true
 ) {
-    val isValidPhone = remember(value) { validator.validate(value) }
-    val state = LocalAuthState.current
-    LaunchedEffect(isValidPhone) {
-        state[formKey] = isValidPhone
+    FormComponent(formKey, mandatory) {
+        val isValidPhone = remember(value) { validator.validate(value) }
+        LaunchedEffect(isValidPhone) {
+            it.value = isValidPhone
+        }
+        TextField(
+            value = value,
+            onValueChange = {
+                onValueChange(it.filter { char -> char.isDigit() }
+                    .take(mask?.count { c -> c == maskChar } ?: it.length))
+            },
+            modifier = modifier,
+            label = label,
+            keyboardOptions = keyboardOptions,
+            keyboardActions = keyboardActions,
+            leadingIcon = leadingIcon,
+            singleLine = singleLine,
+            isError = !isValidPhone && value.isNotEmpty(),
+            interactionSource = interactionSource,
+            textStyle = textStyle,
+            shape = shape,
+            colors = colors,
+            supportingText = if (isValidPhone || value.isBlank()) null else {
+                { supportingText?.invoke(isValidPhone) }
+            },
+            visualTransformation = visualTransformation,
+            trailingIcon = trailingIcon,
+            placeholder = placeholder,
+            enabled = enabled,
+        )
     }
-    TextField(
-        value = value,
-        onValueChange = { onValueChange(it.filter { char -> char.isDigit() }.take(mask?.count { c -> c == maskChar } ?: it.length)) },
-        modifier = modifier,
-        label = label,
-        keyboardOptions = keyboardOptions,
-        keyboardActions = keyboardActions,
-        leadingIcon = leadingIcon,
-        singleLine = singleLine,
-        isError = !isValidPhone && value.isNotEmpty(),
-        interactionSource = interactionSource,
-        textStyle = textStyle,
-        shape = shape,
-        colors = colors,
-        supportingText = {
-            supportingText?.invoke(isValidPhone || value.isBlank())
-        },
-        visualTransformation = visualTransformation,
-        trailingIcon = trailingIcon,
-        placeholder = placeholder,
-        enabled = enabled,
-    )
 }
 
 /**
@@ -141,8 +149,8 @@ fun PhoneField(
     value: TextFieldValue,
     onValueChange: (TextFieldValue) -> Unit,
     validator: FormValidator = remember { FormValidator.PHONE },
-    mask: String? = "+## ### #########",
-    maskChar: Char = '#',
+    mask: String? = DEFAULT_MASK,
+    maskChar: Char = DEFAULT_MASK_CHAR,
     modifier: Modifier = Modifier,
     label: (@Composable () -> Unit)? = null,
     keyboardOptions: KeyboardOptions = KeyboardOptions(
@@ -166,35 +174,39 @@ fun PhoneField(
     trailingIcon: @Composable (() -> Unit)? = null,
     placeholder: @Composable (() -> Unit)? = null,
     formKey: String = "PHONE",
+    mandatory: Boolean = true
 ) {
-    val isValidPhone = remember(value) { validator.validate(value.text) }
-    val state = LocalAuthState.current
-    LaunchedEffect(isValidPhone) {
-        state[formKey] = isValidPhone
+    FormComponent(formKey, mandatory) {
+        val isValidPhone = remember(value) { validator.validate(value.text) }
+        LaunchedEffect(isValidPhone) {
+            it.value = isValidPhone
+        }
+        TextField(
+            value = value,
+            onValueChange = {
+                onValueChange(it.copy(it.text.filter { char -> char.isDigit() }.take(mask?.count { c -> c == maskChar }
+                    ?: it.text.length)))
+            },
+            modifier = modifier,
+            label = label,
+            keyboardOptions = keyboardOptions,
+            keyboardActions = keyboardActions,
+            leadingIcon = leadingIcon,
+            singleLine = singleLine,
+            isError = !isValidPhone && value.text.isNotEmpty(),
+            interactionSource = interactionSource,
+            textStyle = textStyle,
+            shape = shape,
+            colors = colors,
+            supportingText = if (isValidPhone || value.text.isBlank()) null else {
+                { supportingText?.invoke(isValidPhone) }
+            },
+            visualTransformation = visualTransformation,
+            trailingIcon = trailingIcon,
+            placeholder = placeholder,
+            enabled = enabled,
+        )
     }
-    TextField(
-        value = value,
-        onValueChange = { onValueChange(it.copy(it.text.filter { char -> char.isDigit() }.take(mask?.count { c -> c == maskChar }
-            ?: it.text.length))) },
-        modifier = modifier,
-        label = label,
-        keyboardOptions = keyboardOptions,
-        keyboardActions = keyboardActions,
-        leadingIcon = leadingIcon,
-        singleLine = singleLine,
-        isError = !isValidPhone && value.text.isNotEmpty(),
-        interactionSource = interactionSource,
-        textStyle = textStyle,
-        shape = shape,
-        colors = colors,
-        supportingText = {
-            supportingText?.invoke(isValidPhone || value.text.isBlank())
-        },
-        visualTransformation = visualTransformation,
-        trailingIcon = trailingIcon,
-        placeholder = placeholder,
-        enabled = enabled,
-    )
 }
 
 /**
@@ -227,8 +239,8 @@ fun OutlinedPhoneField(
     value: TextFieldValue,
     onValueChange: (TextFieldValue) -> Unit,
     validator: FormValidator = remember { FormValidator.PHONE },
-    mask: String? = "+## ### #########",
-    maskChar: Char = '#',
+    mask: String? = DEFAULT_MASK,
+    maskChar: Char = DEFAULT_MASK_CHAR,
     modifier: Modifier = Modifier,
     label: (@Composable () -> Unit)? = null,
     keyboardOptions: KeyboardOptions = KeyboardOptions(
@@ -252,34 +264,39 @@ fun OutlinedPhoneField(
     trailingIcon: @Composable (() -> Unit)? = null,
     placeholder: @Composable (() -> Unit)? = null,
     formKey: String = "PHONE",
+    mandatory: Boolean = true
 ) {
-    val isValidPhone = remember(value) { validator.validate(value.text) }
-    val state = LocalAuthState.current
-    LaunchedEffect(isValidPhone) {
-        state[formKey] = isValidPhone
+    FormComponent(formKey, mandatory) {
+        val isValidPhone = remember(value) { validator.validate(value.text) }
+        LaunchedEffect(isValidPhone) {
+            it.value = isValidPhone
+        }
+        OutlinedTextField(
+            value = value,
+            onValueChange = {
+                onValueChange(it.copy(it.text.filter { char -> char.isDigit() }
+                    .take(mask?.count { c -> c == maskChar } ?: it.text.length)))
+            },
+            modifier = modifier,
+            label = label,
+            keyboardOptions = keyboardOptions,
+            keyboardActions = keyboardActions,
+            leadingIcon = leadingIcon,
+            singleLine = singleLine,
+            isError = !isValidPhone && value.text.isNotEmpty(),
+            interactionSource = interactionSource,
+            textStyle = textStyle,
+            shape = shape,
+            colors = colors,
+            supportingText = if (isValidPhone || value.text.isBlank()) null else {
+                { supportingText?.invoke(isValidPhone) }
+            },
+            visualTransformation = visualTransformation,
+            trailingIcon = trailingIcon,
+            placeholder = placeholder,
+            enabled = enabled,
+        )
     }
-    OutlinedTextField(
-        value = value,
-        onValueChange = { onValueChange(it.copy(it.text.filter { char -> char.isDigit() }.take(mask?.count { c -> c == maskChar } ?: it.text.length))) },
-        modifier = modifier,
-        label = label,
-        keyboardOptions = keyboardOptions,
-        keyboardActions = keyboardActions,
-        leadingIcon = leadingIcon,
-        singleLine = singleLine,
-        isError = !isValidPhone && value.text.isNotEmpty(),
-        interactionSource = interactionSource,
-        textStyle = textStyle,
-        shape = shape,
-        colors = colors,
-        supportingText = {
-            supportingText?.invoke(isValidPhone || value.text.isBlank())
-        },
-        visualTransformation = visualTransformation,
-        trailingIcon = trailingIcon,
-        placeholder = placeholder,
-        enabled = enabled,
-    )
 }
 
 /**
@@ -312,8 +329,8 @@ fun OutlinedPhoneField(
     value: String,
     onValueChange: (String) -> Unit,
     validator: FormValidator = remember { FormValidator.PHONE },
-    mask: String? = "+## ### #########",
-    maskChar: Char = '#',
+    mask: String? = DEFAULT_MASK,
+    maskChar: Char = DEFAULT_MASK_CHAR,
     modifier: Modifier = Modifier,
     label: (@Composable () -> Unit)? = null,
     keyboardOptions: KeyboardOptions = KeyboardOptions(
@@ -337,32 +354,32 @@ fun OutlinedPhoneField(
     trailingIcon: @Composable (() -> Unit)? = null,
     placeholder: @Composable (() -> Unit)? = null,
     formKey: String = "PHONE",
+    mandatory: Boolean = true
 ) {
-    val isValidPhone = remember(value) { validator.validate(value) }
-    val state = LocalAuthState.current
-    LaunchedEffect(isValidPhone) {
-        state[formKey] = isValidPhone
+    FormComponent(formKey, mandatory) {
+        val isValidPhone = remember(value) { validator.validate(value) }
+        LaunchedEffect(isValidPhone) {
+            it.value = isValidPhone
+        }
+        OutlinedTextField(
+            value = value,
+            onValueChange = { onValueChange(it.filter { char -> char.isDigit() }.take(mask?.count { it == maskChar } ?: it.length)) },
+            modifier = modifier,
+            label = label,
+            keyboardOptions = keyboardOptions,
+            keyboardActions = keyboardActions,
+            leadingIcon = leadingIcon,
+            singleLine = singleLine,
+            isError = !isValidPhone && value.isNotEmpty(),
+            interactionSource = interactionSource,
+            textStyle = textStyle,
+            shape = shape,
+            colors = colors,
+            supportingText = if(isValidPhone || value.isBlank()) null else { { supportingText?.invoke(isValidPhone) } },
+            visualTransformation = visualTransformation,
+            trailingIcon = trailingIcon,
+            placeholder = placeholder,
+            enabled = enabled,
+        )
     }
-    OutlinedTextField(
-        value = value,
-        onValueChange = { onValueChange(it.filter { char -> char.isDigit() }.take(mask?.count { it == maskChar } ?: it.length)) },
-        modifier = modifier,
-        label = label,
-        keyboardOptions = keyboardOptions,
-        keyboardActions = keyboardActions,
-        leadingIcon = leadingIcon,
-        singleLine = singleLine,
-        isError = !isValidPhone && value.isNotEmpty(),
-        interactionSource = interactionSource,
-        textStyle = textStyle,
-        shape = shape,
-        colors = colors,
-        supportingText = {
-            supportingText?.invoke(isValidPhone || value.isBlank())
-        },
-        visualTransformation = visualTransformation,
-        trailingIcon = trailingIcon,
-        placeholder = placeholder,
-        enabled = enabled,
-    )
 }

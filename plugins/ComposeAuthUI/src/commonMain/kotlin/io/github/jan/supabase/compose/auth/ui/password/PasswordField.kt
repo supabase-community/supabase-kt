@@ -27,7 +27,7 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.VisualTransformation
 import io.github.jan.supabase.annotations.SupabaseExperimental
 import io.github.jan.supabase.compose.auth.ui.AuthIcons
-import io.github.jan.supabase.compose.auth.ui.LocalAuthState
+import io.github.jan.supabase.compose.auth.ui.FormComponent
 import io.github.jan.supabase.compose.auth.ui.rememberLockIcon
 import io.github.jan.supabase.compose.auth.ui.rememberVisibilityIcon
 import io.github.jan.supabase.compose.auth.ui.rememberVisibilityOffIcon
@@ -85,35 +85,38 @@ fun PasswordField(
         }
     },
     placeholder: @Composable (() -> Unit)? = null,
-    formKey: String = "PASSWORD"
+    formKey: String = "PASSWORD",
+    mandatory: Boolean = true
 ) {
-    val showPassword = remember { mutableStateOf(false) }
-    val ruleResults = remember(value, rules) { rules.map { PasswordRuleResult(it.description, it.predicate(value)) } }
-    val state = LocalAuthState.current
-    LaunchedEffect(value) {
-        state[formKey] = ruleResults.all { it.isFulfilled }
+    FormComponent(formKey, mandatory) {
+        val showPassword = remember { mutableStateOf(false) }
+        val ruleResults = remember(value, rules) { rules.map { PasswordRuleResult(it.description, it.predicate(value)) } }
+        val allFulfilled = remember(ruleResults) { ruleResults.all { it.isFulfilled } }
+        LaunchedEffect(value) {
+            it.value = ruleResults.all { it.isFulfilled }
+        }
+        OutlinedTextField(
+            value = value,
+            onValueChange = onValueChange,
+            label = label,
+            visualTransformation = visualTransformation(showPassword.value),
+            keyboardOptions = keyboardOptions,
+            keyboardActions = keyboardActions,
+            singleLine = singleLine,
+            isError = ruleResults.firstUnfulfilled() != null && value.isNotEmpty(),
+            modifier = modifier,
+            leadingIcon = leadingIcon,
+            trailingIcon = { trailingIcon?.invoke(showPassword) },
+            supportingText = if(allFulfilled || value.isBlank()) null else { { supportingText?.invoke(ruleResults) } },
+            readOnly = readOnly,
+            enabled = enabled,
+            interactionSource = interactionSource,
+            shape = shape,
+            colors = colors,
+            textStyle = textStyle,
+            placeholder = placeholder,
+        )
     }
-    TextField(
-        value = value,
-        onValueChange = onValueChange,
-        label = label,
-        visualTransformation = visualTransformation(showPassword.value),
-        keyboardOptions = keyboardOptions,
-        keyboardActions = keyboardActions,
-        singleLine = singleLine,
-        isError = ruleResults.firstUnfulfilled() != null && value.isNotEmpty(),
-        modifier = modifier,
-        leadingIcon = leadingIcon,
-        trailingIcon = { trailingIcon?.invoke(showPassword) },
-        supportingText = { supportingText?.invoke(ruleResults) },
-        readOnly = readOnly,
-        enabled = enabled,
-        interactionSource = interactionSource,
-        shape = shape,
-        colors = colors,
-        textStyle = textStyle,
-        placeholder = placeholder,
-    )
 }
 
 /**
@@ -170,35 +173,38 @@ fun PasswordField(
         }
     },
     placeholder: @Composable (() -> Unit)? = null,
-    formKey: String = "PASSWORD"
+    formKey: String = "PASSWORD",
+    mandatory: Boolean = true
 ) {
-    val showPassword = remember { mutableStateOf(false) }
-    val ruleResults = remember(value, rules) { rules.map { PasswordRuleResult(it.description, it.predicate(value.text)) } }
-    val state = LocalAuthState.current
-    LaunchedEffect(value) {
-        state[formKey] = ruleResults.all { it.isFulfilled }
+    FormComponent(formKey, mandatory) {
+        val showPassword = remember { mutableStateOf(false) }
+        val ruleResults = remember(value, rules) { rules.map { PasswordRuleResult(it.description, it.predicate(value.text)) } }
+        val allFulfilled = remember(ruleResults) { ruleResults.all { it.isFulfilled } }
+        LaunchedEffect(value) {
+            it.value = ruleResults.all { it.isFulfilled }
+        }
+        TextField(
+            value = value,
+            onValueChange = onValueChange,
+            label = label,
+            visualTransformation = visualTransformation(showPassword.value),
+            keyboardOptions = keyboardOptions,
+            keyboardActions = keyboardActions,
+            singleLine = singleLine,
+            isError = ruleResults.firstUnfulfilled() != null && value.text.isNotEmpty(),
+            modifier = modifier,
+            leadingIcon = leadingIcon,
+            trailingIcon = { trailingIcon?.invoke(showPassword) },
+            supportingText = if(allFulfilled || value.text.isBlank()) null else { { supportingText?.invoke(ruleResults) } },
+            readOnly = readOnly,
+            enabled = enabled,
+            interactionSource = interactionSource,
+            shape = shape,
+            colors = colors,
+            textStyle = textStyle,
+            placeholder = placeholder,
+        )
     }
-    TextField(
-        value = value,
-        onValueChange = onValueChange,
-        label = label,
-        visualTransformation = visualTransformation(showPassword.value),
-        keyboardOptions = keyboardOptions,
-        keyboardActions = keyboardActions,
-        singleLine = singleLine,
-        isError = ruleResults.firstUnfulfilled() != null && value.text.isNotEmpty(),
-        modifier = modifier,
-        leadingIcon = leadingIcon,
-        trailingIcon = { trailingIcon?.invoke(showPassword) },
-        supportingText = { supportingText?.invoke(ruleResults) },
-        readOnly = readOnly,
-        enabled = enabled,
-        interactionSource = interactionSource,
-        shape = shape,
-        colors = colors,
-        textStyle = textStyle,
-        placeholder = placeholder,
-    )
 }
 
 /**
@@ -254,35 +260,38 @@ fun OutlinedPasswordField(
         }
     },
     placeholder: @Composable (() -> Unit)? = null,
-    formKey: String = "PASSWORD"
+    formKey: String = "PASSWORD",
+    mandatory: Boolean = true
 ) {
-    val showPassword = remember { mutableStateOf(false) }
-    val ruleResults = remember(value, rules) { rules.map { PasswordRuleResult(it.description, it.predicate(value)) } }
-    val state = LocalAuthState.current
-    LaunchedEffect(value) {
-        state[formKey] = ruleResults.all { it.isFulfilled }
+    FormComponent(formKey, mandatory) {
+        val showPassword = remember { mutableStateOf(false) }
+        val ruleResults = remember(value, rules) { rules.map { PasswordRuleResult(it.description, it.predicate(value)) } }
+        val allFulfilled = remember(ruleResults) { ruleResults.all { it.isFulfilled } }
+        LaunchedEffect(value) {
+            it.value = ruleResults.all { it.isFulfilled }
+        }
+        OutlinedTextField(
+            value = value,
+            onValueChange = onValueChange,
+            label = label,
+            visualTransformation = visualTransformation(showPassword.value),
+            keyboardOptions = keyboardOptions,
+            keyboardActions = keyboardActions,
+            singleLine = singleLine,
+            isError = ruleResults.firstUnfulfilled() != null && value.isNotEmpty(),
+            modifier = modifier,
+            leadingIcon = leadingIcon,
+            trailingIcon = { trailingIcon?.invoke(showPassword) },
+            supportingText = if(allFulfilled || value.isBlank()) null else { { supportingText?.invoke(ruleResults) } },
+            readOnly = readOnly,
+            enabled = enabled,
+            interactionSource = interactionSource,
+            shape = shape,
+            colors = colors,
+            textStyle = textStyle,
+            placeholder = placeholder,
+        )
     }
-    OutlinedTextField(
-        value = value,
-        onValueChange = onValueChange,
-        label = label,
-        visualTransformation = visualTransformation(showPassword.value),
-        keyboardOptions = keyboardOptions,
-        keyboardActions = keyboardActions,
-        singleLine = singleLine,
-        isError = ruleResults.firstUnfulfilled() != null && value.isNotEmpty(),
-        modifier = modifier,
-        leadingIcon = leadingIcon,
-        trailingIcon = { trailingIcon?.invoke(showPassword) },
-        supportingText = { supportingText?.invoke(ruleResults) },
-        readOnly = readOnly,
-        enabled = enabled,
-        interactionSource = interactionSource,
-        shape = shape,
-        colors = colors,
-        textStyle = textStyle,
-        placeholder = placeholder,
-    )
 }
 
 /**
@@ -338,35 +347,38 @@ fun OutlinedPasswordField(
         }
     },
     placeholder: @Composable (() -> Unit)? = null,
-    formKey: String = "PASSWORD"
+    formKey: String = "PASSWORD",
+    mandatory: Boolean = true
 ) {
-    val showPassword = remember { mutableStateOf(false) }
-    val ruleResults = remember(value, rules) { rules.map { PasswordRuleResult(it.description, it.predicate(value.text)) } }
-    val state = LocalAuthState.current
-    LaunchedEffect(value) {
-        state[formKey] = ruleResults.all { it.isFulfilled }
+    FormComponent(formKey, mandatory) {
+        val showPassword = remember { mutableStateOf(false) }
+        val ruleResults = remember(value, rules) { rules.map { PasswordRuleResult(it.description, it.predicate(value.text)) } }
+        val allFulfilled = remember(ruleResults) { ruleResults.all { it.isFulfilled } }
+        LaunchedEffect(value) {
+            it.value = ruleResults.all { it.isFulfilled }
+        }
+        OutlinedTextField(
+            value = value,
+            onValueChange = onValueChange,
+            label = label,
+            visualTransformation = visualTransformation(showPassword.value),
+            keyboardOptions = keyboardOptions,
+            keyboardActions = keyboardActions,
+            singleLine = singleLine,
+            isError = ruleResults.firstUnfulfilled() != null && value.text.isNotEmpty(),
+            modifier = modifier,
+            leadingIcon = leadingIcon,
+            trailingIcon = { trailingIcon?.invoke(showPassword) },
+            supportingText = if(allFulfilled || value.text.isBlank()) null else { { supportingText?.invoke(ruleResults) } },
+            readOnly = readOnly,
+            enabled = enabled,
+            interactionSource = interactionSource,
+            shape = shape,
+            colors = colors,
+            textStyle = textStyle,
+            placeholder = placeholder,
+        )
     }
-    TextField(
-        value = value,
-        onValueChange = onValueChange,
-        label = label,
-        visualTransformation = visualTransformation(showPassword.value),
-        keyboardOptions = keyboardOptions,
-        keyboardActions = keyboardActions,
-        singleLine = singleLine,
-        isError = ruleResults.firstUnfulfilled() != null && value.text.isNotEmpty(),
-        modifier = modifier,
-        leadingIcon = leadingIcon,
-        trailingIcon = { trailingIcon?.invoke(showPassword) },
-        supportingText = { supportingText?.invoke(ruleResults) },
-        readOnly = readOnly,
-        enabled = enabled,
-        interactionSource = interactionSource,
-        shape = shape,
-        colors = colors,
-        textStyle = textStyle,
-        placeholder = placeholder,
-    )
 }
 
 private fun List<PasswordRuleResult>.firstUnfulfilled(): PasswordRuleResult? = firstOrNull { !it.isFulfilled }
