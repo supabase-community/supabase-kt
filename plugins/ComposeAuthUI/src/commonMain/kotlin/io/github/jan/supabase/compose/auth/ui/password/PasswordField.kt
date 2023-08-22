@@ -53,7 +53,7 @@ import io.github.jan.supabase.compose.auth.ui.rememberVisibilityOffIcon
  * @param trailingIcon The trailing icon for the password field. Defaults to null.
  * @param placeholder The placeholder for the password field. Defaults to null.
  * @param formKey The key to store the validity of the password field in the AuthState. Defaults to "EMAIL".
- * @see PasswordRule
+ * @param mandatory Whether the form field is mandatory or not. If false, will not affect the [AuthState.validForm] value. You can also make this value dynamic and only make the field mandatory, if e.g. the [value] is not empty. Default is true.
  */
 @SupabaseExperimental
 @ExperimentalMaterial3Api
@@ -140,7 +140,7 @@ fun PasswordField(
  * @param trailingIcon The trailing icon for the password field. Defaults to null.
  * @param placeholder The placeholder for the password field. Defaults to null.
  * @param formKey The key to store the validity of the password field in the AuthState. Defaults to "EMAIL".
- * @see PasswordRule
+ * @param mandatory Whether the form field is mandatory or not. If false, will not affect the [AuthState.validForm] value. You can also make this value dynamic and only make the field mandatory, if e.g. the [value] is not empty. Default is true.
  */
 @SupabaseExperimental
 @ExperimentalMaterial3Api
@@ -228,7 +228,7 @@ fun PasswordField(
  * @param trailingIcon The trailing icon for the password field. Defaults to null.
  * @param placeholder The placeholder for the password field. Defaults to null.
  * @param formKey The key to store the validity of the password field in the AuthState. Defaults to "EMAIL".
- * @see PasswordRule
+ * @param mandatory Whether the form field is mandatory or not. If false, will not affect the [AuthState.validForm] value. You can also make this value dynamic and only make the field mandatory, if e.g. the [value] is not empty. Default is true.
  */
 @SupabaseExperimental
 @ExperimentalMaterial3Api
@@ -315,7 +315,7 @@ fun OutlinedPasswordField(
  * @param trailingIcon The trailing icon for the password field. Defaults to null.
  * @param placeholder The placeholder for the password field. Defaults to null.
  * @param formKey The key to store the validity of the password field in the AuthState. Defaults to "EMAIL".
- * @see PasswordRule
+ * @param mandatory Whether the form field is mandatory or not. If false, will not affect the [AuthState.validForm] value. You can also make this value dynamic and only make the field mandatory, if e.g. the [value] is not empty. Default is true.
  */
 @SupabaseExperimental
 @ExperimentalMaterial3Api

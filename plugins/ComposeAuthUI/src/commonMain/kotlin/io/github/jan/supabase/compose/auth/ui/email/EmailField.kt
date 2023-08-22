@@ -47,6 +47,7 @@ import io.github.jan.supabase.compose.auth.ui.rememberMailIcon
  * @param trailingIcon The trailing icon for the email field. Defaults to null.
  * @param placeholder The placeholder for the email field. Defaults to null.
  * @param formKey The key to store the validity of the email field in the AuthState. Defaults to "EMAIL".
+ * @param mandatory Whether the form field is mandatory or not. If false, will not affect the [AuthState.validForm] value. You can also make this value dynamic and only make the field mandatory, if e.g. the [value] is not empty. Default is true.
  */
 @ExperimentalMaterial3Api
 @SupabaseExperimental
@@ -127,6 +128,7 @@ fun EmailField(
  * @param trailingIcon The trailing icon for the email field. Defaults to null.
  * @param placeholder The placeholder for the email field. Defaults to null.
  * @param formKey The key to store the validity of the email field in the AuthState. Defaults to "EMAIL".
+ * @param mandatory Whether the form field is mandatory or not. If false, will not affect the [AuthState.validForm] value. You can also make this value dynamic and only make the field mandatory, if e.g. the [value] is not empty. Default is true.
  */
 @SupabaseExperimental
 @ExperimentalMaterial3Api
@@ -207,6 +209,7 @@ fun EmailField(
  * @param trailingIcon The trailing icon for the email field. Defaults to null.
  * @param placeholder The placeholder for the email field. Defaults to null.
  * @param formKey The key to store the validity of the email field in the AuthState. Defaults to "EMAIL".
+ * @param mandatory Whether the form field is mandatory or not. If false, will not affect the [AuthState.validForm] value. You can also make this value dynamic and only make the field mandatory, if e.g. the [value] is not empty. Default is true.
  */
 @SupabaseExperimental
 @ExperimentalMaterial3Api
@@ -288,6 +291,7 @@ fun OutlinedEmailField(
  * @param trailingIcon The trailing icon for the email field. Defaults to null.
  * @param placeholder The placeholder for the email field. Defaults to null.
  * @param formKey The key to store the validity of the email field in the AuthState. Defaults to "EMAIL".
+ * @param mandatory Whether the form field is mandatory or not. If false, will not affect the [AuthState.validForm] value. You can also make this value dynamic and only make the field mandatory, if e.g. the [value] is not empty. Default is true.
  */
 @SupabaseExperimental
 @ExperimentalMaterial3Api
