@@ -1,6 +1,6 @@
 # Supabase-kt Compose Auth
 
-Extends gotrue-kt with auth composable
+Extends gotrue-kt with auth composables for Compose Multiplatform
 
 Newest version: [![Maven Central](https://img.shields.io/maven-central/v/io.github.jan-tennert.supabase/supabase-kt)](https://search.maven.org/search?q=g%3Aio.github.jan-tennert.supabase)
 
@@ -19,7 +19,7 @@ val client = createSupabaseClient(
     supabaseKey = "apikey"
 ) {
     //...
-    install(GoTrue){
+    install(GoTrue) {
         //your config
     }
     install(ComposeAuth) {
@@ -35,7 +35,7 @@ The composable can be accessed trough `composeAuth` property from `client`
 
 ```kotlin
 val action = client.composeAuth.rememberLoginWithGoogle(
-    onResult = { result ->
+    onResult = { result -> //optional error handling
         when (result) {
             is NativeSignInResult.Success -> {}
             is NativeSignInResult.ClosedByUser -> {}
@@ -43,11 +43,16 @@ val action = client.composeAuth.rememberLoginWithGoogle(
             is NativeSignInResult.NetworkError -> {}
         } 
     },
-    fallback = {
-    // optional: only add fallback if you like to use custom fallback
+    fallback = { // optional: add custom error handling, not required by default
+    
     }
+)
                             
-Button(onClick = { action.startFlow() }) { Text(text = "Google Login") })
+Button(
+    onClick = { action.startFlow() }
+) { 
+    Text("Google Login") 
+}
 ```
 
 # Support
