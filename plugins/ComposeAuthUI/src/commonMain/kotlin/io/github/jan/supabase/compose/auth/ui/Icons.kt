@@ -1,3 +1,4 @@
+@file:Suppress("MagicNumber")
 package io.github.jan.supabase.compose.auth.ui
 
 import androidx.compose.runtime.Composable
