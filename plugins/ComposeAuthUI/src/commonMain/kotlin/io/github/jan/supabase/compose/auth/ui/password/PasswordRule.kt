@@ -68,5 +68,9 @@ class PasswordRule(val description: String, val predicate: (password: String) ->
  */
 data class PasswordRuleResult(val description: String, val isFulfilled: Boolean)
 
+/**
+ * Creates a [List] of [PasswordRule]s from the specified [rules].
+ * @param rules The rules to create the list from.
+ */
 @Composable
 fun rememberPasswordRuleList(vararg rules: PasswordRule) = remember { rules.toList() }

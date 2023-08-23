@@ -69,6 +69,11 @@ val LocalAuthState = compositionLocalOf {
     AuthState() //possibly to throw an error here
 }
 
+/**
+ * Provides the [AuthState] to the content.
+ * @param state The [AuthState] to provide.
+ * @param content The content to provide the [AuthState] to.
+ */
 @Composable
 fun AuthForm(
     state: AuthState = rememberSaveable(saver = AuthState.SAVER) { AuthState() },
