@@ -1,23 +1,29 @@
 [versions]
-kotlin = "1.9.0"
+kotlin = "1.9.10"
 dokka = "1.8.20"
-ktor = "2.3.2"
+ktor = "2.3.3"
 kotlinx-datetime = "0.4.0"
 kermit = "2.0.0-RC4"
-atomicfu = "0.21.0"
-coroutines = "1.7.2"
+atomicfu = "0.22.0"
+coroutines = "1.7.3"
 android-lifecycle = "2.6.1"
 androidx-startup = "1.1.1"
+androidx-activity-compose = "1.7.2"
+android-play-store = "20.6.0"
 multiplatform-settings = "1.0.0"
-javalin = "5.6.1"
+javalin = "5.6.2"
 complete-kotlin = "1.1.0"
 agp = "8.0.2"
 maven-publish = "0.25.3"
 apollo-kotlin = "3.8.2"
 korlibs = "4.0.9"
-detekt = "1.23.0"
+detekt = "1.23.1"
 moshi = "1.15.0"
 jackson = "2.15.2"
+browser = "1.6.0"
+compose = "1.5.0-rc04"
+googleid = "1.0.1"
+androidsvg = "1.4"
 
 [plugins]
 kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
@@ -28,11 +34,16 @@ android-library = { id = "com.android.library", version.ref = "agp" }
 maven-publish = { id = "com.vanniktech.maven.publish", version.ref = "maven-publish" }
 detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
 
+compose = { id = "org.jetbrains.compose", version.ref = "compose" }
+
+native-cocoapods = { id = "org.jetbrains.kotlin.native.cocoapods", version.ref = "kotlin" }
+
 [libraries]
 kotlinx-atomicfu-plugin = { module = "org.jetbrains.kotlinx:atomicfu-gradle-plugin", version.ref = "atomicfu" }
 kotlinx-atomicfu = { module = "org.jetbrains.kotlinx:atomicfu", version.ref = "atomicfu" }
 kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinx-datetime" }
 kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
+kotlinx-coroutines-play-services = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-play-services", version.ref = "coroutines" }
 kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "coroutines" }
 kotlin-reflect = { module = "org.jetbrains.kotlin:kotlin-reflect", version.ref = "kotlin" }
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
@@ -46,7 +57,11 @@ ktor-json = { module = "io.ktor:ktor-serialization-kotlinx-json", version.ref = 
 kermit = { module = "co.touchlab:kermit", version.ref = "kermit" }
 
 android-lifecycle-process = { module = "androidx.lifecycle:lifecycle-process", version.ref = "android-lifecycle" }
+androidx-browser = { module = "androidx.browser:browser", version.ref = "browser" }
 androidx-startup-runtime = { module = "androidx.startup:startup-runtime", version.ref = "androidx-startup" }
+androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activity-compose" }
+android-play-store-auth = { module = "com.google.android.gms:play-services-auth", version.ref = "android-play-store" }
+android-google-id = { module = "com.google.android.libraries.identity.googleid:googleid", version.ref = "googleid" }
 
 multiplatform-settings-no-arg = { module = "com.russhwolf:multiplatform-settings-no-arg", version.ref = "multiplatform-settings" }
 multiplatform-settings-coroutines = { module = "com.russhwolf:multiplatform-settings-coroutines", version.ref = "multiplatform-settings" }
@@ -57,12 +72,15 @@ javalin = { module = "io.javalin:javalin", version.ref = "javalin" }
 apollo-kotlin = { module = "com.apollographql.apollo3:apollo-runtime", version.ref = "apollo-kotlin" }
 
 krypto = { module = "com.soywiz.korlibs.krypto:krypto", version.ref = "korlibs" }
+korio = { module = "com.soywiz.korlibs.korio:korio", version.ref = "korlibs" }
 
 moshi = { module = "com.squareup.moshi:moshi", version.ref = "moshi" }
 moshi-kotlin = { module = "com.squareup.moshi:moshi-kotlin", version.ref = "moshi" }
 
 jackson = { module = "com.fasterxml.jackson.core:jackson-core", version.ref = "jackson" }
 jackson-kotlin = { module = "com.fasterxml.jackson.module:jackson-module-kotlin", version.ref = "jackson" }
+
+androidsvg = { module = "com.caverock:androidsvg-aar", version.ref = "androidsvg" }
 
 [bundles]
 ktor-client = ["ktor-client-core", "ktor-client-content-negotiation", "ktor-json"]

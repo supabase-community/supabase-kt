@@ -11,11 +11,11 @@ actual class GoTrueConfig : MainConfig, CustomSerializationConfig, GoTrueConfigD
     /**
      * The scheme for the redirect url, when using deep linking
      */
-    var scheme: String = "supabase"
+    var scheme: String? = null
 
     /**
      * The host for the redirect url, when using deep linking
      */
-    var host: String = "login"
+    var host: String? = null
 
 }

@@ -82,6 +82,7 @@ kotlin {
             dependsOn(nonLinuxMain)
             dependencies {
                 api(libs.androidx.startup.runtime)
+                api(libs.androidx.browser)
             }
         }
         val mingwX64Main by getting {
@@ -98,7 +99,7 @@ kotlin {
 }
 
 android {
-    compileSdk = 33
+    compileSdk = 34
     sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
     namespace = "io.github.jan.supabase.gotrue.library"
     defaultConfig {

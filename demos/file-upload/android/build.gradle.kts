@@ -15,7 +15,7 @@ dependencies {
 }
 
 android {
-    compileSdk = 33
+    compileSdk = 34
     defaultConfig {
         applicationId = "io.github.jan.supabase.android"
         minSdk = 26
