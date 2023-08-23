@@ -1,4 +1,4 @@
-@file:Suppress("MagicNumber")
+@file:Suppress("MagicNumber", "UndocumentedPublicFunction", "LongMethod")
 package io.github.jan.supabase.compose.auth.ui
 
 import androidx.compose.runtime.Composable

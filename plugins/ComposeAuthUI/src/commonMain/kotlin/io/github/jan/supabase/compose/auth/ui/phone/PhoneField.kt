@@ -26,8 +26,8 @@ import io.github.jan.supabase.compose.auth.ui.FormComponent
 import io.github.jan.supabase.compose.auth.ui.FormValidator
 import io.github.jan.supabase.compose.auth.ui.rememberCallIcon
 
-const val DEFAULT_MASK = "+## ### #########"
-const val DEFAULT_MASK_CHAR = '#'
+private const val DEFAULT_MASK = "+## ### #########"
+private const val DEFAULT_MASK_CHAR = '#'
 
 /**
  * A custom email input field with validation and pre-defined styling.

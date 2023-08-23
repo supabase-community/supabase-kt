@@ -14,7 +14,7 @@ import androidx.compose.ui.unit.dp
 import io.github.jan.supabase.annotations.SupabaseExperimental
 import io.github.jan.supabase.gotrue.providers.OAuthProvider
 
-val DEFAULT_ICON_SIZE = 24.dp //from Material3
+internal val DEFAULT_ICON_SIZE = 24.dp //from Material3
 
 /**
  * Displays an icon representing the specified OAuth provider.
