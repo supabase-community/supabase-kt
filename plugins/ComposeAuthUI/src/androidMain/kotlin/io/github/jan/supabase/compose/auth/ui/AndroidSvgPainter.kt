@@ -1,6 +1,5 @@
 package io.github.jan.supabase.compose.auth.ui
 
-import androidx.compose.runtime.Composable
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.geometry.isSpecified
 import androidx.compose.ui.graphics.drawscope.DrawScope
@@ -16,7 +15,6 @@ import io.ktor.utils.io.ByteReadChannel
 import io.ktor.utils.io.jvm.javaio.toInputStream
 import kotlin.math.ceil
 
-@Composable
 actual fun svgPainter(bytes: ByteArray, density: Density): Painter {
     val svg = SVG.getFromInputStream(ByteReadChannel(bytes).toInputStream())
     return SVGPainter(svg, density)
