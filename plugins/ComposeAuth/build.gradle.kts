@@ -88,3 +88,8 @@ android {
         targetCompatibility = JavaVersion.VERSION_1_8
     }
 }
+
+compose {
+    kotlinCompilerPlugin.set(dependencies.compiler.forKotlin("1.9.0"))
+    kotlinCompilerPluginArgs.add("suppressKotlinVersionCompatibilityCheck=1.9.10")
+}
