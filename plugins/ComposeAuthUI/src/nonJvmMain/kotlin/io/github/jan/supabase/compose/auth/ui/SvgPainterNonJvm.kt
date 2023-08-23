@@ -9,6 +9,7 @@ import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntSize
+import io.github.jan.supabase.annotations.SupabaseInternal
 import org.jetbrains.skia.Data
 import org.jetbrains.skia.Rect
 import org.jetbrains.skia.svg.SVGDOM
@@ -18,6 +19,7 @@ import org.jetbrains.skia.svg.SVGPreserveAspectRatio
 import org.jetbrains.skia.svg.SVGPreserveAspectRatioAlign
 import kotlin.math.ceil
 
+@SupabaseInternal
 actual fun svgPainter(bytes: ByteArray, density: Density): Painter = loadSvgPainter(bytes, density)
 
 // Note: copied from here:
