@@ -13,17 +13,17 @@ import io.github.jan.supabase.plugins.SupabasePluginProvider
 /**
  * Plugin that extends [GoTrue] Module with composable function that enables
  * easy implementation of Native Login.
- * Currently supported Google Login(Android) and Apple Login(iOS)
+ * Currently supported Google Login (Android) and Apple Login (iOS), other compose-supported targets rely on GoTrue login.
  *
- * To use it install GoTrue and ComposeAuth
+ * To use it, install GoTrue and ComposeAuth
  * ```kotlin
  * val client = createSupabaseClient(supabaseUrl, supabaseKey) {
- *    install(GoTrue){
- *      //your config here
+ *    install(GoTrue) {
+ *       //your config here
  *    }
- *    install(ComposeAuth){
- *      googleNativeLogin(/* your config parameters here */)
- *      appleNativeLogin(/* your config parameters here */)
+ *    install(ComposeAuth) {
+ *       googleNativeLogin(/* your config parameters here */)
+ *       appleNativeLogin(/* your config parameters here */)
  *    }
  * }
  * ```
@@ -31,18 +31,20 @@ import io.github.jan.supabase.plugins.SupabasePluginProvider
  * then on you screen call
  *  ```kotlin
  *  val action = auth.rememberLoginWithGoogle(
- *         onResult = {
- *          // returns NativeSignInResult
- *         },
- *         fallback = {
- *          // optional: only add fallback if you like to use custom fallback
- *         }
+ *     onResult = {
+ *        // returns NativeSignInResult
+ *     },
+ *     fallback = {
+ *        // optional: only add fallback if you like to use custom fallback
+ *     }
+ * )
  *
- * Button(onClick = {
- *      action.startFlow()
- * })
- * {
- *      Text(text = "Google Login")
+ * Button(
+ *     onClick = {
+ *         action.startFlow()
+ *     }
+ * ) {
+ *     Text(text = "Google Login")
  * }
  *  ```
  */
