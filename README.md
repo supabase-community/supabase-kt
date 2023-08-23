@@ -3,17 +3,29 @@
 A Kotlin Multiplatform Client for Supabase.
 Supported targets:
 
-|                                                                    | **GoTrue** | **Realtime** | **Postgrest** | **Storage** | **Functions** | **Apollo-GraphQL** | **Compose Auth 🚧**      | **Compose Auth UI 🚧** |
-|--------------------------------------------------------------------|------------|--------------|---------------|-------------|---------------|--------------------|--------------------------|------------------------|
-| **JVM**                                                            | ✅          | ✅            | ✅             | ✅           | ✅             | ✅                  | using GoTrue as fallback | ✅                      |
-| **Android**                                                        | ✅          | ✅            | ✅             | ✅           | ✅             | ✅                  | Native Google Login      | ✅                      |
-| **JS** *(Browser, NodeJS)*                                         | ✅          | ✅            | ✅             | ✅           | ✅             | ✅                  | using GoTrue as fallback | ✅                      |
-| **IOS**                                                            | ✅          | ✅            | ✅             | ✅           | ✅             | ✅                  | Native Apple Login       | ✅                      |
-| **tvOS** *(tvosArm64, tvosX64, tvosSimulatorArm64)* 🚧             | ☑️         | ✅            | ✅             | ✅           | ✅             | ✅                  | ❌                        | ❌                      |
-| **watchOS** *(watchosArm64, watchosX64, watchosSimulatorArm64)* 🚧 | ☑️         | ✅            | ✅             | ✅           | ✅             | ✅                  | ❌                        | ❌                      |
-| **MacOS**  *(macosX64 & macosArm64)* 🚧                            | ✅          | ✅            | ✅             | ✅           | ✅             | ✅                  | ❌                        | ❌                      |
-| **Windows** *(mingwX64)*   🚧                                      | ☑️         | ✅            | ✅             | ✅           | ✅             | ❌                  | ❌                        | ❌                      |
-| **Linux** *(linuxX64)*  🚧                                         | ☑️         | ✅            | ✅             | ✅           | ✅             | ❌                  | ❌                        | ❌                      |
+|                  | **GoTrue** | **Realtime** | **Postgrest** | **Storage** | **Functions** | **Apollo-GraphQL** | **Compose Auth 🚧**      | **Compose Auth UI 🚧** |
+|------------------|------------|--------------|---------------|-------------|---------------|--------------------|--------------------------|------------------------|
+| **JVM**          | ✅          | ✅            | ✅             | ✅           | ✅             | ✅                  | using GoTrue as fallback | ✅                      |
+| **Android**      | ✅          | ✅            | ✅             | ✅           | ✅             | ✅                  | Native Google Login      | ✅                      |
+| **JS**           | ✅          | ✅            | ✅             | ✅           | ✅             | ✅                  | using GoTrue as fallback | ✅                      |
+| **IOS**          | ✅          | ✅            | ✅             | ✅           | ✅             | ✅                  | Native Apple Login       | ✅                      |
+| **tvOS**  🚧     | ☑️         | ✅            | ✅             | ✅           | ✅             | ✅                  | ❌                        | ❌                      |
+| **watchOS**  🚧  | ☑️         | ✅            | ✅             | ✅           | ✅             | ✅                  | ❌                        | ❌                      |
+| **MacOS**   🚧   | ✅          | ✅            | ✅             | ✅           | ✅             | ✅                  | ❌                        | ❌                      |
+| **Windows**   🚧 | ☑️         | ✅            | ✅             | ✅           | ✅             | ❌                  | ❌                        | ❌                      |
+| **Linux**  🚧    | ☑️         | ✅            | ✅             | ✅           | ✅             | ❌                  | ❌                        | ❌                      |
+
+<details>
+
+<summary>In-depth Kotlin targets</summary>
+
+**tvOS**: tvosArm64, tvosX64, tvosSimulatorArm64
+**watchOS**: watchosArm64, watchosX64, watchosSimulatorArm64  
+**MacOS**: macosX64, macosArm64                                   
+**Windows**: mingwX64                                          
+**Linux**: linuxX64
+
+</details>
 
 ✅ = full support
 
