@@ -16,7 +16,7 @@ complete-kotlin = "1.1.0"
 agp = "8.0.2"
 maven-publish = "0.25.3"
 apollo-kotlin = "3.8.2"
-korlibs = "4.0.9"
+korlibs = "4.0.10"
 detekt = "1.23.1"
 moshi = "1.15.0"
 jackson = "2.15.2"
@@ -72,7 +72,6 @@ javalin = { module = "io.javalin:javalin", version.ref = "javalin" }
 apollo-kotlin = { module = "com.apollographql.apollo3:apollo-runtime", version.ref = "apollo-kotlin" }
 
 krypto = { module = "com.soywiz.korlibs.krypto:krypto", version.ref = "korlibs" }
-korio = { module = "com.soywiz.korlibs.korio:korio", version.ref = "korlibs" }
 
 moshi = { module = "com.squareup.moshi:moshi", version.ref = "moshi" }
 moshi-kotlin = { module = "com.squareup.moshi:moshi-kotlin", version.ref = "moshi" }

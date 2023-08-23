@@ -49,7 +49,6 @@ kotlin {
             dependencies {
                 api(compose.ui)
                 implementation(project(":gotrue-kt"))
-                implementation(libs.korio)
                 implementation(compose.material3)
             }
         }
