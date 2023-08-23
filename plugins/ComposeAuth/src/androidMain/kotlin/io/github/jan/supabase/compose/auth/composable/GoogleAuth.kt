@@ -126,6 +126,10 @@ internal fun ComposeAuth.oneTapSignIn(onResult: (NativeSignInResult) -> Unit, fa
                 } catch (e: Exception) {
                     onResult.invoke(NativeSignInResult.Error(e.localizedMessage ?: "error"))
                 }
+            } else if (result.resultCode == Activity.RESULT_CANCELED) {
+                onResult.invoke(NativeSignInResult.Error("error: operation canceled"))
+            } else {
+                onResult.invoke(NativeSignInResult.Error("error: ${result.resultCode}"))
             }
             state.reset()
         }
@@ -143,10 +147,15 @@ internal fun ComposeAuth.oneTapSignIn(onResult: (NativeSignInResult) -> Unit, fa
 
             val config = config.loginConfig["google"] as GoogleLoginConfig
             val signInRequest = getSignInRequest(config)
-            val oneTapResult = Identity.getSignInClient(context).beginSignIn(signInRequest).await()
-            request.launch(
-                IntentSenderRequest.Builder(oneTapResult.pendingIntent.intentSender).build()
-            )
+            try {
+                val oneTapResult = Identity.getSignInClient(context).beginSignIn(signInRequest).await()
+                request.launch(
+                    IntentSenderRequest.Builder(oneTapResult.pendingIntent.intentSender).build()
+                )
+            }catch (e:Exception){
+                onResult.invoke(NativeSignInResult.Error(e.localizedMessage))
+                state.reset()
+            }
         }
     }
 
