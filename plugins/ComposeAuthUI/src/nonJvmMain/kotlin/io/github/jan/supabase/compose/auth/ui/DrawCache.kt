@@ -1,3 +1,4 @@
+@file:Suppress("ComplexCondition")
 package io.github.jan.supabase.compose.auth.ui
 
 import androidx.compose.ui.graphics.BlendMode
