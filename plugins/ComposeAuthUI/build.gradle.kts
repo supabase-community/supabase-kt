@@ -4,18 +4,17 @@ plugins {
     alias(libs.plugins.compose)
 }
 
-description = "Extends gotrue-kt with composable"
+description = "Extends supabase-kt with a Apollo GraphQL Client"
 
 repositories {
     mavenCentral()
-    maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
 }
 
 @OptIn(org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi::class)
 kotlin {
     targetHierarchy.default()
+    jvmToolchain(8)
     jvm {
-        jvmToolchain(8)
         compilations.all {
             kotlinOptions.freeCompilerArgs = listOf(
                 "-Xjvm-default=all",  // use default methods in interfaces,
@@ -40,7 +39,6 @@ kotlin {
     }
     ios()
     iosSimulatorArm64()
-
     sourceSets {
         all {
             languageSettings.optIn("kotlin.RequiresOptIn")
@@ -49,37 +47,33 @@ kotlin {
         }
         val commonMain by getting {
             dependencies {
-                api(project(":gotrue-kt"))
-                implementation(compose.ui)
-                implementation(compose.runtime)
+                api(compose.ui)
+                implementation(project(":gotrue-kt"))
+                implementation(libs.korio)
+                implementation(compose.material3)
             }
+        }
+        val nonJvmMain by creating {
+            dependsOn(commonMain)
         }
         val androidMain by getting {
-            dependsOn(commonMain)
             dependencies {
-                api(libs.android.play.store.auth)
-                implementation(libs.android.google.id)
-                implementation(libs.kotlinx.coroutines.play.services)
-                implementation(libs.androidx.activity.compose)
+                implementation(libs.androidsvg)
             }
         }
-        val jvmMain by getting {
-            dependsOn(commonMain)
-        }
-
-        val appleMain by getting {
-            dependsOn(commonMain)
+        val iosMain by getting {
+            dependsOn(nonJvmMain)
         }
         val jsMain by getting {
-            dependsOn(commonMain)
+            dependsOn(nonJvmMain)
         }
     }
 }
 
 android {
-    namespace = "io.github.jan.supabase.compose.auth"
     compileSdk = 34
     sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
+    namespace = "io.github.jan.supabase.compose.auth.ui.library"
     defaultConfig {
         minSdk = 21
     }

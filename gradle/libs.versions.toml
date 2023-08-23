@@ -21,8 +21,9 @@ detekt = "1.23.1"
 moshi = "1.15.0"
 jackson = "2.15.2"
 browser = "1.6.0"
-compose = "1.4.3"
+compose = "1.5.0-rc04"
 googleid = "1.0.1"
+androidsvg = "1.4"
 
 [plugins]
 kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
@@ -71,12 +72,15 @@ javalin = { module = "io.javalin:javalin", version.ref = "javalin" }
 apollo-kotlin = { module = "com.apollographql.apollo3:apollo-runtime", version.ref = "apollo-kotlin" }
 
 krypto = { module = "com.soywiz.korlibs.krypto:krypto", version.ref = "korlibs" }
+korio = { module = "com.soywiz.korlibs.korio:korio", version.ref = "korlibs" }
 
 moshi = { module = "com.squareup.moshi:moshi", version.ref = "moshi" }
 moshi-kotlin = { module = "com.squareup.moshi:moshi-kotlin", version.ref = "moshi" }
 
 jackson = { module = "com.fasterxml.jackson.core:jackson-core", version.ref = "jackson" }
 jackson-kotlin = { module = "com.fasterxml.jackson.module:jackson-module-kotlin", version.ref = "jackson" }
+
+androidsvg = { module = "com.caverock:androidsvg-aar", version.ref = "androidsvg" }
 
 [bundles]
 ktor-client = ["ktor-client-core", "ktor-client-content-negotiation", "ktor-json"]
