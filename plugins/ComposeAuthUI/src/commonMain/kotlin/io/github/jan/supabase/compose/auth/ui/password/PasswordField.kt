@@ -91,7 +91,6 @@ fun PasswordField(
     FormComponent(formKey, mandatory) {
         val showPassword = remember { mutableStateOf(false) }
         val ruleResults = remember(value, rules) { rules.map { PasswordRuleResult(it.description, it.predicate(value)) } }
-        val allFulfilled = remember(ruleResults) { ruleResults.all { it.isFulfilled } }
         LaunchedEffect(value) {
             it.value = ruleResults.all { it.isFulfilled }
         }
@@ -107,7 +106,7 @@ fun PasswordField(
             modifier = modifier,
             leadingIcon = leadingIcon,
             trailingIcon = { trailingIcon?.invoke(showPassword) },
-            supportingText = if(allFulfilled || value.isBlank()) null else { { supportingText?.invoke(ruleResults) } },
+            supportingText = { supportingText?.invoke(ruleResults) },
             readOnly = readOnly,
             enabled = enabled,
             interactionSource = interactionSource,
@@ -179,7 +178,6 @@ fun PasswordField(
     FormComponent(formKey, mandatory) {
         val showPassword = remember { mutableStateOf(false) }
         val ruleResults = remember(value, rules) { rules.map { PasswordRuleResult(it.description, it.predicate(value.text)) } }
-        val allFulfilled = remember(ruleResults) { ruleResults.all { it.isFulfilled } }
         LaunchedEffect(value) {
             it.value = ruleResults.all { it.isFulfilled }
         }
@@ -195,7 +193,7 @@ fun PasswordField(
             modifier = modifier,
             leadingIcon = leadingIcon,
             trailingIcon = { trailingIcon?.invoke(showPassword) },
-            supportingText = if(allFulfilled || value.text.isBlank()) null else { { supportingText?.invoke(ruleResults) } },
+            supportingText = { supportingText?.invoke(ruleResults) },
             readOnly = readOnly,
             enabled = enabled,
             interactionSource = interactionSource,
@@ -266,7 +264,6 @@ fun OutlinedPasswordField(
     FormComponent(formKey, mandatory) {
         val showPassword = remember { mutableStateOf(false) }
         val ruleResults = remember(value, rules) { rules.map { PasswordRuleResult(it.description, it.predicate(value)) } }
-        val allFulfilled = remember(ruleResults) { ruleResults.all { it.isFulfilled } }
         LaunchedEffect(value) {
             it.value = ruleResults.all { it.isFulfilled }
         }
@@ -282,7 +279,7 @@ fun OutlinedPasswordField(
             modifier = modifier,
             leadingIcon = leadingIcon,
             trailingIcon = { trailingIcon?.invoke(showPassword) },
-            supportingText = if(allFulfilled || value.isBlank()) null else { { supportingText?.invoke(ruleResults) } },
+            supportingText = { supportingText?.invoke(ruleResults) },
             readOnly = readOnly,
             enabled = enabled,
             interactionSource = interactionSource,
@@ -353,7 +350,6 @@ fun OutlinedPasswordField(
     FormComponent(formKey, mandatory) {
         val showPassword = remember { mutableStateOf(false) }
         val ruleResults = remember(value, rules) { rules.map { PasswordRuleResult(it.description, it.predicate(value.text)) } }
-        val allFulfilled = remember(ruleResults) { ruleResults.all { it.isFulfilled } }
         LaunchedEffect(value) {
             it.value = ruleResults.all { it.isFulfilled }
         }
@@ -369,7 +365,7 @@ fun OutlinedPasswordField(
             modifier = modifier,
             leadingIcon = leadingIcon,
             trailingIcon = { trailingIcon?.invoke(showPassword) },
-            supportingText = if(allFulfilled || value.text.isBlank()) null else { { supportingText?.invoke(ruleResults) } },
+            supportingText = { supportingText?.invoke(ruleResults) },
             readOnly = readOnly,
             enabled = enabled,
             interactionSource = interactionSource,

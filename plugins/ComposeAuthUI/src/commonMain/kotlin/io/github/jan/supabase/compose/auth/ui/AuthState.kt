@@ -18,8 +18,15 @@ class AuthState(
 ) {
 
     private val _states = mutableStateMapOf(*states.toList().toTypedArray())
+
+    /**
+     * The current states of the form.
+     */
     val states: Map<String, Boolean> get() = _states.toMap()
 
+    /**
+     * Whether the form is valid or not.
+     */
     val validForm: Boolean
         get() = states.values.all { it }
 

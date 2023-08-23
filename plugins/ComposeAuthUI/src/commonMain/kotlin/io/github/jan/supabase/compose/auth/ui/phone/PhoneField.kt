@@ -109,9 +109,7 @@ fun PhoneField(
             textStyle = textStyle,
             shape = shape,
             colors = colors,
-            supportingText = if (isValidPhone || value.isBlank()) null else {
-                { supportingText?.invoke(isValidPhone) }
-            },
+            supportingText = { supportingText?.invoke(isValidPhone) },
             visualTransformation = visualTransformation,
             trailingIcon = trailingIcon,
             placeholder = placeholder,
@@ -200,9 +198,7 @@ fun PhoneField(
             textStyle = textStyle,
             shape = shape,
             colors = colors,
-            supportingText = if (isValidPhone || value.text.isBlank()) null else {
-                { supportingText?.invoke(isValidPhone) }
-            },
+            supportingText = { supportingText?.invoke(isValidPhone) },
             visualTransformation = visualTransformation,
             trailingIcon = trailingIcon,
             placeholder = placeholder,
@@ -291,9 +287,7 @@ fun OutlinedPhoneField(
             textStyle = textStyle,
             shape = shape,
             colors = colors,
-            supportingText = if (isValidPhone || value.text.isBlank()) null else {
-                { supportingText?.invoke(isValidPhone) }
-            },
+            supportingText = { supportingText?.invoke(isValidPhone) },
             visualTransformation = visualTransformation,
             trailingIcon = trailingIcon,
             placeholder = placeholder,
@@ -379,7 +373,7 @@ fun OutlinedPhoneField(
             textStyle = textStyle,
             shape = shape,
             colors = colors,
-            supportingText = if(isValidPhone || value.isBlank()) null else { { supportingText?.invoke(isValidPhone) } },
+            supportingText = { supportingText?.invoke(isValidPhone) },
             visualTransformation = visualTransformation,
             trailingIcon = trailingIcon,
             placeholder = placeholder,

@@ -49,8 +49,7 @@ kotlin {
             dependencies {
                 api(compose.ui)
                 implementation(project(":gotrue-kt"))
-                //kamel
-                implementation("com.soywiz.korlibs.korio:korio:4.0.9")
+                implementation(libs.korio)
                 implementation(compose.material3)
             }
         }
@@ -58,7 +57,9 @@ kotlin {
             dependsOn(commonMain)
         }
         val androidMain by getting {
-            dependsOn(nonJvmMain)
+            dependencies {
+                implementation(libs.androidsvg)
+            }
         }
         val iosMain by getting {
             dependsOn(nonJvmMain)
