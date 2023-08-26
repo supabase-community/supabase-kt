@@ -15,7 +15,7 @@ import kotlinx.serialization.json.jsonObject
 /**
  * Authentication method with email and password
  */
-object Email : DefaultAuthProvider<Email.Config, Email.Result> {
+data object Email : DefaultAuthProvider<Email.Config, Email.Result> {
 
     override val grantType: String = "password"
 

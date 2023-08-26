@@ -53,7 +53,7 @@ internal class GoTrueImpl(
     override val config: GoTrueConfig
 ) : GoTrue {
 
-    private val _sessionStatus = MutableStateFlow<SessionStatus>(SessionStatus.NotAuthenticated)
+    private val _sessionStatus = MutableStateFlow<SessionStatus>(SessionStatus.Initializing)
     override val sessionStatus: StateFlow<SessionStatus> = _sessionStatus.asStateFlow()
     internal val authScope = CoroutineScope(config.coroutineDispatcher)
     override val sessionManager = config.sessionManager ?: createDefaultSessionManager()
@@ -92,6 +92,8 @@ internal class GoTrueImpl(
                     _sessionStatus.value = SessionStatus.NotAuthenticated
                 }
             }
+        } else {
+            _sessionStatus.value = SessionStatus.NotAuthenticated
         }
     }
     override suspend fun <C, R, Provider : AuthProvider<C, R>> loginWith(

@@ -20,7 +20,7 @@ sealed class FactorType<T>(val value: String) {
     /**
      * TOTP (timed one-time password) MFA factor
      */
-    object TOTP : FactorType<TOTP.Response>("totp") {
+    data object TOTP : FactorType<TOTP.Response>("totp") {
 
         override suspend fun decodeResponse(json: JsonObject): Response {
             return supabaseJson.decodeFromJsonElement(json["totp"]?.jsonObject ?: error("No 'totp' object found in factor response"))

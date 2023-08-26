@@ -20,7 +20,7 @@ import kotlinx.serialization.json.jsonObject
 /**
  * Authentication method with phone numbers and password
  */
-object Phone : DefaultAuthProvider<Phone.Config, Phone.Result> {
+data object Phone : DefaultAuthProvider<Phone.Config, Phone.Result> {
 
     override val grantType: String = "password"
 

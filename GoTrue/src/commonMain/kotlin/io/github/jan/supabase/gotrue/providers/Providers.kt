@@ -1,115 +1,115 @@
 @file:Suppress("UndocumentedPublicClass")
 package io.github.jan.supabase.gotrue.providers
 
-object Google : IDTokenProvider() {
+data object Google : IDTokenProvider() {
 
     override val name = "google"
 
 }
 
-object Discord : OAuthProvider() {
+data object Discord : OAuthProvider() {
 
     override val name = "discord"
 
 }
 
-object Github : OAuthProvider() {
+data object Github : OAuthProvider() {
 
     override val name = "github"
 
 }
 
-object Gitlab : OAuthProvider() {
+data object Gitlab : OAuthProvider() {
 
     override val name = "gitlab"
 
 }
 
-object Keycloak : OAuthProvider() {
+data object Keycloak : OAuthProvider() {
 
     override val name = "keycloak"
 
 }
 
-object LinkedIn : OAuthProvider() {
+data object LinkedIn : OAuthProvider() {
 
     override val name = "linkedin"
 
 }
 
-object Notion : OAuthProvider() {
+data object Notion : OAuthProvider() {
 
     override val name = "notion"
 
 }
 
-object Slack : OAuthProvider() {
+data object Slack : OAuthProvider() {
 
     override val name = "slack"
 
 }
 
-object Twitch : OAuthProvider() {
+data object Twitch : OAuthProvider() {
 
     override val name = "twitch"
 
 }
 
-object Twitter : OAuthProvider() {
+data object Twitter : OAuthProvider() {
 
     override val name = "twitter"
 
 }
 
-object WorkOS : OAuthProvider() {
+data object WorkOS : OAuthProvider() {
 
     override val name = "workos"
 
 }
 
-object Zoom : OAuthProvider() {
+data object Zoom : OAuthProvider() {
 
     override val name = "zoom"
 
 }
 
-object Bitbucket : OAuthProvider() {
+data object Bitbucket : OAuthProvider() {
 
     override val name = "bitbucket"
 
 }
 
-object Azure : IDTokenProvider() {
+data object Azure : IDTokenProvider() {
 
     override val name = "azure"
 
 }
 
-object Apple : IDTokenProvider() {
+data object Apple : IDTokenProvider() {
 
     override val name = "apple"
 
 }
 
-object Spotify : OAuthProvider() {
+data object Spotify : OAuthProvider() {
 
     override val name = "spotify"
 
 }
 
-object Kakao : OAuthProvider() {
+data object Kakao : OAuthProvider() {
 
     override val name = "kakao"
 
 }
 
-object Facebook : IDTokenProvider() {
+data object Facebook : IDTokenProvider() {
 
     override val name = "facebook"
   
 }
-  
-object Figma : OAuthProvider() {
+
+data object Figma : OAuthProvider() {
 
     override val name = "figma"
 

@@ -23,7 +23,7 @@ import kotlinx.serialization.json.jsonObject
  * Only [Apple], [Google], [Facebook] and [Azure] are supported as providers.
  *
  */
-object IDToken : DefaultAuthProvider<IDToken.Config, IDToken.Result> {
+data object IDToken : DefaultAuthProvider<IDToken.Config, IDToken.Result> {
 
     override val grantType: String = "id_token"
 

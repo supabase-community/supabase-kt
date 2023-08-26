@@ -19,7 +19,7 @@ sealed interface DownloadStatus {
     /**
      * Represents the success of a download
      */
-    object Success : DownloadStatus
+    data object Success : DownloadStatus
 
     /**
      * Represents the data of a download. Only sent, when not streaming to a [ByteWriteChannel]

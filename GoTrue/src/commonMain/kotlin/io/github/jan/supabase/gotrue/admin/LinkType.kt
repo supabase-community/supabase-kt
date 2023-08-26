@@ -34,7 +34,7 @@ sealed interface LinkType<C: LinkType.Config> {
     /**
      * The signup link type
      */
-    object Signup: LinkType<Signup.Config> {
+    data object Signup: LinkType<Signup.Config> {
 
         override val type = "signup"
 
@@ -57,7 +57,7 @@ sealed interface LinkType<C: LinkType.Config> {
     /**
      * The invite link type
      */
-    object Invite : LinkType<Config> {
+    data object Invite : LinkType<Config> {
 
         override val type = "invite"
 
@@ -69,7 +69,7 @@ sealed interface LinkType<C: LinkType.Config> {
     /**
      * The magic link type
      */
-    object MagicLink : LinkType<Config> {
+    data object MagicLink : LinkType<Config> {
 
         override val type: String = "magiclink"
 
@@ -81,7 +81,7 @@ sealed interface LinkType<C: LinkType.Config> {
     /**
      * The recovery link type
      */
-    object RecoveryLink : LinkType<Config> {
+    data object RecoveryLink : LinkType<Config> {
 
         override val type: String = "recovery"
 
@@ -93,7 +93,7 @@ sealed interface LinkType<C: LinkType.Config> {
     /**
      * The email change link type
      */
-    object EmailChangeCurrent : LinkType<EmailChangeCurrent.Config> {
+    data object EmailChangeCurrent : LinkType<EmailChangeCurrent.Config> {
 
         override val type: String = "email_change_current"
 
@@ -115,7 +115,7 @@ sealed interface LinkType<C: LinkType.Config> {
     /**
      * The email change link type
      */
-    object EmailChangeNew : LinkType<EmailChangeCurrent.Config> {
+    data object EmailChangeNew : LinkType<EmailChangeCurrent.Config> {
 
         override val type: String = "email_change_new"
 
