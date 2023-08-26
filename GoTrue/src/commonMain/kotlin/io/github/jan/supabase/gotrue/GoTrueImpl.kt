@@ -53,7 +53,7 @@ internal class GoTrueImpl(
     override val config: GoTrueConfig
 ) : GoTrue {
 
-    private val _sessionStatus = MutableStateFlow<SessionStatus>(SessionStatus.Initializing)
+    private val _sessionStatus = MutableStateFlow<SessionStatus>(SessionStatus.LoadingFromStorage)
     override val sessionStatus: StateFlow<SessionStatus> = _sessionStatus.asStateFlow()
     internal val authScope = CoroutineScope(config.coroutineDispatcher)
     override val sessionManager = config.sessionManager ?: createDefaultSessionManager()
@@ -78,7 +78,6 @@ internal class GoTrueImpl(
     override fun init() {
         setupPlatform()
         if (config.autoLoadFromStorage) {
-            _sessionStatus.value = SessionStatus.LoadingFromStorage
             authScope.launch {
                 Logger.d {
                     "Trying to load latest session"

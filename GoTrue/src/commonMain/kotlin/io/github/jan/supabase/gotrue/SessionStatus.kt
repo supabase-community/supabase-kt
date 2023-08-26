@@ -9,11 +9,6 @@ import kotlin.jvm.JvmInline
 sealed interface SessionStatus {
 
     /**
-     * This status means that [GoTrue] is currently initializing
-     */
-    data object Initializing : SessionStatus
-
-    /**
      * This status means that the user is not logged in
      */
     data object NotAuthenticated : SessionStatus
