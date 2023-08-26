@@ -8,22 +8,16 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import com.stevdzasan.onetap.OneTapSignInWithGoogle
-import com.stevdzasan.onetap.rememberOneTapSignInState
-
-import co.touchlab.kermit.Logger
+import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.common.AppViewModel
-import io.github.jan.supabase.common.di.SERVER_CLIENT_ID
 import io.github.jan.supabase.common.ui.screen.LoginScreen
 import io.github.jan.supabase.common.ui.screen.LoginType
 import io.github.jan.supabase.common.ui.screen.OAuthScreen
+import io.github.jan.supabase.compose.auth.composable.rememberLoginWithGoogle
+import io.github.jan.supabase.compose.auth.composeAuth
 import io.github.jan.supabase.gotrue.SessionStatus
 import io.github.jan.supabase.gotrue.gotrue
 import io.github.jan.supabase.gotrue.handleDeeplinks
@@ -34,10 +28,11 @@ import org.koin.android.ext.android.inject
 class MainActivity : ComponentActivity() {
 
     private val viewModel: AppViewModel by inject()
+    private val supabaseClient: SupabaseClient by inject()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        Logger.base(DebugAntilog())
-        viewModel.supabaseClient.handleDeeplinks(intent)
+        supabaseClient.handleDeeplinks(intent)
         setContent {
             MaterialTheme {
                 val status by viewModel.sessionStatus.collectAsState()
@@ -55,27 +50,19 @@ class MainActivity : ComponentActivity() {
                         }
                     }
                     else -> {
-                        val oneTapState = rememberOneTapSignInState()
+                        val googleState = supabaseClient.composeAuth.rememberLoginWithGoogle()
                         var showInAppGoogleWebView by remember { mutableStateOf(false) }
                         LoginScreen {
                             when (it) {
-                                LoginType.GoogleNative -> oneTapState.open()
-                                LoginType.GoogleInApp -> showInAppGoogleWebView = true
+                                LoginType.GoogleNative -> googleState.startFlow()
+                                LoginType.SpotifyInApp -> showInAppGoogleWebView = true
                                 is LoginType.Login -> viewModel.login(it.email, it.password)
                                 is LoginType.SignUp -> viewModel.signUp(it.email, it.password)
                             }
                         }
-                        OneTapSignInWithGoogle(
-                            state = oneTapState,
-                            clientId = SERVER_CLIENT_ID,
-                            onTokenIdReceived = {
-                                viewModel.loginWithIdToken(it)
-                            },
-                            onDialogDismissed = { println(it) }
-                        )
                         if (showInAppGoogleWebView) {
                             OAuthScreen(
-                                url = viewModel.supabaseClient.gotrue.oAuthUrl(
+                                url = supabaseClient.gotrue.oAuthUrl(
                                     Spotify,
                                     "http://localhost"
                                 ),

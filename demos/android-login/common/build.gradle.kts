@@ -1,5 +1,4 @@
 @file:OptIn(org.jetbrains.compose.ExperimentalComposeLibrary::class)
-import org.jetbrains.compose.compose
 
 plugins {
     kotlin("multiplatform")
@@ -17,7 +16,7 @@ repositories {
 
 kotlin {
     jvmToolchain(8)
-    android()
+    androidTarget()
     sourceSets {
         val commonMain by getting {
             dependencies {
@@ -25,7 +24,7 @@ kotlin {
                 api(compose.foundation)
                 api(compose.material3)
                 api(compose.materialIconsExtended)
-                api(libs.supabase.gotrue)
+                api(libs.bundles.supabase)
                 api(libs.koin.core)
                 implementation("com.google.accompanist:accompanist-webview:0.31.1-alpha")
             }
@@ -59,9 +58,4 @@ android {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
     }
-}
-
-compose {
-    kotlinCompilerPlugin.set(dependencies.compiler.forKotlin("1.8.20"))
-    kotlinCompilerPluginArgs.add("suppressKotlinVersionCompatibilityCheck=1.8.21")
 }

@@ -16,8 +16,6 @@ repositories {
 dependencies {
     api(project(":common"))
     implementation(libs.androidx.activity.compose)
-    implementation("com.github.stevdza-san:OneTapCompose:1.0.3")
-    implementation("com.google.android.gms:play-services-auth:20.5.0")
 }
 
 android {
@@ -41,9 +39,4 @@ android {
             isMinifyEnabled = false
         }
     }
-}
-
-compose {
-    kotlinCompilerPlugin.set(dependencies.compiler.forKotlin("1.8.20"))
-    kotlinCompilerPluginArgs.add("suppressKotlinVersionCompatibilityCheck=1.8.21")
 }
