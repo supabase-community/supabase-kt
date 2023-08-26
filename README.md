@@ -19,6 +19,10 @@ Supported targets:
 
 <summary>In-depth Kotlin targets</summary>
 
+**iOS:** iosArm64, iosSimulatorArm64, iosX64
+
+**JS**: Browser, NodeJS
+
 **tvOS**: tvosArm64, tvosX64, tvosSimulatorArm64
 
 **watchOS**: watchosArm64, watchosX64, watchosSimulatorArm64  
