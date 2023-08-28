@@ -21,8 +21,8 @@ detekt = "1.23.1"
 moshi = "1.15.0"
 jackson = "2.15.2"
 browser = "1.6.0"
-compose = "1.5.0-rc06"
 googleid = "1.1.0"
+compose = "1.5.0"
 androidsvg = "1.4"
 
 [plugins]
