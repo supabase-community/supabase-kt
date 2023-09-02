@@ -6,13 +6,22 @@ import io.github.jan.supabase.exceptions.HttpRequestException
 import io.github.jan.supabase.exceptions.RestException
 import io.github.jan.supabase.gotrue.PostgrestFilterDSL
 import io.github.jan.supabase.postgrest.Postgrest
-import io.github.jan.supabase.postgrest.request.PostgrestRequest
+import io.github.jan.supabase.postgrest.executor.RequestExecutor
+import io.github.jan.supabase.postgrest.request.impl.DeleteRequest
+import io.github.jan.supabase.postgrest.request.impl.InsertRequest
+import io.github.jan.supabase.postgrest.request.impl.SelectRequest
+import io.github.jan.supabase.postgrest.request.impl.UpdateRequest
 import kotlinx.serialization.json.jsonArray
 
 /**
  * The main class to build a postgrest request
  */
-class PostgrestBuilder(val postgrest: Postgrest, val table: String, val schema: String = postgrest.config.defaultSchema) {
+class PostgrestBuilder(
+    val postgrest: Postgrest,
+    val table: String,
+    val schema: String = postgrest.config.defaultSchema,
+    val requestExecutor: RequestExecutor
+) {
 
     /**
      * Executes vertical filtering with select on [table]
@@ -33,8 +42,18 @@ class PostgrestBuilder(val postgrest: Postgrest, val table: String, val schema: 
         count: Count? = null,
         single: Boolean = false,
         filter: @PostgrestFilterDSL PostgrestFilterBuilder.() -> Unit = {}
-    ): PostgrestResult = PostgrestRequest.Select(head, count, single, buildPostgrestFilter(postgrest.config.propertyConversionMethod) { filter(); _params["select"] = listOf(columns.value) }, schema).execute(table, postgrest)
-
+    ): PostgrestResult {
+        val selectRequest = SelectRequest(
+            head,
+            count,
+            single,
+            buildPostgrestFilter(postgrest.config.propertyConversionMethod) {
+                filter(); _params["select"] = listOf(columns.value)
+            },
+            schema
+        )
+        return requestExecutor.execute(table, selectRequest)
+    }
     /**
      * Executes an insert operation on the [table]
      *
@@ -55,10 +74,21 @@ class PostgrestBuilder(val postgrest: Postgrest, val table: String, val schema: 
         returning: Returning = Returning.REPRESENTATION,
         count: Count? = null,
         filter: PostgrestFilterBuilder.() -> Unit = {}
-    ): PostgrestResult = PostgrestRequest.Insert(postgrest.serializer.encodeToJsonElement(values).jsonArray, upsert, onConflict, returning, count, buildPostgrestFilter(postgrest.config.propertyConversionMethod) {
-        filter()
-        if (upsert && onConflict != null) _params["on_conflict"] = listOf(onConflict)
-    }, schema).execute(table, postgrest)
+    ): PostgrestResult {
+        val insertRequest = InsertRequest(
+            postgrest.serializer.encodeToJsonElement(values).jsonArray,
+            upsert,
+            onConflict,
+            returning,
+            count,
+            buildPostgrestFilter(postgrest.config.propertyConversionMethod) {
+                filter()
+                if (upsert && onConflict != null) _params["on_conflict"] = listOf(onConflict)
+            },
+            schema
+        )
+        return requestExecutor.execute(table, insertRequest)
+    }
 
     /**
      * Executes an insert operation on the [table]
@@ -116,7 +146,16 @@ class PostgrestBuilder(val postgrest: Postgrest, val table: String, val schema: 
         returning: Returning = Returning.REPRESENTATION,
         count: Count? = null,
         filter: PostgrestFilterBuilder.() -> Unit = {}
-    ): PostgrestResult = PostgrestRequest.Update(returning, count, buildPostgrestFilter(postgrest.config.propertyConversionMethod, filter), postgrest.serializer.encodeToJsonElement(value), schema).execute(table, postgrest)
+    ): PostgrestResult {
+        val updateRequest = UpdateRequest(
+            returning,
+            count,
+            buildPostgrestFilter(postgrest.config.propertyConversionMethod, filter),
+            postgrest.serializer.encodeToJsonElement(value),
+            schema
+        )
+        return requestExecutor.execute(table, updateRequest)
+    }
 
     /**
      * Executes a delete operation on the [table].
@@ -132,7 +171,15 @@ class PostgrestBuilder(val postgrest: Postgrest, val table: String, val schema: 
         returning: Returning = Returning.REPRESENTATION,
         count: Count? = null,
         filter: PostgrestFilterBuilder.() -> Unit = {}
-    ): PostgrestResult = PostgrestRequest.Delete(returning, count, buildPostgrestFilter(postgrest.config.propertyConversionMethod, filter), schema).execute(table, postgrest)
+    ): PostgrestResult {
+        val deleteRequest = DeleteRequest(
+            returning,
+            count,
+            buildPostgrestFilter(postgrest.config.propertyConversionMethod, filter),
+            schema
+        )
+        return requestExecutor.execute(table, deleteRequest)
+    }
 
     companion object {
         const val HEADER_PREFER = "Prefer"
