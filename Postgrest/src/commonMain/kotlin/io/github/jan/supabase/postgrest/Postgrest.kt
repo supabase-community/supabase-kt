@@ -17,11 +17,13 @@ import io.github.jan.supabase.plugins.CustomSerializationPlugin
 import io.github.jan.supabase.plugins.MainConfig
 import io.github.jan.supabase.plugins.MainPlugin
 import io.github.jan.supabase.plugins.SupabasePluginProvider
+import io.github.jan.supabase.postgrest.executor.RequestExecutor
+import io.github.jan.supabase.postgrest.executor.impl.RequestExecutorImpl
 import io.github.jan.supabase.postgrest.query.Count
 import io.github.jan.supabase.postgrest.query.PostgrestBuilder
 import io.github.jan.supabase.postgrest.query.PostgrestFilterBuilder
 import io.github.jan.supabase.postgrest.query.PostgrestUpdate
-import io.github.jan.supabase.postgrest.request.PostgrestRequest
+import io.github.jan.supabase.postgrest.request.impl.RpcRequest
 import io.ktor.client.statement.HttpResponse
 import io.ktor.http.HttpStatusCode
 import kotlinx.serialization.json.JsonElement
@@ -113,18 +115,27 @@ internal class PostgrestImpl(override val supabaseClient: SupabaseClient, overri
 
     override val pluginKey: String
         get() = Postgrest.key
-    
+
     override var serializer = config.serializer ?: supabaseClient.defaultSerializer
+
+     private val requestExecutor: RequestExecutor by lazy {
+        RequestExecutorImpl(this)
+    }
 
     @OptIn(SupabaseInternal::class)
     val api = supabaseClient.authenticatedSupabaseApi(this)
 
     override fun from(table: String): PostgrestBuilder {
-        return PostgrestBuilder(this, table)
+        return PostgrestBuilder(postgrest = this, table = table, requestExecutor = requestExecutor)
     }
 
     override fun from(schema: String, table: String): PostgrestBuilder {
-        return PostgrestBuilder(this, table, schema)
+        return PostgrestBuilder(
+            postgrest = this,
+            table = table,
+            schema = schema,
+            requestExecutor = requestExecutor
+        )
     }
 
     override suspend fun parseErrorResponse(response: HttpResponse): RestException {
@@ -161,7 +172,17 @@ suspend inline fun <reified T : Any> Postgrest.rpc(
     head: Boolean = false,
     count: Count? = null,
     filter: PostgrestFilterBuilder.() -> Unit = {}
-) = PostgrestRequest.RPC(head, count, PostgrestFilterBuilder(config.propertyConversionMethod).apply(filter).params, if(parameters is JsonElement) parameters else serializer.encodeToJsonElement(parameters)).execute("rpc/$function", this)
+) {
+    val requestExecutor = RequestExecutorImpl(this)
+    val rpcRequest =
+        RpcRequest(
+            head,
+            count,
+            PostgrestFilterBuilder(config.propertyConversionMethod).apply(filter).params,
+            if (parameters is JsonElement) parameters else serializer.encodeToJsonElement(parameters)
+        )
+    requestExecutor.execute("rpc/$function", rpcRequest)
+}
 
 /**
  * Executes a database function
@@ -177,4 +198,12 @@ suspend inline fun Postgrest.rpc(
     head: Boolean = false,
     count: Count? = null,
     filter: PostgrestFilterBuilder.() -> Unit = {}
-) = PostgrestRequest.RPC(head, count, PostgrestFilterBuilder(config.propertyConversionMethod).apply(filter).params).execute("rpc/$function", this)
+) {
+    val rpcRequest = RpcRequest(
+        head,
+        count,
+        PostgrestFilterBuilder(config.propertyConversionMethod).apply(filter).params
+    )
+    val requestExecutor = RequestExecutorImpl(this)
+    requestExecutor.execute("rpc/$function", rpcRequest)
+}
