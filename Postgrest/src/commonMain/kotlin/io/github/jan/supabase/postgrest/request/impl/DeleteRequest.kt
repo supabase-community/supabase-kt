@@ -5,7 +5,7 @@ import io.github.jan.supabase.postgrest.query.Returning
 import io.github.jan.supabase.postgrest.request.PostgrestRequest
 import io.ktor.http.HttpMethod
 
-class Delete(
+class DeleteRequest(
     private val returning: Returning = Returning.REPRESENTATION,
     private val count: Count? = null,
     override val filter: Map<String, List<String>>,

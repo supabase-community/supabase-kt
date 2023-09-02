@@ -4,7 +4,7 @@ import io.github.jan.supabase.postgrest.query.Count
 import io.github.jan.supabase.postgrest.request.PostgrestRequest
 import io.ktor.http.HttpMethod
 
-class Select(
+class SelectRequest(
     head: Boolean = false,
     count: Count? = null,
     override val single: Boolean = false,

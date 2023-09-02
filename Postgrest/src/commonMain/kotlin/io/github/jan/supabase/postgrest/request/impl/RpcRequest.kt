@@ -5,7 +5,7 @@ import io.github.jan.supabase.postgrest.request.PostgrestRequest
 import io.ktor.http.HttpMethod
 import kotlinx.serialization.json.JsonElement
 
-class RPC(
+class RpcRequest(
     head: Boolean = false,
     count: Count? = null,
     override val filter: Map<String, List<String>>,

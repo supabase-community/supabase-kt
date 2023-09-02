@@ -7,7 +7,7 @@ import io.ktor.http.HttpMethod
 import kotlinx.serialization.json.JsonArray
 
 
-class Insert(
+class InsertRequest(
     override val body: JsonArray,
     private val upsert: Boolean = false,
     private val onConflict: String? = null,
