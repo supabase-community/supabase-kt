@@ -1,5 +1,3 @@
-@file:OptIn(ExperimentalCoroutinesApi::class)
-
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.createSupabaseClient
 import io.github.jan.supabase.exceptions.BadRequestRestException
@@ -14,7 +12,6 @@ import io.github.jan.supabase.gotrue.providers.Github
 import io.github.jan.supabase.gotrue.providers.builtin.Email
 import io.github.jan.supabase.gotrue.providers.builtin.Phone
 import io.github.jan.supabase.gotrue.user.UserSession
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
@@ -25,12 +22,10 @@ import kotlin.test.assertNull
 
 class GoTrueTest {
 
-    val mockEngine = GoTrueMock().engine
+    private val mockEngine = GoTrueMock().engine
 
-    @OptIn(ExperimentalCoroutinesApi::class)
-    val dispatcher = StandardTestDispatcher()
+    private val dispatcher = StandardTestDispatcher()
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun test_login_with_email_with_wrong_credentials() {
         val client = createSupabaseClient()
@@ -45,7 +40,6 @@ class GoTrueTest {
         }
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun test_login_with_email_with_correct_credentials() {
         val client = createSupabaseClient()
@@ -59,7 +53,6 @@ class GoTrueTest {
         }
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun test_sign_up_with_email() {
         val client = createSupabaseClient()
@@ -131,7 +124,6 @@ class GoTrueTest {
         }
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun test_loading_session_from_storage() {
         val client = createSupabaseClient {
@@ -154,7 +146,6 @@ class GoTrueTest {
         }
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun test_requesting_user_with_invalid_token() {
         val client = createSupabaseClient()
@@ -166,7 +157,6 @@ class GoTrueTest {
         }
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun test_requesting_user_with_valid_token() {
         val client = createSupabaseClient()
@@ -177,7 +167,6 @@ class GoTrueTest {
         }
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun test_verifying_with_wrong_token() {
         val client = createSupabaseClient()
@@ -193,7 +182,6 @@ class GoTrueTest {
         }
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun test_verifying_with_valid_token() {
         val client = createSupabaseClient()
@@ -211,7 +199,6 @@ class GoTrueTest {
         }
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun test_custom_url() {
         val client = createSupabaseClient {

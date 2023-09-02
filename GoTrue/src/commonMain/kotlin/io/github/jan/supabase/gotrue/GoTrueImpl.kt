@@ -95,6 +95,7 @@ internal class GoTrueImpl(
             _sessionStatus.value = SessionStatus.NotAuthenticated
         }
     }
+
     override suspend fun <C, R, Provider : AuthProvider<C, R>> loginWith(
         provider: Provider,
         redirectUrl: String?,
@@ -239,14 +240,14 @@ internal class GoTrueImpl(
     }
 
     override suspend fun logout(scope: LogoutScope) {
-        if(currentSessionOrNull() == null) {
+        if (currentSessionOrNull() == null) {
             Logger.w { "Trying to logout without a valid session" }
             return
         }
         api.post("logout") {
             parameter("scope", scope.name.lowercase())
         }
-        if(scope != LogoutScope.OTHERS) {
+        if (scope != LogoutScope.OTHERS) {
             codeVerifierCache.deleteCodeVerifier()
             sessionManager.deleteSession()
             sessionJob?.cancel()
@@ -358,49 +359,58 @@ internal class GoTrueImpl(
             return
         }
         if (session.expiresAt <= Clock.System.now()) {
-            Logger.d {
-                "Session expired. Refreshing session..."
-            }
-            try {
-                val newSession = refreshSession(session.refreshToken)
-                importSession(newSession, config.alwaysAutoRefresh)
-            } catch (e: RestException) {
-                logout()
-                Logger.e(e) { "Couldn't refresh session. The refresh token may have been revoked." }
-            } catch (e: Exception) {
-                Logger.e(e) { "Couldn't reach supabase. Either the address doesn't exist or the network might not be on. Retrying in ${config.retryDelay}" }
-                _sessionStatus.value = SessionStatus.NetworkError
-                delay(config.retryDelay)
-                importSession(session)
-            }
+            tryImportingSession(
+                { handleExpiredSession(session, config.alwaysAutoRefresh) },
+                { importSession(session) }
+            )
         } else {
             _sessionStatus.value = SessionStatus.Authenticated(session)
             if (config.autoSaveToStorage) sessionManager.saveSession(session)
             sessionJob?.cancel()
             sessionJob = authScope.launch {
-                val expiresIn = session.expiresAt - Clock.System.now()
-                @Suppress("MagicNumber")
-                val delay = floor(expiresIn.inWholeMilliseconds * 4.0f / 5.0f).toLong() //always refresh 20% before expiry
-                delay(delay)
+                delayBeforeExpiry(session)
                 launch {
-                    Logger.d {
-                        "Session expired. Refreshing session..."
-                    }
-                    try {
-                        val newSession = refreshSession(session.refreshToken)
-                        importSession(newSession)
-                    } catch (e: RestException) {
-                        logout()
-                        Logger.e(e) { "Couldn't refresh session. The refresh token may have been revoked." }
-                    } catch (e: Exception) {
-                        Logger.e(e) { "Couldn't reach supabase. Either the address doesn't exist or the network might not be on. Retrying in ${config.retryDelay}" }
-                        _sessionStatus.value = SessionStatus.NetworkError
-                        delay(config.retryDelay)
-                        importSession(session)
-                    }
+                    tryImportingSession(
+                        { handleExpiredSession(session) },
+                        { importSession(session) }
+                    )
                 }
             }
         }
+    }
+
+    private suspend fun tryImportingSession(
+        importRefreshedSession: suspend () -> Unit,
+        retry: suspend () -> Unit
+    ) {
+        try {
+            importRefreshedSession()
+        } catch (e: RestException) {
+            logout()
+            Logger.e(e) { "Couldn't refresh session. The refresh token may have been revoked." }
+        } catch (e: Exception) {
+            Logger.e(e) { "Couldn't reach supabase. Either the address doesn't exist or the network might not be on. Retrying in ${config.retryDelay}" }
+            _sessionStatus.value = SessionStatus.NetworkError
+            delay(config.retryDelay)
+            retry()
+        }
+    }
+
+    private suspend fun delayBeforeExpiry(session: UserSession) {
+        val expiresIn = session.expiresAt - Clock.System.now()
+
+        @Suppress("MagicNumber")
+        val beforeExpiryTime =
+            floor(expiresIn.inWholeMilliseconds * 4.0f / 5.0f).toLong() //always refresh 20% before expiry
+        delay(beforeExpiryTime)
+    }
+
+    private suspend fun handleExpiredSession(session: UserSession, autoRefresh: Boolean = true) {
+        Logger.d {
+            "Session expired. Refreshing session..."
+        }
+        val newSession = refreshSession(session.refreshToken)
+        importSession(newSession, autoRefresh)
     }
 
     override suspend fun startAutoRefreshForCurrentSession() =
