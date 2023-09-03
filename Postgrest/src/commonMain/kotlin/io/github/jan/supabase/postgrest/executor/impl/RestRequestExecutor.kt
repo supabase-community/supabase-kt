@@ -2,11 +2,10 @@ package io.github.jan.supabase.postgrest.executor.impl
 
 import io.github.jan.supabase.gotrue.GoTrue
 import io.github.jan.supabase.postgrest.Postgrest
-import io.github.jan.supabase.postgrest.PostgrestImpl
 import io.github.jan.supabase.postgrest.executor.RequestExecutor
 import io.github.jan.supabase.postgrest.query.PostgrestBuilder
-import io.github.jan.supabase.postgrest.query.PostgrestResult
 import io.github.jan.supabase.postgrest.request.PostgrestRequest
+import io.github.jan.supabase.postgrest.result.PostgrestResult
 import io.ktor.client.request.accept
 import io.ktor.client.request.bearerAuth
 import io.ktor.client.request.header
@@ -16,12 +15,11 @@ import io.ktor.http.HttpMethod
 import io.ktor.http.contentType
 import io.ktor.http.parametersOf
 
-class RequestExecutorImpl constructor(private val postgrest: Postgrest): RequestExecutor {
+class RestRequestExecutor constructor(private val postgrest: Postgrest): RequestExecutor {
    override suspend fun execute(
         path: String,
         request: PostgrestRequest
     ): PostgrestResult {
-        postgrest as PostgrestImpl
         return postgrest.api.request(path) {
             method = request.method
             contentType(ContentType.Application.Json)

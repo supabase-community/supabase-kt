@@ -1,6 +1,7 @@
 @file:Suppress("UndocumentedPublicProperty")
 package io.github.jan.supabase.postgrest.query
 
+import io.github.jan.supabase.SupabaseSerializer
 import io.github.jan.supabase.encodeToJsonElement
 import io.github.jan.supabase.exceptions.HttpRequestException
 import io.github.jan.supabase.exceptions.RestException
@@ -9,8 +10,11 @@ import io.github.jan.supabase.postgrest.Postgrest
 import io.github.jan.supabase.postgrest.executor.RequestExecutor
 import io.github.jan.supabase.postgrest.request.impl.DeleteRequest
 import io.github.jan.supabase.postgrest.request.impl.InsertRequest
+import io.github.jan.supabase.postgrest.request.impl.RpcRequest
 import io.github.jan.supabase.postgrest.request.impl.SelectRequest
 import io.github.jan.supabase.postgrest.request.impl.UpdateRequest
+import io.github.jan.supabase.postgrest.result.PostgrestResult
+import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.jsonArray
 
 /**
@@ -20,7 +24,8 @@ class PostgrestBuilder(
     val postgrest: Postgrest,
     val table: String,
     val schema: String = postgrest.config.defaultSchema,
-    val requestExecutor: RequestExecutor
+    val requestExecutor: RequestExecutor,
+    val config: Postgrest.Config
 ) {
 
     /**
@@ -179,6 +184,60 @@ class PostgrestBuilder(
             schema
         )
         return requestExecutor.execute(table, deleteRequest)
+    }
+
+
+    /**
+     * Executes a database function
+     *
+     * @param function The name of the function
+     * @param parameters The parameters for the function
+     * @param head If true, select will delete the selected data.
+     * @param count Count algorithm to use to count rows in a table.
+     * @param filter Filter the result
+     * @throws RestException or one of its subclasses if the request failed
+     */
+    suspend inline fun <reified T : Any> rpc(
+        function: String,
+        parameters: T,
+        head: Boolean = false,
+        count: Count? = null,
+        filter: PostgrestFilterBuilder.() -> Unit = {},
+        serializer: SupabaseSerializer
+    ) {
+        val rpcRequest =
+            RpcRequest(
+                head,
+                count,
+                PostgrestFilterBuilder(config.propertyConversionMethod).apply(filter).params,
+                if (parameters is JsonElement) parameters else serializer.encodeToJsonElement(
+                    parameters
+                )
+            )
+        requestExecutor.execute("rpc/$function", rpcRequest)
+    }
+
+    /**
+     * Executes a database function
+     *
+     * @param function The name of the function
+     * @param head If true, select will delete the selected data.
+     * @param count Count algorithm to use to count rows in a table.
+     * @param filter Filter the result
+     * @throws RestException or one of its subclasses if the request failed
+     */
+    suspend fun rpc(
+        function: String,
+        head: Boolean = false,
+        count: Count? = null,
+        filter: PostgrestFilterBuilder.() -> Unit = {}
+    ) {
+        val rpcRequest = RpcRequest(
+            head,
+            count,
+            PostgrestFilterBuilder(config.propertyConversionMethod).apply(filter).params
+        )
+        requestExecutor.execute("rpc/$function", rpcRequest)
     }
 
     companion object {

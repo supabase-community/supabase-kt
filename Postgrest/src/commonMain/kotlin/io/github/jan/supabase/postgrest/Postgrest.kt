@@ -3,30 +3,15 @@ package io.github.jan.supabase.postgrest
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.SupabaseSerializer
 import io.github.jan.supabase.annotations.SupabaseExperimental
-import io.github.jan.supabase.annotations.SupabaseInternal
-import io.github.jan.supabase.bodyOrNull
-import io.github.jan.supabase.encodeToJsonElement
-import io.github.jan.supabase.exceptions.BadRequestRestException
-import io.github.jan.supabase.exceptions.NotFoundRestException
-import io.github.jan.supabase.exceptions.RestException
-import io.github.jan.supabase.exceptions.UnauthorizedRestException
-import io.github.jan.supabase.exceptions.UnknownRestException
-import io.github.jan.supabase.gotrue.authenticatedSupabaseApi
+import io.github.jan.supabase.gotrue.AuthenticatedSupabaseApi
 import io.github.jan.supabase.plugins.CustomSerializationConfig
 import io.github.jan.supabase.plugins.CustomSerializationPlugin
 import io.github.jan.supabase.plugins.MainConfig
 import io.github.jan.supabase.plugins.MainPlugin
 import io.github.jan.supabase.plugins.SupabasePluginProvider
-import io.github.jan.supabase.postgrest.executor.RequestExecutor
-import io.github.jan.supabase.postgrest.executor.impl.RequestExecutorImpl
-import io.github.jan.supabase.postgrest.query.Count
 import io.github.jan.supabase.postgrest.query.PostgrestBuilder
 import io.github.jan.supabase.postgrest.query.PostgrestFilterBuilder
 import io.github.jan.supabase.postgrest.query.PostgrestUpdate
-import io.github.jan.supabase.postgrest.request.impl.RpcRequest
-import io.ktor.client.statement.HttpResponse
-import io.ktor.http.HttpStatusCode
-import kotlinx.serialization.json.JsonElement
 
 /**
  * Plugin to interact with the supabase Postgrest API
@@ -46,6 +31,8 @@ import kotlinx.serialization.json.JsonElement
  * ```
  */
 sealed interface Postgrest : MainPlugin<Postgrest.Config>, CustomSerializationPlugin {
+
+    val api: AuthenticatedSupabaseApi
 
     /**
      * Creates a new [PostgrestBuilder] for the given table
@@ -108,102 +95,9 @@ sealed interface Postgrest : MainPlugin<Postgrest.Config>, CustomSerializationPl
 
 }
 
-internal class PostgrestImpl(override val supabaseClient: SupabaseClient, override val config: Postgrest.Config) : Postgrest {
-
-    override val apiVersion: Int
-        get() = Postgrest.API_VERSION
-
-    override val pluginKey: String
-        get() = Postgrest.key
-
-    override var serializer = config.serializer ?: supabaseClient.defaultSerializer
-
-     private val requestExecutor: RequestExecutor by lazy {
-        RequestExecutorImpl(this)
-    }
-
-    @OptIn(SupabaseInternal::class)
-    val api = supabaseClient.authenticatedSupabaseApi(this)
-
-    override fun from(table: String): PostgrestBuilder {
-        return PostgrestBuilder(postgrest = this, table = table, requestExecutor = requestExecutor)
-    }
-
-    override fun from(schema: String, table: String): PostgrestBuilder {
-        return PostgrestBuilder(
-            postgrest = this,
-            table = table,
-            schema = schema,
-            requestExecutor = requestExecutor
-        )
-    }
-
-    override suspend fun parseErrorResponse(response: HttpResponse): RestException {
-        val body = response.bodyOrNull<PostgrestErrorResponse>() ?: PostgrestErrorResponse("Unknown error")
-        return when(response.status) {
-            HttpStatusCode.Unauthorized -> UnauthorizedRestException(body.message, response, body.details ?: body.hint)
-            HttpStatusCode.NotFound -> NotFoundRestException(body.message, response, body.details ?: body.hint)
-            HttpStatusCode.BadRequest -> BadRequestRestException(body.message, response, body.details ?: body.hint)
-            else -> UnknownRestException(body.message, response, body.details ?: body.hint)
-        }
-    }
-
-}
 
 /**
  * With the postgrest plugin you can directly interact with your database via an api
  */
 val SupabaseClient.postgrest: Postgrest
     get() = pluginManager.getPlugin(Postgrest)
-
-/**
- * Executes a database function
- *
- * @param function The name of the function
- * @param parameters The parameters for the function
- * @param head If true, select will delete the selected data.
- * @param count Count algorithm to use to count rows in a table.
- * @param filter Filter the result
- * @throws RestException or one of its subclasses if the request failed
- */
-suspend inline fun <reified T : Any> Postgrest.rpc(
-    function: String,
-    parameters: T,
-    head: Boolean = false,
-    count: Count? = null,
-    filter: PostgrestFilterBuilder.() -> Unit = {}
-) {
-    val requestExecutor = RequestExecutorImpl(this)
-    val rpcRequest =
-        RpcRequest(
-            head,
-            count,
-            PostgrestFilterBuilder(config.propertyConversionMethod).apply(filter).params,
-            if (parameters is JsonElement) parameters else serializer.encodeToJsonElement(parameters)
-        )
-    requestExecutor.execute("rpc/$function", rpcRequest)
-}
-
-/**
- * Executes a database function
- *
- * @param function The name of the function
- * @param head If true, select will delete the selected data.
- * @param count Count algorithm to use to count rows in a table.
- * @param filter Filter the result
- * @throws RestException or one of its subclasses if the request failed
- */
-suspend inline fun Postgrest.rpc(
-    function: String,
-    head: Boolean = false,
-    count: Count? = null,
-    filter: PostgrestFilterBuilder.() -> Unit = {}
-) {
-    val rpcRequest = RpcRequest(
-        head,
-        count,
-        PostgrestFilterBuilder(config.propertyConversionMethod).apply(filter).params
-    )
-    val requestExecutor = RequestExecutorImpl(this)
-    requestExecutor.execute("rpc/$function", rpcRequest)
-}

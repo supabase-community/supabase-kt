@@ -4,7 +4,7 @@ package io.github.jan.supabase.postgrest.request
 import io.github.jan.supabase.annotations.SupabaseInternal
 import io.github.jan.supabase.bodyOrNull
 import io.github.jan.supabase.postgrest.Postgrest
-import io.github.jan.supabase.postgrest.query.PostgrestResult
+import io.github.jan.supabase.postgrest.result.PostgrestResult
 import io.ktor.client.statement.HttpResponse
 import io.ktor.http.HttpMethod
 import kotlinx.serialization.json.JsonElement
