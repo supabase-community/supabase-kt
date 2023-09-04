@@ -2,7 +2,7 @@
 kotlin = "1.9.10"
 dokka = "1.8.20"
 ktor = "2.3.3"
-kotlinx-datetime = "0.4.0"
+kotlinx-datetime = "0.4.1"
 kermit = "2.0.0-RC4"
 atomicfu = "0.22.0"
 coroutines = "1.7.3"
