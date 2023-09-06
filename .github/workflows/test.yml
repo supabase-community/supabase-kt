@@ -5,6 +5,7 @@ on:
     branches:
       - 'master'
       - 'development'
+      - 'kotlin-k2' #temporary
   pull_request:
     branches:
       - '*'
