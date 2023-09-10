@@ -11,7 +11,7 @@
 /GoTrue/build/
 /Functions/build/
 /plugins/ApolloGraphQL/build
-/plugins/ComposeAuthUI/build/
-/plugins/ComposeAuth/build/
+/plugins/ComposeAuthUI/build
+/plugins/ComposeAuth/build
 .idea
 local.properties
