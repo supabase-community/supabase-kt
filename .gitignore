@@ -10,6 +10,11 @@
 /Realtime/build/
 /GoTrue/build/
 /Functions/build/
-/plugins/ApolloGraphQL/build
+/plugins/ApolloGraphQL/build/
+/plugins/ComposeAuthUI/build/
+/plugins/ComposeAuth/build/
+
+/serializers/
+/htmlReport/
 .idea
 local.properties
