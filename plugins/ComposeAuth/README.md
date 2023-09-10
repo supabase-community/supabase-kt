@@ -29,6 +29,14 @@ val client = createSupabaseClient(
 }
 ```
 
+# Support
+
+Currently, Compose Auth only supports native login for
+Android with Google and iOS with Apple, other variations such as JS rely on fallback which
+by default is GoTrue-kt OAuth flow.
+
+To learn how you can use this plugin in your compose project, visit [Compose Multiplatform](https://github.com/JetBrains/compose-multiplatform/#readme)
+
 # Usage
 
 The composable can be accessed trough `composeAuth` property from `client`
@@ -55,10 +63,13 @@ Button(
 }
 ```
 
-# Support
+# Native Google Auth on Android
 
-Currently, Compose Auth only supports native login for
-Android with Google and iOS with Apple, other variations such as JS rely on fallback which
-by default is GoTrue-kt OAuth flow.
+Here is a guide on how to use Native Google Auth on Android
 
-To learn how you can use this plugin in your compose project, visit [Compose Multiplatform](https://github.com/JetBrains/compose-multiplatform/#readme)
+1. Create a project in your [Google Cloud Developer Console](console.cloud.google.com/)
+2. Create OAuth credentials for a Web application, and use your Supabase callback url as redirect url. (**https://ID.supabase.co/auth/v1/callback**)
+3. Put in the Web OAuth in your Supabase Auth Settings for Google in the Dashboard
+4. Create OAuth credentials for an Android app, and put in your package name and SHA-1 certificate (which you can get by using `gradlew signingReport`)
+5. Put the Android OAuth client id to the authorized client ids in the Supabase Dashboard
+6. Use the **Web** OAuth client id in the Compose Auth plugin
