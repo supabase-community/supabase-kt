@@ -49,15 +49,15 @@ class PostgrestBuilder(
         filter: @PostgrestFilterDSL PostgrestFilterBuilder.() -> Unit = {}
     ): PostgrestResult {
         val selectRequest = SelectRequest(
-            head,
-            count,
-            single,
-            buildPostgrestFilter(postgrest.config.propertyConversionMethod) {
+            head = head,
+            count = count,
+            single = single,
+            filter = buildPostgrestFilter(postgrest.config.propertyConversionMethod) {
                 filter(); _params["select"] = listOf(columns.value)
             },
-            schema
+            schema = schema
         )
-        return requestExecutor.execute(table, selectRequest)
+        return requestExecutor.execute(path = table, request = selectRequest)
     }
     /**
      * Executes an insert operation on the [table]
@@ -81,16 +81,16 @@ class PostgrestBuilder(
         filter: PostgrestFilterBuilder.() -> Unit = {}
     ): PostgrestResult {
         val insertRequest = InsertRequest(
-            postgrest.serializer.encodeToJsonElement(values).jsonArray,
-            upsert,
-            onConflict,
-            returning,
-            count,
-            buildPostgrestFilter(postgrest.config.propertyConversionMethod) {
+            body = postgrest.serializer.encodeToJsonElement(values).jsonArray,
+            upsert = upsert,
+            onConflict = onConflict,
+            returning = returning,
+            count = count,
+            filter = buildPostgrestFilter(postgrest.config.propertyConversionMethod) {
                 filter()
                 if (upsert && onConflict != null) _params["on_conflict"] = listOf(onConflict)
             },
-            schema
+            schema = schema
         )
         return requestExecutor.execute(table, insertRequest)
     }
@@ -133,7 +133,12 @@ class PostgrestBuilder(
         returning: Returning = Returning.REPRESENTATION,
         count: Count? = null,
         filter: PostgrestFilterBuilder.() -> Unit = {}
-    ): PostgrestResult = update(buildPostgrestUpdate(postgrest.config.propertyConversionMethod, update), returning, count, filter)
+    ): PostgrestResult = update(
+        value = buildPostgrestUpdate(
+            propertyConversionMethod = postgrest.config.propertyConversionMethod,
+            block = update
+        ), returning = returning, count = count, filter = filter
+    )
 
     /**
      * Executes an update operation on the [table].
@@ -153,13 +158,13 @@ class PostgrestBuilder(
         filter: PostgrestFilterBuilder.() -> Unit = {}
     ): PostgrestResult {
         val updateRequest = UpdateRequest(
-            returning,
-            count,
-            buildPostgrestFilter(postgrest.config.propertyConversionMethod, filter),
-            postgrest.serializer.encodeToJsonElement(value),
-            schema
+            returning = returning,
+            count = count,
+            filter = buildPostgrestFilter(postgrest.config.propertyConversionMethod, filter),
+            body = postgrest.serializer.encodeToJsonElement(value),
+            schema = schema
         )
-        return requestExecutor.execute(table, updateRequest)
+        return requestExecutor.execute(path = table, request = updateRequest)
     }
 
     /**
@@ -178,12 +183,12 @@ class PostgrestBuilder(
         filter: PostgrestFilterBuilder.() -> Unit = {}
     ): PostgrestResult {
         val deleteRequest = DeleteRequest(
-            returning,
-            count,
-            buildPostgrestFilter(postgrest.config.propertyConversionMethod, filter),
-            schema
+            returning = returning,
+            count = count,
+            filter = buildPostgrestFilter(postgrest.config.propertyConversionMethod, filter),
+            schema = schema
         )
-        return requestExecutor.execute(table, deleteRequest)
+        return requestExecutor.execute(path = table, request = deleteRequest)
     }
 
 
@@ -214,7 +219,7 @@ class PostgrestBuilder(
                     parameters
                 )
             )
-        requestExecutor.execute("rpc/$function", rpcRequest)
+        requestExecutor.execute(path = "rpc/$function", request = rpcRequest)
     }
 
     /**
@@ -233,11 +238,11 @@ class PostgrestBuilder(
         filter: PostgrestFilterBuilder.() -> Unit = {}
     ) {
         val rpcRequest = RpcRequest(
-            head,
-            count,
-            PostgrestFilterBuilder(config.propertyConversionMethod).apply(filter).params
+            head = head,
+            count = count,
+            filter = PostgrestFilterBuilder(config.propertyConversionMethod).apply(filter).params
         )
-        requestExecutor.execute("rpc/$function", rpcRequest)
+        requestExecutor.execute(path = "rpc/$function", request = rpcRequest)
     }
 
     companion object {
