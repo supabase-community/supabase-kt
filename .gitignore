@@ -13,6 +13,5 @@
 /plugins/ApolloGraphQL/build
 /plugins/ComposeAuthUI/build/
 /plugins/ComposeAuth/build/
-/serializers/
 .idea
 local.properties
