@@ -8,11 +8,11 @@ import io.github.jan.supabase.exceptions.RestException
 import io.github.jan.supabase.gotrue.PostgrestFilterDSL
 import io.github.jan.supabase.postgrest.Postgrest
 import io.github.jan.supabase.postgrest.executor.RequestExecutor
-import io.github.jan.supabase.postgrest.request.impl.DeleteRequest
-import io.github.jan.supabase.postgrest.request.impl.InsertRequest
-import io.github.jan.supabase.postgrest.request.impl.RpcRequest
-import io.github.jan.supabase.postgrest.request.impl.SelectRequest
-import io.github.jan.supabase.postgrest.request.impl.UpdateRequest
+import io.github.jan.supabase.postgrest.request.DeleteRequest
+import io.github.jan.supabase.postgrest.request.InsertRequest
+import io.github.jan.supabase.postgrest.request.RpcRequest
+import io.github.jan.supabase.postgrest.request.SelectRequest
+import io.github.jan.supabase.postgrest.request.UpdateRequest
 import io.github.jan.supabase.postgrest.result.PostgrestResult
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.jsonArray
