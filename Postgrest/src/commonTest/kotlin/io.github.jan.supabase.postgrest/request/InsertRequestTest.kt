@@ -8,7 +8,7 @@ import kotlin.test.assertEquals
 
 class InsertRequestTest {
 
-    lateinit var sut: PostgrestRequest
+    private lateinit var sut: PostgrestRequest
 
     @Test
     fun testCreateInsertRequest_withUpsert_thenReturnCorrectValue() {

@@ -11,7 +11,7 @@ import kotlin.test.assertTrue
 
 class RpcRequestTest {
 
-    lateinit var sut: PostgrestRequest
+    private lateinit var sut: PostgrestRequest
 
     @Test
     fun testCreateRpcRequest_isHead_thenReturnCorrectValue() {

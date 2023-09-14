@@ -1,6 +1,5 @@
-package io.github.jan.supabase.postgrest.executor.impl
+package io.github.jan.supabase.postgrest.executor
 
-import io.github.jan.supabase.postgrest.Postgrest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertTrue
@@ -11,11 +10,11 @@ class RestRequestExecutorTest {
 
 
     // Need a mock mechanism to test
-    private lateinit var mockedPostgrest: Postgrest
+    class Car() {
 
+    }
     @BeforeTest
     fun setUp() {
-
     }
 
     @Test

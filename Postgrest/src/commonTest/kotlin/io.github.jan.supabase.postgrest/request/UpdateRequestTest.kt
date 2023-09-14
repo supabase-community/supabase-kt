@@ -2,15 +2,13 @@ package io.github.jan.supabase.postgrest.request
 
 import io.github.jan.supabase.postgrest.query.Count
 import io.github.jan.supabase.postgrest.query.Returning
-import io.github.jan.supabase.postgrest.request.PostgrestRequest
-import io.github.jan.supabase.postgrest.request.UpdateRequest
 import kotlinx.serialization.json.JsonArray
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class UpdateRequestTest {
 
-    lateinit var sut: PostgrestRequest
+    private lateinit var sut: PostgrestRequest
 
 
     @Test

@@ -7,7 +7,7 @@ import kotlin.test.assertEquals
 
 class DeleteRequestTest {
 
-    lateinit var sut: PostgrestRequest
+    private lateinit var sut: PostgrestRequest
 
     @Test
     fun testCreateDeleteRequest_thenReturnCorrectValue() {

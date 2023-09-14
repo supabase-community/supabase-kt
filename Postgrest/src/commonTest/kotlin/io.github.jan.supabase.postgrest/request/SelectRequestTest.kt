@@ -10,7 +10,7 @@ import kotlin.test.assertTrue
 
 class SelectRequestTest {
 
-    lateinit var sut: PostgrestRequest
+    private lateinit var sut: PostgrestRequest
 
     @Test
     fun testCreateSelectRequest_isHead_thenReturnCorrectValue() {

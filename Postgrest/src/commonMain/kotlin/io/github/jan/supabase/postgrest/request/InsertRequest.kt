@@ -7,11 +7,11 @@ import kotlinx.serialization.json.JsonArray
 
 
 class InsertRequest(
-    override val body: JsonArray,
     private val upsert: Boolean = false,
     private val onConflict: String? = null,
     private val returning: Returning = Returning.REPRESENTATION,
     private val count: Count? = null,
+    override val body: JsonArray,
     override val filter: Map<String, List<String>>,
     override val schema: String
 ) : PostgrestRequest {
