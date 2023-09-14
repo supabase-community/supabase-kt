@@ -244,6 +244,7 @@ internal class GoTrueImpl(
             api.post("logout") {
                 parameter("scope", scope.name.lowercase())
             }
+            Logger.d { "Logged out session in Supabase" }
         } else {
             Logger.i { "Skipping session logout as there is no session available. Proceeding to clean up local data..." }
         }
