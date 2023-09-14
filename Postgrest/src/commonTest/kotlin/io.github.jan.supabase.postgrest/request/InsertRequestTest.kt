@@ -13,7 +13,7 @@ class InsertRequestTest {
     lateinit var sut: PostgrestRequest
 
     @Test
-    fun testCreateInsertRequest_thenReturnCorrectValue() {
+    fun testCreateInsertRequest_withUpsert_thenReturnCorrectValue() {
         sut = InsertRequest(
             onConflict = "on_conflict",
             returning = Returning.REPRESENTATION,
@@ -38,7 +38,7 @@ class InsertRequestTest {
     }
 
     @Test
-    fun testCreateInsertRequestUpsert_thenReturnCorrectValue() {
+    fun testCreateInsertRequest_notUpsert_thenReturnCorrectValue() {
         sut = InsertRequest(
             onConflict = "on_conflict",
             returning = Returning.REPRESENTATION,
@@ -63,7 +63,7 @@ class InsertRequestTest {
     }
 
     @Test
-    fun testCreateInsertRequestWithoutCount_thenReturnCorrectValue() {
+    fun testCreateInsertRequest_withoutCount_thenReturnCorrectValue() {
         sut = InsertRequest(
             onConflict = "on_conflict",
             returning = Returning.REPRESENTATION,

@@ -15,7 +15,7 @@ class SelectRequestTest {
     lateinit var sut: PostgrestRequest
 
     @Test
-    fun testCreateSelectRequest_thenReturnCorrectValue() {
+    fun testCreateSelectRequest_isHead_thenReturnCorrectValue() {
         sut = SelectRequest(
             head = true,
             count = Count.EXACT,
@@ -41,7 +41,7 @@ class SelectRequestTest {
     }
 
     @Test
-    fun testCreateSelectRequestHeadFalse_thenReturnCorrectValue() {
+    fun testCreateSelectRequest_notHead_thenReturnCorrectValue() {
         sut = SelectRequest(
             head = false,
             count = Count.EXACT,
@@ -68,7 +68,7 @@ class SelectRequestTest {
     }
 
     @Test
-    fun testCreateSelectRequestWithoutCount_thenReturnCorrectValue() {
+    fun testCreateSelectRequest_notHeadAndWithoutCount_thenReturnCorrectValue() {
         sut = SelectRequest(
             head = false,
             count = null,

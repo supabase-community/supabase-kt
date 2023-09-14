@@ -16,7 +16,7 @@ class RpcRequestTest {
     lateinit var sut: PostgrestRequest
 
     @Test
-    fun testCreateRpcRequest_thenReturnCorrectValue() {
+    fun testCreateRpcRequest_isHead_thenReturnCorrectValue() {
         sut = RpcRequest(
             head = true,
             count = Count.EXACT,
@@ -42,7 +42,7 @@ class RpcRequestTest {
     }
 
     @Test
-    fun testCreateRpcRequestNotHead_thenReturnCorrectValue() {
+    fun testCreateRpcRequest_notHead_thenReturnCorrectValue() {
         sut = RpcRequest(
             head = false,
             count = Count.EXACT,
@@ -66,7 +66,7 @@ class RpcRequestTest {
     }
 
     @Test
-    fun testCreateRpcRequestCountNull_thenReturnCorrectValue() {
+    fun testCreateRpcRequest_withoutCount_thenReturnCorrectValue() {
         sut = RpcRequest(
             head = true,
             count = null,
@@ -90,7 +90,7 @@ class RpcRequestTest {
     }
 
     @Test
-    fun testCreateRpcRequestWithoutBody_thenReturnCorrectValue() {
+    fun testCreateRpcRequest_withoutBody_thenReturnCorrectValue() {
         sut = RpcRequest(
             head = true,
             count = null,
@@ -110,7 +110,7 @@ class RpcRequestTest {
         assertEquals(emptyMap(), sut.urlParams)
     }
     @Test
-    fun testCreateRpcRequestCountNull_thenReturnCorrectValue2() {
+    fun testCreateRpcRequest_notHeadAndWithoutCount_thenReturnCorrectValue() {
         sut = RpcRequest(
             head = false,
             count = null,

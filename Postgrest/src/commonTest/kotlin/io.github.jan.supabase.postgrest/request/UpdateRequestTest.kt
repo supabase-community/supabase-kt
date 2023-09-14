@@ -38,7 +38,7 @@ class UpdateRequestTest {
     }
 
     @Test
-    fun testCreateUpdateRequestWithoutCount_thenReturnCorrectValue() {
+    fun testCreateUpdateRequest_withoutCount_thenReturnCorrectValue() {
         sut = UpdateRequest(
             returning = Returning.REPRESENTATION,
             count = null,

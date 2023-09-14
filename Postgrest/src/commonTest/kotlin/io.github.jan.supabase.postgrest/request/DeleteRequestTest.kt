@@ -27,7 +27,7 @@ class DeleteRequestTest {
     }
 
     @Test
-    fun testCreateDeleteRequestWithoutCount_thenReturnCorrectValue() {
+    fun testCreateDeleteRequest_withoutCount_thenReturnCorrectValue() {
         sut = DeleteRequest(
             returning = Returning.REPRESENTATION,
             count = null,
