@@ -10,11 +10,12 @@
 /Realtime/build/
 /GoTrue/build/
 /Functions/build/
-/plugins/ApolloGraphQL/build/
-/plugins/ComposeAuthUI/build/
-/plugins/ComposeAuth/build/
 
-/serializers/
-/htmlReport/
+/plugins/ApolloGraphQL/build
+/plugins/ComposeAuthUI/build
+/plugins/ComposeAuth/build
+/serializers/Jackson/build
+/serializers/Moshi/build
+
 .idea
 local.properties

@@ -13,6 +13,14 @@ import kotlinx.serialization.json.JsonObject
  * @property emailConfirm Automatically confirms the email address
  * @property phoneConfirm Automatically confirms the phone number
  * @property phone The user's phone number
+ * @property banDuration Determines how long a user is banned for.
+ *  The format for the ban duration follows a strict sequence of decimal numbers with a unit suffix.
+ *
+ *  Valid time units are "ns", "us" (or "µs"), "ms", "s", "m", "h".
+ *
+ *  For example, some possible durations include: '300ms', '2h45m'.
+ *
+ *  Setting the ban duration to 'none' lifts the ban on the user.
  */
 @Serializable
 data class AdminUserUpdateBuilder(
@@ -26,5 +34,7 @@ data class AdminUserUpdateBuilder(
     var emailConfirm: Boolean? = null,
     @SerialName("phone_confirm")
     var phoneConfirm: Boolean? = null,
-    var phone: String? = null
+    var phone: String? = null,
+    @SerialName("ban_duration")
+    var banDuration: String? = null,
 )
