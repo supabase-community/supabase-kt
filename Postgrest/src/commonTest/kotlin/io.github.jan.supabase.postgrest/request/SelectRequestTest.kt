@@ -1,8 +1,6 @@
-package request
+package io.github.jan.supabase.postgrest.request
 
 import io.github.jan.supabase.postgrest.query.Count
-import io.github.jan.supabase.postgrest.request.PostgrestRequest
-import io.github.jan.supabase.postgrest.request.SelectRequest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse

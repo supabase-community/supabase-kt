@@ -1,7 +1,6 @@
-package executor.impl
+package io.github.jan.supabase.postgrest.executor.impl
 
 import io.github.jan.supabase.postgrest.Postgrest
-import io.github.jan.supabase.postgrest.executor.impl.RestRequestExecutor
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlin.test.assertTrue
