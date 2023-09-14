@@ -9,7 +9,7 @@ class RestRequestExecutorTest {
 
     lateinit var testee: RestRequestExecutor
 
-    // Need a machenism to mock this
+    // Need a mechanism to mock this
     lateinit var postgrest: Postgrest
 
     @BeforeTest

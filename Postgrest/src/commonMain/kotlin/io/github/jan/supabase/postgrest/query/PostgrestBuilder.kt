@@ -25,7 +25,6 @@ class PostgrestBuilder(
     val table: String,
     val schema: String = postgrest.config.defaultSchema,
     val requestExecutor: RequestExecutor,
-    val config: Postgrest.Config
 ) {
 
     /**
@@ -214,7 +213,7 @@ class PostgrestBuilder(
             RpcRequest(
                 head,
                 count,
-                PostgrestFilterBuilder(config.propertyConversionMethod).apply(filter).params,
+                PostgrestFilterBuilder(postgrest.config.propertyConversionMethod).apply(filter).params,
                 if (parameters is JsonElement) parameters else serializer.encodeToJsonElement(
                     parameters
                 )
@@ -240,7 +239,7 @@ class PostgrestBuilder(
         val rpcRequest = RpcRequest(
             head = head,
             count = count,
-            filter = PostgrestFilterBuilder(config.propertyConversionMethod).apply(filter).params
+            filter = PostgrestFilterBuilder(postgrest.config.propertyConversionMethod).apply(filter).params
         )
         requestExecutor.execute(path = "rpc/$function", request = rpcRequest)
     }

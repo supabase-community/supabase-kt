@@ -37,7 +37,6 @@ internal class PostgrestImpl(override val supabaseClient: SupabaseClient, overri
             postgrest = this,
             table = table,
             requestExecutor = requestExecutor,
-            config = this.config
         )
     }
 
@@ -47,7 +46,6 @@ internal class PostgrestImpl(override val supabaseClient: SupabaseClient, overri
             table = table,
             schema = schema,
             requestExecutor = requestExecutor,
-            config = this.config
         )
     }
 
