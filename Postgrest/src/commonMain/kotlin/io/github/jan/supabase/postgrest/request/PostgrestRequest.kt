@@ -11,7 +11,7 @@ import io.ktor.http.HttpMethod
 import kotlinx.serialization.json.JsonElement
 
 @SupabaseInternal
-interface PostgrestRequest {
+sealed interface PostgrestRequest {
 
     val body: JsonElement? get() = null
     val method: HttpMethod
