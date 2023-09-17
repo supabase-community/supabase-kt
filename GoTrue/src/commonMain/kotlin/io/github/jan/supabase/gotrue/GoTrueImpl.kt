@@ -240,12 +240,13 @@ internal class GoTrueImpl(
     }
 
     override suspend fun logout(scope: LogoutScope) {
-        if (currentSessionOrNull() == null) {
-            Logger.w { "Trying to logout without a valid session" }
-            return
-        }
-        api.post("logout") {
-            parameter("scope", scope.name.lowercase())
+        if (currentSessionOrNull() != null) {
+            api.post("logout") {
+                parameter("scope", scope.name.lowercase())
+            }
+            Logger.d { "Logged out session in Supabase" }
+        } else {
+            Logger.i { "Skipping session logout as there is no session available. Proceeding to clean up local data..." }
         }
         if (scope != LogoutScope.OTHERS) {
             codeVerifierCache.deleteCodeVerifier()
@@ -254,6 +255,7 @@ internal class GoTrueImpl(
             _sessionStatus.value = SessionStatus.NotAuthenticated
             sessionJob = null
         }
+        Logger.d { "Successfully logged out" }
     }
 
     private suspend fun verify(
