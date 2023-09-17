@@ -1,13 +1,16 @@
 package io.github.jan.supabase.postgrest.executor
 
+import io.github.jan.supabase.bodyOrNull
 import io.github.jan.supabase.gotrue.GoTrue
 import io.github.jan.supabase.postgrest.Postgrest
 import io.github.jan.supabase.postgrest.query.PostgrestBuilder
 import io.github.jan.supabase.postgrest.request.PostgrestRequest
+import io.github.jan.supabase.postgrest.result.PostgrestResult
 import io.ktor.client.request.HttpRequestBuilder
 import io.ktor.client.request.accept
 import io.ktor.client.request.bearerAuth
 import io.ktor.client.request.header
+import io.ktor.client.statement.HttpResponse
 import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
@@ -41,3 +44,6 @@ internal fun HttpRequestBuilder.configurePostgrestRequest(
         }
     }
 }
+
+internal suspend fun HttpResponse.asPostgrestResult(postgrest: Postgrest): PostgrestResult =
+    PostgrestResult(bodyOrNull(), headers, postgrest)
