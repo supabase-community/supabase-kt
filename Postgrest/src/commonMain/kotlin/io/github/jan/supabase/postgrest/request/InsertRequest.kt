@@ -5,8 +5,8 @@ import io.github.jan.supabase.postgrest.query.Returning
 import io.ktor.http.HttpMethod
 import kotlinx.serialization.json.JsonArray
 
-
-class InsertRequest(
+@PublishedApi
+internal data class InsertRequest(
     private val upsert: Boolean = false,
     private val onConflict: String? = null,
     private val returning: Returning = Returning.REPRESENTATION,

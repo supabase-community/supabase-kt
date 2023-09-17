@@ -5,7 +5,8 @@ import io.github.jan.supabase.postgrest.query.Returning
 import io.ktor.http.HttpMethod
 import kotlinx.serialization.json.JsonElement
 
-class UpdateRequest(
+@PublishedApi
+internal class UpdateRequest(
     private val returning: Returning = Returning.REPRESENTATION,
     private val count: Count? = null,
     override val filter: Map<String, List<String>>,

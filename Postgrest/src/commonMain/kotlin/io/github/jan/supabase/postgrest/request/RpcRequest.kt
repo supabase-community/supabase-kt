@@ -4,11 +4,12 @@ import io.github.jan.supabase.postgrest.query.Count
 import io.ktor.http.HttpMethod
 import kotlinx.serialization.json.JsonElement
 
-class RpcRequest(
-    val head: Boolean = false,
-    val count: Count? = null,
-    override val filter: Map<String, List<String>>,
-    override val body: JsonElement? = null,
+@PublishedApi
+internal class RpcRequest(
+     val head: Boolean = false,
+     val count: Count? = null,
+     override val filter: Map<String, List<String>>,
+     override val body: JsonElement? = null,
 ) : PostgrestRequest {
 
     override val schema: String = ""

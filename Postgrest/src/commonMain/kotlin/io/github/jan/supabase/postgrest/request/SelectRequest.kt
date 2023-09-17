@@ -3,7 +3,8 @@ package io.github.jan.supabase.postgrest.request
 import io.github.jan.supabase.postgrest.query.Count
 import io.ktor.http.HttpMethod
 
-class SelectRequest(
+@PublishedApi
+ internal class SelectRequest(
     val head: Boolean = false,
     val count: Count? = null,
     override val single: Boolean = false,
