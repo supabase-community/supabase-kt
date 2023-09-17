@@ -32,6 +32,10 @@ import io.github.jan.supabase.postgrest.query.PostgrestUpdate
  */
 sealed interface Postgrest : MainPlugin<Postgrest.Config>, CustomSerializationPlugin {
 
+    /**
+     * Instance of Authenticated Supabace Api to interact with Supabase APIs
+     * @see io.github.jan.supabase.network.SupabaseApi
+     */
     val api: AuthenticatedSupabaseApi
 
     /**
