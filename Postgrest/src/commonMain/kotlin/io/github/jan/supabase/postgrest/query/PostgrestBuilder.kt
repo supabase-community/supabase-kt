@@ -98,7 +98,7 @@ class PostgrestBuilder(val postgrest: Postgrest, val table: String, val schema: 
         returning: Returning = Returning.REPRESENTATION,
         count: Count? = null,
         filter: PostgrestFilterBuilder.() -> Unit = {}
-    ): PostgrestResult = update(buildPostgrestUpdate(postgrest.config.propertyConversionMethod, update), returning, count, filter)
+    ): PostgrestResult = PostgrestRequest.Update(returning, count, buildPostgrestFilter(postgrest.config.propertyConversionMethod, filter), buildPostgrestUpdate(postgrest.config.propertyConversionMethod, update), schema).execute(table, postgrest)
 
     /**
      * Executes an update operation on the [table].
