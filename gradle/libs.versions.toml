@@ -1,5 +1,5 @@
 [versions]
-kotlin = "1.9.20-Beta"
+kotlin = "1.9.20-Beta2"
 ktor = "2.3.4"
 dokka = "1.9.0"
 kotlinx-datetime = "0.4.0" #0.4.1 broken currently on android
