@@ -9,8 +9,6 @@ import io.github.jan.supabase.exceptions.RestException
 import io.github.jan.supabase.exceptions.UnauthorizedRestException
 import io.github.jan.supabase.exceptions.UnknownRestException
 import io.github.jan.supabase.gotrue.authenticatedSupabaseApi
-import io.github.jan.supabase.postgrest.executor.RequestExecutor
-import io.github.jan.supabase.postgrest.executor.RestRequestExecutor
 import io.github.jan.supabase.postgrest.query.PostgrestBuilder
 import io.ktor.client.statement.HttpResponse
 import io.ktor.http.HttpStatusCode
@@ -25,10 +23,6 @@ internal class PostgrestImpl(override val supabaseClient: SupabaseClient, overri
 
     override var serializer = config.serializer ?: supabaseClient.defaultSerializer
 
-    private val requestExecutor: RequestExecutor by lazy {
-        RestRequestExecutor(this)
-    }
-
     @OptIn(SupabaseInternal::class)
     override val api = supabaseClient.authenticatedSupabaseApi(this)
 
@@ -36,7 +30,6 @@ internal class PostgrestImpl(override val supabaseClient: SupabaseClient, overri
         return PostgrestBuilder(
             postgrest = this,
             table = table,
-            requestExecutor = requestExecutor,
         )
     }
 
@@ -45,7 +38,6 @@ internal class PostgrestImpl(override val supabaseClient: SupabaseClient, overri
             postgrest = this,
             table = table,
             schema = schema,
-            requestExecutor = requestExecutor,
         )
     }
 

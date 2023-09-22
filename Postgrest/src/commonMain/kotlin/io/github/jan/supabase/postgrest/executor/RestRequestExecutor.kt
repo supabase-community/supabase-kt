@@ -4,14 +4,10 @@ import io.github.jan.supabase.postgrest.Postgrest
 import io.github.jan.supabase.postgrest.request.PostgrestRequest
 import io.github.jan.supabase.postgrest.result.PostgrestResult
 
-/**
- * Implementation of [RestRequestExecutor], containing logic of making API to Supabase's Postgrest APIs
- *
- * @property postgrest: instance of Postgrest
- * @constructor Create with instance of Postgrest
- */
-class RestRequestExecutor constructor(private val postgrest: Postgrest) : RequestExecutor {
+@PublishedApi
+internal data object RestRequestExecutor : RequestExecutor {
     override suspend fun execute(
+        postgrest: Postgrest,
         path: String,
         request: PostgrestRequest
     ): PostgrestResult {
