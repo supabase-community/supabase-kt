@@ -132,7 +132,16 @@ class PostgrestBuilder(
         returning: Returning = Returning.REPRESENTATION,
         count: Count? = null,
         filter: PostgrestFilterBuilder.() -> Unit = {}
-    ): PostgrestResult = PostgrestRequest.Update(returning, count, buildPostgrestFilter(postgrest.config.propertyConversionMethod, filter), buildPostgrestUpdate(postgrest.config.propertyConversionMethod, update), schema).execute(table, postgrest)
+    ): PostgrestResult {
+        val updateRequest = UpdateRequest(
+            body = buildPostgrestUpdate(postgrest.config.propertyConversionMethod, update),
+            returning = returning,
+            count = count,
+            filter = buildPostgrestFilter(postgrest.config.propertyConversionMethod, filter),
+            schema = schema
+        )
+        return requestExecutor.execute(path = table, request = updateRequest)
+    }
 
     /**
      * Executes an update operation on the [table].
