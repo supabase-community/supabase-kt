@@ -3,7 +3,6 @@ package io.github.jan.supabase.postgrest
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.SupabaseSerializer
 import io.github.jan.supabase.annotations.SupabaseExperimental
-import io.github.jan.supabase.gotrue.AuthenticatedSupabaseApi
 import io.github.jan.supabase.plugins.CustomSerializationConfig
 import io.github.jan.supabase.plugins.CustomSerializationPlugin
 import io.github.jan.supabase.plugins.MainConfig
@@ -30,13 +29,8 @@ import io.github.jan.supabase.postgrest.query.PostgrestUpdate
  * }.decodeSingle<Product>()
  * ```
  */
-sealed interface Postgrest : MainPlugin<Postgrest.Config>, CustomSerializationPlugin {
 
-    /**
-     * Instance of Authenticated Supabace Api to interact with Supabase APIs
-     * @see io.github.jan.supabase.network.SupabaseApi
-     */
-    val api: AuthenticatedSupabaseApi
+sealed interface Postgrest : MainPlugin<Postgrest.Config>, CustomSerializationPlugin {
 
     /**
      * Creates a new [PostgrestBuilder] for the given table
