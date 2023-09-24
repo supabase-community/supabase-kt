@@ -1,4 +1,4 @@
-package io.github.jan.supabase.postgrest.query
+package io.github.jan.supabase.postgrest.result
 
 import io.github.jan.supabase.decode
 import io.github.jan.supabase.postgrest.Postgrest
