@@ -24,7 +24,7 @@ internal class PostgrestImpl(override val supabaseClient: SupabaseClient, overri
     override var serializer = config.serializer ?: supabaseClient.defaultSerializer
 
     @OptIn(SupabaseInternal::class)
-    override val api = supabaseClient.authenticatedSupabaseApi(this)
+    val api = supabaseClient.authenticatedSupabaseApi(this)
 
     override fun from(table: String): PostgrestBuilder {
         return PostgrestBuilder(
