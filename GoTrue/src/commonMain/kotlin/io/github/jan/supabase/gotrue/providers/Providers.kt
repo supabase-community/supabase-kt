@@ -115,6 +115,12 @@ data object Figma : OAuthProvider() {
 
 }
 
+data object Fly : OAuthProvider() {
+
+    override val name = "fly"
+
+}
+
 /**
  * Creates a new [OAuthProvider] with the given name
  */
