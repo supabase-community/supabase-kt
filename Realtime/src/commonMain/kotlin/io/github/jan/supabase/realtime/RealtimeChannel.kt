@@ -52,7 +52,7 @@ sealed interface RealtimeChannel {
     suspend fun leave()
 
     /**
-     * Sends a message to everyone who joined the channel. Can be sent even if you aren't connected to the channel.
+     * Sends a message to everyone who joined the channel. Can be used even if you aren't connected to the channel.
      * @param event the broadcast event. Example: mouse_cursor
      * @param message the message to send as a JsonObject
      */
@@ -193,7 +193,7 @@ inline fun <reified T : Any> RealtimeChannel.broadcastFlow(event: String): Flow<
 }
 
 /**
- * Sends a message to everyone who joined the channel. Can be sent even if you aren't connected to the channel.
+ * Sends a message to everyone who joined the channel. Can be used even if you aren't connected to the channel.
  * @param event the broadcast event. Example: mouse_cursor
  * @param message the message to send as [T] (can only be something that can be encoded as a json object)
  */
