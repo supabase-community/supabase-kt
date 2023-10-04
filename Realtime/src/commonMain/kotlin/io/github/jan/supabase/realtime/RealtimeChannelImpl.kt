@@ -44,12 +44,7 @@ internal class RealtimeChannelImpl(
 
     override val supabaseClient = realtimeImpl.supabaseClient
 
-    private val broadcastUrl by lazy {
-        realtimeImpl.realtimeUrl(false)
-            .replaceFirst(Regex("^ws", RegexOption.IGNORE_CASE), "http")
-            .replace(Regex("/socket/websocket|/socket|/websocket/?$", RegexOption.IGNORE_CASE), "")
-            .replaceFirst(Regex("/+$"), "") + "/api/broadcast"
-    }
+    private val broadcastUrl = realtimeImpl.broadcastUrl()
     private val subTopic = topic.replaceFirst(Regex("^realtime:", RegexOption.IGNORE_CASE), "")
     private val httpClient = realtimeImpl.supabaseClient.httpClient
 
