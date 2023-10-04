@@ -220,9 +220,8 @@ internal class RealtimeImpl(override val supabaseClient: SupabaseClient, overrid
             }
         }
         if (status.value == Realtime.Status.CONNECTED) error("Websocket already connected")
-        val prefix = if (config.secure == true) "wss://" else "ws://"
         _status.value = Realtime.Status.CONNECTING
-        val realtimeUrl = config.customUrl ?: (prefix + supabaseClient.supabaseUrl + ("/realtime/v${Realtime.API_VERSION}/websocket?apikey=${supabaseClient.supabaseKey}&vsn=1.0.0"))
+        val realtimeUrl = realtimeUrl()
         try {
             ws = supabaseClient.httpClient.webSocketSession(realtimeUrl)
             _status.value = Realtime.Status.CONNECTED
@@ -352,6 +351,12 @@ internal class RealtimeImpl(override val supabaseClient: SupabaseClient, overrid
 
     override suspend fun parseErrorResponse(response: HttpResponse): RestException {
         return UnknownRestException("Unknown error in realtime plugin", response)
+    }
+
+    internal fun realtimeUrl(addParameters: Boolean = true): String {
+        val prefix = if (config.secure == true) "wss://" else "ws://"
+        return config.customUrl
+            ?: (prefix + supabaseClient.supabaseUrl + ("/realtime/v${Realtime.API_VERSION}/websocket${if(addParameters) "?apikey=${supabaseClient.supabaseKey}&vsn=1.0.0" else ""}"))
     }
 
 }
