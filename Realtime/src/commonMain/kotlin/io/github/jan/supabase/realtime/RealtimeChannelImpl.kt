@@ -164,6 +164,7 @@ internal class RealtimeChannelImpl(
                     append("apikey", realtimeImpl.supabaseClient.supabaseKey)
                 }
             }
+            @Suppress("MagicNumber")
             if(response.status.value !in 200..299) {
                 error("Failed to broadcast message (${response.status}): ${response.bodyAsText()}")
             }
