@@ -1,14 +1,12 @@
 package io.github.jan.supabase.postgrest.executor
 
 import io.github.jan.supabase.bodyOrNull
-import io.github.jan.supabase.gotrue.GoTrue
 import io.github.jan.supabase.postgrest.Postgrest
 import io.github.jan.supabase.postgrest.query.PostgrestBuilder
 import io.github.jan.supabase.postgrest.request.PostgrestRequest
 import io.github.jan.supabase.postgrest.result.PostgrestResult
 import io.ktor.client.request.HttpRequestBuilder
 import io.ktor.client.request.accept
-import io.ktor.client.request.bearerAuth
 import io.ktor.client.request.header
 import io.ktor.client.statement.HttpResponse
 import io.ktor.http.ContentType
@@ -18,17 +16,10 @@ import io.ktor.http.contentType
 import io.ktor.http.parametersOf
 
 internal fun HttpRequestBuilder.configurePostgrestRequest(
-    request: PostgrestRequest,
-    postgrest: Postgrest
+    request: PostgrestRequest
 ) {
     method = request.method
     contentType(ContentType.Application.Json)
-    val token = postgrest.config.jwtToken
-        ?: postgrest.supabaseClient.pluginManager.getPluginOrNull(GoTrue)
-            ?.currentAccessTokenOrNull()
-    token?.let {
-        bearerAuth(it)
-    }
     if (request.single) {
         accept(ContentType(HttpHeaders.Accept, "application/vnd.pgrst.object+json"))
     }

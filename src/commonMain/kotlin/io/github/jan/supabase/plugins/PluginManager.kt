@@ -19,7 +19,7 @@ class PluginManager(val installedPlugins: Map<String, SupabasePlugin>) {
      * Retrieve an installed plugin using it's [Provider]
      */
     inline fun <reified Plugin: SupabasePlugin, Config, Provider : SupabasePluginProvider<Config, Plugin>> getPlugin(provider: Provider): Plugin {
-        return getPluginOrNull(provider) ?: error("Plugin ${provider.key} not installed or not of type ${Plugin::class.simpleName}. Consider installing ${Plugin::class.simpleName} within your supabase client builder")
+        return getPluginOrNull(provider) ?: error("Plugin ${provider.key} not installed or not of type ${Plugin::class.simpleName}. Consider installing ${Plugin::class.simpleName} within your SupabaseClientBuilder")
     }
 
     /**
