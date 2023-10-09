@@ -6,8 +6,8 @@ import io.github.jan.supabase.postgrest.query.PostgrestBuilder
 import io.github.jan.supabase.postgrest.request.PostgrestRequest
 import io.github.jan.supabase.postgrest.result.PostgrestResult
 import io.ktor.client.request.HttpRequestBuilder
-import io.ktor.client.request.accept
 import io.ktor.client.request.header
+import io.ktor.client.request.setBody
 import io.ktor.client.statement.HttpResponse
 import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
@@ -21,13 +21,14 @@ internal fun HttpRequestBuilder.configurePostgrestRequest(
     method = request.method
     contentType(ContentType.Application.Json)
     if (request.single) {
-        accept(ContentType(HttpHeaders.Accept, "application/vnd.pgrst.object+json"))
+        headers[HttpHeaders.Accept] = "application/vnd.pgrst.object+json"
     }
     headers[PostgrestBuilder.HEADER_PREFER] = request.prefer.joinToString(",")
     with(url.parameters) {
         appendAll(parametersOf(request.urlParams.mapValues { (_, value) -> listOf(value) }))
         appendAll(parametersOf(request.filter.mapValues { (_, value) -> listOf(value.first()) }))
     }
+    request.body?.let { setBody(it) }
     if (request.schema.isNotBlank()) {
         when (method) {
             HttpMethod.Get, HttpMethod.Head -> header("Accept-Profile", request.schema)

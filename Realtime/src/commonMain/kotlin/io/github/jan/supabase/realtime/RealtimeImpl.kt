@@ -97,7 +97,10 @@ internal class RealtimeImpl(override val supabaseClient: SupabaseClient, overrid
                 rejoinChannels()
             }
         } catch(e: Exception) {
-            Logger.e(e) { "Error while trying to connect to realtime websocket. Trying again in ${config.reconnectDelay}" }
+            Logger.e(e) { """
+                Error while trying to connect to realtime websocket. Trying again in ${config.reconnectDelay}
+                URL: $realtimeUrl
+                """.trimIndent() }
             disconnect()
             connect(true)
         }
@@ -123,8 +126,10 @@ internal class RealtimeImpl(override val supabaseClient: SupabaseClient, overrid
             } catch(e: Exception) {
                 if(!isActive) return@launch
                 Logger.e(e) { "Error while listening for messages. Trying again in ${config.reconnectDelay}" }
-                disconnect()
-                connect(true)
+                scope.launch {
+                    disconnect()
+                    connect(true)
+                }
             }
         }
     }
@@ -219,7 +224,8 @@ internal class RealtimeImpl(override val supabaseClient: SupabaseClient, overrid
     }
 
     private fun realtimeBaseUrl(): String {
-        val prefix = if (config.secure == true) "wss://" else "ws://"
+        val secure = config.secure ?: supabaseClient.useHTTPS
+        val prefix = if (secure) "wss://" else "ws://"
         val baseUrl = config.customUrl
             ?: (prefix + supabaseClient.supabaseUrl)
         return buildUrl(baseUrl) {
@@ -231,12 +237,14 @@ internal class RealtimeImpl(override val supabaseClient: SupabaseClient, overrid
         return buildUrl(realtimeBaseUrl()) {
             parameters["apikey"] = supabaseClient.supabaseKey
             parameters["vsn"] = "1.0.0"
+            pathSegments += listOf("websocket")
         }
     }
 
     fun broadcastUrl(): String {
+        val secure = config.secure ?: supabaseClient.useHTTPS
         return buildUrl(realtimeBaseUrl()) {
-            protocol = if(config.secure == true) URLProtocol.HTTPS else URLProtocol.HTTP
+            protocol = if(secure) URLProtocol.HTTPS else URLProtocol.HTTP
             pathSegments += listOf("api", "broadcast")
         }
     }
