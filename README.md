@@ -110,6 +110,12 @@ implementation("io.github.jan-tennert.supabase:[module]")
 - [Multiplatform Deep Linking (Desktop/Android)](https://github.com/supabase-community/supabase-kt/tree/master/demos/multiplatform-deeplinks)
 - [Groceries Store App (Android)](https://github.com/hieuwu/android-groceries-store)
 
+# Need help?
+
+- [Join the Supabase Discord](https://discord.supabase.com) and create a new post with the 'Kotlin' tag under `help-and-questions`
+- [Create a discussion](https://github.com/supabase-community/supabase-kt/discussions/new/choose)
+- [Create an issue](https://github.com/supabase-community/supabase-kt/issues/new/choose)
+
 # Videos
 
 - [Getting started with Supabase on Android](https://www.youtube.com/watch?v=SGr73sWMX6w) (
