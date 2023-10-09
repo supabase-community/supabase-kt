@@ -54,12 +54,6 @@ internal class RealtimeImpl(override val supabaseClient: SupabaseClient, overrid
     override var serializer = config.serializer ?: supabaseClient.defaultSerializer
     private val websocketUrl = realtimeWebsocketUrl()
 
-    init {
-        if(config.secure == null) {
-            config.secure = supabaseClient.useHTTPS
-        }
-    }
-
     override suspend fun connect() = connect(false)
 
     suspend fun connect(reconnect: Boolean) {
