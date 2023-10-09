@@ -178,6 +178,9 @@ internal class RealtimeChannelImpl(
     }
 
     override suspend fun track(state: JsonObject) {
+        if(status.value != RealtimeChannel.Status.JOINED) {
+            error("You can only track your presence after joining the channel. Did you forget to call `channel.join()`?")
+        }
         val payload = buildJsonObject {
             put("type", "presence")
             put("event", "track")
