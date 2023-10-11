@@ -303,6 +303,11 @@ sealed interface GoTrue : MainPlugin<GoTrueConfig>, CustomSerializationPlugin {
     suspend fun refreshCurrentSession()
 
     /**
+     * Deletes the current session from storage and sets [sessionStatus] to [SessionStatus.NotAuthenticated]
+     */
+    suspend fun clearSession()
+
+    /**
      * Exchanges a code for a session. Used when using the [FlowType.PKCE] flow
      * @param code The code to exchange
      * @param saveSession Whether to save the session in storage
