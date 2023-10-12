@@ -10,6 +10,7 @@ version = "1.0"
 
 
 kotlin {
+    applyDefaultHierarchyTemplate()
     jvmToolchain(11)
     //withJava()
 }
