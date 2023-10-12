@@ -11,6 +11,7 @@ version = "1.0-SNAPSHOT"
 
 
 kotlin {
+    applyDefaultHierarchyTemplate()
     js(IR) {
         browser()
         binaries.executable()

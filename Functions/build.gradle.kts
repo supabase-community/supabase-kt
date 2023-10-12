@@ -10,6 +10,7 @@ repositories {
 }
 
 kotlin {
+    applyDefaultHierarchyTemplate()
     jvm {
         jvmToolchain(8)
         compilations.all {
@@ -34,7 +35,7 @@ kotlin {
             }
         }
     }
-    ios()
+    iosX64()
     iosSimulatorArm64()
     mingwX64()
     macosX64()
@@ -43,7 +44,8 @@ kotlin {
     watchosArm64()
     watchosX64()
     watchosSimulatorArm64()
-    tvos()
+    tvosX64()
+    tvosArm64()
     tvosSimulatorArm64()
     sourceSets {
         all {

@@ -15,6 +15,7 @@ repositories {
 }
 
 kotlin {
+    applyDefaultHierarchyTemplate()
     jvmToolchain(8)
     androidTarget()
     sourceSets {
