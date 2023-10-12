@@ -11,7 +11,6 @@ version = "1.0-SNAPSHOT"
 
 
 kotlin {
-    applyDefaultHierarchyTemplate()
     jvm {
         jvmToolchain(11)
         withJava()
