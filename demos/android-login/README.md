@@ -10,6 +10,8 @@ https://user-images.githubusercontent.com/26686035/235766941-6a62c415-e07e-4d18-
 
 # Configuration
 
+> If you want to implement Native Google Auth in your Android app and use Jetpack Compose/Compose Multiplatform, take a look at the [ComposeAuth](https://github.com/supabase-community/supabase-kt/tree/master/plugins/ComposeAuth) plugin
+
 Then you need to specify your supabase url and key in [supabaseModule.kt](https://github.com/supabase-community/supabase-kt/blob/master/demos/android-login/common/src/commonMain/kotlin/io/github/jan/supabase/common/di/supabaseModule.kt)
 
 If you want the Native Google Sign In,

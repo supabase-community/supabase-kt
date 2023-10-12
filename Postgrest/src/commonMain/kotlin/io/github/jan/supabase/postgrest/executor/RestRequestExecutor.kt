@@ -14,7 +14,7 @@ internal data object RestRequestExecutor : RequestExecutor {
     ): PostgrestResult {
         val authenticatedSupabaseApi = (postgrest as PostgrestImpl).api
         return authenticatedSupabaseApi.request(path) {
-            configurePostgrestRequest(request, postgrest)
+            configurePostgrestRequest(request)
         }.asPostgrestResult(postgrest)
     }
 }

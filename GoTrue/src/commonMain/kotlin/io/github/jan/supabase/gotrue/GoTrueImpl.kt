@@ -249,11 +249,7 @@ internal class GoTrueImpl(
             Logger.i { "Skipping session logout as there is no session available. Proceeding to clean up local data..." }
         }
         if (scope != LogoutScope.OTHERS) {
-            codeVerifierCache.deleteCodeVerifier()
-            sessionManager.deleteSession()
-            sessionJob?.cancel()
-            _sessionStatus.value = SessionStatus.NotAuthenticated
-            sessionJob = null
+            clearSession()
         }
         Logger.d { "Successfully logged out" }
     }
@@ -485,6 +481,14 @@ internal class GoTrueImpl(
                 }
             }
         })
+    }
+
+    override suspend fun clearSession() {
+        codeVerifierCache.deleteCodeVerifier()
+        sessionManager.deleteSession()
+        sessionJob?.cancel()
+        _sessionStatus.value = SessionStatus.NotAuthenticated
+        sessionJob = null
     }
 
 }

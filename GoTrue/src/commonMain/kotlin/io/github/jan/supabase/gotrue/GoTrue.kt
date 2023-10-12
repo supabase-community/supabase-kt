@@ -303,6 +303,11 @@ sealed interface GoTrue : MainPlugin<GoTrueConfig>, CustomSerializationPlugin {
     suspend fun refreshCurrentSession()
 
     /**
+     * Deletes the current session from storage and sets [sessionStatus] to [SessionStatus.NotAuthenticated]
+     */
+    suspend fun clearSession()
+
+    /**
      * Exchanges a code for a session. Used when using the [FlowType.PKCE] flow
      * @param code The code to exchange
      * @param saveSession Whether to save the session in storage
@@ -373,7 +378,7 @@ sealed interface GoTrue : MainPlugin<GoTrueConfig>, CustomSerializationPlugin {
  *
  * @param provider The provider to use. Either [Email] or [Phone]
  * @param createUser Whether to create a user when a user with the given credentials doesn't exist
- * @param redirectUrl The redirect url to use. If you don't specify this, the platform specific will be use, like deeplinks on android.
+ * @param redirectUrl The redirect url to use. If you don't specify this, the platform specific will be used, like deeplinks on android.
  * @throws RestException or one of its subclasses if receiving an error response
  * @throws HttpRequestTimeoutException if the request timed out
  * @throws HttpRequestException on network related issues
