@@ -134,13 +134,26 @@ internal class GoTrueImpl(
 
     override suspend fun modifyUser(
         updateCurrentUser: Boolean,
+        redirectUrl: String?,
         config: UserUpdateBuilder.() -> Unit
     ): UserInfo {
         val updateBuilder = UserUpdateBuilder(serializer = serializer).apply(config)
+        var codeChallenge: String? = null
+        if (this.config.flowType == FlowType.PKCE && updateBuilder.email != null) {
+            val codeVerifier = generateCodeVerifier()
+            codeVerifierCache.saveCodeVerifier(codeVerifier)
+            codeChallenge = generateCodeChallenge(codeVerifier)
+        }
         val body = buildJsonObject {
             putJsonObject(supabaseJson.encodeToJsonElement(updateBuilder).jsonObject)
+            codeChallenge?.let {
+                put("code_challenge", it)
+                put("code_challenge_method", "s256")
+            }
         }.toString()
-        val response = api.putJson("user", body)
+        val response = api.putJson("user", body) {
+            redirectUrl?.let { url.parameters.append("redirect_to", it) }
+        }
         val userInfo = response.safeBody<UserInfo>()
         if (updateCurrentUser && sessionStatus.value is SessionStatus.Authenticated) {
             val newSession =
