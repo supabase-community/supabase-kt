@@ -39,7 +39,7 @@ import kotlinx.coroutines.tasks.await
 @Composable
 actual fun ComposeAuth.rememberLoginWithGoogle(onResult: (NativeSignInResult) -> Unit, fallback: suspend () -> Unit): NativeSignInState {
     return if (android.os.Build.VERSION.SDK_INT > android.os.Build.VERSION_CODES.TIRAMISU) {
-        signInWithCM(onResult, fallback)
+        oneTapSignIn(onResult, fallback)
     } else {
         oneTapSignIn(onResult, fallback)
     }
