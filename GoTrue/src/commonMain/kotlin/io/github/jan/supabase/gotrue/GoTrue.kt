@@ -147,6 +147,7 @@ sealed interface GoTrue : MainPlugin<GoTrueConfig>, CustomSerializationPlugin {
      */
     suspend fun modifyUser(
         updateCurrentUser: Boolean = true,
+        redirectUrl: String? = null,
         config: UserUpdateBuilder.() -> Unit
     ): UserInfo
 
