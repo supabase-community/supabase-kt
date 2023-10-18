@@ -1,19 +1,5 @@
 # Project exclude paths
 /.gradle/
-/build/
-/build/classes/kotlin/desktop/main/
-/buildSrc/.gradle/
-/buildSrc/build/
-/desktopDemo/build/
-/Postgrest/build/
-/Storage/build/
-/Realtime/build/
-/GoTrue/build/
-/Functions/build/
-/plugins/ApolloGraphQL/build
-/plugins/ComposeAuthUI/build
-/plugins/ComposeAuth/build
-/serializers/Jackson/build
-/serializers/Moshi/build
+**/build/**
 .idea
 local.properties
