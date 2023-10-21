@@ -37,6 +37,12 @@ data object LinkedIn : OAuthProvider() {
 
 }
 
+data object LinkedInOIDC : OAuthProvider() {
+
+    override val name = "linkedin_oidc"
+
+}
+
 data object Notion : OAuthProvider() {
 
     override val name = "notion"

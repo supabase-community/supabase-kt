@@ -118,12 +118,22 @@ internal class GoTrueImpl(
         config: (Config.() -> Unit)?
     ): SSO.Result {
         val createdConfig = type.config.apply { config?.invoke(this) }
+        var codeChallenge: String? = null
+        if (this.config.flowType == FlowType.PKCE) {
+            val codeVerifier = generateCodeVerifier()
+            codeVerifierCache.saveCodeVerifier(codeVerifier)
+            codeChallenge = generateCodeChallenge(codeVerifier)
+        }
         return api.postJson("sso", buildJsonObject {
             redirectUrl?.let { put("redirect_to", it) }
             createdConfig.captchaToken?.let {
                 put("gotrue_meta_security", buildJsonObject {
                     put("captcha_token", it)
                 })
+            }
+            codeChallenge?.let {
+                put("code_challenge", it)
+                put("code_challenge_method", "s256")
             }
             when (createdConfig) {
                 is SSO.Config.Domain -> put("domain", createdConfig.domain)
