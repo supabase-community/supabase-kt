@@ -1,5 +1,5 @@
 [versions]
-kotlin = "1.9.20-Beta2"
+kotlin = "1.9.20-RC"
 ktor = "2.3.5"
 dokka = "1.9.0"
 kotlinx-datetime = "0.4.0" #0.4.1 broken currently on android
@@ -22,7 +22,7 @@ moshi = "1.15.0"
 jackson = "2.15.3"
 browser = "1.6.0"
 googleid = "1.1.0"
-compose = "1.5.10-dev1212"
+compose = "1.5.10-rc01"
 androidsvg = "1.4"
 
 [plugins]
