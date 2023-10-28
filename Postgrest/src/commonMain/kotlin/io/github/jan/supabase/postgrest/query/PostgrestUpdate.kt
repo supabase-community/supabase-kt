@@ -21,7 +21,7 @@ class PostgrestUpdate(@PublishedApi internal val propertyConversionMethod: Prope
     /**
      * Sets the value of the column with the name of the [KProperty1] to [value]
      */
-    inline infix fun <reified T, reified V> KProperty1<T, List<V>>.setTo(value: T) {
+    inline infix fun <reified T, reified V> KProperty1<T, V>.setTo(value: V) {
         if(value == null) {
             set(propertyConversionMethod(this), JsonNull)
         } else {
