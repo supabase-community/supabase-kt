@@ -130,7 +130,7 @@ class PostgrestBuilder(
         filter: PostgrestFilterBuilder.() -> Unit = {}
     ): PostgrestResult {
         val updateRequest = UpdateRequest(
-            body = buildPostgrestUpdate(postgrest.config.propertyConversionMethod, update),
+            body = buildPostgrestUpdate(postgrest.config.propertyConversionMethod, postgrest.serializer, update),
             returning = returning,
             count = count,
             filter = buildPostgrestFilter(postgrest.config.propertyConversionMethod, filter),

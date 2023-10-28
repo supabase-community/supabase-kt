@@ -1,18 +1,19 @@
 package io.github.jan.supabase.postgrest.query
 
+import io.github.jan.supabase.SupabaseSerializer
 import io.github.jan.supabase.annotations.SupabaseInternal
+import io.github.jan.supabase.encodeToJsonElement
 import io.github.jan.supabase.postgrest.PropertyConversionMethod
-import io.github.jan.supabase.supabaseJson
 import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.JsonNull
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
-import kotlinx.serialization.json.encodeToJsonElement
 import kotlin.reflect.KProperty1
 
 /**
  * Represents a postgrest update query
  */
-class PostgrestUpdate(@PublishedApi internal val propertyConversionMethod: PropertyConversionMethod) {
+class PostgrestUpdate(@PublishedApi internal val propertyConversionMethod: PropertyConversionMethod, @PublishedApi internal val serializer: SupabaseSerializer) {
 
     @PublishedApi
     internal val map = mutableMapOf<String, JsonElement>()
@@ -20,45 +21,43 @@ class PostgrestUpdate(@PublishedApi internal val propertyConversionMethod: Prope
     /**
      * Sets the value of the column with the name of the [KProperty1] to [value]
      */
-    inline infix fun <T, reified V> KProperty1<T, V>.setTo(value: V?) {
-        map[propertyConversionMethod(this)] = supabaseJson.encodeToJsonElement(value)
+    inline infix fun <reified T, reified V> KProperty1<T, List<V>>.setTo(value: T) {
+        if(value == null) {
+            set(propertyConversionMethod(this), JsonNull)
+        } else {
+            set(propertyConversionMethod(this), serializer.encodeToJsonElement(value))
+        }
     }
 
     /**
      * Sets the value of the column with the name of the [KProperty1] to [value]
      */
-    @Suppress("NOTHING_TO_INLINE")
-    inline infix fun <T> KProperty1<T, String>.setTo(value: String?) = set(propertyConversionMethod(this), value)
+    infix fun <T> KProperty1<T, String>.setTo(value: String?) = set(propertyConversionMethod(this), value)
 
     /**
      * Sets the value of the column with the name of the [KProperty1] to [value]
      */
-    @Suppress("NOTHING_TO_INLINE")
-    inline infix fun <T> KProperty1<T, Int>.setTo(value: Int?) = set(propertyConversionMethod(this), value)
+    infix fun <T> KProperty1<T, Int>.setTo(value: Int?) = set(propertyConversionMethod(this), value)
 
     /**
      * Sets the value of the column with the name of the [KProperty1] to [value]
      */
-    @Suppress("NOTHING_TO_INLINE")
-    inline infix fun <T> KProperty1<T, Long>.setTo(value: Long?) = set(propertyConversionMethod(this), value)
+    infix fun <T> KProperty1<T, Long>.setTo(value: Long?) = set(propertyConversionMethod(this), value)
 
     /**
      * Sets the value of the column with the name of the [KProperty1] to [value]
      */
-    @Suppress("NOTHING_TO_INLINE")
-    inline infix fun <T> KProperty1<T, Float>.setTo(value: Float?) = set(propertyConversionMethod(this), value)
+    infix fun <T> KProperty1<T, Float>.setTo(value: Float?) = set(propertyConversionMethod(this), value)
 
     /**
      * Sets the value of the column with the name of the [KProperty1] to [value]
      */
-    @Suppress("NOTHING_TO_INLINE")
-    inline infix fun <T> KProperty1<T, Double>.setTo(value: Double?) = set(propertyConversionMethod(this), value)
+    infix fun <T> KProperty1<T, Double>.setTo(value: Double?) = set(propertyConversionMethod(this), value)
 
     /**
      * Sets the value of the column with the name of the [KProperty1] to [value]
      */
-    @Suppress("NOTHING_TO_INLINE")
-    inline infix fun <T> KProperty1<T, Boolean>.setTo(value: Boolean?) = set(propertyConversionMethod(this), value)
+    infix fun <T> KProperty1<T, Boolean>.setTo(value: Boolean?) = set(propertyConversionMethod(this), value)
 
     /**
      * Sets the value of the [column] to [value]
@@ -103,10 +102,21 @@ class PostgrestUpdate(@PublishedApi internal val propertyConversionMethod: Prope
     }
 
     /**
+     * Sets the value of the [column] to null
+     */
+    fun setToNull(column: String) {
+        map[column] = JsonNull
+    }
+
+    /**
      * Sets the value of the [column] to [value]
      */
-    operator fun set(column: String, value: JsonElement) {
-        map[column] = value
+    inline operator fun <reified T> set(column: String, value: T) {
+        if(value == null) {
+            map[column] = JsonNull
+        } else {
+            map[column] = serializer.encodeToJsonElement(value)
+        }
     }
 
     @PublishedApi internal fun toJson() = JsonObject(map)
@@ -114,8 +124,8 @@ class PostgrestUpdate(@PublishedApi internal val propertyConversionMethod: Prope
 }
 
 @SupabaseInternal
-inline fun buildPostgrestUpdate(propertyConversionMethod: PropertyConversionMethod = PropertyConversionMethod.SERIAL_NAME, block: PostgrestUpdate.() -> Unit): JsonObject {
-    val update = PostgrestUpdate(propertyConversionMethod)
+inline fun buildPostgrestUpdate(propertyConversionMethod: PropertyConversionMethod = PropertyConversionMethod.SERIAL_NAME, serializer: SupabaseSerializer, block: PostgrestUpdate.() -> Unit): JsonObject {
+    val update = PostgrestUpdate(propertyConversionMethod, serializer)
     update.block()
     return update.toJson()
 }
