@@ -21,11 +21,11 @@ class PostgrestUpdate(@PublishedApi internal val propertyConversionMethod: Prope
     /**
      * Sets the value of the column with the name of the [KProperty1] to [value]
      */
-    inline infix fun <reified T, reified V> KProperty1<T, V>.setTo(value: V) {
+    inline infix fun <T, reified V> KProperty1<T, V>.setTo(value: V?) {
         if(value == null) {
-            set(propertyConversionMethod(this), JsonNull)
+            setToNull(propertyConversionMethod(this))
         } else {
-            set(propertyConversionMethod(this), serializer.encodeToJsonElement(value))
+            set(propertyConversionMethod(this), value)
         }
     }
 
@@ -111,9 +111,9 @@ class PostgrestUpdate(@PublishedApi internal val propertyConversionMethod: Prope
     /**
      * Sets the value of the [column] to [value]
      */
-    inline operator fun <reified T> set(column: String, value: T) {
+    inline operator fun <reified T> set(column: String, value: T?) {
         if(value == null) {
-            map[column] = JsonNull
+            setToNull(column)
         } else {
             map[column] = serializer.encodeToJsonElement(value)
         }
