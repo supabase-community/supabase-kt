@@ -118,8 +118,8 @@ implementation("io.github.jan-tennert.supabase:[module]")
 
 # Videos
 
-- [Getting started with Supabase on Android](https://www.youtube.com/watch?v=SGr73sWMX6w) (
-  by [Eric Ampire](https://www.youtube.com/@eric-ampire))
+- [Getting started with Supabase on Android](https://www.youtube.com/watch?v=SGr73sWMX6w) (by [Eric Ampire](https://www.youtube.com/@eric-ampire))
+- [Supabase | Jetpack Compose | Android | 2023](https://www.youtube.com/playlist?list=PL91kV_wdjTlcGQdcZzkuid094as5eUlwU) (by [YoursSohailYT](https://www.youtube.com/@YoursSohailYT))
 
 # Contribution
 
