@@ -1,5 +1,5 @@
 plugins {
-    alias(libs.plugins.complete.kotlin)
+//    alias(libs.plugins.complete.kotlin)
     alias(libs.plugins.kotlin.multiplatform)
     alias(libs.plugins.android.library)
 }
@@ -12,7 +12,7 @@ repositories {
 
 @OptIn(org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi::class)
 kotlin {
-    targetHierarchy.default()
+    applyDefaultHierarchyTemplate()
     jvm {
         jvmToolchain(8)
         compilations.all {
@@ -37,7 +37,8 @@ kotlin {
             }
         }
     }
-    ios()
+    iosX64()
+    iosArm64()
     iosSimulatorArm64()
     mingwX64()
     macosX64()
@@ -46,7 +47,8 @@ kotlin {
     watchosArm64()
     watchosX64()
     watchosSimulatorArm64()
-    tvos()
+    tvosX64()
+    tvosArm64()
     tvosSimulatorArm64()
     sourceSets {
         all {
