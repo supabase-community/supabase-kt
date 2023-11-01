@@ -283,8 +283,8 @@ sealed interface BucketApi {
  * **Authentication: Bearer <your_access_token>**
  * @param path The path to download
  */
-fun BucketApi.authenticatedRequest(path: String): Pair<String?, String> {
+fun BucketApi.authenticatedRequest(path: String): Pair<String, String> {
     val url = authenticatedUrl(path)
-    val token = supabaseClient.pluginManager.getPluginOrNull(GoTrue)?.currentAccessTokenOrNull()
+    val token = supabaseClient.storage.config.jwtToken ?: supabaseClient.pluginManager.getPluginOrNull(GoTrue)?.currentAccessTokenOrNull() ?: supabaseClient.supabaseKey
     return token to url
 }

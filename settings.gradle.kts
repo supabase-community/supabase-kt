@@ -24,7 +24,7 @@ project(":serializers:Jackson").name = "serializer-jackson"
 include(":plugins:ApolloGraphQL")
 include(":plugins:ComposeAuth")
 include(":plugins:ComposeAuthUI")
-include(":plugins:Coil")
+include(":plugins:CoilIntegration")
 project(":GoTrue").name = "gotrue-kt"
 project(":Postgrest").name = "postgrest-kt"
 project(":Storage").name = "storage-kt"
@@ -33,6 +33,6 @@ project(":Functions").name = "functions-kt"
 project(":plugins:ApolloGraphQL").name = "apollo-graphql"
 project(":plugins:ComposeAuth").name = "compose-auth"
 project(":plugins:ComposeAuthUI").name = "compose-auth-ui"
-project(":plugins:Coil").name = "coil-integration"
+project(":plugins:CoilIntegration").name = "coil-integration"
 rootProject.name = "supabase-kt"
 

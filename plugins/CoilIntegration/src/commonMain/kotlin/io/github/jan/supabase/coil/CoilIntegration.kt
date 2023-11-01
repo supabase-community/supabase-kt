@@ -9,9 +9,12 @@ import io.github.jan.supabase.plugins.SupabasePluginProvider
 import io.github.jan.supabase.storage.StorageItem
 import io.github.jan.supabase.storage.storage
 
+/**
+ * A plugin that integrates Coil with supabase-kt.
+ */
 interface CoilIntegration: SupabasePlugin, Fetcher.Factory<StorageItem> {
 
-    class Config()
+    class Config
 
     companion object : SupabasePluginProvider<Config, CoilIntegration> {
 
@@ -32,7 +35,10 @@ interface CoilIntegration: SupabasePlugin, Fetcher.Factory<StorageItem> {
 internal class CoilIntegrationImpl(private val supabaseClient: SupabaseClient) : CoilIntegration {
 
     override fun create(data: StorageItem, options: Options, imageLoader: ImageLoader): Fetcher {
-        return SupabaseStorageFetcher(storage, data)
+        return SupabaseStorageFetcher(supabaseClient.storage, data, options, imageLoader)
     }
 
 }
+
+val SupabaseClient.coil: CoilIntegration
+    get() = pluginManager.getPlugin(CoilIntegration)
