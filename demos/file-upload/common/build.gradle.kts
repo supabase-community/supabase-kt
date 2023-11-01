@@ -11,7 +11,6 @@ group = "io.github.jan.supabase"
 version = "1.0-SNAPSHOT"
 
 kotlin {
-    applyDefaultHierarchyTemplate()
     android()
     jvm("desktop") {
         jvmToolchain(8)
