@@ -1,6 +1,6 @@
 # Supabase-kt Coil Integration
 
-Extends gotrue-kt with a Coil integration for image loading.
+Extends supabase-kt with a Coil integration for image loading.
 
 Newest version: [![Maven Central](https://img.shields.io/maven-central/v/io.github.jan-tennert.supabase/supabase-kt)](https://search.maven.org/search?q=g%3Aio.github.jan-tennert.supabase)
 
