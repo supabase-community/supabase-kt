@@ -1,49 +1,10 @@
 # supabase-kt
 
 A Kotlin Multiplatform Client for Supabase.
-Supported targets:
 
-|                  | **GoTrue** | **Realtime** | **Postgrest** | **Storage** | **Functions** | **Apollo-GraphQL** | **Compose Auth 🚧** | **Compose Auth UI 🚧** |
-|------------------|------------|--------------|---------------|-------------|---------------|--------------------|---------------------|------------------------|
-| **JVM**          | ✅          | ✅            | ✅             | ✅           | ✅             | ✅                  | ☑️                  | ✅                      |
-| **Android**      | ✅          | ✅            | ✅             | ✅           | ✅             | ✅                  | ✅                   | ✅                      |
-| **JS**           | ✅          | ✅            | ✅             | ✅           | ✅             | ✅                  | ☑️                  | ✅                      |
-| **IOS**          | ✅          | ✅            | ✅             | ✅           | ✅             | ✅                  | 🚧                  | ✅                      |
-| **tvOS**  🚧     | ☑️         | ✅            | ✅             | ✅           | ✅             | ✅                  | ❌                   | ❌                      |
-| **watchOS**  🚧  | ☑️         | ✅            | ✅             | ✅           | ✅             | ✅                  | ❌                   | ❌                      |
-| **MacOS**   🚧   | ✅          | ✅            | ✅             | ✅           | ✅             | ✅                  | ❌                   | ❌                      |
-| **Windows**   🚧 | ☑️         | ✅            | ✅             | ✅           | ✅             | ❌                  | ❌                   | ❌                      |
-| **Linux**  🚧    | ☑️         | ✅            | ✅             | ✅           | ✅             | ❌                  | ❌                   | ❌                      |
+For information about supported Kotlin targets, see the corresponding module README.
 
-<details>
-
-<summary>In-depth Kotlin targets</summary>
-
-**iOS:** iosArm64, iosSimulatorArm64, iosX64
-
-**JS**: Browser, NodeJS
-
-**tvOS**: tvosArm64, tvosX64, tvosSimulatorArm64
-
-**watchOS**: watchosArm64, watchosX64, watchosSimulatorArm64  
-
-**MacOS**: macosX64, macosArm64          
-
-**Windows**: mingwX64    
-
-**Linux**: linuxX64
-
-</details>
-
-✅ = full support
-
-☑️ = partial support: no built-in OAuth/OTP link handling. Linux also has no support for persistent storage. For Compose Auth, it relies on GoTrue as fallback.
-
-🚧 = experimental/needs feedback
-
-❌ = not supported
-
-*Note: WASM planned see [issue](https://github.com/supabase-community/supabase-kt/issues/86)*
+*Note: WASM support planned see [issue](https://github.com/supabase-community/supabase-kt/issues/86)*
 
 [![](https://img.shields.io/github/release/supabase-community/supabase-kt?label=stable)](https://github.com/supabase-community/supabase-kt/releases) [![](https://img.shields.io/maven-central/v/io.github.jan-tennert.supabase/supabase-kt?label=experimental)](https://central.sonatype.com/search?q=io.github.jan.supabase&smo=true)
 
