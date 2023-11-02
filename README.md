@@ -3,17 +3,19 @@
 A Kotlin Multiplatform Client for Supabase.
 Supported targets:
 
-|                  | **GoTrue** | **Realtime** | **Postgrest** | **Storage** | **Functions** | **Apollo-GraphQL** | **Compose Auth 🚧** | **Compose Auth UI 🚧** |
-|------------------|------------|--------------|---------------|-------------|---------------|--------------------|---------------------|------------------------|
-| **JVM**          | ✅          | ✅            | ✅             | ✅           | ✅             | ✅                  | ☑️                  | ✅                      |
-| **Android**      | ✅          | ✅            | ✅             | ✅           | ✅             | ✅                  | ✅                   | ✅                      |
-| **JS**           | ✅          | ✅            | ✅             | ✅           | ✅             | ✅                  | ☑️                  | ✅                      |
-| **IOS**          | ✅          | ✅            | ✅             | ✅           | ✅             | ✅                  | 🚧                  | ✅                      |
-| **tvOS**  🚧     | ☑️         | ✅            | ✅             | ✅           | ✅             | ✅                  | ❌                   | ❌                      |
-| **watchOS**  🚧  | ☑️         | ✅            | ✅             | ✅           | ✅             | ✅                  | ❌                   | ❌                      |
-| **MacOS**   🚧   | ✅          | ✅            | ✅             | ✅           | ✅             | ✅                  | ❌                   | ❌                      |
-| **Windows**   🚧 | ☑️         | ✅            | ✅             | ✅           | ✅             | ❌                  | ❌                   | ❌                      |
-| **Linux**  🚧    | ☑️         | ✅            | ✅             | ✅           | ✅             | ❌                  | ❌                   | ❌                      |
+|             | **GoTrue** | **Realtime** | **Postgrest** | **Storage** | **Functions** |
+|-------------|------------|--------------|---------------|-------------|---------------|
+| **JVM**     | ✅          | ✅            | ✅             | ✅           | ✅             |
+| **Android** | ✅          | ✅            | ✅             | ✅           | ✅             |
+| **JS**      | ✅          | ✅            | ✅             | ✅           | ✅             |
+| **IOS**     | ✅          | ✅            | ✅             | ✅           | ✅             |
+| **tvOS**    | ☑️         | ✅            | ✅             | ✅           | ✅             |
+| **watchOS** | ☑️         | ✅            | ✅             | ✅           | ✅             |
+| **MacOS**   | ✅          | ✅            | ✅             | ✅           | ✅             |
+| **Windows** | ☑️         | ✅            | ✅             | ✅           | ✅             |
+| **Linux**   | ☑️         | ✅            | ✅             | ✅           | ✅             |
+
+For supported targets for plugins like Compose Auth, check the corresponding README.
 
 <details>
 
@@ -37,9 +39,7 @@ Supported targets:
 
 ✅ = full support
 
-☑️ = partial support: no built-in OAuth/OTP link handling. Linux also has no support for persistent storage. For Compose Auth, it relies on GoTrue as fallback.
-
-🚧 = experimental/needs feedback
+☑️ = partial support: check the corresponding README for more information
 
 ❌ = not supported
 

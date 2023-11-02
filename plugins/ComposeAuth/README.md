@@ -2,6 +2,34 @@
 
 Extends gotrue-kt with auth composables for Compose Multiplatform
 
+Supported targets:
+
+| Target | **JVM** | **Android** | **JS** | **iOS** | **tvOS** | **watchOS** | **macOS** | **Windows** | **Linux** |
+|--------|---------|-------------|--------|---------|----------|-------------|-----------|-------------|-----------|
+| Status | ☑️      | ✅           | 	☑️    | ✅      | 	❌       | 	❌          | 	❌        | ❌           | ❌         |
+
+> Note: iOS support is experimental and needs feedback
+
+<details>
+
+<summary>In-depth Kotlin targets</summary>
+
+**iOS:** iosArm64, iosSimulatorArm64, iosX64
+
+**JS**: Browser, NodeJS
+
+**tvOS**: tvosArm64, tvosX64, tvosSimulatorArm64
+
+**watchOS**: watchosArm64, watchosX64, watchosSimulatorArm64
+
+**MacOS**: macosX64, macosArm64
+
+**Windows**: mingwX64
+
+**Linux**: linuxX64
+
+</details>
+
 Newest version: [![Maven Central](https://img.shields.io/maven-central/v/io.github.jan-tennert.supabase/supabase-kt)](https://search.maven.org/search?q=g%3Aio.github.jan-tennert.supabase)
 
 # Installation
@@ -32,7 +60,7 @@ val client = createSupabaseClient(
 # Support
 
 Currently, Compose Auth only supports native login for
-Android with Google and iOS with Apple, other variations such as JS rely on fallback which
+Android with Google and iOS with Apple, other variations such as JS and JVM rely on fallback which
 by default is GoTrue-kt OAuth flow.
 
 To learn how you can use this plugin in your compose project, visit [Compose Multiplatform](https://github.com/JetBrains/compose-multiplatform/#readme)
