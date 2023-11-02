@@ -2,31 +2,7 @@
 
 A Kotlin Multiplatform Client for Supabase.
 
-<details>
-
-<summary>In-depth Kotlin targets</summary>
-
-**iOS:** iosArm64, iosSimulatorArm64, iosX64
-
-**JS**: Browser, NodeJS
-
-**tvOS**: tvosArm64, tvosX64, tvosSimulatorArm64
-
-**watchOS**: watchosArm64, watchosX64, watchosSimulatorArm64  
-
-**MacOS**: macosX64, macosArm64          
-
-**Windows**: mingwX64    
-
-**Linux**: linuxX64
-
-</details>
-
-✅ = full support
-
-☑️ = partial support: check the corresponding README for more information
-
-❌ = not supported
+For information about supported Kotlin targets, see the corresponding module README.
 
 *Note: WASM planned see [issue](https://github.com/supabase-community/supabase-kt/issues/86)*
 
