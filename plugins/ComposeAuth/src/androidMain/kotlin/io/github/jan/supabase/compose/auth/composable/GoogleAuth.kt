@@ -170,7 +170,8 @@ actual fun ComposeAuth.rememberSignOut(logoutScope: LogoutScope): NativeSignInSt
     val context = LocalContext.current
     return defaultSignOutBehavior(logoutScope) {
         if (android.os.Build.VERSION.SDK_INT > android.os.Build.VERSION_CODES.TIRAMISU) {
-            CredentialManager.create(context).clearCredentialState(ClearCredentialStateRequest())
+           // CredentialManager.create(context).clearCredentialState(ClearCredentialStateRequest())
+            Identity.getSignInClient(context).signOut().await()
         } else {
             Identity.getSignInClient(context).signOut().await()
         }
