@@ -58,11 +58,6 @@ val client = createSupabaseClient(
 }
 ```
 
-or create standalone module
-```kotlin
-val gotrue = standaloneSupabaseModule(GoTrue, url = "https://your.gotrue.url.com", apiKey = "your-api-key")
-```
-
 # Usage
 
 See [GoTrue documentation](https://supabase.com/docs/reference/kotlin/auth-signup) for usage
