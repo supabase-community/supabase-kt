@@ -4,7 +4,7 @@ A Kotlin Multiplatform Client for Supabase.
 
 For information about supported Kotlin targets, see the corresponding module README.
 
-*Note: WASM planned see [issue](https://github.com/supabase-community/supabase-kt/issues/86)*
+*Note: WASM support planned see [issue](https://github.com/supabase-community/supabase-kt/issues/86)*
 
 [![](https://img.shields.io/github/release/supabase-community/supabase-kt?label=stable)](https://github.com/supabase-community/supabase-kt/releases) [![](https://img.shields.io/maven-central/v/io.github.jan-tennert.supabase/supabase-kt?label=experimental)](https://central.sonatype.com/search?q=io.github.jan.supabase&smo=true)
 
