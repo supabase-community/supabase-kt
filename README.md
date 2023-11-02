@@ -1,21 +1,6 @@
 # supabase-kt
 
 A Kotlin Multiplatform Client for Supabase.
-Supported targets:
-
-|             | **GoTrue** | **Realtime** | **Postgrest** | **Storage** | **Functions** |
-|-------------|------------|--------------|---------------|-------------|---------------|
-| **JVM**     | ✅          | ✅            | ✅             | ✅           | ✅             |
-| **Android** | ✅          | ✅            | ✅             | ✅           | ✅             |
-| **JS**      | ✅          | ✅            | ✅             | ✅           | ✅             |
-| **IOS**     | ✅          | ✅            | ✅             | ✅           | ✅             |
-| **tvOS**    | ☑️         | ✅            | ✅             | ✅           | ✅             |
-| **watchOS** | ☑️         | ✅            | ✅             | ✅           | ✅             |
-| **MacOS**   | ✅          | ✅            | ✅             | ✅           | ✅             |
-| **Windows** | ☑️         | ✅            | ✅             | ✅           | ✅             |
-| **Linux**   | ☑️         | ✅            | ✅             | ✅           | ✅             |
-
-For supported targets for plugins like Compose Auth, check the corresponding README.
 
 <details>
 
