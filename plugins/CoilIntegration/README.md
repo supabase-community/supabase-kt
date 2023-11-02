@@ -71,7 +71,7 @@ class MyApplication : Application(), ImageLoaderFactory {
 
 ### Display images from Supabase Storage
 
-You can easily create a image request like this:
+You can easily create an image request like this:
 
 ```kotlin
 val request = ImageRequest.Builder(context)

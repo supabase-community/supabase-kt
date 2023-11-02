@@ -4,6 +4,7 @@ import coil.ImageLoader
 import coil.fetch.Fetcher
 import coil.request.Options
 import io.github.jan.supabase.SupabaseClient
+import io.github.jan.supabase.annotations.SupabaseExperimental
 import io.github.jan.supabase.plugins.SupabasePlugin
 import io.github.jan.supabase.plugins.SupabasePluginProvider
 import io.github.jan.supabase.storage.StorageItem
@@ -14,6 +15,9 @@ import io.github.jan.supabase.storage.storage
  */
 interface CoilIntegration: SupabasePlugin, Fetcher.Factory<StorageItem> {
 
+    /**
+     * The configuration for the coil integration.
+     */
     class Config
 
     companion object : SupabasePluginProvider<Config, CoilIntegration> {
@@ -40,5 +44,9 @@ internal class CoilIntegrationImpl(private val supabaseClient: SupabaseClient) :
 
 }
 
+/**
+ * With the [CoilIntegration] plugin installed, you can use this property to access the coil fetcher factory.
+ */
+@SupabaseExperimental
 val SupabaseClient.coil: CoilIntegration
     get() = pluginManager.getPlugin(CoilIntegration)
