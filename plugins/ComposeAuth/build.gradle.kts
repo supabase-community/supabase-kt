@@ -13,7 +13,7 @@ repositories {
 
 @OptIn(org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi::class)
 kotlin {
-    targetHierarchy.default()
+    applyDefaultHierarchyTemplate()
     jvm {
         jvmToolchain(8)
         compilations.all {
@@ -38,7 +38,8 @@ kotlin {
             }
         }
     }
-    ios()
+    iosX64()
+    iosArm64()
     iosSimulatorArm64()
 
     sourceSets {
@@ -87,9 +88,4 @@ android {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
     }
-}
-
-compose {
-    kotlinCompilerPlugin.set(dependencies.compiler.forKotlin("1.9.0"))
-    kotlinCompilerPluginArgs.add("suppressKotlinVersionCompatibilityCheck=1.9.10")
 }
