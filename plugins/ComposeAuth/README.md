@@ -10,7 +10,7 @@ Supported targets:
 
 > Note: iOS support is experimental and needs feedback
 > 
-> ☑️ = Has no support for neither Google and Apple authentication, relies on gotrue-kt for OAuth. 
+> ☑️ = Has no support for neither Google nor Apple Native Auth, relies on gotrue-kt for OAuth. 
 
 <details>
 
