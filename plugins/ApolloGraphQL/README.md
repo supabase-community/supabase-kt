@@ -6,7 +6,7 @@ Supported targets:
 
 | Target | **JVM** | **Android** | **JS** | **iOS** | **tvOS** | **watchOS** | **macOS** | **Windows** | **Linux** |
 |--------|---------|-------------|--------|---------|----------|-------------|-----------|-------------|-----------|
-| Status | ✅       | ✅           | ✅      | ✅       | ✅        | ✅           | ✅         | ❌           | ❌         |
+|        | ✅       | ✅           | ✅      | ✅       | ✅        | ✅           | ✅         | ❌           | ❌         |
 
 <details>
 
@@ -38,7 +38,7 @@ dependencies {
 }
 ```
 
-Install plugin in main SupabaseClient. See the [documentation](https://supabase.com/docs/reference/kotlin/initializing) for more information
+Install the plugin in your SupabaseClient. See the [documentation](https://supabase.com/docs/reference/kotlin/initializing) for more information
 ```kotlin
 val client = createSupabaseClient(
     supabaseUrl = "https://id.supabase.co",
