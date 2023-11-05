@@ -9,7 +9,7 @@ import kotlinx.serialization.json.JsonObject
 @Serializable
 data class UserInfo(
     @SerialName("app_metadata")
-    val appMetadata: AppMetadata,
+    val appMetadata: JsonObject? = null,
     @SerialName("aud")
     val aud: String,
     @SerialName("confirmation_sent_at")
