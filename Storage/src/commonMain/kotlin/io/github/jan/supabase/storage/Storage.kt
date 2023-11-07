@@ -6,6 +6,7 @@ import io.github.jan.supabase.annotations.SupabaseInternal
 import io.github.jan.supabase.bodyOrNull
 import io.github.jan.supabase.collections.AtomicMutableMap
 import io.github.jan.supabase.exceptions.BadRequestRestException
+import io.github.jan.supabase.exceptions.HttpRequestException
 import io.github.jan.supabase.exceptions.NotFoundRestException
 import io.github.jan.supabase.exceptions.RestException
 import io.github.jan.supabase.exceptions.UnauthorizedRestException
@@ -48,8 +49,9 @@ sealed interface Storage : MainPlugin<Storage.Config> {
 
     /**
      * Creates a new bucket in the storage
-     * @param name the name of the bucket
      * @param id the id of the bucket
+     * @param builder overrides bucket config options (like whether the bucket should be public,
+     * file size limit, etc)
      * @throws RestException or one of its subclasses if receiving an error response
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
@@ -72,7 +74,7 @@ sealed interface Storage : MainPlugin<Storage.Config> {
     suspend fun retrieveBuckets(): List<Bucket>
 
     /**
-     * Retrieves a bucket by its [id]
+     * Retrieves a bucket by its [bucketId]
      * @throws RestException or one of its subclasses if receiving an error response
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
@@ -88,7 +90,7 @@ sealed interface Storage : MainPlugin<Storage.Config> {
     suspend fun emptyBucket(bucketId: String)
 
     /**
-     * Deletes a bucket by its [id]
+     * Deletes a bucket by its [bucketId]
      * @throws RestException or one of its subclasses if receiving an error response
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
