@@ -13,8 +13,8 @@ include("Realtime")
 include("Functions")
 include("bom")
 
-//include("test")
-//include("test-w")
+include("test")
+include("test-w")
 
 include(":serializers:Moshi")
 project(":serializers:Moshi").name = "serializer-moshi"
