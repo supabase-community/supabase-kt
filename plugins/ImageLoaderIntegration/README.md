@@ -62,7 +62,8 @@ Create a new ImageLoader with the Supabase Fetcher. See the [Compose-ImageLoader
 ImageLoader {
     //...
     components {
-        add(supabaseClient.imageLoader)
+        add(keyer = supabaseClient.imageLoader)
+        add(fetcherFactory = supabaseClient.imageLoader)
     }
     //...
 }
