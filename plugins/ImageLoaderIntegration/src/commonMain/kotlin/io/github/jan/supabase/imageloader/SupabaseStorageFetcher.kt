@@ -5,7 +5,8 @@ import com.seiko.imageloader.component.fetcher.Fetcher
 import com.seiko.imageloader.model.extraData
 import io.github.jan.supabase.storage.Storage
 import io.github.jan.supabase.storage.StorageItem
-import io.ktor.http.*
+import io.ktor.http.ContentType
+import io.ktor.http.defaultForFileExtension
 import okio.Buffer
 import kotlin.collections.set
 
