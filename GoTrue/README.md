@@ -51,7 +51,7 @@ val client = createSupabaseClient(
     
     //...
     
-    install(GoTrue) {
+    install(Auth) {
         // settings
     }
     
