@@ -64,7 +64,7 @@ implementation("io.github.jan-tennert.supabase:[module]")
 
 #### [Coil Integration](/plugins/CoilIntegration)
 
-#### [Compose-ImageLoader](/plugins/ImageLoaderIntegration)
+#### [Compose-ImageLoader Integration](/plugins/ImageLoaderIntegration)
 
 # Demos
 
