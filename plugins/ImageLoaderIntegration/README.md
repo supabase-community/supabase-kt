@@ -54,9 +54,11 @@ val client = createSupabaseClient(
 
 # Usage
 
-### Add Supabase Fetcher to Compose-ImageLoader
+### Add Supabase Fetcher and Keyer to Compose-ImageLoader
 
-Create a new ImageLoader with the Supabase Fetcher. See the [Compose-ImageLoader documentation](https://github.com/qdsfdhvh/compose-imageloader) for more information.
+Create a new ImageLoader with the Supabase Fetcher and Keyer. See the [Compose-ImageLoader documentation](https://github.com/qdsfdhvh/compose-imageloader) for more information.
+
+> The fetcher is used to download the data and the keyer is used to allow in-memory and disk caching
 
 ```kotlin
 ImageLoader {
