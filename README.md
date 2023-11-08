@@ -22,7 +22,7 @@ For information about supported Kotlin targets, see the corresponding module REA
 
 # Installation
 
-**Available modules**: `gotrue-kt`, `postgrest-kt`, `functions-kt`, `storage-kt`, `realtime-kt`, `apollo-graphql`, `compose-auth`, `compose-auth-ui`, `coil-integration`
+**Available modules**: `gotrue-kt`, `postgrest-kt`, `functions-kt`, `storage-kt`, `realtime-kt`, `apollo-graphql`, `compose-auth`, `compose-auth-ui`, `coil-integration`, `imageloader-integration`
 
 ```kotlin
 dependencies {
@@ -63,6 +63,8 @@ implementation("io.github.jan-tennert.supabase:[module]")
 #### [Compose Auth UI](/plugins/ComposeAuthUI)
 
 #### [Coil Integration](/plugins/CoilIntegration)
+
+#### [Compose-ImageLoader](/plugins/ImageLoaderIntegration)
 
 # Demos
 
