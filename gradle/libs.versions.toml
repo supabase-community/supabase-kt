@@ -25,6 +25,8 @@ googleid = "1.1.0"
 compose = "1.5.10"
 androidsvg = "1.4"
 coil = "2.4.0"
+imageloader = "1.7.0"
+okio = "3.6.0"
 
 [plugins]
 kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
@@ -83,6 +85,8 @@ jackson-kotlin = { module = "com.fasterxml.jackson.module:jackson-module-kotlin"
 androidsvg = { module = "com.caverock:androidsvg-aar", version.ref = "androidsvg" }
 
 coil = { module = "io.coil-kt:coil", version.ref = "coil" }
+imageloader = { module = "io.github.qdsfdhvh:image-loader", version.ref = "imageloader" }
+okio = { module = "com.squareup.okio:okio", version.ref = "okio" }
 
 [bundles]
 ktor-client = ["ktor-client-core", "ktor-client-content-negotiation", "ktor-json"]
