@@ -1,6 +1,6 @@
 # Supabase-kt Compose Auth
 
-Extends gotrue-kt with auth composables for Compose Multiplatform
+Extends gotrue-kt with Native Auth composables for Compose Multiplatform
 
 Supported targets:
 
@@ -59,10 +59,10 @@ val client = createSupabaseClient(
 }
 ```
 
-# Support
+# Native Auth Support
 
-Currently, Compose Auth only supports native login for
-Android with Google and iOS with Apple, other variations such as JS and JVM rely on fallback which
+Currently, Compose Auth only supports Native Auth for
+Android with Google (via Google OneTap and Credential Manager for Android 14+) and iOS with Apple, other variations such as JS and JVM rely on fallback which
 by default is GoTrue-kt OAuth flow.
 
 To learn how you can use this plugin in your compose project, visit [Compose Multiplatform](https://github.com/JetBrains/compose-multiplatform/#readme)
@@ -95,7 +95,7 @@ Button(
 
 # Native Google Auth on Android
 
-Here is a guide on how to use Native Google Auth on Android
+Here is a small guide on how to use Native Google Auth on Android:
 
 1. Create a project in your [Google Cloud Developer Console](console.cloud.google.com/)
 2. Create OAuth credentials for a Web application, and use your Supabase callback url as redirect url. (**https://ID.supabase.co/auth/v1/callback**)
