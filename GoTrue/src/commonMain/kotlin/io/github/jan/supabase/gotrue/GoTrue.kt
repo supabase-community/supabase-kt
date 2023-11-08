@@ -25,7 +25,7 @@ interface GoTrue : Auth {
 
     companion object : SupabasePluginProvider<AuthConfig, Auth> {
 
-        override val key = "gotrue"
+        override val key = "auth"
 
         /**
          * The gotrue api version to use
