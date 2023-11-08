@@ -3,7 +3,6 @@ package io.github.jan.supabase.gotrue.providers
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.gotrue.auth
 import io.github.jan.supabase.gotrue.deepLink
-import io.github.jan.supabase.gotrue.gotrue
 import io.github.jan.supabase.gotrue.user.UserSession
 import platform.Foundation.NSURL
 

@@ -3,7 +3,6 @@ package io.github.jan.supabase.compose.auth
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.gotrue.LogoutScope
 import io.github.jan.supabase.gotrue.auth
-import io.github.jan.supabase.gotrue.gotrue
 import io.github.jan.supabase.gotrue.providers.Apple
 import io.github.jan.supabase.gotrue.providers.Google
 import io.github.jan.supabase.gotrue.providers.IDTokenProvider
