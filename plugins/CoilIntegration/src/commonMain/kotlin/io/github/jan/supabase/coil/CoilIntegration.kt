@@ -2,6 +2,7 @@ package io.github.jan.supabase.coil
 
 import coil.ImageLoader
 import coil.fetch.Fetcher
+import coil.request.ImageRequest
 import coil.request.Options
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.annotations.SupabaseExperimental
@@ -11,7 +12,7 @@ import io.github.jan.supabase.storage.StorageItem
 import io.github.jan.supabase.storage.storage
 
 /**
- * A plugin that integrates Coil with supabase-kt.
+ * A plugin that implements [Fetcher.Factory] to support using [StorageItem] as data when creating a [ImageRequest] or using it as a model in Jetpack Compose.
  */
 interface CoilIntegration: SupabasePlugin, Fetcher.Factory<StorageItem> {
 

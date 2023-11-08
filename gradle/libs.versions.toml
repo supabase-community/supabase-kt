@@ -24,7 +24,7 @@ browser = "1.6.0"
 googleid = "1.1.0"
 compose = "1.5.10"
 androidsvg = "1.4"
-coil = "2.4.0"
+coil = "2.5.0"
 imageloader = "1.7.0"
 okio = "3.6.0"
 
