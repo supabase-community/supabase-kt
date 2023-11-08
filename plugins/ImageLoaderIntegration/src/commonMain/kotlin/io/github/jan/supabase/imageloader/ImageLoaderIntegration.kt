@@ -1,7 +1,10 @@
 package io.github.jan.supabase.imageloader
 
+import com.seiko.imageloader.ImageLoader
+import com.seiko.imageloader.component.ComponentRegistryBuilder
 import com.seiko.imageloader.component.fetcher.Fetcher
 import com.seiko.imageloader.component.keyer.Keyer
+import com.seiko.imageloader.model.ImageRequest
 import com.seiko.imageloader.option.Options
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.annotations.SupabaseExperimental
@@ -11,12 +14,17 @@ import io.github.jan.supabase.storage.StorageItem
 import io.github.jan.supabase.storage.storage
 
 /**
- * A plugin that integrates Compose-ImageLoader with supabase-kt.
+ * A plugin that implements [Fetcher.Factory] and [Keyer] for [ImageLoader] to support using [StorageItem] as data when creating a [ImageRequest].
+ * Use [ComponentRegistryBuilder.add] to add this component to your [ImageLoader] instance:
+ * ```kotlin
+ * add(keyer = supabaseClient.imageLoader)
+ * add(fetcherFactory = supabaseClient.imageLoader)
+ * ```
  */
 interface ImageLoaderIntegration: SupabasePlugin, Fetcher.Factory, Keyer {
 
     /**
-     * The configuration for the imageloader integration.
+     * The configuration for the [ImageLoader] integration.
      */
     class Config
 
@@ -51,7 +59,7 @@ internal class ImageLoaderIntegrationImpl(private val supabaseClient: SupabaseCl
 }
 
 /**
- * With the [ImageLoaderIntegration] plugin installed, you can use this property to access the coil fetcher factory.
+ * With the [ImageLoaderIntegration] plugin installed, you can use this property to access the [ImageLoader] implementations of [Fetcher.Factory] & [Keyer].
  */
 @SupabaseExperimental
 val SupabaseClient.imageLoader: ImageLoaderIntegration

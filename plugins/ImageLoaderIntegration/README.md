@@ -1,4 +1,4 @@
-# Supabase-kt Coil Integration
+# Supabase-kt Compose-ImageLoader Integration
 
 Extends supabase-kt with a [Compose-ImageLoader](https://github.com/qdsfdhvh/compose-imageloader) integration for image loading.
 
