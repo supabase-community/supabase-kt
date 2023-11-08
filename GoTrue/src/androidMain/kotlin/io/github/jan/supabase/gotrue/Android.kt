@@ -13,8 +13,8 @@ import io.github.jan.supabase.gotrue.user.UserSession
 import kotlinx.coroutines.launch
 
 
-internal fun GoTrue.openOAuth(provider: OAuthProvider, redirectTo: String, config: ExternalAuthConfigDefaults) {
-    this as GoTrueImpl
+internal fun Auth.openOAuth(provider: OAuthProvider, redirectTo: String, config: ExternalAuthConfigDefaults) {
+    this as AuthImpl
     openUrl(
         uri = Uri.parse(oAuthUrl(provider, redirectTo) {
             scopes.addAll(config.scopes)
@@ -51,17 +51,17 @@ fun SupabaseClient.handleDeeplinks(intent: Intent, onSessionSuccess: (UserSessio
     val data = intent.data ?: return
     val scheme = data.scheme ?: return
     val host = data.host ?: return
-    if(scheme != gotrue.config.scheme || host != gotrue.config.host) return
-    when(this.gotrue.config.flowType) {
+    if(scheme != auth.config.scheme || host != auth.config.host) return
+    when(this.auth.config.flowType) {
         FlowType.IMPLICIT -> {
             val fragment = data.fragment ?: return
-            gotrue.parseFragmentAndImportSession(fragment, onSessionSuccess)
+            auth.parseFragmentAndImportSession(fragment, onSessionSuccess)
         }
         FlowType.PKCE -> {
             val code = data.getQueryParameter("code") ?: return
-            (gotrue as GoTrueImpl).authScope.launch {
-                this@handleDeeplinks.gotrue.exchangeCodeForSession(code)
-                onSessionSuccess(this@handleDeeplinks.gotrue.currentSessionOrNull() ?: error("No session available"))
+            (auth as AuthImpl).authScope.launch {
+                this@handleDeeplinks.auth.exchangeCodeForSession(code)
+                onSessionSuccess(this@handleDeeplinks.auth.currentSessionOrNull() ?: error("No session available"))
             }
         }
     }

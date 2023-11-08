@@ -3,4 +3,4 @@ package io.github.jan.supabase.gotrue
 import io.github.jan.supabase.annotations.SupabaseInternal
 
 @SupabaseInternal
-actual fun GoTrue.setupPlatform() = Unit
+actual fun Auth.setupPlatform() = Unit

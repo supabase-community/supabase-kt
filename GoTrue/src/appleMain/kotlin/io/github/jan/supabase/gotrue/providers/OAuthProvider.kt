@@ -1,6 +1,7 @@
 package io.github.jan.supabase.gotrue.providers
 
 import io.github.jan.supabase.SupabaseClient
+import io.github.jan.supabase.gotrue.auth
 import io.github.jan.supabase.gotrue.deepLink
 import io.github.jan.supabase.gotrue.gotrue
 import io.github.jan.supabase.gotrue.user.UserSession
@@ -38,8 +39,8 @@ actual abstract class OAuthProvider : AuthProvider<ExternalAuthConfig, Unit> {
         supabaseClient: SupabaseClient,
         externalConfig: ExternalAuthConfig
     ) {
-        val gotrue = supabaseClient.gotrue
-        val url = NSURL(string = supabaseClient.gotrue.oAuthUrl(this, redirectUrl ?: gotrue.config.deepLink) {
+        val gotrue = supabaseClient.auth
+        val url = NSURL(string = supabaseClient.auth.oAuthUrl(this, redirectUrl ?: gotrue.config.deepLink) {
             scopes.addAll(externalConfig.scopes)
             queryParams.putAll(externalConfig.queryParams)
         })

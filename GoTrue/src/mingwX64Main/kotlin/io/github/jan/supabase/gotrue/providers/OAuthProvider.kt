@@ -1,6 +1,7 @@
 package io.github.jan.supabase.gotrue.providers
 
 import io.github.jan.supabase.SupabaseClient
+import io.github.jan.supabase.gotrue.auth
 import io.github.jan.supabase.gotrue.gotrue
 import io.github.jan.supabase.gotrue.user.UserSession
 import kotlinx.cinterop.ExperimentalForeignApi
@@ -24,7 +25,7 @@ actual abstract class OAuthProvider actual constructor() : AuthProvider<External
         config: (ExternalAuthConfig.() -> Unit)?
     ) {
         val externalConfig = ExternalAuthConfig().apply { config?.invoke(this) }
-        val url = supabaseClient.gotrue.oAuthUrl(this@OAuthProvider, redirectUrl) {
+        val url = supabaseClient.auth.oAuthUrl(this@OAuthProvider, redirectUrl) {
             scopes.addAll(externalConfig.scopes)
             queryParams.putAll(externalConfig.queryParams)
         }

@@ -4,7 +4,7 @@ import co.touchlab.kermit.Logger
 import io.github.jan.supabase.annotations.SupabaseInternal
 import io.github.jan.supabase.collections.AtomicMutableList
 import io.github.jan.supabase.decodeIfNotEmptyOrDefault
-import io.github.jan.supabase.gotrue.GoTrue
+import io.github.jan.supabase.gotrue.Auth
 import io.github.jan.supabase.putJsonObject
 import io.github.jan.supabase.realtime.data.BroadcastApiBody
 import io.github.jan.supabase.realtime.data.BroadcastApiMessage
@@ -58,7 +58,7 @@ internal class RealtimeChannelImpl(
         }
         _status.value = RealtimeChannel.Status.JOINING
         Logger.d { "Joining channel $topic" }
-        val currentJwt = realtimeImpl.config.jwtToken ?: supabaseClient.pluginManager.getPluginOrNull(GoTrue)?.currentSessionOrNull()?.let {
+        val currentJwt = realtimeImpl.config.jwtToken ?: supabaseClient.pluginManager.getPluginOrNull(Auth)?.currentSessionOrNull()?.let {
             if(it.expiresAt > Clock.System.now()) it.accessToken else null
         }
         val postgrestChanges = clientChanges.toList()

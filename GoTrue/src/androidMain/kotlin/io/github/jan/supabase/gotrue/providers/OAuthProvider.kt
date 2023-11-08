@@ -1,9 +1,9 @@
 package io.github.jan.supabase.gotrue.providers
 
 import io.github.jan.supabase.SupabaseClient
-import io.github.jan.supabase.gotrue.GoTrueImpl
+import io.github.jan.supabase.gotrue.AuthImpl
+import io.github.jan.supabase.gotrue.auth
 import io.github.jan.supabase.gotrue.deepLink
-import io.github.jan.supabase.gotrue.gotrue
 import io.github.jan.supabase.gotrue.openOAuth
 import io.github.jan.supabase.gotrue.user.UserSession
 
@@ -23,7 +23,7 @@ actual abstract class OAuthProvider : AuthProvider<ExternalAuthConfig, Unit> {
         redirectUrl: String?,
         config: (ExternalAuthConfig.() -> Unit)?
     ) {
-        val gotrue = supabaseClient.gotrue as GoTrueImpl
+        val gotrue = supabaseClient.auth as AuthImpl
         val redirectTo = redirectUrl ?: gotrue.config.deepLink
         val externalConfig = ExternalAuthConfig().apply { config?.invoke(this) }
         gotrue.openOAuth(this, redirectTo, externalConfig)

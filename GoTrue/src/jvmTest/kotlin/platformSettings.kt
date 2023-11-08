@@ -1,3 +1,3 @@
-import io.github.jan.supabase.gotrue.GoTrueConfig
+import io.github.jan.supabase.gotrue.AuthConfig
 
-actual fun GoTrueConfig.platformSettings() = Unit
+actual fun AuthConfig.platformSettings() = Unit

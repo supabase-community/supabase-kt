@@ -1,6 +1,7 @@
 package io.github.jan.supabase.gotrue.providers
 
 import io.github.jan.supabase.SupabaseClient
+import io.github.jan.supabase.gotrue.auth
 import io.github.jan.supabase.gotrue.gotrue
 import io.github.jan.supabase.gotrue.user.UserSession
 import kotlinx.coroutines.Dispatchers
@@ -29,7 +30,7 @@ actual abstract class OAuthProvider : AuthProvider<ExternalAuthConfig, Unit> {
         withContext(Dispatchers.IO) {
             if(redirectUrl != null) {
                 Desktop.getDesktop()
-                    .browse(URI(supabaseClient.gotrue.oAuthUrl(this@OAuthProvider, redirectUrl) {
+                    .browse(URI(supabaseClient.auth.oAuthUrl(this@OAuthProvider, redirectUrl) {
                         scopes.addAll(externalConfig.scopes)
                         queryParams.putAll(externalConfig.queryParams)
                     }))
@@ -37,11 +38,11 @@ actual abstract class OAuthProvider : AuthProvider<ExternalAuthConfig, Unit> {
             }
             launch {
                 createServer({
-                    supabaseClient.gotrue.oAuthUrl(this@OAuthProvider, it) {
+                    supabaseClient.auth.oAuthUrl(this@OAuthProvider, it) {
                         scopes.addAll(externalConfig.scopes)
                         queryParams.putAll(externalConfig.queryParams)
                     }
-                }, supabaseClient.gotrue, onSuccess)
+                }, supabaseClient.auth, onSuccess)
             }
         }
     }

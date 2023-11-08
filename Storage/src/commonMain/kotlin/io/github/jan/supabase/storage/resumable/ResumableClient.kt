@@ -4,7 +4,7 @@ package io.github.jan.supabase.storage.resumable
 
 import co.touchlab.kermit.Logger
 import io.github.jan.supabase.annotations.SupabaseInternal
-import io.github.jan.supabase.gotrue.GoTrue
+import io.github.jan.supabase.gotrue.Auth
 import io.github.jan.supabase.storage.BucketApi
 import io.github.jan.supabase.storage.resumable.ResumableClient.Companion.TUS_VERSION
 import io.github.jan.supabase.storage.storage
@@ -152,7 +152,7 @@ internal class ResumableClientImpl(private val storageApi: BucketApi, private va
         return offset
     }
 
-    private fun accessTokenOrApiKey() = storageApi.supabaseClient.pluginManager.getPluginOrNull(GoTrue)?.currentAccessTokenOrNull() ?: storageApi.supabaseClient.supabaseKey
+    private fun accessTokenOrApiKey() = storageApi.supabaseClient.pluginManager.getPluginOrNull(Auth)?.currentAccessTokenOrNull() ?: storageApi.supabaseClient.supabaseKey
 
     private fun createMetadata(path: String): Map<String, String> = buildMap {
         put("bucketName", storageApi.bucketId)

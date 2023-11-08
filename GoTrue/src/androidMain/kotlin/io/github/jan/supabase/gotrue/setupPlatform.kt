@@ -21,14 +21,14 @@ internal class SupabaseInitializer : Initializer<Context> {
 internal fun applicationContext(): Context = appContext ?: error("Application context not initialized")
 
 @SupabaseInternal
-actual fun GoTrue.setupPlatform() {
+actual fun Auth.setupPlatform() {
     addLifecycleCallbacks(this)
 }
 
-private fun addLifecycleCallbacks(gotrue: GoTrue) {
+private fun addLifecycleCallbacks(gotrue: Auth) {
     if(!gotrue.config.enableLifecycleCallbacks) return
     val lifecycle = ProcessLifecycleOwner.get().lifecycle
-    gotrue as GoTrueImpl
+    gotrue as AuthImpl
     val scope = gotrue.authScope
     lifecycle.addObserver(
         object : DefaultLifecycleObserver {

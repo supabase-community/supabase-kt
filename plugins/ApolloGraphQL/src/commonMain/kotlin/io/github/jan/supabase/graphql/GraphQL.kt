@@ -6,7 +6,7 @@ import com.apollographql.apollo3.network.http.HttpInterceptorChain
 import io.github.jan.supabase.BuildConfig
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.exceptions.RestException
-import io.github.jan.supabase.gotrue.GoTrue
+import io.github.jan.supabase.gotrue.Auth
 import io.github.jan.supabase.plugins.MainConfig
 import io.github.jan.supabase.plugins.MainPlugin
 import io.github.jan.supabase.plugins.SupabasePluginProvider
@@ -89,7 +89,7 @@ internal class GraphQLImpl(override val config: GraphQL.Config, override val sup
             request: ApolloHttpRequest,
             chain: HttpInterceptorChain
         ): ApolloHttpResponse {
-            val accessToken = config.jwtToken ?: supabaseClient.pluginManager.getPluginOrNull(GoTrue)?.currentAccessTokenOrNull() ?: supabaseClient.supabaseKey
+            val accessToken = config.jwtToken ?: supabaseClient.pluginManager.getPluginOrNull(Auth)?.currentAccessTokenOrNull() ?: supabaseClient.supabaseKey
             val newRequest = request.newBuilder().apply {
                 addHeader(HttpHeaders.Authorization, "Bearer $accessToken")
             }
