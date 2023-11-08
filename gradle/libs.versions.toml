@@ -27,6 +27,7 @@ androidsvg = "1.4"
 coil = "2.5.0"
 imageloader = "1.7.0"
 okio = "3.6.0"
+credentials = "1.2.0"
 
 [plugins]
 kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
@@ -65,6 +66,8 @@ androidx-startup-runtime = { module = "androidx.startup:startup-runtime", versio
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activity-compose" }
 android-play-store-auth = { module = "com.google.android.gms:play-services-auth", version.ref = "android-play-store" }
 android-google-id = { module = "com.google.android.libraries.identity.googleid:googleid", version.ref = "googleid" }
+androidx-credentials = { module = "androidx.credentials:credentials", version.ref = "credentials" }
+androidx-credentials-play-services = { module = "androidx.credentials:credentials-play-services-auth", version.ref = "credentials" }
 
 multiplatform-settings-no-arg = { module = "com.russhwolf:multiplatform-settings-no-arg", version.ref = "multiplatform-settings" }
 multiplatform-settings-coroutines = { module = "com.russhwolf:multiplatform-settings-coroutines", version.ref = "multiplatform-settings" }
