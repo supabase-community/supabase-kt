@@ -425,8 +425,8 @@ suspend inline fun <C, R, reified D : Any, Provider : DefaultAuthProvider<C, R>>
  * **DEPRECATED** Use [auth] instead
  */
 @Deprecated("Use auth instead", ReplaceWith("auth", "io.github.jan.supabase.gotrue.auth"), DeprecationLevel.WARNING)
-val SupabaseClient.gotrue: Auth
-    get() = pluginManager.getPlugin(Auth)
+val SupabaseClient.gotrue: GoTrue
+    get() = pluginManager.getPlugin(GoTrue)
 
 /**
  * The Auth plugin handles everything related to Supabase's authentication system

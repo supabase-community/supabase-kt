@@ -21,9 +21,10 @@ import io.github.jan.supabase.plugins.SupabasePluginProvider
  * }
  * ```
  */
+@Deprecated("Use the Auth plugin instead", ReplaceWith("Auth", "io.github.jan.supabase.gotrue.Auth"), DeprecationLevel.WARNING)
 interface GoTrue : Auth {
 
-    companion object : SupabasePluginProvider<AuthConfig, Auth> {
+    companion object : SupabasePluginProvider<AuthConfig, GoTrue> {
 
         override val key = "auth"
 
@@ -33,8 +34,10 @@ interface GoTrue : Auth {
         const val API_VERSION = 1
 
         override fun createConfig(init: AuthConfig.() -> Unit) = AuthConfig().apply(init)
-        override fun create(supabaseClient: SupabaseClient, config: AuthConfig): Auth = AuthImpl(supabaseClient, config)
+        override fun create(supabaseClient: SupabaseClient, config: AuthConfig): GoTrue = GoTrueImpl(AuthImpl(supabaseClient, config))
 
     }
 
 }
+
+internal class GoTrueImpl(auth: Auth): GoTrue, Auth by auth
