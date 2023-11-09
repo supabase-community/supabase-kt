@@ -2,7 +2,7 @@ package io.github.jan.supabase.compose.auth
 
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.gotrue.LogoutScope
-import io.github.jan.supabase.gotrue.gotrue
+import io.github.jan.supabase.gotrue.auth
 import io.github.jan.supabase.gotrue.providers.Apple
 import io.github.jan.supabase.gotrue.providers.Google
 import io.github.jan.supabase.gotrue.providers.IDTokenProvider
@@ -73,11 +73,6 @@ sealed interface ComposeAuth : SupabasePlugin {
 
         override val key: String = "composeauth"
 
-        /**
-         * The version for the api the plugin is using
-         */
-        const val API_VERSION = 1
-
         override fun create(supabaseClient: SupabaseClient, config: Config): ComposeAuth {
             return ComposeAuthImpl(config, supabaseClient)
         }
@@ -97,18 +92,12 @@ val SupabaseClient.composeAuth: ComposeAuth
 internal class ComposeAuthImpl(
     override val config: ComposeAuth.Config,
     override val supabaseClient: SupabaseClient,
-) : ComposeAuth {
-
-    val apiVersion = ComposeAuth.API_VERSION
-
-    val pluginKey = ComposeAuth.key
-
-}
+) : ComposeAuth
 
 internal suspend fun ComposeAuth.loginWithGoogle(idToken: String) {
     val config = config.loginConfig["google"] as? GoogleLoginConfig
 
-    supabaseClient.gotrue.loginWith(IDToken) {
+    supabaseClient.auth.signInWith(IDToken) {
         provider = Google
         this.idToken = idToken
         nonce = config?.nonce
@@ -119,7 +108,7 @@ internal suspend fun ComposeAuth.loginWithGoogle(idToken: String) {
 internal suspend fun ComposeAuth.loginWithApple(idToken: String) {
     val config = config.loginConfig["apple"] as? GoogleLoginConfig
 
-    supabaseClient.gotrue.loginWith(IDToken) {
+    supabaseClient.auth.signInWith(IDToken) {
         provider = Apple
         this.idToken = idToken
         nonce = config?.nonce
@@ -128,9 +117,9 @@ internal suspend fun ComposeAuth.loginWithApple(idToken: String) {
 }
 
 internal suspend fun ComposeAuth.fallbackLogin(provider: IDTokenProvider) {
-    supabaseClient.gotrue.loginWith(provider)
+    supabaseClient.auth.signInWith(provider)
 }
 
 internal suspend fun ComposeAuth.signOut(scope: LogoutScope = LogoutScope.LOCAL) {
-    supabaseClient.gotrue.logout(scope)
+    supabaseClient.auth.logout(scope)
 }

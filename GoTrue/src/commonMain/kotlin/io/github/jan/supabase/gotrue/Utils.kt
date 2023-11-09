@@ -7,10 +7,10 @@ import io.ktor.client.request.HttpRequestBuilder
 import kotlinx.coroutines.launch
 
 @SupabaseInternal
-fun GoTrue.parseFragmentAndImportSession(fragment: String, onSessionSuccess: (UserSession) -> Unit = {}) {
+fun Auth.parseFragmentAndImportSession(fragment: String, onSessionSuccess: (UserSession) -> Unit = {}) {
     Logger.d { "Parsing deeplink fragment $fragment" }
     val session = parseSessionFromFragment(fragment)
-    this as GoTrueImpl
+    this as AuthImpl
     authScope.launch {
         val user = retrieveUser(session.accessToken)
         val newSession = session.copy(user = user)

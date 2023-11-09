@@ -48,10 +48,10 @@ import kotlinx.serialization.json.putJsonObject
 import kotlin.math.floor
 
 @PublishedApi
-internal class GoTrueImpl(
+internal class AuthImpl(
     override val supabaseClient: SupabaseClient,
-    override val config: GoTrueConfig
-) : GoTrue {
+    override val config: AuthConfig
+) : Auth {
 
     private val _sessionStatus = MutableStateFlow<SessionStatus>(SessionStatus.LoadingFromStorage)
     override val sessionStatus: StateFlow<SessionStatus> = _sessionStatus.asStateFlow()
@@ -70,10 +70,10 @@ internal class GoTrueImpl(
     override val serializer = config.serializer ?: supabaseClient.defaultSerializer
 
     override val apiVersion: Int
-        get() = GoTrue.API_VERSION
+        get() = Auth.API_VERSION
 
     override val pluginKey: String
-        get() = GoTrue.key
+        get() = Auth.key
 
     override fun init() {
         setupPlatform()
@@ -96,7 +96,7 @@ internal class GoTrueImpl(
         }
     }
 
-    override suspend fun <C, R, Provider : AuthProvider<C, R>> loginWith(
+    override suspend fun <C, R, Provider : AuthProvider<C, R>> signInWith(
         provider: Provider,
         redirectUrl: String?,
         config: (C.() -> Unit)?
@@ -490,7 +490,7 @@ internal class GoTrueImpl(
         if (this.config.flowType == FlowType.PKCE) {
             val codeVerifier = generateCodeVerifier()
             authScope.launch {
-                supabaseClient.gotrue.codeVerifierCache.saveCodeVerifier(codeVerifier)
+                supabaseClient.auth.codeVerifierCache.saveCodeVerifier(codeVerifier)
             }
             config.queryParams["code_challenge"] = generateCodeChallenge(codeVerifier)
             config.queryParams["code_challenge_method"] = "S256"
@@ -517,10 +517,10 @@ internal class GoTrueImpl(
 }
 
 @SupabaseInternal
-expect fun GoTrue.setupPlatform()
+expect fun Auth.setupPlatform()
 
 @SupabaseInternal
-expect fun GoTrue.createDefaultSessionManager(): SessionManager
+expect fun Auth.createDefaultSessionManager(): SessionManager
 
 @SupabaseInternal
-expect fun GoTrue.createDefaultCodeVerifierCache(): CodeVerifierCache
+expect fun Auth.createDefaultCodeVerifierCache(): CodeVerifierCache

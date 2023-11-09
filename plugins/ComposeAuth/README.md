@@ -49,7 +49,7 @@ val client = createSupabaseClient(
     supabaseKey = "apikey"
 ) {
     //...
-    install(GoTrue) {
+    install(Auth) {
         //your config
     }
     install(ComposeAuth) {

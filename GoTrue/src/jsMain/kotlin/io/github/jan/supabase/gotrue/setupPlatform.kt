@@ -9,8 +9,8 @@ import kotlinx.coroutines.launch
 import org.w3c.dom.url.URL
 
 @SupabaseInternal
-actual fun GoTrue.setupPlatform() {
-    this as GoTrueImpl
+actual fun Auth.setupPlatform() {
+    this as AuthImpl
 
     fun checkForHash() {
         if(window.location.hash.isBlank()) return

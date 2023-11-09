@@ -1,5 +1,5 @@
-import io.github.jan.supabase.gotrue.GoTrueConfig
+import io.github.jan.supabase.gotrue.AuthConfig
 
-actual fun GoTrueConfig.platformSettings() {
+actual fun AuthConfig.platformSettings() {
     enableLifecycleCallbacks = false
 }

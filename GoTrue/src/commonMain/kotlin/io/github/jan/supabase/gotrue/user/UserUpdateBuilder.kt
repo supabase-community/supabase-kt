@@ -2,7 +2,7 @@ package io.github.jan.supabase.gotrue.user
 
 import io.github.jan.supabase.SupabaseSerializer
 import io.github.jan.supabase.encodeToJsonElement
-import io.github.jan.supabase.gotrue.GoTrue
+import io.github.jan.supabase.gotrue.Auth
 import io.github.jan.supabase.serializer.KotlinXSerializer
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -17,7 +17,7 @@ import kotlinx.serialization.json.jsonObject
  * @param email The user's new email address
  * @param password The user's new password
  * @param phoneNumber The user's new phone number
- * @param nonce The nonce sent for reauthentication if the user's password is to be updated. Call [GoTrue.reauthenticate] to send the nonce to the user's email.
+ * @param nonce The nonce sent for reauthentication if the user's password is to be updated. Call [Auth.reauthenticate] to send the nonce to the user's email.
  * @param data Extra user metadata
  */
 @Serializable
