@@ -77,7 +77,7 @@ You can easily display images from Supabase Storage like this:
 
 ```kotlin
 AutoSizeImage(
-    request = remember { ImageRequest(authenticatedStorageItem("icons", "user.png")) },
+    request = remember { ImageRequest(authenticatedStorageItem("icons", "user.png")) }, //or use publicStorageItem("icons", "user.png") for public buckets
     contentDescription = null
 )
 ```
