@@ -31,16 +31,16 @@ import io.ktor.http.HttpStatusCode
  *
  * To use it you need to install it to the [SupabaseClient]:
  * ```kotlin
- * val client = createSupabaseClient(supabaseUrl, supabaseKey) {
+ * val supabase = createSupabaseClient(supabaseUrl, supabaseKey) {
  *    install(Functions)
  * }
  * ```
  *
  * then you can use it like this:
  * ```kotlin
- * val response = client.functions("myFunction")
+ * val response = supabase.functions("myFunction")
  * //or store it in a variable
- * val function = client.functions.buildEdgeFunction("myFunction")
+ * val function = supabase.functions.buildEdgeFunction("myFunction")
  * val response = function()
  * ```
  */

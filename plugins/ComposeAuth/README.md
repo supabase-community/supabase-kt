@@ -5,12 +5,12 @@ Extends gotrue-kt with auth composables for Compose Multiplatform
 Supported targets:
 
 | Target | **JVM** | **Android** | **JS** | **iOS** | **tvOS** | **watchOS** | **macOS** | **Windows** | **Linux** |
-|--------|---------|-------------|--------|---------|----------|-------------|-----------|-------------|-----------|
-|        | ☑️      | ✅           | 	☑️    | ✅       | 	❌       | 	❌          | 	❌        | ❌           | ❌         |
+| ------ | ------- | ----------- | ------ | ------- | -------- | ----------- | --------- | ----------- | --------- |
+|        | ☑️      | ✅          | ☑️     | ✅      | ❌       | ❌          | ❌        | ❌          | ❌        |
 
 > Note: iOS support is experimental and needs feedback
-> 
-> ☑️ = Has no support for neither Google nor Apple Native Auth, relies on gotrue-kt for OAuth. 
+>
+> ☑️ = Has no support for neither Google nor Apple Native Auth, relies on gotrue-kt for OAuth.
 
 <details>
 
@@ -43,8 +43,9 @@ dependencies {
 ```
 
 Install the plugin in your SupabaseClient. See the [documentation](https://supabase.com/docs/reference/kotlin/initializing) for more information
+
 ```kotlin
-val client = createSupabaseClient(
+val supabase = createSupabaseClient(
     supabaseUrl = "https://id.supabase.co",
     supabaseKey = "apikey"
 ) {
@@ -79,17 +80,17 @@ val action = client.composeAuth.rememberLoginWithGoogle(
             is NativeSignInResult.ClosedByUser -> {}
             is NativeSignInResult.Error -> {}
             is NativeSignInResult.NetworkError -> {}
-        } 
+        }
     },
     fallback = { // optional: add custom error handling, not required by default
-    
+
     }
 )
-                            
+
 Button(
     onClick = { action.startFlow() }
-) { 
-    Text("Google Login") 
+) {
+    Text("Google Login")
 }
 ```
 
