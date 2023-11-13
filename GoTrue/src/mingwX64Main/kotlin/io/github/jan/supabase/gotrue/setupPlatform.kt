@@ -4,6 +4,6 @@ import co.touchlab.kermit.Logger
 import io.github.jan.supabase.annotations.SupabaseInternal
 
 @SupabaseInternal
-actual fun GoTrue.setupPlatform() {
+actual fun Auth.setupPlatform() {
     Logger.w { "Windows support is experimental, please report any bugs you find!" }
 }

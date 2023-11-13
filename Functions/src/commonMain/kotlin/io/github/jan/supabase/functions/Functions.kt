@@ -9,7 +9,7 @@ import io.github.jan.supabase.exceptions.BadRequestRestException
 import io.github.jan.supabase.exceptions.NotFoundRestException
 import io.github.jan.supabase.exceptions.RestException
 import io.github.jan.supabase.exceptions.UnauthorizedRestException
-import io.github.jan.supabase.gotrue.GoTrue
+import io.github.jan.supabase.gotrue.Auth
 import io.github.jan.supabase.gotrue.authenticatedSupabaseApi
 import io.github.jan.supabase.plugins.CustomSerializationConfig
 import io.github.jan.supabase.plugins.CustomSerializationPlugin
@@ -118,7 +118,7 @@ class Functions(override val config: Config, override val supabaseClient: Supaba
     /**
      * The config for the [Functions] plugin
      * @param customUrl A custom url to use for the requests. If not provided, the default url will be used
-     * @param jwtToken A jwt token to use for the requests. If not provided, the token from the [GoTrue] plugin, or the supabaseKey will be used
+     * @param jwtToken A jwt token to use for the requests. If not provided, the token from the [Auth] plugin, or the supabaseKey will be used
      * @property serializer A serializer used for serializing/deserializing objects e.g. in [Functions.invoke] or [EdgeFunction.invoke]. Defaults to [KotlinXSerializer]
      */
     data class Config(

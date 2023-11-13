@@ -83,6 +83,7 @@ interface MainPlugin <Config : MainConfig> : SupabasePlugin {
  * @param apiKey The api key for this module
  * @param config The configuration for this module
  */
+@Deprecated("Use createSupabaseClient instead", level = DeprecationLevel.ERROR)
 inline fun <Config : MainConfig, reified Plugin : MainPlugin<Config>> standaloneSupabaseModule(provider: SupabasePluginProvider<Config, Plugin>, url: String, apiKey: String? = null, crossinline config: Config.() -> Unit = {}): Plugin {
     val underlyingClient = createSupabaseClient("", apiKey ?: "") {
         install(provider) {

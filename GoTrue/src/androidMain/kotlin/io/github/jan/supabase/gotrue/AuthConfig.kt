@@ -6,9 +6,9 @@ import io.github.jan.supabase.plugins.CustomSerializationConfig
 import io.github.jan.supabase.plugins.MainConfig
 
 /**
- * The configuration for [GoTrue]
+ * The configuration for [Auth]
  */
-actual class GoTrueConfig : MainConfig, CustomSerializationConfig, GoTrueConfigDefaults() {
+actual class AuthConfig : MainConfig, CustomSerializationConfig, AuthConfigDefaults() {
 
     /**
      * The scheme for the redirect url, when using deep linking
@@ -36,7 +36,7 @@ actual class GoTrueConfig : MainConfig, CustomSerializationConfig, GoTrueConfigD
  * Represents the available actions for external auth such as OAuth and SSO.
  * @property EXTERNAL_BROWSER Open the OAuth/SSO flow in an external browser
  * @property CUSTOM_TABS Open the OAuth/SSO flow in a custom tab
- * @see [GoTrueConfig.defaultExternalAuthAction]
+ * @see [AuthConfig.defaultExternalAuthAction]
  */
 enum class ExternalAuthAction {
     EXTERNAL_BROWSER, CUSTOM_TABS

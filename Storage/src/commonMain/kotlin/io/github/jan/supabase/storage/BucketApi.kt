@@ -4,7 +4,7 @@ import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.annotations.SupabaseExperimental
 import io.github.jan.supabase.exceptions.HttpRequestException
 import io.github.jan.supabase.exceptions.RestException
-import io.github.jan.supabase.gotrue.GoTrue
+import io.github.jan.supabase.gotrue.Auth
 import io.github.jan.supabase.storage.resumable.ResumableClient
 import io.ktor.client.plugins.HttpRequestTimeoutException
 import io.ktor.utils.io.ByteReadChannel
@@ -283,8 +283,8 @@ sealed interface BucketApi {
  * **Authentication: Bearer <your_access_token>**
  * @param path The path to download
  */
-fun BucketApi.authenticatedRequest(path: String): Pair<String?, String> {
+fun BucketApi.authenticatedRequest(path: String): Pair<String, String> {
     val url = authenticatedUrl(path)
-    val token = supabaseClient.pluginManager.getPluginOrNull(GoTrue)?.currentAccessTokenOrNull()
+    val token = supabaseClient.storage.config.jwtToken ?: supabaseClient.pluginManager.getPluginOrNull(Auth)?.currentAccessTokenOrNull() ?: supabaseClient.supabaseKey
     return token to url
 }

@@ -1,6 +1,6 @@
 package io.github.jan.supabase.gotrue.mfa
 
-import io.github.jan.supabase.gotrue.GoTrueImpl
+import io.github.jan.supabase.gotrue.AuthImpl
 import io.github.jan.supabase.gotrue.SessionStatus
 import io.github.jan.supabase.gotrue.user.UserMfaFactor
 import io.github.jan.supabase.gotrue.user.UserSession
@@ -103,7 +103,7 @@ sealed interface MfaApi {
 }
 
 internal class MfaApiImpl(
-    val gotrue: GoTrueImpl
+    val gotrue: AuthImpl
 ) : MfaApi {
 
     override val isMfaEnabledFlow: Flow<Boolean> = gotrue.sessionStatus.map {

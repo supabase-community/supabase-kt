@@ -6,9 +6,9 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
 
 /**
- * The configuration for [GoTrue]
+ * The configuration for [Auth]
  */
-actual class GoTrueConfig : MainConfig, CustomSerializationConfig, GoTrueConfigDefaults() {
+actual class AuthConfig : MainConfig, CustomSerializationConfig, AuthConfigDefaults() {
 
     /**
      * The port the web server is running on, when logging in with OAuth. Defaults to 0 (random port).

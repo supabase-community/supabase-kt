@@ -7,7 +7,7 @@ import io.github.jan.supabase.buildUrl
 import io.github.jan.supabase.collections.AtomicMutableMap
 import io.github.jan.supabase.exceptions.RestException
 import io.github.jan.supabase.exceptions.UnknownRestException
-import io.github.jan.supabase.gotrue.GoTrue
+import io.github.jan.supabase.gotrue.Auth
 import io.github.jan.supabase.gotrue.SessionStatus
 import io.github.jan.supabase.supabaseJson
 import io.ktor.client.plugins.websocket.DefaultClientWebSocketSession
@@ -62,7 +62,7 @@ internal class RealtimeImpl(override val supabaseClient: SupabaseClient, overrid
             Logger.d { "Reconnecting..." }
         } else {
             scope.launch {
-                supabaseClient.pluginManager.getPluginOrNull(GoTrue)?.sessionStatus?.collect {
+                supabaseClient.pluginManager.getPluginOrNull(Auth)?.sessionStatus?.collect {
                     if(status.value == Realtime.Status.CONNECTED) {
                         when(it) {
                             is SessionStatus.Authenticated -> updateJwt(it.session.accessToken)

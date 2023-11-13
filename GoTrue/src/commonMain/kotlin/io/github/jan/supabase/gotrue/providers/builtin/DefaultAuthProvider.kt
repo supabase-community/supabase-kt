@@ -3,12 +3,12 @@ package io.github.jan.supabase.gotrue.providers.builtin
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.annotations.SupabaseExperimental
 import io.github.jan.supabase.annotations.SupabaseInternal
+import io.github.jan.supabase.gotrue.AuthImpl
 import io.github.jan.supabase.gotrue.FlowType
-import io.github.jan.supabase.gotrue.GoTrueImpl
+import io.github.jan.supabase.gotrue.auth
 import io.github.jan.supabase.gotrue.generateCodeChallenge
 import io.github.jan.supabase.gotrue.generateCodeVerifier
 import io.github.jan.supabase.gotrue.generateRedirectUrl
-import io.github.jan.supabase.gotrue.gotrue
 import io.github.jan.supabase.gotrue.providers.AuthProvider
 import io.github.jan.supabase.gotrue.redirectTo
 import io.github.jan.supabase.gotrue.user.UserSession
@@ -56,8 +56,8 @@ sealed interface DefaultAuthProvider<C, R> : AuthProvider<C, R> {
     ) {
         require(config != null) { "Credentials are required" }
         val encodedCredentials = encodeCredentials(config)
-        val finalRedirectUrl = supabaseClient.gotrue.generateRedirectUrl(redirectUrl)
-        val gotrue = supabaseClient.gotrue as GoTrueImpl
+        val finalRedirectUrl = supabaseClient.auth.generateRedirectUrl(redirectUrl)
+        val gotrue = supabaseClient.auth as AuthImpl
         val url = "token?grant_type=$grantType"
         val response = gotrue.api.postJson(url, encodedCredentials) {
             finalRedirectUrl?.let { redirectTo(it) }
@@ -75,9 +75,9 @@ sealed interface DefaultAuthProvider<C, R> : AuthProvider<C, R> {
         config: (C.() -> Unit)?
     ): R? {
         require(config != null) { "Credentials are required" }
-        val finalRedirectUrl = supabaseClient.gotrue.generateRedirectUrl(redirectUrl)
+        val finalRedirectUrl = supabaseClient.auth.generateRedirectUrl(redirectUrl)
         val body = encodeCredentials(config)
-        val gotrue = supabaseClient.gotrue as GoTrueImpl
+        val gotrue = supabaseClient.auth as AuthImpl
         var codeChallenge: String? = null
         if(gotrue.config.flowType == FlowType.PKCE) {
             val codeVerifier = generateCodeVerifier()

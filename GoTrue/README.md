@@ -52,7 +52,7 @@ val supabase = createSupabaseClient(
 
     //...
 
-    install(GoTrue) {
+    install(Auth) {
         // settings
     }
 

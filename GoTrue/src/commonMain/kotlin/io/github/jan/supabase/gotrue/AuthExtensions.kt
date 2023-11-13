@@ -16,9 +16,9 @@ internal fun noDeeplinkError(arg: String): Nothing = error("""
 /**
  * Parses a session from a fragment.
  * @param fragment The fragment to parse the session from
- * @return The parsed session. Note that the user will be null, but you can retrieve it using [GoTrue.retrieveUser]
+ * @return The parsed session. Note that the user will be null, but you can retrieve it using [Auth.retrieveUser]
  */
-fun GoTrue.parseSessionFromFragment(fragment: String): UserSession {
+fun Auth.parseSessionFromFragment(fragment: String): UserSession {
     val sessionParts = fragment.split("&").associate {
         it.split("=").let { pair ->
             pair[0] to pair[1]
@@ -48,6 +48,6 @@ fun GoTrue.parseSessionFromFragment(fragment: String): UserSession {
 /**
  * Parses a session from an url.
  * @param url The url to parse the session from
- * @return The parsed session. Note that the user will be null, but you can retrieve it using [GoTrue.retrieveUser]
+ * @return The parsed session. Note that the user will be null, but you can retrieve it using [Auth.retrieveUser]
  */
-fun GoTrue.parseSessionFromUrl(url: String): UserSession = parseSessionFromFragment(url.substringAfter("#"))
+fun Auth.parseSessionFromUrl(url: String): UserSession = parseSessionFromFragment(url.substringAfter("#"))

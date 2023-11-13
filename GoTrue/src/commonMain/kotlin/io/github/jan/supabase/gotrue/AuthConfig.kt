@@ -11,17 +11,17 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
 /**
- * The configuration for [GoTrue]
+ * The configuration for [Auth]
  */
-expect class GoTrueConfig() : MainConfig, CustomSerializationConfig, GoTrueConfigDefaults
+expect class AuthConfig() : MainConfig, CustomSerializationConfig, AuthConfigDefaults
 
 /**
- * The default values for the [GoTrueConfig]
+ * The default values for the [AuthConfig]
  */
-open class GoTrueConfigDefaults {
+open class AuthConfigDefaults {
 
     /**
-     * The duration after which [GoTrue] should retry refreshing a session, when it failed due to network issues
+     * The duration after which [Auth] should retry refreshing a session, when it failed due to network issues
      */
     var retryDelay: Duration = 10.seconds
 
@@ -31,7 +31,7 @@ open class GoTrueConfigDefaults {
     var alwaysAutoRefresh: Boolean = true
 
     /**
-     * Whether to automatically load the session from [sessionManager], when [GoTrue] is initialized
+     * Whether to automatically load the session from [sessionManager], when [Auth] is initialized
      */
     var autoLoadFromStorage: Boolean = true
 
@@ -71,7 +71,7 @@ open class GoTrueConfigDefaults {
     var jwtToken: String? = null
 
     /**
-     * A serializer used for serializing/deserializing objects e.g. in [GoTrue.sendOtpTo]. Defaults to [SupabaseClientBuilder.defaultSerializer], when null.
+     * A serializer used for serializing/deserializing objects e.g. in [Auth.sendOtpTo]. Defaults to [SupabaseClientBuilder.defaultSerializer], when null.
      */
     var serializer: SupabaseSerializer? = null
 
