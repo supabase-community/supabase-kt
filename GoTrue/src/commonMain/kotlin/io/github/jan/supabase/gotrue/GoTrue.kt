@@ -8,14 +8,14 @@ import io.github.jan.supabase.plugins.SupabasePluginProvider
  *
  * To use it you need to install it to the [SupabaseClient]:
  * ```kotlin
- * val client = createSupabaseClient(supabaseUrl, supabaseKey) {
+ * val supabase = createSupabaseClient(supabaseUrl, supabaseKey) {
  *    install(GoTrue)
  * }
  * ```
  *
  * then you can use it like this:
  * ```kotlin
- * val result = client.gotrue.signUpWith(Email) {
+ * val result = supabase.gotrue.signUpWith(Email) {
  *   email = "example@email.com"
  *   password = "password"
  * }

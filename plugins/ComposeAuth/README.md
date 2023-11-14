@@ -5,12 +5,12 @@ Extends gotrue-kt with Native Auth composables for Compose Multiplatform
 Supported targets:
 
 | Target | **JVM** | **Android** | **JS** | **iOS** | **tvOS** | **watchOS** | **macOS** | **Windows** | **Linux** |
-|--------|---------|-------------|--------|---------|----------|-------------|-----------|-------------|-----------|
-|        | ☑️      | ✅           | 	☑️    | ✅       | 	❌       | 	❌          | 	❌        | ❌           | ❌         |
+| ------ | ------- | ----------- | ------ | ------- | -------- | ----------- | --------- | ----------- | --------- |
+|        | ☑️      | ✅          | ☑️     | ✅      | ❌       | ❌          | ❌        | ❌          | ❌        |
 
 > Note: iOS support is experimental and needs feedback
-> 
-> ☑️ = Has no support for neither Google nor Apple Native Auth, relies on gotrue-kt for OAuth. 
+>
+> ☑️ = Has no support for neither Google nor Apple Native Auth, relies on gotrue-kt for OAuth.
 
 <details>
 
@@ -43,8 +43,9 @@ dependencies {
 ```
 
 Install the plugin in your SupabaseClient. See the [documentation](https://supabase.com/docs/reference/kotlin/initializing) for more information
+
 ```kotlin
-val client = createSupabaseClient(
+val supabase = createSupabaseClient(
     supabaseUrl = "https://id.supabase.co",
     supabaseKey = "apikey"
 ) {
@@ -69,27 +70,27 @@ To learn how you can use this plugin in your compose project, visit [Compose Mul
 
 # Usage
 
-The composable can be accessed trough `composeAuth` property from `client`
+The composable can be accessed trough `composeAuth` property from `supabase`
 
 ```kotlin
-val action = client.composeAuth.rememberLoginWithGoogle(
+val action = supabase.composeAuth.rememberLoginWithGoogle(
     onResult = { result -> //optional error handling
         when (result) {
             is NativeSignInResult.Success -> {}
             is NativeSignInResult.ClosedByUser -> {}
             is NativeSignInResult.Error -> {}
             is NativeSignInResult.NetworkError -> {}
-        } 
+        }
     },
     fallback = { // optional: add custom error handling, not required by default
-    
+
     }
 )
-                            
+
 Button(
     onClick = { action.startFlow() }
-) { 
-    Text("Google Login") 
+) {
+    Text("Google Login")
 }
 ```
 
