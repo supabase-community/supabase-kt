@@ -70,10 +70,10 @@ To learn how you can use this plugin in your compose project, visit [Compose Mul
 
 # Usage
 
-The composable can be accessed trough `composeAuth` property from `client`
+The composable can be accessed trough `composeAuth` property from `supabase`
 
 ```kotlin
-val action = client.composeAuth.rememberLoginWithGoogle(
+val action = supabase.composeAuth.rememberLoginWithGoogle(
     onResult = { result -> //optional error handling
         when (result) {
             is NativeSignInResult.Success -> {}
