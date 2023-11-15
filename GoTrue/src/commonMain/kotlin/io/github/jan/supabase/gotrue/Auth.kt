@@ -108,12 +108,12 @@ sealed interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
      *
      * Example:
      * ```kotlin
-     * val result = gotrue.loginWith(Email) {
+     * val result = gotrue.signInWith(Email) {
      *    email = "example@email.com"
      *    password = "password"
      * }
      * or
-     * gotrue.loginWith(Google) // Opens the browser to login with google
+     * gotrue.signInWith(Google) // Opens the browser to login with google
      * ```
      *
      * @param provider the provider to use for signing up. E.g. [Email], [Phone] or [Google]
@@ -140,7 +140,7 @@ sealed interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
      *    password = "password"
      * }
      * or
-     * gotrue.loginWith(Google) // Opens the browser to login with google
+     * gotrue.signInWith(Google) // Opens the browser to login with google
      * ```
      *
      * @param provider the provider to use for signing up. E.g. [Email], [Phone] or [Google]
@@ -285,13 +285,24 @@ sealed interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
 
     /**
      * Logs out the current user, which means [sessionStatus] will be [SessionStatus.NotAuthenticated] and the access token will be revoked
+     * @param scope The scope of the sign-out.
+     * @throws RestException or one of its subclasses if receiving an error response
+     * @throws HttpRequestTimeoutException if the request timed out
+     * @throws HttpRequestException on network related issues
+     * @see SignOutScope
+     */
+    suspend fun signOut(scope: SignOutScope = SignOutScope.LOCAL)
+
+    /**
+     * Logs out the current user, which means [sessionStatus] will be [SessionStatus.NotAuthenticated] and the access token will be revoked
      * @param scope The scope of the logout.
      * @throws RestException or one of its subclasses if receiving an error response
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
-     * @see LogoutScope
+     * @see SignOutScope
      */
-    suspend fun logout(scope: LogoutScope = LogoutScope.LOCAL)
+    @Deprecated("Use signOut instead", ReplaceWith("signOut(scope)", "io.github.jan.supabase.gotrue.SignOutScope"), DeprecationLevel.WARNING)
+    suspend fun logout(scope: SignOutScope = SignOutScope.LOCAL) = signOut(scope)
 
     /**
      * Imports a user session and starts auto-refreshing if [autoRefresh] is true

@@ -2,7 +2,7 @@ package io.github.jan.supabase.compose.auth.composable
 
 import androidx.compose.runtime.Composable
 import io.github.jan.supabase.compose.auth.ComposeAuth
-import io.github.jan.supabase.gotrue.LogoutScope
+import io.github.jan.supabase.gotrue.SignOutScope
 
 /**
  * Composable for Google login with default behavior
@@ -14,4 +14,4 @@ actual fun ComposeAuth.rememberLoginWithGoogle(onResult: (NativeSignInResult) ->
  * Composable for SignOut with default behavior
  */
 @Composable
-actual fun ComposeAuth.rememberSignOut(logoutScope: LogoutScope): NativeSignInState = defaultSignOutBehavior(logoutScope)
+actual fun ComposeAuth.rememberSignOut(signOutScope: SignOutScope): NativeSignInState = defaultSignOutBehavior(signOutScope)

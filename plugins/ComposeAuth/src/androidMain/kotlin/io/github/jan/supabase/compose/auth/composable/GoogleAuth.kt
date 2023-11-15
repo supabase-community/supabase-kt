@@ -26,7 +26,7 @@ import io.github.jan.supabase.compose.auth.getActivity
 import io.github.jan.supabase.compose.auth.getGoogleIDOptions
 import io.github.jan.supabase.compose.auth.getSignInRequest
 import io.github.jan.supabase.compose.auth.loginWithGoogle
-import io.github.jan.supabase.gotrue.LogoutScope
+import io.github.jan.supabase.gotrue.SignOutScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
@@ -162,9 +162,9 @@ internal fun ComposeAuth.oneTapSignIn(onResult: (NativeSignInResult) -> Unit, fa
  * Composable for Google SignOut with native behavior
  */
 @Composable
-actual fun ComposeAuth.rememberSignOut(logoutScope: LogoutScope): NativeSignInState {
+actual fun ComposeAuth.rememberSignOut(signOutScope: SignOutScope): NativeSignInState {
     val context = LocalContext.current
-    return defaultSignOutBehavior(logoutScope) {
+    return defaultSignOutBehavior(signOutScope) {
         if (android.os.Build.VERSION.SDK_INT > android.os.Build.VERSION_CODES.TIRAMISU) {
             CredentialManager.create(context).clearCredentialState(ClearCredentialStateRequest())
         } else {

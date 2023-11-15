@@ -262,7 +262,7 @@ internal class AuthImpl(
         api.get("reauthenticate")
     }
 
-    override suspend fun logout(scope: LogoutScope) {
+    override suspend fun signOut(scope: SignOutScope) {
         if (currentSessionOrNull() != null) {
             api.post("logout") {
                 parameter("scope", scope.name.lowercase())
@@ -271,7 +271,7 @@ internal class AuthImpl(
         } else {
             Logger.i { "Skipping session logout as there is no session available. Proceeding to clean up local data..." }
         }
-        if (scope != LogoutScope.OTHERS) {
+        if (scope != SignOutScope.OTHERS) {
             clearSession()
         }
         Logger.d { "Successfully logged out" }
