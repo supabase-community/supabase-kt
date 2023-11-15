@@ -301,6 +301,7 @@ sealed interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
      * @throws HttpRequestException on network related issues
      * @see SignOutScope
      */
+    @Deprecated("Use signOut instead", ReplaceWith("signOut(scope)", "io.github.jan.supabase.gotrue.SignOutScope"), DeprecationLevel.WARNING)
     suspend fun logout(scope: SignOutScope = SignOutScope.LOCAL) = signOut(scope)
 
     /**
