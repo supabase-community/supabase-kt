@@ -30,7 +30,7 @@ import io.github.jan.supabase.plugins.SupabasePluginProvider
  *
  * then on you screen call
  *  ```kotlin
- *  val action = auth.rememberLoginWithGoogle(
+ *  val action = auth.rememberSignInWithGoogle(
  *     onResult = {
  *        // returns NativeSignInResult
  *     },
@@ -94,7 +94,7 @@ internal class ComposeAuthImpl(
     override val supabaseClient: SupabaseClient,
 ) : ComposeAuth
 
-internal suspend fun ComposeAuth.loginWithGoogle(idToken: String) {
+internal suspend fun ComposeAuth.signInWithGoogle(idToken: String) {
     val config = config.loginConfig["google"] as? GoogleLoginConfig
 
     supabaseClient.auth.signInWith(IDToken) {
@@ -105,7 +105,7 @@ internal suspend fun ComposeAuth.loginWithGoogle(idToken: String) {
     }
 }
 
-internal suspend fun ComposeAuth.loginWithApple(idToken: String) {
+internal suspend fun ComposeAuth.signInWithApple(idToken: String) {
     val config = config.loginConfig["apple"] as? GoogleLoginConfig
 
     supabaseClient.auth.signInWith(IDToken) {

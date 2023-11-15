@@ -6,7 +6,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import io.github.jan.supabase.compose.auth.AppleLoginConfig
 import io.github.jan.supabase.compose.auth.ComposeAuth
-import io.github.jan.supabase.compose.auth.loginWithApple
+import io.github.jan.supabase.compose.auth.signInWithApple
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import platform.AuthenticationServices.ASAuthorization
@@ -30,7 +30,7 @@ import platform.darwin.NSObject
  * Composable for Apple login with native behavior
  */
 @Composable
-actual fun ComposeAuth.rememberLoginWithApple(
+actual fun ComposeAuth.rememberSignInWithApple(
     onResult: (NativeSignInResult) -> Unit,
     fallback: suspend () -> Unit
 ): NativeSignInState {
@@ -83,7 +83,7 @@ internal fun ComposeAuth.authorizationController(
                     NSUTF8StringEncoding
                 )?.let { idToken ->
                     scope.launch {
-                        loginWithApple(idToken)
+                        signInWithApple(idToken)
                         onResult.invoke(NativeSignInResult.Success)
                     }
                 }

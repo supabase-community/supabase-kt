@@ -14,7 +14,7 @@ sealed interface NativeSignInResult {
 
     /**
      *
-     * User canceled or clicked away
+     * User cancelled or clicked away
      *
      */
     data object ClosedByUser : NativeSignInResult
