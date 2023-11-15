@@ -1,7 +1,7 @@
 package io.github.jan.supabase.compose.auth
 
 import io.github.jan.supabase.SupabaseClient
-import io.github.jan.supabase.gotrue.LogoutScope
+import io.github.jan.supabase.gotrue.SignOutScope
 import io.github.jan.supabase.gotrue.auth
 import io.github.jan.supabase.gotrue.providers.Apple
 import io.github.jan.supabase.gotrue.providers.Google
@@ -120,6 +120,6 @@ internal suspend fun ComposeAuth.fallbackLogin(provider: IDTokenProvider) {
     supabaseClient.auth.signInWith(provider)
 }
 
-internal suspend fun ComposeAuth.signOut(scope: LogoutScope = LogoutScope.LOCAL) {
-    supabaseClient.auth.logout(scope)
+internal suspend fun ComposeAuth.signOut(scope: SignOutScope = SignOutScope.LOCAL) {
+    supabaseClient.auth.signOut(scope)
 }

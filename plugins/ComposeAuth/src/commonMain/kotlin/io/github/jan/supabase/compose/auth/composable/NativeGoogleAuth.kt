@@ -6,7 +6,7 @@ import androidx.compose.runtime.remember
 import io.github.jan.supabase.compose.auth.ComposeAuth
 import io.github.jan.supabase.compose.auth.fallbackLogin
 import io.github.jan.supabase.compose.auth.signOut
-import io.github.jan.supabase.gotrue.LogoutScope
+import io.github.jan.supabase.gotrue.SignOutScope
 import io.github.jan.supabase.gotrue.providers.Google
 
 /**
@@ -36,18 +36,18 @@ fun defaultLoginBehavior(fallback: suspend () -> Unit): NativeSignInState {
  * @return [NativeSignInState]
  */
 @Composable
-expect fun ComposeAuth.rememberSignOut(logoutScope: LogoutScope = LogoutScope.LOCAL): NativeSignInState
+expect fun ComposeAuth.rememberSignOut(signOutScope: SignOutScope = SignOutScope.LOCAL): NativeSignInState
 
 /**
  * Composable used to Sign Out from GoTrue
  */
 @Composable
-fun ComposeAuth.defaultSignOutBehavior(logoutScope: LogoutScope, nativeSignOut: suspend () -> Unit = {}): NativeSignInState {
+fun ComposeAuth.defaultSignOutBehavior(signOutScope: SignOutScope, nativeSignOut: suspend () -> Unit = {}): NativeSignInState {
     val state = remember { NativeSignInState() }
     LaunchedEffect(key1 = state.started) {
         if (state.started) {
             nativeSignOut.invoke()
-            signOut(logoutScope)
+            signOut(signOutScope)
             state.reset()
         }
     }

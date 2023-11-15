@@ -285,7 +285,7 @@ sealed interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
 
     /**
      * Logs out the current user, which means [sessionStatus] will be [SessionStatus.NotAuthenticated] and the access token will be revoked
-     * @param scope The scope of the logout.
+     * @param scope The scope of the sign-out.
      * @throws RestException or one of its subclasses if receiving an error response
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
