@@ -24,6 +24,7 @@ import io.github.jan.supabase.plugins.SupabasePluginProvider
 @Deprecated("Use the Auth plugin instead", ReplaceWith("Auth", "io.github.jan.supabase.gotrue.Auth"), DeprecationLevel.WARNING)
 interface GoTrue : Auth {
 
+    @Deprecated("Use the Auth plugin instead", ReplaceWith("Auth", "io.github.jan.supabase.gotrue.Auth"), DeprecationLevel.WARNING)
     companion object : SupabasePluginProvider<AuthConfig, GoTrue> {
 
         override val key = "auth"
