@@ -22,6 +22,7 @@ import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.google.android.libraries.identity.googleid.GoogleIdTokenParsingException
 import io.github.jan.supabase.compose.auth.ComposeAuth
 import io.github.jan.supabase.compose.auth.GoogleLoginConfig
+import io.github.jan.supabase.compose.auth.defaultSignOutBehavior
 import io.github.jan.supabase.compose.auth.getActivity
 import io.github.jan.supabase.compose.auth.getGoogleIDOptions
 import io.github.jan.supabase.compose.auth.getSignInRequest
