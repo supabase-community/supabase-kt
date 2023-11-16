@@ -73,7 +73,7 @@ To learn how you can use this plugin in your compose project, visit [Compose Mul
 The composable can be accessed trough `composeAuth` property from `supabase`
 
 ```kotlin
-val action = supabase.composeAuth.rememberLoginWithGoogle(
+val action = supabase.composeAuth.rememberSignInWithGoogle(
     onResult = { result -> //optional error handling
         when (result) {
             is NativeSignInResult.Success -> {}

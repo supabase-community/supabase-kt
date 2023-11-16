@@ -27,7 +27,13 @@ import platform.UIKit.UIWindowScene
 import platform.darwin.NSObject
 
 /**
- * Composable for Apple login with native behavior
+ * Composable function that implements Native Apple Auth.
+ *
+ * On unsupported platforms it will use the [fallback]
+ *
+ * @param onResult Callback for the result of the login
+ * @param fallback Fallback function for unsupported platforms
+ * @return [NativeSignInState]
  */
 @Composable
 actual fun ComposeAuth.rememberSignInWithApple(

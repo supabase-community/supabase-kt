@@ -8,7 +8,7 @@ import io.github.jan.supabase.compose.auth.composable.NativeSignInState
 import io.github.jan.supabase.gotrue.SignOutScope
 
 /**
- * Composable used to Sign Out from GoTrue
+ * Composable used to sign out from Auth
  */
 @Composable
 @SupabaseInternal
@@ -25,7 +25,7 @@ fun ComposeAuth.defaultSignOutBehavior(signOutScope: SignOutScope, nativeSignOut
 }
 
 /**
- * Composable of default behavior if Native Login is not supported on the platform
+ * Composable of default behavior if Native Auth is not supported on the platform
  */
 @Composable
 @SupabaseInternal

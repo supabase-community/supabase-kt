@@ -11,9 +11,8 @@ import io.github.jan.supabase.plugins.SupabasePlugin
 import io.github.jan.supabase.plugins.SupabasePluginProvider
 
 /**
- * Plugin that extends [GoTrue] Module with composable function that enables
- * easy implementation of Native Login.
- * Currently supported Google Login (Android) and Apple Login (iOS), other compose-supported targets rely on GoTrue login.
+ * Plugin that extends the [Auth] Module with composable function that enables an easy implementation of Native Auth.
+ * Currently supported Google Login (Android with OneTap or CM on Android 14+) and Apple Login (iOS), other compose-supported targets rely on GoTrue login.
  *
  * To use it, install GoTrue and ComposeAuth
  * ```kotlin
@@ -51,7 +50,7 @@ import io.github.jan.supabase.plugins.SupabasePluginProvider
 sealed interface ComposeAuth : SupabasePlugin {
 
     /**
-     * Returns native login configurations
+     * Returns Native Auth configurations
      */
     val config: Config
 
@@ -84,7 +83,7 @@ sealed interface ComposeAuth : SupabasePlugin {
 }
 
 /**
- * Composable plugin that handles native login using GoTrue
+ * Composable plugin that handles Native Auth on supported platforms
  */
 val SupabaseClient.composeAuth: ComposeAuth
     get() = pluginManager.getPlugin(ComposeAuth)
