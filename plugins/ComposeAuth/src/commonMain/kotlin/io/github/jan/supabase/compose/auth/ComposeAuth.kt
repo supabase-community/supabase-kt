@@ -11,9 +11,8 @@ import io.github.jan.supabase.plugins.SupabasePlugin
 import io.github.jan.supabase.plugins.SupabasePluginProvider
 
 /**
- * Plugin that extends [GoTrue] Module with composable function that enables
- * easy implementation of Native Login.
- * Currently supported Google Login (Android) and Apple Login (iOS), other compose-supported targets rely on GoTrue login.
+ * Plugin that extends the [Auth] Module with composable function that enables an easy implementation of Native Auth.
+ * Currently supported Google Login (Android with OneTap or CM on Android 14+) and Apple Login (iOS), other compose-supported targets rely on GoTrue login.
  *
  * To use it, install GoTrue and ComposeAuth
  * ```kotlin
@@ -30,7 +29,7 @@ import io.github.jan.supabase.plugins.SupabasePluginProvider
  *
  * then on you screen call
  *  ```kotlin
- *  val action = auth.rememberLoginWithGoogle(
+ *  val action = auth.rememberSignInWithGoogle(
  *     onResult = {
  *        // returns NativeSignInResult
  *     },
@@ -51,7 +50,7 @@ import io.github.jan.supabase.plugins.SupabasePluginProvider
 sealed interface ComposeAuth : SupabasePlugin {
 
     /**
-     * Returns native login configurations
+     * Returns Native Auth configurations
      */
     val config: Config
 
@@ -84,7 +83,7 @@ sealed interface ComposeAuth : SupabasePlugin {
 }
 
 /**
- * Composable plugin that handles native login using GoTrue
+ * Composable plugin that handles Native Auth on supported platforms
  */
 val SupabaseClient.composeAuth: ComposeAuth
     get() = pluginManager.getPlugin(ComposeAuth)
@@ -94,7 +93,7 @@ internal class ComposeAuthImpl(
     override val supabaseClient: SupabaseClient,
 ) : ComposeAuth
 
-internal suspend fun ComposeAuth.loginWithGoogle(idToken: String) {
+internal suspend fun ComposeAuth.signInWithGoogle(idToken: String) {
     val config = config.loginConfig["google"] as? GoogleLoginConfig
 
     supabaseClient.auth.signInWith(IDToken) {
@@ -105,7 +104,7 @@ internal suspend fun ComposeAuth.loginWithGoogle(idToken: String) {
     }
 }
 
-internal suspend fun ComposeAuth.loginWithApple(idToken: String) {
+internal suspend fun ComposeAuth.signInWithApple(idToken: String) {
     val config = config.loginConfig["apple"] as? GoogleLoginConfig
 
     supabaseClient.auth.signInWith(IDToken) {
