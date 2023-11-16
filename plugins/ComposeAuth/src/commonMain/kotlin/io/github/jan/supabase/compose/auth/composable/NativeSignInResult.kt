@@ -17,11 +17,13 @@ sealed interface NativeSignInResult {
 
     /**
      * Network error occurred
+     * @property message The error message
      */
     data class NetworkError(val message: String) : NativeSignInResult
 
     /**
      * Error occurred
+     * @property message The error message
      */
     data class Error(val message: String) : NativeSignInResult
 }
