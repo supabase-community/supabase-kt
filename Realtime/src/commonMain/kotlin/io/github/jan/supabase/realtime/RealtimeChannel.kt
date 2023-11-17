@@ -39,6 +39,7 @@ sealed interface RealtimeChannel {
      * Joins the channel
      * @param blockUntilJoined if true, the method will block until the [status] is [Status.JOINED]
      */
+    @Deprecated("Use subscribe instead", ReplaceWith("subscribe(blockUntilJoined)"))
     suspend fun join(blockUntilJoined: Boolean = false) = subscribe(blockUntilJoined)
 
     /**
