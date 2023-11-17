@@ -55,7 +55,13 @@ sealed interface RealtimeChannel {
     /**
      * Leaves the channel
      */
-    suspend fun leave()
+    @Deprecated("Use unsubscribe instead", ReplaceWith("unsubscribe()"))
+    suspend fun leave() = unsubscribe()
+
+    /**
+     * Unsubscribes from the channel
+     */
+    suspend fun unsubscribe()
 
     /**
      * Sends a message to everyone who joined the channel. Can be used even if you aren't connected to the channel.
@@ -83,10 +89,10 @@ sealed interface RealtimeChannel {
      * Represents the status of a channel
      */
     enum class Status {
-        CLOSED,
-        JOINING,
-        JOINED,
-        LEAVING,
+        UNSUBSCRIBED,
+        SUBSCRIBING,
+        SUBSCRIBED,
+        UNSUBSCRIBING,
     }
 
     @Suppress("UndocumentedPublicProperty")
@@ -147,7 +153,7 @@ fun RealtimeChannel.presenceChangeFlow(): Flow<PresenceAction> {
  */
 @OptIn(SupabaseInternal::class)
 inline fun <reified T : PostgresAction> RealtimeChannel.postgresChangeFlow(schema: String, filter: PostgresChangeFilter.() -> Unit = {}): Flow<T> {
-    if(status.value == RealtimeChannel.Status.JOINED) error("You cannot call postgresChangeFlow after joining the channel")
+    if(status.value == RealtimeChannel.Status.SUBSCRIBED) error("You cannot call postgresChangeFlow after joining the channel")
     val event = when(T::class) {
         PostgresAction.Insert::class -> "INSERT"
         PostgresAction.Update::class -> "UPDATE"
