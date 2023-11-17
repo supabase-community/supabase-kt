@@ -39,7 +39,13 @@ sealed interface RealtimeChannel {
      * Joins the channel
      * @param blockUntilJoined if true, the method will block until the [status] is [Status.JOINED]
      */
-    suspend fun join(blockUntilJoined: Boolean = false)
+    suspend fun join(blockUntilJoined: Boolean = false) = subscribe(blockUntilJoined)
+
+    /**
+     * Subscribes to the channel
+     * @param blockUntilSubscribed if true, the method will block the coroutine until the [status] is [Status.JOINED]
+     */
+    suspend fun subscribe(blockUntilSubscribed: Boolean = false)
 
     /**
      * Updates the JWT token for this client

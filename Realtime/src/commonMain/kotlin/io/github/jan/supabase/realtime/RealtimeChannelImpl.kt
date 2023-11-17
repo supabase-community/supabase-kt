@@ -49,9 +49,10 @@ internal class RealtimeChannelImpl(
     private val httpClient = realtimeImpl.supabaseClient.httpClient
 
     @OptIn(SupabaseInternal::class)
-    override suspend fun join(blockUntilJoined: Boolean) {
+    override suspend fun subscribe(blockUntilSubscribed: Boolean) {
         if(realtimeImpl.status.value != Realtime.Status.CONNECTED) {
-            error("Not connected to the realtime websocket. Try calling `supabaseClient.realtime.connect()` before attempting to join a channel.")
+            if(!realtimeImpl.config.connectOnSubscribe) error("You can't subscribe to a channel while the realtime client is not connected. Did you forget to call `realtime.connect()`?")
+            realtimeImpl.connect()
         }
         realtimeImpl.run {
             addChannel(this@RealtimeChannelImpl)
@@ -71,7 +72,7 @@ internal class RealtimeChannelImpl(
         }
         Logger.d { "Joining realtime socket with body $joinConfigObject" }
         realtimeImpl.ws?.sendSerialized(RealtimeMessage(topic, RealtimeChannel.CHANNEL_EVENT_JOIN, joinConfigObject, null))
-        if(blockUntilJoined) {
+        if(blockUntilSubscribed) {
             status.first { it == RealtimeChannel.Status.JOINED }
         }
     }

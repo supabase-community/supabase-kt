@@ -106,6 +106,7 @@ sealed interface Realtime : MainPlugin<Realtime.Config>, CustomSerializationPlug
         override var customUrl: String? = null,
         override var jwtToken: String? = null,
         var disconnectOnSessionLoss: Boolean = true,
+        var connectOnSubscribe: Boolean = true,
     ): MainConfig, CustomSerializationConfig {
 
         override var serializer: SupabaseSerializer? = null
@@ -149,7 +150,15 @@ sealed interface Realtime : MainPlugin<Realtime.Config>, CustomSerializationPlug
 /**
  * Creates a new [RealtimeChannel]
  */
+@Deprecated("Use channel instead", ReplaceWith("channel(channelId, builder)", "io.github.jan.supabase.realtime"))
 inline fun Realtime.createChannel(channelId: String, builder: RealtimeChannelBuilder.() -> Unit = {}): RealtimeChannel {
+    return RealtimeChannelBuilder("realtime:$channelId", this as RealtimeImpl).apply(builder).build()
+}
+
+/**
+ * Creates a new [RealtimeChannel]
+ */
+inline fun Realtime.channel(channelId: String, builder: RealtimeChannelBuilder.() -> Unit = {}): RealtimeChannel {
     return RealtimeChannelBuilder("realtime:$channelId", this as RealtimeImpl).apply(builder).build()
 }
 
@@ -158,3 +167,8 @@ inline fun Realtime.createChannel(channelId: String, builder: RealtimeChannelBui
  */
 val SupabaseClient.realtime: Realtime
     get() = pluginManager.getPlugin(Realtime)
+
+/**
+ * Creates a new [RealtimeChannel]
+ */
+inline fun SupabaseClient.channel(channelId: String, builder: RealtimeChannelBuilder.() -> Unit = {}): RealtimeChannel = realtime.channel(channelId, builder)
