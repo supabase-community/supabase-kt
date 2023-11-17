@@ -196,7 +196,6 @@ sealed interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
-    @Deprecated("Use signInWith(OTP) instead", level = DeprecationLevel.WARNING)
     suspend fun <C, R, Provider : DefaultAuthProvider<C, R>> sendOtpTo(
         provider: Provider,
         createUser: Boolean = false,

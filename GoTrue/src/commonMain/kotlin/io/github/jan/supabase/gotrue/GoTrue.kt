@@ -1,4 +1,3 @@
-@file:Suppress("DEPRECATION")
 package io.github.jan.supabase.gotrue
 
 import io.github.jan.supabase.SupabaseClient
