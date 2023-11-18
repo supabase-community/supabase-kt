@@ -10,9 +10,6 @@ import kotlinx.serialization.Serializable
  *
  * Check the [docs](https://supabase.com/docs/guides/auth/sso/auth-sso-saml) for more information.
  *
- * Create a new instance with [withDomain] or [withProvider].
- *
- * @param config The config for the SSO provider
  */
 data object SSO: AuthProvider<SSO.Config, Unit> {
 
