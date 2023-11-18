@@ -99,3 +99,16 @@ sealed interface Postgrest : MainPlugin<Postgrest.Config>, CustomSerializationPl
  */
 val SupabaseClient.postgrest: Postgrest
     get() = pluginManager.getPlugin(Postgrest)
+
+/**
+ * Creates a new [PostgrestBuilder] for the given table
+ * @param table The table to use for the requests
+ */
+fun SupabaseClient.from(table: String): PostgrestBuilder = pluginManager.getPlugin(Postgrest).from(table)
+
+/**
+ * Creates a new [PostgrestBuilder] for the given schema and table
+ * @param schema The schema to use for the requests
+ * @param table The table to use for the requests
+ */
+fun SupabaseClient.from(schema: String, table: String): PostgrestBuilder = pluginManager.getPlugin(Postgrest).from(schema, table)
