@@ -7,13 +7,13 @@ import io.github.jan.supabase.gotrue.deepLink
 import io.github.jan.supabase.gotrue.openUrl
 import io.github.jan.supabase.gotrue.user.UserSession
 
-internal actual suspend fun <Config : SSO.Config> SSO<Config>.loginWithSSO(
+internal actual suspend fun SSO.loginWithSSO(
     supabaseClient: SupabaseClient,
     onSuccess: suspend (UserSession) -> Unit,
     redirectUrl: String?,
-    config: (Config.() -> Unit)?
+    config: (SSO.Config.() -> Unit)?
 ) {
     val gotrueConfig = supabaseClient.auth.config
-    val result = supabaseClient.auth.retrieveSSOUrl(this, redirectUrl ?: gotrueConfig.deepLink, config)
+    val result = supabaseClient.auth.retrieveSSOUrl(redirectUrl ?: gotrueConfig.deepLink) { config?.invoke(this) }
     openUrl(Uri.parse(result.url), gotrueConfig.defaultExternalAuthAction)
 }

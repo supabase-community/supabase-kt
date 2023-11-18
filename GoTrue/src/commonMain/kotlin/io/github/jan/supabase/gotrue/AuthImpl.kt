@@ -112,12 +112,20 @@ internal class AuthImpl(
         importSession(it)
     }, redirectUrl, config)
 
-    override suspend fun <Config : SSO.Config> retrieveSSOUrl(
-        type: SSO<Config>,
+    override suspend fun retrieveSSOUrl(
         redirectUrl: String?,
-        config: (Config.() -> Unit)?
+        config: SSO.Config.() -> Unit
     ): SSO.Result {
-        val createdConfig = type.config.apply { config?.invoke(this) }
+        val createdConfig = SSO.Config().apply(config)
+
+        require((createdConfig.domain != null && createdConfig.domain!!.isNotBlank()) || (createdConfig.providerId != null && createdConfig.providerId!!.isNotBlank())) {
+            "Either domain or providerId must be set"
+        }
+
+        require(createdConfig.domain == null || createdConfig.providerId == null) {
+            "Either domain or providerId must be set, not both"
+        }
+
         var codeChallenge: String? = null
         if (this.config.flowType == FlowType.PKCE) {
             val codeVerifier = generateCodeVerifier()
@@ -135,9 +143,11 @@ internal class AuthImpl(
                 put("code_challenge", it)
                 put("code_challenge_method", "s256")
             }
-            when (createdConfig) {
-                is SSO.Config.Domain -> put("domain", createdConfig.domain)
-                is SSO.Config.Provider -> put("provider_id", createdConfig.providerId)
+            createdConfig?.domain.let {
+                put("domain", it)
+            }
+            createdConfig?.providerId.let {
+                put("provider_id", it)
             }
         }).body()
     }
