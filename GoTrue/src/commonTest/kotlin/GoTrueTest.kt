@@ -226,7 +226,7 @@ class GoTrueTest {
         val client = createSupabaseClient()
         runTest(dispatcher) {
             client.auth.sendOtpTo(Phone) {
-                phoneNumber = "12345678"
+                phone = "12345678"
             }
             client.close()
         }

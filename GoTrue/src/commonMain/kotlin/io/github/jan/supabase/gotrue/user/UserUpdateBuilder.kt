@@ -16,7 +16,7 @@ import kotlinx.serialization.json.jsonObject
  * A builder for updating a user.
  * @param email The user's new email address
  * @param password The user's new password
- * @param phoneNumber The user's new phone number
+ * @param phone The user's new phone number
  * @param nonce The nonce sent for reauthentication if the user's password is to be updated. Call [Auth.reauthenticate] to send the nonce to the user's email.
  * @param data Extra user metadata
  */
@@ -25,7 +25,7 @@ data class UserUpdateBuilder(
     var email: String? = null,
     var password: String? = null,
     @SerialName("phone")
-    var phoneNumber: String? = null,
+    var phone: String? = null,
     var nonce: String? = null,
     var data: JsonObject? = null,
     @Transient @PublishedApi internal var serializer: SupabaseSerializer = KotlinXSerializer()
