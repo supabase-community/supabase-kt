@@ -158,11 +158,10 @@ sealed interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
 
     /**
      * Retrieves the sso url for the specified [type]
-     * @param type The type of sso to retrieve e.g. [SSO.withDomain] or [SSO.withProvider]
      * @param redirectUrl The redirect url to use
      * @param config The configuration to use
      */
-    suspend fun <Config: SSO.Config> retrieveSSOUrl(type: SSO<Config>, redirectUrl: String? = null, config: (Config.() -> Unit)? = null): SSO.Result
+    suspend fun retrieveSSOUrl(redirectUrl: String? = null, config: SSO.Config.() -> Unit): SSO.Result
 
     /**
      * Modifies the current user

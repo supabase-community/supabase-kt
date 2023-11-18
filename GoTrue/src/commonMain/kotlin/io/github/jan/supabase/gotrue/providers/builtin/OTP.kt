@@ -61,7 +61,10 @@ data object OTP: AuthProvider<OTP.Config, Unit> {
         config: (Config.() -> Unit)?
     ) {
         val otpConfig = Config(supabaseClient.auth.serializer).apply(config ?: {})
+
         require((otpConfig.email != null && otpConfig.email!!.isNotBlank()) || (otpConfig.phone != null && otpConfig.phone!!.isNotBlank())) { "You need to provide either an email or a phone number" }
+        require(!(otpConfig.email != null && otpConfig.phone != null)) { "You can only provide either an email or a phone number" }
+
         val finalRedirectUrl = supabaseClient.auth.generateRedirectUrl(redirectUrl)
         val body = buildJsonObject {
             put("create_user", otpConfig.createUser)

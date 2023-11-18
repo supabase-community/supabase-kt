@@ -8,16 +8,16 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-internal actual suspend fun <Config : SSO.Config> SSO<Config>.loginWithSSO(
+internal actual suspend fun SSO.loginWithSSO(
     supabaseClient: SupabaseClient,
     onSuccess: suspend (UserSession) -> Unit,
     redirectUrl: String?,
-    config: (Config.() -> Unit)?
+    config: (SSO.Config.() -> Unit)?
 ) {
     withContext(Dispatchers.IO) {
         launch {
             createServer({
-                val result = supabaseClient.auth.retrieveSSOUrl(this@loginWithSSO, redirectUrl ?: it, config)
+                val result = supabaseClient.auth.retrieveSSOUrl(redirectUrl ?: it) { config?.invoke(this) }
                 result.url
             }, supabaseClient.auth, onSuccess)
         }

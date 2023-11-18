@@ -5,12 +5,12 @@ import io.github.jan.supabase.gotrue.auth
 import io.github.jan.supabase.gotrue.user.UserSession
 import platform.posix.system
 
-internal actual suspend fun <Config : SSO.Config> SSO<Config>.loginWithSSO(
+internal actual suspend fun SSO.loginWithSSO(
     supabaseClient: SupabaseClient,
     onSuccess: suspend (UserSession) -> Unit,
     redirectUrl: String?,
-    config: (Config.() -> Unit)?
+    config: (SSO.Config.() -> Unit)?
 ) {
-    val result = supabaseClient.auth.retrieveSSOUrl(this@loginWithSSO, redirectUrl, config)
+    val result = supabaseClient.auth.retrieveSSOUrl(redirectUrl) { config?.invoke(this) }
     system("xdg-open ${result.url}")
 }
