@@ -259,12 +259,12 @@ sealed interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
      * Verifies a phone/sms otp
      * @param type The type of the verification
      * @param token The otp to verify
-     * @param phoneNumber The phone number the token was sent to
+     * @param phone The phone number the token was sent to
      * @throws RestException or one of its subclasses if receiving an error response
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
-    suspend fun verifyPhoneOtp(type: OtpType.Phone, phoneNumber: String, token: String, captchaToken: String? = null)
+    suspend fun verifyPhoneOtp(type: OtpType.Phone, phone: String, token: String, captchaToken: String? = null)
 
     /**
      * Retrieves the user attached to the specified [jwt]

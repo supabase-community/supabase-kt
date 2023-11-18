@@ -319,11 +319,11 @@ internal class AuthImpl(
 
     override suspend fun verifyPhoneOtp(
         type: OtpType.Phone,
-        phoneNumber: String,
+        phone: String,
         token: String,
         captchaToken: String?
     ) = verify(type.type, token, captchaToken) {
-        put("phone", phoneNumber)
+        put("phone", phone)
     }
 
     override suspend fun retrieveUser(jwt: String): UserInfo {
