@@ -164,7 +164,7 @@ internal class RealtimeImpl(override val supabaseClient: SupabaseClient, overrid
 
     private fun updateJwt(jwt: String) {
         scope.launch {
-            subscriptions.values.filter { it.status.value == RealtimeChannel.Status.JOINED }.forEach { it.updateAuth(jwt) }
+            subscriptions.values.filter { it.status.value == RealtimeChannel.Status.SUBSCRIBED }.forEach { it.updateAuth(jwt) }
         }
     }
 
@@ -185,17 +185,22 @@ internal class RealtimeImpl(override val supabaseClient: SupabaseClient, overrid
     }
 
     override suspend fun removeChannel(channel: RealtimeChannel) {
-        channel.leave()
+        if(channel.status.value == RealtimeChannel.Status.SUBSCRIBED) {
+            channel.unsubscribe()
+        }
         _subscriptions.remove(channel.topic)
     }
 
+    @SupabaseInternal
     override fun RealtimeChannel.deleteChannel(channel: RealtimeChannel) {
         _subscriptions.remove(channel.topic)
     }
 
     override suspend fun removeAllChannels() {
         _subscriptions.forEach { (_, it) ->
-            it.leave()
+            if(it.status.value == RealtimeChannel.Status.SUBSCRIBED) {
+                it.unsubscribe()
+            }
         }
         _subscriptions.clear()
     }

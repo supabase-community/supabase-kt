@@ -39,7 +39,7 @@ internal class RealtimeChannelImpl(
     private val clientChanges = AtomicMutableList<PostgresJoinConfig>()
     @SupabaseInternal
     override val callbackManager = CallbackManagerImpl(realtimeImpl)
-    private val _status = MutableStateFlow(RealtimeChannel.Status.CLOSED)
+    private val _status = MutableStateFlow(RealtimeChannel.Status.UNSUBSCRIBED)
     override val status = _status.asStateFlow()
 
     override val supabaseClient = realtimeImpl.supabaseClient
@@ -49,15 +49,16 @@ internal class RealtimeChannelImpl(
     private val httpClient = realtimeImpl.supabaseClient.httpClient
 
     @OptIn(SupabaseInternal::class)
-    override suspend fun join(blockUntilJoined: Boolean) {
+    override suspend fun subscribe(blockUntilSubscribed: Boolean) {
         if(realtimeImpl.status.value != Realtime.Status.CONNECTED) {
-            error("Not connected to the realtime websocket. Try calling `supabaseClient.realtime.connect()` before attempting to join a channel.")
+            if(!realtimeImpl.config.connectOnSubscribe) error("You can't subscribe to a channel while the realtime client is not connected. Did you forget to call `realtime.connect()`?")
+            realtimeImpl.connect()
         }
         realtimeImpl.run {
             addChannel(this@RealtimeChannelImpl)
         }
-        _status.value = RealtimeChannel.Status.JOINING
-        Logger.d { "Joining channel $topic" }
+        _status.value = RealtimeChannel.Status.SUBSCRIBING
+        Logger.d { "Subscribing to channel $topic" }
         val currentJwt = realtimeImpl.config.jwtToken ?: supabaseClient.pluginManager.getPluginOrNull(Auth)?.currentSessionOrNull()?.let {
             if(it.expiresAt > Clock.System.now()) it.accessToken else null
         }
@@ -69,10 +70,10 @@ internal class RealtimeChannelImpl(
                 put("access_token", currentJwt)
             }
         }
-        Logger.d { "Joining realtime socket with body $joinConfigObject" }
+        Logger.d { "Subscribing to channel with body $joinConfigObject" }
         realtimeImpl.ws?.sendSerialized(RealtimeMessage(topic, RealtimeChannel.CHANNEL_EVENT_JOIN, joinConfigObject, null))
-        if(blockUntilJoined) {
-            status.first { it == RealtimeChannel.Status.JOINED }
+        if(blockUntilSubscribed) {
+            status.first { it == RealtimeChannel.Status.SUBSCRIBED }
         }
     }
 
@@ -87,15 +88,15 @@ internal class RealtimeChannelImpl(
                 Logger.w { "Received token expired event. This should not happen, please report this warning." }
             }
             RealtimeMessage.EventType.SYSTEM -> {
-                Logger.d { "Joined channel ${message.topic}" }
-                _status.value = RealtimeChannel.Status.JOINED
+                Logger.d { "Subscribed to channel ${message.topic}" }
+                _status.value = RealtimeChannel.Status.SUBSCRIBED
             }
             RealtimeMessage.EventType.POSTGRES_SERVER_CHANGES -> { //check if the server postgres_changes match with the client's and add the given id to the postgres change objects (to identify them later in the events)
                 val serverPostgresChanges = message.payload["response"]?.jsonObject?.get("postgres_changes")?.jsonArray?.let { Json.decodeFromJsonElement<List<PostgresJoinConfig>>(it) } ?: listOf() //server postgres changes
                 callbackManager.setServerChanges(serverPostgresChanges)
-                if(status.value != RealtimeChannel.Status.JOINED) {
+                if(status.value != RealtimeChannel.Status.SUBSCRIBED) {
                     Logger.d { "Joined channel ${message.topic}" }
-                    _status.value = RealtimeChannel.Status.JOINED
+                    _status.value = RealtimeChannel.Status.SUBSCRIBED
                 }
             }
             RealtimeMessage.EventType.POSTGRES_CHANGES -> {
@@ -119,7 +120,7 @@ internal class RealtimeChannelImpl(
                 realtimeImpl.run {
                     deleteChannel(this@RealtimeChannelImpl)
                 }
-                Logger.d { "Left channel ${message.topic}" }
+                Logger.d { "Unsubscribed from channel ${message.topic}" }
             }
             RealtimeMessage.EventType.ERROR -> {
                 Logger.e { "Received an error in channel ${message.topic}. That could be as a result of an invalid access token" }
@@ -136,9 +137,9 @@ internal class RealtimeChannelImpl(
         }
     }
 
-    override suspend fun leave() {
-        _status.value = RealtimeChannel.Status.LEAVING
-        Logger.d { "Leaving channel $topic" }
+    override suspend fun unsubscribe() {
+        _status.value = RealtimeChannel.Status.UNSUBSCRIBING
+        Logger.d { "Unsubscribing from channel $topic" }
         realtimeImpl.ws?.sendSerialized(RealtimeMessage(topic, RealtimeChannel.CHANNEL_EVENT_LEAVE, buildJsonObject {}, null))
     }
 
@@ -150,7 +151,7 @@ internal class RealtimeChannelImpl(
     }
 
     override suspend fun broadcast(event: String, message: JsonObject) {
-        if(status.value != RealtimeChannel.Status.JOINED) {
+        if(status.value != RealtimeChannel.Status.SUBSCRIBED) {
             val response = httpClient.postJson(
                 url = broadcastUrl,
                 body = BroadcastApiBody(listOf(BroadcastApiMessage(subTopic, event, message)))
@@ -178,8 +179,8 @@ internal class RealtimeChannelImpl(
     }
 
     override suspend fun track(state: JsonObject) {
-        if(status.value != RealtimeChannel.Status.JOINED) {
-            error("You can only track your presence after joining the channel. Did you forget to call `channel.join()`?")
+        if(status.value != RealtimeChannel.Status.SUBSCRIBED) {
+            error("You can only track your presence after subscribing to the channel. Did you forget to call `channel.subscribe()`?")
         }
         val payload = buildJsonObject {
             put("type", "presence")

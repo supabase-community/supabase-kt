@@ -96,6 +96,7 @@ sealed interface Realtime : MainPlugin<Realtime.Config>, CustomSerializationPlug
      * @property disconnectOnSessionLoss Whether to disconnect from the websocket when the session is lost. Defaults to true
      * @property reconnectDelay The delay between reconnect attempts. Defaults to 7 seconds
      * @property heartbeatInterval The interval between heartbeat messages. Defaults to 15 seconds
+     * @property connectOnSubscribe Whether to connect to the websocket when subscribing to a channel. Defaults to true
      * @property serializer A serializer used for serializing/deserializing objects e.g. in [PresenceAction.decodeJoinsAs] or [RealtimeChannel.broadcast]. Defaults to [KotlinXSerializer]
      */
     data class Config(
@@ -106,6 +107,7 @@ sealed interface Realtime : MainPlugin<Realtime.Config>, CustomSerializationPlug
         override var customUrl: String? = null,
         override var jwtToken: String? = null,
         var disconnectOnSessionLoss: Boolean = true,
+        var connectOnSubscribe: Boolean = true,
     ): MainConfig, CustomSerializationConfig {
 
         override var serializer: SupabaseSerializer? = null
@@ -149,7 +151,15 @@ sealed interface Realtime : MainPlugin<Realtime.Config>, CustomSerializationPlug
 /**
  * Creates a new [RealtimeChannel]
  */
+@Deprecated("Use channel instead", ReplaceWith("channel(channelId, builder)", "io.github.jan.supabase.realtime"))
 inline fun Realtime.createChannel(channelId: String, builder: RealtimeChannelBuilder.() -> Unit = {}): RealtimeChannel {
+    return RealtimeChannelBuilder("realtime:$channelId", this as RealtimeImpl).apply(builder).build()
+}
+
+/**
+ * Creates a new [RealtimeChannel]
+ */
+inline fun Realtime.channel(channelId: String, builder: RealtimeChannelBuilder.() -> Unit = {}): RealtimeChannel {
     return RealtimeChannelBuilder("realtime:$channelId", this as RealtimeImpl).apply(builder).build()
 }
 
@@ -158,3 +168,8 @@ inline fun Realtime.createChannel(channelId: String, builder: RealtimeChannelBui
  */
 val SupabaseClient.realtime: Realtime
     get() = pluginManager.getPlugin(Realtime)
+
+/**
+ * Creates a new [RealtimeChannel]
+ */
+inline fun SupabaseClient.channel(channelId: String, builder: RealtimeChannelBuilder.() -> Unit = {}): RealtimeChannel = realtime.channel(channelId, builder)
