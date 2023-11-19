@@ -16,7 +16,6 @@ import io.github.jan.supabase.gotrue.mfa.MfaApiImpl
 import io.github.jan.supabase.gotrue.providers.AuthProvider
 import io.github.jan.supabase.gotrue.providers.ExternalAuthConfigDefaults
 import io.github.jan.supabase.gotrue.providers.OAuthProvider
-import io.github.jan.supabase.gotrue.providers.builtin.DefaultAuthProvider
 import io.github.jan.supabase.gotrue.providers.builtin.SSO
 import io.github.jan.supabase.gotrue.user.UserInfo
 import io.github.jan.supabase.gotrue.user.UserSession
@@ -38,7 +37,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
-import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonObjectBuilder
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.encodeToJsonElement
@@ -184,39 +182,6 @@ internal class AuthImpl(
             _sessionStatus.value = SessionStatus.Authenticated(newSession)
         }
         return userInfo
-    }
-
-    @OptIn(SupabaseExperimental::class)
-    override suspend fun <C, R, Provider : DefaultAuthProvider<C, R>> sendOtpTo(
-        provider: Provider,
-        createUser: Boolean,
-        redirectUrl: String?,
-        data: JsonObject?,
-        config: C.() -> Unit
-    ) {
-        val finalRedirectUrl = generateRedirectUrl(redirectUrl)
-        val body = buildJsonObject {
-            putJsonObject(provider.encodeCredentials(config))
-            put("create_user", createUser)
-            data?.let {
-                put("data", it)
-            }
-        }
-        var codeChallenge: String? = null
-        if (this.config.flowType == FlowType.PKCE) {
-            val codeVerifier = generateCodeVerifier()
-            codeVerifierCache.saveCodeVerifier(codeVerifier)
-            codeChallenge = generateCodeChallenge(codeVerifier)
-        }
-        api.postJson("otp", buildJsonObject {
-            putJsonObject(body)
-            codeChallenge?.let {
-                put("code_challenge", it)
-                put("code_challenge_method", "s256")
-            }
-        }) {
-            finalRedirectUrl?.let { url.parameters.append("redirect_to", it) }
-        }
     }
 
     suspend fun resend(type: String, body: JsonObjectBuilder.() -> Unit) {
@@ -417,7 +382,7 @@ internal class AuthImpl(
         try {
             importRefreshedSession()
         } catch (e: RestException) {
-            logout()
+            signOut()
             Logger.e(e) { "Couldn't refresh session. The refresh token may have been revoked." }
         } catch (e: Exception) {
             Logger.e(e) { "Couldn't reach supabase. Either the address doesn't exist or the network might not be on. Retrying in ${config.retryDelay}" }
