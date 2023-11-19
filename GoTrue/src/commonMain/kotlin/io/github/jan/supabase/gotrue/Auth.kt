@@ -226,7 +226,7 @@ sealed interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
     suspend fun retrieveUserForCurrentSession(updateSession: Boolean = false): UserInfo
 
     /**
-     * Logs out the current user, which means [sessionStatus] will be [SessionStatus.NotAuthenticated] and the access token will be revoked
+     * Signs out the current user, which means [sessionStatus] will be [SessionStatus.NotAuthenticated] and the access token will be revoked
      * @param scope The scope of the sign-out.
      * @throws RestException or one of its subclasses if receiving an error response
      * @throws HttpRequestTimeoutException if the request timed out
@@ -249,7 +249,7 @@ sealed interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
     suspend fun importAuthToken(accessToken: String, refreshToken: String = "", retrieveUser: Boolean = false, autoRefresh: Boolean = if(refreshToken.isNotBlank()) config.alwaysAutoRefresh else false) = importSession(UserSession(accessToken, refreshToken, "", "", 0L, "", if(retrieveUser) tryToGetUser(accessToken) else null), autoRefresh)
 
     /**
-     * Retrieves the latest session from storage and starts auto-refreshing if [autoRefresh] is true or [Auth.Config.alwaysAutoRefresh] as the default parameter
+     * Retrieves the latest session from storage and starts auto-refreshing if [autoRefresh] is true or [AuthConfig.alwaysAutoRefresh] as the default parameter
      * @return true, if a session was found, false otherwise
      */
     suspend fun loadFromStorage(autoRefresh: Boolean = config.alwaysAutoRefresh): Boolean
