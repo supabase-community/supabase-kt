@@ -16,10 +16,3 @@ import io.github.jan.supabase.gotrue.providers.Apple
  */
 @Composable
 expect fun ComposeAuth.rememberSignInWithApple(onResult: (NativeSignInResult) -> Unit, fallback: suspend () -> Unit = { fallbackLogin(Apple) }) : NativeSignInState
-
-/**
- * Composable function that implements Native Auth flow for Apple sign in
- */
-@Composable
-@Deprecated("Use rememberSignInWithApple instead", ReplaceWith("rememberSignInWithApple(onResult, fallback)"), DeprecationLevel.WARNING)
-fun ComposeAuth.rememberLoginWithApple(onResult: (NativeSignInResult) -> Unit, fallback: suspend () -> Unit = { fallbackLogin(Apple) }) : NativeSignInState = rememberSignInWithApple(onResult, fallback)

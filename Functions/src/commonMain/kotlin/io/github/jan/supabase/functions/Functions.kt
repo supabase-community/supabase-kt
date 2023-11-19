@@ -2,7 +2,6 @@ package io.github.jan.supabase.functions
 
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.SupabaseSerializer
-import io.github.jan.supabase.annotations.SupabaseExperimental
 import io.github.jan.supabase.annotations.SupabaseInternal
 import io.github.jan.supabase.encode
 import io.github.jan.supabase.exceptions.BadRequestRestException
@@ -126,7 +125,6 @@ class Functions(override val config: Config, override val supabaseClient: Supaba
         override var jwtToken: String? = null,
     ) : MainConfig, CustomSerializationConfig {
 
-        @SupabaseExperimental
         override var serializer: SupabaseSerializer? = null
 
     }

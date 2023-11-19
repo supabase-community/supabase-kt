@@ -36,13 +36,6 @@ sealed interface RealtimeChannel {
     val callbackManager: CallbackManager
 
     /**
-     * Joins the channel
-     * @param blockUntilJoined if true, the method will block until the [status] is [Status.JOINED]
-     */
-    @Deprecated("Use subscribe instead", ReplaceWith("subscribe(blockUntilJoined)"))
-    suspend fun join(blockUntilJoined: Boolean = false) = subscribe(blockUntilJoined)
-
-    /**
      * Subscribes to the channel
      * @param blockUntilSubscribed if true, the method will block the coroutine until the [status] is [Status.JOINED]
      */
@@ -52,12 +45,6 @@ sealed interface RealtimeChannel {
      * Updates the JWT token for this client
      */
     suspend fun updateAuth(jwt: String)
-
-    /**
-     * Leaves the channel
-     */
-    @Deprecated("Use unsubscribe instead", ReplaceWith("unsubscribe()"))
-    suspend fun leave() = unsubscribe()
 
     /**
      * Unsubscribes from the channel

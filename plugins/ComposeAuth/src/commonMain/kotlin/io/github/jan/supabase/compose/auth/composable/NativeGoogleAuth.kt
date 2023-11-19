@@ -19,14 +19,6 @@ import io.github.jan.supabase.gotrue.providers.Google
 expect fun ComposeAuth.rememberSignInWithGoogle(onResult: (NativeSignInResult) -> Unit = {}, fallback: suspend () -> Unit = { fallbackLogin(Google) }): NativeSignInState
 
 /**
- * Composable function what implements Native Google Login flow with default fallback
- * @return [NativeSignInState]
- */
-@Composable
-@Deprecated("Use rememberSignInWithGoogle instead", ReplaceWith("rememberSignInWithGoogle(onResult, fallback)"), DeprecationLevel.WARNING)
-fun ComposeAuth.rememberLoginWithGoogle(onResult: (NativeSignInResult) -> Unit = {}, fallback: suspend () -> Unit = { fallbackLogin(Google) }): NativeSignInState = rememberSignInWithGoogle(onResult, fallback)
-
-/**
  * Composable for
  * @return [NativeSignInState]
  */

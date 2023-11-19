@@ -2,7 +2,6 @@ package io.github.jan.supabase.gotrue
 
 import co.touchlab.kermit.Logger
 import io.github.jan.supabase.SupabaseClient
-import io.github.jan.supabase.encodeToJsonElement
 import io.github.jan.supabase.exceptions.HttpRequestException
 import io.github.jan.supabase.exceptions.RestException
 import io.github.jan.supabase.gotrue.admin.AdminApi
@@ -11,7 +10,6 @@ import io.github.jan.supabase.gotrue.providers.AuthProvider
 import io.github.jan.supabase.gotrue.providers.ExternalAuthConfigDefaults
 import io.github.jan.supabase.gotrue.providers.Google
 import io.github.jan.supabase.gotrue.providers.OAuthProvider
-import io.github.jan.supabase.gotrue.providers.builtin.DefaultAuthProvider
 import io.github.jan.supabase.gotrue.providers.builtin.Email
 import io.github.jan.supabase.gotrue.providers.builtin.Phone
 import io.github.jan.supabase.gotrue.providers.builtin.SSO
@@ -23,8 +21,6 @@ import io.github.jan.supabase.plugins.MainPlugin
 import io.github.jan.supabase.plugins.SupabasePluginProvider
 import io.ktor.client.plugins.HttpRequestTimeoutException
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.serialization.json.JsonObject
-import kotlinx.serialization.json.jsonObject
 
 /**
  * Plugin to interact with the Supabase Auth API
@@ -104,33 +100,6 @@ sealed interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
     ): R?
 
     /**
-     * Logins the user with the specified [provider]
-     *
-     * Example:
-     * ```kotlin
-     * val result = gotrue.signInWith(Email) {
-     *    email = "example@email.com"
-     *    password = "password"
-     * }
-     * or
-     * gotrue.signInWith(Google) // Opens the browser to login with google
-     * ```
-     *
-     * @param provider the provider to use for signing up. E.g. [Email], [Phone] or [Google]
-     * @param redirectUrl The redirect url to use. If you don't specify this, the platform specific will be used, like deeplinks on android.
-     * @param config The configuration to use for the sign-up.
-     * @throws RestException or one of its subclasses if receiving an error response
-     * @throws HttpRequestTimeoutException if the request timed out
-     * @throws HttpRequestException on network related issues
-     */
-    @Deprecated("Use signInWith instead", ReplaceWith("signInWith(provider, redirectUrl, config)"))
-    suspend fun <C, R, Provider : AuthProvider<C, R>> loginWith(
-        provider: Provider,
-        redirectUrl: String? = null,
-        config: (C.() -> Unit)? = null
-    ) = signInWith(provider, redirectUrl, config)
-
-    /**
      * Signs in the user with the specified [provider]
      *
      * Example:
@@ -176,33 +145,6 @@ sealed interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
         redirectUrl: String? = null,
         config: UserUpdateBuilder.() -> Unit
     ): UserInfo
-
-    /**
-     * Sends a one time password to the specified [provider]
-     *
-     * Example:
-     * ```kotlin
-     * gotrue.sendOtpTo(Email) {
-     *    email = "example@email.com"
-     *    password = "password"
-     * }
-     * ```
-     *
-     * @param provider The provider to use. Either [Email] or [Phone]
-     * @param createUser Whether to create a user when a user with the given credentials doesn't exist
-     * @param redirectUrl The redirect url to use. If you don't specify this, the platform specific will be use, like deeplinks on android.
-     * @throws RestException or one of its subclasses if receiving an error response
-     * @throws HttpRequestTimeoutException if the request timed out
-     * @throws HttpRequestException on network related issues
-     */
-    @Deprecated("Use signInWith(OTP) instead", level = DeprecationLevel.WARNING)
-    suspend fun <C, R, Provider : DefaultAuthProvider<C, R>> sendOtpTo(
-        provider: Provider,
-        createUser: Boolean = false,
-        redirectUrl: String? = null,
-        data: JsonObject? = null,
-        config: C.() -> Unit
-    )
 
     /**
      * Resends an existing signup confirmation email, email change email
@@ -292,17 +234,6 @@ sealed interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
      * @see SignOutScope
      */
     suspend fun signOut(scope: SignOutScope = SignOutScope.LOCAL)
-
-    /**
-     * Logs out the current user, which means [sessionStatus] will be [SessionStatus.NotAuthenticated] and the access token will be revoked
-     * @param scope The scope of the logout.
-     * @throws RestException or one of its subclasses if receiving an error response
-     * @throws HttpRequestTimeoutException if the request timed out
-     * @throws HttpRequestException on network related issues
-     * @see SignOutScope
-     */
-    @Deprecated("Use signOut instead", ReplaceWith("signOut(scope)", "io.github.jan.supabase.gotrue.SignOutScope"), DeprecationLevel.WARNING)
-    suspend fun logout(scope: SignOutScope = SignOutScope.LOCAL) = signOut(scope)
 
     /**
      * Imports a user session and starts auto-refreshing if [autoRefresh] is true
@@ -403,41 +334,6 @@ sealed interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
     }
 
 }
-
-/**
- * Sends a one time password to the specified [provider]
- *
- * Example:
- * ```kotlin
- * gotrue.sendOtpTo(Email) {
- *    email = "example@email.com"
- *    password = "password"
- * }
- * ```
- *
- * @param provider The provider to use. Either [Email] or [Phone]
- * @param createUser Whether to create a user when a user with the given credentials doesn't exist
- * @param redirectUrl The redirect url to use. If you don't specify this, the platform specific will be used, like deeplinks on android.
- * @throws RestException or one of its subclasses if receiving an error response
- * @throws HttpRequestTimeoutException if the request timed out
- * @throws HttpRequestException on network related issues
- */
-suspend inline fun <C, R, reified D : Any, Provider : DefaultAuthProvider<C, R>> Auth.sendOtpTo(
-    provider: Provider,
-    data: D,
-    createUser: Boolean = false,
-    redirectUrl: String? = null,
-    noinline config: C.() -> Unit = { }
-): Unit = sendOtpTo(provider, createUser, redirectUrl, this.serializer.encodeToJsonElement(data).jsonObject, config)
-
-/**
- * The Auth plugin handles everything related to supabase's authentication system
- *
- * **DEPRECATED** Use [auth] instead
- */
-@Deprecated("Use auth instead", ReplaceWith("auth", "io.github.jan.supabase.gotrue.auth"), DeprecationLevel.WARNING)
-val SupabaseClient.gotrue: GoTrue
-    get() = pluginManager.getPlugin(GoTrue)
 
 /**
  * The Auth plugin handles everything related to Supabase's authentication system

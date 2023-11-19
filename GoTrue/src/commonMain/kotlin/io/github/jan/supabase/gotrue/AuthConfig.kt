@@ -2,7 +2,6 @@ package io.github.jan.supabase.gotrue
 
 import io.github.jan.supabase.SupabaseClientBuilder
 import io.github.jan.supabase.SupabaseSerializer
-import io.github.jan.supabase.annotations.SupabaseExperimental
 import io.github.jan.supabase.plugins.CustomSerializationConfig
 import io.github.jan.supabase.plugins.MainConfig
 import kotlinx.coroutines.CoroutineDispatcher
@@ -93,6 +92,5 @@ enum class FlowType {
      *
      * Note: OTP's via a link and sign up verification links are not supported on desktop. Replace your email template to send the token instead.
      */
-    @SupabaseExperimental
     PKCE
 }

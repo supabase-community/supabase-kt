@@ -3,7 +3,6 @@ package io.github.jan.supabase.plugins
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.annotations.SupabaseInternal
 import io.github.jan.supabase.buildUrl
-import io.github.jan.supabase.createSupabaseClient
 import io.github.jan.supabase.exceptions.RestException
 import io.ktor.client.statement.HttpResponse
 import io.ktor.http.appendEncodedPathSegments
@@ -74,22 +73,4 @@ interface MainPlugin <Config : MainConfig> : SupabasePlugin {
     @SupabaseInternal
     fun init() {}
 
-}
-
-/**
- * Creates a standalone Supabase Module. Uses an underlying [SupabaseClient]
- * @param provider The provider for this module. E.g. GoTrue, Realtime or Storage
- * @param url The url for this module
- * @param apiKey The api key for this module
- * @param config The configuration for this module
- */
-@Deprecated("Use createSupabaseClient instead", level = DeprecationLevel.ERROR)
-inline fun <Config : MainConfig, reified Plugin : MainPlugin<Config>> standaloneSupabaseModule(provider: SupabasePluginProvider<Config, Plugin>, url: String, apiKey: String? = null, crossinline config: Config.() -> Unit = {}): Plugin {
-    val underlyingClient = createSupabaseClient("", apiKey ?: "") {
-        install(provider) {
-            customUrl = url
-            config()
-        }
-    }
-    return underlyingClient.pluginManager.getPlugin(provider)
 }

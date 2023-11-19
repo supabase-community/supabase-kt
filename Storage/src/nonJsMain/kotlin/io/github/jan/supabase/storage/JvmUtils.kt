@@ -1,6 +1,5 @@
 package io.github.jan.supabase.storage
 
-import io.github.jan.supabase.annotations.SupabaseExperimental
 import io.ktor.util.cio.readChannel
 import io.ktor.util.cio.writeChannel
 import java.io.File
@@ -24,8 +23,7 @@ suspend fun BucketApi.upload(path: String, file: File, upsert: Boolean = false) 
  * @param upsert Whether to overwrite an existing file
  * @return A flow that emits the upload progress and at last the key to the uploaded file
  */
-@SupabaseExperimental
-suspend fun BucketApi.uploadAsFlow(path: String, file: File, upsert: Boolean = false) = uploadAsFlow(path, UploadData(file.readChannel(), file.length()), upsert)
+fun BucketApi.uploadAsFlow(path: String, file: File, upsert: Boolean = false) = uploadAsFlow(path, UploadData(file.readChannel(), file.length()), upsert)
 
 /**
  * Uploads a file in [BucketApi.bucketId] under [path]
@@ -43,8 +41,7 @@ suspend fun BucketApi.upload(path: String, file: Path, upsert: Boolean = false) 
  * @param upsert Whether to overwrite an existing file
  * @return A flow that emits the upload progress and at last the key to the uploaded file
  */
-@SupabaseExperimental
-suspend fun BucketApi.uploadAsFlow(path: String, file: Path, upsert: Boolean = false) = uploadAsFlow(path, UploadData(file.readChannel(), file.fileSize()), upsert)
+fun BucketApi.uploadAsFlow(path: String, file: Path, upsert: Boolean = false) = uploadAsFlow(path, UploadData(file.readChannel(), file.fileSize()), upsert)
 
 /**
  * Uploads a file in [BucketApi.bucketId] under [path] using a presigned url
@@ -64,8 +61,7 @@ suspend fun BucketApi.uploadToSignedUrl(path: String, token: String, file: File,
  * @param upsert Whether to overwrite an existing file
  * @return A flow that emits the upload progress and at last the key to the uploaded file
  */
-@SupabaseExperimental
-suspend fun BucketApi.uploadToSignedUrlAsFlow(path: String, token: String, file: File, upsert: Boolean = false) = uploadToSignedUrlAsFlow(path, token, UploadData(file.readChannel(), file.length()), upsert)
+fun BucketApi.uploadToSignedUrlAsFlow(path: String, token: String, file: File, upsert: Boolean = false) = uploadToSignedUrlAsFlow(path, token, UploadData(file.readChannel(), file.length()), upsert)
 
 /**
  * Uploads a file in [BucketApi.bucketId] under [path] using a presigned url
@@ -84,8 +80,7 @@ suspend fun BucketApi.uploadToSignedUrl(path: String, token: String, file: Path,
  * @param upsert Whether to overwrite an existing file
  * @return A flow that emits the upload progress and at last the key to the uploaded file
  */
-@SupabaseExperimental
-suspend fun BucketApi.uploadToSignedUrlAsFlow(path: String, token: String, file: Path, upsert: Boolean = false) = uploadToSignedUrlAsFlow(path, token, UploadData(file.readChannel(), file.fileSize()), upsert)
+fun BucketApi.uploadToSignedUrlAsFlow(path: String, token: String, file: Path, upsert: Boolean = false) = uploadToSignedUrlAsFlow(path, token, UploadData(file.readChannel(), file.fileSize()), upsert)
 
 /**
  * Updates a file in [BucketApi.bucketId] under [path]
@@ -102,8 +97,7 @@ suspend fun BucketApi.update(path: String, file: Path, upsert: Boolean = false) 
  * @param upsert Whether to overwrite an existing file
  * @return A flow that emits the upload progress and at last the key to the uploaded file
  */
-@SupabaseExperimental
-suspend fun BucketApi.updateAsFlow(path: String, file: Path, upsert: Boolean = false) = updateAsFlow(path, UploadData(file.readChannel(), file.fileSize()), upsert)
+fun BucketApi.updateAsFlow(path: String, file: Path, upsert: Boolean = false) = updateAsFlow(path, UploadData(file.readChannel(), file.fileSize()), upsert)
 
 /**
  * Updates a file in [BucketApi.bucketId] under [path]
@@ -120,8 +114,7 @@ suspend fun BucketApi.update(path: String, file: File, upsert: Boolean = false) 
  * @param upsert Whether to overwrite an existing file
  * @return A flow that emits the upload progress and at last the key to the uploaded file
  */
-@SupabaseExperimental
-suspend fun BucketApi.updateAsFlow(path: String, file: File, upsert: Boolean = false) = updateAsFlow(path, UploadData(file.readChannel(), file.length()), upsert)
+fun BucketApi.updateAsFlow(path: String, file: File, upsert: Boolean = false) = updateAsFlow(path, UploadData(file.readChannel(), file.length()), upsert)
 
 /**
  * Downloads a file from [BucketApi.bucketId] under [path] and saves it to [file]
@@ -136,8 +129,7 @@ suspend fun BucketApi.downloadAuthenticatedTo(path: String, file: File, transfor
  * @param file The file to save the data to
  * @return A flow that emits the download progress and at last the key to the downloaded file
  */
-@SupabaseExperimental
-suspend fun BucketApi.downloadAuthenticatedToAsFlow(path: String, file: File, transform: ImageTransformation.() -> Unit = {}) = downloadAuthenticatedAsFlow(path, file.writeChannel(), transform)
+fun BucketApi.downloadAuthenticatedToAsFlow(path: String, file: File, transform: ImageTransformation.() -> Unit = {}) = downloadAuthenticatedAsFlow(path, file.writeChannel(), transform)
 
 /**
  * Downloads a file from [BucketApi.bucketId] under [path] and saves it to [file]
@@ -152,8 +144,7 @@ suspend fun BucketApi.downloadAuthenticatedTo(path: String, file: Path, transfor
  * @param file The file to save the data to
  * @return A flow that emits the download progress and at last the key to the downloaded file
  */
-@SupabaseExperimental
-suspend fun BucketApi.downloadAuthenticatedToAsFlow(path: String, file: Path, transform: ImageTransformation.() -> Unit = {}) = downloadAuthenticatedAsFlow(path, file.toFile().writeChannel(), transform)
+fun BucketApi.downloadAuthenticatedToAsFlow(path: String, file: Path, transform: ImageTransformation.() -> Unit = {}) = downloadAuthenticatedAsFlow(path, file.toFile().writeChannel(), transform)
 
 /**
  * Downloads a file from [BucketApi.bucketId] under [path] and saves it to [file]
@@ -168,8 +159,7 @@ suspend fun BucketApi.downloadPublicTo(path: String, file: File, transform: Imag
  * @param file The file to save the data to
  * @return A flow that emits the download progress and at last the key to the downloaded file
  */
-@SupabaseExperimental
-suspend fun BucketApi.downloadPublicToAsFlow(path: String, file: File, transform: ImageTransformation.() -> Unit = {}) = downloadPublicAsFlow(path, file.writeChannel(), transform)
+fun BucketApi.downloadPublicToAsFlow(path: String, file: File, transform: ImageTransformation.() -> Unit = {}) = downloadPublicAsFlow(path, file.writeChannel(), transform)
 
 /**
  * Downloads a file from [BucketApi.bucketId] under [path] and saves it to [file]
@@ -187,5 +177,4 @@ suspend fun BucketApi.downloadPublicTo(path: String, file: Path, transform: Imag
  * @param file The file to save the data to
  * @return A flow that emits the download progress and at last the key to the downloaded file
  */
-@SupabaseExperimental
-suspend fun BucketApi.downloadPublicToAsFlow(path: String, file: Path, transform: ImageTransformation.() -> Unit = {}) = downloadPublicAsFlow(path, file.toFile().writeChannel(), transform)
+fun BucketApi.downloadPublicToAsFlow(path: String, file: Path, transform: ImageTransformation.() -> Unit = {}) = downloadPublicAsFlow(path, file.toFile().writeChannel(), transform)

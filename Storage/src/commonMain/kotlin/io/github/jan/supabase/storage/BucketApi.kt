@@ -1,7 +1,6 @@
 package io.github.jan.supabase.storage
 
 import io.github.jan.supabase.SupabaseClient
-import io.github.jan.supabase.annotations.SupabaseExperimental
 import io.github.jan.supabase.exceptions.HttpRequestException
 import io.github.jan.supabase.exceptions.RestException
 import io.github.jan.supabase.gotrue.Auth
@@ -29,7 +28,6 @@ sealed interface BucketApi {
     /**
      * The client for interacting with the resumable upload api
      */
-    @SupabaseExperimental
     val resumable: ResumableClient
 
     /**

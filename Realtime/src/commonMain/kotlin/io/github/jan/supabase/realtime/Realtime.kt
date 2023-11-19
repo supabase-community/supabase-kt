@@ -151,14 +151,6 @@ sealed interface Realtime : MainPlugin<Realtime.Config>, CustomSerializationPlug
 /**
  * Creates a new [RealtimeChannel]
  */
-@Deprecated("Use channel instead", ReplaceWith("channel(channelId, builder)", "io.github.jan.supabase.realtime"))
-inline fun Realtime.createChannel(channelId: String, builder: RealtimeChannelBuilder.() -> Unit = {}): RealtimeChannel {
-    return RealtimeChannelBuilder("realtime:$channelId", this as RealtimeImpl).apply(builder).build()
-}
-
-/**
- * Creates a new [RealtimeChannel]
- */
 inline fun Realtime.channel(channelId: String, builder: RealtimeChannelBuilder.() -> Unit = {}): RealtimeChannel {
     return RealtimeChannelBuilder("realtime:$channelId", this as RealtimeImpl).apply(builder).build()
 }

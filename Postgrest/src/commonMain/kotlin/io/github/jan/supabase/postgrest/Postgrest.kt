@@ -2,7 +2,6 @@ package io.github.jan.supabase.postgrest
 
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.SupabaseSerializer
-import io.github.jan.supabase.annotations.SupabaseExperimental
 import io.github.jan.supabase.plugins.CustomSerializationConfig
 import io.github.jan.supabase.plugins.CustomSerializationPlugin
 import io.github.jan.supabase.plugins.MainConfig
@@ -70,7 +69,6 @@ sealed interface Postgrest : MainPlugin<Postgrest.Config>, CustomSerializationPl
         var propertyConversionMethod: PropertyConversionMethod = PropertyConversionMethod.CAMEL_CASE_TO_SNAKE_CASE,
     ): MainConfig, CustomSerializationConfig {
 
-        @SupabaseExperimental
         override var serializer: SupabaseSerializer? = null
 
     }
