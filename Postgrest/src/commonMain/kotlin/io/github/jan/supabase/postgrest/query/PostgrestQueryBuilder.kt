@@ -64,23 +64,36 @@ class PostgrestQueryBuilder(
      *
      * @param values The values to insert, will automatically get serialized into json.
      * @param request Additional filtering to apply to the query
+     * @param onConflict Comma-separated UNIQUE column(s) to specify how
+     *  duplicate rows are determined. Two rows are duplicates if all the
+     * `onConflict` columns are equal.
+     * @param defaultToNull Make missing fields default to `null`.
+     * Otherwise, use the default value for the column. This only applies when
+     * inserting new rows, not when merging with existing rows under
+     * @param ignoreDuplicates If `true`, duplicate rows are ignored. If `false`, duplicate rows are merged with existing rows.
      * @throws RestException or one of its subclasses if receiving an error response
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
     suspend inline fun <reified T : Any> upsert(
         values: List<T>,
+        onConflict: String? = null,
+        defaultToNull: Boolean = false,
+        ignoreDuplicates: Boolean = false,
         request: PostgrestRequestBuilder.() -> Unit = {}
     ): PostgrestResult {
         val requestBuilder = postgrestRequest(postgrest.config.propertyConversionMethod, request)
+        onConflict?.let {
+            requestBuilder._params["on_conflict"] = listOf(it)
+        }
         val insertRequest = InsertRequest(
             body = postgrest.serializer.encodeToJsonElement(values).jsonArray,
             upsert = true,
             returning = requestBuilder.returning,
             count = requestBuilder.count,
             filter = requestBuilder.params,
-            defaultToNull = requestBuilder.defaultToNull,
-            ignoreDuplicates = requestBuilder.ignoreDuplicates,
+            defaultToNull = defaultToNull,
+            ignoreDuplicates = ignoreDuplicates,
             schema = schema,
             headers = requestBuilder.headers.build()
         )
@@ -96,16 +109,26 @@ class PostgrestQueryBuilder(
      *
      * By default, upserted rows are not returned. To return it, call `[PostgrestRequestBuilder.select]`.
      *
-     * @param values The values to insert, will automatically get serialized into json.
+     * @param value The value to insert, will automatically get serialized into json.
      * @param request Additional filtering to apply to the query
+     * @param onConflict Comma-separated UNIQUE column(s) to specify how
+     *  duplicate rows are determined. Two rows are duplicates if all the
+     * `onConflict` columns are equal.
+     * @param defaultToNull Make missing fields default to `null`.
+     * Otherwise, use the default value for the column. This only applies when
+     * inserting new rows, not when merging with existing rows under
+     * @param ignoreDuplicates If `true`, duplicate rows are ignored. If `false`, duplicate rows are merged with existing rows.
      * @throws RestException or one of its subclasses if receiving an error response
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
     suspend inline fun <reified T : Any> upsert(
         value: T,
+        onConflict: String? = null,
+        defaultToNull: Boolean = false,
+        ignoreDuplicates: Boolean = false,
         request: PostgrestRequestBuilder.() -> Unit = {}
-    ): PostgrestResult = upsert(listOf(value), request)
+    ): PostgrestResult = upsert(listOf(value), onConflict, defaultToNull, ignoreDuplicates, request)
 
     /**
      * Executes an insert operation on the [table]

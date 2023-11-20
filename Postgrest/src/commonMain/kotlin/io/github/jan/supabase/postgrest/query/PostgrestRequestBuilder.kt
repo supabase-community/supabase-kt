@@ -19,10 +19,6 @@ class PostgrestRequestBuilder(@PublishedApi internal val propertyConversionMetho
         private set
     var returning: Returning = Returning.MINIMAL
         private set
-    var defaultToNull: Boolean = false
-        private set
-    var ignoreDuplicates: Boolean = false
-        private set
     @PublishedApi internal val _params: MutableMap<String, List<String>> = mutableMapOf()
     @PublishedApi internal val headers: HeadersBuilder = HeadersBuilder()
     val params: Map<String, List<String>>
@@ -132,25 +128,6 @@ class PostgrestRequestBuilder(@PublishedApi internal val propertyConversionMetho
         }.joinToString("|")
         val forMediatype = headers["Accept"] ?: "application/json"
         headers[HttpHeaders.Accept] = "application/vnd.pgrst.plan+${format}; for=\"${forMediatype}\"; options=${options};"
-    }
-
-    /**
-     * @param onConflict Comma-separated UNIQUE column(s) to specify how
-     *  duplicate rows are determined. Two rows are duplicates if all the
-     *  `onConflict` columns are equal.
-     */
-    fun onConflict(onConflict: String) {
-        _params["on_conflict"] = listOf(onConflict)
-    }
-
-    @JsName("defaultToNullMethod")
-    fun defaultToNull() {
-        defaultToNull = true
-    }
-
-    @JsName("ignoreDuplicatesMethod")
-    fun ignoreDuplicates() {
-        ignoreDuplicates = true
     }
 
     inline fun filter(block: @PostgrestFilterDSL PostgrestFilterBuilder.() -> Unit) {
