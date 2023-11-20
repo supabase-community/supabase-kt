@@ -5,6 +5,7 @@ import io.github.jan.supabase.annotations.SupabaseInternal
 import io.github.jan.supabase.gotrue.PostgrestFilterDSL
 import io.github.jan.supabase.postgrest.PropertyConversionMethod
 import io.github.jan.supabase.postgrest.query.filter.PostgrestFilterBuilder
+import io.github.jan.supabase.postgrest.result.PostgrestResult
 import io.ktor.http.HeadersBuilder
 import io.ktor.http.HttpHeaders
 import kotlin.js.JsName
@@ -15,8 +16,15 @@ import kotlin.js.JsName
 @PostgrestFilterDSL
 class PostgrestRequestBuilder(@PublishedApi internal val propertyConversionMethod: PropertyConversionMethod) {
 
+    /**
+     * The [Count] algorithm to use to count rows in the table or view.
+     */
     var count: Count? = null
         private set
+
+    /**
+     * The [Returning] option to use.
+     */
     var returning: Returning = Returning.MINIMAL
         private set
     @PublishedApi internal val _params: MutableMap<String, List<String>> = mutableMapOf()
@@ -24,6 +32,10 @@ class PostgrestRequestBuilder(@PublishedApi internal val propertyConversionMetho
     val params: Map<String, List<String>>
         get() = _params.toMap()
 
+    /**
+     * Setting [count] allows to use [PostgrestResult.count] to get the total amount of items in the database.
+     * @param count algorithm to use to count rows in the table or view.
+     */
     fun count(count: Count) {
         this.count = count
     }
@@ -48,6 +60,8 @@ class PostgrestRequestBuilder(@PublishedApi internal val propertyConversionMetho
 
     /**
      * Orders the result by [column] in the specified [order].
+     * @param column The column to order by
+     * @param order The order to use
      * @param nullsFirst If true, null values will be ordered first
      * @param referencedTable If the column is from a foreign table, specify the table name here
      */
@@ -58,6 +72,7 @@ class PostgrestRequestBuilder(@PublishedApi internal val propertyConversionMetho
 
     /**
      * Limits the result to [count] rows
+     * @param count The amount of rows to return
      * @param referencedTable If the column is from a foreign table, specify the table name here
      */
     fun limit(count: Long, referencedTable: String? = null) {
@@ -67,6 +82,8 @@ class PostgrestRequestBuilder(@PublishedApi internal val propertyConversionMetho
 
     /**
      * Limits the result to rows from [from] to [to]
+     * @param from The first row to return
+     * @param to The last row to return
      * @param referencedTable If the column is from a foreign table, specify the table name here
      */
     fun range(from: Long, to: Long, referencedTable: String? = null) {
@@ -79,6 +96,7 @@ class PostgrestRequestBuilder(@PublishedApi internal val propertyConversionMetho
 
     /**
      * Limits the result to rows from [range.first] to [range.last]
+     * @param range The range of rows to return
      * @param referencedTable If the column is from a foreign table, specify the table name here
      */
     fun range(range: LongRange, referencedTable: String? = null) = range(range.first, range.last, referencedTable)
