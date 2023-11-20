@@ -1,3 +1,4 @@
+@file:Suppress("UndocumentedPublicProperty", "ConstructorParameterNaming")
 package io.github.jan.supabase.postgrest.query.filter
 
 import io.github.jan.supabase.gotrue.PostgrestFilterDSL

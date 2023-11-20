@@ -25,7 +25,9 @@ class InsertRequestTest {
         assertEquals(
             listOf(
                 "return=representation",
-                "resolution=merge-duplicates", "count=exact"
+                "resolution=merge-duplicates",
+                "missing=default",
+                "count=exact"
             ), sut.prefer
         )
         assertEquals("table", sut.schema)
@@ -48,6 +50,7 @@ class InsertRequestTest {
         assertEquals(
             listOf(
                 "return=representation",
+                "missing=default",
                 "count=exact"
             ), sut.prefer
         )
@@ -72,6 +75,7 @@ class InsertRequestTest {
         assertEquals(
             listOf(
                 "return=representation",
+                "missing=default"
             ), sut.prefer
         )
         assertEquals("table", sut.schema)
