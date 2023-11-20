@@ -1,8 +1,7 @@
 import io.github.jan.supabase.CurrentPlatformTarget
 import io.github.jan.supabase.PlatformTarget
 import io.github.jan.supabase.postgrest.PropertyConversionMethod
-import io.github.jan.supabase.postgrest.query.PostgrestRequestBuilder
-import io.github.jan.supabase.postgrest.query.postgrestRequest
+import io.github.jan.supabase.postgrest.query.filter.PostgrestFilterBuilder
 import io.ktor.http.decodeURLQueryComponent
 import io.ktor.http.formUrlEncode
 import io.ktor.http.parametersOf
@@ -206,8 +205,8 @@ class PostgrestFilterBuilderTest {
         }
     }
 
-    private fun filterToString(builder: PostgrestRequestBuilder.() -> Unit): String {
-        return postgrestRequest(block = builder).mapValues { (_, value) -> listOf(value.first()) }.let {
+    private fun filterToString(builder: PostgrestFilterBuilder.() -> Unit): String {
+        return PostgrestFilterBuilder(PropertyConversionMethod.NONE).apply(block = builder).params.mapValues { (_, value) -> listOf(value.first()) }.let {
             parametersOf(it).formUrlEncode()
         }.decodeURLQueryComponent()
     }

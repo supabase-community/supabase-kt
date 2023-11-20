@@ -1,4 +1,4 @@
-@file:Suppress("UndocumentedPublicProperty")
+@file:Suppress("UndocumentedPublicProperty", "ConstructorParameterNaming")
 package io.github.jan.supabase.postgrest.query
 
 import io.github.jan.supabase.annotations.SupabaseInternal
@@ -148,6 +148,10 @@ class PostgrestRequestBuilder(@PublishedApi internal val propertyConversionMetho
         headers[HttpHeaders.Accept] = "application/vnd.pgrst.plan+${format}; for=\"${forMediatype}\"; options=${options};"
     }
 
+    /**
+     * Adds a filter to the postgrest request.
+     * @param block The filter block
+     */
     inline fun filter(block: @PostgrestFilterDSL PostgrestFilterBuilder.() -> Unit) {
         val filter = PostgrestFilterBuilder(propertyConversionMethod, _params)
         filter.block()
