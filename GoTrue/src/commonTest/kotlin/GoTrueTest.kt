@@ -10,7 +10,7 @@ import io.github.jan.supabase.gotrue.OtpType
 import io.github.jan.supabase.gotrue.auth
 import io.github.jan.supabase.gotrue.providers.Github
 import io.github.jan.supabase.gotrue.providers.builtin.Email
-import io.github.jan.supabase.gotrue.providers.builtin.Phone
+import io.github.jan.supabase.gotrue.providers.builtin.OTP
 import io.github.jan.supabase.gotrue.user.UserSession
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
@@ -85,7 +85,7 @@ class GoTrueTest {
             client.auth.importSession(session, false)
             assertEquals("some_token", client.auth.currentAccessTokenOrNull())
             assertEquals("some_refresh_token", client.auth.currentSessionOrNull()!!.refreshToken)
-            client.auth.logout()
+            client.auth.signOut()
             assertEquals(null, client.auth.currentAccessTokenOrNull())
             client.close()
         }
@@ -214,7 +214,7 @@ class GoTrueTest {
     fun test_otp_email() {
         val client = createSupabaseClient()
         runTest(dispatcher) {
-            client.auth.sendOtpTo(Email) {
+            client.auth.signInWith(OTP) {
                 email = "example@email.com"
             }
             client.close()
@@ -225,7 +225,7 @@ class GoTrueTest {
     fun test_otp_phone() {
         val client = createSupabaseClient()
         runTest(dispatcher) {
-            client.auth.sendOtpTo(Phone) {
+            client.auth.signInWith(OTP) {
                 phone = "12345678"
             }
             client.close()
