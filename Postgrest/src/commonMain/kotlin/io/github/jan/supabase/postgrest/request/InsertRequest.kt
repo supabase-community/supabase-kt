@@ -2,6 +2,7 @@ package io.github.jan.supabase.postgrest.request
 
 import io.github.jan.supabase.postgrest.query.Count
 import io.github.jan.supabase.postgrest.query.Returning
+import io.ktor.http.Headers
 import io.ktor.http.HttpMethod
 import kotlinx.serialization.json.JsonArray
 
@@ -13,7 +14,8 @@ internal data class InsertRequest(
     private val count: Count? = null,
     override val body: JsonArray,
     override val filter: Map<String, List<String>>,
-    override val schema: String
+    override val schema: String,
+    override val headers: Headers
 ) : PostgrestRequest {
 
     override val method = HttpMethod.Post

@@ -3,14 +3,13 @@ package io.github.jan.supabase.postgrest.result
 import io.github.jan.supabase.decode
 import io.github.jan.supabase.postgrest.Postgrest
 import io.ktor.http.Headers
-import kotlinx.serialization.json.JsonElement
 
 /**
  * Represents the result from a postgrest request
  * @param body The body of the response. Can be null if using an database function.
  * @param headers The headers of the response
  */
-class PostgrestResult(val body: JsonElement?, val headers: Headers, @PublishedApi internal val postgrest: Postgrest) {
+class PostgrestResult(val body: String, val headers: Headers, @PublishedApi internal val postgrest: Postgrest) {
 
     private val contentRange = headers["Content-Range"]
 
@@ -30,7 +29,7 @@ class PostgrestResult(val body: JsonElement?, val headers: Headers, @PublishedAp
     /**
      * Decodes [body] as [T] using
      */
-    inline fun <reified T : Any> decodeAs(): T = postgrest.serializer.decode(body?.toString() ?: error("No body found"))
+    inline fun <reified T : Any> decodeAs(): T = postgrest.serializer.decode(body)
 
     /**
      * Decodes [body] as [T] using. If there's an error it will return null

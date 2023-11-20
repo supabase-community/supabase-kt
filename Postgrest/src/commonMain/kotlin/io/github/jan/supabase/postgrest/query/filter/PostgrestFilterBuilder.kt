@@ -1,20 +1,15 @@
-@file:Suppress("UndocumentedPublicProperty")
-package io.github.jan.supabase.postgrest.query
+package io.github.jan.supabase.postgrest.query.filter
 
-import io.github.jan.supabase.annotations.SupabaseInternal
 import io.github.jan.supabase.gotrue.PostgrestFilterDSL
 import io.github.jan.supabase.postgrest.PropertyConversionMethod
-import io.github.jan.supabase.postgrest.formatJoiningFilter
+import io.github.jan.supabase.postgrest.query.Order
 import kotlin.reflect.KProperty1
 
-/**
- * A filter builder for a postgrest query
- */
-@PostgrestFilterDSL
-class PostgrestFilterBuilder(@PublishedApi internal val propertyConversionMethod: PropertyConversionMethod) {
+class PostgrestFilterBuilder(
+    @PublishedApi internal val propertyConversionMethod: PropertyConversionMethod,
+    @PublishedApi internal val _params: MutableMap<String, List<String>> = mutableMapOf()
+) {
 
-    @PublishedApi
-    internal val _params = mutableMapOf<String, List<String>>()
     val params: Map<String, List<String>>
         get() = _params.toMap()
 
@@ -211,29 +206,29 @@ class PostgrestFilterBuilder(@PublishedApi internal val propertyConversionMethod
     /**
      * Orders the result by [column] in the specified [order].
      * @param nullsFirst If true, null values will be ordered first
-     * @param foreignTable If the column is from a foreign table, specify the table name here
+     * @param referencedTable If the column is from a foreign table, specify the table name here
      */
-    fun order(column: String, order: Order, nullsFirst: Boolean = false, foreignTable: String? = null) {
-        val key = if (foreignTable == null) "order" else "\"$foreignTable\".order"
+    fun order(column: String, order: Order, nullsFirst: Boolean = false, referencedTable: String? = null) {
+        val key = if (referencedTable == null) "order" else "\"$referencedTable\".order"
         _params[key] = listOf("${column}.${order.value}.${if (nullsFirst) "nullsfirst" else "nullslast"}")
     }
 
     /**
      * Limits the result to [count] rows
-     * @param foreignTable If the column is from a foreign table, specify the table name here
+     * @param referencedTable If the column is from a foreign table, specify the table name here
      */
-    fun limit(count: Long, foreignTable: String? = null) {
-        val key = if (foreignTable == null) "limit" else "\"$foreignTable\".limit"
+    fun limit(count: Long, referencedTable: String? = null) {
+        val key = if (referencedTable == null) "limit" else "\"$referencedTable\".limit"
         _params[key] = listOf(count.toString())
     }
 
     /**
      * Limits the result to rows from [from] to [to]
-     * @param foreignTable If the column is from a foreign table, specify the table name here
+     * @param referencedTable If the column is from a foreign table, specify the table name here
      */
-    fun range(from: Long, to: Long, foreignTable: String? = null) {
-        val keyOffset = if (foreignTable == null) "offset" else "\"$foreignTable\".offset"
-        val keyLimit = if (foreignTable == null) "limit" else "\"$foreignTable\".limit"
+    fun range(from: Long, to: Long, referencedTable: String? = null) {
+        val keyOffset = if (referencedTable == null) "offset" else "\"$referencedTable\".offset"
+        val keyLimit = if (referencedTable == null) "limit" else "\"$referencedTable\".limit"
 
         _params[keyOffset] = listOf(from.toString())
         _params[keyLimit] = listOf((to - from + 1).toString())
@@ -241,9 +236,9 @@ class PostgrestFilterBuilder(@PublishedApi internal val propertyConversionMethod
 
     /**
      * Limits the result to rows from [range.first] to [range.last]
-     * @param foreignTable If the column is from a foreign table, specify the table name here
+     * @param referencedTable If the column is from a foreign table, specify the table name here
      */
-    fun range(range: LongRange, foreignTable: String? = null) = range(range.first, range.last, foreignTable)
+    fun range(range: LongRange, referencedTable: String? = null) = range(range.first, range.last, referencedTable)
 
     /**
      * Finds all rows where the value of the [column] contains [values]
@@ -395,56 +390,16 @@ class PostgrestFilterBuilder(@PublishedApi internal val propertyConversionMethod
      */
     infix fun <T, V> KProperty1<T, V>.contained(values: List<Any>) = this@PostgrestFilterBuilder.contained(propertyConversionMethod(this), values)
 
+
 }
 
-@SupabaseInternal
-inline fun buildPostgrestFilter(propertyConversionMethod: PropertyConversionMethod = PropertyConversionMethod.CAMEL_CASE_TO_SNAKE_CASE, block: PostgrestFilterBuilder.() -> Unit): Map<String, List<String>> {
-    val filter = PostgrestFilterBuilder(propertyConversionMethod)
-    filter.block()
-    return filter.params
-}
-
-/**
- * Represents a filter operation for a column using a specific operator and a value.
- */
-data class FilterOperation(val column: String, val operator: FilterOperator, val value: String)
-
-/**
- * Represents a single filter operation
- */
-enum class FilterOperator(val identifier: String) {
-    EQ("eq"),
-    NEQ("neq"),
-    GT("gt"),
-    GTE("gte"),
-    LT("lt"),
-    LTE("lte"),
-    LIKE("like"),
-    MATCH("match"),
-    ILIKE("ilike"),
-    IMATCH("imatch"),
-    IS("is"),
-    IN("in"),
-    CS("cs"),
-    CD("cd"),
-    SL("sl"),
-    SR("sr"),
-    NXL("nxl"),
-    NXR("nxr"),
-    ADJ("adj"),
-    OV("ov"),
-    FTS("fts"),
-    PLFTS("plfts"),
-    PHFTS("phfts"),
-    WFTS("wfts"),
-}
-
-/**
- * Used to search rows using a full text search. See [Postgrest](https://postgrest.org/en/stable/api.html#full-text-search) for more information
- */
-enum class TextSearchType(val identifier: String) {
-    TSVECTOR("tsvector"),
-    PLAINTO("plainto"),
-    PHRASETO("phraseto"),
-    WEBSEARCH("websearch")
+@PublishedApi internal inline fun PostgrestFilterBuilder.formatJoiningFilter(filter: PostgrestFilterBuilder.() -> Unit): String {
+    val params = PostgrestFilterBuilder(propertyConversionMethod).apply(filter).params
+    val formattedFilter = params.toList().joinToString(",") {
+        it.second.joinToString(",") { filter ->
+            val isLogicalOperator = filter.startsWith("(") && filter.endsWith(")")
+            it.first + (if(isLogicalOperator) "" else ".") + filter
+        }
+    }
+    return "($formattedFilter)"
 }

@@ -1,8 +1,6 @@
 package io.github.jan.supabase.postgrest
 
 import io.github.jan.supabase.annotations.SupabaseInternal
-import io.github.jan.supabase.postgrest.query.PostgrestFilterBuilder
-import io.github.jan.supabase.postgrest.query.buildPostgrestFilter
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.descriptors.elementNames
 import kotlinx.serialization.serializerOrNull
@@ -13,16 +11,6 @@ private val SNAKE_CASE_REGEX = "(?<=.)[A-Z]".toRegex()
 
 @SupabaseInternal
 expect fun <T, V> getSerialName(property: KProperty1<T, V>): String
-
-@PublishedApi internal inline fun PostgrestFilterBuilder.formatJoiningFilter(filter: PostgrestFilterBuilder.() -> Unit): String {
-    val formattedFilter = buildPostgrestFilter(propertyConversionMethod, filter).toList().joinToString(",") {
-        it.second.joinToString(",") { filter ->
-            val isLogicalOperator = filter.startsWith("(") && filter.endsWith(")")
-            it.first + (if(isLogicalOperator) "" else ".") + filter
-        }
-    }
-    return "($formattedFilter)"
-}
 
 @SupabaseInternal
 internal fun String.camelToSnakeCase(): String {
