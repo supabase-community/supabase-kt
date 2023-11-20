@@ -103,7 +103,7 @@ internal class RealtimeImpl(override val supabaseClient: SupabaseClient, overrid
     private fun rejoinChannels() {
         scope.launch {
             for (channel in _subscriptions.values) {
-                channel.join()
+                channel.subscribe()
             }
         }
     }
