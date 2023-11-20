@@ -2,7 +2,6 @@ package io.github.jan.supabase.gotrue
 
 import co.touchlab.kermit.Logger
 import io.github.jan.supabase.SupabaseClient
-import io.github.jan.supabase.annotations.SupabaseExperimental
 import io.github.jan.supabase.gotrue.user.UserSession
 import kotlinx.coroutines.launch
 import platform.Foundation.NSURL
@@ -15,28 +14,27 @@ import platform.Foundation.NSURLQueryItem
  * @param url The url from the ios app delegate
  * @param onSessionSuccess The callback when the session was successfully imported
  */
-@SupabaseExperimental
 fun SupabaseClient.handleDeeplinks(url: NSURL, onSessionSuccess: (UserSession) -> Unit = {}) {
-    if (url.scheme != gotrue.config.scheme || url.host != gotrue.config.host) {
+    if (url.scheme != auth.config.scheme || url.host != auth.config.host) {
         Logger.d { "Received deeplink with wrong scheme or host" }
         return
     }
-    when (gotrue.config.flowType) {
+    when (auth.config.flowType) {
         FlowType.IMPLICIT -> {
             val fragment = url.fragment
             if (fragment == null) {
                 Logger.d { "No fragment for deeplink" }
                 return
             }
-            gotrue.parseFragmentAndImportSession(fragment, onSessionSuccess)
+            auth.parseFragmentAndImportSession(fragment, onSessionSuccess)
         }
         FlowType.PKCE -> {
             val components = NSURLComponents(url, false)
             val code = (components.queryItems?.firstOrNull { it is NSURLQueryItem && it.name == "code" } as? NSURLQueryItem)?.value ?: return
-            val scope = (gotrue as GoTrueImpl).authScope
+            val scope = (auth as AuthImpl).authScope
             scope.launch {
-                gotrue.exchangeCodeForSession(code)
-                onSessionSuccess(gotrue.currentSessionOrNull() ?: error("No session available"))
+                auth.exchangeCodeForSession(code)
+                onSessionSuccess(auth.currentSessionOrNull() ?: error("No session available"))
             }
         }
     }

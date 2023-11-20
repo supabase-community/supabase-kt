@@ -4,9 +4,9 @@ import io.github.jan.supabase.plugins.CustomSerializationConfig
 import io.github.jan.supabase.plugins.MainConfig
 
 /**
- * The configuration for [GoTrue]
+ * The configuration for [Auth]
  */
-actual class GoTrueConfig : MainConfig, CustomSerializationConfig, GoTrueConfigDefaults() {
+actual class AuthConfig : MainConfig, CustomSerializationConfig, AuthConfigDefaults() {
 
     /**
      * The scheme for the redirect url, when using deep linking

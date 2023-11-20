@@ -1,9 +1,9 @@
 package io.github.jan.supabase.gotrue.admin
 
 import io.github.jan.supabase.annotations.SupabaseInternal
-import io.github.jan.supabase.gotrue.GoTrue
-import io.github.jan.supabase.gotrue.GoTrueImpl
-import io.github.jan.supabase.gotrue.LogoutScope
+import io.github.jan.supabase.gotrue.Auth
+import io.github.jan.supabase.gotrue.AuthImpl
+import io.github.jan.supabase.gotrue.SignOutScope
 import io.github.jan.supabase.gotrue.user.UserInfo
 import io.github.jan.supabase.gotrue.user.UserMfaFactor
 import io.github.jan.supabase.putJsonObject
@@ -21,7 +21,7 @@ import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.put
 
 /**
- * The admin interface for the supabase auth module. Service role access token is required. Import it via [GoTrue.importAuthToken]. Never share it publicly
+ * The admin interface for the supabase auth module. Service role access token is required. Import it via [Auth.importAuthToken]. Never share it publicly
  */
 sealed interface AdminApi {
 
@@ -40,9 +40,16 @@ sealed interface AdminApi {
     /**
      * Removes a user session
      * @param jwt the jwt of the session
-     * @param scope the scope of the logout action
+     * @param scope the scope of the sign-out action
      */
-    suspend fun logout(jwt: String, scope: LogoutScope = LogoutScope.LOCAL)
+    suspend fun signOut(jwt: String, scope: SignOutScope = SignOutScope.LOCAL)
+
+    /**
+     * Removes a user session
+     * @param jwt the jwt of the session
+     * @param scope the scope of the sign-out action
+     */
+    suspend fun logout(jwt: String, scope: SignOutScope = SignOutScope.LOCAL) = signOut(jwt, scope)
 
     /**
      * Retrieves all users
@@ -92,11 +99,11 @@ sealed interface AdminApi {
 }
 
 @PublishedApi
-internal class AdminApiImpl(val gotrue: GoTrue) : AdminApi {
+internal class AdminApiImpl(val gotrue: Auth) : AdminApi {
 
-    val api = (gotrue as GoTrueImpl).api
+    val api = (gotrue as AuthImpl).api
 
-    override suspend fun logout(jwt: String, scope: LogoutScope) {
+    override suspend fun signOut(jwt: String, scope: SignOutScope) {
         api.post("logout") {
             parameter("scope", scope.name.lowercase())
             headers[HttpHeaders.Authorization] = "Bearer $jwt"

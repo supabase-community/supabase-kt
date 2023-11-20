@@ -3,7 +3,9 @@ import io.github.jan.supabase.PlatformTarget
 import io.github.jan.supabase.postgrest.PropertyConversionMethod
 import io.github.jan.supabase.postgrest.query.PostgrestFilterBuilder
 import io.github.jan.supabase.postgrest.query.buildPostgrestFilter
-import io.ktor.http.*
+import io.ktor.http.decodeURLQueryComponent
+import io.ktor.http.formUrlEncode
+import io.ktor.http.parametersOf
 import kotlinx.datetime.Instant
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable

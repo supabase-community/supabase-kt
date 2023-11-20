@@ -21,7 +21,7 @@ class AuthenticatedSupabaseApi @SupabaseInternal constructor(
 ): SupabaseApi(resolveUrl, parseErrorResponse, supabaseClient) {
 
     override suspend fun rawRequest(url: String, builder: HttpRequestBuilder.() -> Unit): HttpResponse = super.rawRequest(url) {
-        val accessToken = supabaseClient.pluginManager.getPluginOrNull(GoTrue)?.let { gotrue ->
+        val accessToken = supabaseClient.pluginManager.getPluginOrNull(Auth)?.let { gotrue ->
             jwtToken ?: gotrue.currentAccessTokenOrNull()
         }
         bearerAuth(accessToken ?: supabaseClient.supabaseKey)
@@ -36,7 +36,7 @@ class AuthenticatedSupabaseApi @SupabaseInternal constructor(
         builder: HttpRequestBuilder.() -> Unit
     ): HttpStatement {
         return super.prepareRequest(url) {
-            supabaseClient.pluginManager.getPluginOrNull(GoTrue)?.let { gotrue ->
+            supabaseClient.pluginManager.getPluginOrNull(Auth)?.let { gotrue ->
                 val jwtToken = jwtToken ?: gotrue.currentAccessTokenOrNull() ?: supabaseClient.supabaseKey
                 bearerAuth(jwtToken)
             }
@@ -48,21 +48,21 @@ class AuthenticatedSupabaseApi @SupabaseInternal constructor(
 }
 
 /**
- * Creates a [AuthenticatedSupabaseApi] with the given [baseUrl]. Requires [GoTrue] to authenticate requests
+ * Creates a [AuthenticatedSupabaseApi] with the given [baseUrl]. Requires [Auth] to authenticate requests
  * All requests will be resolved relative to this url
  */
 @SupabaseInternal
 fun SupabaseClient.authenticatedSupabaseApi(baseUrl: String, parseErrorResponse: (suspend (response: HttpResponse) -> RestException)? = null) = authenticatedSupabaseApi({ baseUrl + it }, parseErrorResponse)
 
 /**
- * Creates a [AuthenticatedSupabaseApi] for the given [plugin]. Requires [GoTrue] to authenticate requests
+ * Creates a [AuthenticatedSupabaseApi] for the given [plugin]. Requires [Auth] to authenticate requests
  * All requests will be resolved using the [MainPlugin.resolveUrl] function
  */
 @SupabaseInternal
 fun SupabaseClient.authenticatedSupabaseApi(plugin: MainPlugin<*>, defaultRequest: (HttpRequestBuilder.() -> Unit)? = null) = authenticatedSupabaseApi(plugin::resolveUrl, plugin::parseErrorResponse, defaultRequest, plugin.config.jwtToken)
 
 /**
- * Creates a [AuthenticatedSupabaseApi] with the given [resolveUrl] function. Requires [GoTrue] to authenticate requests
+ * Creates a [AuthenticatedSupabaseApi] with the given [resolveUrl] function. Requires [Auth] to authenticate requests
  * All requests will be resolved using this function
  */
 @SupabaseInternal

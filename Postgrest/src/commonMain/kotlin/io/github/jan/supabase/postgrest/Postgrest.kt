@@ -2,7 +2,6 @@ package io.github.jan.supabase.postgrest
 
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.SupabaseSerializer
-import io.github.jan.supabase.annotations.SupabaseExperimental
 import io.github.jan.supabase.plugins.CustomSerializationConfig
 import io.github.jan.supabase.plugins.CustomSerializationPlugin
 import io.github.jan.supabase.plugins.MainConfig
@@ -70,7 +69,6 @@ sealed interface Postgrest : MainPlugin<Postgrest.Config>, CustomSerializationPl
         var propertyConversionMethod: PropertyConversionMethod = PropertyConversionMethod.CAMEL_CASE_TO_SNAKE_CASE,
     ): MainConfig, CustomSerializationConfig {
 
-        @SupabaseExperimental
         override var serializer: SupabaseSerializer? = null
 
     }
@@ -99,3 +97,16 @@ sealed interface Postgrest : MainPlugin<Postgrest.Config>, CustomSerializationPl
  */
 val SupabaseClient.postgrest: Postgrest
     get() = pluginManager.getPlugin(Postgrest)
+
+/**
+ * Creates a new [PostgrestBuilder] for the given table
+ * @param table The table to use for the requests
+ */
+fun SupabaseClient.from(table: String): PostgrestBuilder = pluginManager.getPlugin(Postgrest).from(table)
+
+/**
+ * Creates a new [PostgrestBuilder] for the given schema and table
+ * @param schema The schema to use for the requests
+ * @param table The table to use for the requests
+ */
+fun SupabaseClient.from(schema: String, table: String): PostgrestBuilder = pluginManager.getPlugin(Postgrest).from(schema, table)

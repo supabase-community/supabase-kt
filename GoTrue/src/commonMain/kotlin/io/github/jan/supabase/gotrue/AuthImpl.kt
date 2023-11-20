@@ -16,7 +16,6 @@ import io.github.jan.supabase.gotrue.mfa.MfaApiImpl
 import io.github.jan.supabase.gotrue.providers.AuthProvider
 import io.github.jan.supabase.gotrue.providers.ExternalAuthConfigDefaults
 import io.github.jan.supabase.gotrue.providers.OAuthProvider
-import io.github.jan.supabase.gotrue.providers.builtin.DefaultAuthProvider
 import io.github.jan.supabase.gotrue.providers.builtin.SSO
 import io.github.jan.supabase.gotrue.user.UserInfo
 import io.github.jan.supabase.gotrue.user.UserSession
@@ -38,7 +37,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
-import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonObjectBuilder
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.encodeToJsonElement
@@ -48,10 +46,10 @@ import kotlinx.serialization.json.putJsonObject
 import kotlin.math.floor
 
 @PublishedApi
-internal class GoTrueImpl(
+internal class AuthImpl(
     override val supabaseClient: SupabaseClient,
-    override val config: GoTrueConfig
-) : GoTrue {
+    override val config: AuthConfig
+) : Auth {
 
     private val _sessionStatus = MutableStateFlow<SessionStatus>(SessionStatus.LoadingFromStorage)
     override val sessionStatus: StateFlow<SessionStatus> = _sessionStatus.asStateFlow()
@@ -70,10 +68,10 @@ internal class GoTrueImpl(
     override val serializer = config.serializer ?: supabaseClient.defaultSerializer
 
     override val apiVersion: Int
-        get() = GoTrue.API_VERSION
+        get() = Auth.API_VERSION
 
     override val pluginKey: String
-        get() = GoTrue.key
+        get() = Auth.key
 
     override fun init() {
         setupPlatform()
@@ -96,7 +94,7 @@ internal class GoTrueImpl(
         }
     }
 
-    override suspend fun <C, R, Provider : AuthProvider<C, R>> loginWith(
+    override suspend fun <C, R, Provider : AuthProvider<C, R>> signInWith(
         provider: Provider,
         redirectUrl: String?,
         config: (C.() -> Unit)?
@@ -112,12 +110,20 @@ internal class GoTrueImpl(
         importSession(it)
     }, redirectUrl, config)
 
-    override suspend fun <Config : SSO.Config> retrieveSSOUrl(
-        type: SSO<Config>,
+    override suspend fun retrieveSSOUrl(
         redirectUrl: String?,
-        config: (Config.() -> Unit)?
+        config: SSO.Config.() -> Unit
     ): SSO.Result {
-        val createdConfig = type.config.apply { config?.invoke(this) }
+        val createdConfig = SSO.Config().apply(config)
+
+        require((createdConfig.domain != null && createdConfig.domain!!.isNotBlank()) || (createdConfig.providerId != null && createdConfig.providerId!!.isNotBlank())) {
+            "Either domain or providerId must be set"
+        }
+
+        require(createdConfig.domain == null || createdConfig.providerId == null) {
+            "Either domain or providerId must be set, not both"
+        }
+
         var codeChallenge: String? = null
         if (this.config.flowType == FlowType.PKCE) {
             val codeVerifier = generateCodeVerifier()
@@ -135,9 +141,11 @@ internal class GoTrueImpl(
                 put("code_challenge", it)
                 put("code_challenge_method", "s256")
             }
-            when (createdConfig) {
-                is SSO.Config.Domain -> put("domain", createdConfig.domain)
-                is SSO.Config.Provider -> put("provider_id", createdConfig.providerId)
+            createdConfig?.domain.let {
+                put("domain", it)
+            }
+            createdConfig?.providerId.let {
+                put("provider_id", it)
             }
         }).body()
     }
@@ -174,39 +182,6 @@ internal class GoTrueImpl(
             _sessionStatus.value = SessionStatus.Authenticated(newSession)
         }
         return userInfo
-    }
-
-    @OptIn(SupabaseExperimental::class)
-    override suspend fun <C, R, Provider : DefaultAuthProvider<C, R>> sendOtpTo(
-        provider: Provider,
-        createUser: Boolean,
-        redirectUrl: String?,
-        data: JsonObject?,
-        config: C.() -> Unit
-    ) {
-        val finalRedirectUrl = generateRedirectUrl(redirectUrl)
-        val body = buildJsonObject {
-            putJsonObject(provider.encodeCredentials(config))
-            put("create_user", createUser)
-            data?.let {
-                put("data", it)
-            }
-        }
-        var codeChallenge: String? = null
-        if (this.config.flowType == FlowType.PKCE) {
-            val codeVerifier = generateCodeVerifier()
-            codeVerifierCache.saveCodeVerifier(codeVerifier)
-            codeChallenge = generateCodeChallenge(codeVerifier)
-        }
-        api.postJson("otp", buildJsonObject {
-            putJsonObject(body)
-            codeChallenge?.let {
-                put("code_challenge", it)
-                put("code_challenge_method", "s256")
-            }
-        }) {
-            finalRedirectUrl?.let { url.parameters.append("redirect_to", it) }
-        }
     }
 
     suspend fun resend(type: String, body: JsonObjectBuilder.() -> Unit) {
@@ -262,7 +237,7 @@ internal class GoTrueImpl(
         api.get("reauthenticate")
     }
 
-    override suspend fun logout(scope: LogoutScope) {
+    override suspend fun signOut(scope: SignOutScope) {
         if (currentSessionOrNull() != null) {
             api.post("logout") {
                 parameter("scope", scope.name.lowercase())
@@ -271,7 +246,7 @@ internal class GoTrueImpl(
         } else {
             Logger.i { "Skipping session logout as there is no session available. Proceeding to clean up local data..." }
         }
-        if (scope != LogoutScope.OTHERS) {
+        if (scope != SignOutScope.OTHERS) {
             clearSession()
         }
         Logger.d { "Successfully logged out" }
@@ -309,11 +284,11 @@ internal class GoTrueImpl(
 
     override suspend fun verifyPhoneOtp(
         type: OtpType.Phone,
-        phoneNumber: String,
+        phone: String,
         token: String,
         captchaToken: String?
     ) = verify(type.type, token, captchaToken) {
-        put("phone", phoneNumber)
+        put("phone", phone)
     }
 
     override suspend fun retrieveUser(jwt: String): UserInfo {
@@ -407,7 +382,7 @@ internal class GoTrueImpl(
         try {
             importRefreshedSession()
         } catch (e: RestException) {
-            logout()
+            signOut()
             Logger.e(e) { "Couldn't refresh session. The refresh token may have been revoked." }
         } catch (e: Exception) {
             Logger.e(e) { "Couldn't reach supabase. Either the address doesn't exist or the network might not be on. Retrying in ${config.retryDelay}" }
@@ -490,7 +465,7 @@ internal class GoTrueImpl(
         if (this.config.flowType == FlowType.PKCE) {
             val codeVerifier = generateCodeVerifier()
             authScope.launch {
-                supabaseClient.gotrue.codeVerifierCache.saveCodeVerifier(codeVerifier)
+                supabaseClient.auth.codeVerifierCache.saveCodeVerifier(codeVerifier)
             }
             config.queryParams["code_challenge"] = generateCodeChallenge(codeVerifier)
             config.queryParams["code_challenge_method"] = "S256"
@@ -517,10 +492,10 @@ internal class GoTrueImpl(
 }
 
 @SupabaseInternal
-expect fun GoTrue.setupPlatform()
+expect fun Auth.setupPlatform()
 
 @SupabaseInternal
-expect fun GoTrue.createDefaultSessionManager(): SessionManager
+expect fun Auth.createDefaultSessionManager(): SessionManager
 
 @SupabaseInternal
-expect fun GoTrue.createDefaultCodeVerifierCache(): CodeVerifierCache
+expect fun Auth.createDefaultCodeVerifierCache(): CodeVerifierCache

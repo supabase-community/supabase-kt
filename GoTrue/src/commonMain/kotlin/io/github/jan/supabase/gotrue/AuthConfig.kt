@@ -2,7 +2,6 @@ package io.github.jan.supabase.gotrue
 
 import io.github.jan.supabase.SupabaseClientBuilder
 import io.github.jan.supabase.SupabaseSerializer
-import io.github.jan.supabase.annotations.SupabaseExperimental
 import io.github.jan.supabase.plugins.CustomSerializationConfig
 import io.github.jan.supabase.plugins.MainConfig
 import kotlinx.coroutines.CoroutineDispatcher
@@ -11,17 +10,17 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
 /**
- * The configuration for [GoTrue]
+ * The configuration for [Auth]
  */
-expect class GoTrueConfig() : MainConfig, CustomSerializationConfig, GoTrueConfigDefaults
+expect class AuthConfig() : MainConfig, CustomSerializationConfig, AuthConfigDefaults
 
 /**
- * The default values for the [GoTrueConfig]
+ * The default values for the [AuthConfig]
  */
-open class GoTrueConfigDefaults {
+open class AuthConfigDefaults {
 
     /**
-     * The duration after which [GoTrue] should retry refreshing a session, when it failed due to network issues
+     * The duration after which [Auth] should retry refreshing a session, when it failed due to network issues
      */
     var retryDelay: Duration = 10.seconds
 
@@ -31,7 +30,7 @@ open class GoTrueConfigDefaults {
     var alwaysAutoRefresh: Boolean = true
 
     /**
-     * Whether to automatically load the session from [sessionManager], when [GoTrue] is initialized
+     * Whether to automatically load the session from [sessionManager], when [Auth] is initialized
      */
     var autoLoadFromStorage: Boolean = true
 
@@ -71,7 +70,7 @@ open class GoTrueConfigDefaults {
     var jwtToken: String? = null
 
     /**
-     * A serializer used for serializing/deserializing objects e.g. in [GoTrue.sendOtpTo]. Defaults to [SupabaseClientBuilder.defaultSerializer], when null.
+     * A serializer used for serializing/deserializing objects e.g. in [Auth.sendOtpTo]. Defaults to [SupabaseClientBuilder.defaultSerializer], when null.
      */
     var serializer: SupabaseSerializer? = null
 
@@ -93,6 +92,5 @@ enum class FlowType {
      *
      * Note: OTP's via a link and sign up verification links are not supported on desktop. Replace your email template to send the token instead.
      */
-    @SupabaseExperimental
     PKCE
 }

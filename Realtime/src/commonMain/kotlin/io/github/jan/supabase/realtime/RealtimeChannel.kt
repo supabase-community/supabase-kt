@@ -36,10 +36,10 @@ sealed interface RealtimeChannel {
     val callbackManager: CallbackManager
 
     /**
-     * Joins the channel
-     * @param blockUntilJoined if true, the method will block until the [status] is [Status.JOINED]
+     * Subscribes to the channel
+     * @param blockUntilSubscribed if true, the method will block the coroutine until the [status] is [Status.JOINED]
      */
-    suspend fun join(blockUntilJoined: Boolean = false)
+    suspend fun subscribe(blockUntilSubscribed: Boolean = false)
 
     /**
      * Updates the JWT token for this client
@@ -47,9 +47,9 @@ sealed interface RealtimeChannel {
     suspend fun updateAuth(jwt: String)
 
     /**
-     * Leaves the channel
+     * Unsubscribes from the channel
      */
-    suspend fun leave()
+    suspend fun unsubscribe()
 
     /**
      * Sends a message to everyone who joined the channel. Can be used even if you aren't connected to the channel.
@@ -77,10 +77,10 @@ sealed interface RealtimeChannel {
      * Represents the status of a channel
      */
     enum class Status {
-        CLOSED,
-        JOINING,
-        JOINED,
-        LEAVING,
+        UNSUBSCRIBED,
+        SUBSCRIBING,
+        SUBSCRIBED,
+        UNSUBSCRIBING,
     }
 
     @Suppress("UndocumentedPublicProperty")
@@ -141,7 +141,7 @@ fun RealtimeChannel.presenceChangeFlow(): Flow<PresenceAction> {
  */
 @OptIn(SupabaseInternal::class)
 inline fun <reified T : PostgresAction> RealtimeChannel.postgresChangeFlow(schema: String, filter: PostgresChangeFilter.() -> Unit = {}): Flow<T> {
-    if(status.value == RealtimeChannel.Status.JOINED) error("You cannot call postgresChangeFlow after joining the channel")
+    if(status.value == RealtimeChannel.Status.SUBSCRIBED) error("You cannot call postgresChangeFlow after joining the channel")
     val event = when(T::class) {
         PostgresAction.Insert::class -> "INSERT"
         PostgresAction.Update::class -> "UPDATE"
