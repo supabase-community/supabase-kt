@@ -4,6 +4,7 @@ import io.github.jan.supabase.gotrue.PostgrestFilterDSL
 import io.github.jan.supabase.postgrest.PropertyConversionMethod
 import kotlin.reflect.KProperty1
 
+@PostgrestFilterDSL
 class PostgrestFilterBuilder(
     @PublishedApi internal val propertyConversionMethod: PropertyConversionMethod,
     @PublishedApi internal val _params: MutableMap<String, List<String>> = mutableMapOf()

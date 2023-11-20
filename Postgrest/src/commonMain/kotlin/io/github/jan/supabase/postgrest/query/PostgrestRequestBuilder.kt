@@ -153,7 +153,7 @@ class PostgrestRequestBuilder(@PublishedApi internal val propertyConversionMetho
         ignoreDuplicates = true
     }
 
-    inline fun filter(block: PostgrestFilterBuilder.() -> Unit) {
+    inline fun filter(block: @PostgrestFilterDSL PostgrestFilterBuilder.() -> Unit) {
         val filter = PostgrestFilterBuilder(propertyConversionMethod, _params)
         filter.block()
     }
