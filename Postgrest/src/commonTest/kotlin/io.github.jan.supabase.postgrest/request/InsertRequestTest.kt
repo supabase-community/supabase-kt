@@ -13,7 +13,6 @@ class InsertRequestTest {
     @Test
     fun testCreateInsertRequest_withUpsert_thenReturnCorrectValue() {
         sut = InsertRequest(
-            onConflict = "on_conflict",
             returning = Returning.REPRESENTATION,
             count = Count.EXACT,
             upsert = true,
@@ -32,13 +31,11 @@ class InsertRequestTest {
         assertEquals("table", sut.schema)
         assertEquals(mapOf("Key1" to listOf("Value1")), sut.filter)
         assertEquals(JsonArray(listOf()), sut.body)
-        assertEquals(mapOf("on_conflict" to "on_conflict"), sut.urlParams)
     }
 
     @Test
     fun testCreateInsertRequest_notUpsert_thenReturnCorrectValue() {
         sut = InsertRequest(
-            onConflict = "on_conflict",
             returning = Returning.REPRESENTATION,
             count = Count.EXACT,
             upsert = false,
@@ -63,7 +60,6 @@ class InsertRequestTest {
     @Test
     fun testCreateInsertRequest_withoutCount_thenReturnCorrectValue() {
         sut = InsertRequest(
-            onConflict = "on_conflict",
             returning = Returning.REPRESENTATION,
             count = null,
             upsert = false,

@@ -10,7 +10,7 @@ import io.ktor.http.HttpMethod
     val count: Count? = null,
     override val filter: Map<String, List<String>>,
     override val schema: String,
-    override val headers: Headers
+    override val headers: Headers = Headers.Empty,
 ): PostgrestRequest {
 
     override val method = if (head) HttpMethod.Head else HttpMethod.Get

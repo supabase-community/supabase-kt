@@ -11,7 +11,7 @@ import io.ktor.http.HttpHeaders
 import kotlin.js.JsName
 
 /**
- * A filter builder for a postgrest query
+ * A builder for Postgrest requests.
  */
 @PostgrestFilterDSL
 class PostgrestRequestBuilder(@PublishedApi internal val propertyConversionMethod: PropertyConversionMethod) {

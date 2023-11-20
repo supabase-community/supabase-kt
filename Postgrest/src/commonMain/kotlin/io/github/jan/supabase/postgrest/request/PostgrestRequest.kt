@@ -19,7 +19,6 @@ sealed interface PostgrestRequest {
     val filter: Map<String, List<String>>
     val headers: Headers get() = Headers.Empty
     val prefer: List<String>
-    val single: Boolean get() = false
     val urlParams: Map<String, String> get() = mapOf()
     val schema: String
 

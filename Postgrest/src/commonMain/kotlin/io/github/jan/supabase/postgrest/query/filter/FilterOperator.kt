@@ -1,3 +1,8 @@
+@file:Suppress(
+    "UndocumentedPublicClass",
+    "UndocumentedPublicFunction",
+    "UndocumentedPublicProperty"
+)
 package io.github.jan.supabase.postgrest.query.filter
 
 /**

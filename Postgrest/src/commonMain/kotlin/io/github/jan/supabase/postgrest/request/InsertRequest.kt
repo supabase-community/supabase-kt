@@ -16,7 +16,7 @@ internal data class InsertRequest(
     override val body: JsonArray,
     override val filter: Map<String, List<String>>,
     override val schema: String,
-    override val headers: Headers
+    override val headers: Headers = Headers.Empty,
 ) : PostgrestRequest {
 
     override val method = HttpMethod.Post

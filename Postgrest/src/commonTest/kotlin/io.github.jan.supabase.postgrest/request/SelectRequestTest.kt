@@ -17,7 +17,6 @@ class SelectRequestTest {
         sut = SelectRequest(
             head = true,
             count = Count.EXACT,
-            single = true,
             filter = mapOf("Key1" to listOf("Value1")),
             schema = "table"
         )
@@ -32,7 +31,6 @@ class SelectRequestTest {
             ), sut.prefer
         )
         assertEquals("table", sut.schema)
-        assertTrue(sut.single)
         assertEquals(mapOf("Key1" to listOf("Value1")), sut.filter)
         assertNull(sut.body)
         assertEquals(emptyMap(), sut.urlParams)
@@ -43,7 +41,6 @@ class SelectRequestTest {
         sut = SelectRequest(
             head = false,
             count = Count.EXACT,
-            single = true,
             filter = mapOf("Key1" to listOf("Value1")),
             schema = "table"
         )
@@ -59,7 +56,6 @@ class SelectRequestTest {
             ), sut.prefer
         )
         assertEquals("table", sut.schema)
-        assertTrue(sut.single)
         assertEquals(mapOf("Key1" to listOf("Value1")), sut.filter)
         assertNull(sut.body)
         assertEquals(emptyMap(), sut.urlParams)
@@ -70,7 +66,6 @@ class SelectRequestTest {
         sut = SelectRequest(
             head = false,
             count = null,
-            single = true,
             filter = mapOf("Key1" to listOf("Value1")),
             schema = "table"
         )
@@ -85,7 +80,6 @@ class SelectRequestTest {
             ), sut.prefer
         )
         assertEquals("table", sut.schema)
-        assertTrue(sut.single)
         assertEquals(mapOf("Key1" to listOf("Value1")), sut.filter)
         assertNull(sut.body)
         assertEquals(emptyMap(), sut.urlParams)

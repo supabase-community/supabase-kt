@@ -4,6 +4,9 @@ import io.github.jan.supabase.gotrue.PostgrestFilterDSL
 import io.github.jan.supabase.postgrest.PropertyConversionMethod
 import kotlin.reflect.KProperty1
 
+/**
+ * A builder for Postgrest filters
+ */
 @PostgrestFilterDSL
 class PostgrestFilterBuilder(
     @PublishedApi internal val propertyConversionMethod: PropertyConversionMethod,
