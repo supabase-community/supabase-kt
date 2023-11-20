@@ -2,7 +2,6 @@ package io.github.jan.supabase.postgrest.query.filter
 
 import io.github.jan.supabase.gotrue.PostgrestFilterDSL
 import io.github.jan.supabase.postgrest.PropertyConversionMethod
-import io.github.jan.supabase.postgrest.query.Order
 import kotlin.reflect.KProperty1
 
 class PostgrestFilterBuilder(
@@ -202,43 +201,6 @@ class PostgrestFilterBuilder(
         _params[column] = listOf("${textSearchType.identifier}${configPart}.${query}")
         return this
     }
-
-    /**
-     * Orders the result by [column] in the specified [order].
-     * @param nullsFirst If true, null values will be ordered first
-     * @param referencedTable If the column is from a foreign table, specify the table name here
-     */
-    fun order(column: String, order: Order, nullsFirst: Boolean = false, referencedTable: String? = null) {
-        val key = if (referencedTable == null) "order" else "\"$referencedTable\".order"
-        _params[key] = listOf("${column}.${order.value}.${if (nullsFirst) "nullsfirst" else "nullslast"}")
-    }
-
-    /**
-     * Limits the result to [count] rows
-     * @param referencedTable If the column is from a foreign table, specify the table name here
-     */
-    fun limit(count: Long, referencedTable: String? = null) {
-        val key = if (referencedTable == null) "limit" else "\"$referencedTable\".limit"
-        _params[key] = listOf(count.toString())
-    }
-
-    /**
-     * Limits the result to rows from [from] to [to]
-     * @param referencedTable If the column is from a foreign table, specify the table name here
-     */
-    fun range(from: Long, to: Long, referencedTable: String? = null) {
-        val keyOffset = if (referencedTable == null) "offset" else "\"$referencedTable\".offset"
-        val keyLimit = if (referencedTable == null) "limit" else "\"$referencedTable\".limit"
-
-        _params[keyOffset] = listOf(from.toString())
-        _params[keyLimit] = listOf((to - from + 1).toString())
-    }
-
-    /**
-     * Limits the result to rows from [range.first] to [range.last]
-     * @param referencedTable If the column is from a foreign table, specify the table name here
-     */
-    fun range(range: LongRange, referencedTable: String? = null) = range(range.first, range.last, referencedTable)
 
     /**
      * Finds all rows where the value of the [column] contains [values]

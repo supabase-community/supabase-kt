@@ -6,10 +6,10 @@ import io.ktor.http.Headers
 
 /**
  * Represents the result from a postgrest request
- * @param body The body of the response. Can be null if using an database function.
+ * @param data The data of the response.
  * @param headers The headers of the response
  */
-class PostgrestResult(val body: String, val headers: Headers, @PublishedApi internal val postgrest: Postgrest) {
+class PostgrestResult(val data: String, val headers: Headers, @PublishedApi internal val postgrest: Postgrest) {
 
     private val contentRange = headers["Content-Range"]
 
@@ -27,12 +27,12 @@ class PostgrestResult(val body: String, val headers: Headers, @PublishedApi inte
     }
 
     /**
-     * Decodes [body] as [T] using
+     * Decodes [data] as [T] using
      */
-    inline fun <reified T : Any> decodeAs(): T = postgrest.serializer.decode(body)
+    inline fun <reified T : Any> decodeAs(): T = postgrest.serializer.decode(data)
 
     /**
-     * Decodes [body] as [T] using. If there's an error it will return null
+     * Decodes [data] as [T] using. If there's an error it will return null
      */
     inline fun <reified T : Any> decodeAsOrNull(): T? = try {
         decodeAs()
@@ -41,17 +41,17 @@ class PostgrestResult(val body: String, val headers: Headers, @PublishedApi inte
     }
 
     /**
-     * Decodes [body] as a list of [T]
+     * Decodes [data] as a list of [T]
      */
     inline fun <reified T : Any> decodeList(): List<T> = decodeAs()
 
     /**
-     * Decodes [body] as a list of [T] and returns the first item found
+     * Decodes [data] as a list of [T] and returns the first item found
      */
     inline fun <reified T : Any> decodeSingle(): T = decodeList<T>().first()
 
     /**
-     * Decodes [body] as a list of [T] and returns the first item found or null
+     * Decodes [data] as a list of [T] and returns the first item found or null
      */
     inline fun <reified T : Any> decodeSingleOrNull(): T? = decodeList<T>().firstOrNull()
 
