@@ -57,4 +57,14 @@ class PostgrestResult(val data: String, val headers: Headers, @PublishedApi inte
      */
     inline fun <reified T : Any> decodeSingleOrNull(): T? = decodeList<T>().firstOrNull()
 
+    /**
+     * Returns the data
+     */
+    operator fun component1() = data
+
+    /**
+     * Returns the headers
+     */
+    operator fun component2() = headers
+
 }
