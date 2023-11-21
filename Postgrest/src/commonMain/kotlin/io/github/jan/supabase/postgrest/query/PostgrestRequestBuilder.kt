@@ -33,7 +33,7 @@ class PostgrestRequestBuilder(@PublishedApi internal val propertyConversionMetho
         get() = _params.toMap()
 
     /**
-     * Setting [count] allows to use [PostgrestResult.count] to get the total amount of items in the database.
+     * Setting [count] allows to use [PostgrestResult.countOrNull] to get the total amount of items in the database.
      * @param count algorithm to use to count rows in the table or view.
      */
     fun count(count: Count) {

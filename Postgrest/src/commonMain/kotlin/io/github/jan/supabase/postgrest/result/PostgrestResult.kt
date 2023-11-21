@@ -2,6 +2,8 @@ package io.github.jan.supabase.postgrest.result
 
 import io.github.jan.supabase.decode
 import io.github.jan.supabase.postgrest.Postgrest
+import io.github.jan.supabase.postgrest.query.Count
+import io.github.jan.supabase.postgrest.query.PostgrestRequestBuilder
 import io.ktor.http.Headers
 
 /**
@@ -14,14 +16,14 @@ class PostgrestResult(val data: String, val headers: Headers, @PublishedApi inte
     private val contentRange = headers["Content-Range"]
 
     /**
-     * Returns the total amount of items in the database (null if no [Count] option was used in the request)
+     * Returns the total amount of items in the database, or null if no [Count] option was set in the [PostgrestRequestBuilder]
      */
-    fun count(): Long? = contentRange?.substringAfter("/")?.toLongOrNull()
+    fun countOrNull(): Long? = contentRange?.substringAfter("/")?.toLongOrNull()
 
     /**
      * Returns the range of items returned
      */
-    fun range(): LongRange? = contentRange?.substringBefore("/")?.let {
+    fun rangeOrNull(): LongRange? = contentRange?.substringBefore("/")?.let {
         val (start, end) = it.split("-")
         LongRange(start.toLong(), end.toLong())
     }
