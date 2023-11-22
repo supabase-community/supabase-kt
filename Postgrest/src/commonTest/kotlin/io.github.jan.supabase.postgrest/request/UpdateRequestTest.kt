@@ -32,7 +32,6 @@ class UpdateRequestTest {
         assertEquals("table", sut.schema)
         assertEquals(mapOf("Key1" to "Value1"), sut.urlParams)
         assertEquals(JsonArray(listOf()), sut.body)
-        assertEquals(mapOf(), sut.urlParams)
     }
 
     @Test
@@ -54,7 +53,6 @@ class UpdateRequestTest {
         assertEquals("table", sut.schema)
         assertEquals(mapOf("Key1" to "Value1"), sut.urlParams)
         assertEquals(JsonArray(listOf()), sut.body)
-        assertEquals(mapOf(), sut.urlParams)
     }
 
 }
