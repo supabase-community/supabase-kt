@@ -56,10 +56,10 @@ class PostgrestQueryBuilder(
 
     /**
      * Perform an UPSERT on the table or view. Depending on the column(s) passed
-     * to [PostgrestRequestBuilder.onConflict], [upsert] allows you to perform the equivalent of
+     * to [onConflict], [upsert] allows you to perform the equivalent of
      * `[insert] if a row with the corresponding onConflict columns doesn't
      * exist, or if it does exist, perform an alternative action depending on
-     * [PostgrestRequestBuilder.ignoreDuplicates].
+     * [ignoreDuplicates].
      *
      * By default, upserted rows are not returned. To return it, call `[PostgrestRequestBuilder.select]`.
      *
@@ -103,10 +103,10 @@ class PostgrestQueryBuilder(
 
     /**
      * Perform an UPSERT on the table or view. Depending on the column(s) passed
-     * to [PostgrestRequestBuilder.onConflict], [upsert] allows you to perform the equivalent of
+     * to [onConflict], [upsert] allows you to perform the equivalent of
      * `[insert] if a row with the corresponding onConflict columns doesn't
      * exist, or if it does exist, perform an alternative action depending on
-     * [PostgrestRequestBuilder.ignoreDuplicates].
+     * [ignoreDuplicates].
      *
      * By default, upserted rows are not returned. To return it, call `[PostgrestRequestBuilder.select]`.
      *

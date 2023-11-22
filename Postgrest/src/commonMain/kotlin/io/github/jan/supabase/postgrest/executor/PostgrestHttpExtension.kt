@@ -23,7 +23,6 @@ internal fun HttpRequestBuilder.configurePostgrestRequest(
     headers[PostgrestQueryBuilder.HEADER_PREFER] = request.prefer.joinToString(",")
     with(url.parameters) {
         appendAll(parametersOf(request.urlParams.mapValues { (_, value) -> listOf(value) }))
-        appendAll(parametersOf(request.urlParams.mapValues { (_, value) -> listOf(value.first()) }))
     }
     request.body?.let { setBody(it) }
     if (request.schema.isNotBlank()) {
