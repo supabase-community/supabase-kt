@@ -17,7 +17,7 @@ internal fun String.camelToSnakeCase(): String {
     return this.replace(SNAKE_CASE_REGEX, "_$0").lowercase()
 }
 
-fun <T> Map<T, List<T>>.mapToFirstValue() = mapValues { it.value.first() }
+@PublishedApi internal fun <T> Map<T, List<T>>.mapToFirstValue() = mapValues { it.value.first() }
 
 @OptIn(ExperimentalSerializationApi::class)
 @SupabaseInternal

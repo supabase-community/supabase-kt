@@ -30,7 +30,7 @@ suspend inline fun <reified T : Any> Postgrest.rpc(
     val rpcRequest = RpcRequest(
         head = head,
         count = count,
-        urlParams = PostgrestRequestBuilder(config.propertyConversionMethod).apply(filter).params,
+        urlParams = PostgrestRequestBuilder(config.propertyConversionMethod).apply(filter).params.mapToFirstValue(),
         body = encodedParameters
     )
     return RestRequestExecutor.execute(postgrest = this, path = "rpc/$function", request = rpcRequest)
@@ -54,7 +54,7 @@ suspend inline fun Postgrest.rpc(
     val rpcRequest = RpcRequest(
         head = head,
         count = count,
-        urlParams = PostgrestRequestBuilder(config.propertyConversionMethod).apply(filter).params
+        urlParams = PostgrestRequestBuilder(config.propertyConversionMethod).apply(filter).params.mapToFirstValue()
     )
     return RestRequestExecutor.execute(postgrest = this, path = "rpc/$function", request = rpcRequest)
 }
