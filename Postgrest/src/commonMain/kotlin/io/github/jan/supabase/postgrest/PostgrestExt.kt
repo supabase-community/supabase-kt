@@ -3,7 +3,7 @@ package io.github.jan.supabase.postgrest
 import io.github.jan.supabase.encodeToJsonElement
 import io.github.jan.supabase.postgrest.executor.RestRequestExecutor
 import io.github.jan.supabase.postgrest.query.Count
-import io.github.jan.supabase.postgrest.query.PostgrestFilterBuilder
+import io.github.jan.supabase.postgrest.query.PostgrestRequestBuilder
 import io.github.jan.supabase.postgrest.request.RpcRequest
 import io.github.jan.supabase.postgrest.result.PostgrestResult
 import kotlinx.serialization.json.JsonElement
@@ -24,13 +24,13 @@ suspend inline fun <reified T : Any> Postgrest.rpc(
     parameters: T,
     head: Boolean = false,
     count: Count? = null,
-    filter: PostgrestFilterBuilder.() -> Unit = {},
+    filter: PostgrestRequestBuilder.() -> Unit = {},
 ): PostgrestResult {
     val encodedParameters = if (parameters is JsonElement) parameters else serializer.encodeToJsonElement(parameters)
     val rpcRequest = RpcRequest(
         head = head,
         count = count,
-        filter = PostgrestFilterBuilder(config.propertyConversionMethod).apply(filter).params,
+        urlParams = PostgrestRequestBuilder(config.propertyConversionMethod).apply(filter).params.mapToFirstValue(),
         body = encodedParameters
     )
     return RestRequestExecutor.execute(postgrest = this, path = "rpc/$function", request = rpcRequest)
@@ -49,12 +49,12 @@ suspend inline fun Postgrest.rpc(
     function: String,
     head: Boolean = false,
     count: Count? = null,
-    filter: PostgrestFilterBuilder.() -> Unit = {}
+    filter: PostgrestRequestBuilder.() -> Unit = {}
 ): PostgrestResult {
     val rpcRequest = RpcRequest(
         head = head,
         count = count,
-        filter = PostgrestFilterBuilder(config.propertyConversionMethod).apply(filter).params
+        urlParams = PostgrestRequestBuilder(config.propertyConversionMethod).apply(filter).params.mapToFirstValue()
     )
     return RestRequestExecutor.execute(postgrest = this, path = "rpc/$function", request = rpcRequest)
 }

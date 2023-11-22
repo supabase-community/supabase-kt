@@ -7,6 +7,7 @@ import io.github.jan.supabase.postgrest.result.PostgrestResult
 
 @PublishedApi
 internal data object RestRequestExecutor : RequestExecutor {
+
     override suspend fun execute(
         postgrest: Postgrest,
         path: String,
@@ -17,4 +18,5 @@ internal data object RestRequestExecutor : RequestExecutor {
             configurePostgrestRequest(request)
         }.asPostgrestResult(postgrest)
     }
+
 }
