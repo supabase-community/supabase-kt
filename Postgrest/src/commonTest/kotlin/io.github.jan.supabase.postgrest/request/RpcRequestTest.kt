@@ -36,7 +36,6 @@ class RpcRequestTest {
         assertEquals("", sut.schema)
         assertEquals(mapOf("Key1" to "Value1"), sut.urlParams)
         assertEquals(JsonArray(listOf()), sut.body)
-        assertEquals(emptyMap(), sut.urlParams)
     }
 
     @Test
@@ -60,7 +59,6 @@ class RpcRequestTest {
         assertEquals("", sut.schema)
         assertEquals(mapOf("Key1" to "Value1"), sut.urlParams)
         assertEquals(JsonArray(listOf()), sut.body)
-        assertEquals(emptyMap(), sut.urlParams)
     }
 
     @Test
@@ -84,7 +82,6 @@ class RpcRequestTest {
         assertEquals("", sut.schema)
         assertEquals(mapOf("Key1" to "Value1"), sut.urlParams)
         assertEquals(JsonArray(listOf()), sut.body)
-        assertEquals(emptyMap(), sut.urlParams)
     }
 
     @Test
@@ -105,7 +102,6 @@ class RpcRequestTest {
         assertEquals("", sut.schema)
         assertEquals(mapOf("Key1" to "Value1"), sut.urlParams)
         assertNull(sut.body)
-        assertEquals(emptyMap(), sut.urlParams)
     }
     @Test
     fun testCreateRpcRequest_notHeadAndWithoutCount_thenReturnCorrectValue() {
@@ -124,7 +120,6 @@ class RpcRequestTest {
         assertEquals("", sut.schema)
         assertEquals(mapOf("Key1" to "Value1"), sut.urlParams)
         assertEquals(JsonArray(listOf()), sut.body)
-        assertEquals(emptyMap(), sut.urlParams)
     }
 
 }
