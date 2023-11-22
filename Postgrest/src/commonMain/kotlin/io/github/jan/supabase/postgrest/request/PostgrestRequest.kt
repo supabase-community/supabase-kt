@@ -16,10 +16,9 @@ sealed interface PostgrestRequest {
 
     val body: JsonElement? get() = null
     val method: HttpMethod
-    val filter: Map<String, List<String>>
+    val urlParams: Map<String, String>
     val headers: Headers get() = Headers.Empty
     val prefer: List<String>
-    val urlParams: Map<String, String> get() = mapOf()
     val schema: String
 
 }

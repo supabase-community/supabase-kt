@@ -9,12 +9,12 @@ import kotlinx.serialization.json.JsonArray
 @PublishedApi
 internal data class InsertRequest(
     private val upsert: Boolean = false,
-    private val returning: Returning = Returning.REPRESENTATION,
+    private val returning: Returning = Returning.MINIMAL,
     private val count: Count? = null,
     private val ignoreDuplicates: Boolean = false,
     private val defaultToNull: Boolean = false,
     override val body: JsonArray,
-    override val filter: Map<String, List<String>>,
+    override val urlParams: Map<String, String>,
     override val schema: String,
     override val headers: Headers = Headers.Empty,
 ) : PostgrestRequest {

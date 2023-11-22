@@ -7,6 +7,7 @@ import io.github.jan.supabase.exceptions.RestException
 import io.github.jan.supabase.gotrue.PostgrestFilterDSL
 import io.github.jan.supabase.postgrest.Postgrest
 import io.github.jan.supabase.postgrest.executor.RestRequestExecutor
+import io.github.jan.supabase.postgrest.mapToFirstValue
 import io.github.jan.supabase.postgrest.request.DeleteRequest
 import io.github.jan.supabase.postgrest.request.InsertRequest
 import io.github.jan.supabase.postgrest.request.SelectRequest
@@ -46,7 +47,7 @@ class PostgrestQueryBuilder(
         val selectRequest = SelectRequest(
             head = head,
             count = requestBuilder.count,
-            filter = requestBuilder.params,
+            urlParams = requestBuilder.params.mapToFirstValue(),
             schema = schema,
             headers = requestBuilder.headers.build()
         )
@@ -91,7 +92,7 @@ class PostgrestQueryBuilder(
             upsert = true,
             returning = requestBuilder.returning,
             count = requestBuilder.count,
-            filter = requestBuilder.params,
+            urlParams = requestBuilder.params.mapToFirstValue(),
             defaultToNull = defaultToNull,
             ignoreDuplicates = ignoreDuplicates,
             schema = schema,
@@ -148,7 +149,7 @@ class PostgrestQueryBuilder(
             body = postgrest.serializer.encodeToJsonElement(values).jsonArray,
             returning = requestBuilder.returning,
             count = requestBuilder.count,
-            filter = requestBuilder.params,
+            urlParams = requestBuilder.params.mapToFirstValue(),
             schema = schema,
             headers = requestBuilder.headers.build()
         )
@@ -189,7 +190,7 @@ class PostgrestQueryBuilder(
             body = buildPostgrestUpdate(postgrest.config.propertyConversionMethod, postgrest.serializer, update),
             returning = requestBuilder.returning,
             count = requestBuilder.count,
-            filter = requestBuilder.params,
+            urlParams = requestBuilder.params.mapToFirstValue(),
             schema = schema,
             headers = requestBuilder.headers.build()
         )
@@ -215,7 +216,7 @@ class PostgrestQueryBuilder(
         val updateRequest = UpdateRequest(
             returning = requestBuilder.returning,
             count = requestBuilder.count,
-            filter = requestBuilder.params,
+            urlParams = requestBuilder.params.mapToFirstValue(),
             body = postgrest.serializer.encodeToJsonElement(value),
             schema = schema,
             headers = requestBuilder.headers.build()
@@ -240,7 +241,7 @@ class PostgrestQueryBuilder(
         val deleteRequest = DeleteRequest(
             returning = requestBuilder.returning,
             count = requestBuilder.count,
-            filter = requestBuilder.params,
+            urlParams = requestBuilder.params.mapToFirstValue(),
             schema = schema,
             headers = requestBuilder.headers.build()
         )

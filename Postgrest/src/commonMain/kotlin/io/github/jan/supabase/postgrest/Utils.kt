@@ -17,6 +17,8 @@ internal fun String.camelToSnakeCase(): String {
     return this.replace(SNAKE_CASE_REGEX, "_$0").lowercase()
 }
 
+fun <T> Map<T, List<T>>.mapToFirstValue() = mapValues { it.value.first() }
+
 @OptIn(ExperimentalSerializationApi::class)
 @SupabaseInternal
 inline fun <reified T> classPropertyNames(): List<String> = serializerOrNull(typeOf<T>())?.descriptor?.elementNames?.toList() ?: throw IllegalArgumentException("Could not find serializer for ${T::class.simpleName}")

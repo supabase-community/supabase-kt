@@ -17,7 +17,7 @@ class UpdateRequestTest {
             returning = Returning.REPRESENTATION,
             count = Count.EXACT,
             body = JsonArray(listOf()),
-            filter = mapOf("Key1" to listOf("Value1")),
+            urlParams = mapOf("Key1" to "Value1"),
             schema = "table"
         )
 
@@ -30,7 +30,7 @@ class UpdateRequestTest {
             ), sut.prefer
         )
         assertEquals("table", sut.schema)
-        assertEquals(mapOf("Key1" to listOf("Value1")), sut.filter)
+        assertEquals(mapOf("Key1" to "Value1"), sut.urlParams)
         assertEquals(JsonArray(listOf()), sut.body)
         assertEquals(mapOf(), sut.urlParams)
     }
@@ -41,7 +41,7 @@ class UpdateRequestTest {
             returning = Returning.REPRESENTATION,
             count = null,
             body = JsonArray(listOf()),
-            filter = mapOf("Key1" to listOf("Value1")),
+            urlParams = mapOf("Key1" to "Value1"),
             schema = "table"
         )
 
@@ -52,7 +52,7 @@ class UpdateRequestTest {
             ), sut.prefer
         )
         assertEquals("table", sut.schema)
-        assertEquals(mapOf("Key1" to listOf("Value1")), sut.filter)
+        assertEquals(mapOf("Key1" to "Value1"), sut.urlParams)
         assertEquals(JsonArray(listOf()), sut.body)
         assertEquals(mapOf(), sut.urlParams)
     }

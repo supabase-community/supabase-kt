@@ -8,7 +8,7 @@ import io.ktor.http.HttpMethod
  internal class SelectRequest(
     val head: Boolean = false,
     val count: Count? = null,
-    override val filter: Map<String, List<String>>,
+    override val urlParams: Map<String, String>,
     override val schema: String,
     override val headers: Headers = Headers.Empty,
 ): PostgrestRequest {
