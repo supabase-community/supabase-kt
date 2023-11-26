@@ -16,14 +16,14 @@ import io.github.jan.supabase.postgrest.query.PostgrestUpdate
  *
  * To use it you need to install it to the [SupabaseClient]:
  * ```kotlin
- * val client = createSupabaseClient(supabaseUrl, supabaseKey) {
+ * val supabase = createSupabaseClient(supabaseUrl, supabaseKey) {
  *    install(Postgrest)
  * }
  * ```
  *
  * then you can use it like this:
  * ```kotlin
- * val product = client.postgrest["products"].select {
+ * val product = supabase.postgrest["products"].select {
  *    Product::id eq 2
  * }.decodeSingle<Product>()
  * ```

@@ -22,28 +22,24 @@ import kotlin.time.Duration.Companion.seconds
  *
  * To use it you need to install it to the [SupabaseClient]:
  * ```kotlin
- * val client = createSupabaseClient(supabaseUrl, supabaseKey) {
+ * val supabase = createSupabaseClient(supabaseUrl, supabaseKey) {
  *    install(Realtime)
  * }
  * ```
  *
- * then you have to connect to the websocket:
+ * You can then create a channel:
  * ```kotlin
- * client.realtime.connect()
+ * val channel = supabase.realtime.channel("channelId")
  * ```
- * You can then subscribe to a channel:
- * ```kotlin
- * val channel = client.realtime.createChannel("channelId")
- * ```
- * You can then listen to events on the channel:
+ * Then listen to events on the channel:
  * ```kotlin
  * val productChangeFlow = channel.postgrestChangeFlow<PostgrestAction.Insert>(schema = "public") {
  *    table = "products"
  * }.map { it.decodeRecord<Product>() }
  * ```
- * And at last you have to join the channel:
+ * And at last you have to subscribe to the channel:
  * ```kotlin
- * channel.join()
+ * channel.subscribe()
  * ```
  */
 sealed interface Realtime : MainPlugin<Realtime.Config>, CustomSerializationPlugin {

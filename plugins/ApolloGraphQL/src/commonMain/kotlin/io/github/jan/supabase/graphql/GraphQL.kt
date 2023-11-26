@@ -24,7 +24,7 @@ import com.apollographql.apollo3.api.http.HttpResponse as ApolloHttpResponse
 sealed interface GraphQL: MainPlugin<GraphQL.Config> {
 
     /**
-     * The Apollo client. Customizable via [Config.apolloConfiguration]
+     * The Apollo Client. Customizable via [Config.apolloConfiguration]
      */
     val apolloClient: ApolloClient
 
