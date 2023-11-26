@@ -267,6 +267,15 @@ enum class Count(val identifier: String) {
  * Can be used to specify whether you want e.g. the inserted row to be returned on creation with all its new fields
  */
 sealed class Returning(val identifier: String) {
+
+    /**
+     * Doesn't return any data
+     */
     data object Minimal: Returning("minimal")
-    data class Representation(val columns: Columns): Returning("representation")
+
+    /**
+     * Returns data based on the [columns] specified
+     * @param columns The columns to return, defaults to [Columns.ALL]. You can also use [Columns.list], [Columns.type] or [Columns.raw] to specify the columns
+     */
+    data class Representation(val columns: Columns = Columns.ALL): Returning("representation")
 }

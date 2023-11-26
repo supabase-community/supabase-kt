@@ -13,7 +13,7 @@ class InsertRequestTest {
     @Test
     fun testCreateInsertRequest_withUpsert_thenReturnCorrectValue() {
         sut = InsertRequest(
-            returning = Returning.Representation,
+            returning = Returning.Representation(),
             count = Count.EXACT,
             upsert = true,
             body = JsonArray(listOf()),
@@ -38,7 +38,7 @@ class InsertRequestTest {
     @Test
     fun testCreateInsertRequest_notUpsert_thenReturnCorrectValue() {
         sut = InsertRequest(
-            returning = Returning.Representation,
+            returning = Returning.Representation(),
             count = Count.EXACT,
             upsert = false,
             body = JsonArray(listOf()),
@@ -62,7 +62,7 @@ class InsertRequestTest {
     @Test
     fun testCreateInsertRequest_withoutCount_thenReturnCorrectValue() {
         sut = InsertRequest(
-            returning = Returning.Representation,
+            returning = Returning.Representation(),
             count = null,
             upsert = false,
             body = JsonArray(listOf()),

@@ -42,6 +42,7 @@ class PostgrestRequestBuilder(@PublishedApi internal val propertyConversionMetho
 
     /**
      * Return `data` after the query has been executed.
+     * @param columns The columns to return
      */
     fun select(columns: Columns = Columns.ALL) {
         this.returning = Returning.Representation(columns)

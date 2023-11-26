@@ -12,7 +12,7 @@ class DeleteRequestTest {
     @Test
     fun testCreateDeleteRequest_thenReturnCorrectValue() {
         sut = DeleteRequest(
-            returning = Returning.Representation,
+            returning = Returning.Representation(),
             count = Count.EXACT,
             urlParams = mapOf("Key1" to "Value1"),
             schema = "table"
@@ -27,7 +27,7 @@ class DeleteRequestTest {
     @Test
     fun testCreateDeleteRequest_withoutCount_thenReturnCorrectValue() {
         sut = DeleteRequest(
-            returning = Returning.Representation,
+            returning = Returning.Representation(),
             count = null,
             urlParams = mapOf("Key1" to "Value1"),
             schema = "table"
