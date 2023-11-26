@@ -9,7 +9,7 @@ import kotlinx.serialization.json.JsonArray
 @PublishedApi
 internal data class InsertRequest(
     private val upsert: Boolean = false,
-    private val returning: Returning = Returning.MINIMAL,
+    override val returning: Returning = Returning.Minimal,
     private val count: Count? = null,
     private val ignoreDuplicates: Boolean = false,
     private val defaultToNull: Boolean = false,

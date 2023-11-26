@@ -21,7 +21,7 @@ class PostgrestRequestBuilderTest {
         val request = postgrestRequest {
             select()
         }
-        assertEquals(Returning.REPRESENTATION, request.returning)
+        assertEquals(Returning.Representation, request.returning)
     }
 
     @Test

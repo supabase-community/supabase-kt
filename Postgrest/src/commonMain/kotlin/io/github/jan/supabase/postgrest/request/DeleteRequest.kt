@@ -7,7 +7,7 @@ import io.ktor.http.HttpMethod
 
 @PublishedApi
 internal class DeleteRequest(
-    private val returning: Returning = Returning.MINIMAL,
+    override val returning: Returning = Returning.Minimal,
     private val count: Count? = null,
     override val urlParams: Map<String, String>,
     override val schema: String,

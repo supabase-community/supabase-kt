@@ -25,7 +25,7 @@ class PostgrestRequestBuilder(@PublishedApi internal val propertyConversionMetho
     /**
      * The [Returning] option to use.
      */
-    var returning: Returning = Returning.MINIMAL
+    var returning: Returning = Returning.Minimal
         private set
     @PublishedApi internal val _params: MutableMap<String, List<String>> = mutableMapOf()
     @PublishedApi internal val headers: HeadersBuilder = HeadersBuilder()
@@ -43,8 +43,8 @@ class PostgrestRequestBuilder(@PublishedApi internal val propertyConversionMetho
     /**
      * Return `data` after the query has been executed.
      */
-    fun select() {
-        this.returning = Returning.REPRESENTATION
+    fun select(columns: Columns = Columns.ALL) {
+        this.returning = Returning.Representation(columns)
     }
 
     /**

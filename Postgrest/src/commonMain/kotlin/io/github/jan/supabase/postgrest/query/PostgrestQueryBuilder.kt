@@ -266,8 +266,7 @@ enum class Count(val identifier: String) {
 /**
  * Can be used to specify whether you want e.g. the inserted row to be returned on creation with all its new fields
  */
-enum class Returning(val identifier: String) {
-    MINIMAL("minimal"),
-    REPRESENTATION("representation"),
-    HEADERS_ONLY("headers-only")
+sealed class Returning(val identifier: String) {
+    data object Minimal: Returning("minimal")
+    data class Representation(val columns: Columns): Returning("representation")
 }

@@ -14,7 +14,7 @@ class UpdateRequestTest {
     @Test
     fun testCreateUpdateRequest_thenReturnCorrectValue() {
         sut = UpdateRequest(
-            returning = Returning.REPRESENTATION,
+            returning = Returning.Representation,
             count = Count.EXACT,
             body = JsonArray(listOf()),
             urlParams = mapOf("Key1" to "Value1"),
@@ -37,7 +37,7 @@ class UpdateRequestTest {
     @Test
     fun testCreateUpdateRequest_withoutCount_thenReturnCorrectValue() {
         sut = UpdateRequest(
-            returning = Returning.REPRESENTATION,
+            returning = Returning.Representation,
             count = null,
             body = JsonArray(listOf()),
             urlParams = mapOf("Key1" to "Value1"),

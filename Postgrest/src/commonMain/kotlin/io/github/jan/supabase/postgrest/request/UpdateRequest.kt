@@ -8,7 +8,7 @@ import kotlinx.serialization.json.JsonElement
 
 @PublishedApi
 internal class UpdateRequest(
-    private val returning: Returning = Returning.MINIMAL,
+    override val returning: Returning = Returning.Minimal,
     private val count: Count? = null,
     override val urlParams: Map<String, String>,
     override val body: JsonElement,
