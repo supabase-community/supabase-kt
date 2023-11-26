@@ -51,7 +51,7 @@ class PostgrestRequestBuilder(@PublishedApi internal val propertyConversionMetho
     /**
      * Return `data` as a single object instead of an array of objects.
      *
-     * Query result must be one row (e.g. using `.limit(1)`), otherwise this
+     * Query result must be one row (e.g. using `limit(1)`), otherwise this
      * returns an error.
      */
     @JsName("singleValue")
