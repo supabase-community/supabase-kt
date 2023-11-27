@@ -21,10 +21,10 @@ class AuthenticatedSupabaseApi @SupabaseInternal constructor(
 ): SupabaseApi(resolveUrl, parseErrorResponse, supabaseClient) {
 
     override suspend fun rawRequest(url: String, builder: HttpRequestBuilder.() -> Unit): HttpResponse = super.rawRequest(url) {
-        val accessToken = supabaseClient.pluginManager.getPluginOrNull(Auth)?.let { gotrue ->
-            jwtToken ?: gotrue.currentAccessTokenOrNull()
-        }
-        bearerAuth(accessToken ?: supabaseClient.supabaseKey)
+        val jwtToken = jwtToken ?: supabaseClient.pluginManager.getPluginOrNull(Auth)?.let { gotrue ->
+            gotrue.currentAccessTokenOrNull()
+        } ?: supabaseClient.supabaseKey
+        bearerAuth(jwtToken)
         builder()
         defaultRequest?.invoke(this)
     }
@@ -36,10 +36,10 @@ class AuthenticatedSupabaseApi @SupabaseInternal constructor(
         builder: HttpRequestBuilder.() -> Unit
     ): HttpStatement {
         return super.prepareRequest(url) {
-            supabaseClient.pluginManager.getPluginOrNull(Auth)?.let { gotrue ->
-                val jwtToken = jwtToken ?: gotrue.currentAccessTokenOrNull() ?: supabaseClient.supabaseKey
-                bearerAuth(jwtToken)
-            }
+            val jwtToken = jwtToken ?: supabaseClient.pluginManager.getPluginOrNull(Auth)?.let { gotrue ->
+                gotrue.currentAccessTokenOrNull()
+            } ?: supabaseClient.supabaseKey
+            bearerAuth(jwtToken)
             builder()
             defaultRequest?.invoke(this)
         }
