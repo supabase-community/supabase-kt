@@ -93,7 +93,7 @@ class SupabaseClientBuilder @PublishedApi internal constructor(private val supab
     /**
      * Installs a plugin to the [SupabaseClient]
      *
-     * Plugins can be either retrieved by calling [PluginManager.getPlugin] within your [SupabaseClient] instance or by using the corresponding **SupabaseClient.plugin** function.
+     * Plugins can be either retrieved by calling [PluginManager.getPlugin] within your [SupabaseClient] instance or by using the corresponding **SupabaseClient.plugin** extension property.
      */
     @SupabaseDsl
     fun <Config, PluginInstance : SupabasePlugin, Provider : SupabasePluginProvider<Config, PluginInstance>> install(plugin: Provider, init: @SupabaseDsl Config.() -> Unit = {}) {
