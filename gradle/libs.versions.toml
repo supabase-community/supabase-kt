@@ -2,10 +2,10 @@
 kotlin = "1.9.21"
 ktor = "2.3.6"
 dokka = "1.9.10"
-kotlinx-datetime = "0.4.0" #0.4.1 broken currently on android
+kotlinx-datetime = "0.5.0"
 kermit = "2.0.2"
 atomicfu = "0.23.1"
-coroutines = "1.7.3"
+coroutines = "1.8.0-RC"
 android-lifecycle = "2.6.2"
 androidx-startup = "1.1.1"
 androidx-activity-compose = "1.8.1"
