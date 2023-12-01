@@ -2,7 +2,6 @@ name: Question
 description: Template for questions
 title: '[Question]: '
 labels: ["question"]
-assignees: jan-tennert
 body:
   - type: checkboxes
     id: general
