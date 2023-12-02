@@ -4,7 +4,6 @@ package io.github.jan.supabase.gotrue.user
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonObject
 
 @Serializable
@@ -14,7 +13,7 @@ data class Identity(
     @SerialName("identity_data")
     val identityData: JsonObject,
     @SerialName("identity_id")
-    val identityId: String,
+    val identityId: String? = null,
     @SerialName("last_sign_in_at")
     val lastSignInAt: String? = null,
     @SerialName("updated_at")

@@ -27,6 +27,7 @@ import io.ktor.client.call.body
 import io.ktor.client.request.parameter
 import io.ktor.client.statement.HttpResponse
 import io.ktor.client.statement.bodyAsText
+import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
@@ -37,10 +38,12 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
+import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonObjectBuilder
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.encodeToJsonElement
 import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.put
 import kotlinx.serialization.json.putJsonObject
 import kotlin.math.floor
@@ -116,11 +119,15 @@ internal class AuthImpl(
         config: ExternalAuthConfigDefaults.() -> Unit
     ) {
         val url = oAuthUrl(provider, redirectUrl, "user/identities/authorize", config)
-        supabaseClient.openExternalUrl(url) //TODO: Add server callback on the JVM
+        val data = api.rawRequest(url) {
+            method = HttpMethod.Get
+        }.body<JsonObject>()
+        val newUrl = data["url"]?.jsonPrimitive?.content ?: error("No url found in response")
+        supabaseClient.openExternalUrl(newUrl) //TODO: Add server callback on JVM and fix Android
     }
 
     override suspend fun unlinkIdentity(identityId: String) {
-        TODO("Not yet implemented")
+        api.delete("user/identities/${identityId}")
     }
 
     override suspend fun retrieveSSOUrl(
