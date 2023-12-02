@@ -3,7 +3,7 @@ package io.github.jan.supabase.gotrue
 import io.github.jan.supabase.annotations.SupabaseInternal
 
 @SupabaseInternal
-actual fun Auth.generateRedirectUrl(): String? = config.deepLinkOrNull
+actual fun Auth.defaultRedirectUrl(): String? = config.deepLinkOrNull
 
 internal val AuthConfig.deepLink: String
     get() {
