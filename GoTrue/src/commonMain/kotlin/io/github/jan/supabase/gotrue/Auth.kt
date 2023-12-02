@@ -95,7 +95,7 @@ sealed interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
      */
     suspend fun <C, R, Provider : AuthProvider<C, R>> signUpWith(
         provider: Provider,
-        redirectUrl: String? = supabaseClient.defaultRedirectUrl(),
+        redirectUrl: String? = defaultRedirectUrl(),
         config: (C.() -> Unit)? = null
     ): R?
 
@@ -121,13 +121,13 @@ sealed interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
      */
     suspend fun <C, R, Provider : AuthProvider<C, R>> signInWith(
         provider: Provider,
-        redirectUrl: String? = supabaseClient.defaultRedirectUrl(),
+        redirectUrl: String? = defaultRedirectUrl(),
         config: (C.() -> Unit)? = null
     )
 
     suspend fun linkIdentity(
         provider: OAuthProvider,
-        redirectUrl: String? = supabaseClient.defaultRedirectUrl(),
+        redirectUrl: String? = defaultRedirectUrl(),
         config: ExternalAuthConfigDefaults.() -> Unit = {}
     )
 
@@ -140,7 +140,7 @@ sealed interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
      * @param redirectUrl The redirect url to use
      * @param config The configuration to use
      */
-    suspend fun retrieveSSOUrl(redirectUrl: String? = supabaseClient.defaultRedirectUrl(), config: SSO.Config.() -> Unit): SSO.Result
+    suspend fun retrieveSSOUrl(redirectUrl: String? = defaultRedirectUrl(), config: SSO.Config.() -> Unit): SSO.Result
 
     /**
      * Modifies the current user
@@ -152,7 +152,7 @@ sealed interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
      */
     suspend fun modifyUser(
         updateCurrentUser: Boolean = true,
-        redirectUrl: String? = supabaseClient.defaultRedirectUrl(),
+        redirectUrl: String? = defaultRedirectUrl(),
         config: UserUpdateBuilder.() -> Unit
     ): UserInfo
 
@@ -186,7 +186,7 @@ sealed interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
-    suspend fun sendRecoveryEmail(email: String, redirectUrl: String? = supabaseClient.defaultRedirectUrl(), captchaToken: String? = null)
+    suspend fun sendRecoveryEmail(email: String, redirectUrl: String? = defaultRedirectUrl(), captchaToken: String? = null)
 
     /**
      * Sends a nonce to the user's email (preferred) or phone
