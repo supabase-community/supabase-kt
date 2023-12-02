@@ -110,6 +110,19 @@ internal class AuthImpl(
         importSession(it)
     }, redirectUrl, config)
 
+    override suspend fun linkIdentity(
+        provider: OAuthProvider,
+        redirectUrl: String?,
+        config: ExternalAuthConfigDefaults.() -> Unit
+    ) {
+        val url = oAuthUrl(provider, redirectUrl, "user/identities/authorize", config)
+        supabaseClient.openExternalUrl(url) //TODO: Add server callback on the JVM
+    }
+
+    override suspend fun unlinkIdentity(identityId: String) {
+        TODO("Not yet implemented")
+    }
+
     override suspend fun retrieveSSOUrl(
         redirectUrl: String?,
         config: SSO.Config.() -> Unit
@@ -141,10 +154,10 @@ internal class AuthImpl(
                 put("code_challenge", it)
                 put("code_challenge_method", "s256")
             }
-            createdConfig?.domain.let {
+            createdConfig.domain?.let {
                 put("domain", it)
             }
-            createdConfig?.providerId.let {
+            createdConfig.providerId?.let {
                 put("provider_id", it)
             }
         }).body()
@@ -184,7 +197,7 @@ internal class AuthImpl(
         return userInfo
     }
 
-    suspend fun resend(type: String, body: JsonObjectBuilder.() -> Unit) {
+    private suspend fun resend(type: String, body: JsonObjectBuilder.() -> Unit) {
         api.postJson("resend", buildJsonObject {
             put("type", type)
             putJsonObject(buildJsonObject(body))
@@ -459,6 +472,7 @@ internal class AuthImpl(
     override fun oAuthUrl(
         provider: OAuthProvider,
         redirectUrl: String?,
+        url: String,
         additionalConfig: ExternalAuthConfigDefaults.() -> Unit
     ): String {
         val config = ExternalAuthConfigDefaults().apply(additionalConfig)
@@ -471,7 +485,7 @@ internal class AuthImpl(
             config.queryParams["code_challenge_method"] = "S256"
         }
         return resolveUrl(buildString {
-            append("authorize?provider=${provider.name}&redirect_to=$redirectUrl")
+            append("$url?provider=${provider.name}&redirect_to=$redirectUrl")
             if (config.scopes.isNotEmpty()) append("&scopes=${config.scopes.joinToString("+")}")
             if (config.queryParams.isNotEmpty()) {
                 for ((key, value) in config.queryParams) {

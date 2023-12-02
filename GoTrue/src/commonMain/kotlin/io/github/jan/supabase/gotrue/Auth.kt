@@ -125,6 +125,16 @@ sealed interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
         config: (C.() -> Unit)? = null
     )
 
+    suspend fun linkIdentity(
+        provider: OAuthProvider,
+        redirectUrl: String? = null,
+        config: ExternalAuthConfigDefaults.() -> Unit = {}
+    )
+
+    suspend fun unlinkIdentity(
+        identityId: String
+    )
+
     /**
      * Retrieves the sso url for the specified [type]
      * @param redirectUrl The redirect url to use
@@ -294,7 +304,7 @@ sealed interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
      * @param provider The provider to use
      * @param redirectUrl The redirect url to use
      */
-    fun oAuthUrl(provider: OAuthProvider, redirectUrl: String? = null, additionalConfig: ExternalAuthConfigDefaults.() -> Unit = {}): String
+    fun oAuthUrl(provider: OAuthProvider, redirectUrl: String? = null, url: String = "authorize", additionalConfig: ExternalAuthConfigDefaults.() -> Unit = {}): String
 
     /**
      * Stops auto-refreshing the current session

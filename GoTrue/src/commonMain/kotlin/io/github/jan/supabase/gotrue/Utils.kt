@@ -1,6 +1,7 @@
 package io.github.jan.supabase.gotrue
 
 import co.touchlab.kermit.Logger
+import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.annotations.SupabaseInternal
 import io.github.jan.supabase.gotrue.user.UserSession
 import io.ktor.client.request.HttpRequestBuilder
@@ -25,3 +26,5 @@ fun HttpRequestBuilder.redirectTo(url: String) {
 }
 
 internal fun invalidArg(message: String): Nothing = throw IllegalArgumentException(message)
+
+internal expect suspend fun SupabaseClient.openExternalUrl(url: String)
