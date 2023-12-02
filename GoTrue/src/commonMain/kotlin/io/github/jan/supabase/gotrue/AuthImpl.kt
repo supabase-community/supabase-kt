@@ -239,7 +239,6 @@ internal class AuthImpl(
         redirectUrl: String?,
         captchaToken: String?
     ) {
-        val finalRedirectUrl = generateRedirectUrl(redirectUrl)
         val body = buildJsonObject {
             put("email", email)
             captchaToken?.let {
@@ -249,7 +248,7 @@ internal class AuthImpl(
             }
         }.toString()
         api.postJson("recover", body) {
-            finalRedirectUrl?.let { url.encodedParameters.append("redirect_to", it) }
+            redirectUrl?.let { url.encodedParameters.append("redirect_to", it) }
         }
     }
 

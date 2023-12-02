@@ -2,6 +2,7 @@ package io.github.jan.supabase.gotrue.providers.builtin
 
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.gotrue.auth
+import io.github.jan.supabase.gotrue.openExternalUrl
 import io.github.jan.supabase.gotrue.providers.createServer
 import io.github.jan.supabase.gotrue.user.UserSession
 import kotlinx.coroutines.Dispatchers
@@ -15,11 +16,16 @@ internal actual suspend fun SSO.loginWithSSO(
     config: (SSO.Config.() -> Unit)?
 ) {
     withContext(Dispatchers.IO) {
-        launch {
-            createServer({
-                val result = supabaseClient.auth.retrieveSSOUrl(redirectUrl ?: it) { config?.invoke(this) }
-                result.url
-            }, supabaseClient.auth, onSuccess)
+        if(redirectUrl == null) {
+            launch {
+                createServer({
+                    val result = supabaseClient.auth.retrieveSSOUrl(it) { config?.invoke(this) }
+                    result.url
+                }, supabaseClient.auth, onSuccess)
+            }
+        } else {
+            val result = supabaseClient.auth.retrieveSSOUrl(redirectUrl) { config?.invoke(this) }
+            supabaseClient.openExternalUrl(result.url)
         }
     }
 }

@@ -2,18 +2,16 @@ package io.github.jan.supabase.gotrue.providers
 
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.gotrue.auth
+import io.github.jan.supabase.gotrue.openExternalUrl
 import io.github.jan.supabase.gotrue.user.UserSession
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.awt.Desktop
-import java.net.URI
 
 /**
  * Represents an OAuth provider.
  */
-actual abstract class OAuthProvider : AuthProvider<ExternalAuthConfig, Unit> {
-
+actual abstract class OAuthProvider actual constructor() : AuthProvider<ExternalAuthConfig, Unit> {
     /**
      * The name of the provider.
      */
@@ -28,11 +26,10 @@ actual abstract class OAuthProvider : AuthProvider<ExternalAuthConfig, Unit> {
         val externalConfig = ExternalAuthConfig().apply { config?.invoke(this) }
         withContext(Dispatchers.IO) {
             if(redirectUrl != null) {
-                Desktop.getDesktop()
-                    .browse(URI(supabaseClient.auth.oAuthUrl(this@OAuthProvider, redirectUrl) {
-                        scopes.addAll(externalConfig.scopes)
-                        queryParams.putAll(externalConfig.queryParams)
-                    }))
+                supabaseClient.openExternalUrl(supabaseClient.auth.oAuthUrl(this@OAuthProvider, redirectUrl) {
+                    scopes.addAll(externalConfig.scopes)
+                    queryParams.putAll(externalConfig.queryParams)
+                })
                 return@withContext
             }
             launch {
@@ -51,9 +48,8 @@ actual abstract class OAuthProvider : AuthProvider<ExternalAuthConfig, Unit> {
         onSuccess: suspend (UserSession) -> Unit,
         redirectUrl: String?,
         config: (ExternalAuthConfig.() -> Unit)?
-    ) = login(supabaseClient, onSuccess, redirectUrl, config = config)
+    ) = login(supabaseClient, onSuccess, redirectUrl, config)
 
     actual companion object
-
 
 }
