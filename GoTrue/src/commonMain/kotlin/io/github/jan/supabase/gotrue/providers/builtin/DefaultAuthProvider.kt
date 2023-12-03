@@ -8,7 +8,6 @@ import io.github.jan.supabase.gotrue.FlowType
 import io.github.jan.supabase.gotrue.auth
 import io.github.jan.supabase.gotrue.generateCodeChallenge
 import io.github.jan.supabase.gotrue.generateCodeVerifier
-import io.github.jan.supabase.gotrue.generateRedirectUrl
 import io.github.jan.supabase.gotrue.providers.AuthProvider
 import io.github.jan.supabase.gotrue.redirectTo
 import io.github.jan.supabase.gotrue.user.UserSession
@@ -56,11 +55,10 @@ sealed interface DefaultAuthProvider<C, R> : AuthProvider<C, R> {
     ) {
         require(config != null) { "Credentials are required" }
         val encodedCredentials = encodeCredentials(config)
-        val finalRedirectUrl = supabaseClient.auth.generateRedirectUrl(redirectUrl)
         val gotrue = supabaseClient.auth as AuthImpl
         val url = "token?grant_type=$grantType"
         val response = gotrue.api.postJson(url, encodedCredentials) {
-            finalRedirectUrl?.let { redirectTo(it) }
+            redirectUrl?.let { redirectTo(it) }
         }
         response.body<UserSession>().also {
             onSuccess(it)
@@ -75,7 +73,6 @@ sealed interface DefaultAuthProvider<C, R> : AuthProvider<C, R> {
         config: (C.() -> Unit)?
     ): R? {
         require(config != null) { "Credentials are required" }
-        val finalRedirectUrl = supabaseClient.auth.generateRedirectUrl(redirectUrl)
         val body = encodeCredentials(config)
         val gotrue = supabaseClient.auth as AuthImpl
         var codeChallenge: String? = null
@@ -96,7 +93,7 @@ sealed interface DefaultAuthProvider<C, R> : AuthProvider<C, R> {
                 put("code_challenge_method", "s256")
             }
         }) {
-            finalRedirectUrl?.let { redirectTo(it) }
+            redirectUrl?.let { redirectTo(it) }
         }
         val json = response.body<JsonObject>()
         if(json.containsKey("access_token")) {

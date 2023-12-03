@@ -2,6 +2,7 @@ package io.github.jan.supabase.gotrue
 
 import co.touchlab.kermit.Logger
 import io.github.jan.supabase.SupabaseClient
+import io.github.jan.supabase.annotations.SupabaseExperimental
 import io.github.jan.supabase.exceptions.HttpRequestException
 import io.github.jan.supabase.exceptions.RestException
 import io.github.jan.supabase.gotrue.admin.AdminApi
@@ -95,7 +96,7 @@ sealed interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
      */
     suspend fun <C, R, Provider : AuthProvider<C, R>> signUpWith(
         provider: Provider,
-        redirectUrl: String? = null,
+        redirectUrl: String? = defaultRedirectUrl(),
         config: (C.() -> Unit)? = null
     ): R?
 
@@ -121,16 +122,40 @@ sealed interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
      */
     suspend fun <C, R, Provider : AuthProvider<C, R>> signInWith(
         provider: Provider,
-        redirectUrl: String? = null,
+        redirectUrl: String? = defaultRedirectUrl(),
         config: (C.() -> Unit)? = null
     )
 
     /**
-     * Retrieves the sso url for the specified [type]
+     * Links an OAuth Identity to an existing user.
+     *
+     * This methods works similar to signing in with OAuth providers. Refer to the [documentation](https://supabase.com/docs/reference/kotlin/initializing) to learn how to handle OAuth and OTP links.
+     * @param provider The OAuth provider
+     * @param redirectUrl The redirect url to use. If you don't specify this, the platform specific will be used, like deeplinks on android.
+     * @param config Extra configuration
+     */
+    @SupabaseExperimental
+    suspend fun linkIdentity(
+        provider: OAuthProvider,
+        redirectUrl: String? = defaultRedirectUrl(),
+        config: ExternalAuthConfigDefaults.() -> Unit = {}
+    )
+
+    /**
+     * Unlinks an OAuth Identity from an existing user.
+     * @param identityId The id of the OAuth identity
+     */
+    @SupabaseExperimental
+    suspend fun unlinkIdentity(
+        identityId: String
+    )
+
+    /**
+     * Retrieves the sso url for the given [config]
      * @param redirectUrl The redirect url to use
      * @param config The configuration to use
      */
-    suspend fun retrieveSSOUrl(redirectUrl: String? = null, config: SSO.Config.() -> Unit): SSO.Result
+    suspend fun retrieveSSOUrl(redirectUrl: String? = defaultRedirectUrl(), config: SSO.Config.() -> Unit): SSO.Result
 
     /**
      * Modifies the current user
@@ -142,7 +167,7 @@ sealed interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
      */
     suspend fun modifyUser(
         updateCurrentUser: Boolean = true,
-        redirectUrl: String? = null,
+        redirectUrl: String? = defaultRedirectUrl(),
         config: UserUpdateBuilder.() -> Unit
     ): UserInfo
 
@@ -176,7 +201,7 @@ sealed interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
-    suspend fun resetPasswordForEmail(email: String, redirectUrl: String? = null, captchaToken: String? = null)
+    suspend fun resetPasswordForEmail(email: String, redirectUrl: String? = defaultRedirectUrl(), captchaToken: String? = null)
 
     /**
      * Sends a nonce to the user's email (preferred) or phone
@@ -294,7 +319,7 @@ sealed interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
      * @param provider The provider to use
      * @param redirectUrl The redirect url to use
      */
-    fun oAuthUrl(provider: OAuthProvider, redirectUrl: String? = null, additionalConfig: ExternalAuthConfigDefaults.() -> Unit = {}): String
+    fun oAuthUrl(provider: OAuthProvider, redirectUrl: String? = defaultRedirectUrl(), url: String = "authorize", additionalConfig: ExternalAuthConfigDefaults.() -> Unit = {}): String
 
     /**
      * Stops auto-refreshing the current session
@@ -318,6 +343,11 @@ sealed interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
      * Returns the current user or null
      */
     fun currentUserOrNull() = currentSessionOrNull()?.user
+
+    /**
+     * Returns the connected identities to the current user or null
+     */
+    fun currentIdentitiesOrNull() = currentUserOrNull()?.identities
 
     companion object : SupabasePluginProvider<AuthConfig, Auth> {
 

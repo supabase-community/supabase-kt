@@ -27,6 +27,7 @@ import io.ktor.client.call.body
 import io.ktor.client.request.parameter
 import io.ktor.client.statement.HttpResponse
 import io.ktor.client.statement.bodyAsText
+import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
@@ -37,10 +38,12 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
+import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonObjectBuilder
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.encodeToJsonElement
 import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.put
 import kotlinx.serialization.json.putJsonObject
 import kotlin.math.floor
@@ -110,6 +113,32 @@ internal class AuthImpl(
         importSession(it)
     }, redirectUrl, config)
 
+    @SupabaseExperimental
+    override suspend fun linkIdentity(
+        provider: OAuthProvider,
+        redirectUrl: String?,
+        config: ExternalAuthConfigDefaults.() -> Unit
+    ) {
+        startExternalAuth(
+            redirectUrl = redirectUrl,
+            getUrl = {
+                val url = oAuthUrl(provider, it, "user/identities/authorize", config)
+                val data = api.rawRequest(url) {
+                    method = HttpMethod.Get
+                }.body<JsonObject>()
+                data["url"]?.jsonPrimitive?.content ?: error("No url found in response")
+            },
+            onSessionSuccess = {
+                importSession(it)
+            }
+        )
+    }
+
+    @SupabaseExperimental
+    override suspend fun unlinkIdentity(identityId: String) {
+        api.delete("user/identities/$identityId")
+    }
+
     override suspend fun retrieveSSOUrl(
         redirectUrl: String?,
         config: SSO.Config.() -> Unit
@@ -141,10 +170,10 @@ internal class AuthImpl(
                 put("code_challenge", it)
                 put("code_challenge_method", "s256")
             }
-            createdConfig?.domain.let {
+            createdConfig.domain?.let {
                 put("domain", it)
             }
-            createdConfig?.providerId.let {
+            createdConfig.providerId?.let {
                 put("provider_id", it)
             }
         }).body()
@@ -184,7 +213,7 @@ internal class AuthImpl(
         return userInfo
     }
 
-    suspend fun resend(type: String, body: JsonObjectBuilder.() -> Unit) {
+    private suspend fun resend(type: String, body: JsonObjectBuilder.() -> Unit) {
         api.postJson("resend", buildJsonObject {
             put("type", type)
             putJsonObject(buildJsonObject(body))
@@ -222,7 +251,6 @@ internal class AuthImpl(
         require(email.isNotBlank()) {
             "Email must not be blank"
         }
-        val finalRedirectUrl = generateRedirectUrl(redirectUrl)
         var codeChallenge: String? = null
         if (this.config.flowType == FlowType.PKCE) {
             val codeVerifier = generateCodeVerifier()
@@ -242,7 +270,7 @@ internal class AuthImpl(
             }
         }.toString()
         api.postJson("recover", body) {
-            finalRedirectUrl?.let { url.encodedParameters.append("redirect_to", it) }
+            redirectUrl?.let { url.encodedParameters.append("redirect_to", it) }
         }
     }
 
@@ -472,6 +500,7 @@ internal class AuthImpl(
     override fun oAuthUrl(
         provider: OAuthProvider,
         redirectUrl: String?,
+        url: String,
         additionalConfig: ExternalAuthConfigDefaults.() -> Unit
     ): String {
         val config = ExternalAuthConfigDefaults().apply(additionalConfig)
@@ -484,7 +513,7 @@ internal class AuthImpl(
             config.queryParams["code_challenge_method"] = "S256"
         }
         return resolveUrl(buildString {
-            append("authorize?provider=${provider.name}&redirect_to=$redirectUrl")
+            append("$url?provider=${provider.name}&redirect_to=$redirectUrl")
             if (config.scopes.isNotEmpty()) append("&scopes=${config.scopes.joinToString("+")}")
             if (config.queryParams.isNotEmpty()) {
                 for ((key, value) in config.queryParams) {
