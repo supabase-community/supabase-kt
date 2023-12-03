@@ -171,12 +171,12 @@ sealed interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
     /**
      * Sends a password reset email to the user with the specified [email]
      * @param email The email to send the password reset email to
-     * @param redirectUrl The redirect url to use. If you don't specify this, the platform specific will be use, like deeplinks on android.
+     * @param redirectUrl The redirect url to use. If you don't specify this, the platform specific will be used, like deeplinks on android.
      * @throws RestException or one of its subclasses if receiving an error response
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
-    suspend fun sendRecoveryEmail(email: String, redirectUrl: String? = null, captchaToken: String? = null)
+    suspend fun resetPasswordForEmail(email: String, redirectUrl: String? = null, captchaToken: String? = null)
 
     /**
      * Sends a nonce to the user's email (preferred) or phone
