@@ -4,25 +4,11 @@ import android.content.Intent
 import android.net.Uri
 import androidx.browser.customtabs.CustomTabsIntent
 import io.github.jan.supabase.SupabaseClient
-import io.github.jan.supabase.annotations.SupabaseExperimental
+import io.github.jan.supabase.annotations.SupabaseInternal
 import io.github.jan.supabase.gotrue.ExternalAuthAction.CUSTOM_TABS
 import io.github.jan.supabase.gotrue.ExternalAuthAction.EXTERNAL_BROWSER
-import io.github.jan.supabase.gotrue.providers.ExternalAuthConfigDefaults
-import io.github.jan.supabase.gotrue.providers.OAuthProvider
 import io.github.jan.supabase.gotrue.user.UserSession
 import kotlinx.coroutines.launch
-
-
-internal fun Auth.openOAuth(provider: OAuthProvider, redirectTo: String, config: ExternalAuthConfigDefaults) {
-    this as AuthImpl
-    openUrl(
-        uri = Uri.parse(oAuthUrl(provider, redirectTo) {
-            scopes.addAll(config.scopes)
-            queryParams.putAll(config.queryParams)
-        }),
-        action = this.config.defaultExternalAuthAction
-    )
-}
 
 internal fun openUrl(uri: Uri, action: ExternalAuthAction) {
     when(action) {
@@ -46,7 +32,7 @@ internal fun openUrl(uri: Uri, action: ExternalAuthAction) {
  * @param intent The intent from the activity
  * @param onSessionSuccess The callback when the session was successfully imported
  */
-@OptIn(SupabaseExperimental::class)
+@OptIn(SupabaseInternal::class)
 fun SupabaseClient.handleDeeplinks(intent: Intent, onSessionSuccess: (UserSession) -> Unit = {}) {
     val data = intent.data ?: return
     val scheme = data.scheme ?: return

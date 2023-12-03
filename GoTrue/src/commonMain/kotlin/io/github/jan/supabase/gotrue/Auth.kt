@@ -329,6 +329,11 @@ sealed interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
      */
     fun currentUserOrNull() = currentSessionOrNull()?.user
 
+    /**
+     * Returns the connected identities to the current user or null
+     */
+    fun currentIdentitiesOrNull() = currentUserOrNull()?.identities
+
     companion object : SupabasePluginProvider<AuthConfig, Auth> {
 
         override val key = "auth"

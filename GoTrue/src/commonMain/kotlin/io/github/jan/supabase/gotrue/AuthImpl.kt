@@ -118,16 +118,23 @@ internal class AuthImpl(
         redirectUrl: String?,
         config: ExternalAuthConfigDefaults.() -> Unit
     ) {
-        val url = oAuthUrl(provider, redirectUrl, "user/identities/authorize", config)
-        val data = api.rawRequest(url) {
-            method = HttpMethod.Get
-        }.body<JsonObject>()
-        val newUrl = data["url"]?.jsonPrimitive?.content ?: error("No url found in response")
-        supabaseClient.openExternalUrl(newUrl) //TODO: Add server callback on JVM and fix Android
+        startExternalAuth(
+            redirectUrl = redirectUrl,
+            getUrl = {
+                val url = oAuthUrl(provider, it, "user/identities/authorize", config)
+                val data = api.rawRequest(url) {
+                    method = HttpMethod.Get
+                }.body<JsonObject>()
+                data["url"]?.jsonPrimitive?.content ?: error("No url found in response")
+            },
+            onSessionSuccess = {
+                importSession(it)
+            }
+        )
     }
 
     override suspend fun unlinkIdentity(identityId: String) {
-        api.delete("user/identities/${identityId}")
+        api.delete("user/identities/$identityId")
     }
 
     override suspend fun retrieveSSOUrl(
