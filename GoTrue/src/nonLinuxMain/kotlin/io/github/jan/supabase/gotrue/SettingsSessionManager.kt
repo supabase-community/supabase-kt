@@ -26,7 +26,7 @@ class SettingsSessionManager(settings: Settings = createDefaultSettings()): Sess
         return try {
             supabaseJson.decodeFromString(session)
         } catch(e: Exception) {
-            Logger.e(e) { "Failed to load session" }
+            Logger.e(e, "Auth") { "Failed to load session" }
             null
         }
     }

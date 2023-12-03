@@ -374,6 +374,6 @@ val SupabaseClient.auth: Auth
 private suspend fun Auth.tryToGetUser(jwt: String) = try {
     retrieveUser(jwt)
 } catch (e: Exception) {
-    Logger.e(e) { "Couldn't retrieve user using your custom jwt token. If you use the project secret ignore this message" }
+    Logger.e(e, "Auth") { "Couldn't retrieve user using your custom jwt token. If you use the project secret ignore this message" }
     null
 }

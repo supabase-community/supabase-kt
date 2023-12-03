@@ -137,7 +137,7 @@ sealed interface Storage : MainPlugin<Storage.Config> {
             var defaultChunkSize: Long = DEFAULT_CHUNK_SIZE
                 set(value) {
                     if(value != DEFAULT_CHUNK_SIZE) {
-                        Logger.w { "supabase currently only supports a chunk size of 6MB" }
+                        Logger.w("Storage") { "supabase currently only supports a chunk size of 6MB" }
                     }
                     field = value
                 }

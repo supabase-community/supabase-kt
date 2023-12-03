@@ -80,12 +80,12 @@ internal class AuthImpl(
         setupPlatform()
         if (config.autoLoadFromStorage) {
             authScope.launch {
-                Logger.d {
+                Logger.d("Auth") {
                     "Trying to load latest session"
                 }
                 val successful = loadFromStorage()
                 if (successful) {
-                    Logger.d {
+                    Logger.d("Auth") {
                         "Successfully loaded session from storage"
                     }
                 } else {
@@ -283,14 +283,14 @@ internal class AuthImpl(
             api.post("logout") {
                 parameter("scope", scope.name.lowercase())
             }
-            Logger.d { "Logged out session in Supabase" }
+            Logger.d("Auth") { "Logged out session in Supabase" }
         } else {
-            Logger.i { "Skipping session logout as there is no session available. Proceeding to clean up local data..." }
+            Logger.i("Auth") { "Skipping session logout as there is no session available. Proceeding to clean up local data..." }
         }
         if (scope != SignOutScope.OTHERS) {
             clearSession()
         }
-        Logger.d { "Successfully logged out" }
+        Logger.d("Auth") { "Successfully logged out" }
     }
 
     private suspend fun verify(
@@ -367,7 +367,7 @@ internal class AuthImpl(
     }
 
     override suspend fun refreshSession(refreshToken: String): UserSession {
-        Logger.d {
+        Logger.d("Auth") {
             "Refreshing session"
         }
         val body = buildJsonObject {
@@ -424,9 +424,9 @@ internal class AuthImpl(
             importRefreshedSession()
         } catch (e: RestException) {
             signOut()
-            Logger.e(e) { "Couldn't refresh session. The refresh token may have been revoked." }
+            Logger.e(e, "Auth") { "Couldn't refresh session. The refresh token may have been revoked." }
         } catch (e: Exception) {
-            Logger.e(e) { "Couldn't reach supabase. Either the address doesn't exist or the network might not be on. Retrying in ${config.retryDelay}" }
+            Logger.e(e, "Auth") { "Couldn't reach supabase. Either the address doesn't exist or the network might not be on. Retrying in ${config.retryDelay}" }
             _sessionStatus.value = SessionStatus.NetworkError
             delay(config.retryDelay)
             retry()
@@ -443,7 +443,7 @@ internal class AuthImpl(
     }
 
     private suspend fun handleExpiredSession(session: UserSession, autoRefresh: Boolean = true) {
-        Logger.d {
+        Logger.d("Auth") {
             "Session expired. Refreshing session..."
         }
         val newSession = refreshSession(session.refreshToken)

@@ -35,7 +35,7 @@ internal suspend fun createServer(
             }
         }
     server.get("/callback") { ctx ->
-        Logger.d {
+        Logger.d("Auth") {
             "Received callback on oauth callback"
         }
         val accessToken = ctx.queryParam("access_token") ?: return@get
@@ -49,7 +49,7 @@ internal suspend fun createServer(
             val user = gotrue.retrieveUser(accessToken)
             onSuccess(UserSession(accessToken, refreshToken, providerRefreshToken, providerToken, expiresIn, tokenType, user, type))
         }
-        Logger.d {
+        Logger.d("Auth") {
             "Successfully received http callback"
         }
         ctx.html(HTML.redirectPage(gotrue.config.htmlIconUrl, gotrue.config.htmlTitle, gotrue.config.htmlText))

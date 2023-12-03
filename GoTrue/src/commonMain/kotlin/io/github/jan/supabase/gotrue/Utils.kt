@@ -9,7 +9,7 @@ import kotlinx.coroutines.launch
 
 @SupabaseInternal
 fun Auth.parseFragmentAndImportSession(fragment: String, onSessionSuccess: (UserSession) -> Unit = {}) {
-    Logger.d { "Parsing deeplink fragment $fragment" }
+    Logger.d("Auth") { "Parsing deeplink fragment $fragment" }
     val session = parseSessionFromFragment(fragment)
     this as AuthImpl
     authScope.launch {

@@ -35,14 +35,14 @@ private fun addLifecycleCallbacks(gotrue: Auth) {
 
             override fun onStart(owner: LifecycleOwner) {
                 if(!gotrue.isAutoRefreshRunning && gotrue.config.alwaysAutoRefresh) {
-                    Logger.d {
+                    Logger.d("Auth") {
                         "Starting auto refresh"
                     }
                     scope.launch {
                         try {
                             gotrue.startAutoRefreshForCurrentSession()
                         } catch(e: IllegalStateException) {
-                            Logger.d {
+                            Logger.d("Auth") {
                                 "No session found for auto refresh"
                             }
                         }
@@ -51,7 +51,7 @@ private fun addLifecycleCallbacks(gotrue: Auth) {
             }
             override fun onStop(owner: LifecycleOwner) {
                 if(gotrue.isAutoRefreshRunning) {
-                    Logger.d { "Cancelling auto refresh because app is switching to the background" }
+                    Logger.d("Auth") { "Cancelling auto refresh because app is switching to the background" }
                     scope.launch {
                         gotrue.stopAutoRefreshForCurrentSession()
                     }

@@ -58,7 +58,7 @@ internal class RealtimeChannelImpl(
             addChannel(this@RealtimeChannelImpl)
         }
         _status.value = RealtimeChannel.Status.SUBSCRIBING
-        Logger.d { "Subscribing to channel $topic" }
+        Logger.d("Realtime") { "Subscribing to channel $topic" }
         val currentJwt = realtimeImpl.config.jwtToken ?: supabaseClient.pluginManager.getPluginOrNull(Auth)?.currentSessionOrNull()?.let {
             if(it.expiresAt > Clock.System.now()) it.accessToken else null
         }
@@ -70,7 +70,7 @@ internal class RealtimeChannelImpl(
                 put("access_token", currentJwt)
             }
         }
-        Logger.d { "Subscribing to channel with body $joinConfigObject" }
+        Logger.d("Realtime") { "Subscribing to channel with body $joinConfigObject" }
         realtimeImpl.ws?.sendSerialized(RealtimeMessage(topic, RealtimeChannel.CHANNEL_EVENT_JOIN, joinConfigObject, null))
         if(blockUntilSubscribed) {
             status.first { it == RealtimeChannel.Status.SUBSCRIBED }
@@ -80,22 +80,22 @@ internal class RealtimeChannelImpl(
     @OptIn(SupabaseInternal::class)
     fun onMessage(message: RealtimeMessage) {
         if(message.eventType == null) {
-            Logger.e { "Received message without event type: $message" }
+            Logger.e("Realtime") { "Received message without event type: $message" }
             return
         }
         when(message.eventType) {
             RealtimeMessage.EventType.TOKEN_EXPIRED -> {
-                Logger.w { "Received token expired event. This should not happen, please report this warning." }
+                Logger.w("Realtime") { "Received token expired event. This should not happen, please report this warning." }
             }
             RealtimeMessage.EventType.SYSTEM -> {
-                Logger.d { "Subscribed to channel ${message.topic}" }
+                Logger.d("Realtime") { "Subscribed to channel ${message.topic}" }
                 _status.value = RealtimeChannel.Status.SUBSCRIBED
             }
             RealtimeMessage.EventType.POSTGRES_SERVER_CHANGES -> { //check if the server postgres_changes match with the client's and add the given id to the postgres change objects (to identify them later in the events)
                 val serverPostgresChanges = message.payload["response"]?.jsonObject?.get("postgres_changes")?.jsonArray?.let { Json.decodeFromJsonElement<List<PostgresJoinConfig>>(it) } ?: listOf() //server postgres changes
                 callbackManager.setServerChanges(serverPostgresChanges)
                 if(status.value != RealtimeChannel.Status.SUBSCRIBED) {
-                    Logger.d { "Joined channel ${message.topic}" }
+                    Logger.d("Realtime") { "Joined channel ${message.topic}" }
                     _status.value = RealtimeChannel.Status.SUBSCRIBED
                 }
             }
@@ -120,10 +120,10 @@ internal class RealtimeChannelImpl(
                 realtimeImpl.run {
                     deleteChannel(this@RealtimeChannelImpl)
                 }
-                Logger.d { "Unsubscribed from channel ${message.topic}" }
+                Logger.d("Realtime") { "Unsubscribed from channel ${message.topic}" }
             }
             RealtimeMessage.EventType.ERROR -> {
-                Logger.e { "Received an error in channel ${message.topic}. That could be as a result of an invalid access token" }
+                Logger.e("Realtime") { "Received an error in channel ${message.topic}. That could be as a result of an invalid access token" }
             }
             RealtimeMessage.EventType.PRESENCE_DIFF -> {
                 val joins = message.payload["joins"]?.jsonObject?.decodeIfNotEmptyOrDefault(mapOf<String, Presence>()) ?: emptyMap()
@@ -139,12 +139,12 @@ internal class RealtimeChannelImpl(
 
     override suspend fun unsubscribe() {
         _status.value = RealtimeChannel.Status.UNSUBSCRIBING
-        Logger.d { "Unsubscribing from channel $topic" }
+        Logger.d("Realtime") { "Unsubscribing from channel $topic" }
         realtimeImpl.ws?.sendSerialized(RealtimeMessage(topic, RealtimeChannel.CHANNEL_EVENT_LEAVE, buildJsonObject {}, null))
     }
 
     override suspend fun updateAuth(jwt: String) {
-        Logger.d { "Updating auth token for channel $topic" }
+        Logger.d("Realtime") { "Updating auth token for channel $topic" }
         realtimeImpl.ws?.sendSerialized(RealtimeMessage(topic, RealtimeChannel.CHANNEL_EVENT_ACCESS_TOKEN, buildJsonObject {
             put("access_token", jwt)
         }, (++realtimeImpl.ref).toString()))
