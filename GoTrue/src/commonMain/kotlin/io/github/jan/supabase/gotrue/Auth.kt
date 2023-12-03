@@ -125,18 +125,30 @@ sealed interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
         config: (C.() -> Unit)? = null
     )
 
+    /**
+     * Links an OAuth Identity to an existing user.
+     *
+     * This methods works similar to signing in with OAuth providers. Refer to the [documentation](https://supabase.com/docs/reference/kotlin/initializing) to learn how to handle OAuth and OTP links.
+     * @param provider The OAuth provider
+     * @param redirectUrl The redirect url to use. If you don't specify this, the platform specific will be used, like deeplinks on android.
+     * @param config Extra configuration
+     */
     suspend fun linkIdentity(
         provider: OAuthProvider,
         redirectUrl: String? = defaultRedirectUrl(),
         config: ExternalAuthConfigDefaults.() -> Unit = {}
     )
 
+    /**
+     * Unlinks an OAuth Identity from an existing user.
+     * @param identityId The id of the OAuth identity
+     */
     suspend fun unlinkIdentity(
         identityId: String
     )
 
     /**
-     * Retrieves the sso url for the specified [type]
+     * Retrieves the sso url for the given [config]
      * @param redirectUrl The redirect url to use
      * @param config The configuration to use
      */
