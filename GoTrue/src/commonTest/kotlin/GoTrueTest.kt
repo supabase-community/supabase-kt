@@ -236,7 +236,7 @@ class GoTrueTest {
     fun test_recovery() {
         val client = createSupabaseClient()
         runTest(dispatcher) {
-            client.auth.sendRecoveryEmail("example@email.com")
+            client.auth.resetPasswordForEmail("example@email.com")
             client.close()
         }
     }

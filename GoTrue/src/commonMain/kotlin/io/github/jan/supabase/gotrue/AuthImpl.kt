@@ -241,17 +241,30 @@ internal class AuthImpl(
         }
     }
 
-    override suspend fun sendRecoveryEmail(
+    override suspend fun resetPasswordForEmail(
         email: String,
         redirectUrl: String?,
         captchaToken: String?
     ) {
+        require(email.isNotBlank()) {
+            "Email must not be blank"
+        }
+        var codeChallenge: String? = null
+        if (this.config.flowType == FlowType.PKCE) {
+            val codeVerifier = generateCodeVerifier()
+            codeVerifierCache.saveCodeVerifier(codeVerifier)
+            codeChallenge = generateCodeChallenge(codeVerifier)
+        }
         val body = buildJsonObject {
             put("email", email)
             captchaToken?.let {
                 putJsonObject("gotrue_meta_security") {
                     put("captcha_token", captchaToken)
                 }
+            }
+            codeChallenge?.let {
+                put("code_challenge", it)
+                put("code_challenge_method", "s256")
             }
         }.toString()
         api.postJson("recover", body) {
