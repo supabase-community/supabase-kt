@@ -28,14 +28,14 @@ import kotlinx.coroutines.flow.StateFlow
  *
  * To use it you need to install it to the [SupabaseClient]:
  * ```kotlin
- * val client = createSupabaseClient(supabaseUrl, supabaseKey) {
+ * val supabase = createSupabaseClient(supabaseUrl, supabaseKey) {
  *    install(Auth)
  * }
  * ```
  *
  * then you can use it like this:
  * ```kotlin
- * val result = client.gotrue.signUpWith(Email) {
+ * val result = supabase.auth.signUpWith(Email) {
  *   email = "example@email.com"
  *   password = "password"
  * }
