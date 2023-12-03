@@ -2,6 +2,7 @@ package io.github.jan.supabase.gotrue
 
 import co.touchlab.kermit.Logger
 import io.github.jan.supabase.SupabaseClient
+import io.github.jan.supabase.annotations.SupabaseExperimental
 import io.github.jan.supabase.exceptions.HttpRequestException
 import io.github.jan.supabase.exceptions.RestException
 import io.github.jan.supabase.gotrue.admin.AdminApi
@@ -133,6 +134,7 @@ sealed interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
      * @param redirectUrl The redirect url to use. If you don't specify this, the platform specific will be used, like deeplinks on android.
      * @param config Extra configuration
      */
+    @SupabaseExperimental
     suspend fun linkIdentity(
         provider: OAuthProvider,
         redirectUrl: String? = defaultRedirectUrl(),
@@ -143,6 +145,7 @@ sealed interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
      * Unlinks an OAuth Identity from an existing user.
      * @param identityId The id of the OAuth identity
      */
+    @SupabaseExperimental
     suspend fun unlinkIdentity(
         identityId: String
     )

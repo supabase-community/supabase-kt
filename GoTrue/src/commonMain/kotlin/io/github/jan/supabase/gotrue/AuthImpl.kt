@@ -113,6 +113,7 @@ internal class AuthImpl(
         importSession(it)
     }, redirectUrl, config)
 
+    @SupabaseExperimental
     override suspend fun linkIdentity(
         provider: OAuthProvider,
         redirectUrl: String?,
@@ -133,6 +134,7 @@ internal class AuthImpl(
         )
     }
 
+    @SupabaseExperimental
     override suspend fun unlinkIdentity(identityId: String) {
         api.delete("user/identities/$identityId")
     }
