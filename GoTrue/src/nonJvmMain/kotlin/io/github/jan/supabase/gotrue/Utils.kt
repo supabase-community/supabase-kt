@@ -1,3 +1,4 @@
+@file:Suppress("RedundantSuspendModifier")
 package io.github.jan.supabase.gotrue
 
 import io.github.jan.supabase.gotrue.user.UserSession
