@@ -8,7 +8,7 @@ import io.github.jan.supabase.gotrue.user.UserSession
 /**
  * Represents an OAuth provider.
  */
-abstract class OAuthProvider() : AuthProvider<ExternalAuthConfig, Unit> {
+abstract class OAuthProvider : AuthProvider<ExternalAuthConfig, Unit> {
 
     /**
      * The name of the provider.
