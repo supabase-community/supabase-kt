@@ -5,5 +5,5 @@ import io.github.jan.supabase.gotrue.providers.openUrl
 import platform.Foundation.NSURL
 
 internal actual suspend fun SupabaseClient.openExternalUrl(url: String) {
-    openUrl(NSURL(url))
+    openUrl(NSURL(string = url))
 }
