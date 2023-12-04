@@ -1,5 +1,5 @@
 plugins {
-//    alias(libs.plugins.complete.kotlin)
+    alias(libs.plugins.complete.kotlin)
     alias(libs.plugins.kotlin.multiplatform)
     alias(libs.plugins.android.library)
 }
@@ -63,6 +63,9 @@ kotlin {
          //       api(libs.cache4k)
             }
         }
+        val nonJvmMain by creating {
+            dependsOn(commonMain)
+        }
         val nonLinuxMain by creating {
             dependsOn(commonMain)
             dependencies {
@@ -89,14 +92,19 @@ kotlin {
         }
         val mingwX64Main by getting {
             dependsOn(nonLinuxMain)
+            dependsOn(nonJvmMain)
         }
         val appleMain by getting {
             dependsOn(nonLinuxMain)
+            dependsOn(nonJvmMain)
         }
         val jsMain by getting {
             dependsOn(nonLinuxMain)
+            dependsOn(nonJvmMain)
         }
-        val linuxMain by getting
+        val linuxMain by getting {
+            dependsOn(nonJvmMain)
+        }
     }
 }
 

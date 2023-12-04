@@ -13,6 +13,6 @@ fun createDefaultSettings() = try {
 }
 
 @SupabaseInternal
-actual fun GoTrue.createDefaultSessionManager(): SessionManager = if(!IS_NODE) SettingsSessionManager() else MemorySessionManager()
+actual fun Auth.createDefaultSessionManager(): SessionManager = if(!IS_NODE) SettingsSessionManager() else MemorySessionManager()
 @SupabaseInternal
-actual fun GoTrue.createDefaultCodeVerifierCache(): CodeVerifierCache = if(!IS_NODE) SettingsCodeVerifierCache() else MemoryCodeVerifierCache()
+actual fun Auth.createDefaultCodeVerifierCache(): CodeVerifierCache = if(!IS_NODE) SettingsCodeVerifierCache() else MemoryCodeVerifierCache()

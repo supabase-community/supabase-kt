@@ -21,28 +21,28 @@ internal class SupabaseInitializer : Initializer<Context> {
 internal fun applicationContext(): Context = appContext ?: error("Application context not initialized")
 
 @SupabaseInternal
-actual fun GoTrue.setupPlatform() {
+actual fun Auth.setupPlatform() {
     addLifecycleCallbacks(this)
 }
 
-private fun addLifecycleCallbacks(gotrue: GoTrue) {
+private fun addLifecycleCallbacks(gotrue: Auth) {
     if(!gotrue.config.enableLifecycleCallbacks) return
     val lifecycle = ProcessLifecycleOwner.get().lifecycle
-    gotrue as GoTrueImpl
+    gotrue as AuthImpl
     val scope = gotrue.authScope
     lifecycle.addObserver(
         object : DefaultLifecycleObserver {
 
             override fun onStart(owner: LifecycleOwner) {
                 if(!gotrue.isAutoRefreshRunning && gotrue.config.alwaysAutoRefresh) {
-                    Logger.d {
+                    Logger.d("Auth") {
                         "Starting auto refresh"
                     }
                     scope.launch {
                         try {
                             gotrue.startAutoRefreshForCurrentSession()
                         } catch(e: IllegalStateException) {
-                            Logger.d {
+                            Logger.d("Auth") {
                                 "No session found for auto refresh"
                             }
                         }
@@ -51,7 +51,7 @@ private fun addLifecycleCallbacks(gotrue: GoTrue) {
             }
             override fun onStop(owner: LifecycleOwner) {
                 if(gotrue.isAutoRefreshRunning) {
-                    Logger.d { "Cancelling auto refresh because app is switching to the background" }
+                    Logger.d("Auth") { "Cancelling auto refresh because app is switching to the background" }
                     scope.launch {
                         gotrue.stopAutoRefreshForCurrentSession()
                     }

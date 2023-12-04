@@ -4,6 +4,8 @@ A Kotlin Multiplatform Client for Supabase.
 
 For information about supported Kotlin targets, see the corresponding module README.
 
+[Migrating from version 1.5.X to 2.0.0](/MIGRATION.md)
+
 *Note: WASM support planned see [issue](https://github.com/supabase-community/supabase-kt/issues/86)*
 
 [![](https://img.shields.io/github/release/supabase-community/supabase-kt?label=stable)](https://github.com/supabase-community/supabase-kt/releases) [![](https://badgen.net/github/release/supabase-community/supabase-kt?label=prerelease)](https://central.sonatype.com/search?q=io.github.jan.supabase&smo=true)
@@ -22,7 +24,7 @@ For information about supported Kotlin targets, see the corresponding module REA
 
 # Installation
 
-**Available modules**: `gotrue-kt`, `postgrest-kt`, `functions-kt`, `storage-kt`, `realtime-kt`, `apollo-graphql`, `compose-auth`, `compose-auth-ui`
+**Available modules**: `gotrue-kt`, `postgrest-kt`, `functions-kt`, `storage-kt`, `realtime-kt`, `apollo-graphql`, `compose-auth`, `compose-auth-ui`, `coil-integration`, `imageloader-integration`
 
 ```kotlin
 dependencies {
@@ -61,6 +63,10 @@ implementation("io.github.jan-tennert.supabase:[module]")
 #### [Compose Auth](/plugins/ComposeAuth)
 
 #### [Compose Auth UI](/plugins/ComposeAuthUI)
+
+#### [Coil Integration](/plugins/CoilIntegration)
+
+#### [Compose-ImageLoader Integration](/plugins/ImageLoaderIntegration)
 
 # Demos
 

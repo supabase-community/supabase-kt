@@ -2,14 +2,13 @@ package io.github.jan.supabase.postgrest
 
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.SupabaseSerializer
-import io.github.jan.supabase.annotations.SupabaseExperimental
 import io.github.jan.supabase.plugins.CustomSerializationConfig
 import io.github.jan.supabase.plugins.CustomSerializationPlugin
 import io.github.jan.supabase.plugins.MainConfig
 import io.github.jan.supabase.plugins.MainPlugin
 import io.github.jan.supabase.plugins.SupabasePluginProvider
-import io.github.jan.supabase.postgrest.query.PostgrestBuilder
-import io.github.jan.supabase.postgrest.query.PostgrestFilterBuilder
+import io.github.jan.supabase.postgrest.query.PostgrestQueryBuilder
+import io.github.jan.supabase.postgrest.query.PostgrestRequestBuilder
 import io.github.jan.supabase.postgrest.query.PostgrestUpdate
 
 /**
@@ -17,14 +16,14 @@ import io.github.jan.supabase.postgrest.query.PostgrestUpdate
  *
  * To use it you need to install it to the [SupabaseClient]:
  * ```kotlin
- * val client = createSupabaseClient(supabaseUrl, supabaseKey) {
+ * val supabase = createSupabaseClient(supabaseUrl, supabaseKey) {
  *    install(Postgrest)
  * }
  * ```
  *
  * then you can use it like this:
  * ```kotlin
- * val product = client.postgrest["products"].select {
+ * val product = supabase.postgrest["products"].select {
  *    Product::id eq 2
  * }.decodeSingle<Product>()
  * ```
@@ -33,35 +32,35 @@ import io.github.jan.supabase.postgrest.query.PostgrestUpdate
 sealed interface Postgrest : MainPlugin<Postgrest.Config>, CustomSerializationPlugin {
 
     /**
-     * Creates a new [PostgrestBuilder] for the given table
+     * Creates a new [PostgrestQueryBuilder] for the given table
      * @param table The table to use for the requests
      */
-    fun from(table: String): PostgrestBuilder
+    fun from(table: String): PostgrestQueryBuilder
 
     /**
-     * Creates a new [PostgrestBuilder] for the given schema and table
+     * Creates a new [PostgrestQueryBuilder] for the given schema and table
      * @param schema The schema to use for the requests
      * @param table The table to use for the requests
      */
-    fun from(schema: String, table: String): PostgrestBuilder
+    fun from(schema: String, table: String): PostgrestQueryBuilder
 
     /**
-     * Creates a new [PostgrestBuilder] for the given table
+     * Creates a new [PostgrestQueryBuilder] for the given table
      * @param table The table to use for the requests
      */
-    operator fun get(schema: String, table: String): PostgrestBuilder = from(schema, table)
+    operator fun get(schema: String, table: String): PostgrestQueryBuilder = from(schema, table)
 
     /**
-     * Creates a new [PostgrestBuilder] for the given schema and table
+     * Creates a new [PostgrestQueryBuilder] for the given schema and table
      * @param schema The schema to use for the requests
      * @param table The table to use for the requests
      */
-    operator fun get(table: String): PostgrestBuilder = from(table)
+    operator fun get(table: String): PostgrestQueryBuilder = from(table)
 
     /**
      * Config for the Postgrest plugin
      * @param defaultSchema The default schema to use for the requests. Defaults to "public"
-     * @param propertyConversionMethod The method to use to convert the property names to the column names in [PostgrestFilterBuilder] and [PostgrestUpdate]. Defaults to [PropertyConversionMethod.CAMEL_CASE_TO_SNAKE_CASE]
+     * @param propertyConversionMethod The method to use to convert the property names to the column names in [PostgrestRequestBuilder] and [PostgrestUpdate]. Defaults to [PropertyConversionMethod.CAMEL_CASE_TO_SNAKE_CASE]
      */
     data class Config(
         override var customUrl: String? = null,
@@ -70,7 +69,6 @@ sealed interface Postgrest : MainPlugin<Postgrest.Config>, CustomSerializationPl
         var propertyConversionMethod: PropertyConversionMethod = PropertyConversionMethod.CAMEL_CASE_TO_SNAKE_CASE,
     ): MainConfig, CustomSerializationConfig {
 
-        @SupabaseExperimental
         override var serializer: SupabaseSerializer? = null
 
     }
@@ -99,3 +97,16 @@ sealed interface Postgrest : MainPlugin<Postgrest.Config>, CustomSerializationPl
  */
 val SupabaseClient.postgrest: Postgrest
     get() = pluginManager.getPlugin(Postgrest)
+
+/**
+ * Creates a new [PostgrestQueryBuilder] for the given table
+ * @param table The table to use for the requests
+ */
+fun SupabaseClient.from(table: String): PostgrestQueryBuilder = pluginManager.getPlugin(Postgrest).from(table)
+
+/**
+ * Creates a new [PostgrestQueryBuilder] for the given schema and table
+ * @param schema The schema to use for the requests
+ * @param table The table to use for the requests
+ */
+fun SupabaseClient.from(schema: String, table: String): PostgrestQueryBuilder = pluginManager.getPlugin(Postgrest).from(schema, table)
