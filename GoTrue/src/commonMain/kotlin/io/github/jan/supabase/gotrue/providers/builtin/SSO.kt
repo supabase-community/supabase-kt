@@ -1,10 +1,9 @@
 package io.github.jan.supabase.gotrue.providers.builtin
 
 import io.github.jan.supabase.SupabaseClient
-import io.github.jan.supabase.annotations.SupabaseExperimental
+import io.github.jan.supabase.gotrue.auth
 import io.github.jan.supabase.gotrue.providers.AuthProvider
-import io.github.jan.supabase.gotrue.providers.builtin.SSO.Companion.withDomain
-import io.github.jan.supabase.gotrue.providers.builtin.SSO.Companion.withProvider
+import io.github.jan.supabase.gotrue.startExternalAuth
 import io.github.jan.supabase.gotrue.user.UserSession
 import kotlinx.serialization.Serializable
 
@@ -13,34 +12,23 @@ import kotlinx.serialization.Serializable
  *
  * Check the [docs](https://supabase.com/docs/guides/auth/sso/auth-sso-saml) for more information.
  *
- * Create a new instance with [withDomain] or [withProvider].
- *
- * @param config The config for the SSO provider
  */
-class SSO<Config: SSO.Config> private constructor(val config: Config): AuthProvider<Config, Unit> {
+data object SSO: AuthProvider<SSO.Config, Unit> {
 
     /**
      * The SSO config
+     *
+     * Use only one of [providerId] or [domain]
+     *
+     * @param providerId The provider id of the SSO provider
+     * @param captchaToken Optional captcha token
+     * @param domain The domain of the SSO provider
      */
-    sealed class Config {
-
-        /**
-         * Optional captcha token
-         */
-        var captchaToken: String? = null
-
-        /**
-         * Config for a SSO provider with a domain
-         * @param domain The domain of the SSO provider
-         */
-        data class Domain(val domain: String) : Config()
-
-        /**
-         * Config for a SSO provider with a provider id
-         * @param providerId The provider id of the SSO provider
-         */
-        data class Provider(val providerId: String) : Config()
-    }
+    data class Config(
+        var providerId: String? = null,
+        var captchaToken: String? = null,
+        var domain: String? = null,
+    )
 
     /**
      * The result of an SSO login
@@ -50,26 +38,6 @@ class SSO<Config: SSO.Config> private constructor(val config: Config): AuthProvi
     data class Result(
         val url: String
     )
-
-    companion object {
-
-        /**
-         * Create a new SSO instance with a domain
-         */
-        @SupabaseExperimental
-        fun withDomain(domain: String, config: (Config.() -> Unit)? = null): SSO<Config> = SSO(Config.Domain(domain).apply {
-            config?.invoke(this)
-        })
-
-        /**
-         * Create a new SSO instance with a provider id
-         */
-        @SupabaseExperimental
-        fun withProvider(providerId: String, config: (Config.() -> Unit)? = null): SSO<Config> = SSO(Config.Provider(providerId).apply {
-            config?.invoke(this)
-        })
-
-    }
 
     override suspend fun login(
         supabaseClient: SupabaseClient,
@@ -92,9 +60,19 @@ class SSO<Config: SSO.Config> private constructor(val config: Config): AuthProvi
 
 }
 
-internal expect suspend fun <Config : SSO.Config> SSO<Config>.loginWithSSO(
+internal suspend fun loginWithSSO(
     supabaseClient: SupabaseClient,
     onSuccess: suspend (UserSession) -> Unit,
     redirectUrl: String?,
-    config: (Config.() -> Unit)?
-)
+    config: (SSO.Config.() -> Unit)?
+) {
+    supabaseClient.auth.startExternalAuth(
+        redirectUrl = redirectUrl,
+        getUrl = {
+            supabaseClient.auth.retrieveSSOUrl(it) {
+                config?.invoke(this)
+            }.url
+        },
+        onSessionSuccess = onSuccess
+    )
+}

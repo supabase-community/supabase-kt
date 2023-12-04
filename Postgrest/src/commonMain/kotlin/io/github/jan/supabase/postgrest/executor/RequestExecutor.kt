@@ -5,9 +5,8 @@ import io.github.jan.supabase.postgrest.request.PostgrestRequest
 import io.github.jan.supabase.postgrest.result.PostgrestResult
 
 /**
- * Request executor
+ * Request executor interface
  *
- * @constructor Create empty Request executor
  */
 sealed interface RequestExecutor {
 

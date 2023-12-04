@@ -3,7 +3,7 @@ package io.github.jan.supabase.gotrue.providers
 /**
  * Configuration for external authentication providers like Google, Twitter, etc.
  */
-expect class ExternalAuthConfig: ExternalAuthConfigDefaults
+expect class ExternalAuthConfig(): ExternalAuthConfigDefaults
 
 /**
  * The default values for [ExternalAuthConfig]

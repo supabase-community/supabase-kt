@@ -5,8 +5,8 @@ Extends Supabase-kt with a multiplatform Postgrest client.
 Supported targets:
 
 | Target | **JVM** | **Android** | **JS** | **iOS** | **tvOS** | **watchOS** | **macOS** | **Windows** | **Linux** |
-|--------|---------|-------------|--------|---------|----------|-------------|-----------|-------------|-----------|
-|        | ✅       | ✅           | ✅      | ✅       | 	 ✅      | 	 ✅         | 	 ✅       | ✅           | ✅         |
+| ------ | ------- | ----------- | ------ | ------- | -------- | ----------- | --------- | ----------- | --------- |
+|        | ✅      | ✅          | ✅     | ✅      | ✅       | ✅          | ✅        | ✅          | ✅        |
 
 <details>
 
@@ -39,18 +39,19 @@ dependencies {
 ```
 
 Install the plugin in your SupabaseClient. See the [documentation](https://supabase.com/docs/reference/kotlin/initializing) for more information
+
 ```kotlin
-val client = createSupabaseClient(
+val supabase = createSupabaseClient(
     supabaseUrl = "https://id.supabase.co",
     supabaseKey = "apikey"
 ) {
-    
+
     //...
-    
+
     install(Postgrest) {
         // settings
     }
-    
+
 }
 ```
 

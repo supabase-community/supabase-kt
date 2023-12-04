@@ -2,8 +2,8 @@ package io.github.jan.supabase.gotrue.providers
 
 import co.touchlab.kermit.Logger
 import io.github.jan.supabase.annotations.SupabaseExperimental
-import io.github.jan.supabase.gotrue.GoTrue
-import io.github.jan.supabase.gotrue.GoTrueImpl
+import io.github.jan.supabase.gotrue.Auth
+import io.github.jan.supabase.gotrue.AuthImpl
 import io.github.jan.supabase.gotrue.user.UserSession
 import io.javalin.Javalin
 import kotlinx.coroutines.Dispatchers
@@ -18,14 +18,14 @@ private const val HTTP_SERVER_STOP_DELAY = 1000L
 @OptIn(SupabaseExperimental::class)
 internal suspend fun createServer(
     url: suspend (redirect: String) -> String,
-    gotrue: GoTrue,
+    gotrue: Auth,
     onSuccess: suspend (UserSession) -> Unit
 ) {
     val server = Javalin.create()
         .get("/") { ctx ->
             if(ctx.queryParam("code") != null) {
                 val code = ctx.queryParam("code") ?: return@get
-                (gotrue as GoTrueImpl).authScope.launch {
+                (gotrue as AuthImpl).authScope.launch {
                     val session = gotrue.exchangeCodeForSession(code, false)
                     onSuccess(session)
                 }
@@ -35,7 +35,7 @@ internal suspend fun createServer(
             }
         }
     server.get("/callback") { ctx ->
-        Logger.d {
+        Logger.d("Auth") {
             "Received callback on oauth callback"
         }
         val accessToken = ctx.queryParam("access_token") ?: return@get
@@ -45,11 +45,11 @@ internal suspend fun createServer(
         val providerToken = ctx.queryParam("provider_token")
         val providerRefreshToken = ctx.queryParam("provider_refresh_token")
         val type = ctx.queryParam("type").orEmpty()
-        (gotrue as GoTrueImpl).authScope.launch {
+        (gotrue as AuthImpl).authScope.launch {
             val user = gotrue.retrieveUser(accessToken)
             onSuccess(UserSession(accessToken, refreshToken, providerRefreshToken, providerToken, expiresIn, tokenType, user, type))
         }
-        Logger.d {
+        Logger.d("Auth") {
             "Successfully received http callback"
         }
         ctx.html(HTML.redirectPage(gotrue.config.htmlIconUrl, gotrue.config.htmlTitle, gotrue.config.htmlText))

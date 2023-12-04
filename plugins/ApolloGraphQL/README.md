@@ -5,8 +5,8 @@ Extends Supabase-kt with an Apollo GraphQL Client.
 Supported targets:
 
 | Target | **JVM** | **Android** | **JS** | **iOS** | **tvOS** | **watchOS** | **macOS** | **Windows** | **Linux** |
-|--------|---------|-------------|--------|---------|----------|-------------|-----------|-------------|-----------|
-|        | ✅       | ✅           | ✅      | ✅       | ✅        | ✅           | ✅         | ❌           | ❌         |
+| ------ | ------- | ----------- | ------ | ------- | -------- | ----------- | --------- | ----------- | --------- |
+|        | ✅      | ✅          | ✅     | ✅      | ✅       | ✅          | ✅        | ❌          | ❌        |
 
 <details>
 
@@ -39,19 +39,20 @@ dependencies {
 ```
 
 Install the plugin in your SupabaseClient. See the [documentation](https://supabase.com/docs/reference/kotlin/initializing) for more information
+
 ```kotlin
-val client = createSupabaseClient(
+val supabase = createSupabaseClient(
     supabaseUrl = "https://id.supabase.co",
     supabaseKey = "apikey"
 ) {
     //...
-    
+
     install(GraphQL) {
         apolloConfiguration {
             // settings
         }
     }
-    
+
 }
 ```
 
@@ -62,7 +63,7 @@ The plugin automatically creates an Apollo Client with the corresponding headers
 To access the client, you can use the `apolloClient` property of the `GraphQL` plugin instance.
 
 ```kotlin
-client.graphql.apolloClient.query(YourQuery()).execute().data //execute a query
+supabase.graphql.apolloClient.query(YourQuery()).execute().data //execute a query
 ```
 
 To learn about how to use Apollo GraphQL, see [Apollo Kotlin](https://github.com/apollographql/apollo-kotlin#getting-started).
