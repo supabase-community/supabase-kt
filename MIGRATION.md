@@ -1,4 +1,4 @@
-# Migrating from version 1.5.X to 2.0.0
+# Migrating from version 1.4.X to 2.0.0
 
 ## GoTrue
 
