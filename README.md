@@ -4,7 +4,7 @@ A Kotlin Multiplatform Client for Supabase.
 
 For information about supported Kotlin targets, see the corresponding module README.
 
-[Migrating from version 1.5.X to 2.0.0](/MIGRATION)
+[Migrating from version 1.5.X to 2.0.0](/MIGRATION.md)
 
 *Note: WASM support planned see [issue](https://github.com/supabase-community/supabase-kt/issues/86)*
 
