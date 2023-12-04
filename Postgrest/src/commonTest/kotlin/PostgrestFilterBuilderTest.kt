@@ -1,9 +1,10 @@
 import io.github.jan.supabase.CurrentPlatformTarget
 import io.github.jan.supabase.PlatformTarget
 import io.github.jan.supabase.postgrest.PropertyConversionMethod
-import io.github.jan.supabase.postgrest.query.PostgrestFilterBuilder
-import io.github.jan.supabase.postgrest.query.buildPostgrestFilter
-import io.ktor.http.*
+import io.github.jan.supabase.postgrest.query.filter.PostgrestFilterBuilder
+import io.ktor.http.decodeURLQueryComponent
+import io.ktor.http.formUrlEncode
+import io.ktor.http.parametersOf
 import kotlinx.datetime.Instant
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -205,7 +206,7 @@ class PostgrestFilterBuilderTest {
     }
 
     private fun filterToString(builder: PostgrestFilterBuilder.() -> Unit): String {
-        return buildPostgrestFilter(block = builder).mapValues { (_, value) -> listOf(value.first()) }.let {
+        return PostgrestFilterBuilder(PropertyConversionMethod.NONE).apply(block = builder).params.mapValues { (_, value) -> listOf(value.first()) }.let {
             parametersOf(it).formUrlEncode()
         }.decodeURLQueryComponent()
     }

@@ -2,9 +2,16 @@ package io.github.jan.supabase.compose.auth.composable
 
 import androidx.compose.runtime.Composable
 import io.github.jan.supabase.compose.auth.ComposeAuth
+import io.github.jan.supabase.compose.auth.defaultLoginBehavior
 
 /**
- * Composable for Apple login with default behavior
+ * Composable function that implements Native Apple Auth.
+ *
+ * On unsupported platforms it will use the [fallback]
+ *
+ * @param onResult Callback for the result of the login
+ * @param fallback Fallback function for unsupported platforms
+ * @return [NativeSignInState]
  */
 @Composable
-actual fun ComposeAuth.rememberLoginWithApple(onResult: (NativeSignInResult) -> Unit, fallback: suspend () -> Unit): NativeSignInState = defaultLoginBehavior(fallback)
+actual fun ComposeAuth.rememberSignInWithApple(onResult: (NativeSignInResult) -> Unit, fallback: suspend () -> Unit): NativeSignInState = defaultLoginBehavior(fallback)

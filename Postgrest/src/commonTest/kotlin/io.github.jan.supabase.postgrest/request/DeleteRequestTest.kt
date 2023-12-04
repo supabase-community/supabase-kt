@@ -12,31 +12,31 @@ class DeleteRequestTest {
     @Test
     fun testCreateDeleteRequest_thenReturnCorrectValue() {
         sut = DeleteRequest(
-            returning = Returning.REPRESENTATION,
+            returning = Returning.Representation(),
             count = Count.EXACT,
-            filter = mapOf("Key1" to listOf("Value1")),
+            urlParams = mapOf("Key1" to "Value1"),
             schema = "table"
         )
 
         assertEquals("DELETE", sut.method.value)
         assertEquals(listOf("return=representation", "count=exact"), sut.prefer)
         assertEquals("table", sut.schema)
-        assertEquals(mapOf("Key1" to listOf("Value1")), sut.filter)
+        assertEquals(mapOf("Key1" to "Value1"), sut.urlParams)
     }
 
     @Test
     fun testCreateDeleteRequest_withoutCount_thenReturnCorrectValue() {
         sut = DeleteRequest(
-            returning = Returning.REPRESENTATION,
+            returning = Returning.Representation(),
             count = null,
-            filter = mapOf("Key1" to listOf("Value1")),
+            urlParams = mapOf("Key1" to "Value1"),
             schema = "table"
         )
 
         assertEquals("DELETE", sut.method.value)
         assertEquals(listOf("return=representation"), sut.prefer)
         assertEquals("table", sut.schema)
-        assertEquals(mapOf("Key1" to listOf("Value1")), sut.filter)
+        assertEquals(mapOf("Key1" to "Value1"), sut.urlParams)
     }
 
 }

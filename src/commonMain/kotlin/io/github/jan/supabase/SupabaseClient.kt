@@ -70,7 +70,7 @@ internal class SupabaseClientImpl(
 ) : SupabaseClient {
 
     init {
-        Logger.i {
+        Logger.i("Core") {
             "SupabaseClient created! Please report any bugs you find."
         }
     }

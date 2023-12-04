@@ -2,38 +2,39 @@ package io.github.jan.supabase.postgrest.result
 
 import io.github.jan.supabase.decode
 import io.github.jan.supabase.postgrest.Postgrest
+import io.github.jan.supabase.postgrest.query.Count
+import io.github.jan.supabase.postgrest.query.PostgrestRequestBuilder
 import io.ktor.http.Headers
-import kotlinx.serialization.json.JsonElement
 
 /**
  * Represents the result from a postgrest request
- * @param body The body of the response. Can be null if using an database function.
+ * @param data The data of the response.
  * @param headers The headers of the response
  */
-class PostgrestResult(val body: JsonElement?, val headers: Headers, @PublishedApi internal val postgrest: Postgrest) {
+class PostgrestResult(val data: String, val headers: Headers, @PublishedApi internal val postgrest: Postgrest) {
 
     private val contentRange = headers["Content-Range"]
 
     /**
-     * Returns the total amount of items in the database (null if no [Count] option was used in the request)
+     * Returns the total amount of items in the database, or null if no [Count] option was set in the [PostgrestRequestBuilder]
      */
-    fun count(): Long? = contentRange?.substringAfter("/")?.toLongOrNull()
+    fun countOrNull(): Long? = contentRange?.substringAfter("/")?.toLongOrNull()
 
     /**
      * Returns the range of items returned
      */
-    fun range(): LongRange? = contentRange?.substringBefore("/")?.let {
+    fun rangeOrNull(): LongRange? = contentRange?.substringBefore("/")?.let {
         val (start, end) = it.split("-")
         LongRange(start.toLong(), end.toLong())
     }
 
     /**
-     * Decodes [body] as [T] using
+     * Decodes [data] as [T] using
      */
-    inline fun <reified T : Any> decodeAs(): T = postgrest.serializer.decode(body?.toString() ?: error("No body found"))
+    inline fun <reified T : Any> decodeAs(): T = postgrest.serializer.decode(data)
 
     /**
-     * Decodes [body] as [T] using. If there's an error it will return null
+     * Decodes [data] as [T] using. If there's an error it will return null
      */
     inline fun <reified T : Any> decodeAsOrNull(): T? = try {
         decodeAs()
@@ -42,18 +43,28 @@ class PostgrestResult(val body: JsonElement?, val headers: Headers, @PublishedAp
     }
 
     /**
-     * Decodes [body] as a list of [T]
+     * Decodes [data] as a list of [T]
      */
     inline fun <reified T : Any> decodeList(): List<T> = decodeAs()
 
     /**
-     * Decodes [body] as a list of [T] and returns the first item found
+     * Decodes [data] as a list of [T] and returns the first item found
      */
     inline fun <reified T : Any> decodeSingle(): T = decodeList<T>().first()
 
     /**
-     * Decodes [body] as a list of [T] and returns the first item found or null
+     * Decodes [data] as a list of [T] and returns the first item found or null
      */
     inline fun <reified T : Any> decodeSingleOrNull(): T? = decodeList<T>().firstOrNull()
+
+    /**
+     * Returns the data
+     */
+    operator fun component1() = data
+
+    /**
+     * Returns the headers
+     */
+    operator fun component2() = headers
 
 }

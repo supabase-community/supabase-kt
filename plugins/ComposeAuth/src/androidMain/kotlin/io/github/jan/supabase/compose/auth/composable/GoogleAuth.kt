@@ -22,24 +22,29 @@ import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.google.android.libraries.identity.googleid.GoogleIdTokenParsingException
 import io.github.jan.supabase.compose.auth.ComposeAuth
 import io.github.jan.supabase.compose.auth.GoogleLoginConfig
+import io.github.jan.supabase.compose.auth.defaultSignOutBehavior
 import io.github.jan.supabase.compose.auth.getActivity
 import io.github.jan.supabase.compose.auth.getGoogleIDOptions
 import io.github.jan.supabase.compose.auth.getSignInRequest
-import io.github.jan.supabase.compose.auth.loginWithGoogle
-import io.github.jan.supabase.gotrue.LogoutScope
+import io.github.jan.supabase.compose.auth.signInWithGoogle
+import io.github.jan.supabase.gotrue.SignOutScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 
 /**
- * Composable for Google login with native behavior
+ * Composable function that implements Native Google Auth.
  *
- * As of Android 14 Credential Manager is preferred implementation of the SignIn with Google
+ * On unsupported platforms it will use the [fallback]
+ *
+ * @param onResult Callback for the result of the login
+ * @param fallback Fallback function for unsupported platforms
+ * @return [NativeSignInState]
  */
 @Composable
-actual fun ComposeAuth.rememberLoginWithGoogle(onResult: (NativeSignInResult) -> Unit, fallback: suspend () -> Unit): NativeSignInState {
+actual fun ComposeAuth.rememberSignInWithGoogle(onResult: (NativeSignInResult) -> Unit, fallback: suspend () -> Unit): NativeSignInState {
     return if (android.os.Build.VERSION.SDK_INT > android.os.Build.VERSION_CODES.TIRAMISU) {
-        oneTapSignIn(onResult, fallback)
+        signInWithCM(onResult, fallback)
     } else {
         oneTapSignIn(onResult, fallback)
     }
@@ -61,15 +66,14 @@ internal fun ComposeAuth.signInWithCM(onResult: (NativeSignInResult) -> Unit, fa
 
         try {
             val request = GetCredentialRequest.Builder().addCredentialOption(getGoogleIDOptions(config.loginConfig["google"] as? GoogleLoginConfig)).build()
-            val result = CredentialManager.create(context).getCredential(request, activity)
+            val result = CredentialManager.create(context).getCredential(activity, request)
 
             when (result.credential) {
                 is CustomCredential -> {
                     if (result.credential.type == GoogleIdTokenCredential.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL) {
                         try {
                             val googleIdTokenCredential = GoogleIdTokenCredential.createFrom(result.credential.data)
-
-                            loginWithGoogle(googleIdTokenCredential.idToken)
+                            signInWithGoogle(googleIdTokenCredential.idToken)
                             onResult.invoke(NativeSignInResult.Success)
                         } catch (e: GoogleIdTokenParsingException) {
                             onResult.invoke(
@@ -112,7 +116,7 @@ internal fun ComposeAuth.oneTapSignIn(onResult: (NativeSignInResult) -> Unit, fa
                     val credential =
                         Identity.getSignInClient(context).getSignInCredentialFromIntent(result.data)
                     credential.googleIdToken?.let {
-                        loginWithGoogle(it)
+                        signInWithGoogle(it)
                         onResult.invoke(NativeSignInResult.Success)
                     } ?: run {
                         onResult.invoke(NativeSignInResult.Error("error: idToken is missing"))
@@ -136,15 +140,12 @@ internal fun ComposeAuth.oneTapSignIn(onResult: (NativeSignInResult) -> Unit, fa
     }
 
     LaunchedEffect(key1 = state.started) {
-
         if (state.started) {
-
             if (config.loginConfig["google"] == null) {
                 fallback.invoke()
                 state.reset()
                 return@LaunchedEffect
             }
-
             val config = config.loginConfig["google"] as GoogleLoginConfig
             val signInRequest = getSignInRequest(config)
             try {
@@ -153,7 +154,7 @@ internal fun ComposeAuth.oneTapSignIn(onResult: (NativeSignInResult) -> Unit, fa
                     IntentSenderRequest.Builder(oneTapResult.pendingIntent.intentSender).build()
                 )
             }catch (e:Exception){
-                onResult.invoke(NativeSignInResult.Error(e.localizedMessage))
+                onResult.invoke(NativeSignInResult.Error(e.localizedMessage ?: "error"))
                 state.reset()
             }
         }
@@ -166,12 +167,11 @@ internal fun ComposeAuth.oneTapSignIn(onResult: (NativeSignInResult) -> Unit, fa
  * Composable for Google SignOut with native behavior
  */
 @Composable
-actual fun ComposeAuth.rememberSignOut(logoutScope: LogoutScope): NativeSignInState {
+actual fun ComposeAuth.rememberSignOutWithGoogle(signOutScope: SignOutScope): NativeSignInState {
     val context = LocalContext.current
-    return defaultSignOutBehavior(logoutScope) {
+    return defaultSignOutBehavior(signOutScope) {
         if (android.os.Build.VERSION.SDK_INT > android.os.Build.VERSION_CODES.TIRAMISU) {
-           // CredentialManager.create(context).clearCredentialState(ClearCredentialStateRequest())
-            Identity.getSignInClient(context).signOut().await()
+            CredentialManager.create(context).clearCredentialState(ClearCredentialStateRequest())
         } else {
             Identity.getSignInClient(context).signOut().await()
         }

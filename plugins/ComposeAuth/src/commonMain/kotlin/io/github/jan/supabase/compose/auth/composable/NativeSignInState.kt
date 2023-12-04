@@ -5,18 +5,18 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 
 /**
- * State of Auth flow
+ * Represents the state of a Native Auth flow
  */
 class NativeSignInState {
 
     /**
-     * start value of Auth flow
+     * Whether the flow has started
      */
     var started by mutableStateOf(false)
         private set
 
     /**
-     * starts SignIn flow
+     * Starts the Native Auth flow (or the fallback, if not supported)
      */
     fun startFlow() {
         started = true

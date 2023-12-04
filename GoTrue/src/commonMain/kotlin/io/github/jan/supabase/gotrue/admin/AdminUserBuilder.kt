@@ -58,9 +58,9 @@ sealed class AdminUserBuilder {
     data class Email(var email: String = "") : AdminUserBuilder()
 
     /**
-     * @property phoneNumber The user's phone number
+     * @property phone The user's phone number
      */
-    data class Phone(var phoneNumber: String = "") : AdminUserBuilder()
+    data class Phone(var phone: String = "") : AdminUserBuilder()
 
     companion object : KSerializer<AdminUserBuilder> {
 
@@ -81,7 +81,7 @@ sealed class AdminUserBuilder {
             encoder as JsonEncoder
             require(value.password.isNotBlank()) { "Password must not be blank" }
             require(!(value is Email && value.email.isBlank())) { "Email must not be blank" }
-            require(!(value is Phone && value.phoneNumber.isBlank())) { "Phone number must not be blank" }
+            require(!(value is Phone && value.phone.isBlank())) { "Phone number must not be blank" }
             encoder.encodeJsonElement(buildJsonObject {
                 put("password", value.password)
                 value.userMetadata?.let { put("user_metadata", it) }
@@ -92,7 +92,7 @@ sealed class AdminUserBuilder {
                         put("email_confirm", value.autoConfirm)
                     }
                     is Phone -> {
-                        put("phone", value.phoneNumber)
+                        put("phone", value.phone)
                         put("phone_confirm", value.autoConfirm)
                     }
                 }

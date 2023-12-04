@@ -1,29 +1,33 @@
 [versions]
-kotlin = "1.9.20"
-ktor = "2.3.5"
+kotlin = "1.9.21"
+ktor = "2.3.6"
 dokka = "1.9.10"
-kotlinx-datetime = "0.4.0" #0.4.1 broken currently on android
+kotlinx-datetime = "0.5.0"
 kermit = "2.0.2"
-atomicfu = "0.22.0"
-coroutines = "1.7.3"
+atomicfu = "0.23.1"
+coroutines = "1.8.0-RC"
 android-lifecycle = "2.6.2"
 androidx-startup = "1.1.1"
-androidx-activity-compose = "1.8.0"
+androidx-activity-compose = "1.8.1"
 android-play-store = "20.4.1" # Later versions causing Error code 16 for now (Ref: https://issuetracker.google.com/issues/302775651)
-multiplatform-settings = "1.1.0"
+multiplatform-settings = "1.1.1"
 javalin = "5.6.3"
 complete-kotlin = "1.1.0"
 agp = "8.2.0"
 maven-publish = "0.25.3"
 apollo-kotlin = "3.8.2"
 korlibs = "4.0.10"
-detekt = "1.23.3"
+detekt = "1.23.4"
 moshi = "1.15.0"
-jackson = "2.15.3"
-browser = "1.6.0"
+jackson = "2.16.0"
+browser = "1.7.0"
 googleid = "1.1.0"
-compose = "1.5.10"
+compose = "1.5.11"
 androidsvg = "1.4"
+coil = "2.5.0"
+imageloader = "1.7.0"
+okio = "3.6.0"
+credentials = "1.2.0"
 
 [plugins]
 kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
@@ -62,6 +66,8 @@ androidx-startup-runtime = { module = "androidx.startup:startup-runtime", versio
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activity-compose" }
 android-play-store-auth = { module = "com.google.android.gms:play-services-auth", version.ref = "android-play-store" }
 android-google-id = { module = "com.google.android.libraries.identity.googleid:googleid", version.ref = "googleid" }
+androidx-credentials = { module = "androidx.credentials:credentials", version.ref = "credentials" }
+androidx-credentials-play-services = { module = "androidx.credentials:credentials-play-services-auth", version.ref = "credentials" }
 
 multiplatform-settings-no-arg = { module = "com.russhwolf:multiplatform-settings-no-arg", version.ref = "multiplatform-settings" }
 multiplatform-settings-coroutines = { module = "com.russhwolf:multiplatform-settings-coroutines", version.ref = "multiplatform-settings" }
@@ -80,6 +86,10 @@ jackson = { module = "com.fasterxml.jackson.core:jackson-core", version.ref = "j
 jackson-kotlin = { module = "com.fasterxml.jackson.module:jackson-module-kotlin", version.ref = "jackson" }
 
 androidsvg = { module = "com.caverock:androidsvg-aar", version.ref = "androidsvg" }
+
+coil = { module = "io.coil-kt:coil", version.ref = "coil" }
+imageloader = { module = "io.github.qdsfdhvh:image-loader", version.ref = "imageloader" }
+okio = { module = "com.squareup.okio:okio", version.ref = "okio" }
 
 [bundles]
 ktor-client = ["ktor-client-core", "ktor-client-content-negotiation", "ktor-json"]
