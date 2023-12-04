@@ -26,6 +26,7 @@ include(":plugins:ComposeAuth")
 include(":plugins:ComposeAuthUI")
 include(":plugins:CoilIntegration")
 include(":plugins:ImageLoaderIntegration")
+include(":plugins:PostgrestCaching")
 project(":GoTrue").name = "gotrue-kt"
 project(":Postgrest").name = "postgrest-kt"
 project(":Storage").name = "storage-kt"
@@ -36,5 +37,6 @@ project(":plugins:ComposeAuth").name = "compose-auth"
 project(":plugins:ComposeAuthUI").name = "compose-auth-ui"
 project(":plugins:CoilIntegration").name = "coil-integration"
 project(":plugins:ImageLoaderIntegration").name = "imageloader-integration"
+project(":plugins:PostgrestCaching").name = "postgrest-caching"
 rootProject.name = "supabase-kt"
 
