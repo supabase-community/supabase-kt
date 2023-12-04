@@ -149,6 +149,10 @@ class PostgrestRequestBuilder(@PublishedApi internal val propertyConversionMetho
         headers[HttpHeaders.Accept] = "application/vnd.pgrst.plan+${format}; for=\"${forMediatype}\"; options=${options};"
     }
 
+    fun setParam(key: String, value: String) {
+        _params[key] = listOf(value)
+    }
+
     /**
      * Adds a filter to the postgrest request.
      * @param block The filter block
