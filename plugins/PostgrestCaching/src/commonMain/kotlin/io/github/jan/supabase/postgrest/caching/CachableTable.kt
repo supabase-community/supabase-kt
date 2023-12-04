@@ -7,7 +7,6 @@ import io.github.jan.supabase.realtime.PostgresAction
 import io.github.jan.supabase.realtime.channel
 import io.github.jan.supabase.realtime.postgresChangeFlow
 import io.github.jan.supabase.realtime.realtime
-import kotlinx.atomicfu.atomic
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
@@ -21,8 +20,9 @@ class CachableTable <Data> (
     val decodeDataList: (String) -> List<Data>,
 ) {
 
+    @PublishedApi internal val cache = AtomicMutableMap<String, Data>()
+
     inline fun listFlow(crossinline primaryKey: (Data) -> String): Flow<List<Data>> = callbackFlow {
-        val cache = AtomicMutableMap<String, Data>()
         launch {
             val result = supabaseClient.postgrest.from(schema, table).select()
             val data = decodeDataList(result.data)
@@ -68,7 +68,6 @@ class CachableTable <Data> (
     }
 
     inline fun dataFlow(filter: String): Flow<Data?> = callbackFlow {
-        var value by atomic(null as Data?)
         launch {
             val result = supabaseClient.postgrest.from(schema, table).select {
                 limit(1)
@@ -88,20 +87,20 @@ class CachableTable <Data> (
                 when (it) {
                     is PostgresAction.Insert -> {
                         val data = decodeData(it.record.toString())
-                        value = data
+                        cache["data"] = data
                     }
                     is PostgresAction.Update -> {
                         val data = decodeData(it.record.toString())
-                        value = data
+                        cache["data"] = data
                     }
                     is PostgresAction.Delete -> {
                         val data = decodeData(it.oldRecord.toString())
-                        value = null
+                        cache.remove("data")
                         supabaseClient.realtime.removeChannel(channel)
                     }
                     else -> {}
                 }
-                trySend(value)
+                trySend(cache["data"])
             }
         }
         channel.subscribe()
