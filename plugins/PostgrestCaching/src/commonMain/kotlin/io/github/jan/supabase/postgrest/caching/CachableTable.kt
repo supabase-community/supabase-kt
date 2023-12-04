@@ -22,9 +22,9 @@ class CachableTable <Data> (
     val decodeDataList: (String) -> List<Data>,
 ) {
 
-    @PublishedApi internal val cache = AtomicMutableMap<String, Data>()
 
     inline fun listFlow(crossinline primaryKey: (Data) -> String): Flow<List<Data>> = callbackFlow {
+        val cache = AtomicMutableMap<String, Data>()
         try {
             val result = supabaseClient.postgrest.from(schema, table).select()
             val data = decodeDataList(result.data)
@@ -72,7 +72,7 @@ class CachableTable <Data> (
         }
     }
 
-    inline fun dataFlow(filter: String): Flow<Data?> = callbackFlow {
+    inline fun dataFlow(filter: String): Flow<Data> = callbackFlow {
         val splitFilter = filter.split("=")
         try {
             val result = supabaseClient.postgrest.from(schema, table).select {
@@ -98,20 +98,18 @@ class CachableTable <Data> (
                 when (it) {
                     is PostgresAction.Insert -> {
                         val data = decodeData(it.record.toString())
-                        cache["data"] = data
+                        trySend(data)
                     }
                     is PostgresAction.Update -> {
                         val data = decodeData(it.record.toString())
-                        cache["data"] = data
+                        trySend(data)
                     }
                     is PostgresAction.Delete -> {
-                        cache.remove("data")
                         supabaseClient.realtime.removeChannel(channel)
                         close()
                     }
                     else -> {}
                 }
-                trySend(cache["data"])
             }
         }
         channel.subscribe()
