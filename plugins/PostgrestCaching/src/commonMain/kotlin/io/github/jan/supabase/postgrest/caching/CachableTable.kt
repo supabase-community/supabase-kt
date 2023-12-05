@@ -22,8 +22,10 @@ class CachableTable <Data> (
     val decodeDataList: (String) -> List<Data>,
 ) {
 
-
-    inline fun listFlow(crossinline primaryKey: (Data) -> String): Flow<List<Data>> = callbackFlow {
+    inline fun listFlow(
+        filter: String = "",
+        crossinline primaryKey: (Data) -> String,
+    ): Flow<List<Data>> = callbackFlow {
         val cache = AtomicMutableMap<String, Data>()
         try {
             val result = supabaseClient.postgrest.from(schema, table).select()
@@ -40,6 +42,9 @@ class CachableTable <Data> (
         val channel = supabaseClient.realtime.channel("$table$schema")
         val changeFlow = channel.postgresChangeFlow<PostgresAction>(schema) {
             this.table = this@CachableTable.table
+            if(filter.isNotBlank()) {
+                this.filter = filter
+            }
         }
         launch {
             changeFlow.collect {
