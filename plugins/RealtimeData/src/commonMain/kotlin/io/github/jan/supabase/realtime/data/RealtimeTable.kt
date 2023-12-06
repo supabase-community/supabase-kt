@@ -25,7 +25,7 @@ class RealtimeTable <Data> (
 ) {
 
     val channelId: String
-        get() = "$schema$table$id"
+        get() = "$schema:$table:$id"
 
     inline fun listFlow(
         filter: String = "",
