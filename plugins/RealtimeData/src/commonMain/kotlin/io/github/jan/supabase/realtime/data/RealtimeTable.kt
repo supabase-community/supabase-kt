@@ -14,6 +14,7 @@ import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.launch
+import kotlin.reflect.KProperty1
 
 class RealtimeTable <Data> (
     @PublishedApi internal val id: Int,
@@ -82,6 +83,16 @@ class RealtimeTable <Data> (
         }
     }
 
+    inline fun <V> listFlow(
+        filter: String = "",
+        primaryKey: KProperty1<Data, V>,
+    ): Flow<List<Data>> = listFlow(
+        filter = filter,
+        primaryKey = {
+            primaryKey.get(it).toString()
+        }
+    )
+
     inline fun dataFlow(
         crossinline filter: PostgrestFilterBuilder.() -> Unit,
         crossinline primaryKey: (Data) -> PrimaryKey
@@ -129,6 +140,16 @@ class RealtimeTable <Data> (
             }
         }
     }
+
+    inline fun <V> dataFlow(
+        crossinline filter: PostgrestFilterBuilder.() -> Unit,
+        primaryKey: KProperty1<Data, V>
+    ): Flow<Data> = dataFlow(
+        filter = filter,
+        primaryKey = {
+            PrimaryKey(primaryKey.name, primaryKey.get(it).toString())
+        }
+    )
 
 
 }
