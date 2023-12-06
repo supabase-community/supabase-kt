@@ -24,6 +24,9 @@ class RealtimeTable <Data> (
     val decodeDataList: (String) -> List<Data>,
 ) {
 
+    val channelId: String
+        get() = "$schema$table$id"
+
     inline fun listFlow(
         filter: String = "",
         crossinline primaryKey: (Data) -> String,
@@ -41,7 +44,7 @@ class RealtimeTable <Data> (
             close(IllegalStateException("Table with name $table not found"))
             return@callbackFlow
         }
-        val channel = supabaseClient.realtime.channel("$schema$table$id")
+        val channel = supabaseClient.realtime.channel(channelId)
         val changeFlow = channel.postgresChangeFlow<PostgresAction>(schema) {
             this.table = this@RealtimeTable.table
             if(filter.isNotBlank()) {
@@ -96,7 +99,7 @@ class RealtimeTable <Data> (
             close(IllegalStateException("Data matching filter and table name $table not found"))
             return@callbackFlow
         }
-        val channel = supabaseClient.realtime.channel("$schema$table$id")
+        val channel = supabaseClient.realtime.channel(channelId)
         val changeFlow = channel.postgresChangeFlow<PostgresAction>(schema) {
             this.table = this@RealtimeTable.table
             this.filter = "${key.columnName}=eq.${key.value}"
@@ -113,7 +116,6 @@ class RealtimeTable <Data> (
                         trySend(data)
                     }
                     is PostgresAction.Delete -> {
-                        supabaseClient.realtime.removeChannel(channel)
                         close()
                     }
                     else -> {}
