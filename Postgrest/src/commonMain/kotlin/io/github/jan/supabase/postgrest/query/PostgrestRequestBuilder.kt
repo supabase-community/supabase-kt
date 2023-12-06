@@ -146,11 +146,8 @@ class PostgrestRequestBuilder(@PublishedApi internal val propertyConversionMetho
             if (wal) add("wal")
         }.joinToString("|")
         val forMediatype = headers["Accept"] ?: "application/json"
-        headers[HttpHeaders.Accept] = "application/vnd.pgrst.plan+${format}; for=\"${forMediatype}\"; options=${options};"
-    }
-
-    fun setParam(key: String, value: String) {
-        _params[key] = listOf(value)
+        headers[HttpHeaders.Accept] =
+            "application/vnd.pgrst.plan+${format}; for=\"${forMediatype}\"; options=${options};"
     }
 
     /**
