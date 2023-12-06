@@ -64,7 +64,7 @@ kotlin {
 android {
     compileSdk = 34
     sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
-    namespace = "io.github.jan.supabase.caching.library"
+    namespace = "io.github.jan.supabase.realtime.data.library"
     defaultConfig {
         minSdk = 21
     }

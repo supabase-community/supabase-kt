@@ -1,4 +1,4 @@
-package io.github.jan.supabase.postgrest.caching
+package io.github.jan.supabase.realtime.data
 
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.SupabaseSerializer
@@ -8,8 +8,8 @@ import io.github.jan.supabase.plugins.CustomSerializationPlugin
 import io.github.jan.supabase.plugins.SupabasePlugin
 import io.github.jan.supabase.plugins.SupabasePluginProvider
 
-class PostgrestCaching private constructor(
-    private val config: Config,
+class RealtimeData private constructor(
+    config: Config,
     val supabaseClient: SupabaseClient
 ): SupabasePlugin, CustomSerializationPlugin {
 
@@ -17,8 +17,8 @@ class PostgrestCaching private constructor(
 
     override val serializer: SupabaseSerializer = config.serializer ?: supabaseClient.defaultSerializer
 
-    inline fun <reified Data> from(schema: String, table: String): CachableTable<Data> {
-        return CachableTable(
+    inline fun <reified Data> from(schema: String, table: String): RealtimeTable<Data> {
+        return RealtimeTable(
             table,
             schema,
             supabaseClient,
@@ -27,15 +27,15 @@ class PostgrestCaching private constructor(
         )
     }
 
-    inline fun <reified Data> from(table: String): CachableTable<Data> = from("public", table)
+    inline fun <reified Data> from(table: String): RealtimeTable<Data> = from("public", table)
 
 
-    companion object : SupabasePluginProvider<Config, PostgrestCaching> {
+    companion object : SupabasePluginProvider<Config, RealtimeData> {
 
-        override val key: String = "postgrest-caching"
+        override val key: String = "realtime-data"
 
-        override fun create(supabaseClient: SupabaseClient, config: Config): PostgrestCaching {
-            return PostgrestCaching(config, supabaseClient)
+        override fun create(supabaseClient: SupabaseClient, config: Config): RealtimeData {
+            return RealtimeData(config, supabaseClient)
         }
 
 
@@ -46,5 +46,5 @@ class PostgrestCaching private constructor(
 
 }
 
-val SupabaseClient.postgrestCaching: PostgrestCaching
-    get() = pluginManager.getPlugin(PostgrestCaching)
+val SupabaseClient.realtimeData: RealtimeData
+    get() = pluginManager.getPlugin(RealtimeData)

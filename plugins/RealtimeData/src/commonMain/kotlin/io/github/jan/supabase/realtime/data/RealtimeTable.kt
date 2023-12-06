@@ -1,10 +1,11 @@
-package io.github.jan.supabase.postgrest.caching
+package io.github.jan.supabase.realtime.data
 
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.collections.AtomicMutableMap
 import io.github.jan.supabase.exceptions.NotFoundRestException
 import io.github.jan.supabase.exceptions.UnknownRestException
 import io.github.jan.supabase.postgrest.postgrest
+import io.github.jan.supabase.postgrest.query.filter.PostgrestFilterBuilder
 import io.github.jan.supabase.realtime.PostgresAction
 import io.github.jan.supabase.realtime.channel
 import io.github.jan.supabase.realtime.postgresChangeFlow
@@ -14,7 +15,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.launch
 
-class CachableTable <Data> (
+class RealtimeTable <Data> (
     val table: String,
     val schema: String,
     val supabaseClient: SupabaseClient,
@@ -41,7 +42,7 @@ class CachableTable <Data> (
         }
         val channel = supabaseClient.realtime.channel("$table$schema")
         val changeFlow = channel.postgresChangeFlow<PostgresAction>(schema) {
-            this.table = this@CachableTable.table
+            this.table = this@RealtimeTable.table
             if(filter.isNotBlank()) {
                 this.filter = filter
             }
@@ -77,26 +78,27 @@ class CachableTable <Data> (
         }
     }
 
-    inline fun dataFlow(filter: String): Flow<Data> = callbackFlow {
-        val splitFilter = filter.split("=")
-        try {
+    inline fun dataFlow(
+        crossinline filter: PostgrestFilterBuilder.() -> Unit,
+        crossinline primaryKey: (Data) -> PrimaryKey
+    ): Flow<Data> = callbackFlow {
+        val key = try {
             val result = supabaseClient.postgrest.from(schema, table).select {
                 limit(1)
                 single()
-                setParam(splitFilter.first(), splitFilter.last())
+                filter(filter)
             }
-            trySend(decodeData(result.data))
-        } catch(e: NoSuchElementException) {
-            close(IllegalArgumentException("Malformed filter: $filter"))
-            return@callbackFlow
+            val data = decodeData(result.data)
+            trySend(data)
+            primaryKey(data)
         } catch (e: UnknownRestException) {
-            close(IllegalStateException("Data matching filter $filter and table name $table not found"))
+            close(IllegalStateException("Data matching filter and table name $table not found"))
             return@callbackFlow
         }
         val channel = supabaseClient.realtime.channel("$table$schema")
         val changeFlow = channel.postgresChangeFlow<PostgresAction>(schema) {
-            this.table = this@CachableTable.table
-            this.filter = filter
+            this.table = this@RealtimeTable.table
+            this.filter = "${key.columnName}=eq.${key.value}"
         }
         launch {
             changeFlow.collect {
