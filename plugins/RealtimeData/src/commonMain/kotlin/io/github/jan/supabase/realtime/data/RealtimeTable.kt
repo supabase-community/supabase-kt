@@ -25,8 +25,7 @@ class RealtimeTable <Data> (
     val decodeDataList: (String) -> List<Data>,
 ) {
 
-    val channelId: String
-        get() = "$schema:$table:$id"
+    val channelId: String = "$schema:$table:$id"
 
     inline fun listFlow(
         filter: String = "",
