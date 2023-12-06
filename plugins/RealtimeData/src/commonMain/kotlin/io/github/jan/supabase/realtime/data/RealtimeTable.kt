@@ -16,6 +16,7 @@ import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.launch
 
 class RealtimeTable <Data> (
+    @PublishedApi internal val id: Int,
     val table: String,
     val schema: String,
     val supabaseClient: SupabaseClient,
@@ -40,7 +41,7 @@ class RealtimeTable <Data> (
             close(IllegalStateException("Table with name $table not found"))
             return@callbackFlow
         }
-        val channel = supabaseClient.realtime.channel("$table$schema")
+        val channel = supabaseClient.realtime.channel("$schema$table$id")
         val changeFlow = channel.postgresChangeFlow<PostgresAction>(schema) {
             this.table = this@RealtimeTable.table
             if(filter.isNotBlank()) {
@@ -95,7 +96,7 @@ class RealtimeTable <Data> (
             close(IllegalStateException("Data matching filter and table name $table not found"))
             return@callbackFlow
         }
-        val channel = supabaseClient.realtime.channel("$table$schema")
+        val channel = supabaseClient.realtime.channel("$schema$table$id")
         val changeFlow = channel.postgresChangeFlow<PostgresAction>(schema) {
             this.table = this@RealtimeTable.table
             this.filter = "${key.columnName}=eq.${key.value}"

@@ -7,11 +7,14 @@ import io.github.jan.supabase.plugins.CustomSerializationConfig
 import io.github.jan.supabase.plugins.CustomSerializationPlugin
 import io.github.jan.supabase.plugins.SupabasePlugin
 import io.github.jan.supabase.plugins.SupabasePluginProvider
+import kotlinx.atomicfu.atomic
 
 class RealtimeData private constructor(
     config: Config,
     val supabaseClient: SupabaseClient
 ): SupabasePlugin, CustomSerializationPlugin {
+
+    @PublishedApi internal var id: Int by atomic(0)
 
     class Config(override var serializer: SupabaseSerializer? = null) : CustomSerializationConfig
 
@@ -19,6 +22,7 @@ class RealtimeData private constructor(
 
     inline fun <reified Data> from(schema: String, table: String): RealtimeTable<Data> {
         return RealtimeTable(
+            id++,
             table,
             schema,
             supabaseClient,
@@ -37,7 +41,6 @@ class RealtimeData private constructor(
         override fun create(supabaseClient: SupabaseClient, config: Config): RealtimeData {
             return RealtimeData(config, supabaseClient)
         }
-
 
         override fun createConfig(init: Config.() -> Unit): Config {
             return Config().apply(init)
