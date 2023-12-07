@@ -6,10 +6,10 @@ import kotlinx.serialization.json.JsonElement
 
 @PublishedApi
 internal class RpcRequest(
-     val head: Boolean = false,
-     val count: Count? = null,
-     override val filter: Map<String, List<String>>,
-     override val body: JsonElement? = null,
+    val head: Boolean = false,
+    val count: Count? = null,
+    override val urlParams: Map<String, String>,
+    override val body: JsonElement? = null,
 ) : PostgrestRequest {
 
     override val schema: String = ""

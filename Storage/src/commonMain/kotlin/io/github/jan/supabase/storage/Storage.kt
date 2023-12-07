@@ -34,14 +34,14 @@ import kotlin.time.Duration.Companion.seconds
  *
  * To use it you need to install it to the [SupabaseClient]:
  * ```kotlin
- * val client = createSupabaseClient(supabaseUrl, supabaseKey) {
+ * val supabase = createSupabaseClient(supabaseUrl, supabaseKey) {
  *    install(Storage)
  * }
  * ```
  *
  * then you have to interact with the storage api:
  * ```kotlin
- * val bucket = client.storage["icons"]
+ * val bucket = supabase.storage.from("icons")
  * val bytes = bucket.downloadAuthenticated("icon.png")
  * ```
  */
@@ -51,7 +51,7 @@ sealed interface Storage : MainPlugin<Storage.Config> {
      * Creates a new bucket in the storage
      * @param id the id of the bucket
      * @param builder overrides bucket config options (like whether the bucket should be public,
-     * file size limit, etc)
+     * file size limit, etc.)
      * @throws RestException or one of its subclasses if receiving an error response
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
@@ -137,7 +137,7 @@ sealed interface Storage : MainPlugin<Storage.Config> {
             var defaultChunkSize: Long = DEFAULT_CHUNK_SIZE
                 set(value) {
                     if(value != DEFAULT_CHUNK_SIZE) {
-                        Logger.w { "supabase currently only supports a chunk size of 6MB" }
+                        Logger.w("Storage") { "supabase currently only supports a chunk size of 6MB" }
                     }
                     field = value
                 }

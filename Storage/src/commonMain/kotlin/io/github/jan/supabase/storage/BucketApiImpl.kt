@@ -1,6 +1,5 @@
 package io.github.jan.supabase.storage
 
-import io.github.jan.supabase.annotations.SupabaseExperimental
 import io.github.jan.supabase.putJsonObject
 import io.github.jan.supabase.safeBody
 import io.github.jan.supabase.storage.resumable.ResumableClientImpl
@@ -33,7 +32,6 @@ internal class BucketApiImpl(override val bucketId: String, val storage: Storage
 
     override val supabaseClient = storage.supabaseClient
 
-    @SupabaseExperimental
     override val resumable = ResumableClientImpl(this, storage.config.resumable.cache)
 
     override suspend fun update(path: String, data: UploadData, upsert: Boolean): String =

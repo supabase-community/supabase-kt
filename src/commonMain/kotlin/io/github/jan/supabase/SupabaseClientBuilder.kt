@@ -70,7 +70,7 @@ class SupabaseClientBuilder @PublishedApi internal constructor(private val supab
         }
         if(supabaseUrl.startsWith("http://")) {
             useHTTPS = false
-            Logger.w { "You are using a non HTTPS supabase url ($supabaseUrl)."}
+            Logger.w("Core") { "You are using a non HTTPS supabase url ($supabaseUrl)."}
         }
     }
 
@@ -85,16 +85,18 @@ class SupabaseClientBuilder @PublishedApi internal constructor(private val supab
      * **Warning:** This is an internal function and should only be used if you know what you are doing. You don't have to specify the HTTP client engine, it will be automatically set by Ktor.
      */
     @SupabaseInternal
-    fun httpConfig(block: HttpClientConfig<*>.() -> Unit) {
+    @SupabaseDsl
+    fun httpConfig(block: @SupabaseDsl HttpClientConfig<*>.() -> Unit) {
         httpConfigOverrides.add(block)
     }
 
     /**
      * Installs a plugin to the [SupabaseClient]
      *
-     * Plugins can be either retrieved by calling [PluginManager.getPlugin] within your [SupabaseClient] instance or by using the corresponding **SupabaseClient.plugin** function.
+     * Plugins can be either retrieved by calling [PluginManager.getPlugin] within your [SupabaseClient] instance or by using the corresponding **SupabaseClient.plugin** extension property.
      */
-    fun <Config, PluginInstance : SupabasePlugin, Provider : SupabasePluginProvider<Config, PluginInstance>> install(plugin: Provider, init: Config.() -> Unit = {}) {
+    @SupabaseDsl
+    fun <Config, PluginInstance : SupabasePlugin, Provider : SupabasePluginProvider<Config, PluginInstance>> install(plugin: Provider, init: @SupabaseDsl Config.() -> Unit = {}) {
         val config = plugin.createConfig(init)
         plugin.setup(this, config)
         plugins[plugin.key] = {

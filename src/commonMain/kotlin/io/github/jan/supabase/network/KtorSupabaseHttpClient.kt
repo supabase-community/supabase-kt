@@ -48,10 +48,10 @@ class KtorSupabaseHttpClient @SupabaseInternal constructor(
         val response = try {
             httpClient.request(url, builder)
         } catch(e: HttpRequestTimeoutException) {
-            Logger.d { "Request timed out after $requestTimeout ms" }
+            Logger.d("Core") { "Request timed out after $requestTimeout ms" }
             throw e
         } catch(e: Exception) {
-            Logger.d { "Request failed with ${e.message}" }
+            Logger.d("Core") { "Request failed with ${e.message}" }
             throw HttpRequestException(e.message ?: "", request)
         }
         return response
@@ -68,10 +68,10 @@ class KtorSupabaseHttpClient @SupabaseInternal constructor(
         val response = try {
             httpClient.prepareRequest(url, builder)
         } catch(e: HttpRequestTimeoutException) {
-            Logger.d { "Request timed out after $requestTimeout ms" }
+            Logger.d("Core") { "Request timed out after $requestTimeout ms" }
             throw e
         } catch(e: Exception) {
-            Logger.d { "Request failed with ${e.message}" }
+            Logger.d("Core") { "Request failed with ${e.message}" }
             throw HttpRequestException(e.message ?: "", request)
         }
         return response

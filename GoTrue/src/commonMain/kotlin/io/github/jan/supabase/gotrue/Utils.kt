@@ -1,16 +1,17 @@
 package io.github.jan.supabase.gotrue
 
 import co.touchlab.kermit.Logger
+import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.annotations.SupabaseInternal
 import io.github.jan.supabase.gotrue.user.UserSession
 import io.ktor.client.request.HttpRequestBuilder
 import kotlinx.coroutines.launch
 
 @SupabaseInternal
-fun GoTrue.parseFragmentAndImportSession(fragment: String, onSessionSuccess: (UserSession) -> Unit = {}) {
-    Logger.d { "Parsing deeplink fragment $fragment" }
+fun Auth.parseFragmentAndImportSession(fragment: String, onSessionSuccess: (UserSession) -> Unit = {}) {
+    Logger.d("Auth") { "Parsing deeplink fragment $fragment" }
     val session = parseSessionFromFragment(fragment)
-    this as GoTrueImpl
+    this as AuthImpl
     authScope.launch {
         val user = retrieveUser(session.accessToken)
         val newSession = session.copy(user = user)
@@ -25,3 +26,11 @@ fun HttpRequestBuilder.redirectTo(url: String) {
 }
 
 internal fun invalidArg(message: String): Nothing = throw IllegalArgumentException(message)
+
+internal expect suspend fun SupabaseClient.openExternalUrl(url: String)
+
+internal expect suspend fun Auth.startExternalAuth(
+    redirectUrl: String?,
+    getUrl: suspend (redirectTo: String?) -> String,
+    onSessionSuccess: suspend (UserSession) -> Unit
+)

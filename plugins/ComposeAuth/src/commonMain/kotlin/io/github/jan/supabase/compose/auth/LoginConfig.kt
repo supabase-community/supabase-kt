@@ -6,10 +6,12 @@ import kotlinx.serialization.json.JsonObject
  * Config for [ComposeAuth]
  */
 interface LoginConfig {
+
     /**
-     * Returns clientId for native login
+     * Returns the respective client id for Native Auth
      */
     val serverClientId: String
+
 }
 
 /**

@@ -56,24 +56,18 @@ kotlin {
             }
         }
         val androidMain by getting {
-            dependsOn(commonMain)
             dependencies {
                 api(libs.android.play.store.auth)
-                implementation(libs.android.google.id)
+                api(libs.android.google.id)
+                api(libs.androidx.credentials)
+                api(libs.androidx.credentials.play.services)
                 implementation(libs.kotlinx.coroutines.play.services)
                 implementation(libs.androidx.activity.compose)
             }
         }
-        val jvmMain by getting {
-            dependsOn(commonMain)
-        }
-
-        val appleMain by getting {
-            dependsOn(commonMain)
-        }
-        val jsMain by getting {
-            dependsOn(commonMain)
-        }
+        val jvmMain by getting
+        val appleMain by getting
+        val jsMain by getting
     }
 }
 
