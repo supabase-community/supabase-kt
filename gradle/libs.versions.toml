@@ -1,6 +1,6 @@
 [versions]
 kotlin = "1.9.21"
-ktor = "2.3.6"
+ktor = "2.3.7"
 dokka = "1.9.10"
 kotlinx-datetime = "0.5.0"
 kermit = "2.0.2"
