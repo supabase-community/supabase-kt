@@ -92,7 +92,7 @@ class RealtimeTable <Data> (
         }
     )
 
-    inline fun dataFlow(
+    inline fun singleFlow(
         crossinline filter: PostgrestFilterBuilder.() -> Unit,
         crossinline primaryKey: (Data) -> PrimaryKey
     ): Flow<Data> = callbackFlow {
@@ -140,10 +140,10 @@ class RealtimeTable <Data> (
         }
     }
 
-    inline fun <V> dataFlow(
-        crossinline filter: PostgrestFilterBuilder.() -> Unit,
-        primaryKey: KProperty1<Data, V>
-    ): Flow<Data> = dataFlow(
+    inline fun <V> singleFlow(
+        primaryKey: KProperty1<Data, V>,
+        crossinline filter: PostgrestFilterBuilder.() -> Unit
+    ): Flow<Data> = singleFlow(
         filter = filter,
         primaryKey = {
             PrimaryKey(primaryKey.name, primaryKey.get(it).toString())
