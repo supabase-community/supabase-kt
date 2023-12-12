@@ -4,7 +4,7 @@ A Kotlin Multiplatform Client for Supabase.
 
 For information about supported Kotlin targets, see the corresponding module README.
 
-[Migrating from version 1.5.X to 2.0.0](/MIGRATION.md)
+[Migrating from version 1.4.X to 2.0.0](/MIGRATION.md)
 
 *Note: WASM support planned see [issue](https://github.com/supabase-community/supabase-kt/issues/86)*
 
@@ -58,15 +58,15 @@ implementation("io.github.jan-tennert.supabase:[module]")
 
 ### Plugins
 
-#### [Apollo GraphQL integration](/plugins/ApolloGraphQL)
+#### [Apollo GraphQL integration](/plugins/ApolloGraphQL) - Creates an [Apollo GraphQL Client](https://github.com/apollographql/apollo-kotlin) for interacting with the Supabase API.
 
-#### [Compose Auth](/plugins/ComposeAuth)
+#### [Compose Auth](/plugins/ComposeAuth) - Provides easy Native Google & Apple Auth for Compose Multiplatform targets.
 
-#### [Compose Auth UI](/plugins/ComposeAuthUI)
+#### [Compose Auth UI](/plugins/ComposeAuthUI) - Provides UI Components for Compose Multiplatform.
 
-#### [Coil Integration](/plugins/CoilIntegration)
+#### [Coil Integration](/plugins/CoilIntegration) - Provides a [Coil](https://github.com/coil-kt/coil) Integration for displaying images stored in Supabase Storage.
 
-#### [Compose-ImageLoader Integration](/plugins/ImageLoaderIntegration)
+#### [Compose-ImageLoader Integration](/plugins/ImageLoaderIntegration) - Provides a [Compose ImageLoader](https://github.com/qdsfdhvh/compose-imageloader) Integration for displaying images stored in Supabase Storage.
 
 # Demos
 
