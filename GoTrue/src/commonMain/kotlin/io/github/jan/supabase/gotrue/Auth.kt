@@ -144,10 +144,12 @@ sealed interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
     /**
      * Unlinks an OAuth Identity from an existing user.
      * @param identityId The id of the OAuth identity
+     * @param updateLocalUser Whether to delete the identity from the local user or not
      */
     @SupabaseExperimental
     suspend fun unlinkIdentity(
-        identityId: String
+        identityId: String,
+        updateLocalUser: Boolean = true
     )
 
     /**
@@ -348,6 +350,13 @@ sealed interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
      * Returns the connected identities to the current user or null
      */
     fun currentIdentitiesOrNull() = currentUserOrNull()?.identities
+
+    /**
+     * Blocks the current coroutine until the plugin is initialized.
+     *
+     * This will make sure that the [SessionStatus] is set to [SessionStatus.Authenticated], [SessionStatus.NotAuthenticated] or [SessionStatus.NetworkError].
+     */
+    suspend fun awaitInitialization()
 
     companion object : SupabasePluginProvider<AuthConfig, Auth> {
 
