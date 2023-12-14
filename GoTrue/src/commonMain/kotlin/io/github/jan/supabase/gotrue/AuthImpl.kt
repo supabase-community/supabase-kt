@@ -126,7 +126,7 @@ internal class AuthImpl(
                 val response = api.rawRequest(url) {
                     method = HttpMethod.Get
                 }
-                response.request.url.toString() ?: error("No url found in response")
+                response.request.url.toString()
             },
             onSessionSuccess = {
                 importSession(it)
