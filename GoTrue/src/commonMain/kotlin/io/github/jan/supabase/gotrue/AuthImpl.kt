@@ -27,6 +27,7 @@ import io.ktor.client.call.body
 import io.ktor.client.request.parameter
 import io.ktor.client.statement.HttpResponse
 import io.ktor.client.statement.bodyAsText
+import io.ktor.client.statement.request
 import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
 import kotlinx.coroutines.CoroutineScope
@@ -36,14 +37,13 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
-import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonObjectBuilder
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.encodeToJsonElement
 import kotlinx.serialization.json.jsonObject
-import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.put
 import kotlinx.serialization.json.putJsonObject
 import kotlin.math.floor
@@ -123,10 +123,10 @@ internal class AuthImpl(
             redirectUrl = redirectUrl,
             getUrl = {
                 val url = oAuthUrl(provider, it, "user/identities/authorize", config)
-                val data = api.rawRequest(url) {
+                val response = api.rawRequest(url) {
                     method = HttpMethod.Get
-                }.body<JsonObject>()
-                data["url"]?.jsonPrimitive?.content ?: error("No url found in response")
+                }
+                response.request.url.toString() ?: error("No url found in response")
             },
             onSessionSuccess = {
                 importSession(it)
@@ -135,8 +135,14 @@ internal class AuthImpl(
     }
 
     @SupabaseExperimental
-    override suspend fun unlinkIdentity(identityId: String) {
+    override suspend fun unlinkIdentity(identityId: String, updateLocalUser: Boolean) {
         api.delete("user/identities/$identityId")
+        if (updateLocalUser) {
+            val session = currentSessionOrNull() ?: return
+            val newUser = session.user?.copy(identities = session.user.identities?.filter { it.identityId != identityId })
+            val newSession = session.copy(user = newUser)
+            _sessionStatus.value = SessionStatus.Authenticated(newSession)
+        }
     }
 
     override suspend fun retrieveSSOUrl(
@@ -529,6 +535,10 @@ internal class AuthImpl(
         sessionJob?.cancel()
         _sessionStatus.value = SessionStatus.NotAuthenticated
         sessionJob = null
+    }
+
+    override suspend fun awaitInitialization() {
+        sessionStatus.first { it !is SessionStatus.LoadingFromStorage }
     }
 
 }
