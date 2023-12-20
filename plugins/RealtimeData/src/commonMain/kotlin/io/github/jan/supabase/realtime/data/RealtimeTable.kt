@@ -5,6 +5,8 @@ import io.github.jan.supabase.collections.AtomicMutableMap
 import io.github.jan.supabase.exceptions.NotFoundRestException
 import io.github.jan.supabase.exceptions.UnknownRestException
 import io.github.jan.supabase.postgrest.postgrest
+import io.github.jan.supabase.postgrest.query.filter.FilterOperation
+import io.github.jan.supabase.postgrest.query.filter.FilterOperator
 import io.github.jan.supabase.postgrest.query.filter.PostgrestFilterBuilder
 import io.github.jan.supabase.realtime.PostgresAction
 import io.github.jan.supabase.realtime.channel
@@ -28,7 +30,7 @@ class RealtimeTable <Data> (
     val channelId: String = "$schema:$table:$id"
 
     inline fun listFlow(
-        filter: String = "",
+        filter: FilterOperation? = null,
         crossinline primaryKey: (Data) -> String,
     ): Flow<List<Data>> = callbackFlow {
         val cache = AtomicMutableMap<String, Data>()
@@ -47,8 +49,8 @@ class RealtimeTable <Data> (
         val channel = supabaseClient.realtime.channel(channelId)
         val changeFlow = channel.postgresChangeFlow<PostgresAction>(schema) {
             this.table = this@RealtimeTable.table
-            if(filter.isNotBlank()) {
-                this.filter = filter
+            filter?.let {
+                filter(it)
             }
         }
         launch {
@@ -83,7 +85,7 @@ class RealtimeTable <Data> (
     }
 
     inline fun <V> listFlow(
-        filter: String = "",
+        filter: FilterOperation? = null,
         primaryKey: KProperty1<Data, V>,
     ): Flow<List<Data>> = listFlow(
         filter = filter,
@@ -112,7 +114,7 @@ class RealtimeTable <Data> (
         val channel = supabaseClient.realtime.channel(channelId)
         val changeFlow = channel.postgresChangeFlow<PostgresAction>(schema) {
             this.table = this@RealtimeTable.table
-            this.filter = "${key.columnName}=eq.${key.value}"
+            filter(key.columnName, FilterOperator.EQ, key.value)
         }
         launch {
             changeFlow.collect {
