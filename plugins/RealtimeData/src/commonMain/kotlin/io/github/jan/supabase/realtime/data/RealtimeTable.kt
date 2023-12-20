@@ -41,7 +41,7 @@ class RealtimeTable <Data> (
                 val key = primaryKey(it)
                 cache[key] = it
             }
-            trySend(decodeDataList(result.data))
+            trySend(data)
         } catch (e: NotFoundRestException) {
             close(IllegalStateException("Table with name $table not found"))
             return@callbackFlow
