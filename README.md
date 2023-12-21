@@ -14,6 +14,8 @@ For information about supported Kotlin targets, see the corresponding module REA
 
 [Documentation](https://supabase.com/docs/reference/kotlin/introduction)
 
+[Getting started with Android and Supabase [Video]](https://www.youtube.com/watch?v=_iXUVJ6HTHU)
+
 [Quickstart](https://supabase.com/docs/guides/getting-started/quickstarts/kotlin)
 
 [Tutorial: Build a Product Management Android App with Jetpack Compose](https://supabase.com/docs/guides/getting-started/tutorials/with-kotlin)
@@ -85,6 +87,7 @@ implementation("io.github.jan-tennert.supabase:[module]")
 
 # Videos
 
+- [Getting started with Android and Supabase](https://www.youtube.com/watch?v=_iXUVJ6HTHU) by the official Supabase YouTube channel
 - [Getting started with Supabase on Android](https://www.youtube.com/watch?v=SGr73sWMX6w) (by [Eric Ampire](https://www.youtube.com/@eric-ampire))
 - [Supabase | Jetpack Compose | Android | 2023](https://www.youtube.com/playlist?list=PL91kV_wdjTlcGQdcZzkuid094as5eUlwU) (by [YoursSohailYT](https://www.youtube.com/@YoursSohailYT))
 
