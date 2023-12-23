@@ -90,8 +90,7 @@ internal fun ComposeAuth.signInWithCM(onResult: (NativeSignInResult) -> Unit, fa
                         } else {
                             onResult.invoke(NativeSignInResult.Error("error: unexpected type of credential"))
                         }
-                    }
-                    else -> {
+                    } else -> {
                         onResult.invoke(NativeSignInResult.Error("error: unsupported credentials"))
                     }
                 }
