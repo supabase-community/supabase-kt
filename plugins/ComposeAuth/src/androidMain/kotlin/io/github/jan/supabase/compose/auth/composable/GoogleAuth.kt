@@ -91,10 +91,10 @@ internal fun ComposeAuth.signInWithCM(onResult: (NativeSignInResult) -> Unit, fa
                             onResult.invoke(NativeSignInResult.Error("error: unexpected type of credential"))
                         }
                     }
-
-                    else -> onResult.invoke(NativeSignInResult.Error("error: unsupported credentials"))
+                    else -> {
+                        onResult.invoke(NativeSignInResult.Error("error: unsupported credentials"))
+                    }
                 }
-
             } catch (e: GetCredentialException) {
                 when (e) {
                     is GetCredentialCancellationException -> onResult.invoke(NativeSignInResult.ClosedByUser)
@@ -104,6 +104,8 @@ internal fun ComposeAuth.signInWithCM(onResult: (NativeSignInResult) -> Unit, fa
                         )
                     )
                 }
+            } finally {
+                state.reset()
             }
         }
     }
