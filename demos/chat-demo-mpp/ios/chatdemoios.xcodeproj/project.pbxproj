@@ -76,6 +76,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 6581F15D2B36C0D000BA34A9 /* Build configuration list for PBXNativeTarget "chatdemoios" */;
 			buildPhases = (
+				656500D42B3962F0005F97B4 /* ShellScript */,
 				6581F14A2B36C0CF00BA34A9 /* Sources */,
 				6581F14B2B36C0CF00BA34A9 /* Frameworks */,
 				6581F14C2B36C0CF00BA34A9 /* Resources */,
@@ -133,6 +134,26 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		656500D42B3962F0005F97B4 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "cd \"$SRCROOT/..\"\n./gradlew :common:embedAndSignAppleFrameworkForXcode\n";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		6581F14A2B36C0CF00BA34A9 /* Sources */ = {
@@ -276,8 +297,7 @@
 				DEVELOPMENT_ASSET_PATHS = "\"chatdemoios/Preview Content\"";
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
-				FRAMEWORK_SEARCH_PATHS = "/Users/hieuvu/Projects/supabase-kt/demos/chat-demo-mpp/common/build/bin/iosArm64/debugFramework/common.framework";
-				"FRAMEWORK_SEARCH_PATHS[arch=*]" = "$(SRCROOT)/../shared/build/xcode-frameworks/$(CONFIGURATION)/$(SDK_NAME)";
+				FRAMEWORK_SEARCH_PATHS = "$(SRCROOT)/../common/build/$(CONFIGURATION)/$(SDK_NAME)";
 				GENERATE_INFOPLIST_FILE = YES;
 				HEADER_SEARCH_PATHS = "";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
@@ -318,7 +338,7 @@
 				DEVELOPMENT_ASSET_PATHS = "\"chatdemoios/Preview Content\"";
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
-				FRAMEWORK_SEARCH_PATHS = "/Users/hieuvu/Projects/supabase-kt/demos/chat-demo-mpp/common/build/bin/iosArm64/debugFramework/common.framework";
+				FRAMEWORK_SEARCH_PATHS = "$(SRCROOT)/../common/build/$(CONFIGURATION)/$(SDK_NAME)";
 				GENERATE_INFOPLIST_FILE = YES;
 				HEADER_SEARCH_PATHS = "";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
