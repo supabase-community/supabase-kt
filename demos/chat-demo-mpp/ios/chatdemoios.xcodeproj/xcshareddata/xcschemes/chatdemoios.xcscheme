@@ -12,13 +12,6 @@
             buildForProfiling = "YES"
             buildForArchiving = "YES"
             buildForAnalyzing = "YES">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "8217FBB9D1218C346C0781D0B8F2BBE8"
-               BuildableName = "common"
-               BlueprintName = "common"
-               ReferencedContainer = "container:Pods/Pods.xcodeproj">
-            </BuildableReference>
          </BuildActionEntry>
          <BuildActionEntry
             buildForTesting = "YES"
@@ -40,13 +33,6 @@
             buildForProfiling = "YES"
             buildForArchiving = "YES"
             buildForAnalyzing = "YES">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "AE7BB0D0AA32FBEBDE4A01BDD222D7C5"
-               BuildableName = "Pods_chatdemoios.framework"
-               BlueprintName = "Pods-chatdemoios"
-               ReferencedContainer = "container:Pods/Pods.xcodeproj">
-            </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
    </BuildAction>

@@ -5,7 +5,6 @@ plugins {
     id("org.jetbrains.compose")
     id("com.android.library")
     kotlin("plugin.serialization")
-    kotlin("native.cocoapods")
 }
 
 group = "io.github.jan.supabase"
@@ -27,44 +26,7 @@ kotlin {
         it.binaries.framework {
             baseName = "common"
             isStatic = true
-            transitiveExport = true
         }
-    }
-
-//    ios() {
-//        binaries {
-//            framework {
-//                baseName = "ios"
-//                transitiveExport = true // This is default.
-//            }
-//        }
-//    }
-
-    cocoapods {
-
-        // Required properties
-        // Specify the required Pod version here. Otherwise, the Gradle project version is used.
-        version = "1.0"
-        summary = "Some description for a Kotlin/Native module"
-        homepage = "Link to a Kotlin/Native module homepage"
-        framework {
-            // Required properties
-            // Framework name configuration. Use this property instead of deprecated 'frameworkName'
-            baseName = "common"
-
-            // Optional properties
-            // Specify the framework linking type. It's dynamic by default.
-            isStatic = false
-            // Dependency export
-            export(project(":common"))
-            transitiveExport = true // This is default.
-            // Bitcode embedding
-            embedBitcode(org.jetbrains.kotlin.gradle.plugin.mpp.BitcodeEmbeddingMode.BITCODE)
-        }
-        podfile = project.file("/Users/hieuvu/Projects/supabase-kt/demos/chat-demo-mpp/ios/Podfile")
-        // Maps custom Xcode configuration to NativeBuildType
-        xcodeConfigurationToNativeBuildType["CUSTOM_DEBUG"] = org.jetbrains.kotlin.gradle.plugin.mpp.NativeBuildType.DEBUG
-        xcodeConfigurationToNativeBuildType["CUSTOM_RELEASE"] = org.jetbrains.kotlin.gradle.plugin.mpp.NativeBuildType.RELEASE
     }
     sourceSets {
         val commonMain by getting {
