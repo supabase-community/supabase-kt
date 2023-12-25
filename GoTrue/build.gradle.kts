@@ -12,7 +12,7 @@ repositories {
 
 @OptIn(org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi::class)
 kotlin {
-    targetHierarchy.default()
+    applyDefaultHierarchyTemplate()
     jvm {
         jvmToolchain(8)
         compilations.all {
@@ -37,7 +37,8 @@ kotlin {
             }
         }
     }
-    ios()
+    iosX64()
+    iosArm64()
     iosSimulatorArm64()
     mingwX64()
     macosX64()
@@ -46,7 +47,8 @@ kotlin {
     watchosArm64()
     watchosX64()
     watchosSimulatorArm64()
-    tvos()
+    tvosX64()
+    tvosArm64()
     tvosSimulatorArm64()
     sourceSets {
         all {
@@ -60,6 +62,9 @@ kotlin {
                 implementation(libs.krypto)
          //       api(libs.cache4k)
             }
+        }
+        val nonJvmMain by creating {
+            dependsOn(commonMain)
         }
         val nonLinuxMain by creating {
             dependsOn(commonMain)
@@ -87,14 +92,19 @@ kotlin {
         }
         val mingwX64Main by getting {
             dependsOn(nonLinuxMain)
+            dependsOn(nonJvmMain)
         }
         val appleMain by getting {
             dependsOn(nonLinuxMain)
+            dependsOn(nonJvmMain)
         }
         val jsMain by getting {
             dependsOn(nonLinuxMain)
+            dependsOn(nonJvmMain)
         }
-        val linuxMain by getting
+        val linuxMain by getting {
+            dependsOn(nonJvmMain)
+        }
     }
 }
 

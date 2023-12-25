@@ -6,6 +6,7 @@ import io.github.jan.supabase.annotations.SupabaseInternal
 import io.github.jan.supabase.bodyOrNull
 import io.github.jan.supabase.collections.AtomicMutableMap
 import io.github.jan.supabase.exceptions.BadRequestRestException
+import io.github.jan.supabase.exceptions.HttpRequestException
 import io.github.jan.supabase.exceptions.NotFoundRestException
 import io.github.jan.supabase.exceptions.RestException
 import io.github.jan.supabase.exceptions.UnauthorizedRestException
@@ -33,14 +34,14 @@ import kotlin.time.Duration.Companion.seconds
  *
  * To use it you need to install it to the [SupabaseClient]:
  * ```kotlin
- * val client = createSupabaseClient(supabaseUrl, supabaseKey) {
+ * val supabase = createSupabaseClient(supabaseUrl, supabaseKey) {
  *    install(Storage)
  * }
  * ```
  *
  * then you have to interact with the storage api:
  * ```kotlin
- * val bucket = client.storage["icons"]
+ * val bucket = supabase.storage.from("icons")
  * val bytes = bucket.downloadAuthenticated("icon.png")
  * ```
  */
@@ -48,8 +49,9 @@ sealed interface Storage : MainPlugin<Storage.Config> {
 
     /**
      * Creates a new bucket in the storage
-     * @param name the name of the bucket
      * @param id the id of the bucket
+     * @param builder overrides bucket config options (like whether the bucket should be public,
+     * file size limit, etc.)
      * @throws RestException or one of its subclasses if receiving an error response
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
@@ -72,7 +74,7 @@ sealed interface Storage : MainPlugin<Storage.Config> {
     suspend fun retrieveBuckets(): List<Bucket>
 
     /**
-     * Retrieves a bucket by its [id]
+     * Retrieves a bucket by its [bucketId]
      * @throws RestException or one of its subclasses if receiving an error response
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
@@ -88,7 +90,7 @@ sealed interface Storage : MainPlugin<Storage.Config> {
     suspend fun emptyBucket(bucketId: String)
 
     /**
-     * Deletes a bucket by its [id]
+     * Deletes a bucket by its [bucketId]
      * @throws RestException or one of its subclasses if receiving an error response
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
@@ -135,7 +137,7 @@ sealed interface Storage : MainPlugin<Storage.Config> {
             var defaultChunkSize: Long = DEFAULT_CHUNK_SIZE
                 set(value) {
                     if(value != DEFAULT_CHUNK_SIZE) {
-                        Logger.w { "supabase currently only supports a chunk size of 6MB" }
+                        Logger.w("Storage") { "supabase currently only supports a chunk size of 6MB" }
                     }
                     field = value
                 }

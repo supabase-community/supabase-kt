@@ -1,8 +1,8 @@
 package io.github.jan.supabase.compose.auth
 
 import io.github.jan.supabase.SupabaseClient
-import io.github.jan.supabase.gotrue.LogoutScope
-import io.github.jan.supabase.gotrue.gotrue
+import io.github.jan.supabase.gotrue.SignOutScope
+import io.github.jan.supabase.gotrue.auth
 import io.github.jan.supabase.gotrue.providers.Apple
 import io.github.jan.supabase.gotrue.providers.Google
 import io.github.jan.supabase.gotrue.providers.IDTokenProvider
@@ -11,9 +11,8 @@ import io.github.jan.supabase.plugins.SupabasePlugin
 import io.github.jan.supabase.plugins.SupabasePluginProvider
 
 /**
- * Plugin that extends [GoTrue] Module with composable function that enables
- * easy implementation of Native Login.
- * Currently supported Google Login (Android) and Apple Login (iOS), other compose-supported targets rely on GoTrue login.
+ * Plugin that extends the [Auth] Module with composable function that enables an easy implementation of Native Auth.
+ * Currently supported Google Login (Android with OneTap or CM on Android 14+) and Apple Login (iOS), other compose-supported targets rely on GoTrue login.
  *
  * To use it, install GoTrue and ComposeAuth
  * ```kotlin
@@ -30,7 +29,7 @@ import io.github.jan.supabase.plugins.SupabasePluginProvider
  *
  * then on you screen call
  *  ```kotlin
- *  val action = auth.rememberLoginWithGoogle(
+ *  val action = auth.rememberSignInWithGoogle(
  *     onResult = {
  *        // returns NativeSignInResult
  *     },
@@ -51,7 +50,7 @@ import io.github.jan.supabase.plugins.SupabasePluginProvider
 sealed interface ComposeAuth : SupabasePlugin {
 
     /**
-     * Returns native login configurations
+     * Returns Native Auth configurations
      */
     val config: Config
 
@@ -73,11 +72,6 @@ sealed interface ComposeAuth : SupabasePlugin {
 
         override val key: String = "composeauth"
 
-        /**
-         * The version for the api the plugin is using
-         */
-        const val API_VERSION = 1
-
         override fun create(supabaseClient: SupabaseClient, config: Config): ComposeAuth {
             return ComposeAuthImpl(config, supabaseClient)
         }
@@ -89,7 +83,7 @@ sealed interface ComposeAuth : SupabasePlugin {
 }
 
 /**
- * Composable plugin that handles native login using GoTrue
+ * Composable plugin that handles Native Auth on supported platforms
  */
 val SupabaseClient.composeAuth: ComposeAuth
     get() = pluginManager.getPlugin(ComposeAuth)
@@ -97,18 +91,12 @@ val SupabaseClient.composeAuth: ComposeAuth
 internal class ComposeAuthImpl(
     override val config: ComposeAuth.Config,
     override val supabaseClient: SupabaseClient,
-) : ComposeAuth {
+) : ComposeAuth
 
-    val apiVersion = ComposeAuth.API_VERSION
-
-    val pluginKey = ComposeAuth.key
-
-}
-
-internal suspend fun ComposeAuth.loginWithGoogle(idToken: String) {
+internal suspend fun ComposeAuth.signInWithGoogle(idToken: String) {
     val config = config.loginConfig["google"] as? GoogleLoginConfig
 
-    supabaseClient.gotrue.loginWith(IDToken) {
+    supabaseClient.auth.signInWith(IDToken) {
         provider = Google
         this.idToken = idToken
         nonce = config?.nonce
@@ -116,10 +104,10 @@ internal suspend fun ComposeAuth.loginWithGoogle(idToken: String) {
     }
 }
 
-internal suspend fun ComposeAuth.loginWithApple(idToken: String) {
+internal suspend fun ComposeAuth.signInWithApple(idToken: String) {
     val config = config.loginConfig["apple"] as? GoogleLoginConfig
 
-    supabaseClient.gotrue.loginWith(IDToken) {
+    supabaseClient.auth.signInWith(IDToken) {
         provider = Apple
         this.idToken = idToken
         nonce = config?.nonce
@@ -128,9 +116,9 @@ internal suspend fun ComposeAuth.loginWithApple(idToken: String) {
 }
 
 internal suspend fun ComposeAuth.fallbackLogin(provider: IDTokenProvider) {
-    supabaseClient.gotrue.loginWith(provider)
+    supabaseClient.auth.signInWith(provider)
 }
 
-internal suspend fun ComposeAuth.signOut(scope: LogoutScope = LogoutScope.LOCAL) {
-    supabaseClient.gotrue.logout(scope)
+internal suspend fun ComposeAuth.signOut(scope: SignOutScope = SignOutScope.LOCAL) {
+    supabaseClient.auth.signOut(scope)
 }

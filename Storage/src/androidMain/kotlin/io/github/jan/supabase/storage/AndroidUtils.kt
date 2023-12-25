@@ -1,7 +1,7 @@
 package io.github.jan.supabase.storage
 
+import android.annotation.SuppressLint
 import android.net.Uri
-import io.github.jan.supabase.annotations.SupabaseExperimental
 import io.ktor.utils.io.ByteReadChannel
 import io.ktor.utils.io.jvm.javaio.toByteReadChannel
 
@@ -12,7 +12,6 @@ import io.ktor.utils.io.jvm.javaio.toByteReadChannel
  * @param upsert Whether to overwrite an existing file
  * @return the key to the updated file
  */
-@SupabaseExperimental
 suspend fun BucketApi.upload(path: String, uri: Uri, upsert: Boolean = false) = upload(path, UploadData(uri.readChannel(), uri.contentSize), upsert)
 
 /**
@@ -22,7 +21,6 @@ suspend fun BucketApi.upload(path: String, uri: Uri, upsert: Boolean = false) = 
  * @param upsert Whether to overwrite an existing file
  * @return A flow that emits the upload progress and at last the key to the updated file
  */
-@SupabaseExperimental
 fun BucketApi.uploadAsFlow(path: String, uri: Uri, upsert: Boolean = false) = uploadAsFlow(path, UploadData(uri.readChannel(), uri.contentSize), upsert)
 
 /**
@@ -32,7 +30,6 @@ fun BucketApi.uploadAsFlow(path: String, uri: Uri, upsert: Boolean = false) = up
  * @param uri The uri to upload
  * @return the key to the updated file
  */
-@SupabaseExperimental
 suspend fun BucketApi.uploadToSignedUrl(path: String, token: String, uri: Uri, upsert: Boolean = false) = uploadToSignedUrl(path, token, UploadData(uri.readChannel(), uri.contentSize), upsert)
 
 /**
@@ -43,7 +40,6 @@ suspend fun BucketApi.uploadToSignedUrl(path: String, token: String, uri: Uri, u
  * @param upsert Whether to overwrite an existing file
  * @return A flow that emits the upload progress and at last the key to the updated file
  */
-@SupabaseExperimental
 fun BucketApi.uploadToSignedUrlAsFlow(path: String, token: String, uri: Uri, upsert: Boolean = false) = uploadToSignedUrlAsFlow(path, token, UploadData(uri.readChannel(), uri.contentSize), upsert)
 
 /**
@@ -53,7 +49,6 @@ fun BucketApi.uploadToSignedUrlAsFlow(path: String, token: String, uri: Uri, ups
  * @param upsert Whether to overwrite an existing file
  * @return the key to the updated file
  */
-@SupabaseExperimental
 suspend fun BucketApi.update(path: String, uri: Uri, upsert: Boolean = false) = update(path, UploadData(uri.readChannel(), uri.contentSize), upsert)
 
 /**
@@ -63,9 +58,9 @@ suspend fun BucketApi.update(path: String, uri: Uri, upsert: Boolean = false) = 
  * @param upsert Whether to overwrite an existing file
  * @return A flow that emits the upload progress and at last the key to the updated file
  */
-@SupabaseExperimental
 fun BucketApi.updateAsFlow(path: String, uri: Uri, upsert: Boolean = false) = updateAsFlow(path, UploadData(uri.readChannel(), uri.contentSize), upsert)
 
+@SuppressLint("Recycle") //toByteReadChannel closes the input stream automatically
 private fun Uri.readChannel(): ByteReadChannel {
     val context = applicationContext()
     val inputStream = context.contentResolver.openInputStream(this) ?: throw IllegalArgumentException("Uri is not readable")

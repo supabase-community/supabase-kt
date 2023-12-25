@@ -37,6 +37,12 @@ data object LinkedIn : OAuthProvider() {
 
 }
 
+data object LinkedInOIDC : OAuthProvider() {
+
+    override val name = "linkedin_oidc"
+
+}
+
 data object Notion : OAuthProvider() {
 
     override val name = "notion"
@@ -112,6 +118,12 @@ data object Facebook : IDTokenProvider() {
 data object Figma : OAuthProvider() {
 
     override val name = "figma"
+
+}
+
+data object Fly : OAuthProvider() {
+
+    override val name = "fly"
 
 }
 
