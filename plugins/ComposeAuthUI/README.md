@@ -2,9 +2,35 @@
 
 Extends Supabase-kt with UI composables
 
-Newest version: [![Maven Central](https://img.shields.io/maven-central/v/io.github.jan-tennert.supabase/supabase-kt)](https://search.maven.org/search?q=g%3Aio.github.jan-tennert.supabase)
+Supported targets:
+
+| Target | **JVM** | **Android** | **JS** | **iOS** | **tvOS** | **watchOS** | **macOS** | **Windows** | **Linux** |
+|--------|---------|-------------|--------|---------|----------|-------------|-----------|-------------|-----------|
+|        | ✅       | ✅           | ✅      | ✅       | ❌        | ❌           | ❌         | ❌           | ❌         |
+
+<details>
+
+<summary>In-depth Kotlin targets</summary>
+
+**iOS:** iosArm64, iosSimulatorArm64, iosX64
+
+**JS**: Browser, NodeJS
+
+**tvOS**: tvosArm64, tvosX64, tvosSimulatorArm64
+
+**watchOS**: watchosArm64, watchosX64, watchosSimulatorArm64
+
+**MacOS**: macosX64, macosArm64
+
+**Windows**: mingwX64
+
+**Linux**: linuxX64
+
+</details>
 
 # Installation
+
+Newest version: [![](https://img.shields.io/github/release/supabase-community/supabase-kt?label=)](https://github.com/supabase-community/supabase-kt/releases)
 
 ```kotlin
 dependencies {

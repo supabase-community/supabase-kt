@@ -19,7 +19,7 @@ class RpcRequestTest {
             head = true,
             count = Count.EXACT,
             body = JsonArray(listOf()),
-            filter = mapOf("Key1" to listOf("Value1")),
+            urlParams = mapOf("Key1" to "Value1"),
         )
 
         assertTrue((sut as RpcRequest).head)
@@ -34,9 +34,8 @@ class RpcRequestTest {
             ), sut.prefer
         )
         assertEquals("", sut.schema)
-        assertEquals(mapOf("Key1" to listOf("Value1")), sut.filter)
+        assertEquals(mapOf("Key1" to "Value1"), sut.urlParams)
         assertEquals(JsonArray(listOf()), sut.body)
-        assertEquals(emptyMap(), sut.urlParams)
     }
 
     @Test
@@ -45,7 +44,7 @@ class RpcRequestTest {
             head = false,
             count = Count.EXACT,
             body = JsonArray(listOf()),
-            filter = mapOf("Key1" to listOf("Value1")),
+            urlParams = mapOf("Key1" to "Value1"),
         )
         assertFalse((sut as RpcRequest).head)
         val count = (sut as RpcRequest).count
@@ -58,9 +57,8 @@ class RpcRequestTest {
             ), sut.prefer
         )
         assertEquals("", sut.schema)
-        assertEquals(mapOf("Key1" to listOf("Value1")), sut.filter)
+        assertEquals(mapOf("Key1" to "Value1"), sut.urlParams)
         assertEquals(JsonArray(listOf()), sut.body)
-        assertEquals(emptyMap(), sut.urlParams)
     }
 
     @Test
@@ -69,7 +67,7 @@ class RpcRequestTest {
             head = true,
             count = null,
             body = JsonArray(listOf()),
-            filter = mapOf("Key1" to listOf("Value1")),
+            urlParams = mapOf("Key1" to "Value1"),
         )
 
         assertTrue((sut as RpcRequest).head)
@@ -82,9 +80,8 @@ class RpcRequestTest {
             ), sut.prefer
         )
         assertEquals("", sut.schema)
-        assertEquals(mapOf("Key1" to listOf("Value1")), sut.filter)
+        assertEquals(mapOf("Key1" to "Value1"), sut.urlParams)
         assertEquals(JsonArray(listOf()), sut.body)
-        assertEquals(emptyMap(), sut.urlParams)
     }
 
     @Test
@@ -93,7 +90,7 @@ class RpcRequestTest {
             head = true,
             count = null,
             body = null,
-            filter = mapOf("Key1" to listOf("Value1")),
+            urlParams = mapOf("Key1" to "Value1"),
         )
 
         assertTrue((sut as RpcRequest).head)
@@ -103,9 +100,8 @@ class RpcRequestTest {
             ), sut.prefer
         )
         assertEquals("", sut.schema)
-        assertEquals(mapOf("Key1" to listOf("Value1")), sut.filter)
+        assertEquals(mapOf("Key1" to "Value1"), sut.urlParams)
         assertNull(sut.body)
-        assertEquals(emptyMap(), sut.urlParams)
     }
     @Test
     fun testCreateRpcRequest_notHeadAndWithoutCount_thenReturnCorrectValue() {
@@ -113,7 +109,7 @@ class RpcRequestTest {
             head = false,
             count = null,
             body = JsonArray(listOf()),
-            filter = mapOf("Key1" to listOf("Value1")),
+            urlParams = mapOf("Key1" to "Value1"),
         )
 
         assertEquals("POST", sut.method.value)
@@ -122,9 +118,8 @@ class RpcRequestTest {
             ), sut.prefer
         )
         assertEquals("", sut.schema)
-        assertEquals(mapOf("Key1" to listOf("Value1")), sut.filter)
+        assertEquals(mapOf("Key1" to "Value1"), sut.urlParams)
         assertEquals(JsonArray(listOf()), sut.body)
-        assertEquals(emptyMap(), sut.urlParams)
     }
 
 }

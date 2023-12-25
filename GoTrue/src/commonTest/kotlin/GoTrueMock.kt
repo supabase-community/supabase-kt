@@ -1,6 +1,5 @@
 import io.github.jan.supabase.gotrue.providers.builtin.Email
 import io.github.jan.supabase.gotrue.providers.builtin.Phone
-import io.github.jan.supabase.gotrue.user.AppMetadata
 import io.github.jan.supabase.gotrue.user.UserInfo
 import io.github.jan.supabase.gotrue.user.UserSession
 import io.ktor.client.engine.mock.MockEngine
@@ -101,9 +100,9 @@ class GoTrueMock {
         val token = authorizationHeader.substringAfter("Bearer ")
         if(token != VALID_ACCESS_TOKEN) return respondUnauthorized()
         return when(request.method) {
-            HttpMethod.Get -> respond(UserInfo(AppMetadata("", listOf()), "", id = "userid"))
+            HttpMethod.Get -> respond(UserInfo(aud = "", id = "userid"))
             HttpMethod.Put -> {
-                respond(UserInfo(AppMetadata("", listOf()), "", id = "userid", email = "old_email@email.com", emailChangeSentAt = Clock.System.now()))
+                respond(UserInfo(aud = "", id = "userid", email = "old_email@email.com", emailChangeSentAt = Clock.System.now()))
             }
             else -> return respondBadRequest("Invalid method")
         }
@@ -179,7 +178,7 @@ class GoTrueMock {
         "",
         200,
         "token_type",
-        UserInfo(aud = "", appMetadata = AppMetadata("", listOf()), id = "")
+        UserInfo(aud = "", id = "")
     ))
 
     private fun MockRequestHandleScope.respondInternalError(message: String): HttpResponseData {

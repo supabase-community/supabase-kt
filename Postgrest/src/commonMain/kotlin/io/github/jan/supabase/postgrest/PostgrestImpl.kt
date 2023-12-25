@@ -9,7 +9,7 @@ import io.github.jan.supabase.exceptions.RestException
 import io.github.jan.supabase.exceptions.UnauthorizedRestException
 import io.github.jan.supabase.exceptions.UnknownRestException
 import io.github.jan.supabase.gotrue.authenticatedSupabaseApi
-import io.github.jan.supabase.postgrest.query.PostgrestBuilder
+import io.github.jan.supabase.postgrest.query.PostgrestQueryBuilder
 import io.ktor.client.statement.HttpResponse
 import io.ktor.http.HttpStatusCode
 
@@ -26,15 +26,15 @@ internal class PostgrestImpl(override val supabaseClient: SupabaseClient, overri
     @OptIn(SupabaseInternal::class)
     val api = supabaseClient.authenticatedSupabaseApi(this)
 
-    override fun from(table: String): PostgrestBuilder {
-        return PostgrestBuilder(
+    override fun from(table: String): PostgrestQueryBuilder {
+        return PostgrestQueryBuilder(
             postgrest = this,
             table = table,
         )
     }
 
-    override fun from(schema: String, table: String): PostgrestBuilder {
-        return PostgrestBuilder(
+    override fun from(schema: String, table: String): PostgrestQueryBuilder {
+        return PostgrestQueryBuilder(
             postgrest = this,
             table = table,
             schema = schema,

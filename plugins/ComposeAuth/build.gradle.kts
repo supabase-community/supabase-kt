@@ -13,7 +13,7 @@ repositories {
 
 @OptIn(org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi::class)
 kotlin {
-    targetHierarchy.default()
+    applyDefaultHierarchyTemplate()
     jvm {
         jvmToolchain(8)
         compilations.all {
@@ -38,7 +38,8 @@ kotlin {
             }
         }
     }
-    ios()
+    iosX64()
+    iosArm64()
     iosSimulatorArm64()
 
     sourceSets {
@@ -55,24 +56,18 @@ kotlin {
             }
         }
         val androidMain by getting {
-            dependsOn(commonMain)
             dependencies {
                 api(libs.android.play.store.auth)
-                implementation(libs.android.google.id)
+                api(libs.android.google.id)
+                api(libs.androidx.credentials)
+                api(libs.androidx.credentials.play.services)
                 implementation(libs.kotlinx.coroutines.play.services)
                 implementation(libs.androidx.activity.compose)
             }
         }
-        val jvmMain by getting {
-            dependsOn(commonMain)
-        }
-
-        val appleMain by getting {
-            dependsOn(commonMain)
-        }
-        val jsMain by getting {
-            dependsOn(commonMain)
-        }
+        val jvmMain by getting
+        val appleMain by getting
+        val jsMain by getting
     }
 }
 
@@ -87,9 +82,4 @@ android {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
     }
-}
-
-compose {
-    kotlinCompilerPlugin.set(dependencies.compiler.forKotlin("1.9.0"))
-    kotlinCompilerPluginArgs.add("suppressKotlinVersionCompatibilityCheck=1.9.10")
 }

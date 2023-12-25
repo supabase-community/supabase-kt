@@ -13,6 +13,11 @@ import kotlinx.serialization.json.JsonObject
  * @property emailConfirm Automatically confirms the email address
  * @property phoneConfirm Automatically confirms the phone number
  * @property phone The user's phone number
+ * @property role The `role` claim set in the user's access token JWT.
+ *
+ * When a user signs up, this role is set to `authenticated` by default. You should only modify the `role` if you need to provision several levels of admin access that have different permissions on individual columns in your database.
+ *
+ * Setting this role to `service_role` is not recommended as it grants the user admin privileges.
  * @property banDuration Determines how long a user is banned for.
  *  The format for the ban duration follows a strict sequence of decimal numbers with a unit suffix.
  *
@@ -37,4 +42,5 @@ data class AdminUserUpdateBuilder(
     var phone: String? = null,
     @SerialName("ban_duration")
     var banDuration: String? = null,
+    var role: String? = null
 )

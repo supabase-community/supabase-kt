@@ -4,25 +4,11 @@ import android.content.Intent
 import android.net.Uri
 import androidx.browser.customtabs.CustomTabsIntent
 import io.github.jan.supabase.SupabaseClient
-import io.github.jan.supabase.annotations.SupabaseExperimental
+import io.github.jan.supabase.annotations.SupabaseInternal
 import io.github.jan.supabase.gotrue.ExternalAuthAction.CUSTOM_TABS
 import io.github.jan.supabase.gotrue.ExternalAuthAction.EXTERNAL_BROWSER
-import io.github.jan.supabase.gotrue.providers.ExternalAuthConfigDefaults
-import io.github.jan.supabase.gotrue.providers.OAuthProvider
 import io.github.jan.supabase.gotrue.user.UserSession
 import kotlinx.coroutines.launch
-
-
-internal fun GoTrue.openOAuth(provider: OAuthProvider, redirectTo: String, config: ExternalAuthConfigDefaults) {
-    this as GoTrueImpl
-    openUrl(
-        uri = Uri.parse(oAuthUrl(provider, redirectTo) {
-            scopes.addAll(config.scopes)
-            queryParams.putAll(config.queryParams)
-        }),
-        action = this.config.defaultExternalAuthAction
-    )
-}
 
 internal fun openUrl(uri: Uri, action: ExternalAuthAction) {
     when(action) {
@@ -33,6 +19,7 @@ internal fun openUrl(uri: Uri, action: ExternalAuthAction) {
         }
         CUSTOM_TABS -> {
             val intent = CustomTabsIntent.Builder().build()
+            intent.intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
             intent.launchUrl(applicationContext(), uri)
         }
     }
@@ -45,22 +32,22 @@ internal fun openUrl(uri: Uri, action: ExternalAuthAction) {
  * @param intent The intent from the activity
  * @param onSessionSuccess The callback when the session was successfully imported
  */
-@OptIn(SupabaseExperimental::class)
+@OptIn(SupabaseInternal::class)
 fun SupabaseClient.handleDeeplinks(intent: Intent, onSessionSuccess: (UserSession) -> Unit = {}) {
     val data = intent.data ?: return
     val scheme = data.scheme ?: return
     val host = data.host ?: return
-    if(scheme != gotrue.config.scheme || host != gotrue.config.host) return
-    when(this.gotrue.config.flowType) {
+    if(scheme != auth.config.scheme || host != auth.config.host) return
+    when(this.auth.config.flowType) {
         FlowType.IMPLICIT -> {
             val fragment = data.fragment ?: return
-            gotrue.parseFragmentAndImportSession(fragment, onSessionSuccess)
+            auth.parseFragmentAndImportSession(fragment, onSessionSuccess)
         }
         FlowType.PKCE -> {
             val code = data.getQueryParameter("code") ?: return
-            (gotrue as GoTrueImpl).authScope.launch {
-                this@handleDeeplinks.gotrue.exchangeCodeForSession(code)
-                onSessionSuccess(this@handleDeeplinks.gotrue.currentSessionOrNull() ?: error("No session available"))
+            (auth as AuthImpl).authScope.launch {
+                this@handleDeeplinks.auth.exchangeCodeForSession(code)
+                onSessionSuccess(this@handleDeeplinks.auth.currentSessionOrNull() ?: error("No session available"))
             }
         }
     }

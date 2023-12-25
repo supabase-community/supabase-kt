@@ -1,55 +1,20 @@
 # supabase-kt
 
 A Kotlin Multiplatform Client for Supabase.
-Supported targets:
 
-|                  | **GoTrue** | **Realtime** | **Postgrest** | **Storage** | **Functions** | **Apollo-GraphQL** | **Compose Auth 🚧** | **Compose Auth UI 🚧** |
-|------------------|------------|--------------|---------------|-------------|---------------|--------------------|---------------------|------------------------|
-| **JVM**          | ✅          | ✅            | ✅             | ✅           | ✅             | ✅                  | ☑️                  | ✅                      |
-| **Android**      | ✅          | ✅            | ✅             | ✅           | ✅             | ✅                  | ✅                   | ✅                      |
-| **JS**           | ✅          | ✅            | ✅             | ✅           | ✅             | ✅                  | ☑️                  | ✅                      |
-| **IOS**          | ✅          | ✅            | ✅             | ✅           | ✅             | ✅                  | 🚧                  | ✅                      |
-| **tvOS**  🚧     | ☑️         | ✅            | ✅             | ✅           | ✅             | ✅                  | ❌                   | ❌                      |
-| **watchOS**  🚧  | ☑️         | ✅            | ✅             | ✅           | ✅             | ✅                  | ❌                   | ❌                      |
-| **MacOS**   🚧   | ✅          | ✅            | ✅             | ✅           | ✅             | ✅                  | ❌                   | ❌                      |
-| **Windows**   🚧 | ☑️         | ✅            | ✅             | ✅           | ✅             | ❌                  | ❌                   | ❌                      |
-| **Linux**  🚧    | ☑️         | ✅            | ✅             | ✅           | ✅             | ❌                  | ❌                   | ❌                      |
+For information about supported Kotlin targets, see the corresponding module README.
 
-<details>
+[Migrating from version 1.4.X to 2.0.0](/MIGRATION.md)
 
-<summary>In-depth Kotlin targets</summary>
+*Note: WASM support planned see [issue](https://github.com/supabase-community/supabase-kt/issues/86)*
 
-**iOS:** iosArm64, iosSimulatorArm64, iosX64
-
-**JS**: Browser, NodeJS
-
-**tvOS**: tvosArm64, tvosX64, tvosSimulatorArm64
-
-**watchOS**: watchosArm64, watchosX64, watchosSimulatorArm64  
-
-**MacOS**: macosX64, macosArm64          
-
-**Windows**: mingwX64    
-
-**Linux**: linuxX64
-
-</details>
-
-✅ = full support
-
-☑️ = partial support: no built-in OAuth/OTP link handling. Linux also has no support for persistent storage. For Compose Auth, it relies on GoTrue as fallback.
-
-🚧 = experimental/needs feedback
-
-❌ = not supported
-
-*Note: WASM planned see [issue](https://github.com/supabase-community/supabase-kt/issues/86)*
-
-[![](https://img.shields.io/github/release/supabase-community/supabase-kt?label=stable)](https://github.com/supabase-community/supabase-kt/releases) [![](https://img.shields.io/maven-central/v/io.github.jan-tennert.supabase/supabase-kt?label=experimental)](https://central.sonatype.com/search?q=io.github.jan.supabase&smo=true)
+[![](https://img.shields.io/github/release/supabase-community/supabase-kt?label=stable)](https://github.com/supabase-community/supabase-kt/releases) [![](https://badgen.net/github/release/supabase-community/supabase-kt?label=prerelease)](https://central.sonatype.com/search?q=io.github.jan.supabase&smo=true)
 
 ### Links
 
 [Documentation](https://supabase.com/docs/reference/kotlin/introduction)
+
+[Getting started with Android and Supabase [Video]](https://www.youtube.com/watch?v=_iXUVJ6HTHU)
 
 [Quickstart](https://supabase.com/docs/guides/getting-started/quickstarts/kotlin)
 
@@ -61,7 +26,7 @@ Supported targets:
 
 # Installation
 
-**Available modules**: `gotrue-kt`, `postgrest-kt`, `functions-kt`, `storage-kt`, `realtime-kt`, `apollo-graphql`, `compose-auth`, `compose-auth-ui`
+**Available modules**: `gotrue-kt`, `postgrest-kt`, `functions-kt`, `storage-kt`, `realtime-kt`, `apollo-graphql`, `compose-auth`, `compose-auth-ui`, `coil-integration`, `imageloader-integration`
 
 ```kotlin
 dependencies {
@@ -95,11 +60,15 @@ implementation("io.github.jan-tennert.supabase:[module]")
 
 ### Plugins
 
-#### [Apollo GraphQL integration](/plugins/ApolloGraphQL)
+#### [Apollo GraphQL integration](/plugins/ApolloGraphQL) - Creates an [Apollo GraphQL Client](https://github.com/apollographql/apollo-kotlin) for interacting with the Supabase API.
 
-#### [Compose Auth](/plugins/ComposeAuth)
+#### [Compose Auth](/plugins/ComposeAuth) - Provides easy Native Google & Apple Auth for Compose Multiplatform targets.
 
-#### [Compose Auth UI](/plugins/ComposeAuthUI)
+#### [Compose Auth UI](/plugins/ComposeAuthUI) - Provides UI Components for Compose Multiplatform.
+
+#### [Coil Integration](/plugins/CoilIntegration) - Provides a [Coil](https://github.com/coil-kt/coil) Integration for displaying images stored in Supabase Storage.
+
+#### [Compose-ImageLoader Integration](/plugins/ImageLoaderIntegration) - Provides a [Compose ImageLoader](https://github.com/qdsfdhvh/compose-imageloader) Integration for displaying images stored in Supabase Storage.
 
 # Demos
 
@@ -110,10 +79,17 @@ implementation("io.github.jan-tennert.supabase:[module]")
 - [Multiplatform Deep Linking (Desktop/Android)](https://github.com/supabase-community/supabase-kt/tree/master/demos/multiplatform-deeplinks)
 - [Groceries Store App (Android)](https://github.com/hieuwu/android-groceries-store)
 
+# Need help?
+
+- [Join the Supabase Discord](https://discord.supabase.com) and create a new post with the 'Kotlin' tag under `help-and-questions`
+- [Create a discussion](https://github.com/supabase-community/supabase-kt/discussions/new/choose)
+- [Create an issue](https://github.com/supabase-community/supabase-kt/issues/new/choose)
+
 # Videos
 
-- [Getting started with Supabase on Android](https://www.youtube.com/watch?v=SGr73sWMX6w) (
-  by [Eric Ampire](https://www.youtube.com/@eric-ampire))
+- [Getting started with Android and Supabase](https://www.youtube.com/watch?v=_iXUVJ6HTHU) by the official Supabase YouTube channel
+- [Getting started with Supabase on Android](https://www.youtube.com/watch?v=SGr73sWMX6w) (by [Eric Ampire](https://www.youtube.com/@eric-ampire))
+- [Supabase | Jetpack Compose | Android | 2023](https://www.youtube.com/playlist?list=PL91kV_wdjTlcGQdcZzkuid094as5eUlwU) (by [YoursSohailYT](https://www.youtube.com/@YoursSohailYT))
 
 # Contribution
 

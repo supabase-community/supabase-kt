@@ -26,12 +26,12 @@ data object Phone : DefaultAuthProvider<Phone.Config, Phone.Result> {
 
     /**
      * The configuration for the phone authentication method
-     * @param phoneNumber The phone number of the user
+     * @param phone The phone number of the user
      * @param password The password of the user
      * @param channel The channel to send the confirmation to
      */
     @Serializable
-    data class Config(@SerialName("phone") var phoneNumber: String = "", var password: String = "", var channel: Channel = Channel.SMS): DefaultAuthProvider.Config()
+    data class Config(@SerialName("phone") var phone: String = "", var password: String = "", var channel: Channel = Channel.SMS): DefaultAuthProvider.Config()
 
     /**
      * Represents the phone number confirmation channel
