@@ -1,0 +1,16 @@
+PODS:
+  - common (1.0)
+
+DEPENDENCIES:
+  - common (from `/Users/hieuvu/Projects/supabase-kt/demos/chat-demo-mpp/common/common.podspec`)
+
+EXTERNAL SOURCES:
+  common:
+    :path: "/Users/hieuvu/Projects/supabase-kt/demos/chat-demo-mpp/common/common.podspec"
+
+SPEC CHECKSUMS:
+  common: 6489e4775a5fed74a0b3426e9dbf8eb405f098b3
+
+PODFILE CHECKSUM: 4be35d1c2a7dce63512c8388f8bdddd3317ce5d7
+
+COCOAPODS: 1.14.3

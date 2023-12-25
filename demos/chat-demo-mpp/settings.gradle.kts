@@ -11,3 +11,4 @@ pluginManagement {
 rootProject.name = "chat-demo"
 
 include(":android", ":desktop", ":web", ":common")
+include(":ios")

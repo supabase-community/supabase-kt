@@ -11,15 +11,19 @@
 		6581F1542B36C0CF00BA34A9 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6581F1532B36C0CF00BA34A9 /* ContentView.swift */; };
 		6581F1562B36C0D000BA34A9 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6581F1552B36C0D000BA34A9 /* Assets.xcassets */; };
 		6581F15A2B36C0D000BA34A9 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6581F1592B36C0D000BA34A9 /* Preview Assets.xcassets */; };
+		CFCEE6D85EE7010FF288D21F /* Pods_chatdemoios.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DCBA3265D16541D984DF6475 /* Pods_chatdemoios.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		5A59D0FE1818990837E2DE06 /* Pods-chatdemoios.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-chatdemoios.release.xcconfig"; path = "Target Support Files/Pods-chatdemoios/Pods-chatdemoios.release.xcconfig"; sourceTree = "<group>"; };
 		6581F14E2B36C0CF00BA34A9 /* chatdemoios.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = chatdemoios.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		6581F1512B36C0CF00BA34A9 /* chatdemoiosApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = chatdemoiosApp.swift; sourceTree = "<group>"; };
 		6581F1532B36C0CF00BA34A9 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		6581F1552B36C0D000BA34A9 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		6581F1572B36C0D000BA34A9 /* chatdemoios.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = chatdemoios.entitlements; sourceTree = "<group>"; };
 		6581F1592B36C0D000BA34A9 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		A6D5BB6CD750B9827DFACDF3 /* Pods-chatdemoios.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-chatdemoios.debug.xcconfig"; path = "Target Support Files/Pods-chatdemoios/Pods-chatdemoios.debug.xcconfig"; sourceTree = "<group>"; };
+		DCBA3265D16541D984DF6475 /* Pods_chatdemoios.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_chatdemoios.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -27,17 +31,29 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CFCEE6D85EE7010FF288D21F /* Pods_chatdemoios.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		492FC13393DF1DE6322D1EC0 /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				A6D5BB6CD750B9827DFACDF3 /* Pods-chatdemoios.debug.xcconfig */,
+				5A59D0FE1818990837E2DE06 /* Pods-chatdemoios.release.xcconfig */,
+			);
+			path = Pods;
+			sourceTree = "<group>";
+		};
 		6581F1452B36C0CF00BA34A9 = {
 			isa = PBXGroup;
 			children = (
 				6581F1502B36C0CF00BA34A9 /* chatdemoios */,
 				6581F14F2B36C0CF00BA34A9 /* Products */,
+				492FC13393DF1DE6322D1EC0 /* Pods */,
+				F12730E0215F5E013E03F71C /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -69,6 +85,14 @@
 			path = "Preview Content";
 			sourceTree = "<group>";
 		};
+		F12730E0215F5E013E03F71C /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				DCBA3265D16541D984DF6475 /* Pods_chatdemoios.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -76,6 +100,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 6581F15D2B36C0D000BA34A9 /* Build configuration list for PBXNativeTarget "chatdemoios" */;
 			buildPhases = (
+				5543D94EAF015AAF663B8697 /* [CP] Check Pods Manifest.lock */,
 				6581F1602B36C25B00BA34A9 /* Run Script */,
 				6581F14A2B36C0CF00BA34A9 /* Sources */,
 				6581F14B2B36C0CF00BA34A9 /* Frameworks */,
@@ -136,9 +161,31 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		6581F1602B36C25B00BA34A9 /* Run Script */ = {
+		5543D94EAF015AAF663B8697 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-chatdemoios-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		6581F1602B36C25B00BA34A9 /* Run Script */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 8;
 			files = (
 			);
 			inputFileListPaths = (
@@ -150,9 +197,9 @@
 			);
 			outputPaths = (
 			);
-			runOnlyForDeploymentPostprocessing = 0;
+			runOnlyForDeploymentPostprocessing = 1;
 			shellPath = /bin/sh;
-			shellScript = "cd \"$SRCROOT/..\"\n./gradlew :shared:embedAndSignAppleFrameworkForXcode\n";
+			shellScript = "cd \"$SRCROOT/..\"\n./gradlew :common:linkPodDebugFrameworkIosArm64\n./gradlew :common:embedAndSignPodAppleFrameworkForXcode\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -207,6 +254,7 @@
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				FRAMEWORK_SEARCH_PATHS = "$(SRCROOT)/../common/build/xcode-frameworks/$(CONFIGURATION)/$(SDK_NAME)";
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_NO_COMMON_BLOCKS = YES;
@@ -225,6 +273,7 @@
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
+				OTHER_LDFLAGS = "";
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
@@ -268,6 +317,7 @@
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				FRAMEWORK_SEARCH_PATHS = "$(SRCROOT)/../common/build/xcode-frameworks/$(CONFIGURATION)/$(SDK_NAME)";
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
@@ -279,12 +329,14 @@
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
+				OTHER_LDFLAGS = "";
 				SWIFT_COMPILATION_MODE = wholemodule;
 			};
 			name = Release;
 		};
 		6581F15E2B36C0D000BA34A9 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = A6D5BB6CD750B9827DFACDF3 /* Pods-chatdemoios.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -294,9 +346,10 @@
 				DEVELOPMENT_ASSET_PATHS = "\"chatdemoios/Preview Content\"";
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
-				FRAMEWORK_SEARCH_PATHS = "$(SRCROOT)/../shared/build/xcode-frameworks/$(CONFIGURATION)/$(SDK_NAME)";
+				FRAMEWORK_SEARCH_PATHS = "$(SRCROOT)/../common/build/xcode-frameworks/$(CONFIGURATION)/$(SDK_NAME)";
 				"FRAMEWORK_SEARCH_PATHS[arch=*]" = "$(SRCROOT)/../shared/build/xcode-frameworks/$(CONFIGURATION)/$(SDK_NAME)";
 				GENERATE_INFOPLIST_FILE = YES;
+				HEADER_SEARCH_PATHS = "$(SCROOT)/Pods/**";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -312,7 +365,8 @@
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 14.1;
 				MARKETING_VERSION = 1.0;
-				OTHER_LDFLAGS = "\"$(inherited) -framework shared\"";
+				OTHER_LDFLAGS = "\"$(inherited) -framework common\"";
+				"OTHER_LDFLAGS[arch=*]" = "";
 				PRODUCT_BUNDLE_IDENTIFIER = com.chatdemo.chatdemoios;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = auto;
@@ -325,6 +379,7 @@
 		};
 		6581F15F2B36C0D000BA34A9 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 5A59D0FE1818990837E2DE06 /* Pods-chatdemoios.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -334,8 +389,9 @@
 				DEVELOPMENT_ASSET_PATHS = "\"chatdemoios/Preview Content\"";
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
-				FRAMEWORK_SEARCH_PATHS = "$(SRCROOT)/../shared/build/xcode-frameworks/$(CONFIGURATION)/$(SDK_NAME)";
+				FRAMEWORK_SEARCH_PATHS = "$(SRCROOT)/../common/build/xcode-frameworks/$(CONFIGURATION)/$(SDK_NAME)";
 				GENERATE_INFOPLIST_FILE = YES;
+				HEADER_SEARCH_PATHS = "$(SCROOT)/Pods/**";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -351,7 +407,7 @@
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 14.1;
 				MARKETING_VERSION = 1.0;
-				OTHER_LDFLAGS = "\"$(inherited) -framework shared\"";
+				OTHER_LDFLAGS = "\"$(inherited) -framework common\"";
 				PRODUCT_BUNDLE_IDENTIFIER = com.chatdemo.chatdemoios;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = auto;
