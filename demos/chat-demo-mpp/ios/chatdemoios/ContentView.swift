@@ -6,8 +6,10 @@
 //
 
 import SwiftUI
+import common
 
 struct ContentView: View {
+    
     var body: some View {
         VStack {
             Image(systemName: "globe")
@@ -16,6 +18,16 @@ struct ContentView: View {
             Text("Hello, world!")
         }
         .padding()
+    }
+}
+
+struct MyScreenToSwiftUI: UIViewControllerRepresentable {
+    
+    func makeUIViewController(context: Context) -> UIViewController {
+        return AppKt.AppIos(viewModel: RootComponent().viewModel)
+    }
+    
+    func updateUIViewController(_ uiViewController: UIViewController, context: Context) {
     }
 }
 

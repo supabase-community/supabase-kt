@@ -6,12 +6,19 @@
 //
 
 import SwiftUI
+import common
+
 
 @main
 struct chatdemoiosApp: App {
+    
+    init() {
+        KoinKt.doInitKoin(additionalConfiguration: {_ in})
+    }
+    
     var body: some Scene {
         WindowGroup {
-          App(root.viewModel)
+            MyScreenToSwiftUI()
         }
     }
 }
