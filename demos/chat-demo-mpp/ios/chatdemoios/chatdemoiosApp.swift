@@ -8,7 +8,6 @@
 import SwiftUI
 import common
 
-
 @main
 struct chatdemoiosApp: App {
     

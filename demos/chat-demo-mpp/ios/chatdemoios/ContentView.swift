@@ -10,7 +10,9 @@ import common
 
 
 struct ContentView: UIViewControllerRepresentable {
-    let viewModel = RootComponent().getViewModel()
+
+    let viewModel: ChatViewModel = RootComponent().getViewModel()
+
     func makeUIViewController(context: Context) -> UIViewController {
         return AppKt.AppIos(viewModel: viewModel)
     }

@@ -67,9 +67,15 @@ kotlin {
         }
         val iosArm64Main by getting {
             dependsOn(commonMain)
+            dependencies {
+                api(libs.ktor.ios)
+            }
         }
         val iosSimulatorArm64Main by getting {
             dependsOn(commonMain)
+            dependencies {
+                api(libs.ktor.ios)
+            }
         }
     }
 }
