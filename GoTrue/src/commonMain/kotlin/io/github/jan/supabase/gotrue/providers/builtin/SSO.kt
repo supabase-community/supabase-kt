@@ -1,7 +1,9 @@
 package io.github.jan.supabase.gotrue.providers.builtin
 
 import io.github.jan.supabase.SupabaseClient
+import io.github.jan.supabase.gotrue.auth
 import io.github.jan.supabase.gotrue.providers.AuthProvider
+import io.github.jan.supabase.gotrue.startExternalAuth
 import io.github.jan.supabase.gotrue.user.UserSession
 import kotlinx.serialization.Serializable
 
@@ -58,9 +60,19 @@ data object SSO: AuthProvider<SSO.Config, Unit> {
 
 }
 
-internal expect suspend fun SSO.loginWithSSO(
+internal suspend fun loginWithSSO(
     supabaseClient: SupabaseClient,
     onSuccess: suspend (UserSession) -> Unit,
     redirectUrl: String?,
     config: (SSO.Config.() -> Unit)?
-)
+) {
+    supabaseClient.auth.startExternalAuth(
+        redirectUrl = redirectUrl,
+        getUrl = {
+            supabaseClient.auth.retrieveSSOUrl(it) {
+                config?.invoke(this)
+            }.url
+        },
+        onSessionSuccess = onSuccess
+    )
+}

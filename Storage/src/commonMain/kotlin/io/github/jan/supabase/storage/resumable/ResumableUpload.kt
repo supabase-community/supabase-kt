@@ -109,14 +109,14 @@ internal class ResumableUploadImpl(
             while (offset < size) {
                 if(paused || !isActive) return@launch //check if paused or the scope is still active
                 if(updateOffset) { //after an upload error we retrieve the server offset and update the data stream to avoid conflicts
-                    Logger.d { "Trying to update server offset for $path" }
+                    Logger.d("Storage") { "Trying to update server offset for $path" }
                     try {
                         serverOffset = retrieveServerOffset() //retrieve server offset
                         offset = serverOffset
                         dataStream.cancel() //cancel old data stream as we are start reading from a new offset
                         dataStream = createDataStream(offset) //create new data stream
                     } catch(e: Exception) {
-                        Logger.e("Error while updating server offset for $path. Retrying in ${config.retryTimeout}", e)
+                        Logger.e("Error while updating server offset for $path. Retrying in ${config.retryTimeout}", e, "Storage")
                         delay(config.retryTimeout)
                         continue
                     }
@@ -127,7 +127,7 @@ internal class ResumableUploadImpl(
                     offset += uploaded
                 } catch(e: Exception) {
                     if(e !is IllegalStateException) {
-                        Logger.e("Error while uploading chunk. Retrying in ${config.retryTimeout}", e)
+                        Logger.e("Error while uploading chunk. Retrying in ${config.retryTimeout}", e, "Storage")
                         delay(config.retryTimeout)
                         updateOffset = true //if an error occurs, we need to update the server offset to avoid conflicts
                         continue
@@ -166,11 +166,11 @@ internal class ResumableUploadImpl(
                 serverOffset = uploadResponse.headers["Upload-Offset"]?.toLong() ?: error("No upload offset found")
             }
             HttpStatusCode.Conflict -> {
-                Logger.w { "Upload conflict, skipping chunk" }
+                Logger.w("Storage") { "Upload conflict, skipping chunk" }
                 serverOffset = offset + limit
             }
             HttpStatusCode.NoContent -> {
-                Logger.d { "Uploaded chunk" }
+                Logger.d("Storage") { "Uploaded chunk" }
             }
             else -> error("Upload failed with status ${uploadResponse.status}. ${uploadResponse.bodyAsText()}")
         }

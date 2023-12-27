@@ -27,6 +27,8 @@ import io.ktor.client.call.body
 import io.ktor.client.request.parameter
 import io.ktor.client.statement.HttpResponse
 import io.ktor.client.statement.bodyAsText
+import io.ktor.client.statement.request
+import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
@@ -35,6 +37,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
 import kotlinx.serialization.json.JsonObjectBuilder
@@ -77,12 +80,12 @@ internal class AuthImpl(
         setupPlatform()
         if (config.autoLoadFromStorage) {
             authScope.launch {
-                Logger.d {
+                Logger.d("Auth") {
                     "Trying to load latest session"
                 }
                 val successful = loadFromStorage()
                 if (successful) {
-                    Logger.d {
+                    Logger.d("Auth") {
                         "Successfully loaded session from storage"
                     }
                 } else {
@@ -109,6 +112,38 @@ internal class AuthImpl(
     ): R? = provider.signUp(supabaseClient, {
         importSession(it)
     }, redirectUrl, config)
+
+    @SupabaseExperimental
+    override suspend fun linkIdentity(
+        provider: OAuthProvider,
+        redirectUrl: String?,
+        config: ExternalAuthConfigDefaults.() -> Unit
+    ) {
+        startExternalAuth(
+            redirectUrl = redirectUrl,
+            getUrl = {
+                val url = oAuthUrl(provider, it, "user/identities/authorize", config)
+                val response = api.rawRequest(url) {
+                    method = HttpMethod.Get
+                }
+                response.request.url.toString()
+            },
+            onSessionSuccess = {
+                importSession(it)
+            }
+        )
+    }
+
+    @SupabaseExperimental
+    override suspend fun unlinkIdentity(identityId: String, updateLocalUser: Boolean) {
+        api.delete("user/identities/$identityId")
+        if (updateLocalUser) {
+            val session = currentSessionOrNull() ?: return
+            val newUser = session.user?.copy(identities = session.user.identities?.filter { it.identityId != identityId })
+            val newSession = session.copy(user = newUser)
+            _sessionStatus.value = SessionStatus.Authenticated(newSession)
+        }
+    }
 
     override suspend fun retrieveSSOUrl(
         redirectUrl: String?,
@@ -141,10 +176,10 @@ internal class AuthImpl(
                 put("code_challenge", it)
                 put("code_challenge_method", "s256")
             }
-            createdConfig?.domain.let {
+            createdConfig.domain?.let {
                 put("domain", it)
             }
-            createdConfig?.providerId.let {
+            createdConfig.providerId?.let {
                 put("provider_id", it)
             }
         }).body()
@@ -184,7 +219,7 @@ internal class AuthImpl(
         return userInfo
     }
 
-    suspend fun resend(type: String, body: JsonObjectBuilder.() -> Unit) {
+    private suspend fun resend(type: String, body: JsonObjectBuilder.() -> Unit) {
         api.postJson("resend", buildJsonObject {
             put("type", type)
             putJsonObject(buildJsonObject(body))
@@ -214,12 +249,20 @@ internal class AuthImpl(
         }
     }
 
-    override suspend fun sendRecoveryEmail(
+    override suspend fun resetPasswordForEmail(
         email: String,
         redirectUrl: String?,
         captchaToken: String?
     ) {
-        val finalRedirectUrl = generateRedirectUrl(redirectUrl)
+        require(email.isNotBlank()) {
+            "Email must not be blank"
+        }
+        var codeChallenge: String? = null
+        if (this.config.flowType == FlowType.PKCE) {
+            val codeVerifier = generateCodeVerifier()
+            codeVerifierCache.saveCodeVerifier(codeVerifier)
+            codeChallenge = generateCodeChallenge(codeVerifier)
+        }
         val body = buildJsonObject {
             put("email", email)
             captchaToken?.let {
@@ -227,9 +270,13 @@ internal class AuthImpl(
                     put("captcha_token", captchaToken)
                 }
             }
+            codeChallenge?.let {
+                put("code_challenge", it)
+                put("code_challenge_method", "s256")
+            }
         }.toString()
         api.postJson("recover", body) {
-            finalRedirectUrl?.let { url.encodedParameters.append("redirect_to", it) }
+            redirectUrl?.let { url.encodedParameters.append("redirect_to", it) }
         }
     }
 
@@ -242,14 +289,14 @@ internal class AuthImpl(
             api.post("logout") {
                 parameter("scope", scope.name.lowercase())
             }
-            Logger.d { "Logged out session in Supabase" }
+            Logger.d("Auth") { "Logged out session in Supabase" }
         } else {
-            Logger.i { "Skipping session logout as there is no session available. Proceeding to clean up local data..." }
+            Logger.i("Auth") { "Skipping session logout as there is no session available. Proceeding to clean up local data..." }
         }
         if (scope != SignOutScope.OTHERS) {
             clearSession()
         }
-        Logger.d { "Successfully logged out" }
+        Logger.d("Auth") { "Successfully logged out" }
     }
 
     private suspend fun verify(
@@ -326,7 +373,7 @@ internal class AuthImpl(
     }
 
     override suspend fun refreshSession(refreshToken: String): UserSession {
-        Logger.d {
+        Logger.d("Auth") {
             "Refreshing session"
         }
         val body = buildJsonObject {
@@ -383,9 +430,9 @@ internal class AuthImpl(
             importRefreshedSession()
         } catch (e: RestException) {
             signOut()
-            Logger.e(e) { "Couldn't refresh session. The refresh token may have been revoked." }
+            Logger.e(e, "Auth") { "Couldn't refresh session. The refresh token may have been revoked." }
         } catch (e: Exception) {
-            Logger.e(e) { "Couldn't reach supabase. Either the address doesn't exist or the network might not be on. Retrying in ${config.retryDelay}" }
+            Logger.e(e, "Auth") { "Couldn't reach supabase. Either the address doesn't exist or the network might not be on. Retrying in ${config.retryDelay}" }
             _sessionStatus.value = SessionStatus.NetworkError
             delay(config.retryDelay)
             retry()
@@ -402,7 +449,7 @@ internal class AuthImpl(
     }
 
     private suspend fun handleExpiredSession(session: UserSession, autoRefresh: Boolean = true) {
-        Logger.d {
+        Logger.d("Auth") {
             "Session expired. Refreshing session..."
         }
         val newSession = refreshSession(session.refreshToken)
@@ -459,6 +506,7 @@ internal class AuthImpl(
     override fun oAuthUrl(
         provider: OAuthProvider,
         redirectUrl: String?,
+        url: String,
         additionalConfig: ExternalAuthConfigDefaults.() -> Unit
     ): String {
         val config = ExternalAuthConfigDefaults().apply(additionalConfig)
@@ -471,7 +519,7 @@ internal class AuthImpl(
             config.queryParams["code_challenge_method"] = "S256"
         }
         return resolveUrl(buildString {
-            append("authorize?provider=${provider.name}&redirect_to=$redirectUrl")
+            append("$url?provider=${provider.name}&redirect_to=$redirectUrl")
             if (config.scopes.isNotEmpty()) append("&scopes=${config.scopes.joinToString("+")}")
             if (config.queryParams.isNotEmpty()) {
                 for ((key, value) in config.queryParams) {
@@ -487,6 +535,10 @@ internal class AuthImpl(
         sessionJob?.cancel()
         _sessionStatus.value = SessionStatus.NotAuthenticated
         sessionJob = null
+    }
+
+    override suspend fun awaitInitialization() {
+        sessionStatus.first { it !is SessionStatus.LoadingFromStorage }
     }
 
 }

@@ -1,5 +1,6 @@
 package io.github.jan.supabase.storage
 
+import android.annotation.SuppressLint
 import android.net.Uri
 import io.ktor.utils.io.ByteReadChannel
 import io.ktor.utils.io.jvm.javaio.toByteReadChannel
@@ -59,10 +60,9 @@ suspend fun BucketApi.update(path: String, uri: Uri, upsert: Boolean = false) = 
  */
 fun BucketApi.updateAsFlow(path: String, uri: Uri, upsert: Boolean = false) = updateAsFlow(path, UploadData(uri.readChannel(), uri.contentSize), upsert)
 
+@SuppressLint("Recycle") //toByteReadChannel closes the input stream automatically
 private fun Uri.readChannel(): ByteReadChannel {
     val context = applicationContext()
     val inputStream = context.contentResolver.openInputStream(this) ?: throw IllegalArgumentException("Uri is not readable")
-    return inputStream.use {
-        it.toByteReadChannel()
-    }
+    return inputStream.toByteReadChannel()
 }

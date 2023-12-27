@@ -9,7 +9,6 @@ import io.github.jan.supabase.gotrue.FlowType
 import io.github.jan.supabase.gotrue.auth
 import io.github.jan.supabase.gotrue.generateCodeChallenge
 import io.github.jan.supabase.gotrue.generateCodeVerifier
-import io.github.jan.supabase.gotrue.generateRedirectUrl
 import io.github.jan.supabase.gotrue.providers.AuthProvider
 import io.github.jan.supabase.gotrue.user.UserSession
 import io.github.jan.supabase.putJsonObject
@@ -65,7 +64,6 @@ data object OTP: AuthProvider<OTP.Config, Unit> {
         require((otpConfig.email != null && otpConfig.email!!.isNotBlank()) || (otpConfig.phone != null && otpConfig.phone!!.isNotBlank())) { "You need to provide either an email or a phone number" }
         require(!(otpConfig.email != null && otpConfig.phone != null)) { "You can only provide either an email or a phone number" }
 
-        val finalRedirectUrl = supabaseClient.auth.generateRedirectUrl(redirectUrl)
         val body = buildJsonObject {
             put("create_user", otpConfig.createUser)
             otpConfig.data?.let {
@@ -90,7 +88,7 @@ data object OTP: AuthProvider<OTP.Config, Unit> {
                 put("code_challenge_method", "s256")
             }
         }) {
-            finalRedirectUrl?.let { url.parameters.append("redirect_to", it) }
+            redirectUrl?.let { url.parameters.append("redirect_to", it) }
         }
     }
 

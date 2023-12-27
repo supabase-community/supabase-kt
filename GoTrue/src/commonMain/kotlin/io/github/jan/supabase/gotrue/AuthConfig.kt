@@ -70,7 +70,7 @@ open class AuthConfigDefaults {
     var jwtToken: String? = null
 
     /**
-     * A serializer used for serializing/deserializing objects e.g. in [Auth.sendOtpTo]. Defaults to [SupabaseClientBuilder.defaultSerializer], when null.
+     * A serializer used for serializing/deserializing objects e.g. in [Auth.signInWith]. Defaults to [SupabaseClientBuilder.defaultSerializer], when null.
      */
     var serializer: SupabaseSerializer? = null
 

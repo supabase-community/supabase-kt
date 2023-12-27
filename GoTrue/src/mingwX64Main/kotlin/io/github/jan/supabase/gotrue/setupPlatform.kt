@@ -5,5 +5,5 @@ import io.github.jan.supabase.annotations.SupabaseInternal
 
 @SupabaseInternal
 actual fun Auth.setupPlatform() {
-    Logger.w { "Windows support is experimental, please report any bugs you find!" }
+    Logger.w("Auth") { "Windows support is experimental, please report any bugs you find!" }
 }

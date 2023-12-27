@@ -4,6 +4,8 @@ A Kotlin Multiplatform Client for Supabase.
 
 For information about supported Kotlin targets, see the corresponding module README.
 
+[Migrating from version 1.4.X to 2.0.0](/MIGRATION.md)
+
 *Note: WASM support planned see [issue](https://github.com/supabase-community/supabase-kt/issues/86)*
 
 [![](https://img.shields.io/github/release/supabase-community/supabase-kt?label=stable)](https://github.com/supabase-community/supabase-kt/releases) [![](https://badgen.net/github/release/supabase-community/supabase-kt?label=prerelease)](https://central.sonatype.com/search?q=io.github.jan.supabase&smo=true)
@@ -11,6 +13,8 @@ For information about supported Kotlin targets, see the corresponding module REA
 ### Links
 
 [Documentation](https://supabase.com/docs/reference/kotlin/introduction)
+
+[Getting started with Android and Supabase [Video]](https://www.youtube.com/watch?v=_iXUVJ6HTHU)
 
 [Quickstart](https://supabase.com/docs/guides/getting-started/quickstarts/kotlin)
 
@@ -56,15 +60,15 @@ implementation("io.github.jan-tennert.supabase:[module]")
 
 ### Plugins
 
-#### [Apollo GraphQL integration](/plugins/ApolloGraphQL)
+#### [Apollo GraphQL integration](/plugins/ApolloGraphQL) - Creates an [Apollo GraphQL Client](https://github.com/apollographql/apollo-kotlin) for interacting with the Supabase API.
 
-#### [Compose Auth](/plugins/ComposeAuth)
+#### [Compose Auth](/plugins/ComposeAuth) - Provides easy Native Google & Apple Auth for Compose Multiplatform targets.
 
-#### [Compose Auth UI](/plugins/ComposeAuthUI)
+#### [Compose Auth UI](/plugins/ComposeAuthUI) - Provides UI Components for Compose Multiplatform.
 
-#### [Coil Integration](/plugins/CoilIntegration)
+#### [Coil Integration](/plugins/CoilIntegration) - Provides a [Coil](https://github.com/coil-kt/coil) Integration for displaying images stored in Supabase Storage.
 
-#### [Compose-ImageLoader Integration](/plugins/ImageLoaderIntegration)
+#### [Compose-ImageLoader Integration](/plugins/ImageLoaderIntegration) - Provides a [Compose ImageLoader](https://github.com/qdsfdhvh/compose-imageloader) Integration for displaying images stored in Supabase Storage.
 
 # Demos
 
@@ -83,6 +87,7 @@ implementation("io.github.jan-tennert.supabase:[module]")
 
 # Videos
 
+- [Getting started with Android and Supabase](https://www.youtube.com/watch?v=_iXUVJ6HTHU) by the official Supabase YouTube channel
 - [Getting started with Supabase on Android](https://www.youtube.com/watch?v=SGr73sWMX6w) (by [Eric Ampire](https://www.youtube.com/@eric-ampire))
 - [Supabase | Jetpack Compose | Android | 2023](https://www.youtube.com/playlist?list=PL91kV_wdjTlcGQdcZzkuid094as5eUlwU) (by [YoursSohailYT](https://www.youtube.com/@YoursSohailYT))
 

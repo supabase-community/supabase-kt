@@ -70,7 +70,7 @@ class SupabaseClientBuilder @PublishedApi internal constructor(private val supab
         }
         if(supabaseUrl.startsWith("http://")) {
             useHTTPS = false
-            Logger.w { "You are using a non HTTPS supabase url ($supabaseUrl)."}
+            Logger.w("Core") { "You are using a non HTTPS supabase url ($supabaseUrl)."}
         }
     }
 
