@@ -54,7 +54,7 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
       - name: Test supabase-kt
-        run: ./gradlew jsTest --stacktrace
+        run: ./gradlew jsTest wasmJsTest --stacktrace
   testIos:
     runs-on: macos-latest
     steps:
