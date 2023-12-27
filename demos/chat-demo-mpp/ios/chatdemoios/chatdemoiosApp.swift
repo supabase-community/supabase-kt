@@ -18,7 +18,7 @@ struct chatdemoiosApp: App {
     
     var body: some Scene {
         WindowGroup {
-            MyScreenToSwiftUI()
+            ContentView()
         }
     }
 }
