@@ -8,29 +8,13 @@
 import SwiftUI
 import common
 
-struct ContentView: View {
-    
-    var body: some View {
-        VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("Hello, world!")
-        }
-        .padding()
-    }
-}
 
-struct MyScreenToSwiftUI: UIViewControllerRepresentable {
-    
+struct ContentView: UIViewControllerRepresentable {
+    let viewModel = RootComponent().getViewModel()
     func makeUIViewController(context: Context) -> UIViewController {
-        return AppKt.AppIos(viewModel: RootComponent().viewModel)
+        return AppKt.AppIos(viewModel: viewModel)
     }
     
     func updateUIViewController(_ uiViewController: UIViewController, context: Context) {
     }
-}
-
-#Preview {
-    ContentView()
 }
