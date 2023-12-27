@@ -14,7 +14,7 @@ actual fun Auth.setupPlatform() {
         if(window.location.hash.isBlank()) return
         parseFragmentAndImportSession(window.location.hash.substring(1)) {
             val newURL = window.location.href.split("?")[0];
-            window.history.replaceState({}, window.document.title, newURL);
+            window.history.replaceState(null, window.document.title, newURL);
         }
     }
 
@@ -26,7 +26,7 @@ actual fun Auth.setupPlatform() {
             importSession(session)
         }
         val newURL = window.location.href.split("?")[0];
-        window.history.replaceState({}, window.document.title, newURL);
+        window.history.replaceState(null, window.document.title, newURL);
     }
 
     if(IS_BROWSER) {
