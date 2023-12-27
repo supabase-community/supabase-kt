@@ -26,7 +26,6 @@ expect open class MPViewModel() {
     val coroutineScope: CoroutineScope
 
 }
-
 class ChatViewModel(
     val supabaseClient: SupabaseClient,
     private val realtimeChannel: RealtimeChannel,
