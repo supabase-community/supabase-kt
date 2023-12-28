@@ -1,8 +1,8 @@
 [versions]
 kotlin = "1.9.21"
-agp = "8.0.2"
+agp = "8.2.0"
 compose = "1.5.11"
-supabase = "1.1.0"
+supabase = "2.0.2"
 koin = "3.4.3"
 ktor = "2.3.7"
 
@@ -10,6 +10,7 @@ androidx-core = "1.10.1"
 androidx-compat = "1.6.1"
 androidx-lifecycle = "2.6.1"
 androidx-activity = "1.7.2"
+
 [plugins]
 kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
@@ -20,12 +21,12 @@ android-application = { id = "com.android.application", version.ref = "agp" }
 android-library = { id = "com.android.library", version.ref = "agp" }
 
 compose = { id = "org.jetbrains.compose", version.ref = "compose" }
-org-jetbrains-kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 
 [libraries]
 supabase-gotrue = { module = "io.github.jan-tennert.supabase:gotrue-kt", version.ref = "supabase" }
 supabase-realtime = { module = "io.github.jan-tennert.supabase:realtime-kt", version.ref = "supabase" }
 supabase-postgrest = { module = "io.github.jan-tennert.supabase:postgrest-kt", version.ref = "supabase" }
+supabase-compose-ui = { module = "io.github.jan-tennert.supabase:compose-auth-ui", version.ref = "supabase" }
 
 koin-core = { module = "io.insert-koin:koin-core", version.ref = "koin" }
 koin-android = { module = "io.insert-koin:koin-android", version.ref = "koin" }
@@ -41,4 +42,4 @@ ktor-js = { module = "io.ktor:ktor-client-js", version.ref = "ktor" }
 ktor-ios = { module = "io.ktor:ktor-client-ios", version.ref = "ktor" }
 
 [bundles]
-supabase = [ "supabase-gotrue", "supabase-realtime", "supabase-postgrest" ]
+supabase = [ "supabase-gotrue", "supabase-realtime", "supabase-postgrest", "supabase-compose-ui" ]

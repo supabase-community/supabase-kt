@@ -11,7 +11,8 @@ group = "io.github.jan.supabase"
 version = "1.0-SNAPSHOT"
 
 kotlin {
-    android()
+    applyDefaultHierarchyTemplate()
+    androidTarget()
     jvm("desktop") {
         jvmToolchain(11)
     }
@@ -65,13 +66,7 @@ kotlin {
                 api(libs.ktor.js)
             }
         }
-        val iosArm64Main by getting {
-            dependsOn(commonMain)
-            dependencies {
-                api(libs.ktor.ios)
-            }
-        }
-        val iosSimulatorArm64Main by getting {
+        val iosMain by getting {
             dependsOn(commonMain)
             dependencies {
                 api(libs.ktor.ios)
