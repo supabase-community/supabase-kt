@@ -19,7 +19,6 @@ Then you need to specify your supabase url and key in [supabaseModule.kt](https:
 If you want Google login to work, set it up in the supabase dashboard and add `io.jan.supabase://login` to the registered urls.
 
 # Running
-
 To run the app, you need to run the following commands:
 
     ./gradlew :desktop:runDistributable (Desktop)
@@ -29,8 +28,13 @@ For android, use the IDE to run the app.
 
 # iOS Development Setup
 Set up with XCode 15 and run the app on iOS 17
-Open the project with workplace file
+Open the project with workplace file (`chatdemoios.xcworkspace`)
+
 Double click to project and open project settings
+Set up Run script with value
+Move run script to be above compile script
+Then go to
+Set these values
 
 Framwork Search Paths - `$(SRCROOT)/../common/build/xcode-frameworks/$(CONFIGURATION)/$(SDK_NAME)`
 Other linker flags - `$(inherited) -framework common`
