@@ -26,3 +26,13 @@ To run the app, you need to run the following commands:
     ./gradlew :web:jsBrowserDevelopmentRun (JS Canvas)
 
 For android, use the IDE to run the app.
+
+# iOS Development Setup
+Set up with XCode 15 and run the app on iOS 17
+Open the project with workplace file
+Double click to project and open project settings
+
+Framwork Search Paths - `$(SRCROOT)/../common/build/xcode-frameworks/$(CONFIGURATION)/$(SDK_NAME)`
+Other linker flags - `$(inherited) -framework common`
+
+At this point, the app can be run with Android Studio with iOS configuration or XCode
