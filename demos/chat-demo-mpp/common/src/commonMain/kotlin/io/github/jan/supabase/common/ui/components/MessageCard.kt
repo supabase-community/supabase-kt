@@ -24,8 +24,8 @@ import androidx.compose.ui.unit.sp
 import io.github.jan.supabase.common.net.Message
 
 @Composable
-fun MessageCard(message: Message, own: Boolean, onDelete: () -> Unit) {
-    Box(contentAlignment = if(own) Alignment.CenterEnd else Alignment.CenterStart, modifier = Modifier.fillMaxWidth()) {
+fun MessageCard(message: Message, own: Boolean, modifier: Modifier, onDelete: () -> Unit) {
+    Box(contentAlignment = if(own) Alignment.CenterEnd else Alignment.CenterStart, modifier = modifier) {
         val backgroundColor = if(own) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.secondaryContainer
         Row(verticalAlignment = Alignment.CenterVertically) {
             ElevatedCard(modifier = Modifier.widthIn(max = 200.dp), colors = CardDefaults.elevatedCardColors(containerColor = backgroundColor)) {

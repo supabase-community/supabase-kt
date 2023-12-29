@@ -1,7 +1,7 @@
 package io.github.jan.supabase.common.net
 
 import io.github.jan.supabase.SupabaseClient
-import io.github.jan.supabase.gotrue.gotrue
+import io.github.jan.supabase.gotrue.auth
 import io.github.jan.supabase.postgrest.postgrest
 import kotlinx.datetime.Instant
 import kotlinx.serialization.SerialName
@@ -38,16 +38,20 @@ internal class MessageApiImpl(
     override suspend fun retrieveMessages(): List<Message> = table.select().decodeList()
 
     override suspend fun createMessage(content: String): Message {
-        val user = (client.gotrue.currentSessionOrNull() ?: error("No session available")).user ?: error("No user available")
+        val user = (client.auth.currentSessionOrNull() ?: error("No session available")).user ?: error("No user available")
         return table.insert(buildJsonObject {
            put("content", content)
            put("creator_id", user.id)
-        }).decodeSingle()
+        }) {
+            select()
+        }.decodeSingle()
     }
 
     override suspend fun deleteMessage(id: Int) {
         table.delete {
-            Message::id eq id
+            filter {
+                Message::id eq id
+            }
         }
     }
 
