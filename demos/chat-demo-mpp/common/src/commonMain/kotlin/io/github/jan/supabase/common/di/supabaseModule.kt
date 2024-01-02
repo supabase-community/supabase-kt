@@ -2,15 +2,14 @@ package io.github.jan.supabase.common.di
 
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.createSupabaseClient
-import io.github.jan.supabase.gotrue.GoTrue
-import io.github.jan.supabase.gotrue.GoTrueConfig
+import io.github.jan.supabase.gotrue.Auth
+import io.github.jan.supabase.gotrue.AuthConfig
 import io.github.jan.supabase.postgrest.Postgrest
 import io.github.jan.supabase.realtime.Realtime
-import io.github.jan.supabase.realtime.createChannel
-import io.github.jan.supabase.realtime.realtime
+import io.github.jan.supabase.realtime.channel
 import org.koin.dsl.module
 
-expect fun GoTrueConfig.platformGoTrueConfig()
+expect fun AuthConfig.platformGoTrueConfig()
 
 val supabaseModule = module {
     single {
@@ -19,13 +18,13 @@ val supabaseModule = module {
             supabaseKey = "YOUR_KEY"
         ) {
             install(Postgrest)
-            install(GoTrue) {
+            install(Auth) {
                 platformGoTrueConfig()
             }
             install(Realtime)
         }
     }
     single {
-        get<SupabaseClient>().realtime.createChannel("messages")
+        get<SupabaseClient>().channel("messages")
     }
 }
