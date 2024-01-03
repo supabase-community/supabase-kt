@@ -7,15 +7,16 @@ import io.github.jan.supabase.postgrest.postgrest
 import io.github.jan.supabase.postgrest.query.filter.FilterOperation
 import io.github.jan.supabase.postgrest.query.filter.FilterOperator
 import io.github.jan.supabase.postgrest.query.filter.PostgrestFilterBuilder
-import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import kotlinx.serialization.json.jsonPrimitive
 import kotlin.reflect.KProperty1
 
-inline fun <reified Data> RealtimeChannel.presenceFlow(): Flow<List<Data>> {
+data class PrimaryKey<Data>(val columnName: String, val producer: (Data) -> String)
+
+inline fun <reified Data> RealtimeChannel.presenceDataFlow(): Flow<List<Data>> {
     val cache = AtomicMutableMap<String, Data>()
     return presenceChangeFlow().map {
         it.joins.forEach { (key, presence) ->
@@ -28,21 +29,21 @@ inline fun <reified Data> RealtimeChannel.presenceFlow(): Flow<List<Data>> {
     }
 }
 
-inline fun <reified Data : Any> RealtimeChannel.postgresListFlow(
+inline fun <reified Data : Any> RealtimeChannel.postgresListDataFlow(
     schema: String = "public",
     table: String,
     filter: FilterOperation? = null,
-    crossinline primaryKey: (Data) -> String,
-): Flow<List<Data>> = flow {
+    primaryKey: PrimaryKey<Data>
+): Flow<List<Data>> = callbackFlow {
     val cache = AtomicMutableMap<String, Data>()
     try {
         val result = supabaseClient.postgrest.from(schema, table).select()
         val data = result.decodeList<Data>()
         data.forEach {
-            val key = primaryKey(it)
+            val key = primaryKey.producer(it)
             cache[key] = it
         }
-        emit(data)
+        trySend(data)
     } catch (e: NotFoundRestException) {
         close(IllegalStateException("Table with name $table not found"))
         return@callbackFlow
@@ -58,44 +59,47 @@ inline fun <reified Data : Any> RealtimeChannel.postgresListFlow(
             when (it) {
                 is PostgresAction.Insert -> {
                     val data = it.decodeRecord<Data>()
-                    val key = primaryKey(data)
+                    val key = primaryKey.producer(data)
                     cache[key] = data
                 }
                 is PostgresAction.Update -> {
                     val data = it.decodeRecord<Data>()
-                    val key = primaryKey(data)
+                    val key = primaryKey.producer(data)
                     cache[key] = data
                 }
                 is PostgresAction.Delete -> {
-                    val data = it.decodeRecord<Data>()
-                    val key = primaryKey(data)
-                    cache.remove(key)
+                    cache.remove(it.oldRecord[primaryKey.columnName]?.jsonPrimitive?.content ?: error("No primary key found"))
                 }
                 else -> {}
             }
             trySend(cache.values.toList())
         }
-    }
-    awaitClose {
-        launch {
-            changeFlow.()
-        }
+        close()
     }
 }
 
-inline fun <V> RealtimeChannel.listFlow(
+inline fun <reified Data : Any, Value> RealtimeChannel.postgresListDataFlow(
+    schema: String = "public",
+    table: String,
     filter: FilterOperation? = null,
-    primaryKey: KProperty1<Data, V>,
-): Flow<List<Data>> = listFlow(
+    primaryKey: KProperty1<Data, Value>,
+): Flow<List<Data>> = postgresListDataFlow<Data>(
     filter = filter,
-    primaryKey = {
+    table = table,
+    schema = schema,
+    primaryKey = PrimaryKey(
+        primaryKey.name
+    ){
         primaryKey.get(it).toString()
     }
 )
 
-inline fun RealtimeChannel.singleFlow(
+
+inline fun <reified Data : Any> RealtimeChannel.postgresSingleDataFlow(
+    schema: String = "public",
+    table: String,
     crossinline filter: PostgrestFilterBuilder.() -> Unit,
-    crossinline primaryKey: (Data) -> PrimaryKey
+    primaryKey: PrimaryKey<Data>
 ): Flow<Data> = callbackFlow {
     val key = try {
         val result = supabaseClient.postgrest.from(schema, table).select {
@@ -103,27 +107,26 @@ inline fun RealtimeChannel.singleFlow(
             single()
             filter(filter)
         }
-        val data = decodeData(result.data)
+        val data = result.decodeAs<Data>()
         trySend(data)
-        primaryKey(data)
+        primaryKey.producer(data)
     } catch (e: UnknownRestException) {
         close(IllegalStateException("Data matching filter and table name $table not found"))
         return@callbackFlow
     }
-    val channel = supabaseClient.realtime.channel(channelId)
-    val changeFlow = channel.postgresChangeFlow<PostgresAction>(schema) {
-        this.table = this@RealtimeTable.table
-        filter(key.columnName, FilterOperator.EQ, key.value)
+    val changeFlow = postgresChangeFlow<PostgresAction>(schema) {
+        this.table = table
+        filter(primaryKey.columnName, FilterOperator.EQ, key)
     }
     launch {
         changeFlow.collect {
             when (it) {
                 is PostgresAction.Insert -> {
-                    val data = decodeData(it.record.toString())
+                    val data = it.decodeRecord<Data>()
                     trySend(data)
                 }
                 is PostgresAction.Update -> {
-                    val data = decodeData(it.record.toString())
+                    val data = it.decodeRecord<Data>()
                     trySend(data)
                 }
                 is PostgresAction.Delete -> {
@@ -132,21 +135,20 @@ inline fun RealtimeChannel.singleFlow(
                 else -> {}
             }
         }
-    }
-    channel.subscribe()
-    awaitClose {
-        launch {
-            supabaseClient.realtime.removeChannel(channel)
-        }
+        close()
     }
 }
 
-inline fun <V> RealtimeChannel.singleFlow(
-    primaryKey: KProperty1<Data, V>,
+inline fun <reified Data, Value> RealtimeChannel.postgresSingleDataFlow(
+    schema: String = "public",
+    table: String,
+    primaryKey: KProperty1<Data, Value>,
     crossinline filter: PostgrestFilterBuilder.() -> Unit
-): Flow<Data> = singleFlow(
+): Flow<Data> = postgresSingleDataFlow(
+    schema = schema,
+    table = table,
     filter = filter,
-    primaryKey = {
-        PrimaryKey(primaryKey.name, primaryKey.get(it).toString())
+    primaryKey = PrimaryKey(primaryKey.name) {
+        primaryKey.get(it).toString()
     }
 )
