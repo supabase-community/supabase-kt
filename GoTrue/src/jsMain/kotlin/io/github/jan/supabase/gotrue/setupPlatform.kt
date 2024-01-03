@@ -14,7 +14,15 @@ actual fun Auth.setupPlatform() {
 
     fun checkForHash() {
         if(window.location.hash.isBlank()) return
-        val map = window.location.hash.substring(1).split("&").associate {
+
+        val afterHash = window.location.hash.substring(1)
+
+        if(!afterHash.contains('=')) {
+            // No params after hash, no need to continue
+            return
+        }
+
+        val map = afterHash.split("&").associate {
             it.split("=").let { pair ->
                 pair[0] to pair[1]
             }
