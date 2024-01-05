@@ -12,7 +12,13 @@ actual fun Auth.setupPlatform() {
 
     fun checkForHash() {
         if(window.location.hash.isBlank()) return
-        parseFragmentAndImportSession(window.location.hash.substring(1)) {
+        val afterHash = window.location.hash.substring(1)
+
+        if(!afterHash.contains('=')) {
+            // No params after hash, no need to continue
+            return
+        }
+        parseFragmentAndImportSession(afterHash) {
             val newURL = window.location.href.split("?")[0];
             window.history.replaceState(null, window.document.title, newURL);
         }
