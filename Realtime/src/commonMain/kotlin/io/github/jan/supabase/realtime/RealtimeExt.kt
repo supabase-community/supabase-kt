@@ -14,8 +14,17 @@ import kotlinx.coroutines.launch
 import kotlinx.serialization.json.jsonPrimitive
 import kotlin.reflect.KProperty1
 
+/**
+ * Represents the primary key of the [Data] type.
+ * @param columnName the column name of the primary key
+ * @param producer a function that produces the primary key from the [Data] object
+ */
 data class PrimaryKey<Data>(val columnName: String, val producer: (Data) -> String)
 
+/**
+ * Listens for presence changes and caches the presences based on their keys. This function automatically handles joins and leaves.
+ * @return a [Flow] of the current presences in a list. This list is updated and emitted whenever a presence joins or leaves.
+ */
 inline fun <reified Data> RealtimeChannel.presenceDataFlow(): Flow<List<Data>> {
     val cache = AtomicMutableMap<String, Data>()
     return presenceChangeFlow().map {
@@ -29,6 +38,14 @@ inline fun <reified Data> RealtimeChannel.presenceDataFlow(): Flow<List<Data>> {
     }
 }
 
+/**
+ * This function retrieves the initial data from the table and then listens for changes. It automatically handles inserts, updates and deletes.
+ * @param schema the schema of the table
+ * @param table the table name
+ * @param filter an optional filter to filter the data
+ * @param primaryKey the primary key of the [Data] type
+ * @return a [Flow] of the current data in a list. This list is updated and emitted whenever a change occurs.
+ */
 inline fun <reified Data : Any> RealtimeChannel.postgresListDataFlow(
     schema: String = "public",
     table: String,
@@ -78,6 +95,14 @@ inline fun <reified Data : Any> RealtimeChannel.postgresListDataFlow(
     }
 }
 
+/**
+ * This function retrieves the initial data from the table and then listens for changes. It automatically handles inserts, updates and deletes.
+ * @param schema the schema of the table
+ * @param table the table name
+ * @param filter an optional filter to filter the data
+ * @param primaryKey the primary key of the [Data] type
+ * @return a [Flow] of the current data in a list. This list is updated and emitted whenever a change occurs.
+ */
 inline fun <reified Data : Any, Value> RealtimeChannel.postgresListDataFlow(
     schema: String = "public",
     table: String,
@@ -94,7 +119,14 @@ inline fun <reified Data : Any, Value> RealtimeChannel.postgresListDataFlow(
     }
 )
 
-
+/**
+ * This function retrieves the initial data for a single value and then listens for changes on that value. It automatically handles updates and closes the flow on the delete event.
+ * @param schema the schema of the table
+ * @param table the table name
+ * @param filter filter the the value you want to listen to
+ * @param primaryKey the primary key of the [Data] type
+ * @return a [Flow] of the current data. This flow emits a new value whenever a change occurs.
+ */
 inline fun <reified Data : Any> RealtimeChannel.postgresSingleDataFlow(
     schema: String = "public",
     table: String,
@@ -139,6 +171,14 @@ inline fun <reified Data : Any> RealtimeChannel.postgresSingleDataFlow(
     }
 }
 
+/**
+ * This function retrieves the initial data for a single value and then listens for changes on that value. It automatically handles updates and closes the flow on the delete event.
+ * @param schema the schema of the table
+ * @param table the table name
+ * @param filter filter the the value you want to listen to
+ * @param primaryKey the primary key of the [Data] type
+ * @return a [Flow] of the current data. This flow emits a new value whenever a change occurs.
+ */
 inline fun <reified Data, Value> RealtimeChannel.postgresSingleDataFlow(
     schema: String = "public",
     table: String,

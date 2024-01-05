@@ -127,7 +127,7 @@ fun RealtimeChannel.presenceChangeFlow(): Flow<PresenceAction> {
 }
 
 /**
- * You can listen for postgres changes in a channel.
+ * Listen for postgres changes in a channel.
  *
  * Example:
  * ```kotlin
