@@ -4,15 +4,18 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Send
 import androidx.compose.material3.Button
+import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
@@ -56,16 +59,17 @@ fun ChatScreen(viewModel: ChatViewModel, user: UserInfo) {
             modifier = Modifier.fillMaxSize().weight(1f)
         ) {
             items(messages, { it.id }) {
-                MessageCard(it, it.creatorId == ownId) {
+                MessageCard(it, it.creatorId == ownId, Modifier.fillMaxSize().padding(8.dp)) {
                     viewModel.deleteMessage(it.id)
                 }
             }
         }
+        Divider(thickness = 1.dp, modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp))
         Row(verticalAlignment = Alignment.CenterVertically) {
             TextField(
                 value = message,
                 onValueChange = { message = it },
-                modifier = Modifier.scale(0.7f)
+                modifier = Modifier.weight(1f).padding(8.dp)
             )
             IconButton({
                 viewModel.createMessage(message)

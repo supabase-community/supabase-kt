@@ -47,13 +47,13 @@ allprojects {
         pom {
             name.set(this@allprojects.name)
             description.set(this@allprojects.description ?: "A Kotlin Multiplatform Supabase SDK")
-            inceptionYear.set("2023")
+            inceptionYear.set("2024")
             url.set("https://github.com/supabase-community/supabase-kt/")
             licenses {
                 license {
                     name = "MIT License"
-                    url = "https://mit-license.org/"
-                    distribution = "https://mit-license.org/"
+                    url = "https://github.com/supabase-community/supabase-kt/blob/master/LICENSE"
+                    distribution = "https://github.com/supabase-community/supabase-kt/blob/master/LICENSE"
                 }
             }
             developers {

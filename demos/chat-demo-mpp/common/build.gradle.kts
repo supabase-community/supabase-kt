@@ -1,5 +1,4 @@
 @file:OptIn(org.jetbrains.compose.ExperimentalComposeLibrary::class)
-import org.jetbrains.compose.compose
 
 plugins {
     kotlin("multiplatform")
@@ -12,12 +11,23 @@ group = "io.github.jan.supabase"
 version = "1.0-SNAPSHOT"
 
 kotlin {
-    android()
+    applyDefaultHierarchyTemplate()
+    androidTarget()
     jvm("desktop") {
-        jvmToolchain(8)
+        jvmToolchain(11)
     }
     js(IR) {
         browser()
+    }
+
+    listOf(
+        iosArm64(),
+        iosSimulatorArm64(),
+    ).forEach {
+        it.binaries.framework {
+            baseName = "common"
+            isStatic = true
+        }
     }
     sourceSets {
         val commonMain by getting {
@@ -56,6 +66,12 @@ kotlin {
                 api(libs.ktor.js)
             }
         }
+        val iosMain by getting {
+            dependsOn(commonMain)
+            dependencies {
+                api(libs.ktor.ios)
+            }
+        }
     }
 }
 
@@ -67,7 +83,7 @@ android {
         minSdk = 26
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
     }
 }

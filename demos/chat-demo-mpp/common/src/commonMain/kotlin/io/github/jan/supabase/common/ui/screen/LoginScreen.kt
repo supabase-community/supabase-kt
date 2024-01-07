@@ -9,9 +9,11 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Mail
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -28,12 +30,13 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import io.github.jan.supabase.annotations.SupabaseExperimental
 import io.github.jan.supabase.common.ChatViewModel
-import io.github.jan.supabase.common.ui.components.AlertDialog
-import io.github.jan.supabase.common.ui.components.GoogleButton
 import io.github.jan.supabase.common.ui.components.PasswordField
+import io.github.jan.supabase.compose.auth.ui.ProviderButtonContent
+import io.github.jan.supabase.gotrue.providers.Google
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, SupabaseExperimental::class)
 @Composable
 fun LoginScreen(viewModel: ChatViewModel) {
     var signUp by remember { mutableStateOf(false) }
@@ -69,6 +72,7 @@ fun LoginScreen(viewModel: ChatViewModel) {
                 authenticate(signUp, viewModel, email, password)
             }),
         )
+
         Button(
             onClick = { authenticate(signUp, viewModel, email, password) },
             modifier = Modifier.padding(top = 10.dp),
@@ -76,9 +80,14 @@ fun LoginScreen(viewModel: ChatViewModel) {
         ) {
             Text(if (signUp) "Register" else "Login")
         }
-        GoogleButton(
-            text = if (signUp) "Sign Up with Google" else "Login with Google"
-        ) { viewModel.loginWithGoogle() }
+
+        OutlinedButton(
+            onClick = {
+                viewModel.loginWithGoogle()
+            }
+        ) {
+            ProviderButtonContent(Google, text = if (signUp) "Sign Up with Google" else "Login with Google")
+        }
 
     }
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.BottomCenter) {
@@ -88,9 +97,21 @@ fun LoginScreen(viewModel: ChatViewModel) {
     }
 
     if(loginAlert != null) {
-        AlertDialog(loginAlert!!) {
-            viewModel.loginAlert.value = null
-        }
+        AlertDialog(
+            onDismissRequest = {
+                viewModel.loginAlert.value = null
+            },
+            text = {
+                Text(loginAlert!!)
+            },
+            confirmButton = {
+                TextButton(onClick = {
+                    viewModel.loginAlert.value = null
+                }) {
+                    Text("Ok")
+                }
+            }
+        )
     }
 }
 
