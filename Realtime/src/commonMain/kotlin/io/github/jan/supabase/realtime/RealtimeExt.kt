@@ -1,6 +1,7 @@
 @file:Suppress("MatchingDeclarationName")
 package io.github.jan.supabase.realtime
 
+import io.github.jan.supabase.annotations.SupabaseExperimental
 import io.github.jan.supabase.collections.AtomicMutableMap
 import io.github.jan.supabase.exceptions.NotFoundRestException
 import io.github.jan.supabase.exceptions.UnknownRestException
@@ -25,6 +26,7 @@ data class PrimaryKey<Data>(val columnName: String, val producer: (Data) -> Stri
  * Listens for presence changes and caches the presences based on their keys. This function automatically handles joins and leaves.
  * @return a [Flow] of the current presences in a list. This list is updated and emitted whenever a presence joins or leaves.
  */
+@SupabaseExperimental
 inline fun <reified Data> RealtimeChannel.presenceDataFlow(): Flow<List<Data>> {
     val cache = AtomicMutableMap<String, Data>()
     return presenceChangeFlow().map {
@@ -46,6 +48,7 @@ inline fun <reified Data> RealtimeChannel.presenceDataFlow(): Flow<List<Data>> {
  * @param primaryKey the primary key of the [Data] type
  * @return a [Flow] of the current data in a list. This list is updated and emitted whenever a change occurs.
  */
+@SupabaseExperimental
 suspend inline fun <reified Data : Any> RealtimeChannel.postgresListDataFlow(
     schema: String = "public",
     table: String,
@@ -105,6 +108,7 @@ suspend inline fun <reified Data : Any> RealtimeChannel.postgresListDataFlow(
  * @param primaryKey the primary key of the [Data] type
  * @return a [Flow] of the current data in a list. This list is updated and emitted whenever a change occurs.
  */
+@SupabaseExperimental
 suspend inline fun <reified Data : Any, Value> RealtimeChannel.postgresListDataFlow(
     schema: String = "public",
     table: String,
@@ -129,6 +133,7 @@ suspend inline fun <reified Data : Any, Value> RealtimeChannel.postgresListDataF
  * @param primaryKey the primary key of the [Data] type
  * @return a [Flow] of the current data. This flow emits a new value whenever a change occurs.
  */
+@SupabaseExperimental
 suspend inline fun <reified Data : Any> RealtimeChannel.postgresSingleDataFlow(
     schema: String = "public",
     table: String,
@@ -179,6 +184,7 @@ suspend inline fun <reified Data : Any> RealtimeChannel.postgresSingleDataFlow(
  * @param primaryKey the primary key of the [Data] type
  * @return a [Flow] of the current data. This flow emits a new value whenever a change occurs.
  */
+@SupabaseExperimental
 suspend inline fun <reified Data, Value> RealtimeChannel.postgresSingleDataFlow(
     schema: String = "public",
     table: String,
