@@ -37,7 +37,7 @@ sealed interface RealtimeChannel {
 
     /**
      * Subscribes to the channel
-     * @param blockUntilSubscribed if true, the method will block the coroutine until the [status] is [Status.JOINED]
+     * @param blockUntilSubscribed if true, the method will block the coroutine until the [status] is [Status.SUBSCRIBED]
      */
     suspend fun subscribe(blockUntilSubscribed: Boolean = false)
 
