@@ -62,7 +62,7 @@ suspend inline fun <reified Data : Any> RealtimeChannel.postgresListDataFlow(
         }
         data
     } catch (e: NotFoundRestException) {
-        throw IllegalStateException("Table with name $table not found")
+        error("Table with name $table not found")
     }
     val changeFlow = postgresChangeFlow<PostgresAction>(schema) {
         this.table = table
@@ -144,7 +144,7 @@ suspend inline fun <reified Data : Any> RealtimeChannel.postgresSingleDataFlow(
         val data = result.decodeAs<Data>()
         primaryKey.producer(data) to data
     } catch (e: UnknownRestException) {
-        throw IllegalStateException("Data matching filter and table name $table not found")
+        error("Data matching filter and table name $table not found")
     }
     val changeFlow = postgresChangeFlow<PostgresAction>(schema) {
         this.table = table
