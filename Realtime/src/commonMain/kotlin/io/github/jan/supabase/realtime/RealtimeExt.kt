@@ -132,8 +132,8 @@ suspend inline fun <reified Data : Any, Value> RealtimeChannel.postgresListDataF
 suspend inline fun <reified Data : Any> RealtimeChannel.postgresSingleDataFlow(
     schema: String = "public",
     table: String,
-    crossinline filter: PostgrestFilterBuilder.() -> Unit,
-    primaryKey: PrimaryKey<Data>
+    primaryKey: PrimaryKey<Data>,
+    crossinline filter: PostgrestFilterBuilder.() -> Unit
 ): Flow<Data> {
     val (key, initialData) = try {
         val result = supabaseClient.postgrest.from(schema, table).select {
