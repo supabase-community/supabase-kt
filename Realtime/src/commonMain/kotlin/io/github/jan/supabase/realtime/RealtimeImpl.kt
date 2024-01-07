@@ -190,7 +190,7 @@ internal class RealtimeImpl(override val supabaseClient: SupabaseClient, overrid
         }
         _subscriptions.remove(channel.topic)
         if(subscriptions.isEmpty() && config.disconnectOnNoSubscriptions) {
-            Logger.d { "No more subscriptions, disconnecting from realtime websocket" }
+            Logger.d("Realtime") { "No more subscriptions, disconnecting from realtime websocket" }
             disconnect()
         }
     }
@@ -208,7 +208,7 @@ internal class RealtimeImpl(override val supabaseClient: SupabaseClient, overrid
         }
         _subscriptions.clear()
         if(config.disconnectOnNoSubscriptions) {
-            Logger.d { "No more subscriptions, disconnecting from realtime websocket" }
+            Logger.d("Realtime") { "No more subscriptions, disconnecting from realtime websocket" }
             disconnect()
         }
     }
