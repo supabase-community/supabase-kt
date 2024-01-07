@@ -17,7 +17,7 @@ import kotlin.reflect.KProperty1
 /**
  * Represents the primary key of the [Data] type.
  * @param columnName the column name of the primary key
- * @param producer a function that produces the primary key from the [Data] object
+ * @param producer a function that produces the primary key value from the [Data] object
  */
 data class PrimaryKey<Data>(val columnName: String, val producer: (Data) -> String)
 
