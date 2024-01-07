@@ -203,7 +203,7 @@ class PostgrestFilterBuilder(
      */
     fun textSearch(column: String, query: String, textSearchType: TextSearchType, config: String? = null): PostgrestFilterBuilder {
         val configPart = if (config === null) "" else "(${config})"
-        _params[column] = listOf("${textSearchType.identifier}${configPart}.${query}")
+        _params[column] = listOf("${textSearchType.identifier}fts${configPart}.${query}")
         return this
     }
 

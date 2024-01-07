@@ -1,10 +1,10 @@
 [versions]
-kotlin = "1.8.20"
-agp = "8.0.2"
-compose = "1.4.0"
-supabase = "1.1.0"
-koin = "3.4.1"
-ktor = "2.3.1"
+kotlin = "1.9.21"
+agp = "8.2.0"
+compose = "1.5.11"
+supabase = "2.0.2"
+koin = "3.4.3"
+ktor = "2.3.7"
 
 androidx-core = "1.10.1"
 androidx-compat = "1.6.1"
@@ -26,6 +26,7 @@ compose = { id = "org.jetbrains.compose", version.ref = "compose" }
 supabase-gotrue = { module = "io.github.jan-tennert.supabase:gotrue-kt", version.ref = "supabase" }
 supabase-realtime = { module = "io.github.jan-tennert.supabase:realtime-kt", version.ref = "supabase" }
 supabase-postgrest = { module = "io.github.jan-tennert.supabase:postgrest-kt", version.ref = "supabase" }
+supabase-compose-ui = { module = "io.github.jan-tennert.supabase:compose-auth-ui", version.ref = "supabase" }
 
 koin-core = { module = "io.insert-koin:koin-core", version.ref = "koin" }
 koin-android = { module = "io.insert-koin:koin-android", version.ref = "koin" }
@@ -38,6 +39,7 @@ androidx-activity-compose = { module = "androidx.activity:activity-compose", ver
 
 ktor-cio = { module = "io.ktor:ktor-client-cio", version.ref = "ktor" }
 ktor-js = { module = "io.ktor:ktor-client-js", version.ref = "ktor" }
+ktor-ios = { module = "io.ktor:ktor-client-ios", version.ref = "ktor" }
 
 [bundles]
-supabase = [ "supabase-gotrue", "supabase-realtime", "supabase-postgrest" ]
+supabase = [ "supabase-gotrue", "supabase-realtime", "supabase-postgrest", "supabase-compose-ui" ]

@@ -5,7 +5,7 @@ import co.touchlab.kermit.Logger
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.common.net.Message
 import io.github.jan.supabase.common.net.MessageApi
-import io.github.jan.supabase.gotrue.gotrue
+import io.github.jan.supabase.gotrue.auth
 import io.github.jan.supabase.gotrue.providers.Google
 import io.github.jan.supabase.gotrue.providers.builtin.Email
 import io.github.jan.supabase.realtime.PostgresAction
@@ -26,14 +26,13 @@ expect open class MPViewModel() {
     val coroutineScope: CoroutineScope
 
 }
-
 class ChatViewModel(
     val supabaseClient: SupabaseClient,
     private val realtimeChannel: RealtimeChannel,
     private val messageApi: MessageApi
 ) : MPViewModel() {
 
-    val sessionStatus = supabaseClient.gotrue.sessionStatus
+    val sessionStatus = supabaseClient.auth.sessionStatus
     val loginAlert = MutableStateFlow<String?>(null)
     val messages = MutableStateFlow<List<Message>>(emptyList())
 
@@ -42,7 +41,7 @@ class ChatViewModel(
     fun signUp(email: String, password: String) {
         coroutineScope.launch {
             kotlin.runCatching {
-                supabaseClient.gotrue.signUpWith(Email) {
+                supabaseClient.auth.signUpWith(Email) {
                     this.email = email
                     this.password = password
                 }
@@ -57,7 +56,7 @@ class ChatViewModel(
     fun login(email: String, password: String) {
         coroutineScope.launch {
             kotlin.runCatching {
-                supabaseClient.gotrue.loginWith(Email) {
+                supabaseClient.auth.signInWith(Email) {
                     this.email = email
                     this.password = password
                 }
@@ -71,7 +70,7 @@ class ChatViewModel(
     fun loginWithGoogle() {
         coroutineScope.launch {
             kotlin.runCatching {
-                supabaseClient.gotrue.loginWith(Google)
+                supabaseClient.auth.signInWith(Google)
             }
         }
     }
@@ -79,7 +78,8 @@ class ChatViewModel(
     fun logout() {
         coroutineScope.launch {
             kotlin.runCatching {
-                supabaseClient.gotrue.invalidateSession()
+                supabaseClient.auth.signOut()
+                messages.value = emptyList()
             }
         }
     }
@@ -88,8 +88,6 @@ class ChatViewModel(
     fun connectToRealtime() {
         coroutineScope.launch {
             kotlin.runCatching {
-                supabaseClient.realtime.connect()
-
                 realtimeChannel.postgresChangeFlow<PostgresAction>("public") {
                     table = "messages"
                 }.onEach {
@@ -101,7 +99,7 @@ class ChatViewModel(
                     }
                 }.launchIn(coroutineScope)
 
-                realtimeChannel.join()
+                realtimeChannel.subscribe()
 
             }.onFailure {
                 it.printStackTrace()
