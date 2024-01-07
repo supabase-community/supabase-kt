@@ -24,6 +24,8 @@ data class PrimaryKey<Data>(val columnName: String, val producer: (Data) -> Stri
 
 /**
  * Listens for presence changes and caches the presences based on their keys. This function automatically handles joins and leaves.
+ *
+ * If you want more control, use the [presenceChangeFlow] function.
  * @return a [Flow] of the current presences in a list. This list is updated and emitted whenever a presence joins or leaves.
  */
 @SupabaseExperimental
@@ -42,6 +44,8 @@ inline fun <reified Data> RealtimeChannel.presenceDataFlow(): Flow<List<Data>> {
 
 /**
  * This function retrieves the initial data from the table and then listens for changes. It automatically handles inserts, updates and deletes.
+ *
+ * If you want more control, use the [postgresChangeFlow] function.
  * @param schema the schema of the table
  * @param table the table name
  * @param filter an optional filter to filter the data
@@ -102,6 +106,8 @@ suspend inline fun <reified Data : Any> RealtimeChannel.postgresListDataFlow(
 
 /**
  * This function retrieves the initial data from the table and then listens for changes. It automatically handles inserts, updates and deletes.
+ *
+ * If you want more control, use the [postgresChangeFlow] function.
  * @param schema the schema of the table
  * @param table the table name
  * @param filter an optional filter to filter the data
@@ -127,6 +133,8 @@ suspend inline fun <reified Data : Any, Value> RealtimeChannel.postgresListDataF
 
 /**
  * This function retrieves the initial data for a single value and then listens for changes on that value. It automatically handles updates and closes the flow on the delete event.
+ *
+ * If you want more control, use the [postgresChangeFlow] function.
  * @param schema the schema of the table
  * @param table the table name
  * @param filter filter the the value you want to listen to
@@ -178,6 +186,8 @@ suspend inline fun <reified Data : Any> RealtimeChannel.postgresSingleDataFlow(
 
 /**
  * This function retrieves the initial data for a single value and then listens for changes on that value. It automatically handles updates and closes the flow on the delete event.
+ *
+ * If you want more control, use the [postgresChangeFlow] function.
  * @param schema the schema of the table
  * @param table the table name
  * @param filter filter the the value you want to listen to
