@@ -78,6 +78,7 @@ javalin = { module = "io.javalin:javalin", version.ref = "javalin" }
 apollo-kotlin = { module = "com.apollographql.apollo3:apollo-runtime", version.ref = "apollo-kotlin" }
 
 krypto = { module = "com.soywiz.korlibs.krypto:krypto", version.ref = "korlibs" }
+okio = { module = "com.squareup.okio:okio", version.ref = "okio" }
 
 moshi = { module = "com.squareup.moshi:moshi", version.ref = "moshi" }
 moshi-kotlin = { module = "com.squareup.moshi:moshi-kotlin", version.ref = "moshi" }
@@ -89,7 +90,6 @@ androidsvg = { module = "com.caverock:androidsvg-aar", version.ref = "androidsvg
 
 coil = { module = "io.coil-kt:coil", version.ref = "coil" }
 imageloader = { module = "io.github.qdsfdhvh:image-loader", version.ref = "imageloader" }
-okio = { module = "com.squareup.okio:okio", version.ref = "okio" }
 
 [bundles]
 ktor-client = ["ktor-client-core", "ktor-client-content-negotiation", "ktor-json"]
