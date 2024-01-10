@@ -13,8 +13,8 @@ android-play-store = "20.4.1" # Later versions causing Error code 16 for now (Re
 multiplatform-settings = "1.1.1"
 javalin = "5.6.3"
 complete-kotlin = "1.1.0"
-agp = "8.2.0"
-maven-publish = "0.26.0"
+agp = "8.2.1"
+maven-publish = "0.27.0"
 apollo-kotlin = "3.8.2"
 korlibs = "4.0.10"
 detekt = "1.23.4"
@@ -25,7 +25,7 @@ googleid = "1.1.0"
 compose = "1.5.11"
 androidsvg = "1.4"
 coil = "2.5.0"
-imageloader = "1.7.1"
+imageloader = "1.7.2"
 okio = "3.7.0"
 credentials = "1.2.0"
 
@@ -78,6 +78,7 @@ javalin = { module = "io.javalin:javalin", version.ref = "javalin" }
 apollo-kotlin = { module = "com.apollographql.apollo3:apollo-runtime", version.ref = "apollo-kotlin" }
 
 krypto = { module = "com.soywiz.korlibs.krypto:krypto", version.ref = "korlibs" }
+okio = { module = "com.squareup.okio:okio", version.ref = "okio" }
 
 moshi = { module = "com.squareup.moshi:moshi", version.ref = "moshi" }
 moshi-kotlin = { module = "com.squareup.moshi:moshi-kotlin", version.ref = "moshi" }
@@ -89,7 +90,6 @@ androidsvg = { module = "com.caverock:androidsvg-aar", version.ref = "androidsvg
 
 coil = { module = "io.coil-kt:coil", version.ref = "coil" }
 imageloader = { module = "io.github.qdsfdhvh:image-loader", version.ref = "imageloader" }
-okio = { module = "com.squareup.okio:okio", version.ref = "okio" }
 
 [bundles]
 ktor-client = ["ktor-client-core", "ktor-client-content-negotiation", "ktor-json"]
