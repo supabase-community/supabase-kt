@@ -6,7 +6,7 @@ Supported targets:
 
 | Target | **JVM** | **Android** | **JS** | **iOS** | **tvOS** | **watchOS** | **macOS** | **Windows** | **Linux** |
 |--------|---------|-------------|--------|---------|----------|-------------|-----------|-------------|-----------|
-| Status | ❌       | ✅           | ❌      | ❌       | ❌        | ❌           | ❌         | ❌           | ❌         |
+| Status | ✅       | ✅           | ✅      | ✅       | ❌        | ❌           | ❌         | ❌           | ❌         |
 
 <details>
 
@@ -52,6 +52,8 @@ val client = createSupabaseClient(
 }
 ```
 
+You will also need a [Ktor Engine](https://ktor.io/docs/http-client-engines.html) for each of your Kotlin targets. See the [Supabase documentation](https://supabase.com/docs/reference/kotlin/installing#add-ktor-client-engine-to-each-of-your-kotlin-targets-required) for more information.
+
 # Usage
 
 ### Add Supabase Fetcher to Coil
@@ -62,6 +64,8 @@ Create a new ImageLoader with the Supabase Fetcher. See the [Coil documentation]
 ImageLoader.Builder(context)
     .components {
         add(supabaseClient.coil)
+        //You also need the network image fetcher:
+        add(NetworkFetcher.Factory())
     }
     .build()
 ```
@@ -78,7 +82,7 @@ val request = ImageRequest.Builder(context)
     .build()
 ```
 
-Or if you are using [Jetpack Compose](https://coil-kt.github.io/coil/compose/):
+Or if you are using [Compose Multiplatform](https://coil-kt.github.io/coil/compose/):
 
 ```kotlin
 AsyncImage(
