@@ -78,7 +78,7 @@ internal class RealtimeImpl(override val supabaseClient: SupabaseClient, overrid
                 }
             }
         }
-        if (status.value == Realtime.Status.CONNECTED) error("Websocket already connected")
+        if (status.value == Realtime.Status.CONNECTED) return
         _status.value = Realtime.Status.CONNECTING
         val realtimeUrl = websocketUrl
         try {
