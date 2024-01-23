@@ -86,6 +86,12 @@ internal fun ComposeAuth.signInWithCM(onResult: (NativeSignInResult) -> Unit, fa
                                         e.localizedMessage ?: "error: google id parsing exception"
                                     )
                                 )
+                            } catch(e: Exception) {
+                                onResult.invoke(
+                                    NativeSignInResult.Error(
+                                        e.localizedMessage ?: "error"
+                                    )
+                                )
                             }
                         } else {
                             onResult.invoke(NativeSignInResult.Error("error: unexpected type of credential"))
