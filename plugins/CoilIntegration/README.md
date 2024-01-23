@@ -52,7 +52,7 @@ val client = createSupabaseClient(
 }
 ```
 
-You will also need a [Ktor Engine](https://ktor.io/docs/http-client-engines.html) for each of your Kotlin targets. See the [Supabase documentation](https://supabase.com/docs/reference/kotlin/installing#add-ktor-client-engine-to-each-of-your-kotlin-targets-required) for more information.
+If you don't have a coil-network artifact in your dependencies, you will need to add it. See the [Coil documentation](https://coil-kt.github.io/coil/upgrading_to_coil3/#network-images) for more information.
 
 # Usage
 
@@ -64,8 +64,9 @@ Create a new ImageLoader with the Supabase Fetcher. See the [Coil documentation]
 ImageLoader.Builder(context)
     .components {
         add(supabaseClient.coil)
-        //You also need the network image fetcher:
-        add(NetworkFetcher.Factory())
+        //You also need the add the network fetcher factory if you don't have it already
+        //Depending on the network artifact you added, this will be different
+        add(KtorNetworkFetcherFactory())
     }
     .build()
 ```
