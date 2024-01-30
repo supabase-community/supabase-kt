@@ -45,29 +45,30 @@ actual fun ComposeAuth.rememberSignInWithApple(
     val scope = rememberCoroutineScope()
 
     LaunchedEffect(key1 = state.started) {
-
-        if (config.loginConfig["apple"] == null) {
-            fallback.invoke()
-            state.reset()
-            return@LaunchedEffect
-        }
-
-        val appleIDProvider = ASAuthorizationAppleIDProvider()
-        val request = appleIDProvider.createRequest().apply {
-            requestedScopes = listOf(ASAuthorizationScopeFullName, ASAuthorizationScopeEmail)
-            nonce = (config.loginConfig["apple"] as? AppleLoginConfig)?.nonce
-        }
-
-        val controller = ASAuthorizationController(listOf(request)).apply {
-            delegate = authorizationController(scope) {
-                onResult.invoke(it)
+        if(state.started) {
+            if (config.loginConfig["apple"] == null) {
+                fallback.invoke()
                 state.reset()
+                return@LaunchedEffect
             }
 
-            presentationContextProvider = presentationAnchor()
+            val appleIDProvider = ASAuthorizationAppleIDProvider()
+            val request = appleIDProvider.createRequest().apply {
+                requestedScopes = listOf(ASAuthorizationScopeFullName, ASAuthorizationScopeEmail)
+                nonce = (config.loginConfig["apple"] as? AppleLoginConfig)?.nonce
+            }
 
+            val controller = ASAuthorizationController(listOf(request)).apply {
+                delegate = authorizationController(scope) {
+                    onResult.invoke(it)
+                    state.reset()
+                }
+
+                presentationContextProvider = presentationAnchor()
+
+            }
+            controller.performRequests()
         }
-        controller.performRequests()
     }
 
     return state
