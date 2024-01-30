@@ -70,6 +70,7 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 api(project(":gotrue-kt"))
+                api(project(":postgrest-kt"))
                 api(libs.ktor.client.websockets)
             }
         }

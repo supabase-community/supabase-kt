@@ -78,7 +78,7 @@ internal class RealtimeImpl(override val supabaseClient: SupabaseClient, overrid
                 }
             }
         }
-        if (status.value == Realtime.Status.CONNECTED) error("Websocket already connected")
+        if (status.value == Realtime.Status.CONNECTED) return
         _status.value = Realtime.Status.CONNECTING
         val realtimeUrl = websocketUrl
         try {
@@ -189,6 +189,10 @@ internal class RealtimeImpl(override val supabaseClient: SupabaseClient, overrid
             channel.unsubscribe()
         }
         _subscriptions.remove(channel.topic)
+        if(subscriptions.isEmpty() && config.disconnectOnNoSubscriptions) {
+            Logger.d("Realtime") { "No more subscriptions, disconnecting from realtime websocket" }
+            disconnect()
+        }
     }
 
     @SupabaseInternal
@@ -203,6 +207,10 @@ internal class RealtimeImpl(override val supabaseClient: SupabaseClient, overrid
             }
         }
         _subscriptions.clear()
+        if(config.disconnectOnNoSubscriptions) {
+            Logger.d("Realtime") { "No more subscriptions, disconnecting from realtime websocket" }
+            disconnect()
+        }
     }
 
     @SupabaseInternal
