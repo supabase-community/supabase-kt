@@ -7,14 +7,14 @@ import kotlinx.serialization.serializerOrNull
 import kotlin.reflect.KProperty1
 import kotlin.reflect.typeOf
 
-private val SNAKE_CASE_REGEX = "(?<=.)[A-Z]".toRegex()
+private val SNAKE_CASE_REGEX = "([a-z0-9])([A-Z])".toRegex()
 
 @SupabaseInternal
 expect fun <T, V> getSerialName(property: KProperty1<T, V>): String
 
 @SupabaseInternal
 internal fun String.camelToSnakeCase(): String {
-    return this.replace(SNAKE_CASE_REGEX, "_$0").lowercase()
+    return this.replace(SNAKE_CASE_REGEX, "$1_$2").lowercase()
 }
 
 @PublishedApi internal fun <T> Map<T, List<T>>.mapToFirstValue() = mapValues { it.value.first() }
