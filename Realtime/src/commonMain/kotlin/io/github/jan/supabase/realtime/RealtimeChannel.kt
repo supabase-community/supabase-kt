@@ -127,7 +127,7 @@ fun RealtimeChannel.presenceChangeFlow(): Flow<PresenceAction> {
 }
 
 /**
- * You can listen for postgres changes in a channel.
+ * Listen for postgres changes in a channel.
  *
  * Example:
  * ```kotlin
@@ -135,6 +135,8 @@ fun RealtimeChannel.presenceChangeFlow(): Flow<PresenceAction> {
  *    table = "products"
  * }.map { it.decodeRecord<Product>() }
  * ```
+ *
+ * If you just want to check for changes and also retrieve initial values, you can use the [postgresListDataFlow] or [postgresSingleDataFlow] functions.
  *
  * @param T The event type you want to listen to (e.g. [PostgresAction.Update] for updates or only [PostgresAction] for all)
  * @param schema The schema name of the table that is being monitored. For normal supabase tables that might be "public".

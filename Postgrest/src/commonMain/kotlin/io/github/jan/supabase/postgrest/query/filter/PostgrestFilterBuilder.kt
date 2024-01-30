@@ -11,7 +11,8 @@ import kotlin.reflect.KProperty1
 @PostgrestFilterDSL
 class PostgrestFilterBuilder(
     @PublishedApi internal val propertyConversionMethod: PropertyConversionMethod,
-    @PublishedApi internal val _params: MutableMap<String, List<String>> = mutableMapOf()
+    @PublishedApi internal val _params: MutableMap<String, List<String>> = mutableMapOf(),
+    val isInLogicalExpression: Boolean = false
 ) {
 
     val params: Map<String, List<String>>
@@ -186,7 +187,7 @@ class PostgrestFilterBuilder(
     @PostgrestFilterDSL
     inline fun or(negate: Boolean = false, filter: @PostgrestFilterDSL PostgrestFilterBuilder.() -> Unit) {
         val prefix = if(negate) "not." else ""
-        _params[prefix + "or"] = listOf(formatJoiningFilter(filter))
+        _params[prefix + "or"] = listOf(formatJoiningFilter(filter)) + if(isInLogicalExpression) _params[prefix + "and"] ?: emptyList() else emptyList()
     }
 
     /**
@@ -195,7 +196,7 @@ class PostgrestFilterBuilder(
     @PostgrestFilterDSL
     inline fun and(negate: Boolean = false, filter: @PostgrestFilterDSL PostgrestFilterBuilder.() -> Unit) {
         val prefix = if (negate) "not." else ""
-        _params[prefix + "and"] = listOf(formatJoiningFilter(filter))
+        _params[prefix + "and"] = listOf(formatJoiningFilter(filter)) + if(isInLogicalExpression) _params[prefix + "and"] ?: emptyList() else emptyList()
     }
 
     /**
@@ -361,7 +362,7 @@ class PostgrestFilterBuilder(
 }
 
 @PublishedApi internal inline fun PostgrestFilterBuilder.formatJoiningFilter(filter: PostgrestFilterBuilder.() -> Unit): String {
-    val params = PostgrestFilterBuilder(propertyConversionMethod).apply(filter).params
+    val params = PostgrestFilterBuilder(propertyConversionMethod, isInLogicalExpression = true).apply(filter).params
     val formattedFilter = params.toList().joinToString(",") {
         it.second.joinToString(",") { filter ->
             val isLogicalOperator = filter.startsWith("(") && filter.endsWith(")")
