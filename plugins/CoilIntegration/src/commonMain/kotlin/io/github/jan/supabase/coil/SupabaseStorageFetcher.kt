@@ -2,6 +2,7 @@ package io.github.jan.supabase.coil
 
 import coil3.Extras
 import coil3.ImageLoader
+import coil3.annotation.ExperimentalCoilApi
 import coil3.fetch.FetchResult
 import coil3.fetch.Fetcher
 import coil3.network.httpHeaders
@@ -10,7 +11,6 @@ import coil3.toUri
 import io.github.jan.supabase.storage.Storage
 import io.github.jan.supabase.storage.StorageItem
 import io.github.jan.supabase.storage.authenticatedRequest
-import io.ktor.client.utils.buildHeaders
 
 internal class SupabaseStorageFetcher(
     private val storage: Storage,
@@ -19,6 +19,7 @@ internal class SupabaseStorageFetcher(
     private val imageLoader: ImageLoader
 ) : Fetcher {
 
+    @OptIn(ExperimentalCoilApi::class)
     override suspend fun fetch(): FetchResult? {
         val bucket = storage[item.bucketId]
         val (token, url) = if (item.authenticated) {
@@ -28,12 +29,15 @@ internal class SupabaseStorageFetcher(
         }
         val extras = options.extras.newBuilder()
         if (item.authenticated) {
-            extras[Extras.Key.httpHeaders] = buildHeaders {
-                appendAll(options.httpHeaders)
+            extras[Extras.Key.httpHeaders] = options.httpHeaders.newBuilder().apply {
                 set("Authorization", "Bearer $token")
-            }
+            }.build()
         }
-        val (fetcher, _) = imageLoader.components.newFetcher(url.toUri(), options.copy(extras = extras.build()), imageLoader) ?: error("No fetcher found for $url")
+        val (fetcher, _) = imageLoader.components.newFetcher(
+            url.toUri(),
+            options.copy(extras = extras.build()),
+            imageLoader
+        ) ?: error("No fetcher found for $url")
         return fetcher.fetch()
     }
 

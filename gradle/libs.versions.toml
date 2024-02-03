@@ -89,7 +89,7 @@ jackson-kotlin = { module = "com.fasterxml.jackson.module:jackson-module-kotlin"
 androidsvg = { module = "com.caverock:androidsvg-aar", version.ref = "androidsvg" }
 
 coil = { module = "io.coil-kt.coil3:coil", version.ref = "coil" }
-coil-network = { module = "io.coil-kt.coil3:coil-network", version.ref = "coil" }
+coil-network-core = { module = "io.coil-kt.coil3:coil-network-core", version.ref = "coil" }
 imageloader = { module = "io.github.qdsfdhvh:image-loader", version.ref = "imageloader" }
 
 [bundles]
@@ -98,4 +98,4 @@ multiplatform-settings = ["multiplatform-settings-no-arg", "multiplatform-settin
 testing = ["kotlinx-coroutines-test", "multiplatform-settings-test", "ktor-client-mock", "kotlin-test"]
 moshi = ["moshi", "moshi-kotlin"]
 jackson = ["jackson", "jackson-kotlin"]
-coil = ["coil", "coil-network"]
+coil = ["coil", "coil-network-core"]
