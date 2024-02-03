@@ -6,7 +6,7 @@ For information about supported Kotlin targets, see the corresponding module REA
 
 [Migrating from version 1.4.X to 2.0.0](/MIGRATION.md)
 
-*Note: [WASM](https://github.com/supabase-community/supabase-kt/issues/86) build available: [2.0.4-wasm0](https://github.com/supabase-community/supabase-kt/releases/tag/2.0.2-wasm0)*
+*Note: [WASM](https://github.com/supabase-community/supabase-kt/issues/86) build available: [2.1.1-wasm0](https://github.com/supabase-community/supabase-kt/releases/tag/2.0.2-wasm0)*
 
 [![](https://img.shields.io/github/release/supabase-community/supabase-kt?label=stable)](https://github.com/supabase-community/supabase-kt/releases) [![](https://badgen.net/github/release/supabase-community/supabase-kt?label=prerelease)](https://central.sonatype.com/search?q=io.github.jan.supabase&smo=true)
 
