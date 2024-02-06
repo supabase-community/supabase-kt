@@ -1,7 +1,6 @@
 package io.github.jan.supabase.gotrue
 
 import io.github.jan.supabase.gotrue.user.UserSession
-import kotlin.jvm.JvmInline
 
 /**
  * Represents the status of the current session in [Auth]
@@ -26,7 +25,7 @@ sealed interface SessionStatus {
     /**
      * This status means that [Auth] holds a valid session
      * @param session The session
+     * @param oldStatus The previous status. Useful for knowing if the user was already authenticated
      */
-    @JvmInline
-    value class Authenticated(val session: UserSession) : SessionStatus
+    data class Authenticated(val session: UserSession, val oldStatus: SessionStatus) : SessionStatus
 }
