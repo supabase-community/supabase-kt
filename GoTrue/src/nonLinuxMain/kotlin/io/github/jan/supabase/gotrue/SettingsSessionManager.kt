@@ -1,17 +1,21 @@
 package io.github.jan.supabase.gotrue
 
-import co.touchlab.kermit.Logger
 import com.russhwolf.settings.ExperimentalSettingsApi
 import com.russhwolf.settings.Settings
 import com.russhwolf.settings.coroutines.toSuspendSettings
 import io.github.jan.supabase.gotrue.user.UserSession
+import io.github.jan.supabase.logging.SupabaseLogger
+import io.github.jan.supabase.logging.e
 import io.github.jan.supabase.supabaseJson
 import kotlinx.serialization.encodeToString
 
 /**
  * A [SessionManager] that uses the [Settings] API.
  */
-class SettingsSessionManager(settings: Settings = createDefaultSettings()): SessionManager {
+class SettingsSessionManager(
+    settings: Settings = createDefaultSettings(),
+    private val logger: SupabaseLogger
+) : SessionManager {
 
     private val suspendSettings = settings.toSuspendSettings()
 
@@ -26,7 +30,7 @@ class SettingsSessionManager(settings: Settings = createDefaultSettings()): Sess
         return try {
             supabaseJson.decodeFromString(session)
         } catch(e: Exception) {
-            Logger.e(e, "Auth") { "Failed to load session" }
+            logger.e(e) { "Failed to load session" }
             null
         }
     }

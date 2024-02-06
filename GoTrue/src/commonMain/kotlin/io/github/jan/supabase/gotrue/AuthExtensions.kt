@@ -1,7 +1,7 @@
 package io.github.jan.supabase.gotrue
 
-import co.touchlab.kermit.Logger
 import io.github.jan.supabase.gotrue.user.UserSession
+import io.github.jan.supabase.logging.d
 
 internal fun noDeeplinkError(arg: String): Nothing = error("""
         Trying to use a deeplink as a redirect url, but no deeplink $arg is set in the GoTrueConfig.
@@ -24,7 +24,7 @@ fun Auth.parseSessionFromFragment(fragment: String): UserSession {
             pair[0] to pair[1]
         }
     }
-    Logger.d("Auth") { "Fragment parts: $sessionParts" }
+    logger.d { "Fragment parts: $sessionParts" }
 
     val accessToken = sessionParts["access_token"] ?: invalidArg("No access token found")
     val refreshToken = sessionParts["refresh_token"] ?: invalidArg("No refresh token found")

@@ -10,6 +10,7 @@ import io.github.jan.supabase.exceptions.RestException
 import io.github.jan.supabase.exceptions.UnauthorizedRestException
 import io.github.jan.supabase.gotrue.Auth
 import io.github.jan.supabase.gotrue.authenticatedSupabaseApi
+import io.github.jan.supabase.logging.SupabaseLogger
 import io.github.jan.supabase.plugins.CustomSerializationConfig
 import io.github.jan.supabase.plugins.CustomSerializationPlugin
 import io.github.jan.supabase.plugins.MainConfig
@@ -46,10 +47,12 @@ import io.ktor.http.HttpStatusCode
 class Functions(override val config: Config, override val supabaseClient: SupabaseClient) : MainPlugin<Functions.Config>, CustomSerializationPlugin {
 
     override val apiVersion: Int
-        get() = Functions.API_VERSION
+        get() = API_VERSION
 
     override val pluginKey: String
         get() = key
+
+    override val logger: SupabaseLogger = config.logger(config.logLevel ?: supabaseClient.logLevel)
 
     override val serializer = config.serializer ?: supabaseClient.defaultSerializer
 
@@ -120,10 +123,7 @@ class Functions(override val config: Config, override val supabaseClient: Supaba
      * @param jwtToken A jwt token to use for the requests. If not provided, the token from the [Auth] plugin, or the supabaseKey will be used
      * @property serializer A serializer used for serializing/deserializing objects e.g. in [Functions.invoke] or [EdgeFunction.invoke]. Defaults to [KotlinXSerializer]
      */
-    data class Config(
-        override var customUrl: String? = null,
-        override var jwtToken: String? = null,
-    ) : MainConfig, CustomSerializationConfig {
+    class Config : MainConfig(), CustomSerializationConfig {
 
         override var serializer: SupabaseSerializer? = null
 

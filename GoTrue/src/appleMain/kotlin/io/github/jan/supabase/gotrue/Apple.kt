@@ -1,8 +1,8 @@
 package io.github.jan.supabase.gotrue
 
-import co.touchlab.kermit.Logger
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.gotrue.user.UserSession
+import io.github.jan.supabase.logging.d
 import kotlinx.coroutines.launch
 import platform.Foundation.NSURL
 import platform.Foundation.NSURLComponents
@@ -16,14 +16,14 @@ import platform.Foundation.NSURLQueryItem
  */
 fun SupabaseClient.handleDeeplinks(url: NSURL, onSessionSuccess: (UserSession) -> Unit = {}) {
     if (url.scheme != auth.config.scheme || url.host != auth.config.host) {
-        Logger.d("Auth") { "Received deeplink with wrong scheme or host" }
+        auth.logger.d { "Received deeplink with wrong scheme or host" }
         return
     }
     when (auth.config.flowType) {
         FlowType.IMPLICIT -> {
             val fragment = url.fragment
             if (fragment == null) {
-                Logger.d("Auth") { "No fragment for deeplink" }
+                auth.logger.d { "No fragment for deeplink" }
                 return
             }
             auth.parseFragmentAndImportSession(fragment, onSessionSuccess)

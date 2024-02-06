@@ -1,10 +1,10 @@
 package io.github.jan.supabase.gotrue.providers
 
-import co.touchlab.kermit.Logger
 import io.github.jan.supabase.annotations.SupabaseExperimental
 import io.github.jan.supabase.gotrue.Auth
 import io.github.jan.supabase.gotrue.AuthImpl
 import io.github.jan.supabase.gotrue.user.UserSession
+import io.github.jan.supabase.logging.d
 import io.javalin.Javalin
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -35,7 +35,7 @@ internal suspend fun createServer(
             }
         }
     server.get("/callback") { ctx ->
-        Logger.d("Auth") {
+        gotrue.logger.d {
             "Received callback on oauth callback"
         }
         val accessToken = ctx.queryParam("access_token") ?: return@get
@@ -49,7 +49,7 @@ internal suspend fun createServer(
             val user = gotrue.retrieveUser(accessToken)
             onSuccess(UserSession(accessToken, refreshToken, providerRefreshToken, providerToken, expiresIn, tokenType, user, type))
         }
-        Logger.d("Auth") {
+        gotrue.logger.d {
             "Successfully received http callback"
         }
         ctx.html(HTML.redirectPage(gotrue.config.htmlIconUrl, gotrue.config.htmlTitle, gotrue.config.htmlText))

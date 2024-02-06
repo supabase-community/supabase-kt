@@ -7,7 +7,9 @@ import io.github.jan.supabase.gotrue.providers.Apple
 import io.github.jan.supabase.gotrue.providers.Google
 import io.github.jan.supabase.gotrue.providers.IDTokenProvider
 import io.github.jan.supabase.gotrue.providers.builtin.IDToken
+import io.github.jan.supabase.logging.SupabaseLogger
 import io.github.jan.supabase.plugins.SupabasePlugin
+import io.github.jan.supabase.plugins.SupabasePluginConfig
 import io.github.jan.supabase.plugins.SupabasePluginProvider
 
 /**
@@ -47,17 +49,7 @@ import io.github.jan.supabase.plugins.SupabasePluginProvider
  * }
  *  ```
  */
-sealed interface ComposeAuth : SupabasePlugin {
-
-    /**
-     * Returns Native Auth configurations
-     */
-    val config: Config
-
-    /**
-     * The corresponding [SupabaseClient] instance
-     */
-    val supabaseClient: SupabaseClient
+sealed interface ComposeAuth : SupabasePlugin<ComposeAuth.Config> {
 
     /**
      * Config for [ComposeAuth]
@@ -66,7 +58,7 @@ sealed interface ComposeAuth : SupabasePlugin {
      */
     data class Config(
         val loginConfig: MutableMap<String, LoginConfig> = mutableMapOf()
-    ) : SupabasePlugin
+    ) : SupabasePluginConfig()
 
     companion object : SupabasePluginProvider<Config, ComposeAuth> {
 
@@ -91,7 +83,11 @@ val SupabaseClient.composeAuth: ComposeAuth
 internal class ComposeAuthImpl(
     override val config: ComposeAuth.Config,
     override val supabaseClient: SupabaseClient,
-) : ComposeAuth
+) : ComposeAuth {
+
+    override val logger: SupabaseLogger = config.logger(config.logLevel ?: supabaseClient.logLevel, "Compose Auth")
+
+}
 
 internal suspend fun ComposeAuth.signInWithGoogle(idToken: String) {
     val config = config.loginConfig["google"] as? GoogleLoginConfig

@@ -10,34 +10,24 @@ import io.ktor.http.appendEncodedPathSegments
 /**
  * Config for [MainPlugin]s
  */
-interface MainConfig {
+open class MainConfig : SupabasePluginConfig() {
 
     /**
      * The url used for this module
      */
-    var customUrl: String?
+    var customUrl: String? = null
 
     /**
      * The jwt token used for this module. If null, the client will use the token from GoTrue's current session
      */
-    var jwtToken: String?
+    var jwtToken: String? = null
 
 }
 
 /**
  * Represents main plugins like Auth or Functions
  */
-interface MainPlugin <Config : MainConfig> : SupabasePlugin {
-
-    /**
-     * The configuration for this plugin
-     */
-    val config: Config
-
-    /**
-     * The corresponding [SupabaseClient] instance
-     */
-    val supabaseClient: SupabaseClient
+interface MainPlugin <Config : MainConfig> : SupabasePlugin<Config> {
 
     /**
      * The version for the api the plugin is using

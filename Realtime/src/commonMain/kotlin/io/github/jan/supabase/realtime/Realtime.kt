@@ -101,12 +101,10 @@ sealed interface Realtime : MainPlugin<Realtime.Config>, CustomSerializationPlug
         var secure: Boolean? = null,
         var heartbeatInterval: Duration = 15.seconds,
         var reconnectDelay: Duration = 7.seconds,
-        override var customUrl: String? = null,
-        override var jwtToken: String? = null,
         var disconnectOnSessionLoss: Boolean = true,
         var connectOnSubscribe: Boolean = true,
         var disconnectOnNoSubscriptions: Boolean = true,
-    ): MainConfig, CustomSerializationConfig {
+    ): MainConfig(), CustomSerializationConfig {
 
         override var serializer: SupabaseSerializer? = null
 

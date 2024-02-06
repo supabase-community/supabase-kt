@@ -8,7 +8,9 @@ import com.seiko.imageloader.model.ImageRequest
 import com.seiko.imageloader.option.Options
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.annotations.SupabaseExperimental
+import io.github.jan.supabase.logging.SupabaseLogger
 import io.github.jan.supabase.plugins.SupabasePlugin
+import io.github.jan.supabase.plugins.SupabasePluginConfig
 import io.github.jan.supabase.plugins.SupabasePluginProvider
 import io.github.jan.supabase.storage.StorageItem
 import io.github.jan.supabase.storage.storage
@@ -21,19 +23,19 @@ import io.github.jan.supabase.storage.storage
  * add(fetcherFactory = supabaseClient.imageLoader)
  * ```
  */
-interface ImageLoaderIntegration: SupabasePlugin, Fetcher.Factory, Keyer {
+interface ImageLoaderIntegration: SupabasePlugin<ImageLoaderIntegration.Config>, Fetcher.Factory, Keyer {
 
     /**
      * The configuration for the [ImageLoader] integration.
      */
-    class Config
+    class Config: SupabasePluginConfig()
 
     companion object : SupabasePluginProvider<Config, ImageLoaderIntegration> {
 
         override val key = "imageloader"
 
         override fun create(supabaseClient: SupabaseClient, config: Config): ImageLoaderIntegration {
-            return ImageLoaderIntegrationImpl(supabaseClient)
+            return ImageLoaderIntegrationImpl(supabaseClient, config)
         }
 
         override fun createConfig(init: Config.() -> Unit): Config {
@@ -44,7 +46,12 @@ interface ImageLoaderIntegration: SupabasePlugin, Fetcher.Factory, Keyer {
 
 }
 
-internal class ImageLoaderIntegrationImpl(private val supabaseClient: SupabaseClient) : ImageLoaderIntegration {
+internal class ImageLoaderIntegrationImpl(
+    override val supabaseClient: SupabaseClient,
+    override val config: ImageLoaderIntegration.Config
+) : ImageLoaderIntegration {
+
+    override val logger: SupabaseLogger = config.logger(config.logLevel ?: supabaseClient.logLevel, "ImageLoader Integration")
 
     override fun create(data: Any, options: Options): Fetcher? {
         if(data !is StorageItem) return null

@@ -1,10 +1,11 @@
 @file:Suppress("UndocumentedPublicFunction")
 package io.github.jan.supabase.network
 
-import co.touchlab.kermit.Logger
 import io.github.jan.supabase.BuildConfig
 import io.github.jan.supabase.annotations.SupabaseInternal
 import io.github.jan.supabase.exceptions.HttpRequestException
+import io.github.jan.supabase.logging.SupabaseLogger
+import io.github.jan.supabase.logging.e
 import io.github.jan.supabase.supabaseJson
 import io.ktor.client.HttpClient
 import io.ktor.client.HttpClientConfig
@@ -33,6 +34,7 @@ class KtorSupabaseHttpClient @SupabaseInternal constructor(
     modifiers: List<HttpClientConfig<*>.() -> Unit> = listOf(),
     private val requestTimeout: Long,
     engine: HttpClientEngine? = null,
+    private val logger: SupabaseLogger
 ): SupabaseHttpClient() {
 
     @SupabaseInternal
@@ -48,10 +50,10 @@ class KtorSupabaseHttpClient @SupabaseInternal constructor(
         val response = try {
             httpClient.request(url, builder)
         } catch(e: HttpRequestTimeoutException) {
-            Logger.d("Core") { "Request timed out after $requestTimeout ms" }
+            logger.e { "Request timed out after $requestTimeout ms on url $url" }
             throw e
         } catch(e: Exception) {
-            Logger.d("Core") { "Request failed with ${e.message}" }
+            logger.e { "Request failed with ${e.message} on url $url" }
             throw HttpRequestException(e.message ?: "", request)
         }
         return response
@@ -68,10 +70,10 @@ class KtorSupabaseHttpClient @SupabaseInternal constructor(
         val response = try {
             httpClient.prepareRequest(url, builder)
         } catch(e: HttpRequestTimeoutException) {
-            Logger.d("Core") { "Request timed out after $requestTimeout ms" }
+            logger.e { "Request timed out after $requestTimeout ms on url $url" }
             throw e
         } catch(e: Exception) {
-            Logger.d("Core") { "Request failed with ${e.message}" }
+            logger.e { "Request failed with ${e.message} on url $url" }
             throw HttpRequestException(e.message ?: "", request)
         }
         return response

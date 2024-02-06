@@ -5,8 +5,8 @@ import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ProcessLifecycleOwner
 import androidx.startup.Initializer
-import co.touchlab.kermit.Logger
 import io.github.jan.supabase.annotations.SupabaseInternal
+import io.github.jan.supabase.logging.d
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -37,14 +37,14 @@ private fun addLifecycleCallbacks(gotrue: Auth) {
 
                 override fun onStart(owner: LifecycleOwner) {
                     if(!gotrue.isAutoRefreshRunning && gotrue.config.alwaysAutoRefresh) {
-                        Logger.d("Auth") {
+                        gotrue.logger.d {
                             "Starting auto refresh"
                         }
                         scope.launch {
                             try {
                                 gotrue.startAutoRefreshForCurrentSession()
                             } catch(e: IllegalStateException) {
-                                Logger.d("Auth") {
+                                gotrue.logger.d {
                                     "No session found for auto refresh"
                                 }
                             }
@@ -53,7 +53,7 @@ private fun addLifecycleCallbacks(gotrue: Auth) {
                 }
                 override fun onStop(owner: LifecycleOwner) {
                     if(gotrue.isAutoRefreshRunning) {
-                        Logger.d("Auth") { "Cancelling auto refresh because app is switching to the background" }
+                        gotrue.logger.d { "Cancelling auto refresh because app is switching to the background" }
                         scope.launch {
                             gotrue.stopAutoRefreshForCurrentSession()
                         }

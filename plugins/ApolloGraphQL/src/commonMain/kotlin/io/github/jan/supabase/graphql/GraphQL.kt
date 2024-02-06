@@ -7,6 +7,7 @@ import io.github.jan.supabase.BuildConfig
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.exceptions.RestException
 import io.github.jan.supabase.gotrue.Auth
+import io.github.jan.supabase.logging.SupabaseLogger
 import io.github.jan.supabase.plugins.MainConfig
 import io.github.jan.supabase.plugins.MainPlugin
 import io.github.jan.supabase.plugins.SupabasePluginProvider
@@ -33,10 +34,8 @@ sealed interface GraphQL: MainPlugin<GraphQL.Config> {
      * @param apolloConfiguration custom apollo client configuration
      */
     data class Config(
-        override var customUrl: String? = null,
-        override var jwtToken: String? = null,
         internal var apolloConfiguration: ApolloClient.Builder.() -> Unit = {}
-    ): MainConfig {
+    ): MainConfig() {
 
         /**
          * Add custom apollo client configuration
@@ -70,6 +69,7 @@ sealed interface GraphQL: MainPlugin<GraphQL.Config> {
 
 internal class GraphQLImpl(override val config: GraphQL.Config, override val supabaseClient: SupabaseClient) : GraphQL {
 
+    override val logger: SupabaseLogger = config.logger(config.logLevel ?: supabaseClient.logLevel, "Apollo GraphQL Plugin")
     override val apiVersion: Int = GraphQL.API_VERSION
     override val pluginKey: String = GraphQL.key
     override val apolloClient = ApolloClient.Builder().apply {
