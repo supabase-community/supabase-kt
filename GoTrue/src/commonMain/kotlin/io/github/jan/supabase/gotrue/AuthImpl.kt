@@ -541,6 +541,10 @@ internal class AuthImpl(
         sessionStatus.first { it !is SessionStatus.LoadingFromStorage }
     }
 
+    fun resetLoadingState() {
+        _sessionStatus.value = SessionStatus.LoadingFromStorage
+    }
+
 }
 
 @SupabaseInternal

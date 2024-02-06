@@ -56,6 +56,7 @@ private fun addLifecycleCallbacks(gotrue: Auth) {
                         Logger.d("Auth") { "Cancelling auto refresh because app is switching to the background" }
                         scope.launch {
                             gotrue.stopAutoRefreshForCurrentSession()
+                            gotrue.resetLoadingState()
                         }
                     }
                 }
