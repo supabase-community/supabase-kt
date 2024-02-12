@@ -62,7 +62,9 @@ sealed interface ComposeAuth : SupabasePlugin<ComposeAuth.Config> {
 
     companion object : SupabasePluginProvider<Config, ComposeAuth> {
 
-        override val key: String = "composeauth"
+        override val KEY: String = "composeauth"
+
+        override val LOGGER: SupabaseLogger = SupabaseClient.createLogger("Supabase-ComposeAuth")
 
         override fun create(supabaseClient: SupabaseClient, config: Config): ComposeAuth {
             return ComposeAuthImpl(config, supabaseClient)
@@ -83,11 +85,7 @@ val SupabaseClient.composeAuth: ComposeAuth
 internal class ComposeAuthImpl(
     override val config: ComposeAuth.Config,
     override val supabaseClient: SupabaseClient,
-) : ComposeAuth {
-
-    override val logger: SupabaseLogger = config.logger(config.logLevel ?: supabaseClient.logLevel, "Compose Auth")
-
-}
+) : ComposeAuth
 
 internal suspend fun ComposeAuth.signInWithGoogle(idToken: String) {
     val config = config.loginConfig["google"] as? GoogleLoginConfig

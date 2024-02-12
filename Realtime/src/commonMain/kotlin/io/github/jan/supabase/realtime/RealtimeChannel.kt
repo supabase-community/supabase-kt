@@ -186,7 +186,7 @@ inline fun <reified T : Any> RealtimeChannel.broadcastFlow(event: String): Flow<
         val decodedValue = try {
             supabaseClient.realtime.serializer.decode<T>(it.toString())
         } catch(e: Exception) {
-            supabaseClient.realtime.logger.e(e) { "Couldn't decode $this as ${T::class.simpleName}. The corresponding handler wasn't called" }
+            Realtime.LOGGER.e(e) { "Couldn't decode $this as ${T::class.simpleName}. The corresponding handler wasn't called" }
             null
         }
         decodedValue?.let { value -> trySend(value) }

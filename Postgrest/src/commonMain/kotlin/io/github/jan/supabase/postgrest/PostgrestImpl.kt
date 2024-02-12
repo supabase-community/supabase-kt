@@ -19,7 +19,7 @@ internal class PostgrestImpl(override val supabaseClient: SupabaseClient, overri
         get() = Postgrest.API_VERSION
 
     override val pluginKey: String
-        get() = Postgrest.key
+        get() = Postgrest.KEY
 
     override var serializer = config.serializer ?: supabaseClient.defaultSerializer
 

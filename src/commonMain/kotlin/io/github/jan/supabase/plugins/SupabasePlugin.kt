@@ -16,7 +16,6 @@ open class SupabasePluginConfig {
  */
 interface SupabasePlugin<Config : SupabasePluginConfig> {
 
-    val logger: SupabaseLogger
     val config: Config
     val supabaseClient: SupabaseClient
 
@@ -35,7 +34,12 @@ interface SupabasePluginProvider<Config : SupabasePluginConfig, PluginInstance :
     /**
      * The key of this plugin. This key is used to identify the plugin within the [PluginManager]
      */
-    val key: String
+    val KEY: String
+
+    /**
+     * The logger used in this plugin.
+     */
+    val LOGGER: SupabaseLogger
 
     /**
      * Create a config for this plugin using the [init] function
@@ -51,5 +55,12 @@ interface SupabasePluginProvider<Config : SupabasePluginConfig, PluginInstance :
      * Create an instance of this plugin using the [supabaseClient] and [config]
      */
     fun create(supabaseClient: SupabaseClient, config: Config) : PluginInstance
+
+    /**
+     * Updates the plugin's logging level
+     */
+    fun setLoggingLevel(level: LogLevel) {
+        LOGGER.setLevel(level)
+    }
 
 }

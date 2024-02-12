@@ -19,7 +19,6 @@ import io.github.jan.supabase.gotrue.providers.builtin.SSO
 import io.github.jan.supabase.gotrue.user.UserInfo
 import io.github.jan.supabase.gotrue.user.UserSession
 import io.github.jan.supabase.gotrue.user.UserUpdateBuilder
-import io.github.jan.supabase.logging.SupabaseLogger
 import io.github.jan.supabase.logging.d
 import io.github.jan.supabase.logging.e
 import io.github.jan.supabase.logging.i
@@ -57,7 +56,6 @@ internal class AuthImpl(
     override val config: AuthConfig
 ) : Auth {
 
-    override val logger: SupabaseLogger = config.logger(config.logLevel ?: supabaseClient.logLevel, "Auth")
     private val _sessionStatus = MutableStateFlow<SessionStatus>(SessionStatus.LoadingFromStorage)
     override val sessionStatus: StateFlow<SessionStatus> = _sessionStatus.asStateFlow()
     internal val authScope = CoroutineScope(config.coroutineDispatcher)
@@ -78,21 +76,24 @@ internal class AuthImpl(
         get() = Auth.API_VERSION
 
     override val pluginKey: String
-        get() = Auth.key
+        get() = Auth.KEY
 
     override fun init() {
         setupPlatform()
         if (config.autoLoadFromStorage) {
             authScope.launch {
-                logger.d {
-                    "Trying to load latest session"
+                Auth.LOGGER.i {
+                    "Trying to load latest session from storage."
                 }
                 val successful = loadFromStorage()
                 if (successful) {
-                    logger.d {
-                        "Successfully loaded session from storage"
+                    Auth.LOGGER.i {
+                        "Successfully loaded session from storage!"
                     }
                 } else {
+                    Auth.LOGGER.i {
+                        "No session found."
+                    }
                     _sessionStatus.value = SessionStatus.NotAuthenticated
                 }
             }
@@ -293,14 +294,14 @@ internal class AuthImpl(
             api.post("logout") {
                 parameter("scope", scope.name.lowercase())
             }
-            logger.d { "Logged out session in Supabase" }
+            Auth.LOGGER.d { "Logged out session in Supabase" }
         } else {
-            logger.i { "Skipping session logout as there is no session available. Proceeding to clean up local data..." }
+            Auth.LOGGER.i { "Skipping session logout as there is no session available. Proceeding to clean up local data..." }
         }
         if (scope != SignOutScope.OTHERS) {
             clearSession()
         }
-        logger.d { "Successfully logged out" }
+        Auth.LOGGER.d { "Successfully logged out" }
     }
 
     private suspend fun verify(
@@ -377,7 +378,7 @@ internal class AuthImpl(
     }
 
     override suspend fun refreshSession(refreshToken: String): UserSession {
-        logger.d {
+        Auth.LOGGER.d {
             "Refreshing session"
         }
         val body = buildJsonObject {
@@ -433,10 +434,10 @@ internal class AuthImpl(
         try {
             importRefreshedSession()
         } catch (e: RestException) {
-            signOut()
-            logger.e(e) { "Couldn't refresh session. The refresh token may have been revoked." }
+            clearSession()
+            Auth.LOGGER.e(e) { "Couldn't refresh session. The refresh token may have been revoked." }
         } catch (e: Exception) {
-            logger.e(e) { "Couldn't reach supabase. Either the address doesn't exist or the network might not be on. Retrying in ${config.retryDelay}" }
+            Auth.LOGGER.e(e) { "Couldn't reach supabase. Either the address doesn't exist or the network might not be on. Retrying in ${config.retryDelay}" }
             _sessionStatus.value = SessionStatus.NetworkError
             delay(config.retryDelay)
             retry()
@@ -453,7 +454,7 @@ internal class AuthImpl(
     }
 
     private suspend fun handleExpiredSession(session: UserSession, autoRefresh: Boolean = true) {
-        logger.d {
+        Auth.LOGGER.d {
             "Session expired. Refreshing session..."
         }
         val newSession = refreshSession(session.refreshToken)
@@ -489,7 +490,6 @@ internal class AuthImpl(
                 response,
                 errorBody.description
             )
-
             HttpStatusCode.BadRequest -> BadRequestRestException(
                 errorBody.error,
                 response,
@@ -501,7 +501,6 @@ internal class AuthImpl(
                 response,
                 errorBody.description
             )
-
             else -> UnknownRestException(errorBody.error, response)
         }
     }

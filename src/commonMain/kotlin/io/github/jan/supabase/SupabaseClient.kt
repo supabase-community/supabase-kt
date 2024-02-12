@@ -3,7 +3,6 @@ package io.github.jan.supabase
 import io.github.jan.supabase.annotations.SupabaseInternal
 import io.github.jan.supabase.logging.KermitSupabaseLogger
 import io.github.jan.supabase.logging.LogLevel
-import io.github.jan.supabase.logging.SupabaseLogger
 import io.github.jan.supabase.logging.i
 import io.github.jan.supabase.network.KtorSupabaseHttpClient
 import io.github.jan.supabase.plugins.MainPlugin
@@ -55,16 +54,20 @@ sealed interface SupabaseClient {
     val defaultSerializer: SupabaseSerializer
 
     /**
-     * The default log level used for plugins.
-     */
-    val logLevel: LogLevel
-
-    val logger: SupabaseLogger
-
-    /**
      * Releases all resources held by the [httpClient] and all plugins the [pluginManager]
      */
     suspend fun close()
+
+    companion object {
+
+        var DEFAULT_LOG_LEVEL = LogLevel.Info
+            internal set
+
+        internal val LOGGER = createLogger("Supabase-Core")
+
+        fun createLogger(tag: String, level: LogLevel? = null) = KermitSupabaseLogger(level, tag)
+
+    }
 
 }
 
@@ -77,13 +80,10 @@ internal class SupabaseClientImpl(
     requestTimeout: Long,
     httpEngine: HttpClientEngine?,
     override val defaultSerializer: SupabaseSerializer,
-    override val logLevel: LogLevel
 ) : SupabaseClient {
 
-    override val logger = KermitSupabaseLogger(logLevel, "Supabase")
-
     init {
-        logger.i {
+        SupabaseClient.LOGGER.i {
             "SupabaseClient created! Please report any bugs you find."
         }
     }
@@ -97,7 +97,7 @@ internal class SupabaseClientImpl(
  //   override val coroutineContext = Dispatchers.Default + SupervisorJob()
 
     @OptIn(SupabaseInternal::class)
-    override val httpClient = KtorSupabaseHttpClient(supabaseKey, httpConfigOverrides, requestTimeout, httpEngine, logger)
+    override val httpClient = KtorSupabaseHttpClient(supabaseKey, httpConfigOverrides, requestTimeout, httpEngine)
 
     override val pluginManager = PluginManager(plugins.toList().associate { (key, value) ->
         key to value(this)

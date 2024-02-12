@@ -8,7 +8,6 @@ import io.github.jan.supabase.exceptions.RestException
 import io.github.jan.supabase.exceptions.UnknownRestException
 import io.github.jan.supabase.gotrue.Auth
 import io.github.jan.supabase.gotrue.SessionStatus
-import io.github.jan.supabase.logging.SupabaseLogger
 import io.github.jan.supabase.logging.d
 import io.github.jan.supabase.logging.e
 import io.github.jan.supabase.logging.i
@@ -38,7 +37,6 @@ import kotlinx.serialization.json.buildJsonObject
 
 internal class RealtimeImpl(override val supabaseClient: SupabaseClient, override val config: Realtime.Config) : Realtime {
 
-    override val logger: SupabaseLogger = config.logger(config.logLevel ?: supabaseClient.logLevel, "Realtime")
     var ws: DefaultClientWebSocketSession? = null
     private val _status = MutableStateFlow(Realtime.Status.DISCONNECTED)
     override val status: StateFlow<Realtime.Status> = _status.asStateFlow()
@@ -54,7 +52,7 @@ internal class RealtimeImpl(override val supabaseClient: SupabaseClient, overrid
         get() = Realtime.API_VERSION
 
     override val pluginKey: String
-        get() = Realtime.key
+        get() = Realtime.KEY
 
     override var serializer = config.serializer ?: supabaseClient.defaultSerializer
     private val websocketUrl = realtimeWebsocketUrl()
@@ -64,7 +62,7 @@ internal class RealtimeImpl(override val supabaseClient: SupabaseClient, overrid
     suspend fun connect(reconnect: Boolean) {
         if (reconnect) {
             delay(config.reconnectDelay)
-            logger.d { "Reconnecting..." }
+            Realtime.LOGGER.d { "Reconnecting..." }
         } else {
             scope.launch {
                 supabaseClient.pluginManager.getPluginOrNull(Auth)?.sessionStatus?.collect {
@@ -73,7 +71,7 @@ internal class RealtimeImpl(override val supabaseClient: SupabaseClient, overrid
                             is SessionStatus.Authenticated -> updateJwt(it.session.accessToken)
                             is SessionStatus.NotAuthenticated -> {
                                 if(config.disconnectOnSessionLoss) {
-                                    logger.w { "No auth session found, disconnecting from realtime websocket"}
+                                    Realtime.LOGGER.w { "No auth session found, disconnecting from realtime websocket"}
                                     disconnect()
                                 }
                             }
@@ -89,14 +87,14 @@ internal class RealtimeImpl(override val supabaseClient: SupabaseClient, overrid
         try {
             ws = supabaseClient.httpClient.webSocketSession(realtimeUrl)
             _status.value = Realtime.Status.CONNECTED
-            logger.i { "Connected to realtime websocket!" }
+            Realtime.LOGGER.i { "Connected to realtime websocket!" }
             listenForMessages()
             startHeartbeating()
             if(reconnect) {
                 rejoinChannels()
             }
         } catch(e: Exception) {
-            logger.e(e) { """
+            Realtime.LOGGER.e(e) { """
                 Error while trying to connect to realtime websocket. Trying again in ${config.reconnectDelay}
                 URL: $realtimeUrl
                 """.trimIndent() }
@@ -124,7 +122,7 @@ internal class RealtimeImpl(override val supabaseClient: SupabaseClient, overrid
                 }
             } catch(e: Exception) {
                 if(!isActive) return@launch
-                logger.e(e) { "Error while listening for messages. Trying again in ${config.reconnectDelay}" }
+                Realtime.LOGGER.e(e) { "Error while listening for messages. Trying again in ${config.reconnectDelay}" }
                 scope.launch {
                     disconnect()
                     connect(true)
@@ -146,7 +144,7 @@ internal class RealtimeImpl(override val supabaseClient: SupabaseClient, overrid
     }
 
     override fun disconnect() {
-        logger.d { "Closing websocket connection" }
+        Realtime.LOGGER.d { "Closing websocket connection" }
         messageJob?.cancel()
         ws?.cancel()
         ws = null
@@ -156,13 +154,13 @@ internal class RealtimeImpl(override val supabaseClient: SupabaseClient, overrid
 
     private fun onMessage(stringMessage: String) {
         val message = supabaseJson.decodeFromString<RealtimeMessage>(stringMessage)
-        logger.d { "Received message $stringMessage" }
+        Realtime.LOGGER.d { "Received message $stringMessage" }
         val channel = subscriptions[message.topic] as? RealtimeChannelImpl
         if(message.ref?.toIntOrNull() == heartbeatRef) {
-            logger.i { "Heartbeat received" }
+            Realtime.LOGGER.i { "Heartbeat received" }
             heartbeatRef = 0
         } else {
-            logger.d { "Received event ${message.event} for channel ${channel?.topic}" }
+            Realtime.LOGGER.d { "Received event ${message.event} for channel ${channel?.topic}" }
             channel?.onMessage(message)
         }
     }
@@ -177,14 +175,14 @@ internal class RealtimeImpl(override val supabaseClient: SupabaseClient, overrid
         if (heartbeatRef != 0) {
             heartbeatRef = 0
             ref = 0
-            logger.e { "Heartbeat timeout. Trying to reconnect in ${config.reconnectDelay}" }
+            Realtime.LOGGER.e { "Heartbeat timeout. Trying to reconnect in ${config.reconnectDelay}" }
             scope.launch {
                 disconnect()
                 connect(true)
             }
             return
         }
-        logger.d { "Sending heartbeat" }
+        Realtime.LOGGER.d { "Sending heartbeat" }
         heartbeatRef = ++ref
         ws?.sendSerialized(RealtimeMessage("phoenix", "heartbeat", buildJsonObject { }, heartbeatRef.toString()))
     }
@@ -195,7 +193,7 @@ internal class RealtimeImpl(override val supabaseClient: SupabaseClient, overrid
         }
         _subscriptions.remove(channel.topic)
         if(subscriptions.isEmpty() && config.disconnectOnNoSubscriptions) {
-            logger.d { "No more subscriptions, disconnecting from realtime websocket" }
+            Realtime.LOGGER.d { "No more subscriptions, disconnecting from realtime websocket" }
             disconnect()
         }
     }
@@ -213,7 +211,7 @@ internal class RealtimeImpl(override val supabaseClient: SupabaseClient, overrid
         }
         _subscriptions.clear()
         if(config.disconnectOnNoSubscriptions) {
-            logger.d { "No more subscriptions, disconnecting from realtime websocket" }
+            Realtime.LOGGER.d { "No more subscriptions, disconnecting from realtime websocket" }
             disconnect()
         }
     }

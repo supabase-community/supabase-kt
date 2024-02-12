@@ -4,6 +4,7 @@ import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.SupabaseClientBuilder
 import io.github.jan.supabase.SupabaseSerializer
 import io.github.jan.supabase.annotations.SupabaseInternal
+import io.github.jan.supabase.logging.SupabaseLogger
 import io.github.jan.supabase.plugins.CustomSerializationConfig
 import io.github.jan.supabase.plugins.CustomSerializationPlugin
 import io.github.jan.supabase.plugins.MainConfig
@@ -112,7 +113,9 @@ sealed interface Realtime : MainPlugin<Realtime.Config>, CustomSerializationPlug
 
     companion object : SupabasePluginProvider<Config, Realtime> {
 
-        override val key = "realtime"
+        override val KEY = "realtime"
+
+        override val LOGGER: SupabaseLogger = SupabaseClient.createLogger("Supabase-Realtime")
 
         /**
          * The current realtime api version

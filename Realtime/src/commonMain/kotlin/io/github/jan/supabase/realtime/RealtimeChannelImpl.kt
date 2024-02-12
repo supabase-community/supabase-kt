@@ -38,7 +38,6 @@ internal class RealtimeChannelImpl(
     private val presenceJoinConfig: PresenceJoinConfig,
 ) : RealtimeChannel {
 
-    private val logger = realtimeImpl.logger
     private val clientChanges = AtomicMutableList<PostgresJoinConfig>()
     @SupabaseInternal
     override val callbackManager = CallbackManagerImpl(realtimeImpl)
@@ -61,7 +60,7 @@ internal class RealtimeChannelImpl(
             addChannel(this@RealtimeChannelImpl)
         }
         _status.value = RealtimeChannel.Status.SUBSCRIBING
-        logger.d { "Subscribing to channel $topic" }
+        Realtime.LOGGER.d { "Subscribing to channel $topic" }
         val currentJwt = realtimeImpl.config.jwtToken ?: supabaseClient.pluginManager.getPluginOrNull(Auth)?.currentSessionOrNull()?.let {
             if(it.expiresAt > Clock.System.now()) it.accessToken else null
         }
@@ -73,7 +72,7 @@ internal class RealtimeChannelImpl(
                 put("access_token", currentJwt)
             }
         }
-        logger.d { "Subscribing to channel with body $joinConfigObject" }
+        Realtime.LOGGER.d { "Subscribing to channel with body $joinConfigObject" }
         realtimeImpl.ws?.sendSerialized(RealtimeMessage(topic, RealtimeChannel.CHANNEL_EVENT_JOIN, joinConfigObject, null))
         if(blockUntilSubscribed) {
             status.first { it == RealtimeChannel.Status.SUBSCRIBED }
@@ -83,22 +82,22 @@ internal class RealtimeChannelImpl(
     @OptIn(SupabaseInternal::class)
     fun onMessage(message: RealtimeMessage) {
         if(message.eventType == null) {
-            logger.e { "Received message without event type: $message" }
+            Realtime.LOGGER.e { "Received message without event type: $message" }
             return
         }
         when(message.eventType) {
             RealtimeMessage.EventType.TOKEN_EXPIRED -> {
-                logger.w { "Received token expired event. This should not happen, please report this warning." }
+                Realtime.LOGGER.w { "Received token expired event. This should not happen, please report this warning." }
             }
             RealtimeMessage.EventType.SYSTEM -> {
-                logger.d { "Subscribed to channel ${message.topic}" }
+                Realtime.LOGGER.d { "Subscribed to channel ${message.topic}" }
                 _status.value = RealtimeChannel.Status.SUBSCRIBED
             }
             RealtimeMessage.EventType.POSTGRES_SERVER_CHANGES -> { //check if the server postgres_changes match with the client's and add the given id to the postgres change objects (to identify them later in the events)
                 val serverPostgresChanges = message.payload["response"]?.jsonObject?.get("postgres_changes")?.jsonArray?.let { Json.decodeFromJsonElement<List<PostgresJoinConfig>>(it) } ?: listOf() //server postgres changes
                 callbackManager.setServerChanges(serverPostgresChanges)
                 if(status.value != RealtimeChannel.Status.SUBSCRIBED) {
-                    logger.d { "Joined channel ${message.topic}" }
+                    Realtime.LOGGER.d { "Joined channel ${message.topic}" }
                     _status.value = RealtimeChannel.Status.SUBSCRIBED
                 }
             }
@@ -123,10 +122,10 @@ internal class RealtimeChannelImpl(
                 realtimeImpl.run {
                     deleteChannel(this@RealtimeChannelImpl)
                 }
-                logger.d { "Unsubscribed from channel ${message.topic}" }
+                Realtime.LOGGER.d { "Unsubscribed from channel ${message.topic}" }
             }
             RealtimeMessage.EventType.ERROR -> {
-                logger.e { "Received an error in channel ${message.topic}. That could be as a result of an invalid access token" }
+                Realtime.LOGGER.e { "Received an error in channel ${message.topic}. That could be as a result of an invalid access token" }
             }
             RealtimeMessage.EventType.PRESENCE_DIFF -> {
                 val joins = message.payload["joins"]?.jsonObject?.decodeIfNotEmptyOrDefault(mapOf<String, Presence>()) ?: emptyMap()
@@ -142,12 +141,12 @@ internal class RealtimeChannelImpl(
 
     override suspend fun unsubscribe() {
         _status.value = RealtimeChannel.Status.UNSUBSCRIBING
-        logger.d { "Unsubscribing from channel $topic" }
+        Realtime.LOGGER.d { "Unsubscribing from channel $topic" }
         realtimeImpl.ws?.sendSerialized(RealtimeMessage(topic, RealtimeChannel.CHANNEL_EVENT_LEAVE, buildJsonObject {}, null))
     }
 
     override suspend fun updateAuth(jwt: String) {
-        logger.d { "Updating auth token for channel $topic" }
+        Realtime.LOGGER.d { "Updating auth token for channel $topic" }
         realtimeImpl.ws?.sendSerialized(RealtimeMessage(topic, RealtimeChannel.CHANNEL_EVENT_ACCESS_TOKEN, buildJsonObject {
             put("access_token", jwt)
         }, (++realtimeImpl.ref).toString()))

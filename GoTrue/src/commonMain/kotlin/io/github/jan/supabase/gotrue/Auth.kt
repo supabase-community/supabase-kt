@@ -16,6 +16,7 @@ import io.github.jan.supabase.gotrue.providers.builtin.SSO
 import io.github.jan.supabase.gotrue.user.UserInfo
 import io.github.jan.supabase.gotrue.user.UserSession
 import io.github.jan.supabase.gotrue.user.UserUpdateBuilder
+import io.github.jan.supabase.logging.SupabaseLogger
 import io.github.jan.supabase.logging.e
 import io.github.jan.supabase.plugins.CustomSerializationPlugin
 import io.github.jan.supabase.plugins.MainPlugin
@@ -360,7 +361,9 @@ sealed interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
 
     companion object : SupabasePluginProvider<AuthConfig, Auth> {
 
-        override val key = "auth"
+        override val KEY = "auth"
+
+        override val LOGGER: SupabaseLogger = SupabaseClient.createLogger("Supabase-Auth")
 
         /**
          * The gotrue api version to use
@@ -383,6 +386,6 @@ val SupabaseClient.auth: Auth
 private suspend fun Auth.tryToGetUser(jwt: String) = try {
     retrieveUser(jwt)
 } catch (e: Exception) {
-    logger.e(e) { "Couldn't retrieve user using your custom jwt token. If you use the project secret ignore this message" }
+    Auth.LOGGER.e(e) { "Couldn't retrieve user using your custom jwt token. If you use the project secret ignore this message" }
     null
 }

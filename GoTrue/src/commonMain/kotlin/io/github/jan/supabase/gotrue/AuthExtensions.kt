@@ -24,7 +24,8 @@ fun Auth.parseSessionFromFragment(fragment: String): UserSession {
             pair[0] to pair[1]
         }
     }
-    logger.d { "Fragment parts: $sessionParts" }
+
+    Auth.LOGGER.d { "Fragment parts: $sessionParts" }
 
     val accessToken = sessionParts["access_token"] ?: invalidArg("No access token found")
     val refreshToken = sessionParts["refresh_token"] ?: invalidArg("No refresh token found")

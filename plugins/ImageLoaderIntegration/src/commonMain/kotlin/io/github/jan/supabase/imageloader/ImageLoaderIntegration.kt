@@ -9,6 +9,7 @@ import com.seiko.imageloader.option.Options
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.annotations.SupabaseExperimental
 import io.github.jan.supabase.logging.SupabaseLogger
+import io.github.jan.supabase.logging.d
 import io.github.jan.supabase.plugins.SupabasePlugin
 import io.github.jan.supabase.plugins.SupabasePluginConfig
 import io.github.jan.supabase.plugins.SupabasePluginProvider
@@ -32,7 +33,9 @@ interface ImageLoaderIntegration: SupabasePlugin<ImageLoaderIntegration.Config>,
 
     companion object : SupabasePluginProvider<Config, ImageLoaderIntegration> {
 
-        override val key = "imageloader"
+        override val KEY = "imageloader"
+
+        override val LOGGER: SupabaseLogger = SupabaseClient.createLogger("Supabase-ComposeImageLoader")
 
         override fun create(supabaseClient: SupabaseClient, config: Config): ImageLoaderIntegration {
             return ImageLoaderIntegrationImpl(supabaseClient, config)
@@ -51,16 +54,17 @@ internal class ImageLoaderIntegrationImpl(
     override val config: ImageLoaderIntegration.Config
 ) : ImageLoaderIntegration {
 
-    override val logger: SupabaseLogger = config.logger(config.logLevel ?: supabaseClient.logLevel, "ImageLoader Integration")
-
     override fun create(data: Any, options: Options): Fetcher? {
         if(data !is StorageItem) return null
+        ImageLoaderIntegration.LOGGER.d { "Creating Storage Fetcher" }
         return SupabaseStorageFetcher(supabaseClient.storage, data)
     }
 
     override fun key(data: Any, options: Options, type: Keyer.Type): String? {
         if(data !is StorageItem) return null
-        return data.bucketId + data.path
+        val key = data.bucketId + data.path
+        ImageLoaderIntegration.LOGGER.d { "Key for $data created: $key" }
+        return key
     }
 
 }

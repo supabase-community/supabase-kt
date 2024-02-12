@@ -53,7 +53,11 @@ class SupabaseClientBuilder @PublishedApi internal constructor(private val supab
      *
      * Can be overridden by the plugin's config
      */
-    var defaultLogLevel: LogLevel = LogLevel.Debug
+    var defaultLogLevel: LogLevel
+        set(value) {
+            SupabaseClient.DEFAULT_LOG_LEVEL = value
+        }
+        get() = SupabaseClient.DEFAULT_LOG_LEVEL
 
     /**
      * The default serializer used to serialize and deserialize custom data types.
@@ -91,8 +95,7 @@ class SupabaseClientBuilder @PublishedApi internal constructor(private val supab
             useHTTPS,
             requestTimeout.inWholeMilliseconds,
             httpEngine,
-            defaultSerializer,
-            defaultLogLevel
+            defaultSerializer
         )
     }
 
@@ -116,7 +119,7 @@ class SupabaseClientBuilder @PublishedApi internal constructor(private val supab
     fun <Config : SupabasePluginConfig, PluginInstance : SupabasePlugin<Config>, Provider : SupabasePluginProvider<Config, PluginInstance>> install(plugin: Provider, init: @SupabaseDsl Config.() -> Unit = {}) {
         val config = plugin.createConfig(init)
         plugin.setup(this, config)
-        plugins[plugin.key] = {
+        plugins[plugin.KEY] = {
             plugin.create(it, config)
         }
     }

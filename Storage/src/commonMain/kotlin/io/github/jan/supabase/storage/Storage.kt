@@ -147,7 +147,9 @@ sealed interface Storage : MainPlugin<Storage.Config> {
 
     companion object : SupabasePluginProvider<Config, Storage> {
 
-        override val key: String = "storage"
+        override val KEY: String = "storage"
+
+        override val LOGGER: SupabaseLogger = SupabaseClient.createLogger("Supabase-Storage")
 
         /**
          * The api version of the storage plugin
@@ -171,12 +173,10 @@ sealed interface Storage : MainPlugin<Storage.Config> {
 internal class StorageImpl(override val supabaseClient: SupabaseClient, override val config: Storage.Config) : Storage {
 
     override val pluginKey: String
-        get() = Storage.key
+        get() = Storage.KEY
 
     override val apiVersion: Int
         get() = Storage.API_VERSION
-
-    override val logger: SupabaseLogger = config.logger(config.logLevel ?: supabaseClient.logLevel, "Storage")
 
     @OptIn(SupabaseInternal::class)
     internal val api = supabaseClient.authenticatedSupabaseApi(this) {

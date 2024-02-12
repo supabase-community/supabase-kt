@@ -10,7 +10,6 @@ import io.github.jan.supabase.exceptions.RestException
 import io.github.jan.supabase.exceptions.UnauthorizedRestException
 import io.github.jan.supabase.gotrue.Auth
 import io.github.jan.supabase.gotrue.authenticatedSupabaseApi
-import io.github.jan.supabase.logging.SupabaseLogger
 import io.github.jan.supabase.plugins.CustomSerializationConfig
 import io.github.jan.supabase.plugins.CustomSerializationPlugin
 import io.github.jan.supabase.plugins.MainConfig
@@ -50,9 +49,7 @@ class Functions(override val config: Config, override val supabaseClient: Supaba
         get() = API_VERSION
 
     override val pluginKey: String
-        get() = key
-
-    override val logger: SupabaseLogger = config.logger(config.logLevel ?: supabaseClient.logLevel)
+        get() = KEY
 
     override val serializer = config.serializer ?: supabaseClient.defaultSerializer
 
@@ -131,7 +128,9 @@ class Functions(override val config: Config, override val supabaseClient: Supaba
 
     companion object : SupabasePluginProvider<Config, Functions> {
 
-        override val key = "functions"
+        override val KEY = "functions"
+
+        override val LOGGER = SupabaseClient.createLogger("Supabase-Functions")
 
         /**
          * The current functions api version

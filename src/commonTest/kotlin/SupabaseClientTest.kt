@@ -18,7 +18,7 @@ class TestPlugin(private val config: Config) : SupabasePlugin {
 
     companion object : SupabasePluginProvider<Config, TestPlugin> {
 
-        override val key = "test"
+        override val KEY = "test"
 
         override fun createConfig(init: Config.() -> Unit): Config {
             return Config().apply(init)
