@@ -5,7 +5,6 @@ import io.github.jan.supabase.annotations.SupabaseInternal
 import io.github.jan.supabase.logging.LogLevel
 import io.github.jan.supabase.plugins.PluginManager
 import io.github.jan.supabase.plugins.SupabasePlugin
-import io.github.jan.supabase.plugins.SupabasePluginConfig
 import io.github.jan.supabase.plugins.SupabasePluginProvider
 import io.github.jan.supabase.serializer.KotlinXSerializer
 import io.ktor.client.HttpClientConfig
@@ -116,7 +115,7 @@ class SupabaseClientBuilder @PublishedApi internal constructor(private val supab
      * Plugins can be either retrieved by calling [PluginManager.getPlugin] within your [SupabaseClient] instance or by using the corresponding **SupabaseClient.plugin** extension property.
      */
     @SupabaseDsl
-    fun <Config : SupabasePluginConfig, PluginInstance : SupabasePlugin<Config>, Provider : SupabasePluginProvider<Config, PluginInstance>> install(plugin: Provider, init: @SupabaseDsl Config.() -> Unit = {}) {
+    fun <Config, PluginInstance : SupabasePlugin<Config>, Provider : SupabasePluginProvider<Config, PluginInstance>> install(plugin: Provider, init: @SupabaseDsl Config.() -> Unit = {}) {
         val config = plugin.createConfig(init)
         plugin.setup(this, config)
         plugins[plugin.KEY] = {
