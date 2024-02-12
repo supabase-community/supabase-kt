@@ -12,6 +12,7 @@ import io.github.jan.supabase.exceptions.UnauthorizedRestException
 import io.github.jan.supabase.exceptions.UnknownRestException
 import io.github.jan.supabase.gotrue.authenticatedSupabaseApi
 import io.github.jan.supabase.logging.SupabaseLogger
+import io.github.jan.supabase.logging.w
 import io.github.jan.supabase.plugins.MainConfig
 import io.github.jan.supabase.plugins.MainPlugin
 import io.github.jan.supabase.plugins.SupabasePluginProvider
@@ -133,6 +134,12 @@ sealed interface Storage : MainPlugin<Storage.Config> {
              * The default chunk size for resumable uploads. **Supabase currently only supports a chunk size of 6MB, so be careful when changing this value**
              */
             var defaultChunkSize: Long = DEFAULT_CHUNK_SIZE
+                set(value) {
+                    if(value != DEFAULT_CHUNK_SIZE) {
+                        Storage.logger.w { "Supabase currently only supports a chunk size of 6MB" }
+                    }
+                    field = value
+                }
 
         }
 
