@@ -70,6 +70,7 @@ class KermitSupabaseLogger(level: LogLevel?, tag: String, private val logger: Lo
         LogLevel.INFO -> Severity.Info
         LogLevel.WARNING -> Severity.Warn
         LogLevel.ERROR -> Severity.Error
+        LogLevel.NONE -> Severity.Assert
     }
 
 }
