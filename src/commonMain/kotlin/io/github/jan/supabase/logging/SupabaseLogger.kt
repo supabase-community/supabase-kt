@@ -38,26 +38,26 @@ class KermitSupabaseLogger(level: LogLevel?, tag: String, private val logger: Lo
     }
 
     private fun LogLevel.toSeverity() = when(this) {
-        LogLevel.Debug -> Severity.Debug
-        LogLevel.Info -> Severity.Info
-        LogLevel.Warning -> Severity.Warn
-        LogLevel.Error -> Severity.Error
+        LogLevel.DEBUG -> Severity.Debug
+        LogLevel.INFO -> Severity.Info
+        LogLevel.WARNING -> Severity.Warn
+        LogLevel.ERROR -> Severity.Error
     }
 
 }
 
 inline fun SupabaseLogger.d(throwable: Throwable? = null, message: () -> String) {
-    log(LogLevel.Debug, throwable, message)
+    log(LogLevel.DEBUG, throwable, message)
 }
 
 inline fun SupabaseLogger.i(throwable: Throwable? = null, message: () -> String) {
-    log(LogLevel.Info, throwable, message)
+    log(LogLevel.INFO, throwable, message)
 }
 
 inline fun SupabaseLogger.w(throwable: Throwable? = null, message: () -> String) {
-    log(LogLevel.Warning, throwable, message)
+    log(LogLevel.WARNING, throwable, message)
 }
 
 inline fun SupabaseLogger.e(throwable: Throwable? = null, message: () -> String) {
-    log(LogLevel.Error, throwable, message)
+    log(LogLevel.ERROR, throwable, message)
 }

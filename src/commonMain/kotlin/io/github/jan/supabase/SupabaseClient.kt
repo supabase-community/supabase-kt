@@ -60,7 +60,7 @@ sealed interface SupabaseClient {
 
     companion object {
 
-        var DEFAULT_LOG_LEVEL = LogLevel.Info
+        var DEFAULT_LOG_LEVEL = LogLevel.INFO
             internal set
 
         internal val LOGGER = createLogger("Supabase-Core")
