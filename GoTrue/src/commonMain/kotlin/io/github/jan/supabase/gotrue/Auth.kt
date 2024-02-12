@@ -1,6 +1,5 @@
 package io.github.jan.supabase.gotrue
 
-import co.touchlab.kermit.Logger
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.annotations.SupabaseExperimental
 import io.github.jan.supabase.exceptions.HttpRequestException
@@ -17,6 +16,8 @@ import io.github.jan.supabase.gotrue.providers.builtin.SSO
 import io.github.jan.supabase.gotrue.user.UserInfo
 import io.github.jan.supabase.gotrue.user.UserSession
 import io.github.jan.supabase.gotrue.user.UserUpdateBuilder
+import io.github.jan.supabase.logging.SupabaseLogger
+import io.github.jan.supabase.logging.e
 import io.github.jan.supabase.plugins.CustomSerializationPlugin
 import io.github.jan.supabase.plugins.MainPlugin
 import io.github.jan.supabase.plugins.SupabasePluginProvider
@@ -362,6 +363,8 @@ sealed interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
 
         override val key = "auth"
 
+        override val logger: SupabaseLogger = SupabaseClient.createLogger("Supabase-Auth")
+
         /**
          * The gotrue api version to use
          */
@@ -383,6 +386,6 @@ val SupabaseClient.auth: Auth
 private suspend fun Auth.tryToGetUser(jwt: String) = try {
     retrieveUser(jwt)
 } catch (e: Exception) {
-    Logger.e(e, "Auth") { "Couldn't retrieve user using your custom jwt token. If you use the project secret ignore this message" }
+    Auth.logger.e(e) { "Couldn't retrieve user using your custom jwt token. If you use the project secret ignore this message" }
     null
 }

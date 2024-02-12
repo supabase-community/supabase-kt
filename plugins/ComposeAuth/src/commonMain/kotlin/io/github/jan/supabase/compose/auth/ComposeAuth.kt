@@ -7,6 +7,7 @@ import io.github.jan.supabase.gotrue.providers.Apple
 import io.github.jan.supabase.gotrue.providers.Google
 import io.github.jan.supabase.gotrue.providers.IDTokenProvider
 import io.github.jan.supabase.gotrue.providers.builtin.IDToken
+import io.github.jan.supabase.logging.SupabaseLogger
 import io.github.jan.supabase.plugins.SupabasePlugin
 import io.github.jan.supabase.plugins.SupabasePluginProvider
 
@@ -47,17 +48,7 @@ import io.github.jan.supabase.plugins.SupabasePluginProvider
  * }
  *  ```
  */
-sealed interface ComposeAuth : SupabasePlugin {
-
-    /**
-     * Returns Native Auth configurations
-     */
-    val config: Config
-
-    /**
-     * The corresponding [SupabaseClient] instance
-     */
-    val supabaseClient: SupabaseClient
+sealed interface ComposeAuth : SupabasePlugin<ComposeAuth.Config> {
 
     /**
      * Config for [ComposeAuth]
@@ -66,11 +57,13 @@ sealed interface ComposeAuth : SupabasePlugin {
      */
     data class Config(
         val loginConfig: MutableMap<String, LoginConfig> = mutableMapOf()
-    ) : SupabasePlugin
+    )
 
     companion object : SupabasePluginProvider<Config, ComposeAuth> {
 
         override val key: String = "composeauth"
+
+        override val logger: SupabaseLogger = SupabaseClient.createLogger("Supabase-ComposeAuth")
 
         override fun create(supabaseClient: SupabaseClient, config: Config): ComposeAuth {
             return ComposeAuthImpl(config, supabaseClient)

@@ -4,6 +4,7 @@ import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.SupabaseClientBuilder
 import io.github.jan.supabase.SupabaseSerializer
 import io.github.jan.supabase.annotations.SupabaseInternal
+import io.github.jan.supabase.logging.SupabaseLogger
 import io.github.jan.supabase.plugins.CustomSerializationConfig
 import io.github.jan.supabase.plugins.CustomSerializationPlugin
 import io.github.jan.supabase.plugins.MainConfig
@@ -101,12 +102,10 @@ sealed interface Realtime : MainPlugin<Realtime.Config>, CustomSerializationPlug
         var secure: Boolean? = null,
         var heartbeatInterval: Duration = 15.seconds,
         var reconnectDelay: Duration = 7.seconds,
-        override var customUrl: String? = null,
-        override var jwtToken: String? = null,
         var disconnectOnSessionLoss: Boolean = true,
         var connectOnSubscribe: Boolean = true,
         var disconnectOnNoSubscriptions: Boolean = true,
-    ): MainConfig, CustomSerializationConfig {
+    ): MainConfig(), CustomSerializationConfig {
 
         override var serializer: SupabaseSerializer? = null
 
@@ -115,6 +114,8 @@ sealed interface Realtime : MainPlugin<Realtime.Config>, CustomSerializationPlug
     companion object : SupabasePluginProvider<Config, Realtime> {
 
         override val key = "realtime"
+
+        override val logger: SupabaseLogger = SupabaseClient.createLogger("Supabase-Realtime")
 
         /**
          * The current realtime api version

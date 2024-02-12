@@ -12,12 +12,12 @@ import kotlin.time.Duration.Companion.seconds
 /**
  * The configuration for [Auth]
  */
-expect class AuthConfig() : MainConfig, CustomSerializationConfig, AuthConfigDefaults
+expect class AuthConfig() : CustomSerializationConfig, AuthConfigDefaults
 
 /**
  * The default values for the [AuthConfig]
  */
-open class AuthConfigDefaults {
+open class AuthConfigDefaults : MainConfig() {
 
     /**
      * The duration after which [Auth] should retry refreshing a session, when it failed due to network issues
@@ -58,16 +58,6 @@ open class AuthConfigDefaults {
      * The type of login flow to use. Defaults to [FlowType.IMPLICIT]
      */
     var flowType: FlowType = FlowType.IMPLICIT
-
-    /**
-     * The custom url to use for the gotrue instance. When null, the default url will be used
-     */
-    var customUrl: String? = null
-
-    /**
-     * The custom jwt token to use for the gotrue instance. When null, the jwt token from the GoTrue session or the supabaseKey will be used
-     */
-    var jwtToken: String? = null
 
     /**
      * A serializer used for serializing/deserializing objects e.g. in [Auth.signInWith]. Defaults to [SupabaseClientBuilder.defaultSerializer], when null.

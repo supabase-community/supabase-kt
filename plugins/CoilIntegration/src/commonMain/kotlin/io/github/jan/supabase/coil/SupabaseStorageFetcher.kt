@@ -5,6 +5,7 @@ import coil.ImageLoader
 import coil.fetch.FetchResult
 import coil.fetch.Fetcher
 import coil.request.Options
+import io.github.jan.supabase.logging.d
 import io.github.jan.supabase.storage.Storage
 import io.github.jan.supabase.storage.StorageItem
 import io.github.jan.supabase.storage.authenticatedRequest
@@ -17,6 +18,7 @@ internal class SupabaseStorageFetcher(
 ) : Fetcher {
 
     override suspend fun fetch(): FetchResult? {
+        CoilIntegration.logger.d { "Received fetcher request for item $item" }
         val bucket = storage[item.bucketId]
         val (token, url) = if (item.authenticated) {
             bucket.authenticatedRequest(item.path)
