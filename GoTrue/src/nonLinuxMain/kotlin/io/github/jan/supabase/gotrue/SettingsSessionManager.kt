@@ -14,7 +14,7 @@ import kotlinx.serialization.encodeToString
  */
 class SettingsSessionManager(
     settings: Settings = createDefaultSettings(),
-    private val logger: SupabaseLogger
+    private val logger: SupabaseLogger //Some better solution as this doesn't really work
 ) : SessionManager {
 
     private val suspendSettings = settings.toSuspendSettings()
