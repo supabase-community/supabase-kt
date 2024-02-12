@@ -2,19 +2,13 @@ package io.github.jan.supabase.plugins
 
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.SupabaseClientBuilder
-import io.github.jan.supabase.logging.KermitSupabaseLogger
 import io.github.jan.supabase.logging.LogLevel
 import io.github.jan.supabase.logging.SupabaseLogger
-
-open class SupabasePluginConfig {
-    var logLevel: LogLevel? = null
-    var logger: (level: LogLevel, tag: String) -> SupabaseLogger = { level, tag -> KermitSupabaseLogger(level, tag) }
-}
 
 /**
  * A plugin is a feature that can be installed into the supabase client
  */
-interface SupabasePlugin<Config : SupabasePluginConfig> {
+interface SupabasePlugin<Config> {
 
     val config: Config
     val supabaseClient: SupabaseClient
@@ -29,7 +23,7 @@ interface SupabasePlugin<Config : SupabasePluginConfig> {
 /**
  * A plugin provider is used to create a plugin instance. Typically inherited by a companion object of the plugin
  */
-interface SupabasePluginProvider<Config : SupabasePluginConfig, PluginInstance : SupabasePlugin<Config>> {
+interface SupabasePluginProvider<Config, PluginInstance : SupabasePlugin<Config>> {
 
     /**
      * The key of this plugin. This key is used to identify the plugin within the [PluginManager]

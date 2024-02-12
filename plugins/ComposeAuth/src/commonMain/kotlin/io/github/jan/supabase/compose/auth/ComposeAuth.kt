@@ -9,7 +9,6 @@ import io.github.jan.supabase.gotrue.providers.IDTokenProvider
 import io.github.jan.supabase.gotrue.providers.builtin.IDToken
 import io.github.jan.supabase.logging.SupabaseLogger
 import io.github.jan.supabase.plugins.SupabasePlugin
-import io.github.jan.supabase.plugins.SupabasePluginConfig
 import io.github.jan.supabase.plugins.SupabasePluginProvider
 
 /**
@@ -58,7 +57,7 @@ sealed interface ComposeAuth : SupabasePlugin<ComposeAuth.Config> {
      */
     data class Config(
         val loginConfig: MutableMap<String, LoginConfig> = mutableMapOf()
-    ) : SupabasePluginConfig()
+    )
 
     companion object : SupabasePluginProvider<Config, ComposeAuth> {
 

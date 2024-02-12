@@ -10,7 +10,7 @@ import io.ktor.http.appendEncodedPathSegments
 /**
  * Config for [MainPlugin]s
  */
-open class MainConfig : SupabasePluginConfig() {
+open class MainConfig {
 
     /**
      * The url used for this module

@@ -9,7 +9,6 @@ import io.github.jan.supabase.annotations.SupabaseExperimental
 import io.github.jan.supabase.logging.SupabaseLogger
 import io.github.jan.supabase.logging.d
 import io.github.jan.supabase.plugins.SupabasePlugin
-import io.github.jan.supabase.plugins.SupabasePluginConfig
 import io.github.jan.supabase.plugins.SupabasePluginProvider
 import io.github.jan.supabase.storage.StorageItem
 import io.github.jan.supabase.storage.storage
@@ -22,7 +21,7 @@ interface CoilIntegration: SupabasePlugin<CoilIntegration.Config>, Fetcher.Facto
     /**
      * The configuration for the coil integration.
      */
-    class Config: SupabasePluginConfig()
+    class Config
 
     companion object : SupabasePluginProvider<Config, CoilIntegration> {
 

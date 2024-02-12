@@ -11,7 +11,6 @@ import io.github.jan.supabase.annotations.SupabaseExperimental
 import io.github.jan.supabase.logging.SupabaseLogger
 import io.github.jan.supabase.logging.d
 import io.github.jan.supabase.plugins.SupabasePlugin
-import io.github.jan.supabase.plugins.SupabasePluginConfig
 import io.github.jan.supabase.plugins.SupabasePluginProvider
 import io.github.jan.supabase.storage.StorageItem
 import io.github.jan.supabase.storage.storage
@@ -29,7 +28,7 @@ interface ImageLoaderIntegration: SupabasePlugin<ImageLoaderIntegration.Config>,
     /**
      * The configuration for the [ImageLoader] integration.
      */
-    class Config: SupabasePluginConfig()
+    class Config
 
     companion object : SupabasePluginProvider<Config, ImageLoaderIntegration> {
 

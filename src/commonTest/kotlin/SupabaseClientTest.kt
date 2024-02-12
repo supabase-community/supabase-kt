@@ -2,6 +2,7 @@ import io.github.jan.supabase.BuildConfig
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.SupabaseClientBuilder
 import io.github.jan.supabase.createSupabaseClient
+import io.github.jan.supabase.logging.SupabaseLogger
 import io.github.jan.supabase.plugins.SupabasePlugin
 import io.github.jan.supabase.plugins.SupabasePluginProvider
 import io.ktor.client.engine.mock.MockEngine
@@ -12,7 +13,7 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 
-class TestPlugin(private val config: Config) : SupabasePlugin {
+class TestPlugin(override val config: Config, override val supabaseClient: SupabaseClient) : SupabasePlugin<TestPlugin.Config> {
 
     data class Config(var testValue: Boolean = false)
 
@@ -20,12 +21,14 @@ class TestPlugin(private val config: Config) : SupabasePlugin {
 
         override val KEY = "test"
 
+        override val LOGGER: SupabaseLogger = SupabaseClient.createLogger("Test")
+
         override fun createConfig(init: Config.() -> Unit): Config {
             return Config().apply(init)
         }
 
         override fun create(supabaseClient: SupabaseClient, config: Config): TestPlugin {
-            return TestPlugin(config)
+            return TestPlugin(config, supabaseClient)
         }
 
         override fun setup(builder: SupabaseClientBuilder, config: Config) {
