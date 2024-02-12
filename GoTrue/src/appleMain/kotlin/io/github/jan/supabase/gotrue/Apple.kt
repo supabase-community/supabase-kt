@@ -16,14 +16,14 @@ import platform.Foundation.NSURLQueryItem
  */
 fun SupabaseClient.handleDeeplinks(url: NSURL, onSessionSuccess: (UserSession) -> Unit = {}) {
     if (url.scheme != auth.config.scheme || url.host != auth.config.host) {
-        auth.logger.d { "Received deeplink with wrong scheme or host" }
+        Auth.logger.d { "Received deeplink with wrong scheme or host" }
         return
     }
     when (auth.config.flowType) {
         FlowType.IMPLICIT -> {
             val fragment = url.fragment
             if (fragment == null) {
-                auth.logger.d { "No fragment for deeplink" }
+                Auth.logger.d { "No fragment for deeplink" }
                 return
             }
             auth.parseFragmentAndImportSession(fragment, onSessionSuccess)
