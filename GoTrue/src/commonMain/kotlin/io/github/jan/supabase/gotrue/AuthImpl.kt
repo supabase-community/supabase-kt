@@ -76,22 +76,22 @@ internal class AuthImpl(
         get() = Auth.API_VERSION
 
     override val pluginKey: String
-        get() = Auth.KEY
+        get() = Auth.key
 
     override fun init() {
         setupPlatform()
         if (config.autoLoadFromStorage) {
             authScope.launch {
-                Auth.LOGGER.i {
+                Auth.logger.i {
                     "Trying to load latest session from storage."
                 }
                 val successful = loadFromStorage()
                 if (successful) {
-                    Auth.LOGGER.i {
+                    Auth.logger.i {
                         "Successfully loaded session from storage!"
                     }
                 } else {
-                    Auth.LOGGER.i {
+                    Auth.logger.i {
                         "No session found."
                     }
                     _sessionStatus.value = SessionStatus.NotAuthenticated
@@ -294,14 +294,14 @@ internal class AuthImpl(
             api.post("logout") {
                 parameter("scope", scope.name.lowercase())
             }
-            Auth.LOGGER.d { "Logged out session in Supabase" }
+            Auth.logger.d { "Logged out session in Supabase" }
         } else {
-            Auth.LOGGER.i { "Skipping session logout as there is no session available. Proceeding to clean up local data..." }
+            Auth.logger.i { "Skipping session logout as there is no session available. Proceeding to clean up local data..." }
         }
         if (scope != SignOutScope.OTHERS) {
             clearSession()
         }
-        Auth.LOGGER.d { "Successfully logged out" }
+        Auth.logger.d { "Successfully logged out" }
     }
 
     private suspend fun verify(
@@ -378,7 +378,7 @@ internal class AuthImpl(
     }
 
     override suspend fun refreshSession(refreshToken: String): UserSession {
-        Auth.LOGGER.d {
+        Auth.logger.d {
             "Refreshing session"
         }
         val body = buildJsonObject {
@@ -435,9 +435,9 @@ internal class AuthImpl(
             importRefreshedSession()
         } catch (e: RestException) {
             clearSession()
-            Auth.LOGGER.e(e) { "Couldn't refresh session. The refresh token may have been revoked." }
+            Auth.logger.e(e) { "Couldn't refresh session. The refresh token may have been revoked." }
         } catch (e: Exception) {
-            Auth.LOGGER.e(e) { "Couldn't reach supabase. Either the address doesn't exist or the network might not be on. Retrying in ${config.retryDelay}" }
+            Auth.logger.e(e) { "Couldn't reach supabase. Either the address doesn't exist or the network might not be on. Retrying in ${config.retryDelay}" }
             _sessionStatus.value = SessionStatus.NetworkError
             delay(config.retryDelay)
             retry()
@@ -454,7 +454,7 @@ internal class AuthImpl(
     }
 
     private suspend fun handleExpiredSession(session: UserSession, autoRefresh: Boolean = true) {
-        Auth.LOGGER.d {
+        Auth.logger.d {
             "Session expired. Refreshing session..."
         }
         val newSession = refreshSession(session.refreshToken)

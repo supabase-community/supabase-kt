@@ -113,9 +113,9 @@ sealed interface Realtime : MainPlugin<Realtime.Config>, CustomSerializationPlug
 
     companion object : SupabasePluginProvider<Config, Realtime> {
 
-        override val KEY = "realtime"
+        override val key = "realtime"
 
-        override val LOGGER: SupabaseLogger = SupabaseClient.createLogger("Supabase-Realtime")
+        override val logger: SupabaseLogger = SupabaseClient.createLogger("Supabase-Realtime")
 
         /**
          * The current realtime api version

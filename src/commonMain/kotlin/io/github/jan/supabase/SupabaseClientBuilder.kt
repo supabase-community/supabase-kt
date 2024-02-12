@@ -118,7 +118,7 @@ class SupabaseClientBuilder @PublishedApi internal constructor(private val supab
     fun <Config, PluginInstance : SupabasePlugin<Config>, Provider : SupabasePluginProvider<Config, PluginInstance>> install(plugin: Provider, init: @SupabaseDsl Config.() -> Unit = {}) {
         val config = plugin.createConfig(init)
         plugin.setup(this, config)
-        plugins[plugin.KEY] = {
+        plugins[plugin.key] = {
             plugin.create(it, config)
         }
     }

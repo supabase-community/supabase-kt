@@ -61,9 +61,9 @@ sealed interface ComposeAuth : SupabasePlugin<ComposeAuth.Config> {
 
     companion object : SupabasePluginProvider<Config, ComposeAuth> {
 
-        override val KEY: String = "composeauth"
+        override val key: String = "composeauth"
 
-        override val LOGGER: SupabaseLogger = SupabaseClient.createLogger("Supabase-ComposeAuth")
+        override val logger: SupabaseLogger = SupabaseClient.createLogger("Supabase-ComposeAuth")
 
         override fun create(supabaseClient: SupabaseClient, config: Config): ComposeAuth {
             return ComposeAuthImpl(config, supabaseClient)

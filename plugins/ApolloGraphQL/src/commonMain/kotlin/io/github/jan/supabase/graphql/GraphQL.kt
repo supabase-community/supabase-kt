@@ -49,9 +49,9 @@ sealed interface GraphQL: MainPlugin<GraphQL.Config> {
 
     companion object: SupabasePluginProvider<Config, GraphQL> {
 
-        override val KEY: String = "graphql"
+        override val key: String = "graphql"
 
-        override val LOGGER: SupabaseLogger = SupabaseClient.createLogger("Supabase-ApolloGraphQL")
+        override val logger: SupabaseLogger = SupabaseClient.createLogger("Supabase-ApolloGraphQL")
 
         /**
          * The current graphql api version
@@ -73,7 +73,7 @@ sealed interface GraphQL: MainPlugin<GraphQL.Config> {
 internal class GraphQLImpl(override val config: GraphQL.Config, override val supabaseClient: SupabaseClient) : GraphQL {
 
     override val apiVersion: Int = GraphQL.API_VERSION
-    override val pluginKey: String = GraphQL.KEY
+    override val pluginKey: String = GraphQL.key
     override val apolloClient = ApolloClient.Builder().apply {
         serverUrl(config.customUrl ?: resolveUrl())
         addHttpHeader("apikey", supabaseClient.supabaseKey)
@@ -91,7 +91,7 @@ internal class GraphQLImpl(override val config: GraphQL.Config, override val sup
             request: ApolloHttpRequest,
             chain: HttpInterceptorChain
         ): ApolloHttpResponse {
-            GraphQL.LOGGER.d { "Intercepting Apollo request with url ${request.url}" }
+            GraphQL.logger.d { "Intercepting Apollo request with url ${request.url}" }
             val accessToken = config.jwtToken ?: supabaseClient.pluginManager.getPluginOrNull(Auth)?.currentAccessTokenOrNull() ?: supabaseClient.supabaseKey
             val newRequest = request.newBuilder().apply {
                 addHeader(HttpHeaders.Authorization, "Bearer $accessToken")

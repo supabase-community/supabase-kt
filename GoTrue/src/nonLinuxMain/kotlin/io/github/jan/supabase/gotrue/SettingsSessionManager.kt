@@ -28,7 +28,7 @@ class SettingsSessionManager(
         return try {
             supabaseJson.decodeFromString(session)
         } catch(e: Exception) {
-            Auth.LOGGER.e(e) { "Failed to load session" }
+            Auth.logger.e(e) { "Failed to load session" }
             null
         }
     }

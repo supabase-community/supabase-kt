@@ -32,9 +32,9 @@ interface ImageLoaderIntegration: SupabasePlugin<ImageLoaderIntegration.Config>,
 
     companion object : SupabasePluginProvider<Config, ImageLoaderIntegration> {
 
-        override val KEY = "imageloader"
+        override val key = "imageloader"
 
-        override val LOGGER: SupabaseLogger = SupabaseClient.createLogger("Supabase-ComposeImageLoader")
+        override val logger: SupabaseLogger = SupabaseClient.createLogger("Supabase-ComposeImageLoader")
 
         override fun create(supabaseClient: SupabaseClient, config: Config): ImageLoaderIntegration {
             return ImageLoaderIntegrationImpl(supabaseClient, config)
@@ -55,14 +55,14 @@ internal class ImageLoaderIntegrationImpl(
 
     override fun create(data: Any, options: Options): Fetcher? {
         if(data !is StorageItem) return null
-        ImageLoaderIntegration.LOGGER.d { "Creating Storage Fetcher" }
+        ImageLoaderIntegration.logger.d { "Creating Storage Fetcher" }
         return SupabaseStorageFetcher(supabaseClient.storage, data)
     }
 
     override fun key(data: Any, options: Options, type: Keyer.Type): String? {
         if(data !is StorageItem) return null
         val key = data.bucketId + data.path
-        ImageLoaderIntegration.LOGGER.d { "Key for $data created: $key" }
+        ImageLoaderIntegration.logger.d { "Key for $data created: $key" }
         return key
     }
 

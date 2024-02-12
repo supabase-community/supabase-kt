@@ -74,9 +74,9 @@ sealed interface Postgrest : MainPlugin<Postgrest.Config>, CustomSerializationPl
 
     companion object : SupabasePluginProvider<Config, Postgrest> {
 
-        override val KEY = "rest"
+        override val key = "rest"
 
-        override val LOGGER: SupabaseLogger = SupabaseClient.createLogger("Supabase-PostgREST")
+        override val logger: SupabaseLogger = SupabaseClient.createLogger("Supabase-PostgREST")
 
         /**
          * The current postgrest API version

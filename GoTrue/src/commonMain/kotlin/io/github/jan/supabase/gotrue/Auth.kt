@@ -361,9 +361,9 @@ sealed interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
 
     companion object : SupabasePluginProvider<AuthConfig, Auth> {
 
-        override val KEY = "auth"
+        override val key = "auth"
 
-        override val LOGGER: SupabaseLogger = SupabaseClient.createLogger("Supabase-Auth")
+        override val logger: SupabaseLogger = SupabaseClient.createLogger("Supabase-Auth")
 
         /**
          * The gotrue api version to use
@@ -386,6 +386,6 @@ val SupabaseClient.auth: Auth
 private suspend fun Auth.tryToGetUser(jwt: String) = try {
     retrieveUser(jwt)
 } catch (e: Exception) {
-    Auth.LOGGER.e(e) { "Couldn't retrieve user using your custom jwt token. If you use the project secret ignore this message" }
+    Auth.logger.e(e) { "Couldn't retrieve user using your custom jwt token. If you use the project secret ignore this message" }
     null
 }

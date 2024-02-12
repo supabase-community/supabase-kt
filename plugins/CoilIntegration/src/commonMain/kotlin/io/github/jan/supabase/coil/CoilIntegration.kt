@@ -25,9 +25,9 @@ interface CoilIntegration: SupabasePlugin<CoilIntegration.Config>, Fetcher.Facto
 
     companion object : SupabasePluginProvider<Config, CoilIntegration> {
 
-        override val KEY = "coil"
+        override val key = "coil"
 
-        override val LOGGER: SupabaseLogger = SupabaseClient.createLogger("Supabase-CoilIntegration")
+        override val logger: SupabaseLogger = SupabaseClient.createLogger("Supabase-CoilIntegration")
 
         override fun create(supabaseClient: SupabaseClient, config: Config): CoilIntegration {
             return CoilIntegrationImpl(supabaseClient, config)
@@ -47,7 +47,7 @@ internal class CoilIntegrationImpl(
 ) : CoilIntegration {
 
     override fun create(data: StorageItem, options: Options, imageLoader: ImageLoader): Fetcher {
-        CoilIntegration.LOGGER.d { "Creating Storage Fetcher" }
+        CoilIntegration.logger.d { "Creating Storage Fetcher" }
         return SupabaseStorageFetcher(supabaseClient.storage, data, options, imageLoader)
     }
 

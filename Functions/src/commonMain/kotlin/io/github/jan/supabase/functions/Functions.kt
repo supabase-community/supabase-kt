@@ -49,7 +49,7 @@ class Functions(override val config: Config, override val supabaseClient: Supaba
         get() = API_VERSION
 
     override val pluginKey: String
-        get() = KEY
+        get() = key
 
     override val serializer = config.serializer ?: supabaseClient.defaultSerializer
 
@@ -128,9 +128,9 @@ class Functions(override val config: Config, override val supabaseClient: Supaba
 
     companion object : SupabasePluginProvider<Config, Functions> {
 
-        override val KEY = "functions"
+        override val key = "functions"
 
-        override val LOGGER = SupabaseClient.createLogger("Supabase-Functions")
+        override val logger = SupabaseClient.createLogger("Supabase-Functions")
 
         /**
          * The current functions api version

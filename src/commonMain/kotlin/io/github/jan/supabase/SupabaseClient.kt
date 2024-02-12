@@ -3,6 +3,7 @@ package io.github.jan.supabase
 import io.github.jan.supabase.annotations.SupabaseInternal
 import io.github.jan.supabase.logging.KermitSupabaseLogger
 import io.github.jan.supabase.logging.LogLevel
+import io.github.jan.supabase.logging.SupabaseLogger
 import io.github.jan.supabase.logging.i
 import io.github.jan.supabase.network.KtorSupabaseHttpClient
 import io.github.jan.supabase.plugins.MainPlugin
@@ -60,11 +61,19 @@ sealed interface SupabaseClient {
 
     companion object {
 
+        /**
+         * The default logging level used for plugins. Can be changed within the [SupabaseClientBuilder]
+         */
         var DEFAULT_LOG_LEVEL = LogLevel.INFO
             internal set
 
         internal val LOGGER = createLogger("Supabase-Core")
 
+        /**
+         * Creates a new [SupabaseLogger] using the [KermitSupabaseLogger] implementation.
+         * @param tag The tag for the logger
+         * @param level The logging level. If set to null, the [DEFAULT_LOG_LEVEL] property will be used instead
+         */
         fun createLogger(tag: String, level: LogLevel? = null) = KermitSupabaseLogger(level, tag)
 
     }

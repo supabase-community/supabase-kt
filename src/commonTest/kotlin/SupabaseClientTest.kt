@@ -19,9 +19,9 @@ class TestPlugin(override val config: Config, override val supabaseClient: Supab
 
     companion object : SupabasePluginProvider<Config, TestPlugin> {
 
-        override val KEY = "test"
+        override val key = "test"
 
-        override val LOGGER: SupabaseLogger = SupabaseClient.createLogger("Test")
+        override val logger: SupabaseLogger = SupabaseClient.createLogger("Test")
 
         override fun createConfig(init: Config.() -> Unit): Config {
             return Config().apply(init)

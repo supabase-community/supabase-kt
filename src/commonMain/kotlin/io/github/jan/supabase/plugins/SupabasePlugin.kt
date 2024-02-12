@@ -10,7 +10,14 @@ import io.github.jan.supabase.logging.SupabaseLogger
  */
 interface SupabasePlugin<Config> {
 
+    /**
+     * The config for this plugin
+     */
     val config: Config
+
+    /**
+     * The corresponding [SupabaseClient]
+     */
     val supabaseClient: SupabaseClient
 
     /**
@@ -28,12 +35,12 @@ interface SupabasePluginProvider<Config, PluginInstance : SupabasePlugin<Config>
     /**
      * The key of this plugin. This key is used to identify the plugin within the [PluginManager]
      */
-    val KEY: String
+    val key: String
 
     /**
      * The logger used in this plugin.
      */
-    val LOGGER: SupabaseLogger
+    val logger: SupabaseLogger
 
     /**
      * Create a config for this plugin using the [init] function
@@ -54,7 +61,7 @@ interface SupabasePluginProvider<Config, PluginInstance : SupabasePlugin<Config>
      * Updates the plugin's logging level
      */
     fun setLoggingLevel(level: LogLevel) {
-        LOGGER.setLevel(level)
+        logger.setLevel(level)
     }
 
 }
