@@ -16,11 +16,12 @@ sealed interface OtpType {
      * Email OTP types
      */
     enum class Email(override val type: String): OtpType {
-        MAGIC_LINK("magiclink"),
-        SIGNUP("signup"),
+        @Deprecated("Use OtpType.Email.EMAIL instead", ReplaceWith("OtpType.Email.EMAIL")) MAGIC_LINK("magiclink"),
+        @Deprecated("Use OtpType.Email.EMAIL instead", ReplaceWith("OtpType.Email.EMAIL")) SIGNUP("signup"),
         INVITE("invite"),
         RECOVERY("recovery"),
-        EMAIL_CHANGE("email_change")
+        EMAIL_CHANGE("email_change"),
+        EMAIL("email")
     }
 
     /**

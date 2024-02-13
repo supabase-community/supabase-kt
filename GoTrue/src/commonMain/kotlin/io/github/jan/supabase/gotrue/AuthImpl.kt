@@ -141,7 +141,7 @@ internal class AuthImpl(
             val session = currentSessionOrNull() ?: return
             val newUser = session.user?.copy(identities = session.user.identities?.filter { it.identityId != identityId })
             val newSession = session.copy(user = newUser)
-            _sessionStatus.value = SessionStatus.Authenticated(newSession)
+            _sessionStatus.value = SessionStatus.Authenticated(newSession, sessionStatus.value)
         }
     }
 
@@ -214,7 +214,7 @@ internal class AuthImpl(
             if (this.config.autoSaveToStorage) {
                 sessionManager.saveSession(newSession)
             }
-            _sessionStatus.value = SessionStatus.Authenticated(newSession)
+            _sessionStatus.value = SessionStatus.Authenticated(newSession, sessionStatus.value)
         }
         return userInfo
     }
@@ -350,7 +350,7 @@ internal class AuthImpl(
         val user = retrieveUser(currentAccessTokenOrNull() ?: error("No session found"))
         if (updateSession) {
             val session = currentSessionOrNull() ?: error("No session found")
-            val newStatus = SessionStatus.Authenticated(session.copy(user = user))
+            val newStatus = SessionStatus.Authenticated(session.copy(user = user), sessionStatus.value)
             _sessionStatus.value = newStatus
             if (config.autoSaveToStorage) sessionManager.saveSession(newStatus.session)
         }
@@ -395,7 +395,7 @@ internal class AuthImpl(
 
     override suspend fun importSession(session: UserSession, autoRefresh: Boolean) {
         if (!autoRefresh) {
-            _sessionStatus.value = SessionStatus.Authenticated(session)
+            _sessionStatus.value = SessionStatus.Authenticated(session, sessionStatus.value)
             if (session.refreshToken.isNotBlank() && session.expiresIn != 0L && config.autoSaveToStorage) {
                 sessionManager.saveSession(session)
             }
@@ -407,7 +407,7 @@ internal class AuthImpl(
                 { importSession(session) }
             )
         } else {
-            _sessionStatus.value = SessionStatus.Authenticated(session)
+            _sessionStatus.value = SessionStatus.Authenticated(session, sessionStatus.value)
             if (config.autoSaveToStorage) sessionManager.saveSession(session)
             sessionJob?.cancel()
             sessionJob = authScope.launch {
@@ -539,6 +539,10 @@ internal class AuthImpl(
 
     override suspend fun awaitInitialization() {
         sessionStatus.first { it !is SessionStatus.LoadingFromStorage }
+    }
+
+    fun resetLoadingState() {
+        _sessionStatus.value = SessionStatus.LoadingFromStorage
     }
 
 }
