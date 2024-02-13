@@ -19,19 +19,11 @@ actual class AuthConfig : CustomSerializationConfig, AuthConfigDefaults() {
      */
     var timeout: Duration = 1.minutes
 
-    /**
-     * The title of the redirect page, when logging in with OAuth. Defaults to "Supabase Auth".
-     */
     var htmlTitle: String = "Supabase Auth"
 
     /**
-     * The text of the redirect page, when logging in with OAuth. Defaults to "Logged in. You may continue in your app.".
+     * The html content of the redirect page, when logging in with OAuth. Defaults to a page with a title, text and icon.
      */
-    var htmlText: String = "Logged in. You may continue in your app."
-
-    /**
-     * The icon of the redirect page, when logging in with OAuth. Defaults to "https://supabase.com/brand-assets/supabase-logo-icon.png".
-     */
-    var htmlIconUrl: String = "https://supabase.com/brand-assets/supabase-logo-icon.png"
+    var redirectHtml: String = HTML.redirectPage("https://supabase.com/brand-assets/supabase-logo-icon.png", "Supabase Auth", "Logged in. You may continue in your app")
 
 }

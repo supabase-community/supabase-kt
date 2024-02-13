@@ -63,7 +63,14 @@ kotlin {
          //       api(libs.cache4k)
             }
         }
-        val nonJvmMain by creating {
+        val desktopMain by creating {
+            dependsOn(commonMain)
+            dependencies {
+                api(libs.ktor.server.core)
+                api(libs.ktor.server.cio)
+            }
+        }
+        val nonDesktopMain by creating {
             dependsOn(commonMain)
         }
         val nonLinuxMain by creating {
@@ -79,9 +86,7 @@ kotlin {
         }
         val jvmMain by getting {
             dependsOn(nonLinuxMain)
-            dependencies {
-                implementation(libs.javalin)
-            }
+            dependsOn(desktopMain)
         }
         val androidMain by getting {
             dependsOn(nonLinuxMain)
@@ -92,18 +97,31 @@ kotlin {
         }
         val mingwX64Main by getting {
             dependsOn(nonLinuxMain)
-            dependsOn(nonJvmMain)
+            dependsOn(nonDesktopMain) //no ktor server engine supports the windows target
+            //dependsOn(desktopMain)
         }
         val appleMain by getting {
             dependsOn(nonLinuxMain)
-            dependsOn(nonJvmMain)
+            dependsOn(desktopMain)
         }
         val jsMain by getting {
             dependsOn(nonLinuxMain)
-            dependsOn(nonJvmMain)
+            dependsOn(nonDesktopMain)
         }
         val linuxMain by getting {
-            dependsOn(nonJvmMain)
+            dependsOn(desktopMain)
+        }
+        val iosMain by getting {
+            dependsOn(nonDesktopMain)
+        }
+        val tvosMain by getting {
+            dependsOn(nonDesktopMain)
+        }
+        val watchosMain by getting {
+            dependsOn(nonDesktopMain)
+        }
+        val macosMain by getting {
+            dependsOn(desktopMain)
         }
     }
 }

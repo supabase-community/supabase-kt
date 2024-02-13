@@ -1,19 +1,20 @@
-package io.github.jan.supabase.gotrue.providers
+package io.github.jan.supabase.gotrue
 
 import io.github.jan.supabase.annotations.SupabaseExperimental
-import io.github.jan.supabase.gotrue.Auth
-import io.github.jan.supabase.gotrue.AuthImpl
 import io.github.jan.supabase.gotrue.user.UserSession
 import io.github.jan.supabase.logging.d
-import io.javalin.Javalin
-import kotlinx.coroutines.Dispatchers
+import io.ktor.server.application.ApplicationCall
+import io.ktor.server.application.ApplicationStopPreparing
+import io.ktor.server.application.call
+import io.ktor.server.cio.CIO
+import io.ktor.server.engine.ApplicationEngineEnvironment
+import io.ktor.server.engine.embeddedServer
+import io.ktor.server.response.respond
+import io.ktor.server.routing.get
+import io.ktor.server.routing.routing
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import java.awt.Desktop
-import java.net.URI
-
-private const val HTTP_SERVER_STOP_DELAY = 1000L
 
 @OptIn(SupabaseExperimental::class)
 internal suspend fun createServer(
@@ -21,51 +22,67 @@ internal suspend fun createServer(
     gotrue: Auth,
     onSuccess: suspend (UserSession) -> Unit
 ) {
-    val server = Javalin.create()
-        .get("/") { ctx ->
-            if(ctx.queryParam("code") != null) {
-                val code = ctx.queryParam("code") ?: return@get
-                (gotrue as AuthImpl).authScope.launch {
+    val server = embeddedServer(CIO, port = 0) {
+        routing {
+            get("/") {
+                val code = call.parameters["code"]
+                if(code != null) {
                     val session = gotrue.exchangeCodeForSession(code, false)
                     onSuccess(session)
+                    shutdown(call, gotrue.config.redirectHtml)
+                } else {
+                    call.respond(HTML.landingPage(gotrue.config.htmlTitle))
                 }
-                ctx.html(HTML.redirectPage(gotrue.config.htmlIconUrl, gotrue.config.htmlTitle, gotrue.config.htmlText))
-            } else {
-                ctx.html(HTML.landingPage(gotrue.config.htmlTitle))
+            }
+            get("/callback") {
+                Auth.logger.d {
+                    "Received request on OAuth callback route"
+                }
+                val accessToken = call.parameters["access_token"] ?: return@get
+                val refreshToken = call.parameters["refresh_token"] ?: return@get
+                val expiresIn = call.parameters["expires_in"]?.toLong() ?: return@get
+                val tokenType = call.parameters["token_type"] ?: return@get
+                val providerToken = call.parameters["provider_token"]
+                val providerRefreshToken = call.parameters["provider_refresh_token"]
+                val type = call.parameters["type"].orEmpty()
+                val user = gotrue.retrieveUser(accessToken)
+                onSuccess(UserSession(accessToken, refreshToken, providerRefreshToken, providerToken, expiresIn, tokenType, user, type))
+                Auth.logger.d {
+                    "Successfully authenticated user with OAuth"
+                }
+                shutdown(call, gotrue.config.redirectHtml)
             }
         }
-    server.get("/callback") { ctx ->
-        Auth.logger.d {
-            "Received callback on oauth callback"
-        }
-        val accessToken = ctx.queryParam("access_token") ?: return@get
-        val refreshToken = ctx.queryParam("refresh_token") ?: return@get
-        val expiresIn = ctx.queryParam("expires_in")?.toLong() ?: return@get
-        val tokenType = ctx.queryParam("token_type") ?: return@get
-        val providerToken = ctx.queryParam("provider_token")
-        val providerRefreshToken = ctx.queryParam("provider_refresh_token")
-        val type = ctx.queryParam("type").orEmpty()
-        (gotrue as AuthImpl).authScope.launch {
-            val user = gotrue.retrieveUser(accessToken)
-            onSuccess(UserSession(accessToken, refreshToken, providerRefreshToken, providerToken, expiresIn, tokenType, user, type))
-        }
-        Auth.logger.d {
-            "Successfully received http callback"
-        }
-        ctx.html(HTML.redirectPage(gotrue.config.htmlIconUrl, gotrue.config.htmlTitle, gotrue.config.htmlText))
-        gotrue.authScope.launch(Dispatchers.IO) {
-            delay(HTTP_SERVER_STOP_DELAY)
-            server.stop()
+    }
+    server.start(wait = true)
+    gotrue.supabaseClient.openExternalUrl(url("http://localhost:${server.resolvedConnectors().first().port}"))
+    delay(gotrue.config.timeout)
+    server.stop()
+}
+
+private suspend fun shutdown(call: ApplicationCall, message: String) {
+    val application = call.application
+    val environment = application.environment
+
+    val latch = CompletableDeferred<Nothing>()
+    call.application.launch {
+        latch.join()
+
+        environment.monitor.raise(ApplicationStopPreparing, environment)
+        if (environment is ApplicationEngineEnvironment) {
+            environment.stop()
+        } else {
+            application.dispose()
         }
     }
-    withContext(Dispatchers.IO) {
-        server.start(gotrue.config.httpPort)
-        Desktop.getDesktop()
-            .browse(URI(url("http://localhost:${server.port()}")))
-        delay(gotrue.config.timeout)
-        server.stop()
+
+    try {
+        call.respond(message)
+    } finally {
+        latch.cancel()
     }
 }
+
 internal object HTML {
 
     fun landingPage(title: String) = """
