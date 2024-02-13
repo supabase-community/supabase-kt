@@ -26,4 +26,6 @@ actual class AuthConfig : CustomSerializationConfig, AuthConfigDefaults() {
      */
     var redirectHtml: String = HTML.redirectPage("https://supabase.com/brand-assets/supabase-logo-icon.png", "Supabase Auth", "Logged in. You may continue in your app")
 
+    //maybe some map thing for deeplinks?
+
 }
