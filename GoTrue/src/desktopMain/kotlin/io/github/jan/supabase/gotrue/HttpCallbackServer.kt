@@ -3,35 +3,43 @@ package io.github.jan.supabase.gotrue
 import io.github.jan.supabase.annotations.SupabaseExperimental
 import io.github.jan.supabase.gotrue.user.UserSession
 import io.github.jan.supabase.logging.d
+import io.ktor.http.ContentType
+import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.ApplicationCall
 import io.ktor.server.application.ApplicationStopPreparing
 import io.ktor.server.application.call
 import io.ktor.server.cio.CIO
 import io.ktor.server.engine.ApplicationEngineEnvironment
 import io.ktor.server.engine.embeddedServer
-import io.ktor.server.response.respond
+import io.ktor.server.response.respondText
 import io.ktor.server.routing.get
 import io.ktor.server.routing.routing
 import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlin.coroutines.resume
 
 @OptIn(SupabaseExperimental::class)
 internal suspend fun createServer(
     url: suspend (redirect: String) -> String,
-    gotrue: Auth,
+    auth: Auth,
     onSuccess: suspend (UserSession) -> Unit
 ) {
+    auth as AuthImpl
+    Auth.logger.d { "Creating OAuth callback server" }
     val server = embeddedServer(CIO, port = 0) {
         routing {
             get("/") {
                 val code = call.parameters["code"]
                 if(code != null) {
-                    val session = gotrue.exchangeCodeForSession(code, false)
+                    val session = auth.exchangeCodeForSession(code, false)
                     onSuccess(session)
-                    shutdown(call, gotrue.config.redirectHtml)
+                    shutdown(call, auth.config.httpCallbackConfig.redirectHtml)
                 } else {
-                    call.respond(HTML.landingPage(gotrue.config.htmlTitle))
+                    call.respondText(ContentType.Text.Html, HttpStatusCode.OK) { HTML.landingPage(auth.config.httpCallbackConfig.htmlTitle) }
                 }
             }
             get("/callback") {
@@ -45,19 +53,52 @@ internal suspend fun createServer(
                 val providerToken = call.parameters["provider_token"]
                 val providerRefreshToken = call.parameters["provider_refresh_token"]
                 val type = call.parameters["type"].orEmpty()
-                val user = gotrue.retrieveUser(accessToken)
+                val user = auth.retrieveUser(accessToken)
                 onSuccess(UserSession(accessToken, refreshToken, providerRefreshToken, providerToken, expiresIn, tokenType, user, type))
                 Auth.logger.d {
                     "Successfully authenticated user with OAuth"
                 }
-                shutdown(call, gotrue.config.redirectHtml)
+                shutdown(call, auth.config.httpCallbackConfig.redirectHtml)
             }
         }
     }
-    server.start(wait = true)
-    gotrue.supabaseClient.openExternalUrl(url("http://localhost:${server.resolvedConnectors().first().port}"))
-    delay(gotrue.config.timeout)
-    server.stop()
+    coroutineScope {
+        val timeoutScope = launch {
+            val port = server.resolvedConnectors().first().port
+            Auth.logger.d {
+                "Started OAuth callback server on port $port. Opening url in browser..."
+            }
+            auth.supabaseClient.openExternalUrl(
+                url(
+                    "http://localhost:$port"
+                )
+            )
+            delay(auth.config.httpCallbackConfig.timeout)
+            if(this.isActive) {
+                Auth.logger.d {
+                    "Timeout reached. Shutting down callback server..."
+                }
+                server.stop()
+            } else {
+                Auth.logger.d {
+                    "Callback server was shut down manually"
+                }
+            }
+        }
+        launch {
+            suspendCancellableCoroutine {
+                server.environment.monitor.subscribe(ApplicationStopPreparing) { _ ->
+                    it.resume(Unit)
+                    timeoutScope.cancel()
+                }
+                server.start()
+                it.invokeOnCancellation {
+                    server.stop()
+                    timeoutScope.cancel()
+                }
+            }
+        }.join()
+    }
 }
 
 private suspend fun shutdown(call: ApplicationCall, message: String) {
@@ -77,7 +118,7 @@ private suspend fun shutdown(call: ApplicationCall, message: String) {
     }
 
     try {
-        call.respond(message)
+        call.respondText(ContentType.Text.Html, HttpStatusCode.OK) { message }
     } finally {
         latch.cancel()
     }
