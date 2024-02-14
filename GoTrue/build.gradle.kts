@@ -102,7 +102,6 @@ kotlin {
         }
         val appleMain by getting {
             dependsOn(nonLinuxMain)
-            dependsOn(desktopMain)
         }
         val jsMain by getting {
             dependsOn(nonLinuxMain)
