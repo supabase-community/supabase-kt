@@ -1,5 +1,6 @@
 package io.github.jan.supabase.gotrue
 
+import io.github.jan.supabase.gotrue.server.HttpCallbackHtml
 import io.github.jan.supabase.plugins.CustomSerializationConfig
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
@@ -11,6 +12,9 @@ actual class AuthConfig : CustomSerializationConfig, AuthConfigDefaults() {
 
     internal var httpCallbackConfig: HttpCallbackConfig = HttpCallbackConfig()
 
+    /**
+     * Configures the http callback for the web server, when logging in with OAuth or SSO.
+     */
     fun httpCallbackConfig(block: HttpCallbackConfig.() -> Unit) {
         httpCallbackConfig = HttpCallbackConfig().apply(block)
     }
@@ -29,5 +33,5 @@ data class HttpCallbackConfig(
     var httpPort: Int = 0,
     var timeout: Duration = 1.minutes,
     var htmlTitle: String = "Supabase Auth",
-    var redirectHtml: String = HTML.redirectPage("https://supabase.com/brand-assets/supabase-logo-icon.png", "Supabase Auth", "Logged in. You may continue in your app")
+    var redirectHtml: String = HttpCallbackHtml.redirectPage("https://supabase.com/brand-assets/supabase-logo-icon.png", "Supabase Auth", "Logged in. You may continue in your app")
 )

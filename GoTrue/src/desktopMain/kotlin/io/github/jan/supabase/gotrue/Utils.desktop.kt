@@ -1,5 +1,6 @@
 package io.github.jan.supabase.gotrue
 
+import io.github.jan.supabase.gotrue.server.createServer
 import io.github.jan.supabase.gotrue.user.UserSession
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
