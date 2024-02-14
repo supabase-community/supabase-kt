@@ -65,12 +65,12 @@ open class AuthConfigDefaults : MainConfig() {
     var serializer: SupabaseSerializer? = null
 
     /**
-     * The deeplink scheme used for the implicit and PKCE flow. When null, no deeplinks will be handled
+     * The deeplink scheme used for the implicit and PKCE flow. When null, deeplinks won't be used as redirect urls
      */
     var scheme: String? = null
 
     /**
-     * The deeplink host used for the implicit and PKCE flow. When null, no deeplinks will be handled
+     * The deeplink host used for the implicit and PKCE flow. When null, deeplinks won't be used as redirect urls
      */
     var host: String? = null
 
