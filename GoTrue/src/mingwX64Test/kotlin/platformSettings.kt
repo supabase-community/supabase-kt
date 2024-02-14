@@ -1,1 +1,0 @@
-actual fun AuthConfig.platformSettings() = Unit

@@ -95,7 +95,7 @@ kotlin {
                 api(libs.androidx.browser)
             }
         }
-        val mingwX64Main by getting {
+        val mingwMain by getting {
             dependsOn(nonLinuxMain)
             dependsOn(nonDesktopMain) //no ktor server engine supports the windows target
             //dependsOn(desktopMain)

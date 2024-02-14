@@ -3,6 +3,7 @@ import io.github.jan.supabase.createSupabaseClient
 import io.github.jan.supabase.exceptions.BadRequestRestException
 import io.github.jan.supabase.exceptions.UnauthorizedRestException
 import io.github.jan.supabase.gotrue.Auth
+import io.github.jan.supabase.gotrue.AuthConfig
 import io.github.jan.supabase.gotrue.MemoryCodeVerifierCache
 import io.github.jan.supabase.gotrue.MemorySessionManager
 import io.github.jan.supabase.gotrue.OtpType
@@ -267,8 +268,8 @@ class GoTrueTest {
                 sessionManager = MemorySessionManager()
                 codeVerifierCache = MemoryCodeVerifierCache()
 
-                platformSettings()
                 additionalGoTrueSettings()
+                platformSettings()
             }
         }
     }
