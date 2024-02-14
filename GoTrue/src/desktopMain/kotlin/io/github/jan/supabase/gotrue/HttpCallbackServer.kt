@@ -37,6 +37,9 @@ internal suspend fun createServer(
                 if(code != null) {
                     val session = auth.exchangeCodeForSession(code, false)
                     onSuccess(session)
+                    Auth.logger.d {
+                        "Successfully authenticated user with OAuth using the PKCE flow"
+                    }
                     shutdown(call, auth.config.httpCallbackConfig.redirectHtml)
                 } else {
                     call.respondText(ContentType.Text.Html, HttpStatusCode.OK) { HTML.landingPage(auth.config.httpCallbackConfig.htmlTitle) }
@@ -56,7 +59,7 @@ internal suspend fun createServer(
                 val user = auth.retrieveUser(accessToken)
                 onSuccess(UserSession(accessToken, refreshToken, providerRefreshToken, providerToken, expiresIn, tokenType, user, type))
                 Auth.logger.d {
-                    "Successfully authenticated user with OAuth"
+                    "Successfully authenticated user with OAuth using the implicit flow"
                 }
                 shutdown(call, auth.config.httpCallbackConfig.redirectHtml)
             }
