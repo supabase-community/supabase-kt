@@ -39,6 +39,7 @@ import kotlin.time.Duration.Companion.milliseconds
 internal class RealtimeImpl(override val supabaseClient: SupabaseClient, override val config: Realtime.Config) : Realtime {
 
     private var ws: DefaultClientWebSocketSession? = null
+    @Suppress("MagicNumber")
     private val msPerEvent = 1000 / config.eventsPerSecond
     private val _status = MutableStateFlow(Realtime.Status.DISCONNECTED)
     override val status: StateFlow<Realtime.Status> = _status.asStateFlow()
