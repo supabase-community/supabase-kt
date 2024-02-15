@@ -12,6 +12,8 @@ on:
 jobs:
   build:
     runs-on: macos-latest
+    env:
+      KONAN_DATA_DIR: ~/.gradle/konan
     steps:
       - name: Checkout sources
         uses: actions/checkout@v4
@@ -25,6 +27,8 @@ jobs:
         with:
           cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
           cache-read-only: ${{ github.ref != 'refs/heads/master' && github.ref != 'refs/heads/development' }}
+          gradle-home-cache-includes: |
+            konan
       - name: Test supabase-kt
         run: ./gradlew build --stacktrace --configuration-cache
   test:
@@ -41,6 +45,8 @@ jobs:
         ]
     runs-on: macos-latest
     needs: build
+    env:
+      KONAN_DATA_DIR: ~/.gradle/konan
     steps:
       - name: Checkout sources
         uses: actions/checkout@v4
@@ -54,5 +60,7 @@ jobs:
         with:
           cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
           cache-read-only: true
+          gradle-home-cache-includes: |
+            konan
       - name: Test supabase-kt
         run: ./gradlew ${{ matrix.command }} --stacktrace --configuration-cache
