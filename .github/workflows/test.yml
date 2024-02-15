@@ -40,6 +40,7 @@ jobs:
           'mingwX64Test',
         ]
     runs-on: macos-latest
+    needs: build
     steps:
       - name: Checkout sources
         uses: actions/checkout@v4
