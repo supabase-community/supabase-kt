@@ -35,7 +35,7 @@ jobs:
         uses: gradle/actions/setup-gradle@v3.1.0
         with:
           cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
-          cache-read-only: true
+          cache-read-only: ${{ github.ref != 'refs/heads/master' && github.ref != 'refs/heads/development' }}
           gradle-home-cache-includes: ~/.konan
       - name: Test supabase-kt
         run: ./gradlew ${{ matrix.command }} --stacktrace --configuration-cache
