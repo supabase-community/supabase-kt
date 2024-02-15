@@ -26,4 +26,4 @@ jobs:
           cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
           cache-read-only: ${{ github.ref != 'refs/heads/master' && github.ref != 'refs/heads/development' }}
       - name: Analyze code using detekt
-        run: ./gradlew detektAll --stacktrace
+        run: ./gradlew detektAll --stacktrace --configuration-cache
