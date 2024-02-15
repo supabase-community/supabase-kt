@@ -17,25 +17,18 @@ jobs:
   publish:
     runs-on: macos-latest
     steps:
-      - run: echo "Will start a Maven Central upload"
-
-      - uses: actions/checkout@v2
-
-      - name: Setup JDK
-        uses: actions/setup-java@v1
+      - run: echo "Publishing to Maven Central..."
+      - uses: actions/checkout@v4
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
         with:
-          java-version: 17
-      - name: Grant execute permission for gradlew
-        run: chmod +x gradlew
-      - uses: actions/cache@v3
+          java-version: '17'
+          distribution: 'temurin'
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3.1.0
         with:
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
-            ~/.konan
-          key: ${{ runner.os }}-gradle-v3-${{ hashFiles('gradle.properties', 'gradle/libs.versions.toml', 'gradle/wrapper/gradle-wrapper.properties') }}
-          restore-keys: |
-            ${{ runner.os }}-gradle-v3-
+          cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
+          cache-read-only: true
       - name: Publish
         run: ./gradlew publishAllPublicationsToMavenCentral
       - name: Close and release
