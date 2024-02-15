@@ -15,7 +15,16 @@ jobs:
     steps:
       - name: Checkout sources
         uses: actions/checkout@v4
-      - name: Setup
-        uses: ./.github/workflows/setup.yml
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3.1.0
+        with:
+          cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
       - name: Analyze code using detekt
         run: ./gradlew detektAll --stacktrace
