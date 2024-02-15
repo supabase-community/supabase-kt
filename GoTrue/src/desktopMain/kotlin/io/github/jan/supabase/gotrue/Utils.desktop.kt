@@ -4,7 +4,6 @@ import io.github.jan.supabase.gotrue.server.createServer
 import io.github.jan.supabase.gotrue.user.UserSession
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 internal actual suspend fun Auth.startExternalAuth(
@@ -17,10 +16,8 @@ internal actual suspend fun Auth.startExternalAuth(
             supabaseClient.openExternalUrl(getUrl(redirectUrl))
             return@withContext
         }
-        launch {
-            createServer({
-                getUrl(it)
-            }, supabaseClient.auth, onSessionSuccess)
-        }
+        createServer({
+            getUrl(it)
+        }, supabaseClient.auth, onSessionSuccess)
     }
 }
