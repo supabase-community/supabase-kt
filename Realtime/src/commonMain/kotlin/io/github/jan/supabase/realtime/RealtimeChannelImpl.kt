@@ -12,7 +12,6 @@ import io.github.jan.supabase.realtime.data.BroadcastApiBody
 import io.github.jan.supabase.realtime.data.BroadcastApiMessage
 import io.github.jan.supabase.realtime.data.PostgresActionData
 import io.github.jan.supabase.supabaseJson
-import io.ktor.client.plugins.websocket.sendSerialized
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.headers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -73,7 +72,9 @@ internal class RealtimeChannelImpl(
             }
         }
         Realtime.logger.d { "Subscribing to channel with body $joinConfigObject" }
-        realtimeImpl.ws?.sendSerialized(RealtimeMessage(topic, RealtimeChannel.CHANNEL_EVENT_JOIN, joinConfigObject, null))
+        realtimeImpl.send(
+            RealtimeMessage(topic, RealtimeChannel.CHANNEL_EVENT_JOIN, joinConfigObject, null)
+        )
         if(blockUntilSubscribed) {
             status.first { it == RealtimeChannel.Status.SUBSCRIBED }
         }
@@ -142,12 +143,12 @@ internal class RealtimeChannelImpl(
     override suspend fun unsubscribe() {
         _status.value = RealtimeChannel.Status.UNSUBSCRIBING
         Realtime.logger.d { "Unsubscribing from channel $topic" }
-        realtimeImpl.ws?.sendSerialized(RealtimeMessage(topic, RealtimeChannel.CHANNEL_EVENT_LEAVE, buildJsonObject {}, null))
+        realtimeImpl.send(RealtimeMessage(topic, RealtimeChannel.CHANNEL_EVENT_LEAVE, buildJsonObject {}, null))
     }
 
     override suspend fun updateAuth(jwt: String) {
         Realtime.logger.d { "Updating auth token for channel $topic" }
-        realtimeImpl.ws?.sendSerialized(RealtimeMessage(topic, RealtimeChannel.CHANNEL_EVENT_ACCESS_TOKEN, buildJsonObject {
+        realtimeImpl.send(RealtimeMessage(topic, RealtimeChannel.CHANNEL_EVENT_ACCESS_TOKEN, buildJsonObject {
             put("access_token", jwt)
         }, (++realtimeImpl.ref).toString()))
     }
@@ -167,11 +168,13 @@ internal class RealtimeChannelImpl(
                 error("Failed to broadcast message (${response.status}): ${response.bodyAsText()}")
             }
         } else {
-            realtimeImpl.ws?.sendSerialized(RealtimeMessage(topic, "broadcast", buildJsonObject {
-                put("type", "broadcast")
-                put("event", event)
-                put("payload", message)
-            }, (++realtimeImpl.ref).toString()))
+            realtimeImpl.send(
+                RealtimeMessage(topic, "broadcast", buildJsonObject {
+                    put("type", "broadcast")
+                    put("event", event)
+                    put("payload", message)
+                }, (++realtimeImpl.ref).toString())
+            )
         }
     }
 
@@ -191,14 +194,18 @@ internal class RealtimeChannelImpl(
                 putJsonObject(state)
             }
         }
-        realtimeImpl.ws?.sendSerialized(RealtimeMessage(topic, RealtimeChannel.CHANNEL_EVENT_PRESENCE, payload, (++realtimeImpl.ref).toString()))
+        realtimeImpl.send(
+            RealtimeMessage(topic, RealtimeChannel.CHANNEL_EVENT_PRESENCE, payload, (++realtimeImpl.ref).toString())
+        )
     }
 
     override suspend fun untrack() {
-        realtimeImpl.ws?.sendSerialized(RealtimeMessage(topic, RealtimeChannel.CHANNEL_EVENT_PRESENCE, buildJsonObject {
-            put("type", "presence")
-            put("event", "untrack")
-        }, (++realtimeImpl.ref).toString()))
+        realtimeImpl.send(
+            RealtimeMessage(topic, RealtimeChannel.CHANNEL_EVENT_PRESENCE, buildJsonObject {
+                put("type", "presence")
+                put("event", "untrack")
+            }, (++realtimeImpl.ref).toString())
+        )
     }
 
 }
