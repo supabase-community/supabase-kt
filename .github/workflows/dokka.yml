@@ -28,7 +28,7 @@ jobs:
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
-      KONAN_DATA_DIR: ~/.gradle/konan
+      KONAN_DATA_DIR: ~/.gradle/kotlinNative
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -43,8 +43,7 @@ jobs:
         with:
           cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
           cache-read-only: true
-          gradle-home-cache-includes: |
-            konan
+          gradle-home-cache-includes: kotlinNative
       - name: Build multi-module GH pages
         run: ./gradlew dokkaHtmlMultiModule  
       - name: Setup Pages
