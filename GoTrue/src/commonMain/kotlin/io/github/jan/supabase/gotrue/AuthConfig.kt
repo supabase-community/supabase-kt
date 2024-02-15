@@ -64,6 +64,31 @@ open class AuthConfigDefaults : MainConfig() {
      */
     var serializer: SupabaseSerializer? = null
 
+    /**
+     * The deeplink scheme used for the implicit and PKCE flow. When null, deeplinks won't be used as redirect urls
+     *
+     * **Note:** Deeplinks are only used as redirect urls on Android and Apple platforms. Other platforms will use their own default redirect url.
+     */
+    var scheme: String? = null
+
+    /**
+     * The deeplink host used for the implicit and PKCE flow. When null, deeplinks won't be used as redirect urls
+     *
+     * **Note:** Deeplinks are only used as redirect urls on Android and Apple platforms. Other platforms will use their own default redirect url.
+     */
+    var host: String? = null
+
+    /**
+     * The default redirect url used for authentication. When null, a platform specific default redirect url will be used.
+     *
+     * On Android and Apple platforms, the default redirect url is the deeplink.
+     *
+     * On Browser platforms, the default redirect url is the current url.
+     *
+     * On Desktop (excluding MacOS) platforms, there is no default redirect url. For OAuth flows, a http callback server will be used and a localhost url will be the redirect url.
+     */
+    var defaultRedirectUrl: String? = null
+
 }
 
 /**
@@ -84,3 +109,23 @@ enum class FlowType {
      */
     PKCE
 }
+
+/**
+ * The deeplink used for the implicit and PKCE flow. Throws an [IllegalArgumentException], if either the scheme or host is not set
+ */
+val AuthConfig.deepLink: String
+    get() {
+        val scheme = scheme ?: noDeeplinkError("scheme")
+        val host = host ?: noDeeplinkError("host")
+        return "${scheme}://${host}"
+    }
+
+/**
+ * The deeplink used for the implicit and PKCE flow. Returns null, if either the scheme or host is not set
+ */
+val AuthConfig.deepLinkOrNull: String?
+    get() {
+        val scheme = scheme ?: return null
+        val host = host ?: return null
+        return "${scheme}://${host}"
+    }

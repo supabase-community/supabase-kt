@@ -127,7 +127,7 @@ internal class AuthImpl(
         startExternalAuth(
             redirectUrl = redirectUrl,
             getUrl = {
-                val url = oAuthUrl(provider, it, "user/identities/authorize", config)
+                val url = getOAuthUrl(provider, it, "user/identities/authorize", config)
                 val response = api.rawRequest(url) {
                     method = HttpMethod.Get
                 }
@@ -506,7 +506,7 @@ internal class AuthImpl(
     }
 
     @OptIn(SupabaseExperimental::class)
-    override fun oAuthUrl(
+    override fun getOAuthUrl(
         provider: OAuthProvider,
         redirectUrl: String?,
         url: String,

@@ -321,8 +321,13 @@ sealed interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
      * Returns the url to use for oAuth
      * @param provider The provider to use
      * @param redirectUrl The redirect url to use
+     * @param url The url suffix.
+     *
+     * For normal OAuth it would be "authorize".
+     *
+     * For linking identities it would be "user/identities/authorize"
      */
-    fun oAuthUrl(provider: OAuthProvider, redirectUrl: String? = defaultRedirectUrl(), url: String = "authorize", additionalConfig: ExternalAuthConfigDefaults.() -> Unit = {}): String
+    fun getOAuthUrl(provider: OAuthProvider, redirectUrl: String? = defaultRedirectUrl(), url: String = "authorize", additionalConfig: ExternalAuthConfigDefaults.() -> Unit = {}): String
 
     /**
      * Stops auto-refreshing the current session
