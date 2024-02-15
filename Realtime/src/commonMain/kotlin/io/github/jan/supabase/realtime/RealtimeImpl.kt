@@ -263,7 +263,7 @@ internal class RealtimeImpl(override val supabaseClient: SupabaseClient, overrid
     }
 
     override suspend fun send(message: RealtimeMessage) {
-        if(message.event !in listOf("broadcast", "presence", "postgres_changes")) {
+        if(message.event !in listOf("broadcast", "presence", "postgres_changes") || msPerEvent < 0) {
             ws?.sendSerialized(message)
             return
         }
