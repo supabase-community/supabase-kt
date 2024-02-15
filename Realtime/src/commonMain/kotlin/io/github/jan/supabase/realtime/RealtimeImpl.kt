@@ -187,7 +187,7 @@ internal class RealtimeImpl(override val supabaseClient: SupabaseClient, overrid
         }
         Realtime.logger.d { "Sending heartbeat" }
         heartbeatRef = ++ref
-        ws?.sendSerialized(RealtimeMessage("phoenix", "heartbeat", buildJsonObject { }, heartbeatRef.toString()))
+        send(RealtimeMessage("phoenix", "heartbeat", buildJsonObject { }, heartbeatRef.toString()))
     }
 
     override suspend fun removeChannel(channel: RealtimeChannel) {
