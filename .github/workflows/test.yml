@@ -25,6 +25,6 @@ jobs:
     runs-on: macos-latest
     steps:
       - name: Setup
-        uses: ./.setup.yml
+        uses: ./.github/workflows/setup.yml
       - name: Test supabase-kt
         run: ./gradlew {{ matrix.command }} --stacktrace
