@@ -24,6 +24,8 @@ jobs:
         ]
     runs-on: macos-latest
     steps:
+      - name: Checkout sources
+        uses: actions/checkout@v4
       - name: Setup
         uses: ./.github/workflows/setup.yml
       - name: Test supabase-kt
