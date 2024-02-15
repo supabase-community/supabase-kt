@@ -4,6 +4,7 @@ import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.SupabaseClientBuilder
 import io.github.jan.supabase.SupabaseSerializer
 import io.github.jan.supabase.annotations.SupabaseInternal
+import io.github.jan.supabase.logging.SupabaseLogger
 import io.github.jan.supabase.plugins.CustomSerializationConfig
 import io.github.jan.supabase.plugins.CustomSerializationPlugin
 import io.github.jan.supabase.plugins.MainConfig
@@ -87,12 +88,21 @@ sealed interface Realtime : MainPlugin<Realtime.Config>, CustomSerializationPlug
     suspend fun block()
 
     /**
+     * Sends a message to the realtime websocket
+     * @param message The message to send
+     */
+    @SupabaseInternal
+    suspend fun send(message: RealtimeMessage)
+
+    /**
      * @property websocketConfig Custom configuration for the ktor websocket
      * @property secure Whether to use wss or ws. Defaults to [SupabaseClient.useHTTPS] when null
      * @property disconnectOnSessionLoss Whether to disconnect from the websocket when the session is lost. Defaults to true
      * @property reconnectDelay The delay between reconnect attempts. Defaults to 7 seconds
      * @property heartbeatInterval The interval between heartbeat messages. Defaults to 15 seconds
      * @property connectOnSubscribe Whether to connect to the websocket when subscribing to a channel. Defaults to true
+     * @property eventsPerSecond The maximum amount of events per second (client-side rate-limiting). Defaults to 10 (100 ms per event). Set to a negative number to disable rate-limiting.
+     * @property disconnectOnNoSubscriptions Whether to disconnect from the websocket when there are no more subscriptions. Defaults to true
      * @property serializer A serializer used for serializing/deserializing objects e.g. in [PresenceAction.decodeJoinsAs] or [RealtimeChannel.broadcast]. Defaults to [KotlinXSerializer]
      */
     data class Config(
@@ -100,11 +110,11 @@ sealed interface Realtime : MainPlugin<Realtime.Config>, CustomSerializationPlug
         var secure: Boolean? = null,
         var heartbeatInterval: Duration = 15.seconds,
         var reconnectDelay: Duration = 7.seconds,
-        override var customUrl: String? = null,
-        override var jwtToken: String? = null,
         var disconnectOnSessionLoss: Boolean = true,
         var connectOnSubscribe: Boolean = true,
-    ): MainConfig, CustomSerializationConfig {
+        var disconnectOnNoSubscriptions: Boolean = true,
+        var eventsPerSecond: Int = 10,
+    ): MainConfig(), CustomSerializationConfig {
 
         override var serializer: SupabaseSerializer? = null
 
@@ -113,6 +123,8 @@ sealed interface Realtime : MainPlugin<Realtime.Config>, CustomSerializationPlug
     companion object : SupabasePluginProvider<Config, Realtime> {
 
         override val key = "realtime"
+
+        override val logger: SupabaseLogger = SupabaseClient.createLogger("Supabase-Realtime")
 
         /**
          * The current realtime api version

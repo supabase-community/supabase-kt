@@ -246,7 +246,7 @@ class GoTrueTest {
         val client = createSupabaseClient()
         val expected =
             "https://example.com/auth/v1/authorize?provider=github&redirect_to=https://example.com&scopes=test+test2&custom=value"
-        val actual = client.auth.oAuthUrl(Github, "https://example.com") {
+        val actual = client.auth.getOAuthUrl(Github, "https://example.com") {
             scopes.addAll(listOf("test", "test2"))
             queryParams["custom"] = "value"
         }
@@ -268,8 +268,8 @@ class GoTrueTest {
                 sessionManager = MemorySessionManager()
                 codeVerifierCache = MemoryCodeVerifierCache()
 
-                platformSettings()
                 additionalGoTrueSettings()
+                platformSettings()
             }
         }
     }

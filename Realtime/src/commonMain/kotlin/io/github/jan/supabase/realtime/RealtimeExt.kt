@@ -61,7 +61,13 @@ suspend inline fun <reified Data : Any> RealtimeChannel.postgresListDataFlow(
 ): Flow<List<Data>> {
     val cache = AtomicMutableMap<String, Data>()
     val initialData = try {
-        val result = supabaseClient.postgrest.from(schema, table).select()
+        val result = supabaseClient.postgrest.from(schema, table).select {
+            filter?.let {
+                filter {
+                    this.filter(it)
+                }
+            }
+        }
         val data = result.decodeList<Data>()
         data.forEach {
             val key = primaryKey.producer(it)

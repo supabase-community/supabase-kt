@@ -5,8 +5,9 @@ import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ProcessLifecycleOwner
 import androidx.startup.Initializer
-import co.touchlab.kermit.Logger
 import io.github.jan.supabase.annotations.SupabaseInternal
+import io.github.jan.supabase.logging.d
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 private var appContext: Context? = null
@@ -30,33 +31,39 @@ private fun addLifecycleCallbacks(gotrue: Auth) {
     val lifecycle = ProcessLifecycleOwner.get().lifecycle
     gotrue as AuthImpl
     val scope = gotrue.authScope
-    lifecycle.addObserver(
-        object : DefaultLifecycleObserver {
+    scope.launch(Dispatchers.Main) {
+        lifecycle.addObserver(
+            object : DefaultLifecycleObserver {
 
-            override fun onStart(owner: LifecycleOwner) {
-                if(!gotrue.isAutoRefreshRunning && gotrue.config.alwaysAutoRefresh) {
-                    Logger.d("Auth") {
-                        "Starting auto refresh"
-                    }
-                    scope.launch {
-                        try {
-                            gotrue.startAutoRefreshForCurrentSession()
-                        } catch(e: IllegalStateException) {
-                            Logger.d("Auth") {
-                                "No session found for auto refresh"
+                override fun onStart(owner: LifecycleOwner) {
+                    if(!gotrue.isAutoRefreshRunning && gotrue.config.alwaysAutoRefresh) {
+                        Auth.logger.d {
+                            "Trying to re-load session from storage..."
+                        }
+                        scope.launch {
+                            val sessionFound = gotrue.loadFromStorage()
+                            if(!sessionFound) {
+                                Auth.logger.d {
+                                    "No session found, not starting auto refresh"
+                                }
+                            } else {
+                                Auth.logger.d {
+                                    "Session found, auto refresh started"
+                                }
                             }
                         }
                     }
                 }
-            }
-            override fun onStop(owner: LifecycleOwner) {
-                if(gotrue.isAutoRefreshRunning) {
-                    Logger.d("Auth") { "Cancelling auto refresh because app is switching to the background" }
-                    scope.launch {
-                        gotrue.stopAutoRefreshForCurrentSession()
+                override fun onStop(owner: LifecycleOwner) {
+                    if(gotrue.isAutoRefreshRunning) {
+                        Auth.logger.d { "Cancelling auto refresh because app is switching to the background" }
+                        scope.launch {
+                            gotrue.stopAutoRefreshForCurrentSession()
+                            gotrue.resetLoadingState()
+                        }
                     }
                 }
             }
-        }
-    )
+        )
+    }
 }

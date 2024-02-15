@@ -1,7 +1,10 @@
 package io.github.jan.supabase
 
-import co.touchlab.kermit.Logger
 import io.github.jan.supabase.annotations.SupabaseInternal
+import io.github.jan.supabase.logging.KermitSupabaseLogger
+import io.github.jan.supabase.logging.LogLevel
+import io.github.jan.supabase.logging.SupabaseLogger
+import io.github.jan.supabase.logging.i
 import io.github.jan.supabase.network.KtorSupabaseHttpClient
 import io.github.jan.supabase.plugins.MainPlugin
 import io.github.jan.supabase.plugins.PluginManager
@@ -56,12 +59,31 @@ sealed interface SupabaseClient {
      */
     suspend fun close()
 
+    companion object {
+
+        /**
+         * The default logging level used for plugins. Can be changed within the [SupabaseClientBuilder]
+         */
+        var DEFAULT_LOG_LEVEL = LogLevel.INFO
+            internal set
+
+        internal val LOGGER = createLogger("Supabase-Core")
+
+        /**
+         * Creates a new [SupabaseLogger] using the [KermitSupabaseLogger] implementation.
+         * @param tag The tag for the logger
+         * @param level The logging level. If set to null, the [DEFAULT_LOG_LEVEL] property will be used instead
+         */
+        fun createLogger(tag: String, level: LogLevel? = null) = KermitSupabaseLogger(level, tag)
+
+    }
+
 }
 
 internal class SupabaseClientImpl(
     override val supabaseUrl: String,
     override val supabaseKey: String,
-    plugins: Map<String, (SupabaseClient) -> SupabasePlugin>,
+    plugins: Map<String, (SupabaseClient) -> SupabasePlugin<*>>,
     httpConfigOverrides: MutableList<HttpClientConfig<*>.() -> Unit>,
     override val useHTTPS: Boolean,
     requestTimeout: Long,
@@ -70,7 +92,7 @@ internal class SupabaseClientImpl(
 ) : SupabaseClient {
 
     init {
-        Logger.i("Core") {
+        SupabaseClient.LOGGER.i {
             "SupabaseClient created! Please report any bugs you find."
         }
     }

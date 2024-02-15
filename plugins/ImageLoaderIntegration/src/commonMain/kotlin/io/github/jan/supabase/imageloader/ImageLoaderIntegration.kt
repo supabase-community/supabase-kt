@@ -8,6 +8,8 @@ import com.seiko.imageloader.model.ImageRequest
 import com.seiko.imageloader.option.Options
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.annotations.SupabaseExperimental
+import io.github.jan.supabase.logging.SupabaseLogger
+import io.github.jan.supabase.logging.d
 import io.github.jan.supabase.plugins.SupabasePlugin
 import io.github.jan.supabase.plugins.SupabasePluginProvider
 import io.github.jan.supabase.storage.StorageItem
@@ -21,7 +23,7 @@ import io.github.jan.supabase.storage.storage
  * add(fetcherFactory = supabaseClient.imageLoader)
  * ```
  */
-interface ImageLoaderIntegration: SupabasePlugin, Fetcher.Factory, Keyer {
+interface ImageLoaderIntegration: SupabasePlugin<ImageLoaderIntegration.Config>, Fetcher.Factory, Keyer {
 
     /**
      * The configuration for the [ImageLoader] integration.
@@ -32,8 +34,10 @@ interface ImageLoaderIntegration: SupabasePlugin, Fetcher.Factory, Keyer {
 
         override val key = "imageloader"
 
+        override val logger: SupabaseLogger = SupabaseClient.createLogger("Supabase-ComposeImageLoader")
+
         override fun create(supabaseClient: SupabaseClient, config: Config): ImageLoaderIntegration {
-            return ImageLoaderIntegrationImpl(supabaseClient)
+            return ImageLoaderIntegrationImpl(supabaseClient, config)
         }
 
         override fun createConfig(init: Config.() -> Unit): Config {
@@ -44,16 +48,22 @@ interface ImageLoaderIntegration: SupabasePlugin, Fetcher.Factory, Keyer {
 
 }
 
-internal class ImageLoaderIntegrationImpl(private val supabaseClient: SupabaseClient) : ImageLoaderIntegration {
+internal class ImageLoaderIntegrationImpl(
+    override val supabaseClient: SupabaseClient,
+    override val config: ImageLoaderIntegration.Config
+) : ImageLoaderIntegration {
 
     override fun create(data: Any, options: Options): Fetcher? {
         if(data !is StorageItem) return null
+        ImageLoaderIntegration.logger.d { "Creating Storage Fetcher" }
         return SupabaseStorageFetcher(supabaseClient.storage, data)
     }
 
     override fun key(data: Any, options: Options, type: Keyer.Type): String? {
         if(data !is StorageItem) return null
-        return data.bucketId + data.path
+        val key = data.bucketId + data.path
+        ImageLoaderIntegration.logger.d { "Key for $data created: $key" }
+        return key
     }
 
 }

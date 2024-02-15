@@ -1,32 +1,31 @@
 [versions]
-kotlin = "1.9.21"
-ktor = "2.3.7"
+kotlin = "1.9.22"
+ktor = "2.3.8"
 dokka = "1.9.10"
 kotlinx-datetime = "0.5.0"
-kermit = "2.0.2"
-atomicfu = "0.23.1"
-coroutines = "1.8.0-RC2"
-android-lifecycle = "2.6.2"
+kermit = "2.0.3"
+atomicfu = "0.23.2"
+coroutines = "1.8.0"
+android-lifecycle = "2.7.0"
 androidx-startup = "1.1.1"
 androidx-activity-compose = "1.8.2"
 android-play-store = "20.4.1" # Later versions causing Error code 16 for now (Ref: https://issuetracker.google.com/issues/302775651)
 multiplatform-settings = "1.1.1"
-javalin = "5.6.3"
 complete-kotlin = "1.1.0"
-agp = "8.2.0"
-maven-publish = "0.26.0"
+agp = "8.2.2"
+maven-publish = "0.27.0"
 apollo-kotlin = "3.8.2"
 korlibs = "4.0.10"
-detekt = "1.23.4"
-moshi = "1.15.0"
+detekt = "1.23.5"
+moshi = "1.15.1"
 jackson = "2.16.1"
 browser = "1.7.0"
 googleid = "1.1.0"
-compose = "1.5.11"
+compose = "1.6.0-rc01"
 androidsvg = "1.4"
 coil = "2.5.0"
-imageloader = "1.7.1"
-okio = "3.7.0"
+imageloader = "1.7.4"
+okio = "3.8.0"
 credentials = "1.2.0"
 
 [plugins]
@@ -57,6 +56,8 @@ ktor-client-content-negotiation = { module = "io.ktor:ktor-client-content-negoti
 ktor-client-websockets = { module = "io.ktor:ktor-client-websockets", version.ref = "ktor" }
 ktor-client-mock = { module = "io.ktor:ktor-client-mock", version.ref = "ktor" }
 ktor-json = { module = "io.ktor:ktor-serialization-kotlinx-json", version.ref = "ktor" }
+ktor-server-core = { module = "io.ktor:ktor-server-core", version.ref = "ktor" }
+ktor-server-cio = { module = "io.ktor:ktor-server-cio", version.ref = "ktor" }
 
 kermit = { module = "co.touchlab:kermit", version.ref = "kermit" }
 
@@ -73,11 +74,10 @@ multiplatform-settings-no-arg = { module = "com.russhwolf:multiplatform-settings
 multiplatform-settings-coroutines = { module = "com.russhwolf:multiplatform-settings-coroutines", version.ref = "multiplatform-settings" }
 multiplatform-settings-test = { module = "com.russhwolf:multiplatform-settings-test", version.ref = "multiplatform-settings" }
 
-javalin = { module = "io.javalin:javalin", version.ref = "javalin" }
-
 apollo-kotlin = { module = "com.apollographql.apollo3:apollo-runtime", version.ref = "apollo-kotlin" }
 
 krypto = { module = "com.soywiz.korlibs.krypto:krypto", version.ref = "korlibs" }
+okio = { module = "com.squareup.okio:okio", version.ref = "okio" }
 
 moshi = { module = "com.squareup.moshi:moshi", version.ref = "moshi" }
 moshi-kotlin = { module = "com.squareup.moshi:moshi-kotlin", version.ref = "moshi" }
@@ -89,7 +89,6 @@ androidsvg = { module = "com.caverock:androidsvg-aar", version.ref = "androidsvg
 
 coil = { module = "io.coil-kt:coil", version.ref = "coil" }
 imageloader = { module = "io.github.qdsfdhvh:image-loader", version.ref = "imageloader" }
-okio = { module = "com.squareup.okio:okio", version.ref = "okio" }
 
 [bundles]
 ktor-client = ["ktor-client-core", "ktor-client-content-negotiation", "ktor-json"]
