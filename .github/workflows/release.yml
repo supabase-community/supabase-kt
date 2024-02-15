@@ -16,8 +16,6 @@ env:
 jobs:
   publish:
     runs-on: macos-latest
-    env:
-      KONAN_DATA_DIR: ~/.gradle/kotlinNative
     steps:
       - run: echo "Publishing to Maven Central..."
       - uses: actions/checkout@v4
