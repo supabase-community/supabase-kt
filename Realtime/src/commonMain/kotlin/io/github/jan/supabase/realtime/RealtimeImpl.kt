@@ -34,10 +34,12 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.job
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.buildJsonObject
+import kotlin.time.Duration.Companion.milliseconds
 
 internal class RealtimeImpl(override val supabaseClient: SupabaseClient, override val config: Realtime.Config) : Realtime {
 
-    var ws: DefaultClientWebSocketSession? = null
+    private var ws: DefaultClientWebSocketSession? = null
+    private val msPerEvent = 1000 / config.eventsPerSecond
     private val _status = MutableStateFlow(Realtime.Status.DISCONNECTED)
     override val status: StateFlow<Realtime.Status> = _status.asStateFlow()
     private val _subscriptions = AtomicMutableMap<String, RealtimeChannel>()
@@ -48,6 +50,7 @@ internal class RealtimeImpl(override val supabaseClient: SupabaseClient, overrid
     var messageJob: Job? = null
     var ref by atomic(0)
     var heartbeatRef by atomic(0)
+    var inThrottle by atomic(false)
     override val apiVersion: Int
         get() = Realtime.API_VERSION
 
@@ -256,6 +259,20 @@ internal class RealtimeImpl(override val supabaseClient: SupabaseClient, overrid
         return buildUrl(realtimeBaseUrl()) {
             protocol = if(secure) URLProtocol.HTTPS else URLProtocol.HTTP
             pathSegments += listOf("api", "broadcast")
+        }
+    }
+
+    override suspend fun send(message: RealtimeMessage) {
+        if(message.event !in listOf("broadcast", "presence", "postgres_changes")) {
+            ws?.sendSerialized(message)
+            return
+        }
+        if(inThrottle) throw RealtimeRateLimitException(config.eventsPerSecond)
+        ws?.sendSerialized(message)
+        scope.launch {
+            inThrottle = true
+            delay(msPerEvent.milliseconds)
+            inThrottle = false
         }
     }
 
