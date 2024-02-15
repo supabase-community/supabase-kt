@@ -33,4 +33,4 @@ jobs:
         run: ./gradlew publishAllPublicationsToMavenCentral
       - name: Close and release
         if: inputs.close_and_release
-        run: ./gradlew closeAndReleaseRepository
+        run: ./gradlew closeAndReleaseRepository --configuration-cache
