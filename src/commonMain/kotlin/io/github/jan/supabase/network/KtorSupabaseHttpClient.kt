@@ -1,10 +1,12 @@
 @file:Suppress("UndocumentedPublicFunction")
 package io.github.jan.supabase.network
 
-import co.touchlab.kermit.Logger
 import io.github.jan.supabase.BuildConfig
+import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.annotations.SupabaseInternal
 import io.github.jan.supabase.exceptions.HttpRequestException
+import io.github.jan.supabase.logging.d
+import io.github.jan.supabase.logging.e
 import io.github.jan.supabase.supabaseJson
 import io.ktor.client.HttpClient
 import io.ktor.client.HttpClientConfig
@@ -18,9 +20,12 @@ import io.ktor.client.request.HttpRequestBuilder
 import io.ktor.client.request.headers
 import io.ktor.client.request.prepareRequest
 import io.ktor.client.request.request
+import io.ktor.client.request.url
 import io.ktor.client.statement.HttpResponse
 import io.ktor.client.statement.HttpStatement
+import io.ktor.http.encodedPath
 import io.ktor.serialization.kotlinx.json.json
+import kotlin.time.Duration.Companion.milliseconds
 
 private const val HTTPS_PORT = 443
 
@@ -32,7 +37,7 @@ class KtorSupabaseHttpClient @SupabaseInternal constructor(
     private val supabaseKey: String,
     modifiers: List<HttpClientConfig<*>.() -> Unit> = listOf(),
     private val requestTimeout: Long,
-    engine: HttpClientEngine? = null,
+    engine: HttpClientEngine? = null
 ): SupabaseHttpClient() {
 
     @SupabaseInternal
@@ -42,18 +47,23 @@ class KtorSupabaseHttpClient @SupabaseInternal constructor(
 
     override suspend fun request(url: String, builder: HttpRequestBuilder.() -> Unit): HttpResponse {
         val request = HttpRequestBuilder().apply {
+            url(url)
             builder()
         }
+        val endPoint = request.url.encodedPath
+        SupabaseClient.LOGGER.d { "Starting ${request.method.value} request to endpoint $endPoint" }
 
         val response = try {
             httpClient.request(url, builder)
         } catch(e: HttpRequestTimeoutException) {
-            Logger.d("Core") { "Request timed out after $requestTimeout ms" }
+            SupabaseClient.LOGGER.e { "${request.method.value} request to endpoint $endPoint timed out after $requestTimeout ms" }
             throw e
         } catch(e: Exception) {
-            Logger.d("Core") { "Request failed with ${e.message}" }
+            SupabaseClient.LOGGER.e { "${request.method.value} request to endpoint $endPoint failed with exception ${e.message}" }
             throw HttpRequestException(e.message ?: "", request)
         }
+        val responseTime = (response.responseTime.timestamp - response.requestTime.timestamp).milliseconds
+        SupabaseClient.LOGGER.d { "${request.method.value} request to endpoint $endPoint successfully finished in $responseTime" }
         return response
     }
 
@@ -62,16 +72,17 @@ class KtorSupabaseHttpClient @SupabaseInternal constructor(
         builder: HttpRequestBuilder.() -> Unit
     ): HttpStatement {
         val request = HttpRequestBuilder().apply {
+            url(url)
             builder()
         }
 
         val response = try {
             httpClient.prepareRequest(url, builder)
         } catch(e: HttpRequestTimeoutException) {
-            Logger.d("Core") { "Request timed out after $requestTimeout ms" }
+            SupabaseClient.LOGGER.e { "Request timed out after $requestTimeout ms on url $url" }
             throw e
         } catch(e: Exception) {
-            Logger.d("Core") { "Request failed with ${e.message}" }
+            SupabaseClient.LOGGER.e { "Request failed with ${e.message} on url $url" }
             throw HttpRequestException(e.message ?: "", request)
         }
         return response
