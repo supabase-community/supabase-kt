@@ -38,6 +38,18 @@ kotlin {
             }
         }
     }
+    wasmJs {
+        browser {
+            testTask {
+                enabled = false
+            }
+        }
+        nodejs {
+            testTask {
+                enabled = false
+            }
+        }
+    }
     iosX64()
     iosArm64()
     iosSimulatorArm64()
@@ -55,6 +67,9 @@ kotlin {
                 implementation(compose.runtime)
             }
         }
+        val noDefaultMain by creating {
+            dependsOn(commonMain)
+        }
         val androidMain by getting {
             dependencies {
                 api(libs.android.play.store.auth)
@@ -65,9 +80,16 @@ kotlin {
                 implementation(libs.androidx.activity.compose)
             }
         }
-        val jvmMain by getting
+        val jvmMain by getting {
+            dependsOn(noDefaultMain)
+        }
         val appleMain by getting
-        val jsMain by getting
+        val jsMain by getting {
+            dependsOn(noDefaultMain)
+        }
+        val wasmJsMain by getting {
+            dependsOn(noDefaultMain)
+        }
     }
 }
 

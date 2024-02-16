@@ -37,6 +37,18 @@ kotlin {
             }
         }
     }
+    wasmJs {
+        browser {
+            testTask {
+                enabled = false
+            }
+        }
+        nodejs {
+            testTask {
+                enabled = false
+            }
+        }
+    }
     iosX64()
     iosArm64()
     iosSimulatorArm64()
@@ -65,6 +77,9 @@ kotlin {
             dependsOn(nonJvmMain)
         }
         val jsMain by getting {
+            dependsOn(nonJvmMain)
+        }
+        val wasmJsMain by getting {
             dependsOn(nonJvmMain)
         }
     }

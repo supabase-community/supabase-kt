@@ -119,6 +119,10 @@ kotlin {
             dependsOn(nonLinuxMain)
             dependsOn(nonDesktopMain)
         }
+        val wasmJsMain by getting {
+            dependsOn(nonLinuxMain)
+            dependsOn(nonDesktopMain)
+        }
         /*val linuxMain by getting {
             dependsOn(desktopMain)
         }*/
