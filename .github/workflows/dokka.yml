@@ -5,7 +5,7 @@ on:
   # Runs on pushes targeting the default branch
   # Pattern matched against refs/tags
   push:
-    tags:        
+    tags:
       - '[0-9]+.[0-9]+.[0-9]+'
 
   # Allows you to run this workflow manually from the Actions tab
@@ -43,7 +43,7 @@ jobs:
           cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
           cache-read-only: true
       - name: Build multi-module GH pages
-        run: ./gradlew dokkaHtmlMultiModule  
+        run: ./gradlew dokkaHtmlMultiModule
       - name: Setup Pages
         uses: actions/configure-pages@v3
       - name: Upload artifact
