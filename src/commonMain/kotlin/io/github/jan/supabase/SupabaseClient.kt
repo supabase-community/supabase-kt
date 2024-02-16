@@ -16,7 +16,7 @@ import io.ktor.client.engine.HttpClientEngine
  */
 sealed interface SupabaseClient {
 
-    val supabaseHttpUrl: String
+    val supabaseHttpUrl: Strng
 
     /**
      * The base supabase url without any scheme
