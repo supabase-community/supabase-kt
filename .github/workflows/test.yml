@@ -9,9 +9,6 @@ on:
     branches:
       - '*'
 
-permissions:
-  pull-requests: write
-
 jobs:
   test:
     strategy:
@@ -39,7 +36,5 @@ jobs:
         with:
           cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
           cache-read-only: ${{ github.ref != 'refs/heads/master' && github.ref != 'refs/heads/development' }}
-          gradle-home-cache-includes: ~/.konan
-          add-job-summary-as-pr-comment: on-failure
       - name: Test supabase-kt
         run: ./gradlew ${{ matrix.command }} --stacktrace --configuration-cache

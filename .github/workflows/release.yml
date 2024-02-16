@@ -29,7 +29,6 @@ jobs:
         with:
           cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
           cache-read-only: true
-          gradle-home-cache-includes: kotlinNative
       - name: Publish
         run: ./gradlew publishAllPublicationsToMavenCentral
       - name: Close and release

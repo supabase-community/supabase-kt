@@ -42,7 +42,6 @@ jobs:
         with:
           cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
           cache-read-only: true
-          gradle-home-cache-includes: ~/.konan
       - name: Build multi-module GH pages
         run: ./gradlew dokkaHtmlMultiModule
       - name: Setup Pages
