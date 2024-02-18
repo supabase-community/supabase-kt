@@ -53,7 +53,7 @@ class PostgrestRequestBuilderTest {
         val request = postgrestRequest {
             order("messages", Order.ASCENDING, true, "table")
         }
-        assertEquals(listOf("messages.asc.nullsfirst"), request.params["\"table\".order"])
+        assertEquals(listOf("messages.asc.nullsfirst"), request.params["table.order"])
     }
 
     @Test
@@ -69,7 +69,7 @@ class PostgrestRequestBuilderTest {
         val request = postgrestRequest {
             limit(10, "table")
         }
-        assertEquals(listOf("10"), request.params["\"table\".limit"])
+        assertEquals(listOf("10"), request.params["table.limit"])
     }
 
     @Test
@@ -86,8 +86,8 @@ class PostgrestRequestBuilderTest {
         val request = postgrestRequest {
             range(10, 20, "table")
         }
-        assertEquals(listOf("10"), request.params["\"table\".offset"])
-        assertEquals(listOf("11"), request.params["\"table\".limit"])
+        assertEquals(listOf("10"), request.params["table.offset"])
+        assertEquals(listOf("11"), request.params["table.limit"])
     }
 
     @Test
