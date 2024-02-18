@@ -1,5 +1,6 @@
 package io.github.jan.supabase.gotrue
 
+import io.github.jan.supabase.gotrue.providers.AuthProvider
 import io.github.jan.supabase.gotrue.user.UserSession
 
 /**
@@ -9,8 +10,9 @@ sealed interface SessionStatus {
 
     /**
      * This status means that the user is not logged in
+     * @param isSignOut Whether this status was caused by a sign out
      */
-    data object NotAuthenticated : SessionStatus
+    data class NotAuthenticated(val isSignOut: Boolean) : SessionStatus
 
     /**
      * This status means that [Auth] is currently loading the session from storage
@@ -25,7 +27,18 @@ sealed interface SessionStatus {
     /**
      * This status means that [Auth] holds a valid session
      * @param session The session
-     * @param oldStatus The previous status. Useful for knowing if the user was already authenticated
+     * @param source The source of the session
      */
-    data class Authenticated(val session: UserSession, val oldStatus: SessionStatus) : SessionStatus
+    data class Authenticated(val session: UserSession, val source: SessionSource?) : SessionStatus
+
+}
+
+sealed interface SessionSource {
+    data object Storage : SessionSource
+    data class SignIn(val provider: AuthProvider<*, *>) : SessionSource
+    data class SignUp(val provider: AuthProvider<*, *>) : SessionSource
+    data object External : SessionSource
+    data class Refresh(val oldSession: UserSession) : SessionSource
+    data class UserChanged(val oldSession: UserSession) : SessionSource
+    data class UserIdentitiesChanged(val oldSession: UserSession) : SessionSource
 }

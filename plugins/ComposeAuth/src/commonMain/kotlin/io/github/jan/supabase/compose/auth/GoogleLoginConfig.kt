@@ -1,18 +1,7 @@
 package io.github.jan.supabase.compose.auth
 
+import io.github.jan.supabase.compose.auth.composable.handleGoogleSignOut
 import kotlinx.serialization.json.JsonObject
-
-/**
- * Config for [ComposeAuth]
- */
-interface LoginConfig {
-
-    /**
-     * Returns the respective client id for Native Auth
-     */
-    val serverClientId: String
-
-}
 
 /**
  * Config for requesting IDToken from play-auth API
@@ -21,26 +10,17 @@ interface LoginConfig {
  * @param associateLinkedAccounts Sets whether to support sign-in using Google accounts that are linked to your users' accounts.
  * @param nonce Sets the nonce to use when generating a Google ID token.
  * @param extraData Add extra data for user on sign-in
+ * @param handleSignOut Sets whether to sign out from Google on sign out from your app
  */
 data class GoogleLoginConfig(
-    override val serverClientId: String,
+    val serverClientId: String,
     val isSupported: Boolean = true,
     val filterByAuthorizedAccounts: Boolean = false,
     val associateLinkedAccounts: Pair<String, List<String>>? = null,
     val nonce: String? = null,
-    var extraData: JsonObject? = null
-) : LoginConfig
-
-/**
- * Config for Apple's Authorization API
- * @param nonce A string value to pass to the identity provider.
- * @param extraData Add extra data for user on sign-in
- */
-data class AppleLoginConfig(
-    override val serverClientId: String = "",
-    val nonce: String? = null,
-    var extraData: JsonObject? = null
-) : LoginConfig
+    var extraData: JsonObject? = null,
+    var handleSignOut: (suspend () -> Unit)? = ::handleGoogleSignOut
+)
 
 /**
  * Helper function that return native configs
@@ -53,7 +33,7 @@ fun ComposeAuth.Config.googleNativeLogin(
     nonce: String? = null,
     extraData: JsonObject? = null
 ) {
-    loginConfig["google"] =
+    googleLoginConfig =
         GoogleLoginConfig(
             serverClientId,
             isSupported,
@@ -62,15 +42,4 @@ fun ComposeAuth.Config.googleNativeLogin(
             nonce,
             extraData
         )
-}
-
-/**
- * Helper function that return native configs
- */
-fun ComposeAuth.Config.appleNativeLogin(
-    serverClientId: String = "",
-    nonce: String? = null,
-    extraData: JsonObject? = null
-) {
-    loginConfig["apple"] = AppleLoginConfig(serverClientId, nonce, extraData)
 }

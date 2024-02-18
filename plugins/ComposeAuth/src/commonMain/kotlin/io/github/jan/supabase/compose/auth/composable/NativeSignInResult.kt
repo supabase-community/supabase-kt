@@ -25,5 +25,5 @@ sealed interface NativeSignInResult {
      * Error occurred
      * @property message The error message
      */
-    data class Error(val message: String) : NativeSignInResult
+    data class Error(val message: String, val exception: Exception? = null) : NativeSignInResult
 }

@@ -1,7 +1,7 @@
 package io.github.jan.supabase.compose.auth
 
 import io.github.jan.supabase.SupabaseClient
-import io.github.jan.supabase.gotrue.SignOutScope
+import io.github.jan.supabase.gotrue.SessionStatus
 import io.github.jan.supabase.gotrue.auth
 import io.github.jan.supabase.gotrue.providers.Apple
 import io.github.jan.supabase.gotrue.providers.Google
@@ -10,6 +10,11 @@ import io.github.jan.supabase.gotrue.providers.builtin.IDToken
 import io.github.jan.supabase.logging.SupabaseLogger
 import io.github.jan.supabase.plugins.SupabasePlugin
 import io.github.jan.supabase.plugins.SupabasePluginProvider
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 
 /**
  * Plugin that extends the [Auth] Module with composable function that enables an easy implementation of Native Auth.
@@ -52,11 +57,10 @@ sealed interface ComposeAuth : SupabasePlugin<ComposeAuth.Config> {
 
     /**
      * Config for [ComposeAuth]
-     * @param loginConfig provide [LoginConfig]
-     *
      */
     data class Config(
-        val loginConfig: MutableMap<String, LoginConfig> = mutableMapOf()
+        var googleLoginConfig: GoogleLoginConfig? = null,
+        var appleLoginConfig: AppleLoginConfig? = null,
     )
 
     companion object : SupabasePluginProvider<Config, ComposeAuth> {
@@ -84,10 +88,30 @@ val SupabaseClient.composeAuth: ComposeAuth
 internal class ComposeAuthImpl(
     override val config: ComposeAuth.Config,
     override val supabaseClient: SupabaseClient,
-) : ComposeAuth
+) : ComposeAuth {
+
+    private val scope = CoroutineScope(Dispatchers.Default)
+
+    init {
+        if(config.googleLoginConfig?.handleSignOut != null) {
+            supabaseClient.auth.sessionStatus
+                .onEach {
+                    if(it is SessionStatus.NotAuthenticated && it.isSignOut) {
+                        config.googleLoginConfig?.handleSignOut?.invoke()
+                    }
+                }
+                .launchIn(scope)
+        }
+    }
+
+    override suspend fun close() {
+        scope.cancel()
+    }
+
+}
 
 internal suspend fun ComposeAuth.signInWithGoogle(idToken: String) {
-    val config = config.loginConfig["google"] as? GoogleLoginConfig
+    val config = config.googleLoginConfig
 
     supabaseClient.auth.signInWith(IDToken) {
         provider = Google
@@ -98,7 +122,7 @@ internal suspend fun ComposeAuth.signInWithGoogle(idToken: String) {
 }
 
 internal suspend fun ComposeAuth.signInWithApple(idToken: String) {
-    val config = config.loginConfig["apple"] as? GoogleLoginConfig
+    val config = config.appleLoginConfig
 
     supabaseClient.auth.signInWith(IDToken) {
         provider = Apple
@@ -110,8 +134,4 @@ internal suspend fun ComposeAuth.signInWithApple(idToken: String) {
 
 internal suspend fun ComposeAuth.fallbackLogin(provider: IDTokenProvider) {
     supabaseClient.auth.signInWith(provider)
-}
-
-internal suspend fun ComposeAuth.signOut(scope: SignOutScope = SignOutScope.LOCAL) {
-    supabaseClient.auth.signOut(scope)
 }
