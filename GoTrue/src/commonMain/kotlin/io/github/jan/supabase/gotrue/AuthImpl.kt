@@ -402,7 +402,7 @@ internal class AuthImpl(
     override suspend fun importSession(
         session: UserSession,
         autoRefresh: Boolean,
-        source: SessionSource?
+        source: SessionSource
     ) {
         if (!autoRefresh) {
             _sessionStatus.value = SessionStatus.Authenticated(session, source)
@@ -467,7 +467,7 @@ internal class AuthImpl(
     }
 
     override suspend fun startAutoRefreshForCurrentSession() =
-        importSession(currentSessionOrNull() ?: error("No session found"), true, null)
+        importSession(currentSessionOrNull() ?: error("No session found"), true, (sessionStatus.value as SessionStatus.Authenticated).source)
 
     override fun stopAutoRefreshForCurrentSession() {
         sessionJob?.cancel()

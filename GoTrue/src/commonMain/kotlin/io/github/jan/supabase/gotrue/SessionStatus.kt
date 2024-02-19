@@ -29,16 +29,57 @@ sealed interface SessionStatus {
      * @param session The session
      * @param source The source of the session
      */
-    data class Authenticated(val session: UserSession, val source: SessionSource?) : SessionStatus
+    data class Authenticated(val session: UserSession, val source: SessionSource = SessionSource.Unknown) : SessionStatus
 
 }
 
+/**
+ * Represents the source of a session
+ */
 sealed interface SessionSource {
+
+    /**
+     * The session was loaded from storage
+     */
     data object Storage : SessionSource
+
+    /**
+     * The session was loaded from a sign in
+     * @param provider The provider that was used to sign in
+     */
     data class SignIn(val provider: AuthProvider<*, *>) : SessionSource
+
+    /**
+     * The session was loaded from a sign up (only if auto-confirm is enabled)
+     * @param provider The provider that was used to sign up
+     */
     data class SignUp(val provider: AuthProvider<*, *>) : SessionSource
+
+    /**
+     * The session comes from an external source, e.g. OAuth via deeplinks.
+     */
     data object External : SessionSource
+
+    /**
+     * The session comes from an unknown source
+     */
+    data object Unknown : SessionSource
+
+    /**
+     * The session was refreshed
+     * @param oldSession The old session
+     */
     data class Refresh(val oldSession: UserSession) : SessionSource
+
+    /**
+     * The session was changed due to a user change (e.g. via [Auth.modifyUser] or [Auth.retrieveUserForCurrentSession])
+     * @param oldSession The old session
+     */
     data class UserChanged(val oldSession: UserSession) : SessionSource
+
+    /**
+     * The session was changed due to a user identity change (e.g. via [Auth.linkIdentity] or [Auth.unlinkIdentity])
+     * @param oldSession The old session
+     */
     data class UserIdentitiesChanged(val oldSession: UserSession) : SessionSource
 }
