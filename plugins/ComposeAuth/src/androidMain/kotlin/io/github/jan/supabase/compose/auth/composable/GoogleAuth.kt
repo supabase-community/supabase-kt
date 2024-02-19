@@ -34,17 +34,17 @@ actual fun ComposeAuth.rememberSignInWithGoogle(onResult: (NativeSignInResult) -
 
 @Composable
 internal fun ComposeAuth.signInWithCM(onResult: (NativeSignInResult) -> Unit, fallback: suspend () -> Unit): NativeSignInState{
-    val state = remember { NativeSignInState() }
+    val state = remember { NativeSignInState(serializer) }
     val context = LocalContext.current
 
-    LaunchedEffect(key1 = state.started){
-        if (state.started) {
+    LaunchedEffect(key1 = state.status) {
+        if (state.status is NativeSignInStatus.Started) {
             val activity = context.getActivity()
-
+            val status = state.status as NativeSignInStatus.Started
             try {
                 if (activity != null && config.googleLoginConfig != null) {
                     val request = GetCredentialRequest.Builder()
-                        .addCredentialOption(getGoogleIDOptions(config.googleLoginConfig))
+                        .addCredentialOption(getGoogleIDOptions(config.googleLoginConfig, status.nonce))
                         .build()
                     val result = CredentialManager.create(context).getCredential(activity, request)
 
@@ -54,7 +54,7 @@ internal fun ComposeAuth.signInWithCM(onResult: (NativeSignInResult) -> Unit, fa
                                 try {
                                     val googleIdTokenCredential =
                                         GoogleIdTokenCredential.createFrom(result.credential.data)
-                                    signInWithGoogle(googleIdTokenCredential.idToken)
+                                    signInWithGoogle(googleIdTokenCredential.idToken, status.nonce, status.extraData)
                                     onResult.invoke(NativeSignInResult.Success)
                                 } catch (e: GoogleIdTokenParsingException) {
                                     onResult.invoke(

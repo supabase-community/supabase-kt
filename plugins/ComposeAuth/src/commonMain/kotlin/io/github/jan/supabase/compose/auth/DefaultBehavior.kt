@@ -5,16 +5,17 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import io.github.jan.supabase.annotations.SupabaseInternal
 import io.github.jan.supabase.compose.auth.composable.NativeSignInState
+import io.github.jan.supabase.compose.auth.composable.NativeSignInStatus
 
 /**
  * Composable of default behavior if Native Auth is not supported on the platform
  */
 @Composable
 @SupabaseInternal
-fun defaultLoginBehavior(fallback: suspend () -> Unit): NativeSignInState {
-    val state = remember { NativeSignInState() }
-    LaunchedEffect(key1 = state.started) {
-        if (state.started) {
+fun ComposeAuth.defaultLoginBehavior(fallback: suspend () -> Unit): NativeSignInState {
+    val state = remember { NativeSignInState(serializer) }
+    LaunchedEffect(key1 = state.status) {
+        if (state.status is NativeSignInStatus.Started) {
             fallback.invoke()
             state.reset()
         }
