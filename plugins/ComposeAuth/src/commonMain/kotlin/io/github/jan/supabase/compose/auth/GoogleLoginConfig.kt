@@ -4,6 +4,7 @@ import io.github.jan.supabase.compose.auth.composable.handleGoogleSignOut
 
 /**
  * Config for requesting IDToken from play-auth API
+ * @param serverClientId The server client ID
  * @param isSupported Sets whether Google ID token-backed credentials should be returned by the API.
  * @param associateLinkedAccounts Sets whether to support sign-in using Google accounts that are linked to your users' accounts.
  * @param handleSignOut Sets whether to sign out from Google on sign out from your app
