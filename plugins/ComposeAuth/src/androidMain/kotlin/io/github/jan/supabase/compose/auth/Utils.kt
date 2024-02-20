@@ -7,12 +7,13 @@ import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 
 internal fun getGoogleIDOptions(
     config: GoogleLoginConfig?,
+    filterByAuthorizedAccounts: Boolean,
     nonce: String? = null
 ): GetGoogleIdOption {
     val googleIdOption = GetGoogleIdOption.Builder()
     config?.let { options ->
         googleIdOption.setServerClientId(options.serverClientId)
-        googleIdOption.setFilterByAuthorizedAccounts(options.filterByAuthorizedAccounts)
+        googleIdOption.setFilterByAuthorizedAccounts(filterByAuthorizedAccounts)
         googleIdOption.setNonce(nonce)
 
         options.associateLinkedAccounts?.let {

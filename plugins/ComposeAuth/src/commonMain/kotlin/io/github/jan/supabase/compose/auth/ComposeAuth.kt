@@ -2,6 +2,7 @@ package io.github.jan.supabase.compose.auth
 
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.SupabaseSerializer
+import io.github.jan.supabase.compose.auth.composable.NativeSignInState
 import io.github.jan.supabase.gotrue.SessionStatus
 import io.github.jan.supabase.gotrue.auth
 import io.github.jan.supabase.gotrue.providers.Apple
@@ -61,6 +62,9 @@ sealed interface ComposeAuth : SupabasePlugin<ComposeAuth.Config>, CustomSeriali
 
     /**
      * Config for [ComposeAuth]
+     * @property googleLoginConfig Config for Google Login
+     * @property appleLoginConfig Config for Apple Login. Currently a placeholder.
+     * @property serializer The [SupabaseSerializer] to use for serialization when using [NativeSignInState.startFlow]
      */
     data class Config(
         var googleLoginConfig: GoogleLoginConfig? = null,
@@ -99,7 +103,11 @@ internal class ComposeAuthImpl(
 
     override val serializer: SupabaseSerializer = config.serializer ?: supabaseClient.defaultSerializer
 
-    init {
+    override suspend fun close() {
+        scope.cancel()
+    }
+
+    override fun init() {
         if(config.googleLoginConfig?.handleSignOut != null) {
             supabaseClient.auth.sessionStatus
                 .onEach {
@@ -111,15 +119,9 @@ internal class ComposeAuthImpl(
         }
     }
 
-    override suspend fun close() {
-        scope.cancel()
-    }
-
 }
 
 internal suspend fun ComposeAuth.signInWithGoogle(idToken: String, nonce: String?, extraData: JsonObject?) {
-    val config = config.googleLoginConfig
-
     supabaseClient.auth.signInWith(IDToken) {
         provider = Google
         this.idToken = idToken
@@ -129,8 +131,6 @@ internal suspend fun ComposeAuth.signInWithGoogle(idToken: String, nonce: String
 }
 
 internal suspend fun ComposeAuth.signInWithApple(idToken: String, nonce: String?, extraData: JsonObject?) {
-    val config = config.appleLoginConfig
-
     supabaseClient.auth.signInWith(IDToken) {
         provider = Apple
         this.idToken = idToken

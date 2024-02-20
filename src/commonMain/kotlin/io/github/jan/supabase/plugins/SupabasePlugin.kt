@@ -23,7 +23,14 @@ interface SupabasePlugin<Config> {
     /**
      * Free all resources used by this plugin
      */
-    open suspend fun close() {}
+    suspend fun close() {}
+
+    /**
+     * Initialize the plugin. Use this function, if you want to execute code after the plugin has been created but also have to access other plugins.
+     *
+     * **Note:** This function is called by the [SupabaseClient] after all plugins have been created. Do not call this function manually.
+     */
+    fun init() {}
 
 }
 

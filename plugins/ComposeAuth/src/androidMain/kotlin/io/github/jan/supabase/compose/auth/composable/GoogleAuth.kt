@@ -8,6 +8,7 @@ import androidx.credentials.ClearCredentialStateRequest
 import androidx.credentials.CredentialManager
 import androidx.credentials.CustomCredential
 import androidx.credentials.GetCredentialRequest
+import androidx.credentials.GetCredentialResponse
 import androidx.credentials.exceptions.GetCredentialCancellationException
 import androidx.credentials.exceptions.GetCredentialException
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
@@ -17,6 +18,7 @@ import io.github.jan.supabase.compose.auth.applicationContext
 import io.github.jan.supabase.compose.auth.getActivity
 import io.github.jan.supabase.compose.auth.getGoogleIDOptions
 import io.github.jan.supabase.compose.auth.signInWithGoogle
+import io.ktor.util.Digest
 
 /**
  * Composable function that implements Native Google Auth.
@@ -43,17 +45,20 @@ internal fun ComposeAuth.signInWithCM(onResult: (NativeSignInResult) -> Unit, fa
             val status = state.status as NativeSignInStatus.Started
             try {
                 if (activity != null && config.googleLoginConfig != null) {
-                    val request = GetCredentialRequest.Builder()
-                        .addCredentialOption(getGoogleIDOptions(config.googleLoginConfig, status.nonce))
-                        .build()
-                    val result = CredentialManager.create(context).getCredential(activity, request)
-
-                    when (result.credential) {
+                    val digest = Digest("SHA-256")
+                    digest += status.nonce!!.toByteArray()
+                    val hashedNonce = digest.build().joinToString("") { "%02x".format(it) }
+                    val response = makeRequest(context, activity, config, hashedNonce)
+                    if(response == null) {
+                        onResult.invoke(NativeSignInResult.ClosedByUser)
+                        return@LaunchedEffect
+                    }
+                    when (response.credential) {
                         is CustomCredential -> {
-                            if (result.credential.type == GoogleIdTokenCredential.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL) {
+                            if (response.credential.type == GoogleIdTokenCredential.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL) {
                                 try {
                                     val googleIdTokenCredential =
-                                        GoogleIdTokenCredential.createFrom(result.credential.data)
+                                        GoogleIdTokenCredential.createFrom(response.credential.data)
                                     signInWithGoogle(googleIdTokenCredential.idToken, status.nonce, status.extraData)
                                     onResult.invoke(NativeSignInResult.Success)
                                 } catch (e: GoogleIdTokenParsingException) {
@@ -75,8 +80,8 @@ internal fun ComposeAuth.signInWithCM(onResult: (NativeSignInResult) -> Unit, fa
                                 onResult.invoke(NativeSignInResult.Error("Unexpected type of credential"))
                             }
                         } else -> {
-                        onResult.invoke(NativeSignInResult.Error("Unsupported credentials"))
-                    }
+                            onResult.invoke(NativeSignInResult.Error("Unsupported credentials"))
+                        }
                     }
                 } else {
                     fallback.invoke()
@@ -86,7 +91,7 @@ internal fun ComposeAuth.signInWithCM(onResult: (NativeSignInResult) -> Unit, fa
                     is GetCredentialCancellationException -> onResult.invoke(NativeSignInResult.ClosedByUser)
                     else -> onResult.invoke(
                         NativeSignInResult.Error(
-                            e.localizedMessage ?: "error: getCredentialException",
+                            e.localizedMessage ?: "Credential exception",
                             e
                         )
                     )
@@ -104,4 +109,32 @@ internal fun ComposeAuth.signInWithCM(onResult: (NativeSignInResult) -> Unit, fa
 
 internal actual suspend fun handleGoogleSignOut() {
     CredentialManager.create(applicationContext()).clearCredentialState(ClearCredentialStateRequest())
+}
+
+private suspend fun tryRequest(
+    context: android.content.Context,
+    activity: android.app.Activity,
+    config: ComposeAuth.Config,
+    nonce: String?,
+    withFilter: Boolean
+): GetCredentialResponse {
+    val request = GetCredentialRequest.Builder()
+        .addCredentialOption(getGoogleIDOptions(config.googleLoginConfig, withFilter, nonce))
+        .build()
+    return CredentialManager.create(context).getCredential(activity, request)
+}
+
+private suspend fun makeRequest(
+    context: android.content.Context,
+    activity: android.app.Activity,
+    config: ComposeAuth.Config,
+    nonce: String?
+): GetCredentialResponse? {
+    return try {
+        tryRequest(context, activity, config, nonce, true)
+    } catch(e: GetCredentialCancellationException) {
+        return null
+    } catch(e: GetCredentialException) {
+        tryRequest(context, activity, config, nonce, false)
+    }
 }

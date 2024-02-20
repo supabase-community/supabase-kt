@@ -40,7 +40,7 @@ interface MainPlugin <Config : MainConfig> : SupabasePlugin<Config> {
     val pluginKey: String
 
     /**
-     * Gets the auth url from either [config.customUrl] or [SupabaseClient.supabaseHttpUrl] and adds [path] to it
+     * Gets the auth url from either [MainConfig.customUrl] or [SupabaseClient.supabaseHttpUrl] and adds [path] to it
      */
     @OptIn(SupabaseInternal::class)
     fun resolveUrl(path: String = ""): String {
@@ -59,8 +59,5 @@ interface MainPlugin <Config : MainConfig> : SupabasePlugin<Config> {
      * Parses the response from the server and builds a [RestException]
      */
     suspend fun parseErrorResponse(response: HttpResponse): RestException
-
-    @SupabaseInternal
-    fun init() {}
 
 }
