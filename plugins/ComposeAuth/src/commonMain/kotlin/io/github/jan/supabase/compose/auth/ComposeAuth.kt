@@ -10,6 +10,7 @@ import io.github.jan.supabase.gotrue.providers.Google
 import io.github.jan.supabase.gotrue.providers.IDTokenProvider
 import io.github.jan.supabase.gotrue.providers.builtin.IDToken
 import io.github.jan.supabase.logging.SupabaseLogger
+import io.github.jan.supabase.logging.d
 import io.github.jan.supabase.plugins.CustomSerializationConfig
 import io.github.jan.supabase.plugins.CustomSerializationPlugin
 import io.github.jan.supabase.plugins.SupabasePlugin
@@ -112,6 +113,7 @@ internal class ComposeAuthImpl(
             supabaseClient.auth.sessionStatus
                 .onEach {
                     if(it is SessionStatus.NotAuthenticated && it.isSignOut) {
+                        ComposeAuth.logger.d { "Received sign out event from Supabase, clearing any Google credentials..." }
                         config.googleLoginConfig?.handleSignOut?.invoke()
                     }
                 }
