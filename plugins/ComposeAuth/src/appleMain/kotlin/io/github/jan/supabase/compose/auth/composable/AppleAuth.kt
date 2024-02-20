@@ -58,7 +58,7 @@ actual fun ComposeAuth.rememberSignInWithApple(
 
                     val request = appleIDProvider.createRequest().apply {
                         requestedScopes = listOf(ASAuthorizationScopeFullName, ASAuthorizationScopeEmail)
-                        nonce = status.nonce
+                        nonce = hashedNonce
                     }
 
                     val controller = ASAuthorizationController(listOf(request)).apply {
