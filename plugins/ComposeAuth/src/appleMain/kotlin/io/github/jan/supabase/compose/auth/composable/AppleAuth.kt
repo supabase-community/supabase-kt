@@ -6,6 +6,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import io.github.jan.supabase.compose.auth.ComposeAuth
 import io.github.jan.supabase.compose.auth.signInWithApple
+import io.ktor.util.Digest
+import io.ktor.utils.io.core.toByteArray
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import platform.AuthenticationServices.ASAuthorization
@@ -34,6 +36,7 @@ import platform.darwin.NSObject
  * @param fallback Fallback function for unsupported platforms
  * @return [NativeSignInState]
  */
+@OptIn(ExperimentalStdlibApi::class)
 @Composable
 actual fun ComposeAuth.rememberSignInWithApple(
     onResult: (NativeSignInResult) -> Unit,
@@ -49,6 +52,10 @@ actual fun ComposeAuth.rememberSignInWithApple(
                 if (config.appleLoginConfig != null) {
                     val status = state.status as NativeSignInStatus.Started
                     val appleIDProvider = ASAuthorizationAppleIDProvider()
+                    val hashedNonce = Digest("SHA-256").apply {
+                        this += status.nonce!!.toByteArray()
+                    }.build().toHexString()
+
                     val request = appleIDProvider.createRequest().apply {
                         requestedScopes = listOf(ASAuthorizationScopeFullName, ASAuthorizationScopeEmail)
                         nonce = status.nonce

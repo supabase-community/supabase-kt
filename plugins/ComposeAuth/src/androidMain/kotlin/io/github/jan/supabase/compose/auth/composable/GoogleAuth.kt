@@ -34,6 +34,7 @@ actual fun ComposeAuth.rememberSignInWithGoogle(onResult: (NativeSignInResult) -
     return signInWithCM(onResult, fallback)
 }
 
+@OptIn(ExperimentalStdlibApi::class)
 @Composable
 internal fun ComposeAuth.signInWithCM(onResult: (NativeSignInResult) -> Unit, fallback: suspend () -> Unit): NativeSignInState{
     val state = remember { NativeSignInState(serializer) }
@@ -47,7 +48,7 @@ internal fun ComposeAuth.signInWithCM(onResult: (NativeSignInResult) -> Unit, fa
                 if (activity != null && config.googleLoginConfig != null) {
                     val digest = Digest("SHA-256")
                     digest += status.nonce!!.toByteArray()
-                    val hashedNonce = digest.build().joinToString("") { "%02x".format(it) }
+                    val hashedNonce = digest.build().toHexString()
                     val response = makeRequest(context, activity, config, hashedNonce)
                     if(response == null) {
                         onResult.invoke(NativeSignInResult.ClosedByUser)
