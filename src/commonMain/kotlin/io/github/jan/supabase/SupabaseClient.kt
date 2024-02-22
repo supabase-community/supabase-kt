@@ -113,11 +113,7 @@ internal class SupabaseClientImpl(
     })
 
     init {
-        pluginManager.installedPlugins.values.forEach {
-            if(it is MainPlugin<*>) {
-                it.init()
-            }
-        }
+        pluginManager.installedPlugins.values.forEach(SupabasePlugin<*>::init)
     }
 
     override suspend fun close() {

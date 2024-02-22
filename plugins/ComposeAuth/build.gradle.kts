@@ -51,23 +51,27 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 api(project(":gotrue-kt"))
-                implementation(compose.ui)
                 implementation(compose.runtime)
             }
         }
+        val noDefaultMain by creating {
+            dependsOn(commonMain)
+        }
         val androidMain by getting {
             dependencies {
-                api(libs.android.play.store.auth)
                 api(libs.android.google.id)
                 api(libs.androidx.credentials)
                 api(libs.androidx.credentials.play.services)
-                implementation(libs.kotlinx.coroutines.play.services)
                 implementation(libs.androidx.activity.compose)
             }
         }
-        val jvmMain by getting
+        val jvmMain by getting {
+            dependsOn(noDefaultMain)
+        }
         val appleMain by getting
-        val jsMain by getting
+        val jsMain by getting {
+            dependsOn(noDefaultMain)
+        }
     }
 }
 

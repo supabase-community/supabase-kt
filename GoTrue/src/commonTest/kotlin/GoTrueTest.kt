@@ -7,6 +7,8 @@ import io.github.jan.supabase.gotrue.AuthConfig
 import io.github.jan.supabase.gotrue.MemoryCodeVerifierCache
 import io.github.jan.supabase.gotrue.MemorySessionManager
 import io.github.jan.supabase.gotrue.OtpType
+import io.github.jan.supabase.gotrue.SessionSource
+import io.github.jan.supabase.gotrue.SessionStatus
 import io.github.jan.supabase.gotrue.auth
 import io.github.jan.supabase.gotrue.providers.Github
 import io.github.jan.supabase.gotrue.providers.builtin.Email
@@ -17,8 +19,10 @@ import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
+import kotlin.test.assertIs
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
+import kotlin.test.assertTrue
 
 class GoTrueTest {
 
@@ -49,6 +53,8 @@ class GoTrueTest {
                 password = GoTrueMock.VALID_PASSWORD
             }
             assertEquals(GoTrueMock.NEW_ACCESS_TOKEN, client.auth.currentAccessTokenOrNull())
+            assertIs<SessionSource.SignIn>(client.auth.sessionSource())
+            assertIs<Email>(client.auth.sessionSourceAs<SessionSource.SignIn>().provider)
             client.close()
         }
     }
@@ -82,11 +88,16 @@ class GoTrueTest {
         runTest(dispatcher) {
             val session =
                 UserSession("some_token", "some_refresh_token", "", "", 20, "token_type", null)
-            client.auth.importSession(session, false)
+            client.auth.importSession(session, false, source = SessionSource.External)
+            assertIs<SessionSource.External>(client.auth.sessionSource())
             assertEquals("some_token", client.auth.currentAccessTokenOrNull())
             assertEquals("some_refresh_token", client.auth.currentSessionOrNull()!!.refreshToken)
             client.auth.signOut()
-            assertEquals(null, client.auth.currentAccessTokenOrNull())
+            assertNull(client.auth.currentAccessTokenOrNull())
+            assertIs<SessionStatus.NotAuthenticated>(client.auth.sessionStatus.value)
+            assertTrue {
+                (client.auth.sessionStatus.value as SessionStatus.NotAuthenticated).isSignOut
+            }
             client.close()
         }
     }
@@ -120,6 +131,7 @@ class GoTrueTest {
             )
             client.auth.importSession(session, true)
             assertEquals(GoTrueMock.NEW_ACCESS_TOKEN, client.auth.currentAccessTokenOrNull())
+            assertIs<SessionSource.Refresh>(client.auth.sessionSource())
             client.close()
         }
     }
@@ -140,7 +152,9 @@ class GoTrueTest {
             )
         }
         runTest {
+            assertIs<SessionStatus.NotAuthenticated>(client.auth.sessionStatus.value)
             client.auth.loadFromStorage()
+            assertIs<SessionSource.Storage>(client.auth.sessionSource())
             assertNotNull(client.auth.currentSessionOrNull())
             client.close()
         }
@@ -196,6 +210,8 @@ class GoTrueTest {
                 client.auth.currentAccessTokenOrNull(),
                 "verify with valid token should update the user session"
             )
+            assertIs<SessionSource.SignIn>(client.auth.sessionSource())
+            assertIs<OTP>(client.auth.sessionSourceAs<SessionSource.SignIn>().provider)
         }
     }
 
@@ -273,6 +289,10 @@ class GoTrueTest {
             }
         }
     }
+
+    private fun Auth.sessionSource() = (sessionStatus.value as SessionStatus.Authenticated).source
+
+    private inline fun <reified T> Auth.sessionSourceAs() = sessionSource() as T
 
 }
 

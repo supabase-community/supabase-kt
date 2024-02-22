@@ -15,6 +15,7 @@ import io.github.jan.supabase.gotrue.mfa.MfaApiImpl
 import io.github.jan.supabase.gotrue.providers.AuthProvider
 import io.github.jan.supabase.gotrue.providers.ExternalAuthConfigDefaults
 import io.github.jan.supabase.gotrue.providers.OAuthProvider
+import io.github.jan.supabase.gotrue.providers.builtin.OTP
 import io.github.jan.supabase.gotrue.providers.builtin.SSO
 import io.github.jan.supabase.gotrue.user.UserInfo
 import io.github.jan.supabase.gotrue.user.UserSession
@@ -94,11 +95,11 @@ internal class AuthImpl(
                     Auth.logger.i {
                         "No session found."
                     }
-                    _sessionStatus.value = SessionStatus.NotAuthenticated
+                    _sessionStatus.value = SessionStatus.NotAuthenticated(false)
                 }
             }
         } else {
-            _sessionStatus.value = SessionStatus.NotAuthenticated
+            _sessionStatus.value = SessionStatus.NotAuthenticated(false)
         }
     }
 
@@ -107,7 +108,7 @@ internal class AuthImpl(
         redirectUrl: String?,
         config: (C.() -> Unit)?
     ) = provider.login(supabaseClient, {
-        importSession(it)
+        importSession(it, source = SessionSource.SignIn(provider))
     }, redirectUrl, config)
 
     override suspend fun <C, R, Provider : AuthProvider<C, R>> signUpWith(
@@ -115,7 +116,7 @@ internal class AuthImpl(
         redirectUrl: String?,
         config: (C.() -> Unit)?
     ): R? = provider.signUp(supabaseClient, {
-        importSession(it)
+        importSession(it, source = SessionSource.SignUp(provider))
     }, redirectUrl, config)
 
     @SupabaseExperimental
@@ -134,7 +135,7 @@ internal class AuthImpl(
                 response.request.url.toString()
             },
             onSessionSuccess = {
-                importSession(it)
+                importSession(it, source = SessionSource.UserIdentitiesChanged(it))
             }
         )
     }
@@ -146,7 +147,7 @@ internal class AuthImpl(
             val session = currentSessionOrNull() ?: return
             val newUser = session.user?.copy(identities = session.user.identities?.filter { it.identityId != identityId })
             val newSession = session.copy(user = newUser)
-            _sessionStatus.value = SessionStatus.Authenticated(newSession, sessionStatus.value)
+            _sessionStatus.value = SessionStatus.Authenticated(newSession, SessionSource.UserIdentitiesChanged(session))
         }
     }
 
@@ -219,7 +220,7 @@ internal class AuthImpl(
             if (this.config.autoSaveToStorage) {
                 sessionManager.saveSession(newSession)
             }
-            _sessionStatus.value = SessionStatus.Authenticated(newSession, sessionStatus.value)
+            _sessionStatus.value = SessionStatus.Authenticated(newSession, SessionSource.UserChanged(newSession))
         }
         return userInfo
     }
@@ -322,7 +323,7 @@ internal class AuthImpl(
         }
         val response = api.postJson("verify", body)
         val session = response.body<UserSession>()
-        importSession(session)
+        importSession(session, source = SessionSource.SignIn(OTP))
     }
 
     override suspend fun verifyEmailOtp(
@@ -355,7 +356,7 @@ internal class AuthImpl(
         val user = retrieveUser(currentAccessTokenOrNull() ?: error("No session found"))
         if (updateSession) {
             val session = currentSessionOrNull() ?: error("No session found")
-            val newStatus = SessionStatus.Authenticated(session.copy(user = user), sessionStatus.value)
+            val newStatus = SessionStatus.Authenticated(session.copy(user = user), SessionSource.UserChanged(currentSessionOrNull() ?: error("Session shouldn't be null")))
             _sessionStatus.value = newStatus
             if (config.autoSaveToStorage) sessionManager.saveSession(newStatus.session)
         }
@@ -372,7 +373,7 @@ internal class AuthImpl(
         }.safeBody<UserSession>()
         codeVerifierCache.deleteCodeVerifier()
         if (saveSession) {
-            importSession(session)
+            importSession(session, source = SessionSource.External)
         }
         return session
     }
@@ -395,12 +396,16 @@ internal class AuthImpl(
             currentSessionOrNull()?.refreshToken
                 ?: error("No refresh token found in current session")
         )
-        importSession(newSession)
+        importSession(newSession, source = SessionSource.Refresh(currentSessionOrNull() ?: error("No session found")))
     }
 
-    override suspend fun importSession(session: UserSession, autoRefresh: Boolean) {
+    override suspend fun importSession(
+        session: UserSession,
+        autoRefresh: Boolean,
+        source: SessionSource
+    ) {
         if (!autoRefresh) {
-            _sessionStatus.value = SessionStatus.Authenticated(session, sessionStatus.value)
+            _sessionStatus.value = SessionStatus.Authenticated(session, source)
             if (session.refreshToken.isNotBlank() && session.expiresIn != 0L && config.autoSaveToStorage) {
                 sessionManager.saveSession(session)
             }
@@ -412,7 +417,7 @@ internal class AuthImpl(
                 { importSession(session) }
             )
         } else {
-            _sessionStatus.value = SessionStatus.Authenticated(session, sessionStatus.value)
+            _sessionStatus.value = SessionStatus.Authenticated(session, source)
             if (config.autoSaveToStorage) sessionManager.saveSession(session)
             sessionJob?.cancel()
             sessionJob = authScope.launch {
@@ -420,7 +425,7 @@ internal class AuthImpl(
                 launch {
                     tryImportingSession(
                         { handleExpiredSession(session) },
-                        { importSession(session) }
+                        { importSession(session, source = source) }
                     )
                 }
             }
@@ -458,11 +463,11 @@ internal class AuthImpl(
             "Session expired. Refreshing session..."
         }
         val newSession = refreshSession(session.refreshToken)
-        importSession(newSession, autoRefresh)
+        importSession(newSession, autoRefresh, SessionSource.Refresh(session))
     }
 
     override suspend fun startAutoRefreshForCurrentSession() =
-        importSession(currentSessionOrNull() ?: error("No session found"), true)
+        importSession(currentSessionOrNull() ?: error("No session found"), true, (sessionStatus.value as SessionStatus.Authenticated).source)
 
     override fun stopAutoRefreshForCurrentSession() {
         sessionJob?.cancel()
@@ -472,7 +477,7 @@ internal class AuthImpl(
     override suspend fun loadFromStorage(autoRefresh: Boolean): Boolean {
         val session = sessionManager.loadSession()
         session?.let {
-            importSession(it, autoRefresh)
+            importSession(it, autoRefresh, SessionSource.Storage)
         }
         return session != null
     }
@@ -536,7 +541,7 @@ internal class AuthImpl(
         codeVerifierCache.deleteCodeVerifier()
         sessionManager.deleteSession()
         sessionJob?.cancel()
-        _sessionStatus.value = SessionStatus.NotAuthenticated
+        _sessionStatus.value = SessionStatus.NotAuthenticated(true)
         sessionJob = null
     }
 
