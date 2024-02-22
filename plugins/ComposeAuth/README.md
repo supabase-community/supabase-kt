@@ -98,7 +98,7 @@ Button(
 
 Here is a small guide on how to use Native Google Auth on Android:
 
-1. Create a project in your [Google Cloud Developer Console](console.cloud.google.com/)
+1. Create a project in your [Google Cloud Developer Console](https://console.cloud.google.com/)
 2. Create OAuth credentials for a Web application, and use your Supabase callback url as redirect url. (**https://ID.supabase.co/auth/v1/callback**)
 3. Put in the Web OAuth in your Supabase Auth Settings for Google in the Dashboard
 4. Create OAuth credentials for an Android app, and put in your package name and SHA-1 certificate (which you can get by using `gradlew signingReport`)
