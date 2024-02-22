@@ -5,6 +5,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import androidx.credentials.ClearCredentialStateRequest
+import androidx.credentials.Credential
 import androidx.credentials.CredentialManager
 import androidx.credentials.CustomCredential
 import androidx.credentials.GetCredentialRequest
@@ -17,10 +18,10 @@ import io.github.jan.supabase.compose.auth.ComposeAuth
 import io.github.jan.supabase.compose.auth.applicationContext
 import io.github.jan.supabase.compose.auth.getActivity
 import io.github.jan.supabase.compose.auth.getGoogleIDOptions
+import io.github.jan.supabase.compose.auth.hash
 import io.github.jan.supabase.compose.auth.signInWithGoogle
 import io.github.jan.supabase.logging.d
 import io.github.jan.supabase.logging.e
-import io.ktor.util.Digest
 
 /**
  * Composable function that implements Native Google Auth.
@@ -36,7 +37,6 @@ actual fun ComposeAuth.rememberSignInWithGoogle(onResult: (NativeSignInResult) -
     return signInWithCM(onResult, fallback)
 }
 
-@OptIn(ExperimentalStdlibApi::class)
 @Composable
 internal fun ComposeAuth.signInWithCM(onResult: (NativeSignInResult) -> Unit, fallback: suspend () -> Unit): NativeSignInState{
     val state = remember { NativeSignInState(serializer) }
@@ -48,11 +48,7 @@ internal fun ComposeAuth.signInWithCM(onResult: (NativeSignInResult) -> Unit, fa
             val status = state.status as NativeSignInStatus.Started
             try {
                 if (activity != null && config.googleLoginConfig != null) {
-                    val hashedNonce = if(status.nonce != null) {
-                        val digest = Digest("SHA-256")
-                        digest += status.nonce.toByteArray()
-                        digest.build().toHexString()
-                    } else null
+                    val hashedNonce = status.nonce?.hash()
                     ComposeAuth.logger.d { "Starting Google Sign In Flow${if(hashedNonce != null) " with hashed nonce: $hashedNonce" else ""}" }
                     val response = makeRequest(context, activity, config, hashedNonce)
                     if(response == null) {
@@ -60,40 +56,10 @@ internal fun ComposeAuth.signInWithCM(onResult: (NativeSignInResult) -> Unit, fa
                         ComposeAuth.logger.d { "Google Sign In Flow was closed by user" }
                         return@LaunchedEffect
                     }
-                    when (response.credential) {
-                        is CustomCredential -> {
-                            if (response.credential.type == GoogleIdTokenCredential.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL) {
-                                ComposeAuth.logger.d { "Received Google ID Token Credential, logging into Supabase..." }
-                                try {
-                                    val googleIdTokenCredential =
-                                        GoogleIdTokenCredential.createFrom(response.credential.data)
-                                    signInWithGoogle(googleIdTokenCredential.idToken, status.nonce, status.extraData)
-                                    ComposeAuth.logger.d { "Successfully logged into Supabase with Google ID Token Credential" }
-                                    onResult.invoke(NativeSignInResult.Success)
-                                } catch (e: GoogleIdTokenParsingException) {
-                                    ComposeAuth.logger.e(e) { "Google ID Token parsing exception" }
-                                    onResult.invoke(
-                                        NativeSignInResult.Error(
-                                            e.localizedMessage ?: "Google id parsing exception",
-                                            e
-                                        )
-                                    )
-                                } catch(e: Exception) {
-                                    ComposeAuth.logger.e(e) { "Error while logging into Supabase with Google ID Token Credential" }
-                                    onResult.invoke(
-                                        NativeSignInResult.Error(
-                                            e.localizedMessage ?: "error",
-                                            e
-                                        )
-                                    )
-                                }
-                            } else {
-                                onResult.invoke(NativeSignInResult.Error("Unexpected type of credential"))
-                            }
-                        } else -> {
-                            onResult.invoke(NativeSignInResult.Error("Unsupported credentials"))
-                        }
-                    }
+                    parseCredential(
+                        response.credential,
+                        onResult
+                    ) { signInWithGoogle(it, status.nonce, status.extraData) }
                 } else {
                     fallback.invoke()
                 }
@@ -120,6 +86,49 @@ internal fun ComposeAuth.signInWithCM(onResult: (NativeSignInResult) -> Unit, fa
     }
 
     return state
+}
+
+private suspend fun parseCredential(
+    credential: Credential,
+    onResult: (NativeSignInResult) -> Unit,
+    signInWithGoogle: suspend (idToken: String) -> Unit
+) {
+    when (credential) {
+        is CustomCredential -> {
+            if (credential.type == GoogleIdTokenCredential.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL) {
+                ComposeAuth.logger.d { "Received Google ID Token Credential, logging into Supabase..." }
+                try {
+                    val googleIdTokenCredential =
+                        GoogleIdTokenCredential.createFrom(credential.data)
+                    signInWithGoogle(googleIdTokenCredential.idToken)
+                    ComposeAuth.logger.d { "Successfully logged into Supabase with Google ID Token Credential" }
+                    onResult.invoke(NativeSignInResult.Success)
+                } catch (e: GoogleIdTokenParsingException) {
+                    ComposeAuth.logger.e(e) { "Google ID Token parsing exception" }
+                    onResult.invoke(
+                        NativeSignInResult.Error(
+                            e.localizedMessage ?: "Google id parsing exception",
+                            e
+                        )
+                    )
+                } catch (e: Exception) {
+                    ComposeAuth.logger.e(e) { "Error while logging into Supabase with Google ID Token Credential" }
+                    onResult.invoke(
+                        NativeSignInResult.Error(
+                            e.localizedMessage ?: "error",
+                            e
+                        )
+                    )
+                }
+            } else {
+                onResult.invoke(NativeSignInResult.Error("Unexpected type of credential"))
+            }
+        }
+
+        else -> {
+            onResult.invoke(NativeSignInResult.Error("Unsupported credentials"))
+        }
+    }
 }
 
 internal actual suspend fun handleGoogleSignOut() {
