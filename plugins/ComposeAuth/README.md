@@ -63,7 +63,7 @@ val supabase = createSupabaseClient(
 # Native Auth Support
 
 Currently, Compose Auth only supports Native Auth for
-Android with Google (via Google OneTap and Credential Manager for Android 14+) and iOS with Apple, other variations such as JS and JVM rely on fallback which
+Android with Google (via Credential Manager) and iOS with Apple, other variations such as JS and JVM rely on fallback which
 by default is GoTrue-kt OAuth flow.
 
 To learn how you can use this plugin in your compose project, visit [Compose Multiplatform](https://github.com/JetBrains/compose-multiplatform/#readme)
@@ -88,7 +88,7 @@ val action = supabase.composeAuth.rememberSignInWithGoogle(
 )
 
 Button(
-    onClick = { action.startFlow() }
+    onClick = { action.startFlow() } //optional: you can also pass in extra data for the user like a name. A nonce is automatically generated, but you can also pass in a custom nonce 
 ) {
     Text("Google Login")
 }
