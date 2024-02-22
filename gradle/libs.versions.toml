@@ -23,7 +23,7 @@ googleid = "1.1.0"
 compose = "1.6.0-rc01"
 androidsvg = "1.4"
 coil = "2.5.0"
-imageloader = "1.7.4"
+imageloader = "1.7.5"
 okio = "3.8.0"
 credentials = "1.2.0"
 
