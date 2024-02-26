@@ -5,8 +5,8 @@ import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ProcessLifecycleOwner
 import androidx.startup.Initializer
-import co.touchlab.kermit.Logger
 import io.github.jan.supabase.annotations.SupabaseInternal
+import io.github.jan.supabase.logging.d
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -37,17 +37,17 @@ private fun addLifecycleCallbacks(gotrue: Auth) {
 
                 override fun onStart(owner: LifecycleOwner) {
                     if(!gotrue.isAutoRefreshRunning && gotrue.config.alwaysAutoRefresh) {
-                        Logger.d("Auth") {
+                        Auth.logger.d {
                             "Trying to re-load session from storage..."
                         }
                         scope.launch {
                             val sessionFound = gotrue.loadFromStorage()
                             if(!sessionFound) {
-                                Logger.d("Auth") {
+                                Auth.logger.d {
                                     "No session found, not starting auto refresh"
                                 }
                             } else {
-                                Logger.d("Auth") {
+                                Auth.logger.d {
                                     "Session found, auto refresh started"
                                 }
                             }
@@ -56,7 +56,7 @@ private fun addLifecycleCallbacks(gotrue: Auth) {
                 }
                 override fun onStop(owner: LifecycleOwner) {
                     if(gotrue.isAutoRefreshRunning) {
-                        Logger.d("Auth") { "Cancelling auto refresh because app is switching to the background" }
+                        Auth.logger.d { "Cancelling auto refresh because app is switching to the background" }
                         scope.launch {
                             gotrue.stopAutoRefreshForCurrentSession()
                             gotrue.resetLoadingState()
