@@ -29,7 +29,16 @@ sealed interface SessionStatus {
      * @param session The session
      * @param source The source of the session
      */
-    data class Authenticated(val session: UserSession, val source: SessionSource = SessionSource.Unknown) : SessionStatus
+    data class Authenticated(val session: UserSession, val source: SessionSource = SessionSource.Unknown) : SessionStatus {
+
+        /**
+         * Whether the session is new, i.e. [source] is [SessionSource.SignIn], [SessionSource.SignUp] or [SessionSource.External].
+         * Use this to determine whether this status is the result of a new sign in or sign up or just a session refresh.
+         */
+        val isNew: Boolean
+            get() = source is SessionSource.SignIn || source is SessionSource.SignUp || source is SessionSource.External
+
+    }
 
 }
 
