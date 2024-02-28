@@ -65,9 +65,9 @@ interface SupabasePluginProvider<Config, PluginInstance : SupabasePlugin<Config>
     fun create(supabaseClient: SupabaseClient, config: Config) : PluginInstance
 
     /**
-     * Updates the plugin's logging level
+     * Updates the plugin's log level
      */
-    fun setLoggingLevel(level: LogLevel) {
+    fun setLogLevel(level: LogLevel) {
         logger.setLevel(level)
     }
 
