@@ -10,34 +10,24 @@ import io.ktor.http.appendEncodedPathSegments
 /**
  * Config for [MainPlugin]s
  */
-interface MainConfig {
+open class MainConfig {
 
     /**
      * The url used for this module
      */
-    var customUrl: String?
+    var customUrl: String? = null
 
     /**
      * The jwt token used for this module. If null, the client will use the token from GoTrue's current session
      */
-    var jwtToken: String?
+    var jwtToken: String? = null
 
 }
 
 /**
  * Represents main plugins like Auth or Functions
  */
-interface MainPlugin <Config : MainConfig> : SupabasePlugin {
-
-    /**
-     * The configuration for this plugin
-     */
-    val config: Config
-
-    /**
-     * The corresponding [SupabaseClient] instance
-     */
-    val supabaseClient: SupabaseClient
+interface MainPlugin <Config : MainConfig> : SupabasePlugin<Config> {
 
     /**
      * The version for the api the plugin is using
@@ -50,7 +40,7 @@ interface MainPlugin <Config : MainConfig> : SupabasePlugin {
     val pluginKey: String
 
     /**
-     * Gets the auth url from either [config.customUrl] or [SupabaseClient.supabaseHttpUrl] and adds [path] to it
+     * Gets the auth url from either [MainConfig.customUrl] or [SupabaseClient.supabaseHttpUrl] and adds [path] to it
      */
     @OptIn(SupabaseInternal::class)
     fun resolveUrl(path: String = ""): String {
@@ -69,8 +59,5 @@ interface MainPlugin <Config : MainConfig> : SupabasePlugin {
      * Parses the response from the server and builds a [RestException]
      */
     suspend fun parseErrorResponse(response: HttpResponse): RestException
-
-    @SupabaseInternal
-    fun init() {}
 
 }

@@ -1,6 +1,5 @@
 package io.github.jan.supabase.storage
 
-import co.touchlab.kermit.Logger
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.annotations.SupabaseInternal
 import io.github.jan.supabase.bodyOrNull
@@ -12,6 +11,8 @@ import io.github.jan.supabase.exceptions.RestException
 import io.github.jan.supabase.exceptions.UnauthorizedRestException
 import io.github.jan.supabase.exceptions.UnknownRestException
 import io.github.jan.supabase.gotrue.authenticatedSupabaseApi
+import io.github.jan.supabase.logging.SupabaseLogger
+import io.github.jan.supabase.logging.w
 import io.github.jan.supabase.plugins.MainConfig
 import io.github.jan.supabase.plugins.MainPlugin
 import io.github.jan.supabase.plugins.SupabasePluginProvider
@@ -114,11 +115,9 @@ sealed interface Storage : MainPlugin<Storage.Config> {
      * @param transferTimeout the timeout for uploading and downloading files (default: 120 seconds)
      */
     data class Config(
-        override var customUrl: String? = null,
-        override var jwtToken: String? = null,
         var transferTimeout: Duration = 120.seconds,
         @PublishedApi internal var resumable: Resumable = Resumable()
-    ) : MainConfig {
+    ) : MainConfig() {
 
         /**
          * @param cache the cache for caching resumable upload urls
@@ -137,7 +136,7 @@ sealed interface Storage : MainPlugin<Storage.Config> {
             var defaultChunkSize: Long = DEFAULT_CHUNK_SIZE
                 set(value) {
                     if(value != DEFAULT_CHUNK_SIZE) {
-                        Logger.w("Storage") { "supabase currently only supports a chunk size of 6MB" }
+                        Storage.logger.w { "Supabase currently only supports a chunk size of 6MB" }
                     }
                     field = value
                 }
@@ -156,6 +155,8 @@ sealed interface Storage : MainPlugin<Storage.Config> {
     companion object : SupabasePluginProvider<Config, Storage> {
 
         override val key: String = "storage"
+
+        override val logger: SupabaseLogger = SupabaseClient.createLogger("Supabase-Storage")
 
         /**
          * The api version of the storage plugin
@@ -190,6 +191,7 @@ internal class StorageImpl(override val supabaseClient: SupabaseClient, override
             requestTimeoutMillis = config.transferTimeout.inWholeMilliseconds
         }
     }
+
     private val resumableClients = AtomicMutableMap<String, BucketApi>()
 
     override suspend fun retrieveBuckets(): List<Bucket> = api.get("bucket").safeBody()

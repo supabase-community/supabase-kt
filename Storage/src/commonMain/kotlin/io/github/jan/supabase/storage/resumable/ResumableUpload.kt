@@ -1,8 +1,10 @@
 package io.github.jan.supabase.storage.resumable
 
-import co.touchlab.kermit.Logger
 import io.github.jan.supabase.annotations.SupabaseInternal
 import io.github.jan.supabase.gotrue.Auth
+import io.github.jan.supabase.logging.d
+import io.github.jan.supabase.logging.e
+import io.github.jan.supabase.logging.w
 import io.github.jan.supabase.storage.BucketApi
 import io.github.jan.supabase.storage.Storage
 import io.github.jan.supabase.storage.UploadStatus
@@ -109,14 +111,14 @@ internal class ResumableUploadImpl(
             while (offset < size) {
                 if(paused || !isActive) return@launch //check if paused or the scope is still active
                 if(updateOffset) { //after an upload error we retrieve the server offset and update the data stream to avoid conflicts
-                    Logger.d("Storage") { "Trying to update server offset for $path" }
+                    Storage.logger.d { "Trying to update server offset for $path" }
                     try {
                         serverOffset = retrieveServerOffset() //retrieve server offset
                         offset = serverOffset
                         dataStream.cancel() //cancel old data stream as we are start reading from a new offset
                         dataStream = createDataStream(offset) //create new data stream
                     } catch(e: Exception) {
-                        Logger.e("Error while updating server offset for $path. Retrying in ${config.retryTimeout}", e, "Storage")
+                        Storage.logger.e(e) { "Error while updating server offset for $path. Retrying in ${config.retryTimeout}" }
                         delay(config.retryTimeout)
                         continue
                     }
@@ -127,7 +129,7 @@ internal class ResumableUploadImpl(
                     offset += uploaded
                 } catch(e: Exception) {
                     if(e !is IllegalStateException) {
-                        Logger.e("Error while uploading chunk. Retrying in ${config.retryTimeout}", e, "Storage")
+                        Storage.logger.e(e) {"Error while uploading chunk. Retrying in ${config.retryTimeout}" }
                         delay(config.retryTimeout)
                         updateOffset = true //if an error occurs, we need to update the server offset to avoid conflicts
                         continue
@@ -166,11 +168,11 @@ internal class ResumableUploadImpl(
                 serverOffset = uploadResponse.headers["Upload-Offset"]?.toLong() ?: error("No upload offset found")
             }
             HttpStatusCode.Conflict -> {
-                Logger.w("Storage") { "Upload conflict, skipping chunk" }
+                Storage.logger.w { "Upload conflict, skipping chunk" }
                 serverOffset = offset + limit
             }
             HttpStatusCode.NoContent -> {
-                Logger.d("Storage") { "Uploaded chunk" }
+                Storage.logger.d { "Uploaded chunk" }
             }
             else -> error("Upload failed with status ${uploadResponse.status}. ${uploadResponse.bodyAsText()}")
         }
