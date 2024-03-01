@@ -8,6 +8,7 @@ import coil3.fetch.Fetcher
 import coil3.network.httpHeaders
 import coil3.request.Options
 import coil3.toUri
+import io.github.jan.supabase.logging.d
 import io.github.jan.supabase.storage.Storage
 import io.github.jan.supabase.storage.StorageItem
 import io.github.jan.supabase.storage.authenticatedRequest
