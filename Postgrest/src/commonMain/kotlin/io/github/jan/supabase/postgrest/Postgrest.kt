@@ -2,6 +2,7 @@ package io.github.jan.supabase.postgrest
 
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.SupabaseSerializer
+import io.github.jan.supabase.logging.SupabaseLogger
 import io.github.jan.supabase.plugins.CustomSerializationConfig
 import io.github.jan.supabase.plugins.CustomSerializationPlugin
 import io.github.jan.supabase.plugins.MainConfig
@@ -63,11 +64,9 @@ sealed interface Postgrest : MainPlugin<Postgrest.Config>, CustomSerializationPl
      * @param propertyConversionMethod The method to use to convert the property names to the column names in [PostgrestRequestBuilder] and [PostgrestUpdate]. Defaults to [PropertyConversionMethod.CAMEL_CASE_TO_SNAKE_CASE]
      */
     data class Config(
-        override var customUrl: String? = null,
-        override var jwtToken: String? = null,
         var defaultSchema: String = "public",
         var propertyConversionMethod: PropertyConversionMethod = PropertyConversionMethod.CAMEL_CASE_TO_SNAKE_CASE,
-    ): MainConfig, CustomSerializationConfig {
+    ): MainConfig(), CustomSerializationConfig {
 
         override var serializer: SupabaseSerializer? = null
 
@@ -76,6 +75,8 @@ sealed interface Postgrest : MainPlugin<Postgrest.Config>, CustomSerializationPl
     companion object : SupabasePluginProvider<Config, Postgrest> {
 
         override val key = "rest"
+
+        override val logger: SupabaseLogger = SupabaseClient.createLogger("Supabase-PostgREST")
 
         /**
          * The current postgrest API version

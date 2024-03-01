@@ -6,6 +6,8 @@ import coil3.request.ImageRequest
 import coil3.request.Options
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.annotations.SupabaseExperimental
+import io.github.jan.supabase.logging.SupabaseLogger
+import io.github.jan.supabase.logging.d
 import io.github.jan.supabase.plugins.SupabasePlugin
 import io.github.jan.supabase.plugins.SupabasePluginProvider
 import io.github.jan.supabase.storage.StorageItem
@@ -14,7 +16,7 @@ import io.github.jan.supabase.storage.storage
 /**
  * A plugin that implements [Fetcher.Factory] to support using [StorageItem] as data when creating a [ImageRequest] or using it as a model in Compose Multiplatform.
  */
-interface CoilIntegration: SupabasePlugin, Fetcher.Factory<StorageItem> {
+interface CoilIntegration: SupabasePlugin<CoilIntegration.Config>, Fetcher.Factory<StorageItem> {
 
     /**
      * The configuration for the coil integration.
@@ -25,8 +27,10 @@ interface CoilIntegration: SupabasePlugin, Fetcher.Factory<StorageItem> {
 
         override val key = "coil"
 
+        override val logger: SupabaseLogger = SupabaseClient.createLogger("Supabase-CoilIntegration")
+
         override fun create(supabaseClient: SupabaseClient, config: Config): CoilIntegration {
-            return CoilIntegrationImpl(supabaseClient)
+            return CoilIntegrationImpl(supabaseClient, config)
         }
 
         override fun createConfig(init: Config.() -> Unit): Config {
@@ -37,9 +41,13 @@ interface CoilIntegration: SupabasePlugin, Fetcher.Factory<StorageItem> {
 
 }
 
-internal class CoilIntegrationImpl(private val supabaseClient: SupabaseClient) : CoilIntegration {
+internal class CoilIntegrationImpl(
+    override val supabaseClient: SupabaseClient,
+    override val config: CoilIntegration.Config
+) : CoilIntegration {
 
     override fun create(data: StorageItem, options: Options, imageLoader: ImageLoader): Fetcher {
+        CoilIntegration.logger.d { "Creating Storage Fetcher" }
         return SupabaseStorageFetcher(supabaseClient.storage, data, options, imageLoader)
     }
 

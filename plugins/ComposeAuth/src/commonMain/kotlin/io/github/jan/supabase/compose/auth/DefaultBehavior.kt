@@ -5,34 +5,19 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import io.github.jan.supabase.annotations.SupabaseInternal
 import io.github.jan.supabase.compose.auth.composable.NativeSignInState
-import io.github.jan.supabase.gotrue.SignOutScope
-
-/**
- * Composable used to sign out from Auth
- */
-@Composable
-@SupabaseInternal
-fun ComposeAuth.defaultSignOutBehavior(signOutScope: SignOutScope, nativeSignOut: suspend () -> Unit = {}): NativeSignInState {
-    val state = remember { NativeSignInState() }
-    LaunchedEffect(key1 = state.started) {
-        if (state.started) {
-            nativeSignOut.invoke()
-            signOut(signOutScope)
-            state.reset()
-        }
-    }
-    return state
-}
+import io.github.jan.supabase.compose.auth.composable.NativeSignInStatus
+import io.github.jan.supabase.logging.d
 
 /**
  * Composable of default behavior if Native Auth is not supported on the platform
  */
 @Composable
 @SupabaseInternal
-fun defaultLoginBehavior(fallback: suspend () -> Unit): NativeSignInState {
-    val state = remember { NativeSignInState() }
-    LaunchedEffect(key1 = state.started) {
-        if (state.started) {
+fun ComposeAuth.defaultLoginBehavior(fallback: suspend () -> Unit): NativeSignInState {
+    val state = remember { NativeSignInState(serializer) }
+    LaunchedEffect(key1 = state.status) {
+        if (state.status is NativeSignInStatus.Started) {
+            ComposeAuth.logger.d { "Native Auth is not supported on this platform, falling back to default behavior"}
             fallback.invoke()
             state.reset()
         }

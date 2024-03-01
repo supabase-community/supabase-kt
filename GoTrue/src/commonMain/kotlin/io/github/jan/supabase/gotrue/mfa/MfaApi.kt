@@ -103,29 +103,29 @@ sealed interface MfaApi {
 }
 
 internal class MfaApiImpl(
-    val gotrue: AuthImpl
+    val auth: AuthImpl
 ) : MfaApi {
 
-    override val isMfaEnabledFlow: Flow<Boolean> = gotrue.sessionStatus.map {
+    override val isMfaEnabledFlow: Flow<Boolean> = auth.sessionStatus.map {
         when(it) {
             is SessionStatus.Authenticated -> isMfaEnabled
             SessionStatus.LoadingFromStorage -> false
             SessionStatus.NetworkError -> false
-            SessionStatus.NotAuthenticated -> false
+            is SessionStatus.NotAuthenticated -> false
         }
     }
-    override val loggedInUsingMfaFlow: Flow<Boolean> = gotrue.sessionStatus.map {
+    override val loggedInUsingMfaFlow: Flow<Boolean> = auth.sessionStatus.map {
         when(it) {
             is SessionStatus.Authenticated -> loggedInUsingMfa
             SessionStatus.LoadingFromStorage -> false
             SessionStatus.NetworkError -> false
-            SessionStatus.NotAuthenticated -> false
+            is SessionStatus.NotAuthenticated -> false
         }
     }
     override val verifiedFactors: List<UserMfaFactor>
-        get() = (gotrue.sessionStatus.value as? SessionStatus.Authenticated)?.session?.user?.factors?.filter(UserMfaFactor::isVerified) ?: emptyList()
+        get() = (auth.sessionStatus.value as? SessionStatus.Authenticated)?.session?.user?.factors?.filter(UserMfaFactor::isVerified) ?: emptyList()
 
-    val api = gotrue.api
+    val api = auth.api
 
     override suspend fun <Response> enroll(
         factorType: FactorType<Response>,
@@ -164,7 +164,7 @@ internal class MfaApiImpl(
         })
         val session = result.body<UserSession>()
         if(saveSession) {
-            gotrue.importSession(session)
+            auth.importSession(session)
         }
         return session
     }
@@ -174,7 +174,7 @@ internal class MfaApiImpl(
     }
 
     override fun getAuthenticatorAssuranceLevel(): MfaLevel {
-        val jwt = gotrue.currentAccessTokenOrNull() ?: error("Current session is null")
+        val jwt = auth.currentAccessTokenOrNull() ?: error("Current session is null")
         val parts = jwt.split(".")
         val decodedJwt = Json.decodeFromString<JsonObject>(parts[1].decodeBase64String())
         val aal = AuthenticatorAssuranceLevel.from(decodedJwt["aal"]?.jsonPrimitive?.content ?: error("No 'aal' claim found in JWT"))
@@ -184,7 +184,7 @@ internal class MfaApiImpl(
 
 
     override suspend fun retrieveFactorsForCurrentUser(): List<UserMfaFactor> {
-        return gotrue.retrieveUser(gotrue.currentAccessTokenOrNull() ?: error("Current session is null")).factors
+        return auth.retrieveUser(auth.currentAccessTokenOrNull() ?: error("Current session is null")).factors
     }
 
 }

@@ -28,7 +28,7 @@ abstract class OAuthProvider : AuthProvider<ExternalAuthConfig, Unit> {
         supabaseClient.auth.startExternalAuth(
             redirectUrl = redirectUrl,
             getUrl = {
-                supabaseClient.auth.oAuthUrl(this, it) {
+                supabaseClient.auth.getOAuthUrl(this, it) {
                     scopes.addAll(authConfig.scopes)
                     queryParams.putAll(authConfig.queryParams)
                 }

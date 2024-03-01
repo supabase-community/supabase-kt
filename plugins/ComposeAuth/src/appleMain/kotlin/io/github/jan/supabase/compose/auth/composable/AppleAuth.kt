@@ -4,8 +4,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import io.github.jan.supabase.compose.auth.AppleLoginConfig
 import io.github.jan.supabase.compose.auth.ComposeAuth
+import io.github.jan.supabase.compose.auth.hash
 import io.github.jan.supabase.compose.auth.signInWithApple
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -35,39 +35,47 @@ import platform.darwin.NSObject
  * @param fallback Fallback function for unsupported platforms
  * @return [NativeSignInState]
  */
+@OptIn(ExperimentalStdlibApi::class)
 @Composable
 actual fun ComposeAuth.rememberSignInWithApple(
     onResult: (NativeSignInResult) -> Unit,
     fallback: suspend () -> Unit
 ): NativeSignInState {
 
-    val state = remember { NativeSignInState() }
+    val state = remember { NativeSignInState(this.serializer) }
     val scope = rememberCoroutineScope()
 
-    LaunchedEffect(key1 = state.started) {
-        if(state.started) {
-            if (config.loginConfig["apple"] == null) {
-                fallback.invoke()
-                state.reset()
-                return@LaunchedEffect
-            }
+    LaunchedEffect(key1 = state.status) {
+        if(state.status is NativeSignInStatus.Started) {
+            try {
+                if (config.appleLoginConfig != null) {
+                    val status = state.status as NativeSignInStatus.Started
+                    val appleIDProvider = ASAuthorizationAppleIDProvider()
+                    val hashedNonce = status.nonce?.hash()
 
-            val appleIDProvider = ASAuthorizationAppleIDProvider()
-            val request = appleIDProvider.createRequest().apply {
-                requestedScopes = listOf(ASAuthorizationScopeFullName, ASAuthorizationScopeEmail)
-                nonce = (config.loginConfig["apple"] as? AppleLoginConfig)?.nonce
-            }
+                    val request = appleIDProvider.createRequest().apply {
+                        requestedScopes = listOf(ASAuthorizationScopeFullName, ASAuthorizationScopeEmail)
+                        nonce = hashedNonce
+                    }
 
-            val controller = ASAuthorizationController(listOf(request)).apply {
-                delegate = authorizationController(scope) {
-                    onResult.invoke(it)
-                    state.reset()
+                    val controller = ASAuthorizationController(listOf(request)).apply {
+                        delegate = authorizationController(scope, status) {
+                            onResult.invoke(it)
+                            state.reset()
+                        }
+
+                        presentationContextProvider = presentationAnchor()
+
+                    }
+                    controller.performRequests()
+                } else {
+                    fallback.invoke()
                 }
-
-                presentationContextProvider = presentationAnchor()
-
+            } catch(e: Exception) {
+                onResult.invoke(NativeSignInResult.Error(e.message ?: "error"))
+            } finally {
+                state.reset()
             }
-            controller.performRequests()
         }
     }
 
@@ -75,7 +83,8 @@ actual fun ComposeAuth.rememberSignInWithApple(
 }
 
 internal fun ComposeAuth.authorizationController(
-    scope:CoroutineScope,
+    scope: CoroutineScope,
+    status: NativeSignInStatus.Started,
     onResult: (NativeSignInResult) -> Unit
 ): ASAuthorizationControllerDelegateProtocol {
     return object : NSObject(), ASAuthorizationControllerDelegateProtocol {
@@ -90,7 +99,7 @@ internal fun ComposeAuth.authorizationController(
                     NSUTF8StringEncoding
                 )?.let { idToken ->
                     scope.launch {
-                        signInWithApple(idToken)
+                        signInWithApple(idToken, status.nonce, status.extraData)
                         onResult.invoke(NativeSignInResult.Success)
                     }
                 }

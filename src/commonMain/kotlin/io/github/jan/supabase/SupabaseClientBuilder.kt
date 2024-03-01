@@ -1,8 +1,8 @@
 package io.github.jan.supabase
 
-import co.touchlab.kermit.Logger
 import io.github.jan.supabase.annotations.SupabaseDsl
 import io.github.jan.supabase.annotations.SupabaseInternal
+import io.github.jan.supabase.logging.LogLevel
 import io.github.jan.supabase.plugins.PluginManager
 import io.github.jan.supabase.plugins.SupabasePlugin
 import io.github.jan.supabase.plugins.SupabasePluginProvider
@@ -48,6 +48,17 @@ class SupabaseClientBuilder @PublishedApi internal constructor(private val supab
     var requestTimeout = 10.seconds
 
     /**
+     * The default log level used for plugins.
+     *
+     * Can be overridden by the plugin's config
+     */
+    var defaultLogLevel: LogLevel
+        set(value) {
+            SupabaseClient.DEFAULT_LOG_LEVEL = value
+        }
+        get() = SupabaseClient.DEFAULT_LOG_LEVEL
+
+    /**
      * The default serializer used to serialize and deserialize custom data types.
      *
      * Default: [KotlinXSerializer]
@@ -55,7 +66,7 @@ class SupabaseClientBuilder @PublishedApi internal constructor(private val supab
     var defaultSerializer: SupabaseSerializer = KotlinXSerializer()
 
     private val httpConfigOverrides = mutableListOf<HttpClientConfig<*>.() -> Unit>()
-    private val plugins = mutableMapOf<String, ((SupabaseClient) -> SupabasePlugin)>()
+    private val plugins = mutableMapOf<String, ((SupabaseClient) -> SupabasePlugin<*>)>()
 
     init {
         val module = when {
@@ -70,13 +81,21 @@ class SupabaseClientBuilder @PublishedApi internal constructor(private val supab
         }
         if(supabaseUrl.startsWith("http://")) {
             useHTTPS = false
-            Logger.w("Core") { "You are using a non HTTPS supabase url ($supabaseUrl)."}
         }
     }
 
     @PublishedApi
     internal fun build(): SupabaseClient {
-        return SupabaseClientImpl(supabaseUrl.split("//").last(), supabaseKey, plugins, httpConfigOverrides, useHTTPS, requestTimeout.inWholeMilliseconds, httpEngine, defaultSerializer)
+        return SupabaseClientImpl(
+            supabaseUrl.split("//").last(),
+            supabaseKey,
+            plugins,
+            httpConfigOverrides,
+            useHTTPS,
+            requestTimeout.inWholeMilliseconds,
+            httpEngine,
+            defaultSerializer
+        )
     }
 
     /**
@@ -96,7 +115,7 @@ class SupabaseClientBuilder @PublishedApi internal constructor(private val supab
      * Plugins can be either retrieved by calling [PluginManager.getPlugin] within your [SupabaseClient] instance or by using the corresponding **SupabaseClient.plugin** extension property.
      */
     @SupabaseDsl
-    fun <Config, PluginInstance : SupabasePlugin, Provider : SupabasePluginProvider<Config, PluginInstance>> install(plugin: Provider, init: @SupabaseDsl Config.() -> Unit = {}) {
+    fun <Config, PluginInstance : SupabasePlugin<Config>, Provider : SupabasePluginProvider<Config, PluginInstance>> install(plugin: Provider, init: @SupabaseDsl Config.() -> Unit = {}) {
         val config = plugin.createConfig(init)
         plugin.setup(this, config)
         plugins[plugin.key] = {
