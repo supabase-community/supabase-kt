@@ -68,6 +68,8 @@ class PostgrestRequestBuilder(@PublishedApi internal val propertyConversionMetho
      */
     fun order(column: String, order: Order, nullsFirst: Boolean = false, referencedTable: String? = null) {
         val key = if (referencedTable == null) "order" else "$referencedTable.order"
+        val existingOrder = _params[key]?.firstOrNull() ?: ""
+        val newOrder = "$existingOrder,${column}.${order.value}.${if (nullsFirst) "nullsfirst" else "nullslast"}"
         _params[key] = listOf("${column}.${order.value}.${if (nullsFirst) "nullsfirst" else "nullslast"}")
     }
 
