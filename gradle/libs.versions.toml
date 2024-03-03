@@ -9,9 +9,7 @@ coroutines = "1.8.0"
 android-lifecycle = "2.7.0"
 androidx-startup = "1.1.1"
 androidx-activity-compose = "1.8.2"
-android-play-store = "20.4.1" # Later versions causing Error code 16 for now (Ref: https://issuetracker.google.com/issues/302775651)
 multiplatform-settings = "1.1.1"
-javalin = "5.6.3"
 complete-kotlin = "1.1.0"
 agp = "8.2.2"
 maven-publish = "0.27.0"
@@ -24,8 +22,8 @@ browser = "1.7.0"
 googleid = "1.1.0"
 compose = "1.6.0"
 androidsvg = "1.4"
-coil = "2.6.0"
 imageloader = "1.7.6"
+coil = "2.6.0"
 okio = "3.8.0"
 credentials = "1.2.0"
 
@@ -57,6 +55,8 @@ ktor-client-content-negotiation = { module = "io.ktor:ktor-client-content-negoti
 ktor-client-websockets = { module = "io.ktor:ktor-client-websockets", version.ref = "ktor" }
 ktor-client-mock = { module = "io.ktor:ktor-client-mock", version.ref = "ktor" }
 ktor-json = { module = "io.ktor:ktor-serialization-kotlinx-json", version.ref = "ktor" }
+ktor-server-core = { module = "io.ktor:ktor-server-core", version.ref = "ktor" }
+ktor-server-cio = { module = "io.ktor:ktor-server-cio", version.ref = "ktor" }
 
 kermit = { module = "co.touchlab:kermit", version.ref = "kermit" }
 
@@ -64,7 +64,6 @@ android-lifecycle-process = { module = "androidx.lifecycle:lifecycle-process", v
 androidx-browser = { module = "androidx.browser:browser", version.ref = "browser" }
 androidx-startup-runtime = { module = "androidx.startup:startup-runtime", version.ref = "androidx-startup" }
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activity-compose" }
-android-play-store-auth = { module = "com.google.android.gms:play-services-auth", version.ref = "android-play-store" }
 android-google-id = { module = "com.google.android.libraries.identity.googleid:googleid", version.ref = "googleid" }
 androidx-credentials = { module = "androidx.credentials:credentials", version.ref = "credentials" }
 androidx-credentials-play-services = { module = "androidx.credentials:credentials-play-services-auth", version.ref = "credentials" }
@@ -72,8 +71,6 @@ androidx-credentials-play-services = { module = "androidx.credentials:credential
 multiplatform-settings-no-arg = { module = "com.russhwolf:multiplatform-settings-no-arg", version.ref = "multiplatform-settings" }
 multiplatform-settings-coroutines = { module = "com.russhwolf:multiplatform-settings-coroutines", version.ref = "multiplatform-settings" }
 multiplatform-settings-test = { module = "com.russhwolf:multiplatform-settings-test", version.ref = "multiplatform-settings" }
-
-javalin = { module = "io.javalin:javalin", version.ref = "javalin" }
 
 apollo-kotlin = { module = "com.apollographql.apollo3:apollo-runtime", version.ref = "apollo-kotlin" }
 

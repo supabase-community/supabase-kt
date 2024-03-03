@@ -1,10 +1,10 @@
 package io.github.jan.supabase.realtime
 
-import co.touchlab.kermit.Logger
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.annotations.SupabaseInternal
 import io.github.jan.supabase.decode
 import io.github.jan.supabase.encodeToJsonElement
+import io.github.jan.supabase.logging.e
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
@@ -186,7 +186,7 @@ inline fun <reified T : Any> RealtimeChannel.broadcastFlow(event: String): Flow<
         val decodedValue = try {
             supabaseClient.realtime.serializer.decode<T>(it.toString())
         } catch(e: Exception) {
-            Logger.e(e, "Realtime") { "Couldn't decode $this as ${T::class.simpleName}. The corresponding handler wasn't called" }
+            Realtime.logger.e(e) { "Couldn't decode $this as ${T::class.simpleName}. The corresponding handler wasn't called" }
             null
         }
         decodedValue?.let { value -> trySend(value) }

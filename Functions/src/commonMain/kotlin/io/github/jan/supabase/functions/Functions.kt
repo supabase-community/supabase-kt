@@ -46,7 +46,7 @@ import io.ktor.http.HttpStatusCode
 class Functions(override val config: Config, override val supabaseClient: SupabaseClient) : MainPlugin<Functions.Config>, CustomSerializationPlugin {
 
     override val apiVersion: Int
-        get() = Functions.API_VERSION
+        get() = API_VERSION
 
     override val pluginKey: String
         get() = key
@@ -120,10 +120,7 @@ class Functions(override val config: Config, override val supabaseClient: Supaba
      * @param jwtToken A jwt token to use for the requests. If not provided, the token from the [Auth] plugin, or the supabaseKey will be used
      * @property serializer A serializer used for serializing/deserializing objects e.g. in [Functions.invoke] or [EdgeFunction.invoke]. Defaults to [KotlinXSerializer]
      */
-    data class Config(
-        override var customUrl: String? = null,
-        override var jwtToken: String? = null,
-    ) : MainConfig, CustomSerializationConfig {
+    class Config : MainConfig(), CustomSerializationConfig {
 
         override var serializer: SupabaseSerializer? = null
 
@@ -132,6 +129,8 @@ class Functions(override val config: Config, override val supabaseClient: Supaba
     companion object : SupabasePluginProvider<Config, Functions> {
 
         override val key = "functions"
+
+        override val logger = SupabaseClient.createLogger("Supabase-Functions")
 
         /**
          * The current functions api version
