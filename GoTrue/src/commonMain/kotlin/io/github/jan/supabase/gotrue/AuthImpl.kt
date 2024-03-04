@@ -43,6 +43,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
+import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonObjectBuilder
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.encodeToJsonElement
@@ -110,6 +111,18 @@ internal class AuthImpl(
     ) = provider.login(supabaseClient, {
         importSession(it, source = SessionSource.SignIn(provider))
     }, redirectUrl, config)
+
+    override suspend fun signInAnonymously(data: JsonObject?, captchaToken: String?) {
+        val response = api.postJson("signup", buildJsonObject {
+            data?.let { put("data", it) }
+            captchaToken?.let {
+                putJsonObject("gotrue_meta_security") {
+                    put("captcha_token", captchaToken)
+                }
+            }
+        })
+        //TODO: handle response
+    }
 
     override suspend fun <C, R, Provider : AuthProvider<C, R>> signUpWith(
         provider: Provider,

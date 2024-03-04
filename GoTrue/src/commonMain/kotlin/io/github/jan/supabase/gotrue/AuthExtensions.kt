@@ -1,7 +1,9 @@
 package io.github.jan.supabase.gotrue
 
+import io.github.jan.supabase.encodeToJsonElement
 import io.github.jan.supabase.gotrue.user.UserSession
 import io.github.jan.supabase.logging.d
+import kotlinx.serialization.json.jsonObject
 
 internal fun noDeeplinkError(arg: String): Nothing = error("""
         Trying to use a deeplink as a redirect url, but no deeplink $arg is set in the GoTrueConfig.
@@ -52,3 +54,8 @@ fun Auth.parseSessionFromFragment(fragment: String): UserSession {
  * @return The parsed session. Note that the user will be null, but you can retrieve it using [Auth.retrieveUser]
  */
 fun Auth.parseSessionFromUrl(url: String): UserSession = parseSessionFromFragment(url.substringAfter("#"))
+
+/**
+ * TODO: docs
+ */
+suspend inline fun <reified T : Any> Auth.signInAnonymously(data: T, captchaToken: String? = null) = signInAnonymously(serializer.encodeToJsonElement(data).jsonObject, captchaToken)

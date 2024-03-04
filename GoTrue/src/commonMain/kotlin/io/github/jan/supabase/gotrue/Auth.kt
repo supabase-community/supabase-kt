@@ -23,6 +23,7 @@ import io.github.jan.supabase.plugins.MainPlugin
 import io.github.jan.supabase.plugins.SupabasePluginProvider
 import io.ktor.client.plugins.HttpRequestTimeoutException
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.serialization.json.JsonObject
 
 /**
  * Plugin to interact with the Supabase Auth API
@@ -126,6 +127,11 @@ sealed interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
         redirectUrl: String? = defaultRedirectUrl(),
         config: (C.() -> Unit)? = null
     )
+
+    /**
+     * TODO: Docs
+     */
+    suspend fun signInAnonymously(data: JsonObject? = null, captchaToken: String? = null)
 
     /**
      * Links an OAuth Identity to an existing user.
