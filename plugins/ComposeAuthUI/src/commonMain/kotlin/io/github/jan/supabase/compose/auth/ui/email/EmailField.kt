@@ -245,7 +245,6 @@ fun OutlinedEmailField(
     FormComponent(formKey, mandatory) {
         val isValidEmail = remember(value) { validator.validate(value) }
         LaunchedEffect(isValidEmail) {
-            println(isValidEmail)
             it.value = isValidEmail
         }
         OutlinedTextField(
