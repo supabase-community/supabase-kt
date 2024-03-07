@@ -105,8 +105,10 @@ internal class RealtimeImpl(override val supabaseClient: SupabaseClient, overrid
                 Error while trying to connect to realtime websocket. Trying again in ${config.reconnectDelay}
                 URL: $realtimeUrl
                 """.trimIndent() }
-            disconnect()
-            connect(true)
+            scope.launch {
+                disconnect()
+                connect(true)
+            }
         }
     }
 
