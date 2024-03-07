@@ -70,23 +70,6 @@ internal class RealtimeImpl(override val supabaseClient: SupabaseClient, overrid
         if (reconnect) {
             delay(config.reconnectDelay)
             Realtime.logger.d { "Reconnecting..." }
-        } else {
-            scope.launch {
-                supabaseClient.pluginManager.getPluginOrNull(Auth)?.sessionStatus?.collect {
-                    if(status.value == Realtime.Status.CONNECTED) {
-                        when(it) {
-                            is SessionStatus.Authenticated -> updateJwt(it.session.accessToken)
-                            is SessionStatus.NotAuthenticated -> {
-                                if(config.disconnectOnSessionLoss) {
-                                    Realtime.logger.w { "No auth session found, disconnecting from realtime websocket"}
-                                    disconnect()
-                                }
-                            }
-                            else -> {}
-                        }
-                    }
-                }
-            }
         }
         if (status.value == Realtime.Status.CONNECTED) return
         _status.value = Realtime.Status.CONNECTING
@@ -105,8 +88,29 @@ internal class RealtimeImpl(override val supabaseClient: SupabaseClient, overrid
                 Error while trying to connect to realtime websocket. Trying again in ${config.reconnectDelay}
                 URL: $realtimeUrl
                 """.trimIndent() }
-            disconnect()
-            connect(true)
+            scope.launch {
+                disconnect()
+                connect(true)
+            }
+        }
+    }
+
+    override fun init() {
+        scope.launch {
+            supabaseClient.pluginManager.getPluginOrNull(Auth)?.sessionStatus?.collect {
+                if(status.value == Realtime.Status.CONNECTED) {
+                    when(it) {
+                        is SessionStatus.Authenticated -> updateJwt(it.session.accessToken)
+                        is SessionStatus.NotAuthenticated -> {
+                            if(config.disconnectOnSessionLoss) {
+                                Realtime.logger.w { "No auth session found, disconnecting from realtime websocket"}
+                                disconnect()
+                            }
+                        }
+                        else -> {}
+                    }
+                }
+            }
         }
     }
 
