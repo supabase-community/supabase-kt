@@ -188,13 +188,13 @@ sealed interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
     /**
      * Resends an existing SMS OTP or phone change OTP.
      * @param type The phone otp type
-     * @param phoneNumber The phone to resend the otp to
+     * @param phone The phone to resend the otp to
      * @param captchaToken The captcha token to use
      * @throws RestException or one of its subclasses if receiving an error response
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
-    suspend fun resendPhone(type: OtpType.Phone, phoneNumber: String, captchaToken: String? = null)
+    suspend fun resendPhone(type: OtpType.Phone, phone: String, captchaToken: String? = null)
 
     /**
      * Sends a password reset email to the user with the specified [email]
