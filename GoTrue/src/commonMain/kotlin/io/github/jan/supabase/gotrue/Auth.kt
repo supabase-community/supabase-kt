@@ -89,7 +89,7 @@ sealed interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
      * ```
      *
      * @param provider the provider to use for signing up. E.g. [Email], [Phone] or [Google]
-     * @param redirectUrl The redirect url to use. If you don't specify this, the platform specific will be use, like deeplinks on android.
+     * @param redirectUrl The redirect url to use. If you don't specify this, the platform specific will be used, like deeplinks on android.
      * @param config The configuration to use for the sign-up.
      * @return The result of the sign-up (e.g. the user id) or null if auto-confirm is enabled (resulting in a login)
      * @throws RestException or one of its subclasses if receiving an error response
@@ -194,13 +194,13 @@ sealed interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
     /**
      * Resends an existing SMS OTP or phone change OTP.
      * @param type The phone otp type
-     * @param phoneNumber The phone to resend the otp to
+     * @param phone The phone to resend the otp to
      * @param captchaToken The captcha token to use
      * @throws RestException or one of its subclasses if receiving an error response
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
-    suspend fun resendPhone(type: OtpType.Phone, phoneNumber: String, captchaToken: String? = null)
+    suspend fun resendPhone(type: OtpType.Phone, phone: String, captchaToken: String? = null)
 
     /**
      * Sends a password reset email to the user with the specified [email]

@@ -51,7 +51,7 @@ sealed interface MfaApi {
     val loggedInUsingMfaFlow: Flow<Boolean>
 
     /**
-     * @param factorType The type of MFA factor to enroll. Currently only supports TOTP. Defaults to TOTP.
+     * @param factorType The type of MFA factor to enroll. Currently only supports TOTP.
      * @param issuer Domain which the user is enrolling with
      * @param friendlyName Human readable name assigned to a device
      * @return MfaEnrollResponse containing the id of the MFA factor, the type of MFA factor and the data of the MFA factor (like QR-Code for TOTP)

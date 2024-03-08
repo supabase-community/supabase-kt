@@ -257,10 +257,10 @@ internal class AuthImpl(
 
     override suspend fun resendPhone(
         type: OtpType.Phone,
-        phoneNumber: String,
+        phone: String,
         captchaToken: String?
     ) = resend(type.type) {
-        put("phone", phoneNumber)
+        put("phone", phone)
         captchaToken?.let {
             putJsonObject("gotrue_meta_security") {
                 put("captcha_token", captchaToken)
