@@ -88,7 +88,7 @@ sealed interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
      * ```
      *
      * @param provider the provider to use for signing up. E.g. [Email], [Phone] or [Google]
-     * @param redirectUrl The redirect url to use. If you don't specify this, the platform specific will be use, like deeplinks on android.
+     * @param redirectUrl The redirect url to use. If you don't specify this, the platform specific will be used, like deeplinks on android.
      * @param config The configuration to use for the sign-up.
      * @return The result of the sign-up (e.g. the user id) or null if auto-confirm is enabled (resulting in a login)
      * @throws RestException or one of its subclasses if receiving an error response
