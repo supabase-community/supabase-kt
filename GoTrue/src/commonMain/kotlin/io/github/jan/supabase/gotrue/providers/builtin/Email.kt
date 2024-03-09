@@ -1,6 +1,7 @@
 package io.github.jan.supabase.gotrue.providers.builtin
 
 import io.github.jan.supabase.exceptions.SupabaseEncodingException
+import io.github.jan.supabase.gotrue.user.Identity
 import io.github.jan.supabase.supabaseJson
 import kotlinx.datetime.Instant
 import kotlinx.serialization.ExperimentalSerializationApi
@@ -31,6 +32,7 @@ data object Email : DefaultAuthProvider<Email.Config, Email.Result> {
      * The sign up result of the email authentication method
      * @param id The id of the created user
      * @param email The email of the created user
+     * @param identities The identities of the created user
      * @param confirmationSentAt The time the confirmation was sent
      * @param createdAt The time the user was created
      * @param updatedAt The time the user was updated
@@ -39,6 +41,7 @@ data object Email : DefaultAuthProvider<Email.Config, Email.Result> {
     data class Result(
         val id: String,
         val email: String,
+        val identities: List<Identity>?,
         @SerialName("confirmation_sent_at") val confirmationSentAt: Instant,
         @SerialName("created_at") val createdAt: Instant,
         @SerialName("updated_at") val updatedAt: Instant,
