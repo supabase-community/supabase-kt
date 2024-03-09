@@ -1,5 +1,6 @@
 import io.github.jan.supabase.gotrue.providers.builtin.Email
 import io.github.jan.supabase.gotrue.providers.builtin.Phone
+import io.github.jan.supabase.gotrue.user.Identity
 import io.github.jan.supabase.gotrue.user.UserInfo
 import io.github.jan.supabase.gotrue.user.UserSession
 import io.ktor.client.engine.mock.MockEngine
@@ -118,7 +119,17 @@ class GoTrueMock {
 
         return when {
             body.containsKey("email") -> {
-                respond(Email.Result("uuid", body["email"]!!.jsonPrimitive.content, Clock.System.now(), Clock.System.now(), Clock.System.now()))
+                val identity = Identity(
+                    id = "uuid",
+                    identityData = JsonObject(emptyMap()),
+                    identityId = "uuid2",
+                    lastSignInAt = Clock.System.now().toString(),
+                    createdAt = Clock.System.now().toString(),
+                    provider = "email",
+                    userId = "uuid",
+                    updatedAt = Clock.System.now().toString(),
+                )
+                respond(Email.Result("uuid", body["email"]!!.jsonPrimitive.content, listOf(identity), Clock.System.now(), Clock.System.now(), Clock.System.now()))
             }
             body.containsKey("phone") -> {
                 respond(Phone.Result("uuid", body["phone"]!!.jsonPrimitive.content, Clock.System.now(), Clock.System.now(), Clock.System.now()))
