@@ -121,7 +121,8 @@ internal class AuthImpl(
                 }
             }
         })
-        //TODO: handle response
+        val session = response.safeBody<UserSession>()
+        importSession(session, source = SessionSource.AnonymousSignIn)
     }
 
     override suspend fun <C, R, Provider : AuthProvider<C, R>> signUpWith(
