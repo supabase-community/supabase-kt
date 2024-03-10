@@ -33,6 +33,8 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.job
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.serialization.json.buildJsonObject
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -47,6 +49,7 @@ internal class RealtimeImpl(override val supabaseClient: SupabaseClient, overrid
     override val subscriptions: Map<String, RealtimeChannel>
         get() = _subscriptions.toMap()
     private val scope = CoroutineScope(Dispatchers.Default + SupervisorJob())
+    private val mutex = Mutex()
     var heartbeatJob: Job? = null
     var messageJob: Job? = null
     var ref by atomic(0)
@@ -63,27 +66,10 @@ internal class RealtimeImpl(override val supabaseClient: SupabaseClient, overrid
 
     override suspend fun connect() = connect(false)
 
-    suspend fun connect(reconnect: Boolean) {
+    suspend fun connect(reconnect: Boolean): Unit = mutex.withLock {
         if (reconnect) {
             delay(config.reconnectDelay)
             Realtime.logger.d { "Reconnecting..." }
-        } else {
-            scope.launch {
-                supabaseClient.pluginManager.getPluginOrNull(Auth)?.sessionStatus?.collect {
-                    if(status.value == Realtime.Status.CONNECTED) {
-                        when(it) {
-                            is SessionStatus.Authenticated -> updateJwt(it.session.accessToken)
-                            is SessionStatus.NotAuthenticated -> {
-                                if(config.disconnectOnSessionLoss) {
-                                    Realtime.logger.w { "No auth session found, disconnecting from realtime websocket"}
-                                    disconnect()
-                                }
-                            }
-                            else -> {}
-                        }
-                    }
-                }
-            }
         }
         if (status.value == Realtime.Status.CONNECTED) return
         _status.value = Realtime.Status.CONNECTING
@@ -102,8 +88,29 @@ internal class RealtimeImpl(override val supabaseClient: SupabaseClient, overrid
                 Error while trying to connect to realtime websocket. Trying again in ${config.reconnectDelay}
                 URL: $realtimeUrl
                 """.trimIndent() }
-            disconnect()
-            connect(true)
+            scope.launch {
+                disconnect()
+                connect(true)
+            }
+        }
+    }
+
+    override fun init() {
+        scope.launch {
+            supabaseClient.pluginManager.getPluginOrNull(Auth)?.sessionStatus?.collect {
+                if(status.value == Realtime.Status.CONNECTED) {
+                    when(it) {
+                        is SessionStatus.Authenticated -> updateJwt(it.session.accessToken)
+                        is SessionStatus.NotAuthenticated -> {
+                            if(config.disconnectOnSessionLoss) {
+                                Realtime.logger.w { "No auth session found, disconnecting from realtime websocket"}
+                                disconnect()
+                            }
+                        }
+                        else -> {}
+                    }
+                }
+            }
         }
     }
 

@@ -12,12 +12,14 @@ actual fun Auth.setupPlatform() {
 
     fun checkForHash() {
         if(window.location.hash.isBlank()) return
+
         val afterHash = window.location.hash.substring(1)
 
         if(!afterHash.contains('=')) {
             // No params after hash, no need to continue
             return
         }
+
         parseFragmentAndImportSession(afterHash) {
             val newURL = window.location.href.split("?")[0];
             window.history.replaceState({}, window.document.title, newURL);
@@ -29,7 +31,7 @@ actual fun Auth.setupPlatform() {
         val code = url.searchParams.get("code") ?: return
         authScope.launch {
             val session = exchangeCodeForSession(code)
-            importSession(session)
+            importSession(session, source = SessionSource.External)
         }
         val newURL = window.location.href.split("?")[0];
         window.history.replaceState({}, window.document.title, newURL);

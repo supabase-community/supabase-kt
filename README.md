@@ -26,15 +26,13 @@ For information about supported Kotlin targets, see the corresponding module REA
 
 # Installation
 
+### Add one ore more modules to your project
+
 **Available modules**: `gotrue-kt`, `postgrest-kt`, `functions-kt`, `storage-kt`, `realtime-kt`, `apollo-graphql`, `compose-auth`, `compose-auth-ui`, `coil-integration`, `imageloader-integration`
 
 ```kotlin
 dependencies {
     implementation("io.github.jan-tennert.supabase:[module]:VERSION")
-
-    //add ktor client engine (if you don't already have one, see https://ktor.io/docs/http-client-engines.html for all engines)
-    //e.g. the CIO engine
-    implementation("io.ktor:ktor-client-cio:KTOR_VERSION")
 }
 ```
 
@@ -45,6 +43,52 @@ modules:
 implementation(platform("io.github.jan-tennert.supabase:bom:VERSION"))
 implementation("io.github.jan-tennert.supabase:[module]")
 ```
+
+### Add a Ktor Client Engine to each of your Kotlin targets
+
+You can find a list of available engines [here](https://ktor.io/docs/http-client-engines.html).
+If you plan to use the Realtime dependency, make sure to check if the engine supports WebSockets. See the [Ktor docs](https://ktor.io/docs/http-client-engines.html#limitations) for more information.
+
+
+```kotlin
+implementation("io.ktor:ktor-client-[engine]:VERSION")
+```
+
+<details>
+<summary>Multiplatform Example</summary>
+
+For targets: `jvm`, `android`, `js`, `ios`
+
+```kotlin
+val commonMain by getting {
+    dependencies {
+        //supabase modules
+    }
+}
+val jvmMain by getting {
+    dependencies {
+        implementation("io.ktor:ktor-client-cio:KTOR_VERSION")
+    }
+}
+val androidMain by getting {
+    dependsOn(jvmMain)
+}
+val jsMain by getting {
+    dependencies {
+        implementation("io.ktor:ktor-client-js:KTOR_VERSION")
+    }
+}
+val iosMain by getting {
+    dependencies {
+        implementation("io.ktor:ktor-client-darwin:KTOR_VERSION")
+    }
+}
+```
+</details>
+
+**Note:** It is recommended to use the same Ktor version as supabase-kt:
+
+![https://img.shields.io/badge/ktor-2.3.8-blue](https://img.shields.io/badge/ktor-2.3.8-blue)
 
 # Main Modules
 
