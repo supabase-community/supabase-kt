@@ -113,7 +113,7 @@ sealed interface Realtime : MainPlugin<Realtime.Config>, CustomSerializationPlug
         var disconnectOnSessionLoss: Boolean = true,
         var connectOnSubscribe: Boolean = true,
         var disconnectOnNoSubscriptions: Boolean = true,
-        var eventsPerSecond: Int = 10,
+        @Deprecated("This property is deprecated and will be removed in a future version.") var eventsPerSecond: Int = 10,
     ): MainConfig(), CustomSerializationConfig {
 
         override var serializer: SupabaseSerializer? = null
