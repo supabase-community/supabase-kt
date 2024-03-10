@@ -10,6 +10,7 @@ import io.github.jan.supabase.serializer.KotlinXSerializer
 import io.ktor.client.HttpClientConfig
 import io.ktor.client.engine.HttpClientEngine
 import io.ktor.client.plugins.HttpRequestTimeoutException
+import kotlinx.serialization.json.Json
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
@@ -63,7 +64,7 @@ class SupabaseClientBuilder @PublishedApi internal constructor(private val supab
      *
      * Default: [KotlinXSerializer]
      */
-    var defaultSerializer: SupabaseSerializer = KotlinXSerializer()
+    var defaultSerializer: SupabaseSerializer = KotlinXSerializer(Json { ignoreUnknownKeys = true })
 
     private val httpConfigOverrides = mutableListOf<HttpClientConfig<*>.() -> Unit>()
     private val plugins = mutableMapOf<String, ((SupabaseClient) -> SupabasePlugin<*>)>()
