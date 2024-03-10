@@ -36,6 +36,7 @@ fun Auth.parseSessionFromFragment(fragment: String): UserSession {
     val type = sessionParts["type"] ?: ""
     val providerToken = sessionParts["provider_token"]
     val providerRefreshToken = sessionParts["provider_refresh_token"]
+
     return UserSession(
         accessToken = accessToken,
         refreshToken = refreshToken,
@@ -56,6 +57,11 @@ fun Auth.parseSessionFromFragment(fragment: String): UserSession {
 fun Auth.parseSessionFromUrl(url: String): UserSession = parseSessionFromFragment(url.substringAfter("#"))
 
 /**
- * TODO: docs
+ * Signs in the user without any credentials. This will create a new user session with a new access token.
+ *
+ * If you want to upgrade this anonymous user to a real user, use [Auth.linkIdentity] to link an OAuth identity or [Auth.modifyUser] to add an email or phone.
+ *
+ * @param data Extra data for the user
+ * @param captchaToken The captcha token to use
  */
 suspend inline fun <reified T : Any> Auth.signInAnonymously(data: T, captchaToken: String? = null) = signInAnonymously(serializer.encodeToJsonElement(data).jsonObject, captchaToken)

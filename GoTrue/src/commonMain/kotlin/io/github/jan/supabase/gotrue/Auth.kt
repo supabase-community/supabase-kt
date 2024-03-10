@@ -132,6 +132,9 @@ sealed interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
      * Signs in the user without any credentials. This will create a new user session with a new access token.
      *
      * If you want to upgrade this anonymous user to a real user, use [linkIdentity] to link an OAuth identity or [modifyUser] to add an email or phone.
+     *
+     * @param data Extra data for the user
+     * @param captchaToken The captcha token to use
      */
     @SupabaseExperimental
     suspend fun signInAnonymously(data: JsonObject? = null, captchaToken: String? = null)
