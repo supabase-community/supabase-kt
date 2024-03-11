@@ -1,5 +1,5 @@
 [versions]
-kotlin = "1.9.22"
+kotlin = "1.9.23"
 ktor = "2.3.9"
 dokka = "1.9.10"
 kotlinx-datetime = "0.5.0"
