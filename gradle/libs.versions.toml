@@ -25,7 +25,7 @@ androidsvg = "1.4"
 imageloader = "1.7.8"
 coil = "2.6.0"
 okio = "3.8.0"
-credentials = "1.2.0"
+credentials = "1.2.1"
 
 [plugins]
 kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
