@@ -24,7 +24,7 @@ compose = "1.6.1"
 androidsvg = "1.4"
 imageloader = "1.7.8"
 coil = "2.6.0"
-okio = "3.8.0"
+okio = "3.9.0"
 credentials = "1.2.1"
 
 [plugins]
