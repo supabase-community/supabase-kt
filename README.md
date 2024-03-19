@@ -8,7 +8,7 @@ For information about supported Kotlin targets, see the corresponding module REA
 
 *Note: [WASM](https://github.com/supabase-community/supabase-kt/issues/86) build available: [2.2.2-wasm0](https://github.com/supabase-community/supabase-kt/releases/tag/2.2.2-wasm0)*
 
-[![](https://img.shields.io/github/release/supabase-community/supabase-kt?label=stable)](https://github.com/supabase-community/supabase-kt/releases) [![](https://badgen.net/github/release/supabase-community/supabase-kt?label=prerelease)](https://central.sonatype.com/search?q=io.github.jan.supabase&smo=true)
+[![](https://img.shields.io/github/release/supabase-community/supabase-kt?label=stable)](https://github.com/supabase-community/supabase-kt/releases) [![](https://badgen.net/github/release/supabase-community/supabase-kt?label=prerelease)](https://central.sonatype.com/search?q=io.github.jan.supabase&smo=true) [![Kotlin](https://img.shields.io/badge/kotlin-1.9.23-blue.svg?logo=kotlin)](http://kotlinlang.org) ![https://img.shields.io/badge/ktor-2.3.9-blue](https://img.shields.io/badge/ktor-2.3.9-blue)
 
 ### Links
 
@@ -125,6 +125,7 @@ val iosMain by getting {
 
 # Need help?
 
+- Join the [#supabase-kt](https://kotlinlang.slack.com/archives/C06QXPC7064) Kotlin Slack channel
 - [Join the Supabase Discord](https://discord.supabase.com) and create a new post with the 'Kotlin' tag under `help-and-questions`
 - [Create a discussion](https://github.com/supabase-community/supabase-kt/discussions/new/choose)
 - [Create an issue](https://github.com/supabase-community/supabase-kt/issues/new/choose)
