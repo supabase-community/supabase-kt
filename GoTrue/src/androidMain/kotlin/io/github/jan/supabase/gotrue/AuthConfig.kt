@@ -1,7 +1,9 @@
 package io.github.jan.supabase.gotrue
 
-import io.github.jan.supabase.gotrue.ExternalAuthAction.CUSTOM_TABS
-import io.github.jan.supabase.gotrue.ExternalAuthAction.EXTERNAL_BROWSER
+import androidx.browser.customtabs.CustomTabsIntent
+import io.github.jan.supabase.gotrue.ExternalAuthAction.Companion.CUSTOM_TABS
+import io.github.jan.supabase.gotrue.ExternalAuthAction.Companion.EXTERNAL_BROWSER
+import io.github.jan.supabase.gotrue.providers.ExternalAuthConfig
 import io.github.jan.supabase.plugins.CustomSerializationConfig
 
 /**
@@ -15,9 +17,9 @@ actual class AuthConfig : CustomSerializationConfig, AuthConfigDefaults() {
     var enableLifecycleCallbacks: Boolean = true
 
     /**
-     * The action to use for the OAuth flow
+     * The action to use for the OAuth flow. Can be overriden per-request in the [ExternalAuthConfig]
      */
-    var defaultExternalAuthAction: ExternalAuthAction = ExternalAuthAction.EXTERNAL_BROWSER
+    var defaultExternalAuthAction: ExternalAuthAction = ExternalAuthAction.DEFAULT
 
 }
 
@@ -27,6 +29,36 @@ actual class AuthConfig : CustomSerializationConfig, AuthConfigDefaults() {
  * @property CUSTOM_TABS Open the OAuth/SSO flow in a custom tab
  * @see [AuthConfig.defaultExternalAuthAction]
  */
-enum class ExternalAuthAction {
-    EXTERNAL_BROWSER, CUSTOM_TABS
+sealed interface ExternalAuthAction {
+
+    /**
+     * Open the OAuth/SSO flow in an external browser
+     */
+    data object ExternalBrowser : ExternalAuthAction
+
+    /**
+     * Open the OAuth/SSO flow in a custom tab
+     * @property intentBuilder The builder for the custom tabs intent
+     */
+    data class CustomTabs(val intentBuilder: CustomTabsIntent.Builder.() -> Unit = {}) : ExternalAuthAction
+
+    companion object {
+        /**
+         * The default action to use for the OAuth flow
+         */
+        val DEFAULT: ExternalAuthAction = ExternalBrowser
+
+        /**
+         * External browser action
+         */
+        @Deprecated("Use ExternalBrowser object instead", ReplaceWith("ExternalBrowser"))
+        val EXTERNAL_BROWSER: ExternalAuthAction = ExternalBrowser
+
+        /**
+         * Custom tabs action
+         */
+        @Deprecated("Use CustomTabs class instead", ReplaceWith("CustomTabs"))
+        val CUSTOM_TABS: ExternalAuthAction = CustomTabs()
+    }
+
 }
