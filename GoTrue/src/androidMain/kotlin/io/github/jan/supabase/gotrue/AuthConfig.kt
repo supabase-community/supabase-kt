@@ -57,7 +57,7 @@ sealed interface ExternalAuthAction {
         /**
          * Custom tabs action
          */
-        @Deprecated("Use CustomTabs class instead", ReplaceWith("CustomTabs"))
+        @Deprecated("Use CustomTabs class instead", ReplaceWith("CustomTabs()"))
         val CUSTOM_TABS: ExternalAuthAction = CustomTabs()
     }
 
