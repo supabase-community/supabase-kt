@@ -51,13 +51,13 @@ sealed interface ExternalAuthAction {
         /**
          * External browser action
          */
-        @Deprecated("Use ExternalBrowser object instead", ReplaceWith("ExternalBrowser"))
+        @Deprecated("Use ExternalBrowser object instead", ReplaceWith("ExternalAuthAction.ExternalBrowser"))
         val EXTERNAL_BROWSER: ExternalAuthAction = ExternalBrowser
 
         /**
          * Custom tabs action
          */
-        @Deprecated("Use CustomTabs class instead", ReplaceWith("CustomTabs()"))
+        @Deprecated("Use CustomTabs class instead", ReplaceWith("ExternalAuthAction.CustomTabs()"))
         val CUSTOM_TABS: ExternalAuthAction = CustomTabs()
     }
 
