@@ -1,11 +1,9 @@
 package io.github.jan.supabase.compose.auth
 
-import io.ktor.util.Digest
 import io.ktor.utils.io.core.toByteArray
+import korlibs.crypto.SHA256
 
-@OptIn(ExperimentalStdlibApi::class)
-internal suspend fun String.hash(): String {
-    val digest = Digest("SHA-256")
-    digest += this.toByteArray()
-    return digest.build().toHexString()
+internal fun String.hash(): String {
+    val hash = SHA256.digest(this.toByteArray())
+    return hash.hex
 }

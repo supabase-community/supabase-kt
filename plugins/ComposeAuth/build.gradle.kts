@@ -64,6 +64,7 @@ kotlin {
             dependencies {
                 api(project(":gotrue-kt"))
                 implementation(compose.runtime)
+                implementation(libs.krypto)
             }
         }
         val noDefaultMain by creating {

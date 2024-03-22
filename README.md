@@ -6,9 +6,13 @@ For information about supported Kotlin targets, see the corresponding module REA
 
 [Migrating from version 1.4.X to 2.0.0](/MIGRATION.md)
 
-*Note: [WASM](https://github.com/supabase-community/supabase-kt/issues/86) build available: [2.1.1-wasm0](https://github.com/supabase-community/supabase-kt/releases/tag/2.0.2-wasm0)*
+*Note: [WASM](https://github.com/supabase-community/supabase-kt/issues/86) build available: [2.2.2-wasm0](https://github.com/supabase-community/supabase-kt/releases/tag/2.2.2-wasm0)*
 
-[![](https://img.shields.io/github/release/supabase-community/supabase-kt?label=stable)](https://github.com/supabase-community/supabase-kt/releases) [![](https://badgen.net/github/release/supabase-community/supabase-kt?label=prerelease)](https://central.sonatype.com/search?q=io.github.jan.supabase&smo=true)
+[![](https://img.shields.io/github/release/supabase-community/supabase-kt?label=stable)](https://github.com/supabase-community/supabase-kt/releases) 
+[![](https://badgen.net/github/release/supabase-community/supabase-kt?label=prerelease)](https://central.sonatype.com/search?q=io.github.jan.supabase&smo=true) 
+[![Kotlin](https://img.shields.io/badge/kotlin-1.9.23-blue.svg?logo=kotlin)](http://kotlinlang.org) 
+![https://img.shields.io/badge/ktor-2.3.9-blue](https://img.shields.io/badge/ktor-2.3.9-blue)
+[![slack](https://img.shields.io/badge/slack-%23supabase--kt-purple.svg?logo=slack)](https://kotlinlang.slack.com/archives/C06QXPC7064)
 
 ### Links
 
@@ -88,7 +92,7 @@ val iosMain by getting {
 
 **Note:** It is recommended to use the same Ktor version as supabase-kt:
 
-![https://img.shields.io/badge/ktor-2.3.8-blue](https://img.shields.io/badge/ktor-2.3.8-blue)
+![https://img.shields.io/badge/ktor-2.3.9-blue](https://img.shields.io/badge/ktor-2.3.9-blue)
 
 # Main Modules
 
@@ -125,6 +129,7 @@ val iosMain by getting {
 
 # Need help?
 
+- Join the [#supabase-kt](https://kotlinlang.slack.com/archives/C06QXPC7064) Kotlin Slack channel
 - [Join the Supabase Discord](https://discord.supabase.com) and create a new post with the 'Kotlin' tag under `help-and-questions`
 - [Create a discussion](https://github.com/supabase-community/supabase-kt/discussions/new/choose)
 - [Create an issue](https://github.com/supabase-community/supabase-kt/issues/new/choose)
