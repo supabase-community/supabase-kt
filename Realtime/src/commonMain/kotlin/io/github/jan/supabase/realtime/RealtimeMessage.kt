@@ -18,6 +18,7 @@ data class RealtimeMessage(val topic: String, val event: String, val payload: Js
     val eventType: EventType? = when {
         event == RealtimeChannel.CHANNEL_EVENT_SYSTEM && payload["status"]?.jsonPrimitive?.content == "ok" -> EventType.SYSTEM
         event == RealtimeChannel.CHANNEL_EVENT_REPLY && payload["response"]?.jsonObject?.containsKey(RealtimeChannel.CHANNEL_EVENT_POSTGRES_CHANGES) ?: false -> EventType.POSTGRES_SERVER_CHANGES
+        event == RealtimeChannel.CHANNEL_EVENT_REPLY && payload["status"]?.jsonPrimitive?.content == "ok" -> EventType.SYSTEM_REPLY
         event == RealtimeChannel.CHANNEL_EVENT_POSTGRES_CHANGES -> EventType.POSTGRES_CHANGES
         event == RealtimeChannel.CHANNEL_EVENT_BROADCAST -> EventType.BROADCAST
         event == RealtimeChannel.CHANNEL_EVENT_CLOSE -> EventType.CLOSE
@@ -29,7 +30,7 @@ data class RealtimeMessage(val topic: String, val event: String, val payload: Js
     }
 
     enum class EventType {
-        SYSTEM, POSTGRES_SERVER_CHANGES, POSTGRES_CHANGES, BROADCAST, CLOSE, ERROR, PRESENCE_DIFF, PRESENCE_STATE, TOKEN_EXPIRED
+        SYSTEM, SYSTEM_REPLY, POSTGRES_SERVER_CHANGES, POSTGRES_CHANGES, BROADCAST, CLOSE, ERROR, PRESENCE_DIFF, PRESENCE_STATE, TOKEN_EXPIRED
     }
 
 }

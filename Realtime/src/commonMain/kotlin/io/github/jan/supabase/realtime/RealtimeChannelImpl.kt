@@ -94,6 +94,13 @@ internal class RealtimeChannelImpl(
                 Realtime.logger.d { "Subscribed to channel ${message.topic}" }
                 _status.value = RealtimeChannel.Status.SUBSCRIBED
             }
+            RealtimeMessage.EventType.SYSTEM_REPLY -> {
+                Realtime.logger.d { "Received system reply: ${message.payload}." }
+                if(status.value == RealtimeChannel.Status.UNSUBSCRIBING) {
+                    _status.value = RealtimeChannel.Status.UNSUBSCRIBED
+                    Realtime.logger.d { "Unsubscribed from channel ${message.topic}" }
+                }
+            }
             RealtimeMessage.EventType.POSTGRES_SERVER_CHANGES -> { //check if the server postgres_changes match with the client's and add the given id to the postgres change objects (to identify them later in the events)
                 val serverPostgresChanges = message.payload["response"]?.jsonObject?.get("postgres_changes")?.jsonArray?.let { Json.decodeFromJsonElement<List<PostgresJoinConfig>>(it) } ?: listOf() //server postgres changes
                 callbackManager.setServerChanges(serverPostgresChanges)

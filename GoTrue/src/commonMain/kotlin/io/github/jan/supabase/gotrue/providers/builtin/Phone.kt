@@ -1,8 +1,8 @@
 package io.github.jan.supabase.gotrue.providers.builtin
 
 import io.github.jan.supabase.exceptions.SupabaseEncodingException
+import io.github.jan.supabase.gotrue.user.UserInfo
 import io.github.jan.supabase.supabaseJson
-import kotlinx.datetime.Instant
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.MissingFieldException
@@ -20,7 +20,7 @@ import kotlinx.serialization.json.jsonObject
 /**
  * Authentication method with phone numbers and password
  */
-data object Phone : DefaultAuthProvider<Phone.Config, Phone.Result> {
+data object Phone : DefaultAuthProvider<Phone.Config, UserInfo> {
 
     override val grantType: String = "password"
 
@@ -65,25 +65,8 @@ data object Phone : DefaultAuthProvider<Phone.Config, Phone.Result> {
         }
     }
 
-    /**
-     * The sign up result of the phone authentication method
-     * @param id The id of the created user
-     * @param phone The phone number of the created user
-     * @param confirmationSentAt The time the confirmation was sent
-     * @param createdAt The time the user was created
-     * @param updatedAt The time the user was updated
-     */
-    @Serializable
-    data class Result(
-        val id: String,
-        val phone: String,
-        @SerialName("confirmation_sent_at") val confirmationSentAt: Instant,
-        @SerialName("created_at") val createdAt: Instant,
-        @SerialName("updated_at") val updatedAt: Instant,
-    )
-
     @OptIn(ExperimentalSerializationApi::class)
-    override fun decodeResult(json: JsonObject): Result = try {
+    override fun decodeResult(json: JsonObject): UserInfo = try {
         supabaseJson.decodeFromJsonElement(json)
     } catch(e: MissingFieldException) {
         throw SupabaseEncodingException("Couldn't decode sign up phone result. Input: $json")

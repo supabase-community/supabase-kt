@@ -68,7 +68,10 @@ class PostgrestRequestBuilder(@PublishedApi internal val propertyConversionMetho
      */
     fun order(column: String, order: Order, nullsFirst: Boolean = false, referencedTable: String? = null) {
         val key = if (referencedTable == null) "order" else "$referencedTable.order"
-        _params[key] = listOf("${column}.${order.value}.${if (nullsFirst) "nullsfirst" else "nullslast"}")
+        val orderEntry = _params[key]?.firstOrNull()
+        val existingOrder = if (orderEntry == null) "" else "$orderEntry,"
+        val newOrder = "$existingOrder${column}.${order.value}.${if (nullsFirst) "nullsfirst" else "nullslast"}"
+        _params[key] = listOf(newOrder)
     }
 
     /**
@@ -123,7 +126,7 @@ class PostgrestRequestBuilder(@PublishedApi internal val propertyConversionMetho
      * actual run time will be returned
      * @param verbose - If `true`, the query identifier will be returned
      * and `data` will include the output columns of the query
-     * @param .settings - If `true`, include information on configuration
+     * @param settings - If `true`, include information on configuration
      * parameters that affect query planning
      * @param buffers - If `true`, include information on buffer usage
      * @param wal - If `true`, include information on WAL record generation

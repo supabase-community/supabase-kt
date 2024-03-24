@@ -6,8 +6,8 @@ import io.github.jan.supabase.gotrue.providers.Azure
 import io.github.jan.supabase.gotrue.providers.Facebook
 import io.github.jan.supabase.gotrue.providers.Google
 import io.github.jan.supabase.gotrue.providers.IDTokenProvider
+import io.github.jan.supabase.gotrue.user.UserInfo
 import io.github.jan.supabase.supabaseJson
-import kotlinx.datetime.Instant
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.MissingFieldException
 import kotlinx.serialization.SerialName
@@ -23,7 +23,7 @@ import kotlinx.serialization.json.jsonObject
  * Only [Apple], [Google], [Facebook] and [Azure] are supported as providers.
  *
  */
-data object IDToken : DefaultAuthProvider<IDToken.Config, IDToken.Result> {
+data object IDToken : DefaultAuthProvider<IDToken.Config, UserInfo> {
 
     override val grantType: String = "id_token"
 
@@ -42,23 +42,8 @@ data object IDToken : DefaultAuthProvider<IDToken.Config, IDToken.Result> {
         var nonce: String? = null
     ) : DefaultAuthProvider.Config()
 
-    /**
-     * The sign-up result of the id token authentication method
-     * @param id The id of the created user
-     * @param confirmationSentAt The time the confirmation was sent
-     * @param createdAt The time the user was created
-     * @param updatedAt The time the user was updated
-     */
-    @Serializable
-    data class Result(
-        val id: String,
-        @SerialName("confirmation_sent_at") val confirmationSentAt: Instant,
-        @SerialName("created_at") val createdAt: Instant,
-        @SerialName("updated_at") val updatedAt: Instant,
-    )
-
     @OptIn(ExperimentalSerializationApi::class)
-    override fun decodeResult(json: JsonObject): Result = try {
+    override fun decodeResult(json: JsonObject): UserInfo = try {
         supabaseJson.decodeFromJsonElement(json)
     } catch(e: MissingFieldException) {
         throw SupabaseEncodingException("Couldn't decode sign up id token result. Input: $json")

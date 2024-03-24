@@ -39,7 +39,7 @@ data object OTP: AuthProvider<OTP.Config, Unit> {
         var email: String? = null,
         var phone: String? = null,
         var data: JsonObject? = null,
-        var createUser: Boolean = false,
+        var createUser: Boolean = true,
     ) {
 
         /**

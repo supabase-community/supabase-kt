@@ -52,6 +52,11 @@ sealed interface SessionSource {
     data object Storage : SessionSource
 
     /**
+     * The session was loaded from an anonymous sign in
+     */
+    data object AnonymousSignIn : SessionSource
+
+    /**
      * The session was loaded from a sign in
      * @param provider The provider that was used to sign in
      */

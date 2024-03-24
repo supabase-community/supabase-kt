@@ -1,5 +1,3 @@
-import io.github.jan.supabase.gotrue.providers.builtin.Email
-import io.github.jan.supabase.gotrue.providers.builtin.Phone
 import io.github.jan.supabase.gotrue.user.UserInfo
 import io.github.jan.supabase.gotrue.user.UserSession
 import io.ktor.client.engine.mock.MockEngine
@@ -118,10 +116,10 @@ class GoTrueMock {
 
         return when {
             body.containsKey("email") -> {
-                respond(Email.Result("uuid", body["email"]!!.jsonPrimitive.content, Clock.System.now(), Clock.System.now(), Clock.System.now()))
+                respond(UserInfo(id ="uuid", email = body["email"]!!.jsonPrimitive.content, aud = ""))
             }
             body.containsKey("phone") -> {
-                respond(Phone.Result("uuid", body["phone"]!!.jsonPrimitive.content, Clock.System.now(), Clock.System.now(), Clock.System.now()))
+                respond(UserInfo(id ="uuid", phone = body["phone"]!!.jsonPrimitive.content, aud = ""))
             }
             !body.containsKey("password") -> respondBadRequest("Missing password")
             else -> respondBadRequest("Missing email or phone")
