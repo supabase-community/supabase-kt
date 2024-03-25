@@ -37,13 +37,25 @@ kotlin {
             }
         }
     }
+    wasmJs {
+        browser {
+            testTask {
+                enabled = false
+            }
+        }
+        nodejs {
+            testTask {
+                enabled = false
+            }
+        }
+    }
     iosX64()
     iosArm64()
     iosSimulatorArm64()
-    mingwX64()
-    macosX64()
+   // mingwX64()
+  //  macosX64()
     macosArm64()
-    linuxX64()
+   // linuxX64()
     watchosArm64()
     watchosX64()
     watchosSimulatorArm64()
@@ -76,7 +88,7 @@ kotlin {
         val nonLinuxMain by creating {
             dependsOn(commonMain)
             dependencies {
-                api(libs.bundles.multiplatform.settings)
+                api(libs.multiplatform.settings.no.arg) //the coroutines dependency is not supported on wasm-js
             }
         }
         val commonTest by getting {
@@ -95,11 +107,11 @@ kotlin {
                 api(libs.androidx.browser)
             }
         }
-        val mingwMain by getting {
+        /*val mingwMain by getting {
             dependsOn(nonLinuxMain)
             dependsOn(nonDesktopMain) //no ktor server engine supports the windows target
             //dependsOn(desktopMain)
-        }
+        }*/
         val appleMain by getting {
             dependsOn(nonLinuxMain)
         }
@@ -107,9 +119,13 @@ kotlin {
             dependsOn(nonLinuxMain)
             dependsOn(nonDesktopMain)
         }
-        val linuxMain by getting {
-            dependsOn(desktopMain)
+        val wasmJsMain by getting {
+            dependsOn(nonLinuxMain)
+            dependsOn(nonDesktopMain)
         }
+        /*val linuxMain by getting {
+            dependsOn(desktopMain)
+        }*/
         val iosMain by getting {
             dependsOn(nonDesktopMain)
         }

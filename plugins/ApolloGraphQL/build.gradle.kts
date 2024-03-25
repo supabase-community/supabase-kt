@@ -36,10 +36,22 @@ kotlin {
             }
         }
     }
+    wasmJs {
+        browser {
+            testTask {
+                enabled = false
+            }
+        }
+        nodejs {
+            testTask {
+                enabled = false
+            }
+        }
+    }
     iosX64()
     iosArm64()
     iosSimulatorArm64()
-    macosX64()
+  //  macosX64()
     macosArm64()
     watchosArm64()
     watchosSimulatorArm64()

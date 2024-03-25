@@ -27,6 +27,7 @@ allprojects {
             url = uri("https://maven.pkg.jetbrains.space/public/p/ktor/eap")
             name = "ktor-eap"
         }
+        maven("https://maven.pkg.jetbrains.space/kotlin/p/wasm/experimental")
     }
 }
 allprojects {
@@ -169,13 +170,25 @@ kotlin {
             }
         }
     }
+    wasmJs {
+        browser {
+            testTask {
+                enabled = false
+            }
+        }
+        nodejs {
+            testTask {
+                enabled = false
+            }
+        }
+    }
     iosX64()
     iosArm64()
     iosSimulatorArm64()
-    mingwX64()
-    macosX64()
+//    mingwX64()
+  //  macosX64()
     macosArm64()
-    linuxX64()
+  //  linuxX64()
     watchosArm64()
     watchosX64()
     watchosSimulatorArm64()
@@ -212,7 +225,7 @@ kotlin {
             }
         }
         val appleMain by getting
-        val macosMain by getting
+     //   val macosMain by getting
     }
 }
 

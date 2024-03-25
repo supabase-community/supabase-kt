@@ -36,13 +36,25 @@ kotlin {
             }
         }
     }
+    wasmJs {
+        browser {
+            testTask {
+                enabled = false
+            }
+        }
+        nodejs {
+            testTask {
+                enabled = false
+            }
+        }
+    }
     iosX64()
     iosArm64()
     iosSimulatorArm64()
-    mingwX64()
-    macosX64()
+  //  mingwX64()
+  //  macosX64()
     macosArm64()
-    linuxX64()
+ //   linuxX64()
     watchosArm64()
     watchosX64()
     watchosSimulatorArm64()
@@ -70,7 +82,7 @@ kotlin {
         val androidMain by getting
         val jsMain by getting
         val appleMain by getting
-        val macosMain by getting
+   //     val macosMain by getting
         val iosMain by getting
         val iosSimulatorArm64Main by getting {
             dependsOn(iosMain)
