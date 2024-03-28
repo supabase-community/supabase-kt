@@ -205,7 +205,7 @@ internal class AuthImpl(
         }).body()
     }
 
-    override suspend fun modifyUser(
+    override suspend fun updateUser(
         updateCurrentUser: Boolean,
         redirectUrl: String?,
         config: UserUpdateBuilder.() -> Unit
