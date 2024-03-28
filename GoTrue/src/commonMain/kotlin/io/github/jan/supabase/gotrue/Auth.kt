@@ -131,7 +131,7 @@ sealed interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
     /**
      * Signs in the user without any credentials. This will create a new user session with a new access token.
      *
-     * If you want to upgrade this anonymous user to a real user, use [linkIdentity] to link an OAuth identity or [modifyUser] to add an email or phone.
+     * If you want to upgrade this anonymous user to a real user, use [linkIdentity] to link an OAuth identity or [updateUser] to add an email or phone.
      *
      * @param data Extra data for the user
      * @param captchaToken The captcha token to use
@@ -180,11 +180,26 @@ sealed interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
-    suspend fun modifyUser(
+    suspend fun updateUser(
         updateCurrentUser: Boolean = true,
         redirectUrl: String? = defaultRedirectUrl(),
         config: UserUpdateBuilder.() -> Unit
     ): UserInfo
+
+    /**
+     * Modifies the current user
+     * @param updateCurrentUser Whether to update the current user in the [SupabaseClient]
+     * @param config The configuration to use
+     * @throws RestException or one of its subclasses if receiving an error response
+     * @throws HttpRequestTimeoutException if the request timed out
+     * @throws HttpRequestException on network related issues
+     */
+    @Deprecated("Use updateUser instead")
+    suspend fun modifyUser(
+        updateCurrentUser: Boolean = true,
+        redirectUrl: String? = defaultRedirectUrl(),
+        config: UserUpdateBuilder.() -> Unit
+    ): UserInfo = updateUser(updateCurrentUser, redirectUrl, config)
 
     /**
      * Resends an existing signup confirmation email, email change email
