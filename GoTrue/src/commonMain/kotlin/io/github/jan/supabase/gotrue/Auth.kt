@@ -1,7 +1,6 @@
 package io.github.jan.supabase.gotrue
 
 import io.github.jan.supabase.SupabaseClient
-import io.github.jan.supabase.annotations.SupabaseExperimental
 import io.github.jan.supabase.exceptions.HttpRequestException
 import io.github.jan.supabase.exceptions.RestException
 import io.github.jan.supabase.gotrue.admin.AdminApi
@@ -136,7 +135,6 @@ sealed interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
      * @param data Extra data for the user
      * @param captchaToken The captcha token to use
      */
-    @SupabaseExperimental
     suspend fun signInAnonymously(data: JsonObject? = null, captchaToken: String? = null)
 
     /**
@@ -147,7 +145,6 @@ sealed interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
      * @param redirectUrl The redirect url to use. If you don't specify this, the platform specific will be used, like deeplinks on android.
      * @param config Extra configuration
      */
-    @SupabaseExperimental
     suspend fun linkIdentity(
         provider: OAuthProvider,
         redirectUrl: String? = defaultRedirectUrl(),
@@ -159,7 +156,6 @@ sealed interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
      * @param identityId The id of the OAuth identity
      * @param updateLocalUser Whether to delete the identity from the local user or not
      */
-    @SupabaseExperimental
     suspend fun unlinkIdentity(
         identityId: String,
         updateLocalUser: Boolean = true
