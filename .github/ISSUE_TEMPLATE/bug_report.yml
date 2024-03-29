@@ -16,7 +16,7 @@ body:
           required: true
         - label: I am using the latest version
           required: true
-        - label: I checked the [troubleshooting](https://github.com/supabase-community/supabase-kt/blob/master/Troubleshooting) page for similar problems
+        - label: I checked the [troubleshooting](https://github.com/supabase-community/supabase-kt/blob/master/TROUBLESHOOTING.MD) page for similar problems
           required: true
   - type: input
     id: version
