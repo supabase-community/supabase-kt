@@ -16,9 +16,7 @@ body:
           required: true
         - label: I am using the latest version
           required: true
-        - label: I checked the [troubleshooting](https://github.com/supabase-community/supabase-kt/wiki/Troubleshooting) page for similar problems
-          required: true
-        - label: I enabled [logging](https://github.com/supabase-community/supabase-kt/wiki/Logging) and checked the logs
+        - label: I checked the [troubleshooting](https://github.com/supabase-community/supabase-kt/blob/master/Troubleshooting) page for similar problems
           required: true
   - type: input
     id: version
@@ -31,9 +29,9 @@ body:
   - type: input
     id: target
     attributes:
-      label: Target(s)
+      label: Kotlin Target(s) and their respective versions
       description: which kotlin targets are affected
-      placeholder: JVM and Android
+      placeholder: JVM 17 and Android 14
     validations:
       required: true
   - type: textarea
