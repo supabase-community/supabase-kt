@@ -39,7 +39,7 @@ class RpcRequestTest {
     @Test
     fun testCreateRpcRequest_notHead_thenReturnCorrectValue() {
         sut = RpcRequest(
-            method = HttpMethod.Head,
+            method = HttpMethod.Post,
             count = Count.EXACT,
             body = JsonArray(listOf()),
             urlParams = mapOf("Key1" to "Value1"),
@@ -100,7 +100,7 @@ class RpcRequestTest {
     @Test
     fun testCreateRpcRequest_notHeadAndWithoutCount_thenReturnCorrectValue() {
         sut = RpcRequest(
-            method = HttpMethod.Head,
+            method = HttpMethod.Post,
             count = null,
             body = JsonArray(listOf()),
             urlParams = mapOf("Key1" to "Value1"),
