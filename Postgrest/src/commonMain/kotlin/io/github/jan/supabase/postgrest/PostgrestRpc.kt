@@ -1,3 +1,4 @@
+@file:Suppress("MatchingDeclarationName")
 package io.github.jan.supabase.postgrest
 
 import io.github.jan.supabase.encodeToJsonElement

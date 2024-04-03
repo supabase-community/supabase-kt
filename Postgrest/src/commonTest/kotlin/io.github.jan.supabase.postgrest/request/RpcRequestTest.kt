@@ -1,13 +1,12 @@
 package io.github.jan.supabase.postgrest.request
 
 import io.github.jan.supabase.postgrest.query.Count
+import io.ktor.http.HttpMethod
 import kotlinx.serialization.json.JsonArray
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertFalse
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
-import kotlin.test.assertTrue
 
 class RpcRequestTest {
 
@@ -16,13 +15,12 @@ class RpcRequestTest {
     @Test
     fun testCreateRpcRequest_isHead_thenReturnCorrectValue() {
         sut = RpcRequest(
-            head = true,
+            method = HttpMethod.Head,
             count = Count.EXACT,
             body = JsonArray(listOf()),
             urlParams = mapOf("Key1" to "Value1"),
         )
 
-        assertTrue((sut as RpcRequest).head)
         val count = (sut as RpcRequest).count
         assertNotNull(count)
         assertEquals("exact", count.identifier)
@@ -41,12 +39,11 @@ class RpcRequestTest {
     @Test
     fun testCreateRpcRequest_notHead_thenReturnCorrectValue() {
         sut = RpcRequest(
-            head = false,
+            method = HttpMethod.Head,
             count = Count.EXACT,
             body = JsonArray(listOf()),
             urlParams = mapOf("Key1" to "Value1"),
         )
-        assertFalse((sut as RpcRequest).head)
         val count = (sut as RpcRequest).count
         assertNotNull(count)
         assertEquals("exact", count.identifier)
@@ -64,13 +61,11 @@ class RpcRequestTest {
     @Test
     fun testCreateRpcRequest_withoutCount_thenReturnCorrectValue() {
         sut = RpcRequest(
-            head = true,
+            method = HttpMethod.Head,
             count = null,
             body = JsonArray(listOf()),
             urlParams = mapOf("Key1" to "Value1"),
         )
-
-        assertTrue((sut as RpcRequest).head)
 
         val count = (sut as RpcRequest).count
         assertNull(count)
@@ -87,13 +82,12 @@ class RpcRequestTest {
     @Test
     fun testCreateRpcRequest_withoutBody_thenReturnCorrectValue() {
         sut = RpcRequest(
-            head = true,
+            method = HttpMethod.Head,
             count = null,
             body = null,
             urlParams = mapOf("Key1" to "Value1"),
         )
 
-        assertTrue((sut as RpcRequest).head)
         assertEquals("HEAD", sut.method.value)
         assertEquals(
             listOf(
@@ -106,7 +100,7 @@ class RpcRequestTest {
     @Test
     fun testCreateRpcRequest_notHeadAndWithoutCount_thenReturnCorrectValue() {
         sut = RpcRequest(
-            head = false,
+            method = HttpMethod.Head,
             count = null,
             body = JsonArray(listOf()),
             urlParams = mapOf("Key1" to "Value1"),
