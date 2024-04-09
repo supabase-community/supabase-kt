@@ -21,7 +21,7 @@ value class Columns @PublishedApi internal constructor(val value: String) {
          * Select all columns given in the [value] parameter
          * @param value The columns to select, separated by a comma
          */
-        fun raw(value: String) = Columns(value)
+        fun raw(value: String) = Columns(value.replace("\n", ""))
 
         /**
          * Select all columns given in the [columns] parameter
