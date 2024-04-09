@@ -8,7 +8,7 @@ body:
     attributes:
       label: General info
       options:
-        - label: I checked the [troubleshooting](https://github.com/supabase-community/supabase-kt/wiki/Troubleshooting) page for similar problems
+        - label: I checked the [troubleshooting](https://github.com/supabase-community/supabase-kt/blob/master/TROUBLESHOOTING.MD) page for similar problems
           required: true
   - type: textarea
     id: question
@@ -17,3 +17,9 @@ body:
       description: Please ask your question
     validations:
       required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant log output (optional)
+      description: Please copy and paste any relevant log output. This will be automatically formatted into code, so no need for backticks.
+      render: shell
