@@ -5,20 +5,18 @@ import android.net.Uri
 import androidx.browser.customtabs.CustomTabsIntent
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.annotations.SupabaseInternal
-import io.github.jan.supabase.gotrue.ExternalAuthAction.CUSTOM_TABS
-import io.github.jan.supabase.gotrue.ExternalAuthAction.EXTERNAL_BROWSER
 import io.github.jan.supabase.gotrue.user.UserSession
 import kotlinx.coroutines.launch
 
 internal fun openUrl(uri: Uri, action: ExternalAuthAction) {
     when(action) {
-        EXTERNAL_BROWSER -> {
+        ExternalAuthAction.ExternalBrowser -> {
             val browserIntent = Intent(Intent.ACTION_VIEW, uri)
             browserIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
             applicationContext().startActivity(browserIntent)
         }
-        CUSTOM_TABS -> {
-            val intent = CustomTabsIntent.Builder().build()
+        is ExternalAuthAction.CustomTabs -> {
+            val intent = CustomTabsIntent.Builder().apply(action.intentBuilder).build()
             intent.intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
             intent.launchUrl(applicationContext(), uri)
         }

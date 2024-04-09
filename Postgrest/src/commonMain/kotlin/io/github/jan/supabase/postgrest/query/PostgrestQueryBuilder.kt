@@ -29,7 +29,7 @@ class PostgrestQueryBuilder(
      * Executes vertical filtering with select on [table]
      *
      * @param columns The columns to retrieve, defaults to [Columns.ALL]. You can also use [Columns.list], [Columns.type] or [Columns.raw] to specify the columns
-     * @param head If true, select will delete the selected data.
+     * @param head If true, no body will be returned. Useful when using count.
      * @param request Additional filtering to apply to the query
      * @return PostgrestResult which is either an error, an empty JsonArray or the data you requested as an JsonArray
      * @throws RestException or one of its subclasses if receiving an error response

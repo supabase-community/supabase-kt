@@ -59,7 +59,7 @@ fun Auth.parseSessionFromUrl(url: String): UserSession = parseSessionFromFragmen
 /**
  * Signs in the user without any credentials. This will create a new user session with a new access token.
  *
- * If you want to upgrade this anonymous user to a real user, use [Auth.linkIdentity] to link an OAuth identity or [Auth.modifyUser] to add an email or phone.
+ * If you want to upgrade this anonymous user to a real user, use [Auth.linkIdentity] to link an OAuth identity or [Auth.updateUser] to add an email or phone.
  *
  * @param data Extra data for the user
  * @param captchaToken The captcha token to use
