@@ -1,5 +1,5 @@
 plugins {
-    alias(libs.plugins.complete.kotlin)
+   // alias(libs.plugins.complete.kotlin)
     alias(libs.plugins.kotlin.multiplatform)
     alias(libs.plugins.android.library)
 }
@@ -13,15 +13,8 @@ repositories {
 @OptIn(org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi::class)
 kotlin {
     applyDefaultHierarchyTemplate()
-    jvm {
-        jvmToolchain(8)
-        compilations.all {
-            kotlinOptions.freeCompilerArgs = listOf(
-                "-Xjvm-default=all",  // use default methods in interfaces,
-                "-Xlambdas=indy"      // use invokedynamic lambdas instead of synthetic classes
-            )
-        }
-    }
+    jvmToolchain(8)
+    jvm()
     androidTarget {
         publishLibraryVariants("release", "debug")
     }

@@ -12,15 +12,8 @@ repositories {
 @OptIn(org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi::class)
 kotlin {
     applyDefaultHierarchyTemplate()
-    jvm {
-        jvmToolchain(8)
-        compilations.all {
-            kotlinOptions.freeCompilerArgs = listOf(
-                "-Xjvm-default=all",  // use default methods in interfaces,
-                "-Xlambdas=indy"      // use invokedynamic lambdas instead of synthetic classes
-            )
-        }
-    }
+    jvmToolchain(8)
+    jvm()
     androidTarget {
         publishLibraryVariants("release", "debug")
     }
@@ -72,9 +65,7 @@ kotlin {
         val appleMain by getting
         val macosMain by getting
         val iosMain by getting
-        val iosSimulatorArm64Main by getting {
-            dependsOn(iosMain)
-        }
+        val iosSimulatorArm64Main by getting
     }
 }
 
