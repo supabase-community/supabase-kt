@@ -12,7 +12,7 @@ repositories {
 @OptIn(org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi::class)
 kotlin {
     applyDefaultHierarchyTemplate()
-    jvmToolchain(8)
+    jvmToolchain(11)
     jvm()
     androidTarget {
         publishLibraryVariants("release", "debug")
@@ -82,15 +82,11 @@ kotlin {
         val appleMain by getting {
             dependsOn(nonLinuxMain)
         }
-        val iosMain by getting {
-            dependsOn(appleMain)
-        }
+        val iosMain by getting
         val mingwX64Main by getting {
             dependsOn(nonLinuxMain)
         }
-        val iosSimulatorArm64Main by getting {
-            dependsOn(iosMain)
-        }
+        val iosSimulatorArm64Main by getting
     }
 }
 

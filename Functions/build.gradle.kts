@@ -11,7 +11,7 @@ repositories {
 
 kotlin {
     applyDefaultHierarchyTemplate()
-    jvmToolchain(8)
+    jvmToolchain(11)
     jvm()
     androidTarget {
         publishLibraryVariants("release", "debug")

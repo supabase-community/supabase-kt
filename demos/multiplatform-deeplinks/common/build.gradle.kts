@@ -12,7 +12,7 @@ version = "1.0-SNAPSHOT"
 
 kotlin {
     jvm("desktop") {
-        jvmToolchain(8)
+        jvmToolchain(11)
     }
     android()
     sourceSets {
