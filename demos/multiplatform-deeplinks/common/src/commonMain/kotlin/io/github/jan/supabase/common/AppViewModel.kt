@@ -3,7 +3,7 @@ package io.github.jan.supabase.common
 
 import co.touchlab.kermit.Logger
 import io.github.jan.supabase.SupabaseClient
-import io.github.jan.supabase.gotrue.auth
+import io.github.jan.supabase.gotrue.gotrue
 import io.github.jan.supabase.gotrue.parseFragmentAndImportSession
 import io.github.jan.supabase.gotrue.providers.Google
 import io.github.jan.supabase.gotrue.providers.builtin.Email
@@ -24,7 +24,7 @@ class AppViewModel(
     val supabaseClient: SupabaseClient
 ) : MPViewModel() {
 
-    val sessionStatus = supabaseClient.auth.sessionStatus
+    val sessionStatus = supabaseClient.gotrue.sessionStatus
     val loginAlert = MutableStateFlow<String?>(null)
 
     //Auth
@@ -32,7 +32,7 @@ class AppViewModel(
     fun signUp(email: String, password: String) {
         coroutineScope.launch {
             kotlin.runCatching {
-                supabaseClient.auth.signUpWith(Email, redirectUrl = URL_PROTOCOL) {
+                supabaseClient.gotrue.signUpWith(Email, redirectUrl = URL_PROTOCOL) {
                     this.email = email
                     this.password = password
                 }
@@ -47,7 +47,7 @@ class AppViewModel(
     fun login(email: String, password: String) {
         coroutineScope.launch {
             kotlin.runCatching {
-                supabaseClient.auth.loginWith(Email) {
+                supabaseClient.gotrue.loginWith(Email) {
                     this.email = email
                     this.password = password
                 }
@@ -62,7 +62,7 @@ class AppViewModel(
     fun importSession(fragment: String) {
         coroutineScope.launch {
             kotlin.runCatching {
-                supabaseClient.auth.parseFragmentAndImportSession(fragment)
+                supabaseClient.gotrue.parseFragmentAndImportSession(fragment)
             }.onFailure {
                 it.printStackTrace()
                 loginAlert.value = "There was an error while logging in."
@@ -73,7 +73,7 @@ class AppViewModel(
     fun loginWithGoogle() {
         coroutineScope.launch {
             kotlin.runCatching {
-                supabaseClient.auth.loginWith(Google, redirectUrl = URL_PROTOCOL)
+                supabaseClient.gotrue.loginWith(Google, redirectUrl = URL_PROTOCOL)
             }
         }
     }
@@ -81,7 +81,7 @@ class AppViewModel(
     fun logout() {
         coroutineScope.launch {
             kotlin.runCatching {
-                supabaseClient.auth.logout()
+                supabaseClient.gotrue.logout()
             }
         }
     }
