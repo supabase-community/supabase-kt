@@ -85,7 +85,7 @@ sealed interface SessionSource {
     data class Refresh(val oldSession: UserSession) : SessionSource
 
     /**
-     * The session was changed due to a user change (e.g. via [Auth.modifyUser] or [Auth.retrieveUserForCurrentSession])
+     * The session was changed due to a user change (e.g. via [Auth.updateUser] or [Auth.retrieveUserForCurrentSession])
      * @param oldSession The old session
      */
     data class UserChanged(val oldSession: UserSession) : SessionSource

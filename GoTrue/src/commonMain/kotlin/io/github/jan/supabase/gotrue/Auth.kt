@@ -1,7 +1,6 @@
 package io.github.jan.supabase.gotrue
 
 import io.github.jan.supabase.SupabaseClient
-import io.github.jan.supabase.annotations.SupabaseExperimental
 import io.github.jan.supabase.exceptions.HttpRequestException
 import io.github.jan.supabase.exceptions.RestException
 import io.github.jan.supabase.gotrue.admin.AdminApi
@@ -131,12 +130,11 @@ sealed interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
     /**
      * Signs in the user without any credentials. This will create a new user session with a new access token.
      *
-     * If you want to upgrade this anonymous user to a real user, use [linkIdentity] to link an OAuth identity or [modifyUser] to add an email or phone.
+     * If you want to upgrade this anonymous user to a real user, use [linkIdentity] to link an OAuth identity or [updateUser] to add an email or phone.
      *
      * @param data Extra data for the user
      * @param captchaToken The captcha token to use
      */
-    @SupabaseExperimental
     suspend fun signInAnonymously(data: JsonObject? = null, captchaToken: String? = null)
 
     /**
@@ -147,7 +145,6 @@ sealed interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
      * @param redirectUrl The redirect url to use. If you don't specify this, the platform specific will be used, like deeplinks on android.
      * @param config Extra configuration
      */
-    @SupabaseExperimental
     suspend fun linkIdentity(
         provider: OAuthProvider,
         redirectUrl: String? = defaultRedirectUrl(),
@@ -159,7 +156,6 @@ sealed interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
      * @param identityId The id of the OAuth identity
      * @param updateLocalUser Whether to delete the identity from the local user or not
      */
-    @SupabaseExperimental
     suspend fun unlinkIdentity(
         identityId: String,
         updateLocalUser: Boolean = true
@@ -180,11 +176,26 @@ sealed interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
-    suspend fun modifyUser(
+    suspend fun updateUser(
         updateCurrentUser: Boolean = true,
         redirectUrl: String? = defaultRedirectUrl(),
         config: UserUpdateBuilder.() -> Unit
     ): UserInfo
+
+    /**
+     * Modifies the current user
+     * @param updateCurrentUser Whether to update the current user in the [SupabaseClient]
+     * @param config The configuration to use
+     * @throws RestException or one of its subclasses if receiving an error response
+     * @throws HttpRequestTimeoutException if the request timed out
+     * @throws HttpRequestException on network related issues
+     */
+    @Deprecated("Use updateUser instead")
+    suspend fun modifyUser(
+        updateCurrentUser: Boolean = true,
+        redirectUrl: String? = defaultRedirectUrl(),
+        config: UserUpdateBuilder.() -> Unit
+    ): UserInfo = updateUser(updateCurrentUser, redirectUrl, config)
 
     /**
      * Resends an existing signup confirmation email, email change email

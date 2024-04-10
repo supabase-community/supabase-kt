@@ -23,6 +23,6 @@ body:
     id: usecase
     attributes:
       label: Usecase
-      description: 'Please provide an usecase for your feature request '
+      description: 'Please provide an use case for your feature request'
     validations:
-      required: true
+      required: false
