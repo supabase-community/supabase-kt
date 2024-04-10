@@ -112,7 +112,7 @@ configure(allprojects.filter { it.name != "bom" && it.name !in excludedModules }
     }
 
     tasks.withType<io.gitlab.arturbosch.detekt.Detekt>().configureEach {
-        jvmTarget = "11"
+        jvmTarget = "1.8"
         reports {
             xml.required = true
             html.required = true
@@ -145,7 +145,7 @@ configure(allprojects.filter { it.name != "bom" && it.name !in excludedModules }
 @OptIn(org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi::class)
 kotlin {
     applyDefaultHierarchyTemplate()
-    jvmToolchain(11)
+    jvmToolchain(8)
     jvm()
     androidTarget {
         publishLibraryVariants("release", "debug")

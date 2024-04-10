@@ -14,7 +14,7 @@ kotlin {
     applyDefaultHierarchyTemplate()
     androidTarget()
     jvm("desktop") {
-        jvmToolchain(11)
+        jvmToolchain(8)
     }
     js(IR) {
         browser()

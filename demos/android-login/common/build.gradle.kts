@@ -15,7 +15,7 @@ repositories {
 }
 
 kotlin {
-    jvmToolchain(11)
+    jvmToolchain(8)
     androidTarget()
     sourceSets {
         val commonMain by getting {
