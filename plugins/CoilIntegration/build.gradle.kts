@@ -13,8 +13,8 @@ repositories {
 @OptIn(org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi::class)
 kotlin {
     applyDefaultHierarchyTemplate()
+    jvmToolchain(8)
     androidTarget {
-        jvmToolchain(8)
         publishLibraryVariants("release", "debug")
     }
 
