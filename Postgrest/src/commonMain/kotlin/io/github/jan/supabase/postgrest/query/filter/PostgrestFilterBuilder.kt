@@ -187,7 +187,7 @@ class PostgrestFilterBuilder(
     @PostgrestFilterDSL
     inline fun or(negate: Boolean = false, filter: @PostgrestFilterDSL PostgrestFilterBuilder.() -> Unit) {
         val prefix = if(negate) "not." else ""
-        _params[prefix + "or"] = listOf(formatJoiningFilter(filter)) + if(isInLogicalExpression) _params[prefix + "and"] ?: emptyList() else emptyList()
+        _params[prefix + "or"] = listOf(formatJoiningFilter(filter)) + if(isInLogicalExpression) _params[prefix + "or"] ?: emptyList() else emptyList()
     }
 
     /**
