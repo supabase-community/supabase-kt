@@ -188,9 +188,12 @@ class PostgrestFilterBuilder(
      */
     @PostgrestFilterDSL
     inline fun or(negate: Boolean = false, referencedTable: String? = null, filter: @PostgrestFilterDSL PostgrestFilterBuilder.() -> Unit) {
-        val prefix = (if (negate) "not." else "") + (if(referencedTable !== null) "$referencedTable." else "")
+        val prefix = buildString {
+            if(negate) append("not.")
+            if(referencedTable !== null) append("$referencedTable.")
+        }
         val joiningFilter = formatJoiningFilter(filter)
-        if(joiningFilter == "()") return
+        if(joiningFilter == "()") return //empty logical expressions return a postgrest error
         _params[prefix + "or"] = listOf(joiningFilter) + if(isInLogicalExpression) _params[prefix + "or"] ?: emptyList() else emptyList()
     }
 
@@ -201,9 +204,12 @@ class PostgrestFilterBuilder(
      */
     @PostgrestFilterDSL
     inline fun and(negate: Boolean = false, referencedTable: String? = null, filter: @PostgrestFilterDSL PostgrestFilterBuilder.() -> Unit) {
-        val prefix = (if (negate) "not." else "") + (if(referencedTable !== null) "$referencedTable." else "")
+        val prefix = buildString {
+            if(negate) append("not.")
+            if(referencedTable !== null) append("$referencedTable.")
+        }
         val joiningFilter = formatJoiningFilter(filter)
-        if(joiningFilter == "()") return
+        if(joiningFilter == "()") return //empty logical expressions return a postgrest error
         _params[prefix + "and"] = listOf(joiningFilter) + if(isInLogicalExpression) _params[prefix + "and"] ?: emptyList() else emptyList()
     }
 
