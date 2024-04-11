@@ -190,7 +190,7 @@ class PostgrestFilterBuilder(
     inline fun or(negate: Boolean = false, referencedTable: String? = null, filter: @PostgrestFilterDSL PostgrestFilterBuilder.() -> Unit) {
         val prefix = buildString {
             if(negate) append("not.")
-            if(referencedTable !== null) append("$referencedTable.")
+            if(referencedTable != null) append("$referencedTable.")
         }
         val joiningFilter = formatJoiningFilter(filter)
         if(joiningFilter == "()") return //empty logical expressions return a postgrest error
@@ -206,7 +206,7 @@ class PostgrestFilterBuilder(
     inline fun and(negate: Boolean = false, referencedTable: String? = null, filter: @PostgrestFilterDSL PostgrestFilterBuilder.() -> Unit) {
         val prefix = buildString {
             if(negate) append("not.")
-            if(referencedTable !== null) append("$referencedTable.")
+            if(referencedTable != null) append("$referencedTable.")
         }
         val joiningFilter = formatJoiningFilter(filter)
         if(joiningFilter == "()") return //empty logical expressions return a postgrest error
