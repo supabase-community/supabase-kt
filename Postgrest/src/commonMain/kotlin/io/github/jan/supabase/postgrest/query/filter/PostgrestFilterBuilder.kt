@@ -183,20 +183,34 @@ class PostgrestFilterBuilder(
 
     /**
      * Adds an `or` condition to the query
+     * @param negate Whether to negate the condition
+     * @param referencedTable The table to reference
      */
     @PostgrestFilterDSL
-    inline fun or(negate: Boolean = false, filter: @PostgrestFilterDSL PostgrestFilterBuilder.() -> Unit) {
-        val prefix = if(negate) "not." else ""
-        _params[prefix + "or"] = listOf(formatJoiningFilter(filter)) + if(isInLogicalExpression) _params[prefix + "or"] ?: emptyList() else emptyList()
+    inline fun or(negate: Boolean = false, referencedTable: String? = null, filter: @PostgrestFilterDSL PostgrestFilterBuilder.() -> Unit) {
+        val prefix = buildString {
+            if(negate) append("not.")
+            if(referencedTable != null) append("$referencedTable.")
+        }
+        val joiningFilter = formatJoiningFilter(filter)
+        if(joiningFilter == "()") return //empty logical expressions return a postgrest error
+        _params[prefix + "or"] = listOf(joiningFilter) + if(isInLogicalExpression) _params[prefix + "or"] ?: emptyList() else emptyList()
     }
 
     /**
      * Adds an `and` condition to the query
+     * @param negate Whether to negate the condition
+     * @param referencedTable The table to reference
      */
     @PostgrestFilterDSL
-    inline fun and(negate: Boolean = false, filter: @PostgrestFilterDSL PostgrestFilterBuilder.() -> Unit) {
-        val prefix = if (negate) "not." else ""
-        _params[prefix + "and"] = listOf(formatJoiningFilter(filter)) + if(isInLogicalExpression) _params[prefix + "and"] ?: emptyList() else emptyList()
+    inline fun and(negate: Boolean = false, referencedTable: String? = null, filter: @PostgrestFilterDSL PostgrestFilterBuilder.() -> Unit) {
+        val prefix = buildString {
+            if(negate) append("not.")
+            if(referencedTable != null) append("$referencedTable.")
+        }
+        val joiningFilter = formatJoiningFilter(filter)
+        if(joiningFilter == "()") return //empty logical expressions return a postgrest error
+        _params[prefix + "and"] = listOf(joiningFilter) + if(isInLogicalExpression) _params[prefix + "and"] ?: emptyList() else emptyList()
     }
 
     /**
