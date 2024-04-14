@@ -1,3 +1,4 @@
+@file:Suppress("MatchingDeclarationName")
 package io.github.jan.supabase.gotrue
 
 import korlibs.crypto.SHA256
