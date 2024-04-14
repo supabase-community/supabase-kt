@@ -20,7 +20,7 @@ import kotlinx.serialization.json.contentOrNull
 import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.put
 
-class GoTrueMock {
+class AuthApiMock {
 
     val engine = MockEngine {
         handleRequest(it) ?: respondInternalError("Invalid route")
@@ -202,6 +202,5 @@ class GoTrueMock {
         const val VALID_ACCESS_TOKEN = "valid_access_token"
         const val VALID_VERIFY_TOKEN = "valid_verify_token"
     }
-
 
 }
