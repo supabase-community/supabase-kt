@@ -1,6 +1,6 @@
 import java.net.URL
 
-val excludedModules = listOf("plugins", "serializers")
+val excludedModules = listOf("plugins", "serializers", "test-common")
 
 fun allprojects(init: Project.() -> Unit) = configure(allprojects.filter { it.name !in excludedModules }, init)
 
@@ -196,6 +196,7 @@ kotlin {
         }
         val commonTest by getting {
             dependencies {
+                implementation(project(":test-common"))
                 implementation(libs.bundles.testing)
             }
         }

@@ -1,66 +1,63 @@
 import io.github.jan.supabase.BuildConfig
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.SupabaseClientBuilder
-import io.github.jan.supabase.createSupabaseClient
+import io.github.jan.supabase.SupabaseSerializer
+import io.github.jan.supabase.logging.LogLevel
 import io.github.jan.supabase.logging.SupabaseLogger
 import io.github.jan.supabase.plugins.SupabasePlugin
 import io.github.jan.supabase.plugins.SupabasePluginProvider
-import io.ktor.client.engine.mock.MockEngine
+import io.github.jan.supabase.testing.createMockedSupabaseClient
 import io.ktor.client.engine.mock.respond
-import io.ktor.http.HttpStatusCode
 import kotlinx.coroutines.test.runTest
+import kotlin.reflect.KType
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertIs
 import kotlin.test.assertNotNull
-
-class TestPlugin(override val config: Config, override val supabaseClient: SupabaseClient) : SupabasePlugin<TestPlugin.Config> {
-
-    data class Config(var testValue: Boolean = false)
-
-    companion object : SupabasePluginProvider<Config, TestPlugin> {
-
-        override val key = "test"
-
-        override val logger: SupabaseLogger = SupabaseClient.createLogger("Test")
-
-        override fun createConfig(init: Config.() -> Unit): Config {
-            return Config().apply(init)
-        }
-
-        override fun create(supabaseClient: SupabaseClient, config: Config): TestPlugin {
-            return TestPlugin(config, supabaseClient)
-        }
-
-        override fun setup(builder: SupabaseClientBuilder, config: Config) {
-            builder.useHTTPS = config.testValue
-        }
-
-    }
-
-}
 
 class SupabaseClientTest {
 
-    private val mockEngine = MockEngine { data ->
-        val headers = data.headers
-        if("X-Client-Info" !in headers) return@MockEngine respond("Missing X-Client-Info header", HttpStatusCode.BadRequest)
-        val clientInfo = headers["X-Client-Info"]!!
-        if(clientInfo != "supabase-kt/${BuildConfig.PROJECT_VERSION}") return@MockEngine respond("Invalid X-Client-Info header", HttpStatusCode.BadRequest)
-        respond("") //ignore for this test
-    }
-
     @Test
-    fun testClientHeader() {
+    fun testClientInfoHeader() {
         runTest {
             val client = createMockedSupabaseClient(
                 supabaseUrl = "https://example.supabase.co",
-                supabaseKey = "somekey"
-            ) {
-
-            }
-            val response = client.httpClient.get("")
-            assertEquals(HttpStatusCode.OK, response.status, "Status code should be OK")
+                supabaseKey = "somekey",
+                requestHandler = {
+                    assertEquals(
+                        "supabase-kt/${BuildConfig.PROJECT_VERSION}",
+                        it.headers["X-Client-Info"],
+                        "X-Client-Info header should be set to 'supabase-kt/${BuildConfig.PROJECT_VERSION}'"
+                    )
+                    respond("")
+                }
+            )
+            client.httpClient.get("")
         }
+    }
+
+    @Test
+    fun testDefaultLogLevel() {
+        val client = createMockedSupabaseClient(
+            configuration = {
+                defaultLogLevel = LogLevel.DEBUG
+            }
+        )
+        assertEquals(
+            LogLevel.DEBUG,
+            SupabaseClient.DEFAULT_LOG_LEVEL,
+            "Default log level should be set to ${LogLevel.DEBUG}"
+        )
+    }
+
+    @Test
+    fun testDefaultSerializer() {
+        val client = createMockedSupabaseClient(
+            configuration = {
+                defaultSerializer = DummySerializer()
+            }
+        )
+        assertIs<DummySerializer>(client.defaultSerializer, "Default serializer should be an instance of DummySerializer")
     }
 
     @Test
@@ -68,9 +65,7 @@ class SupabaseClientTest {
         val client = createMockedSupabaseClient(
             supabaseUrl = "https://example.supabase.co",
             supabaseKey = "somekey"
-        ) {
-
-        }
+        )
         assertEquals("example.supabase.co", client.supabaseUrl, "Supabase url should not contain https://")
         assertEquals("somekey", client.supabaseKey, "Supabase key should be set to somekey")
         assertEquals(
@@ -84,12 +79,13 @@ class SupabaseClientTest {
     fun testClientBuilderPlugins() {
         val client = createMockedSupabaseClient(
             supabaseUrl = "example.supabase.co",
-            supabaseKey = "somekey"
-        ) {
-            install(TestPlugin) {
-                testValue = true
+            supabaseKey = "somekey",
+            configuration =  {
+                install(TestPlugin) {
+                    testValue = true
+                }
             }
-        }
+        )
         val plugin = client.pluginManager.getPluginOrNull(TestPlugin)
         //test if the plugin was correctly installed
         assertNotNull(plugin, "Plugin 'test' should not be null")
@@ -99,17 +95,6 @@ class SupabaseClientTest {
             client.supabaseHttpUrl,
             "Supabase http url should be https://example.supabase.co because the plugin modifies it"
         )
-    }
-
-    private fun createMockedSupabaseClient(
-        supabaseUrl: String,
-        supabaseKey: String,
-        init: SupabaseClientBuilder.() -> Unit
-    ): SupabaseClient {
-        return createSupabaseClient(supabaseUrl, supabaseKey) {
-            httpEngine = mockEngine
-            init()
-        }
     }
 
 }
