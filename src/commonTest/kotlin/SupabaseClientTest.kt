@@ -1,15 +1,9 @@
 import io.github.jan.supabase.BuildConfig
 import io.github.jan.supabase.SupabaseClient
-import io.github.jan.supabase.SupabaseClientBuilder
-import io.github.jan.supabase.SupabaseSerializer
 import io.github.jan.supabase.logging.LogLevel
-import io.github.jan.supabase.logging.SupabaseLogger
-import io.github.jan.supabase.plugins.SupabasePlugin
-import io.github.jan.supabase.plugins.SupabasePluginProvider
 import io.github.jan.supabase.testing.createMockedSupabaseClient
 import io.ktor.client.engine.mock.respond
 import kotlinx.coroutines.test.runTest
-import kotlin.reflect.KType
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertIs
@@ -38,7 +32,7 @@ class SupabaseClientTest {
 
     @Test
     fun testDefaultLogLevel() {
-        val client = createMockedSupabaseClient(
+        createMockedSupabaseClient(
             configuration = {
                 defaultLogLevel = LogLevel.DEBUG
             }

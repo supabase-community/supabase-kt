@@ -54,6 +54,12 @@ kotlin {
              //   api(libs.cache4k)
             }
         }
+        val commonTest by getting {
+            dependencies {
+                implementation(project(":test-common"))
+                implementation(libs.bundles.testing)
+            }
+        }
         val nonJsMain by creating {
             dependsOn(commonMain)
         }
@@ -70,11 +76,6 @@ kotlin {
         val androidMain by getting {
             dependsOn(nonJsMain)
             dependsOn(nonLinuxMain)
-        }
-        val commonTest by getting {
-            dependencies {
-                implementation(libs.bundles.testing)
-            }
         }
         val jsMain by getting {
             dependsOn(nonLinuxMain)

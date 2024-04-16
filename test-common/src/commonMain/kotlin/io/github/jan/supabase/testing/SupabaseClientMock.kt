@@ -13,7 +13,7 @@ inline fun createMockedSupabaseClient(
     supabaseUrl: String = "https://projectref.supabase.co",
     supabaseKey: String = "project-anon-key",
     configuration: SupabaseClientBuilder.() -> Unit = {},
-    crossinline requestHandler: MockRequestHandleScope.(HttpRequestData) -> HttpResponseData = { respond("") },
+    crossinline requestHandler: suspend MockRequestHandleScope.(HttpRequestData) -> HttpResponseData = { respond("") },
 ): SupabaseClient {
     return createSupabaseClient(
         supabaseUrl = supabaseUrl,
