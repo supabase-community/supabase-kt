@@ -104,7 +104,7 @@ class StorageTest {
         runTest {
             val expectedId = "test-bucket"
             val expectedPublic = true
-            val expectedFileSizeLimit = 10000
+            val expectedFileSizeLimit = 10000L
             val expectedAllowedMimeTypes = listOf("image/jpeg", "image/png")
             val expectedCreatedAt = Clock.System.now()
             val expectedUpdatedAt = Clock.System.now()
@@ -115,30 +115,30 @@ class StorageTest {
                 respond(
                     """
                     [
-                        {
-                            "id": "$expectedId",
-                            "name": "$expectedId",
-                            "public": $expectedPublic,
-                            "file_size_limit": $expectedFileSizeLimit,
-                            "allowed_mime_types": ${expectedAllowedMimeTypes.joinToString(prefix = "[", postfix = "]", transform = { s -> "\"$s\"" })},
-                            "created_at": "$expectedCreatedAt",
-                            "updated_at": "$expectedUpdatedAt"
-                            "owner": "$owner"
-                        }
+                        ${createSampleBucket(
+                            id = expectedId,
+                            name = expectedId,
+                            public = expectedPublic,
+                            fileSizeLimit = expectedFileSizeLimit,
+                            allowedMimeTypes = expectedAllowedMimeTypes,
+                            createdAt = expectedCreatedAt.toString(),
+                            updatedAt = expectedUpdatedAt.toString(),
+                            owner = owner
+                        )}
                     ]
                     """
                 )
             }
             val buckets = client.storage.retrieveBuckets()
             assertEquals(1, buckets.size, "Buckets should contain 1 item")
-            assertEquals("test-bucket", buckets[0].id, "Bucket id should be 'test-bucket'")
-            assertEquals("test-bucket", buckets[0].name, "Bucket name should be 'test-bucket'")
-            assertEquals(true, buckets[0].public, "Bucket public should be true")
-            assertEquals(10000, buckets[0].fileSizeLimit, "Bucket file size limit should be 10000")
+            assertEquals(expectedId, buckets[0].id, "Bucket id should be 'test-bucket'")
+            assertEquals(expectedId, buckets[0].name, "Bucket name should be 'test-bucket'")
+            assertEquals(expectedPublic, buckets[0].public, "Bucket public should be true")
+            assertEquals(expectedFileSizeLimit, buckets[0].fileSizeLimit, "Bucket file size limit should be 10000")
             assertEquals(expectedCreatedAt, buckets[0].createdAt, "Bucket created at should be $expectedCreatedAt")
             assertEquals(expectedUpdatedAt, buckets[0].updatedAt, "Bucket updated at should be $expectedUpdatedAt")
             assertEquals(owner, buckets[0].owner, "Bucket owner should be $owner")
-            assertEquals(listOf("image/jpeg", "image/png"), buckets[0].allowedMimeTypes, "Bucket allowed mime types should be ['image/jpeg', 'image/png']")
+            assertEquals(expectedAllowedMimeTypes, buckets[0].allowedMimeTypes, "Bucket allowed mime types should be ['image/jpeg', 'image/png']")
         }
     }
 
@@ -147,7 +147,7 @@ class StorageTest {
         runTest {
             val expectedId = "test-bucket"
             val expectedPublic = true
-            val expectedFileSizeLimit = 10000
+            val expectedFileSizeLimit = 10000L
             val expectedAllowedMimeTypes = listOf("image/jpeg", "image/png")
             val expectedCreatedAt = Clock.System.now()
             val expectedUpdatedAt = Clock.System.now()
@@ -157,28 +157,28 @@ class StorageTest {
                 assertEquals(HttpMethod.Get, it.method, "Method should be GET")
                 respond(
                     """
-                    {
-                        "id": "$expectedId",
-                        "name": "$expectedId",
-                        "public": $expectedPublic,
-                        "file_size_limit": $expectedFileSizeLimit,
-                        "allowed_mime_types": ${expectedAllowedMimeTypes.joinToString(prefix = "[", postfix = "]", transform = { s -> "\"$s\"" })},
-                        "created_at": "$expectedCreatedAt",
-                        "updated_at": "$expectedUpdatedAt"
-                        "owner": "$owner"
-                    }
+                    ${createSampleBucket(
+                        id = expectedId,
+                        name = expectedId,
+                        public = expectedPublic,
+                        fileSizeLimit = expectedFileSizeLimit,
+                        allowedMimeTypes = expectedAllowedMimeTypes,
+                        createdAt = expectedCreatedAt.toString(),
+                        updatedAt = expectedUpdatedAt.toString(),
+                        owner = owner
+                    )}
                     """
                 )
             }
             val bucket = client.storage.retrieveBucketById(expectedId)
-            assertEquals("test-bucket", bucket?.id, "Bucket id should be 'test-bucket'")
-            assertEquals("test-bucket", bucket?.name, "Bucket name should be 'test-bucket'")
-            assertEquals(true, bucket?.public, "Bucket public should be true")
-            assertEquals(10000, bucket?.fileSizeLimit, "Bucket file size limit should be 10000")
+            assertEquals(expectedId, bucket?.id, "Bucket id should be 'test-bucket'")
+            assertEquals(expectedId, bucket?.name, "Bucket name should be 'test-bucket'")
+            assertEquals(expectedPublic, bucket?.public, "Bucket public should be true")
+            assertEquals(expectedFileSizeLimit, bucket?.fileSizeLimit, "Bucket file size limit should be 10000")
             assertEquals(expectedCreatedAt, bucket?.createdAt, "Bucket created at should be $expectedCreatedAt")
             assertEquals(expectedUpdatedAt, bucket?.updatedAt, "Bucket updated at should be $expectedUpdatedAt")
             assertEquals(owner, bucket?.owner, "Bucket owner should be $owner")
-            assertEquals(listOf("image/jpeg", "image/png"), bucket?.allowedMimeTypes, "Bucket allowed mime types should be ['image/jpeg', 'image/png']")
+            assertEquals(expectedAllowedMimeTypes, bucket?.allowedMimeTypes, "Bucket allowed mime types should be ['image/jpeg', 'image/png']")
         }
     }
 
@@ -202,6 +202,31 @@ class StorageTest {
             client.storage.retrieveBuckets()
         }
     }
+
+    private fun createSampleBucket(
+        id: String,
+        name: String,
+        public: Boolean,
+        fileSizeLimit: Long,
+        allowedMimeTypes: List<String>,
+        createdAt: String,
+        updatedAt: String,
+        owner: String
+    ): String {
+        return """
+            {
+                "id": "$id",
+                "name": "$name",
+                "public": $public,
+                "file_size_limit": $fileSizeLimit,
+                "allowed_mime_types": ${allowedMimeTypes.joinToString(prefix = "[", postfix = "]", transform = { s -> "\"$s\"" })},
+                "created_at": "$createdAt",
+                "updated_at": "$updatedAt",
+                "owner": "$owner"
+            }
+        """
+    }
+
 
     private fun JsonArray.toStringArray(): List<String> {
         return map { it.jsonPrimitive.content }
