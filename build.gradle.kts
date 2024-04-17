@@ -196,7 +196,6 @@ kotlin {
         }
         val commonTest by getting {
             dependencies {
-                implementation(project(":test-common"))
                 implementation(libs.bundles.testing)
             }
         }

@@ -78,7 +78,7 @@ class StorageTest {
         runTest {
             val name = "test-bucket"
             val client = createMockedSupabaseClient(configuration = configureClient) {
-                assertEquals("/bucket/$name", it.url.pathAfterVersion(), "URL should end with '$name'")
+                assertEquals("/bucket/$name", it.url.pathAfterVersion(), "URL should end with 'bucket/$name'")
                 assertEquals(HttpMethod.Delete, it.method, "Method should be DELETE")
                 respond("")
             }
@@ -91,7 +91,7 @@ class StorageTest {
         runTest {
             val name = "test-bucket"
             val client = createMockedSupabaseClient(configuration = configureClient) {
-                assertEquals("/bucket/$name/empty", it.url.pathAfterVersion(), "URL should end with '$name/empty'")
+                assertEquals("/bucket/$name/empty", it.url.pathAfterVersion(), "URL should end with 'bucket/$name/empty'")
                 assertEquals(HttpMethod.Post, it.method, "Method should be POST")
                 respond("")
             }

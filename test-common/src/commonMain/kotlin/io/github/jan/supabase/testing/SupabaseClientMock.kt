@@ -9,11 +9,11 @@ import io.ktor.client.engine.mock.respond
 import io.ktor.client.request.HttpRequestData
 import io.ktor.client.request.HttpResponseData
 
-inline fun createMockedSupabaseClient(
+fun createMockedSupabaseClient(
     supabaseUrl: String = "https://projectref.supabase.co",
     supabaseKey: String = "project-anon-key",
     configuration: SupabaseClientBuilder.() -> Unit = {},
-    crossinline requestHandler: suspend MockRequestHandleScope.(HttpRequestData) -> HttpResponseData = { respond("") },
+    requestHandler: suspend MockRequestHandleScope.(HttpRequestData) -> HttpResponseData = { respond("") },
 ): SupabaseClient {
     return createSupabaseClient(
         supabaseUrl = supabaseUrl,
