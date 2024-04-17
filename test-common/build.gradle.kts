@@ -54,6 +54,11 @@ kotlin {
                 implementation(libs.bundles.testing)
             }
         }
+        val commonTest by getting {
+            dependencies {
+                implementation(libs.bundles.testing)
+            }
+        }
         val jvmMain by getting
         val androidMain by getting
         val jsMain by getting
