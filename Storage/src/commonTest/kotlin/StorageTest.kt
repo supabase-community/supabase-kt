@@ -1,7 +1,9 @@
 import io.github.jan.supabase.SupabaseClientBuilder
 import io.github.jan.supabase.gotrue.Auth
 import io.github.jan.supabase.gotrue.auth
+import io.github.jan.supabase.gotrue.minimalSettings
 import io.github.jan.supabase.storage.Storage
+import io.github.jan.supabase.storage.resumable.MemoryResumableCache
 import io.github.jan.supabase.storage.storage
 import io.github.jan.supabase.testing.createMockedSupabaseClient
 import io.github.jan.supabase.testing.pathAfterVersion
@@ -21,7 +23,11 @@ import kotlin.test.assertEquals
 class StorageTest {
 
     private val configureClient: SupabaseClientBuilder.() -> Unit = {
-        install(Storage)
+        install(Storage) {
+            resumable {
+                cache = MemoryResumableCache()
+            }
+        }
     }
 
     @Test
@@ -188,10 +194,14 @@ class StorageTest {
             val key = "test-key"
             val client = createMockedSupabaseClient(
                 configuration = {
-                    install(Storage)
+                    install(Storage) {
+                        resumable {
+                            cache = MemoryResumableCache()
+                        }
+                    }
                     install(Auth) {
-                        autoLoadFromStorage = false
-                        autoSaveToStorage = false
+                        minimalSettings()
+                        enableLifecycleCallbacks = false
                     }
                 }
             ) {

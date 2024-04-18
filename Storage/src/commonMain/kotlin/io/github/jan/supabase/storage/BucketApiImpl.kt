@@ -2,6 +2,7 @@ package io.github.jan.supabase.storage
 
 import io.github.jan.supabase.putJsonObject
 import io.github.jan.supabase.safeBody
+import io.github.jan.supabase.storage.resumable.ResumableCache
 import io.github.jan.supabase.storage.resumable.ResumableClientImpl
 import io.ktor.client.call.body
 import io.ktor.client.request.HttpRequestBuilder
@@ -28,11 +29,11 @@ import kotlinx.serialization.json.put
 import kotlinx.serialization.json.putJsonArray
 import kotlin.time.Duration
 
-internal class BucketApiImpl(override val bucketId: String, val storage: StorageImpl) : BucketApi {
+internal class BucketApiImpl(override val bucketId: String, val storage: StorageImpl, resumableCache: ResumableCache) : BucketApi {
 
     override val supabaseClient = storage.supabaseClient
 
-    override val resumable = ResumableClientImpl(this, storage.config.resumable.cache)
+    override val resumable = ResumableClientImpl(this, resumableCache)
 
     override suspend fun update(path: String, data: UploadData, upsert: Boolean): String =
         uploadOrUpdate(
