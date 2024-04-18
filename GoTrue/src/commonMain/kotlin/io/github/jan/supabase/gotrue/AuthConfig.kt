@@ -142,8 +142,8 @@ val AuthConfig.deepLinkOrNull: String?
  * @param alwaysAutoRefresh Whether to always automatically refresh the session, when it expires
  * @param autoLoadFromStorage Whether to automatically load the session from [sessionManager], when [Auth] is initialized
  * @param autoSaveToStorage Whether to automatically save the session to [sessionManager], when the session changes
- * @param sessionManager The session manager used to store/load the session. When null, the default [MemorySessionManager] will be used
- * @param codeVerifierCache The cache used to store/load the code verifier for the [FlowType.PKCE] flow. When null, the default [MemoryCodeVerifierCache] will be used
+ * @param sessionManager The session manager used to store/load the session.
+ * @param codeVerifierCache The cache used to store/load the code verifier for the [FlowType.PKCE] flow.
  * @see AuthConfigDefaults
  */
 fun AuthConfigDefaults.minimalSettings(
