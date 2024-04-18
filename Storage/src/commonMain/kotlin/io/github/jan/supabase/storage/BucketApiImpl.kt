@@ -2,6 +2,7 @@ package io.github.jan.supabase.storage
 
 import io.github.jan.supabase.putJsonObject
 import io.github.jan.supabase.safeBody
+import io.github.jan.supabase.storage.BucketApi.Companion.UPSERT_HEADER
 import io.github.jan.supabase.storage.resumable.ResumableCache
 import io.github.jan.supabase.storage.resumable.ResumableClientImpl
 import io.ktor.client.call.body
@@ -75,11 +76,12 @@ internal class BucketApiImpl(override val bucketId: String, val storage: Storage
         })
     }
 
-    override suspend fun move(from: String, to: String) {
+    override suspend fun move(from: String, to: String, destinationBucket: String?) {
         storage.api.postJson("object/move", buildJsonObject {
             put("bucketId", bucketId)
             put("sourceKey", from)
             put("destinationKey", to)
+            destinationBucket?.let { put("destinationBucket", it) }
         })
     }
 
@@ -222,7 +224,7 @@ internal class BucketApiImpl(override val bucketId: String, val storage: Storage
                 override fun readFrom(): ByteReadChannel = data.stream
             })
             header(HttpHeaders.ContentType, ContentType.defaultForFilePath(path))
-            header("x-upsert", upsert.toString())
+            header(UPSERT_HEADER, upsert.toString())
             extra()
         }.body<JsonObject>()["Key"]?.jsonPrimitive?.content
             ?: error("Expected a key in a upload response")

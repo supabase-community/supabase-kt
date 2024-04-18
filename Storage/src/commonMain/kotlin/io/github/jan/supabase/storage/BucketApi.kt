@@ -124,7 +124,7 @@ sealed interface BucketApi {
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
-    suspend fun move(from: String, to: String)
+    suspend fun move(from: String, to: String, destinationBucket: String? = null)
 
     /**
      * Copies a file under [from] to [to]
@@ -268,6 +268,15 @@ sealed interface BucketApi {
      * @throws HttpRequestException on network related issues
      */
     fun publicRenderUrl(path: String, transform: ImageTransformation.() -> Unit = {}): String
+
+    companion object {
+
+        /**
+         * The header to use for upserting files
+         */
+        const val UPSERT_HEADER = "x-upsert"
+
+    }
 
 }
 

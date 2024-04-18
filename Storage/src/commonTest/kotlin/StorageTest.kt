@@ -5,6 +5,8 @@ import io.github.jan.supabase.gotrue.minimalSettings
 import io.github.jan.supabase.storage.Storage
 import io.github.jan.supabase.storage.resumable.MemoryResumableCache
 import io.github.jan.supabase.storage.storage
+import io.github.jan.supabase.testing.assertMethodIs
+import io.github.jan.supabase.testing.assertPathIs
 import io.github.jan.supabase.testing.createMockedSupabaseClient
 import io.github.jan.supabase.testing.pathAfterVersion
 import io.github.jan.supabase.testing.toJsonElement
@@ -39,8 +41,8 @@ class StorageTest {
             val allowedMimeType = listOf("image/jpeg", "image/png")
             val client = createMockedSupabaseClient(configuration = configureClient) {
                 val body = it.body.toJsonElement().jsonObject
-                assertEquals(HttpMethod.Post, it.method, "Method should be POST")
-                assertEquals("/bucket", it.url.pathAfterVersion(), "URL should end with 'bucket'")
+                assertMethodIs(HttpMethod.Post, it.method)
+                assertPathIs("/bucket", it.url.pathAfterVersion())
                 assertEquals(body["name"]?.jsonPrimitive?.content, name, "Name should be $name")
                 assertEquals(body["public"]?.jsonPrimitive?.boolean, public, "Public should be $public")
                 assertEquals(body["file_size_limit"]?.jsonPrimitive?.content, fileSizeLimit, "File size limit should be $fileSizeLimit")
@@ -64,8 +66,8 @@ class StorageTest {
             val allowedMimeType = listOf("image/jpeg")
             val client = createMockedSupabaseClient(configuration = configureClient) {
                 val body = it.body.toJsonElement().jsonObject
-                assertEquals("/bucket/$name", it.url.pathAfterVersion(), "URL should end with 'bucket/$name'")
-                assertEquals(HttpMethod.Put, it.method, "Method should be PUT")
+                assertPathIs("/bucket/$name", it.url.pathAfterVersion())
+                assertMethodIs(HttpMethod.Put, it.method)
                 assertEquals(body["public"]?.jsonPrimitive?.boolean, public, "Public should be $public")
                 assertEquals(body["file_size_limit"]?.jsonPrimitive?.content, fileSizeLimit, "File size limit should be $fileSizeLimit")
                 assertEquals(body["allowed_mime_types"]?.jsonArray?.toStringArray(), allowedMimeType, "Allowed mime type should be $allowedMimeType")
@@ -84,8 +86,8 @@ class StorageTest {
         runTest {
             val name = "test-bucket"
             val client = createMockedSupabaseClient(configuration = configureClient) {
-                assertEquals("/bucket/$name", it.url.pathAfterVersion(), "URL should end with 'bucket/$name'")
-                assertEquals(HttpMethod.Delete, it.method, "Method should be DELETE")
+                assertPathIs("/bucket/$name", it.url.pathAfterVersion())
+                assertMethodIs(HttpMethod.Delete, it.method)
                 respond("")
             }
             client.storage.deleteBucket(name)
@@ -97,8 +99,8 @@ class StorageTest {
         runTest {
             val name = "test-bucket"
             val client = createMockedSupabaseClient(configuration = configureClient) {
-                assertEquals("/bucket/$name/empty", it.url.pathAfterVersion(), "URL should end with 'bucket/$name/empty'")
-                assertEquals(HttpMethod.Post, it.method, "Method should be POST")
+                assertPathIs("/bucket/$name/empty", it.url.pathAfterVersion())
+                assertMethodIs(HttpMethod.Post, it.method)
                 respond("")
             }
             client.storage.emptyBucket(name)
@@ -116,8 +118,8 @@ class StorageTest {
             val expectedUpdatedAt = Clock.System.now()
             val owner = "uuid"
             val client = createMockedSupabaseClient(configuration = configureClient) {
-                assertEquals("/bucket", it.url.pathAfterVersion(), "URL should end with 'bucket'")
-                assertEquals(HttpMethod.Get, it.method, "Method should be GET")
+                assertPathIs("/bucket", it.url.pathAfterVersion())
+                assertMethodIs(HttpMethod.Get, it.method)
                 respond(
                     """
                     [
@@ -159,8 +161,8 @@ class StorageTest {
             val expectedUpdatedAt = Clock.System.now()
             val owner = "uuid"
             val client = createMockedSupabaseClient(configuration = configureClient) {
-                assertEquals("/bucket/$expectedId", it.url.pathAfterVersion(), "URL should end with 'bucket/$expectedId'")
-                assertEquals(HttpMethod.Get, it.method, "Method should be GET")
+                assertPathIs("/bucket/$expectedId", it.url.pathAfterVersion())
+                assertMethodIs(HttpMethod.Get, it.method)
                 respond(
                     """
                     ${createSampleBucket(
