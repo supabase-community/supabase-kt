@@ -89,6 +89,13 @@ open class AuthConfigDefaults : MainConfig() {
      */
     var defaultRedirectUrl: String? = null
 
+    /**
+     * Whether to stop auto-refresh on focus loss, and resume it on focus again.
+     *
+     * Currently only supported on Android.
+     */
+    var enableLifecycleCallbacks: Boolean = true
+
 }
 
 /**
@@ -129,3 +136,29 @@ val AuthConfig.deepLinkOrNull: String?
         val host = host ?: return null
         return "${scheme}://${host}"
     }
+
+/**
+ * Applies minimal settings to the [AuthConfig]. This is useful for server side applications, where you don't need to store the session or code verifier.
+ * @param alwaysAutoRefresh Whether to always automatically refresh the session, when it expires
+ * @param autoLoadFromStorage Whether to automatically load the session from [sessionManager], when [Auth] is initialized
+ * @param autoSaveToStorage Whether to automatically save the session to [sessionManager], when the session changes
+ * @param sessionManager The session manager used to store/load the session.
+ * @param codeVerifierCache The cache used to store/load the code verifier for the [FlowType.PKCE] flow.
+ * @param enableLifecycleCallbacks Whether to stop auto-refresh on focus loss, and resume it on focus again. Currently only supported on Android.
+ * @see AuthConfigDefaults
+ */
+fun AuthConfigDefaults.minimalSettings(
+    alwaysAutoRefresh: Boolean = false,
+    autoLoadFromStorage: Boolean = false,
+    autoSaveToStorage: Boolean = false,
+    sessionManager: SessionManager? = MemorySessionManager(),
+    codeVerifierCache: CodeVerifierCache? = MemoryCodeVerifierCache(),
+    enableLifecycleCallbacks: Boolean = false
+) {
+    this.alwaysAutoRefresh = alwaysAutoRefresh
+    this.autoLoadFromStorage = autoLoadFromStorage
+    this.autoSaveToStorage = autoSaveToStorage
+    this.sessionManager = sessionManager
+    this.codeVerifierCache = codeVerifierCache
+    this.enableLifecycleCallbacks = enableLifecycleCallbacks
+}
