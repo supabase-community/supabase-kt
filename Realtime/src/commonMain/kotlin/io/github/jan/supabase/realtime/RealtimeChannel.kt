@@ -73,6 +73,9 @@ sealed interface RealtimeChannel {
     @SupabaseInternal
     fun RealtimeChannel.addPostgresChange(data: PostgresJoinConfig)
 
+    @SupabaseInternal
+    fun RealtimeChannel.removePostgresChange(data: PostgresJoinConfig)
+
     /**
      * Represents the status of a channel
      */
@@ -163,7 +166,10 @@ inline fun <reified T : PostgresAction> RealtimeChannel.postgresChangeFlow(schem
         }
 
         val id = callbackManager.addPostgresCallback(config, callback)
-        awaitClose { callbackManager.removeCallbackById(id) }
+        awaitClose {
+            callbackManager.removeCallbackById(id)
+            removePostgresChange(config)
+        }
     }
 }
 

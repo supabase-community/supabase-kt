@@ -190,6 +190,11 @@ internal class RealtimeChannelImpl(
         clientChanges.add(data)
     }
 
+    @SupabaseInternal
+    override fun RealtimeChannel.removePostgresChange(data: PostgresJoinConfig) {
+        clientChanges.remove(data)
+    }
+
     override suspend fun track(state: JsonObject) {
         if(status.value != RealtimeChannel.Status.SUBSCRIBED) {
             error("You can only track your presence after subscribing to the channel. Did you forget to call `channel.subscribe()`?")
