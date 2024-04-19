@@ -74,19 +74,21 @@ internal class BucketApiImpl(override val bucketId: String, val storage: Storage
         })
     }
 
-    override suspend fun move(from: String, to: String) {
+    override suspend fun move(from: String, to: String, destinationBucket: String?) {
         storage.api.postJson("object/move", buildJsonObject {
             put("bucketId", bucketId)
             put("sourceKey", from)
             put("destinationKey", to)
+            destinationBucket?.let { put("destinationBucket", it) }
         })
     }
 
-    override suspend fun copy(from: String, to: String) {
+    override suspend fun copy(from: String, to: String, destinationBucket: String?) {
         storage.api.postJson("object/copy", buildJsonObject {
             put("bucketId", bucketId)
             put("sourceKey", from)
             put("destinationKey", to)
+            destinationBucket?.let { put("destinationBucket", it) }
         })
     }
 
