@@ -14,14 +14,7 @@ repositories {
 kotlin {
     applyDefaultHierarchyTemplate()
     jvmToolchain(8)
-    jvm {
-        compilations.all {
-            kotlinOptions.freeCompilerArgs = listOf(
-                "-Xjvm-default=all",  // use default methods in interfaces,
-                "-Xlambdas=indy"      // use invokedynamic lambdas instead of synthetic classes
-            )
-        }
-    }
+    jvm()
     androidTarget {
         publishLibraryVariants("release", "debug")
     }

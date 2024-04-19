@@ -10,8 +10,8 @@ For information about supported Kotlin targets, see the corresponding module REA
 
 [![](https://img.shields.io/github/release/supabase-community/supabase-kt?label=stable)](https://github.com/supabase-community/supabase-kt/releases) 
 [![](https://badgen.net/github/release/supabase-community/supabase-kt?label=prerelease)](https://central.sonatype.com/search?q=io.github.jan.supabase&smo=true) 
-[![Kotlin](https://img.shields.io/badge/kotlin-1.9.23-blue.svg?logo=kotlin)](http://kotlinlang.org) 
-![https://img.shields.io/badge/ktor-2.3.9-blue](https://img.shields.io/badge/ktor-2.3.9-blue)
+[![Kotlin](https://img.shields.io/badge/kotlin-2.0.0--RC1-blue.svg?logo=kotlin)](http://kotlinlang.org) 
+![https://img.shields.io/badge/ktor-2.3.10-blue](https://img.shields.io/badge/ktor-2.3.10-blue)
 [![slack](https://img.shields.io/badge/slack-%23supabase--kt-purple.svg?logo=slack)](https://kotlinlang.slack.com/archives/C06QXPC7064)
 
 ### Links
@@ -92,7 +92,7 @@ val iosMain by getting {
 
 **Note:** It is recommended to use the same Ktor version as supabase-kt:
 
-![https://img.shields.io/badge/ktor-2.3.9-blue](https://img.shields.io/badge/ktor-2.3.9-blue)
+![https://img.shields.io/badge/ktor-2.3.10-blue](https://img.shields.io/badge/ktor-2.3.10-blue)
 
 # Main Modules
 

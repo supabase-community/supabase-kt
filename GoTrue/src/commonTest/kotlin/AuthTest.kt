@@ -26,7 +26,7 @@ import kotlin.test.assertTrue
 
 class GoTrueTest {
 
-    private val mockEngine = GoTrueMock().engine
+    private val mockEngine = AuthApiMock().engine
 
     private val dispatcher = StandardTestDispatcher()
 
@@ -50,9 +50,9 @@ class GoTrueTest {
         runTest(dispatcher) {
             client.auth.signInWith(Email) {
                 email = "email@example.com"
-                password = GoTrueMock.VALID_PASSWORD
+                password = AuthApiMock.VALID_PASSWORD
             }
-            assertEquals(GoTrueMock.NEW_ACCESS_TOKEN, client.auth.currentAccessTokenOrNull())
+            assertEquals(AuthApiMock.NEW_ACCESS_TOKEN, client.auth.currentAccessTokenOrNull())
             assertIs<SessionSource.SignIn>(client.auth.sessionSource())
             assertIs<Email>(client.auth.sessionSourceAs<SessionSource.SignIn>().provider)
             client.close()
@@ -65,7 +65,7 @@ class GoTrueTest {
         runTest(dispatcher) {
             val result = client.auth.signUpWith(Email) {
                 email = "email@example.com"
-                password = GoTrueMock.VALID_PASSWORD
+                password = AuthApiMock.VALID_PASSWORD
             } ?: error("Sign up with email should not return null")
             assertEquals("email@example.com", result.email)
             client.close()
@@ -122,7 +122,7 @@ class GoTrueTest {
         runTest(dispatcher) {
             val session = UserSession(
                 "old_token",
-                GoTrueMock.VALID_REFRESH_TOKEN,
+                AuthApiMock.VALID_REFRESH_TOKEN,
                 "",
                 "",
                 0,
@@ -130,7 +130,7 @@ class GoTrueTest {
                 null
             )
             client.auth.importSession(session, true)
-            assertEquals(GoTrueMock.NEW_ACCESS_TOKEN, client.auth.currentAccessTokenOrNull())
+            assertEquals(AuthApiMock.NEW_ACCESS_TOKEN, client.auth.currentAccessTokenOrNull())
             assertIs<SessionSource.Refresh>(client.auth.sessionSource())
             client.close()
         }
@@ -175,7 +175,7 @@ class GoTrueTest {
     fun test_requesting_user_with_valid_token() {
         val client = createSupabaseClient()
         runTest(dispatcher) {
-            val user = client.auth.retrieveUser(GoTrueMock.VALID_ACCESS_TOKEN)
+            val user = client.auth.retrieveUser(AuthApiMock.VALID_ACCESS_TOKEN)
             assertEquals("userid", user.id)
             client.close()
         }
@@ -203,10 +203,10 @@ class GoTrueTest {
             client.auth.verifyEmailOtp(
                 OtpType.Email.INVITE,
                 "example@gmail.com",
-                GoTrueMock.VALID_VERIFY_TOKEN
+                AuthApiMock.VALID_VERIFY_TOKEN
             )
             assertEquals(
-                GoTrueMock.NEW_ACCESS_TOKEN,
+                AuthApiMock.NEW_ACCESS_TOKEN,
                 client.auth.currentAccessTokenOrNull(),
                 "verify with valid token should update the user session"
             )

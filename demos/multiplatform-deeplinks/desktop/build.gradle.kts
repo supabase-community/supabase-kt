@@ -10,7 +10,7 @@ version = "1.0"
 
 
 kotlin {
-    jvmToolchain(11)
+    jvmToolchain(8)
     //withJava()
 }
 
