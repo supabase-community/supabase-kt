@@ -144,6 +144,7 @@ val AuthConfig.deepLinkOrNull: String?
  * @param autoSaveToStorage Whether to automatically save the session to [sessionManager], when the session changes
  * @param sessionManager The session manager used to store/load the session.
  * @param codeVerifierCache The cache used to store/load the code verifier for the [FlowType.PKCE] flow.
+ * @param enableLifecycleCallbacks Whether to stop auto-refresh on focus loss, and resume it on focus again. Currently only supported on Android.
  * @see AuthConfigDefaults
  */
 fun AuthConfigDefaults.minimalSettings(
@@ -151,11 +152,13 @@ fun AuthConfigDefaults.minimalSettings(
     autoLoadFromStorage: Boolean = false,
     autoSaveToStorage: Boolean = false,
     sessionManager: SessionManager? = MemorySessionManager(),
-    codeVerifierCache: CodeVerifierCache? = MemoryCodeVerifierCache()
+    codeVerifierCache: CodeVerifierCache? = MemoryCodeVerifierCache(),
+    enableLifecycleCallbacks: Boolean = false
 ) {
     this.alwaysAutoRefresh = alwaysAutoRefresh
     this.autoLoadFromStorage = autoLoadFromStorage
     this.autoSaveToStorage = autoSaveToStorage
     this.sessionManager = sessionManager
     this.codeVerifierCache = codeVerifierCache
+    this.enableLifecycleCallbacks = enableLifecycleCallbacks
 }
