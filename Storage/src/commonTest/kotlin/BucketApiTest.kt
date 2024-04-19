@@ -220,14 +220,14 @@ class BucketApiTest {
     @Test
     fun testCreateSignedUrl() {
         runTest {
-            val expectedPath = "data.png"
+            val expectedPath = "folder/data.png"
             val expectedExpiresIn = 120.seconds
             val expectedHeight = 100
             val expectedWidth = 100
             val expectedQuality = 80
             val expectedResize = ImageTransformation.Resize.COVER
             val expectedFormat = "origin"
-            val expectedUrl = "/object/sign/avatars/folder/cat.png?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1cmwiOiJhdmF0YXJzL2ZvbGRlci9jYXQucG5nIiwiaWF0IjoxNjE3NzI2MjczLCJleHAiOjE2MTc3MjcyNzN9.s7Gt8ME80iREVxPhH01ZNv8oUn4XtaWsmiQ5csiUHn4"
+            val expectedUrl = "/object/sign/$bucketId/folder/data.png?token=12345"
             val client = createMockedSupabaseClient(configuration = configureClient) {
                 assertMethodIs(HttpMethod.Post, it.method)
                 assertPathIs("/object/sign/$bucketId/$expectedPath", it.url.pathAfterVersion())
@@ -263,6 +263,176 @@ class BucketApiTest {
             }
             assertEquals(client.storage.resolveUrl(expectedUrl.substring(1)), url, "URL should be $expectedUrl")
         }
+    }
+
+    @Test
+    fun testCreateSignedUrls() {
+        runTest {
+            val expectedPaths = listOf("folder/data.png", "folder/data2.png", "folder/data3.png")
+            val expectedExpiresIn = 120.seconds
+            val expectedUrls = listOf(
+                "/object/sign/$bucketId/folder/data.png?token=11111",
+                "/object/sign/$bucketId/folder/data2.png?token=22222",
+                "/object/sign/$bucketId/folder/data3.png?token=33333"
+            )
+            val client = createMockedSupabaseClient(configuration = configureClient) {
+                assertMethodIs(HttpMethod.Post, it.method)
+                assertPathIs("/object/sign/$bucketId", it.url.pathAfterVersion())
+                val content = it.body.toJsonElement().jsonObject
+                val paths = content["paths"]?.jsonArray
+                assertNotNull(paths, "Paths element should not be null")
+                assertContentEquals(expectedPaths, paths.map { e -> e.jsonPrimitive.content }, "Paths should be $expectedPaths")
+                assertEquals(
+                    expectedExpiresIn,
+                    content["expiresIn"]?.jsonPrimitive?.long?.seconds,
+                    "Expires in should be $expectedExpiresIn"
+                )
+                respond(
+                    content = """
+                    [
+                        { "signedURL": "${expectedUrls[0]}", "path": "${expectedPaths[0]}" },
+                        { "signedURL": "${expectedUrls[1]}", "path": "${expectedPaths[1]}" },
+                        { "signedURL": "${expectedUrls[2]}", "path": "${expectedPaths[2]}" }
+                    ]
+                    """.trimIndent(),
+                    headers = headersOf(
+                        HttpHeaders.ContentType,
+                        ContentType.Application.Json.toString()
+                    )
+                )
+            }
+            val urls = client.storage[bucketId].createSignedUrls(expectedExpiresIn, expectedPaths)
+            assertEquals(expectedUrls.map { client.storage.resolveUrl(it.substring(1)) }, urls.map { it.signedURL }, "URLs should be $expectedUrls")
+        }
+    }
+
+    @Test
+    fun testCreateSignedUploadUrl() {
+        runTest {
+            val expectedPath = "folder/data.png"
+            val expectedToken = "12345"
+            val expectedUrl =
+                "/object/upload/sign/$bucketId/folder/data.png?token=$expectedToken"
+            val client = createMockedSupabaseClient(configuration = configureClient) {
+                assertMethodIs(HttpMethod.Post, it.method)
+                assertPathIs(
+                    "/object/upload/sign/$bucketId/$expectedPath",
+                    it.url.pathAfterVersion()
+                )
+                respond(
+                    content = """
+                    { 
+                        "url": "$expectedUrl"
+                    }
+                    """.trimIndent(),
+                    headers = headersOf(
+                        HttpHeaders.ContentType,
+                        ContentType.Application.Json.toString()
+                    )
+                )
+            }
+            val url = client.storage[bucketId].createSignedUploadUrl(expectedPath)
+            assertEquals(expectedToken, url.token, "Token should be $expectedToken")
+            assertEquals(client.storage.resolveUrl(expectedUrl.substring(1)), url.url, "URL should be $expectedUrl")
+            assertEquals(expectedPath, url.path, "Path should be $expectedPath")
+        }
+    }
+
+    @Test
+    fun testDownloadAuthenticated() {
+        runTest {
+            val expectedPath = "data.png"
+            val expectedData = byteArrayOf(1, 2, 3)
+            val client = createMockedSupabaseClient(configuration = configureClient) {
+                assertMethodIs(HttpMethod.Get, it.method)
+                assertPathIs("/object/authenticated/$bucketId/$expectedPath", it.url.pathAfterVersion())
+                respond(expectedData)
+            }
+            val data = client.storage[bucketId].downloadAuthenticated(expectedPath)
+            assertContentEquals(expectedData, data, "Data should be [1, 2, 3]")
+        }
+    }
+
+    @Test
+    fun testDownloadPublic() {
+        runTest {
+            val expectedPath = "data.png"
+            val expectedData = byteArrayOf(1, 2, 3)
+            val client = createMockedSupabaseClient(configuration = configureClient) {
+                assertMethodIs(HttpMethod.Get, it.method)
+                assertPathIs("/object/public/$bucketId/$expectedPath", it.url.pathAfterVersion())
+                respond(expectedData)
+            }
+            val data = client.storage[bucketId].downloadPublic(expectedPath)
+            assertContentEquals(expectedData, data, "Data should be [1, 2, 3]")
+        }
+    }
+
+    @Test
+    fun testDownloadAuthenticatedWithTransform() {
+        runTest {
+            val expectedPath = "data.png"
+            val expectedData = byteArrayOf(1, 2, 3)
+            val expectedHeight = 100
+            val expectedWidth = 100
+            val expectedQuality = 80
+            val expectedResize = ImageTransformation.Resize.COVER
+            val expectedFormat = "origin"
+            val client = createMockedSupabaseClient(configuration = configureClient) {
+                assertMethodIs(HttpMethod.Get, it.method)
+                assertPathIs("/render/image/authenticated/$bucketId/$expectedPath", it.url.pathAfterVersion())
+                val content = it.url.parameters
+                assertEquals(expectedWidth.toString(), content["width"], "Width should be $expectedWidth")
+                assertEquals(expectedHeight.toString(), content["height"], "Height should be $expectedHeight")
+                assertEquals(expectedQuality.toString(), content["quality"], "Quality should be $expectedQuality")
+                assertEquals(expectedResize.name.lowercase(), content["resize"], "Resize should be ${expectedResize.name.lowercase()}")
+                assertEquals(expectedFormat, content["format"], "Format should be $expectedFormat")
+                respond(expectedData)
+            }
+            val data = client.storage[bucketId].downloadAuthenticated(expectedPath) {
+                size(expectedWidth, expectedHeight)
+                format = expectedFormat
+                quality = expectedQuality
+                resize = expectedResize
+            }
+            assertContentEquals(expectedData, data, "Data should be [1, 2, 3]")
+        }
+    }
+
+    @Test
+    fun testDownloadPublicWithTransform() {
+        runTest {
+            val expectedPath = "data.png"
+            val expectedData = byteArrayOf(1, 2, 3)
+            val expectedHeight = 100
+            val expectedWidth = 100
+            val expectedQuality = 80
+            val expectedResize = ImageTransformation.Resize.COVER
+            val expectedFormat = "origin"
+            val client = createMockedSupabaseClient(configuration = configureClient) {
+                assertMethodIs(HttpMethod.Get, it.method)
+                assertPathIs("/render/image/public/$bucketId/$expectedPath", it.url.pathAfterVersion())
+                val content = it.url.parameters
+                assertEquals(expectedWidth.toString(), content["width"], "Width should be $expectedWidth")
+                assertEquals(expectedHeight.toString(), content["height"], "Height should be $expectedHeight")
+                assertEquals(expectedQuality.toString(), content["quality"], "Quality should be $expectedQuality")
+                assertEquals(expectedResize.name.lowercase(), content["resize"], "Resize should be ${expectedResize.name.lowercase()}")
+                assertEquals(expectedFormat, content["format"], "Format should be $expectedFormat")
+                respond(expectedData)
+            }
+            val data = client.storage[bucketId].downloadPublic(expectedPath) {
+                size(expectedWidth, expectedHeight)
+                format = expectedFormat
+                quality = expectedQuality
+                resize = expectedResize
+            }
+            assertContentEquals(expectedData, data, "Data should be [1, 2, 3]")
+        }
+    }
+
+    @Test
+    fun testList() {
+        //TODO
     }
 
     private fun testUploadMethod(

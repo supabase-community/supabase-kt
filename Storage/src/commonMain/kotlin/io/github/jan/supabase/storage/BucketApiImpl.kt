@@ -53,7 +53,7 @@ internal class BucketApiImpl(override val bucketId: String, val storage: Storage
 
     override suspend fun createSignedUploadUrl(path: String): UploadSignedUrl {
         val result = storage.api.post("object/upload/sign/$bucketId/$path")
-        val urlPath = result.body<JsonObject>()["url"]?.jsonPrimitive?.content
+        val urlPath = result.body<JsonObject>()["url"]?.jsonPrimitive?.content?.substring(1)
             ?: error("Expected a url in create upload signed url response")
         val url = Url(storage.resolveUrl(urlPath))
         return UploadSignedUrl(
