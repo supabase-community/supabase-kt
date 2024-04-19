@@ -104,6 +104,7 @@ sealed interface BucketApi {
 
     /**
      * Deletes all files in [bucketId] with in [paths]
+     * @param paths The paths to delete
      * @throws RestException or one of its subclasses if receiving an error response
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
@@ -112,6 +113,7 @@ sealed interface BucketApi {
 
     /**
      * Deletes all files in [bucketId] with in [paths]
+     * @param paths The paths to delete
      * @throws RestException or one of its subclasses if receiving an error response
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
@@ -120,6 +122,9 @@ sealed interface BucketApi {
 
     /**
      * Moves a file under [from] to [to]
+     * @param from The path to move from
+     * @param to The path to move to
+     * @param destinationBucket The bucket to move the file to. If null, the file will be moved within the same bucket
      * @throws RestException or one of its subclasses if receiving an error response
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
@@ -128,6 +133,9 @@ sealed interface BucketApi {
 
     /**
      * Copies a file under [from] to [to]
+     * @param from The path to copy from
+     * @param to The path to copy to
+     * @param destinationBucket The destination bucket to copy to. If null, the current bucket is used
      * @throws RestException or one of its subclasses if receiving an error response
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
