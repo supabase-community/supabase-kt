@@ -132,7 +132,7 @@ sealed interface BucketApi {
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
-    suspend fun copy(from: String, to: String)
+    suspend fun copy(from: String, to: String, destinationBucket: String? = null)
 
     /**
      * Creates a signed url to upload without authentication.

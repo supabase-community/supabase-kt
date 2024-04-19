@@ -1,6 +1,7 @@
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.SupabaseClientBuilder
 import io.github.jan.supabase.storage.BucketApi
+import io.github.jan.supabase.storage.ImageTransformation
 import io.github.jan.supabase.storage.Storage
 import io.github.jan.supabase.storage.resumable.MemoryResumableCache
 import io.github.jan.supabase.storage.storage
@@ -18,13 +19,16 @@ import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
 import io.ktor.http.headersOf
 import kotlinx.coroutines.test.runTest
+import kotlinx.serialization.json.int
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
+import kotlinx.serialization.json.long
 import kotlin.test.Test
 import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
+import kotlin.time.Duration.Companion.seconds
 
 class BucketApiTest {
 
@@ -190,6 +194,74 @@ class BucketApiTest {
                 respond("")
             }
             client.storage[bucketId].move(expectedFrom, expectedTo, expectedToBucket)
+        }
+    }
+
+    @Test
+    fun testCopy() {
+        runTest {
+            val expectedFrom = "data.png"
+            val expectedTo = "data2.png"
+            val expectedToBucket = "bucket2"
+            val client = createMockedSupabaseClient(configuration = configureClient) {
+                assertMethodIs(HttpMethod.Post, it.method)
+                assertPathIs("/object/copy", it.url.pathAfterVersion())
+                val content = it.body.toJsonElement().jsonObject
+                assertEquals(expectedFrom, content["sourceKey"]?.jsonPrimitive?.content, "From should be '$expectedFrom'")
+                assertEquals(expectedTo, content["destinationKey"]?.jsonPrimitive?.content, "To should be '$expectedTo'")
+                assertEquals(bucketId, content["bucketId"]?.jsonPrimitive?.content, "Bucket should be '$bucketId'")
+                assertEquals(expectedToBucket, content["destinationBucket"]?.jsonPrimitive?.content, "To bucket should be '$expectedToBucket'")
+                respond("")
+            }
+            client.storage[bucketId].copy(expectedFrom, expectedTo, expectedToBucket)
+        }
+    }
+
+    @Test
+    fun testCreateSignedUrl() {
+        runTest {
+            val expectedPath = "data.png"
+            val expectedExpiresIn = 120.seconds
+            val expectedHeight = 100
+            val expectedWidth = 100
+            val expectedQuality = 80
+            val expectedResize = ImageTransformation.Resize.COVER
+            val expectedFormat = "origin"
+            val expectedUrl = "/object/sign/avatars/folder/cat.png?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1cmwiOiJhdmF0YXJzL2ZvbGRlci9jYXQucG5nIiwiaWF0IjoxNjE3NzI2MjczLCJleHAiOjE2MTc3MjcyNzN9.s7Gt8ME80iREVxPhH01ZNv8oUn4XtaWsmiQ5csiUHn4"
+            val client = createMockedSupabaseClient(configuration = configureClient) {
+                assertMethodIs(HttpMethod.Post, it.method)
+                assertPathIs("/object/sign/$bucketId/$expectedPath", it.url.pathAfterVersion())
+                val content = it.body.toJsonElement().jsonObject
+                val transform = content["transform"]?.jsonObject
+                assertEquals(
+                    expectedExpiresIn,
+                    content["expiresIn"]?.jsonPrimitive?.long?.seconds,
+                    "Expires in should be $expectedExpiresIn"
+                )
+                assertEquals(expectedWidth, transform?.get("width")?.jsonPrimitive?.int, "Width should be $expectedWidth")
+                assertEquals(expectedHeight, transform?.get("height")?.jsonPrimitive?.int, "Height should be $expectedHeight")
+                assertEquals(expectedQuality, transform?.get("quality")?.jsonPrimitive?.int, "Quality should be $expectedQuality")
+                assertEquals(expectedResize.name.lowercase(), transform?.get("resize")?.jsonPrimitive?.content, "Resize should be ${expectedResize.name.lowercase()}")
+                assertEquals(expectedFormat, transform?.get("format")?.jsonPrimitive?.content, "Format should be $expectedFormat")
+                respond(
+                    content = """
+                    { 
+                        "signedURL": "$expectedUrl"
+                    }
+                    """.trimIndent(),
+                    headers = headersOf(
+                        HttpHeaders.ContentType,
+                        ContentType.Application.Json.toString()
+                    )
+                )
+            }
+            val url = client.storage[bucketId].createSignedUrl(expectedPath, expectedExpiresIn) {
+                size(expectedWidth, expectedHeight)
+                format = expectedFormat
+                quality = expectedQuality
+                resize = expectedResize
+            }
+            assertEquals(client.storage.resolveUrl(expectedUrl.substring(1)), url, "URL should be $expectedUrl")
         }
     }
 
