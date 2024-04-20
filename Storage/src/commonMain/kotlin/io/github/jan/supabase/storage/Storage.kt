@@ -125,7 +125,7 @@ sealed interface Storage : MainPlugin<Storage.Config> {
          * @param onlyUpdateStateAfterChunk whether the state should only be updated after a chunk was uploaded successfully or also when the chunk is currently being uploaded
          */
         data class Resumable(
-            var cache: ResumableCache = createDefaultResumableCache(),
+            var cache: ResumableCache? = null,
             var retryTimeout: Duration = 5.seconds,
             var onlyUpdateStateAfterChunk: Boolean = false
         ) {
@@ -241,7 +241,7 @@ internal class StorageImpl(override val supabaseClient: SupabaseClient, override
     }
 
     override fun get(bucketId: String): BucketApi = resumableClients.getOrPut(bucketId) {
-        BucketApiImpl(bucketId, this)
+        BucketApiImpl(bucketId, this, config.resumable.cache ?: createDefaultResumableCache())
     }
 
     override suspend fun parseErrorResponse(response: HttpResponse): RestException {

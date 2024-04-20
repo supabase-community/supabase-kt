@@ -3,7 +3,7 @@ plugins {
     alias(libs.plugins.android.library)
 }
 
-description = "Extends supabase-kt with a Storage Client"
+description = "Common test module"
 
 repositories {
     mavenCentral()
@@ -50,43 +50,19 @@ kotlin {
         }
         val commonMain by getting {
             dependencies {
-                api(project(":gotrue-kt"))
-             //   api(libs.cache4k)
+                implementation(project(":"))
+                implementation(libs.bundles.testing)
             }
         }
         val commonTest by getting {
             dependencies {
-                implementation(project(":test-common"))
                 implementation(libs.bundles.testing)
             }
         }
-        val nonJsMain by creating {
-            dependsOn(commonMain)
-        }
-        val nonLinuxMain by creating {
-            dependsOn(commonMain)
-            dependencies {
-                api(libs.bundles.multiplatform.settings)
-            }
-        }
-        val jvmMain by getting {
-            dependsOn(nonJsMain)
-            dependsOn(nonLinuxMain)
-        }
-        val androidMain by getting {
-            dependsOn(nonJsMain)
-            dependsOn(nonLinuxMain)
-        }
-        val jsMain by getting {
-            dependsOn(nonLinuxMain)
-        }
-        val appleMain by getting {
-            dependsOn(nonLinuxMain)
-        }
+        val jvmMain by getting
+        val androidMain by getting
+        val jsMain by getting
         val iosMain by getting
-        val mingwX64Main by getting {
-            dependsOn(nonLinuxMain)
-        }
         val iosSimulatorArm64Main by getting
     }
 }
@@ -94,7 +70,7 @@ kotlin {
 android {
     compileSdk = 34
     sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
-    namespace = "io.github.jan.supabase.storage.library"
+    namespace = "io.github.jan.supabase.testing.library"
     defaultConfig {
         minSdk = 21
     }

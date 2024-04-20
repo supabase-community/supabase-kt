@@ -1,8 +1,8 @@
 import java.net.URL
 
-val excludedModules = listOf("plugins", "serializers")
+val excludedModules = listOf("plugins", "serializers", "test-common")
 
-fun allprojects(init: Project.() -> Unit) = configure(allprojects.filter { it.name !in excludedModules }, init)
+fun submodules(init: Project.() -> Unit) = configure(allprojects.filter { it.name !in excludedModules }, init)
 
 buildscript {
     dependencies {
@@ -29,7 +29,7 @@ allprojects {
         }
     }
 }
-allprojects {
+submodules {
     apply(plugin = "org.jetbrains.dokka")
     apply(plugin = "org.jetbrains.kotlin.plugin.serialization")
     apply(plugin = "kotlinx-atomicfu")
@@ -42,11 +42,11 @@ allprojects {
         publishToMavenCentral(com.vanniktech.maven.publish.SonatypeHost.S01)
 
         signAllPublications()
-        coordinates("io.github.jan-tennert.supabase", this@allprojects.name, extra["supabase-version"].toString())
+        coordinates("io.github.jan-tennert.supabase", this@submodules.name, extra["supabase-version"].toString())
 
         pom {
-            name.set(this@allprojects.name)
-            description.set(this@allprojects.description ?: "A Kotlin Multiplatform Supabase SDK")
+            name.set(this@submodules.name)
+            description.set(this@submodules.description ?: "A Kotlin Multiplatform Supabase SDK")
             inceptionYear.set("2024")
             url.set("https://github.com/supabase-community/supabase-kt/")
             licenses {

@@ -15,6 +15,7 @@ include("bom")
 
 include("test")
 include("test-w")
+include("test-common")
 
 include(":serializers:Moshi")
 project(":serializers:Moshi").name = "serializer-moshi"

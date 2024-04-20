@@ -277,6 +277,15 @@ sealed interface BucketApi {
      */
     fun publicRenderUrl(path: String, transform: ImageTransformation.() -> Unit = {}): String
 
+    companion object {
+
+        /**
+         * The header to use for upserting files
+         */
+        const val UPSERT_HEADER = "x-upsert"
+
+    }
+
 }
 
 

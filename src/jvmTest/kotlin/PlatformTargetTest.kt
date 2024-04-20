@@ -1,6 +1,6 @@
 import io.github.jan.supabase.CurrentPlatformTarget
 import io.github.jan.supabase.PlatformTarget
-import org.junit.Test
+import kotlin.test.Test
 import kotlin.test.assertEquals
 
 actual class PlatformTargetTest {
