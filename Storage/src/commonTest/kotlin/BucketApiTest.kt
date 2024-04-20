@@ -19,6 +19,7 @@ import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
 import io.ktor.http.headersOf
 import kotlinx.coroutines.test.runTest
+import kotlinx.datetime.Clock
 import kotlinx.serialization.json.int
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
@@ -432,7 +433,51 @@ class BucketApiTest {
 
     @Test
     fun testList() {
-        //TODO
+        runTest {
+            val expectedLimit = 10
+            val expectedOffset = 5
+            val expectedSearch = "data"
+            val expectedColumn = "name"
+            val expectedOrder = "asc"
+            val expectedData = listOf("data.png", "data2.png", "data3.png")
+            val client = createMockedSupabaseClient(configuration = configureClient) {
+                assertMethodIs(HttpMethod.Post, it.method)
+                assertPathIs("/object/list/$bucketId", it.url.pathAfterVersion())
+                val content = it.body.toJsonElement().jsonObject
+                val sortBy = content["sortBy"]?.jsonObject
+                assertEquals(expectedLimit, content["limit"]?.jsonPrimitive?.int, "Limit should be $expectedLimit")
+                assertEquals(expectedOffset, content["offset"]?.jsonPrimitive?.int, "Offset should be $expectedOffset")
+                assertEquals(expectedSearch, content["search"]?.jsonPrimitive?.content, "Search should be $expectedSearch")
+                assertEquals(expectedColumn, sortBy?.get("column")?.jsonPrimitive?.content, "Column should be $expectedColumn")
+                assertEquals(expectedOrder, sortBy?.get("order")?.jsonPrimitive?.content, "Order should be $expectedOrder")
+                respond(
+                    content = """
+                    [
+                      {
+                        "name": "string",
+                        "bucket_id": "string",
+                        "id": "string",
+                        "updated_at": "${Clock.System.now()}",
+                        "created_at": "${Clock.System.now()}",
+                        "last_accessed_at": "${Clock.System.now()}",
+                        "metadata": {}
+                      }
+                    ]
+                    """.trimIndent(),
+                    headers = headersOf(
+                        HttpHeaders.ContentType,
+                        ContentType.Application.Json.toString()
+                    )
+                )
+            }
+            val data = client.storage[bucketId].list {
+                limit = expectedLimit
+                offset = expectedOffset
+                search = expectedSearch
+                sortBy(expectedColumn, expectedOrder)
+            }
+         //   assertContentEquals(expectedData, data, "Data should be $expectedData")
+        }
     }
 
     private fun testUploadMethod(
