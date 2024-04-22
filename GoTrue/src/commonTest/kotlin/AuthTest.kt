@@ -1,293 +1,316 @@
-import io.github.jan.supabase.SupabaseClient
-import io.github.jan.supabase.createSupabaseClient
-import io.github.jan.supabase.exceptions.BadRequestRestException
-import io.github.jan.supabase.exceptions.UnauthorizedRestException
+import io.github.jan.supabase.SupabaseClientBuilder
 import io.github.jan.supabase.gotrue.Auth
 import io.github.jan.supabase.gotrue.AuthConfig
-import io.github.jan.supabase.gotrue.MemoryCodeVerifierCache
-import io.github.jan.supabase.gotrue.MemorySessionManager
-import io.github.jan.supabase.gotrue.OtpType
+import io.github.jan.supabase.gotrue.FlowType
+import io.github.jan.supabase.gotrue.PKCEConstants
 import io.github.jan.supabase.gotrue.SessionSource
 import io.github.jan.supabase.gotrue.SessionStatus
 import io.github.jan.supabase.gotrue.auth
-import io.github.jan.supabase.gotrue.providers.Github
+import io.github.jan.supabase.gotrue.minimalSettings
+import io.github.jan.supabase.gotrue.providers.Google
 import io.github.jan.supabase.gotrue.providers.builtin.Email
+import io.github.jan.supabase.gotrue.providers.builtin.IDToken
 import io.github.jan.supabase.gotrue.providers.builtin.OTP
-import io.github.jan.supabase.gotrue.user.UserSession
-import kotlinx.coroutines.test.StandardTestDispatcher
+import io.github.jan.supabase.gotrue.providers.builtin.Phone
+import io.github.jan.supabase.testing.assertMethodIs
+import io.github.jan.supabase.testing.assertPathIs
+import io.github.jan.supabase.testing.createMockedSupabaseClient
+import io.github.jan.supabase.testing.pathAfterVersion
+import io.github.jan.supabase.testing.toJsonElement
+import io.ktor.client.engine.mock.respond
+import io.ktor.http.ContentType
+import io.ktor.http.HttpHeaders
+import io.ktor.http.HttpMethod
+import io.ktor.http.headersOf
 import kotlinx.coroutines.test.runTest
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
+import kotlinx.serialization.json.put
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertFailsWith
-import kotlin.test.assertIs
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
-import kotlin.test.assertTrue
 
-class GoTrueTest {
+class AuthTest {
 
-    private val mockEngine = AuthApiMock().engine
-
-    private val dispatcher = StandardTestDispatcher()
-
-    @Test
-    fun test_login_with_email_with_wrong_credentials() {
-        val client = createSupabaseClient()
-        runTest(dispatcher) {
-            assertFailsWith<BadRequestRestException>("Login with email and wrong password should fail") {
-                client.auth.signInWith(Email, "https://website.com") {
-                    email = "email@example.com"
-                    password = "wrong_password"
-                }
-            }
-            client.close()
+    private val configuration: SupabaseClientBuilder.() -> Unit = {
+        install(Auth) {
+            minimalSettings()
+            flowType = FlowType.PKCE
         }
     }
 
     @Test
-    fun test_login_with_email_with_correct_credentials() {
-        val client = createSupabaseClient()
-        runTest(dispatcher) {
-            client.auth.signInWith(Email) {
-                email = "email@example.com"
-                password = AuthApiMock.VALID_PASSWORD
-            }
-            assertEquals(AuthApiMock.NEW_ACCESS_TOKEN, client.auth.currentAccessTokenOrNull())
-            assertIs<SessionSource.SignIn>(client.auth.sessionSource())
-            assertIs<Email>(client.auth.sessionSourceAs<SessionSource.SignIn>().provider)
-            client.close()
-        }
-    }
-
-    @Test
-    fun test_sign_up_with_email() {
-        val client = createSupabaseClient()
-        runTest(dispatcher) {
-            val result = client.auth.signUpWith(Email) {
-                email = "email@example.com"
-                password = AuthApiMock.VALID_PASSWORD
-            } ?: error("Sign up with email should not return null")
-            assertEquals("email@example.com", result.email)
-            client.close()
-        }
-    }
-
-    @Test
-    fun test_import_jwt_token() {
-        val client = createSupabaseClient()
-        runTest(dispatcher) {
-            client.auth.importAuthToken("some_token")
-            assertEquals("some_token", client.auth.currentAccessTokenOrNull())
-            client.close()
-        }
-    }
-
-    @Test
-    fun test_import_session_and_invalidate_session() {
-        val client = createSupabaseClient()
-        runTest(dispatcher) {
-            val session =
-                UserSession("some_token", "some_refresh_token", "", "", 20, "token_type", null)
-            client.auth.importSession(session, false, source = SessionSource.External)
-            assertIs<SessionSource.External>(client.auth.sessionSource())
-            assertEquals("some_token", client.auth.currentAccessTokenOrNull())
-            assertEquals("some_refresh_token", client.auth.currentSessionOrNull()!!.refreshToken)
-            client.auth.signOut()
-            assertNull(client.auth.currentAccessTokenOrNull())
-            assertIs<SessionStatus.NotAuthenticated>(client.auth.sessionStatus.value)
-            assertTrue {
-                (client.auth.sessionStatus.value as SessionStatus.NotAuthenticated).isSignOut
-            }
-            client.close()
-        }
-    }
-
-    @Test
-    fun test_auto_refresh_with_wrong_token() {
-        val client = createSupabaseClient {
-            alwaysAutoRefresh = true
-        }
-        runTest(dispatcher) {
-            val session =
-                UserSession("old_token", "some_refresh_token", "", "", 0, "token_type", null)
-            client.auth.importSession(session, true)
-            assertNull(client.auth.currentAccessTokenOrNull(), null)
-            client.close()
-        }
-    }
-
-    @Test
-    fun test_auto_refresh_with_correct_token() {
-        val client = createSupabaseClient()
-        runTest(dispatcher) {
-            val session = UserSession(
-                "old_token",
-                AuthApiMock.VALID_REFRESH_TOKEN,
-                "",
-                "",
-                0,
-                "token_type",
-                null
-            )
-            client.auth.importSession(session, true)
-            assertEquals(AuthApiMock.NEW_ACCESS_TOKEN, client.auth.currentAccessTokenOrNull())
-            assertIs<SessionSource.Refresh>(client.auth.sessionSource())
-            client.close()
-        }
-    }
-
-    @Test
-    fun test_loading_session_from_storage() {
-        val client = createSupabaseClient {
-            sessionManager = MemorySessionManager(
-                UserSession(
-                    "token",
-                    "refresh_token",
-                    "",
-                    "",
-                    1000,
-                    "type",
-                    null
-                )
-            )
-        }
+    fun testSignUpWithEmailNoAutoconfirm() {
         runTest {
-            assertIs<SessionStatus.NotAuthenticated>(client.auth.sessionStatus.value)
-            client.auth.loadFromStorage()
-            assertIs<SessionSource.Storage>(client.auth.sessionSource())
-            assertNotNull(client.auth.currentSessionOrNull())
-            client.close()
-        }
-    }
-
-    @Test
-    fun test_requesting_user_with_invalid_token() {
-        val client = createSupabaseClient()
-        runTest(dispatcher) {
-            assertFailsWith<UnauthorizedRestException>("Requesting user with invalid token should fail") {
-                client.auth.retrieveUser("invalid_token")
+            val expectedEmail = "example@email.com"
+            val expectedPassword = "password"
+            val captchaToken = "captchaToken"
+            val userData = buildJsonObject {
+                put("key", "value")
             }
-            client.close()
-        }
-    }
-
-    @Test
-    fun test_requesting_user_with_valid_token() {
-        val client = createSupabaseClient()
-        runTest(dispatcher) {
-            val user = client.auth.retrieveUser(AuthApiMock.VALID_ACCESS_TOKEN)
-            assertEquals("userid", user.id)
-            client.close()
-        }
-    }
-
-    @Test
-    fun test_verifying_with_wrong_token() {
-        val client = createSupabaseClient()
-        runTest(dispatcher) {
-            assertFailsWith<BadRequestRestException>("verifying with a wrong token should fail") {
-                client.auth.verifyEmailOtp(
-                    OtpType.Email.INVITE,
-                    "example@email.com",
-                    "wrong_token"
+            val expectedUrl = "https://example.com"
+            val client = createMockedSupabaseClient(configuration = configuration) {
+                val body = it.body.toJsonElement().jsonObject
+                val metaSecurity = body["gotrue_meta_security"]!!.jsonObject
+                val params = it.url.parameters
+                assertEquals(expectedUrl, params["redirect_to"])
+                assertMethodIs(HttpMethod.Post, it.method)
+                assertPathIs("/signup", it.url.pathAfterVersion())
+                assertEquals(expectedEmail, body["email"]?.jsonPrimitive?.content)
+                assertEquals(expectedPassword, body["password"]?.jsonPrimitive?.content)
+                assertEquals(captchaToken, metaSecurity["captcha_token"]?.jsonPrimitive?.content)
+                assertEquals(userData, body["data"]!!.jsonObject)
+                containsCodeChallenge(body)
+                respond(
+                    sampleUserObject(email = expectedEmail),
+                    headers = headersOf(HttpHeaders.ContentType, ContentType.Application.Json.toString())
                 )
             }
-            client.close()
-        }
-    }
-
-    @Test
-    fun test_verifying_with_valid_token() {
-        val client = createSupabaseClient()
-        runTest(dispatcher) {
-            client.auth.verifyEmailOtp(
-                OtpType.Email.INVITE,
-                "example@gmail.com",
-                AuthApiMock.VALID_VERIFY_TOKEN
-            )
-            assertEquals(
-                AuthApiMock.NEW_ACCESS_TOKEN,
-                client.auth.currentAccessTokenOrNull(),
-                "verify with valid token should update the user session"
-            )
-            assertIs<SessionSource.SignIn>(client.auth.sessionSource())
-            assertIs<OTP>(client.auth.sessionSourceAs<SessionSource.SignIn>().provider)
-        }
-    }
-
-    @Test
-    fun test_custom_url() {
-        val client = createSupabaseClient {
-            customUrl = "https://custom.auth.com"
-        }
-        runTest(dispatcher) {
-            assertEquals("https://custom.auth.com/signup", client.auth.resolveUrl("signup"))
-            client.close()
-        }
-    }
-
-    @Test
-    fun test_otp_email() {
-        val client = createSupabaseClient()
-        runTest(dispatcher) {
-            client.auth.signInWith(OTP) {
-                email = "example@email.com"
+            val user = client.auth.signUpWith(Email, redirectUrl = expectedUrl) {
+                email = expectedEmail
+                password = expectedPassword
+                this.captchaToken = captchaToken
+                data = userData
             }
-            client.close()
+            assertEquals(expectedEmail, user?.email, "Email should be equal")
         }
     }
 
     @Test
-    fun test_otp_phone() {
-        val client = createSupabaseClient()
-        runTest(dispatcher) {
-            client.auth.signInWith(OTP) {
-                phone = "12345678"
+    fun testSignUpWithEmailAutoconfirm() {
+        runTest {
+            val expectedEmail = "example@email.com"
+            val expectedPassword = "password"
+            val captchaToken = "captchaToken"
+            val userData = buildJsonObject {
+                put("key", "value")
             }
-            client.close()
+            val client = createMockedSupabaseClient(configuration = configuration) {
+                val body = it.body.toJsonElement().jsonObject
+                val metaSecurity = body["gotrue_meta_security"]!!.jsonObject
+                assertMethodIs(HttpMethod.Post, it.method)
+                assertPathIs("/signup", it.url.pathAfterVersion())
+                assertEquals(expectedEmail, body["email"]?.jsonPrimitive?.content)
+                assertEquals(expectedPassword, body["password"]?.jsonPrimitive?.content)
+                assertEquals(captchaToken, metaSecurity["captcha_token"]?.jsonPrimitive?.content)
+                assertEquals(userData, body["data"]!!.jsonObject)
+                containsCodeChallenge(body)
+                respond(
+                    sampleUserSession(),
+                    headers = headersOf(HttpHeaders.ContentType, ContentType.Application.Json.toString())
+                )
+            }
+            val user = client.auth.signUpWith(Email) {
+                email = expectedEmail
+                password = expectedPassword
+                this.captchaToken = captchaToken
+                data = userData
+            }
+            assertNull(user)
+            assertNotNull(client.auth.currentSessionOrNull(), "Session should not be null")
+            assertEquals(client.auth.sessionSource(), SessionSource.SignUp(Email))
         }
     }
 
     @Test
-    fun test_recovery() {
-        val client = createSupabaseClient()
-        runTest(dispatcher) {
-            client.auth.resetPasswordForEmail("example@email.com")
-            client.close()
+    fun testSignUpWithPhoneAutoconfirm() {
+        runTest {
+            val expectedPhone = "+1234567890"
+            val expectedPassword = "password"
+            val captchaToken = "captchaToken"
+            val userData = buildJsonObject {
+                put("key", "value")
+            }
+            val client = createMockedSupabaseClient(configuration = configuration) {
+                val body = it.body.toJsonElement().jsonObject
+                val metaSecurity = body["gotrue_meta_security"]!!.jsonObject
+                assertMethodIs(HttpMethod.Post, it.method)
+                assertPathIs("/signup", it.url.pathAfterVersion())
+                assertEquals(expectedPhone, body["phone"]?.jsonPrimitive?.content)
+                assertEquals(expectedPassword, body["password"]?.jsonPrimitive?.content)
+                assertEquals(captchaToken, metaSecurity["captcha_token"]?.jsonPrimitive?.content)
+                assertEquals(userData, body["data"]!!.jsonObject)
+                containsCodeChallenge(body)
+                respond(
+                    sampleUserSession(),
+                    headers = headersOf(HttpHeaders.ContentType, ContentType.Application.Json.toString())
+                )
+            }
+            val user = client.auth.signUpWith(Phone) {
+                phone = expectedPhone
+                password = expectedPassword
+                this.captchaToken = captchaToken
+                data = userData
+            }
+            assertNull(user)
+            assertNotNull(client.auth.currentSessionOrNull(), "Session should not be null")
+            assertEquals(client.auth.sessionSource(), SessionSource.SignUp(Phone))
         }
     }
 
     @Test
-    fun test_oauth_url() {
-        val client = createSupabaseClient()
-        val expected =
-            "https://example.com/auth/v1/authorize?provider=github&redirect_to=https://example.com&scopes=test+test2&custom=value"
-        val actual = client.auth.getOAuthUrl(Github, "https://example.com") {
-            scopes.addAll(listOf("test", "test2"))
-            queryParams["custom"] = "value"
+    fun testSignUpWithPhoneNoAutoconfirm() {
+        runTest {
+            val expectedPhone = "+1234567890"
+            val expectedPassword = "password"
+            val captchaToken = "captchaToken"
+            val userData = buildJsonObject {
+                put("key", "value")
+            }
+            val expectedUrl = "https://example.com"
+            val client = createMockedSupabaseClient(configuration = configuration) {
+                val body = it.body.toJsonElement().jsonObject
+                val metaSecurity = body["gotrue_meta_security"]!!.jsonObject
+                val params = it.url.parameters
+                assertEquals(expectedUrl, params["redirect_to"])
+                assertMethodIs(HttpMethod.Post, it.method)
+                assertPathIs("/signup", it.url.pathAfterVersion())
+                assertEquals(expectedPhone, body["phone"]?.jsonPrimitive?.content)
+                assertEquals(expectedPassword, body["password"]?.jsonPrimitive?.content)
+                assertEquals(captchaToken, metaSecurity["captcha_token"]?.jsonPrimitive?.content)
+                assertEquals(userData, body["data"]!!.jsonObject)
+                containsCodeChallenge(body)
+                respond(
+                    sampleUserObject(phone = expectedPhone),
+                    headers = headersOf(HttpHeaders.ContentType, ContentType.Application.Json.toString())
+                )
+            }
+            val user = client.auth.signUpWith(Phone, redirectUrl = expectedUrl) {
+                phone = expectedPhone
+                password = expectedPassword
+                this.captchaToken = captchaToken
+                data = userData
+            }
+            assertEquals(expectedPhone, user?.phone, "Phone should be equal")
         }
-        assertEquals(expected, actual)
     }
 
-    private fun createSupabaseClient(additionalGoTrueSettings: AuthConfig.() -> Unit = {}): SupabaseClient {
-        return createSupabaseClient(
-            supabaseUrl = "https://example.com",
-            supabaseKey = "example",
-        ) {
-            httpEngine = mockEngine
-
-            install(Auth) {
-                autoLoadFromStorage = false
-                alwaysAutoRefresh = false
-                coroutineDispatcher = dispatcher
-
-                sessionManager = MemorySessionManager()
-                codeVerifierCache = MemoryCodeVerifierCache()
-
-                additionalGoTrueSettings()
-                platformSettings()
+    @Test
+    fun testSignUpOtpWithPhone() {
+        runTest {
+            val expectedPhone = "+1234567890"
+            val captchaToken = "captchaToken"
+            val userData = buildJsonObject {
+                put("key", "value")
+            }
+            val expectedUrl = "https://example.com"
+            val client = createMockedSupabaseClient(configuration = configuration) {
+                val body = it.body.toJsonElement().jsonObject
+                val metaSecurity = body["gotrue_meta_security"]!!.jsonObject
+                val params = it.url.parameters
+                assertEquals(expectedUrl, params["redirect_to"])
+                assertMethodIs(HttpMethod.Post, it.method)
+                assertPathIs("/otp", it.url.pathAfterVersion())
+                assertEquals(expectedPhone, body["phone"]?.jsonPrimitive?.content)
+                assertEquals(captchaToken, metaSecurity["captcha_token"]?.jsonPrimitive?.content)
+                assertEquals(userData, body["data"]!!.jsonObject)
+                containsCodeChallenge(body)
+                respond("")
+            }
+            client.auth.signUpWith(OTP, redirectUrl = expectedUrl) {
+                phone = expectedPhone
+                this.captchaToken = captchaToken
+                data = userData
             }
         }
+    }
+
+    @Test
+    fun testSignUpOtpWithEmail() {
+        runTest {
+            val expectedEmail = "example@email.com"
+            val captchaToken = "captchaToken"
+            val userData = buildJsonObject {
+                put("key", "value")
+            }
+            val expectedUrl = "https://example.com"
+            val client = createMockedSupabaseClient(configuration = configuration) {
+                val body = it.body.toJsonElement().jsonObject
+                val metaSecurity = body["gotrue_meta_security"]!!.jsonObject
+                val params = it.url.parameters
+                assertEquals(expectedUrl, params["redirect_to"])
+                assertMethodIs(HttpMethod.Post, it.method)
+                assertPathIs("/otp", it.url.pathAfterVersion())
+                assertEquals(expectedEmail, body["email"]?.jsonPrimitive?.content)
+                assertEquals(captchaToken, metaSecurity["captcha_token"]?.jsonPrimitive?.content)
+                assertEquals(userData, body["data"]!!.jsonObject)
+                containsCodeChallenge(body)
+                respond("")
+            }
+            client.auth.signUpWith(OTP, redirectUrl = expectedUrl) {
+                email = expectedEmail
+                this.captchaToken = captchaToken
+                data = userData
+            }
+        }
+    }
+
+    @Test
+    fun testSignInWithIDToken() {
+        runTest {
+            val captchaToken = "captchaToken"
+            val userData = buildJsonObject {
+                put("key", "value")
+            }
+            val expectedIdToken = "idToken"
+            val expectedProvider = Google
+            val expectedAccessToken = "accessToken"
+            val expectedNonce = "nonce"
+            val client = createMockedSupabaseClient(configuration = configuration) {
+                val body = it.body.toJsonElement().jsonObject
+                val metaSecurity = body["gotrue_meta_security"]!!.jsonObject
+                val params = it.url.parameters
+                assertMethodIs(HttpMethod.Post, it.method)
+                assertPathIs("/token", it.url.pathAfterVersion())
+                assertEquals("id_token", params["grant_type"])
+                assertEquals(captchaToken, metaSecurity["captcha_token"]?.jsonPrimitive?.content)
+                assertEquals(userData, body["data"]!!.jsonObject)
+                assertEquals(expectedIdToken, body["id_token"]?.jsonPrimitive?.content)
+                assertEquals(expectedProvider.name, body["provider"]?.jsonPrimitive?.content)
+                assertEquals(expectedAccessToken, body["access_token"]?.jsonPrimitive?.content)
+                assertEquals(expectedNonce, body["nonce"]?.jsonPrimitive?.content)
+                containsCodeChallenge(body)
+                respond(
+                    sampleUserSession(),
+                    headers = headersOf(HttpHeaders.ContentType, ContentType.Application.Json.toString())
+                )
+            }
+            client.auth.signInWith(IDToken) {
+                this.captchaToken = captchaToken
+                data = userData
+                this.idToken = expectedIdToken
+                provider = expectedProvider
+                this.nonce = expectedNonce
+                accessToken = expectedAccessToken
+            }
+            assertNotNull(client.auth.currentSessionOrNull(), "Session should not be null")
+        }
+    }
+
+    private fun sampleUserObject(email: String? = null, phone: String? = null) = """
+        {
+            "id": "id",
+            "aud": "aud",
+            "email": "$email",
+            "phone": "$phone"
+        }
+    """.trimIndent()
+
+    private fun sampleUserSession() = """
+        {
+        "access_token": "token",
+        "refresh_token": "refresh",
+        "token_type": "bearer",
+        "expires_in": 3600
+        }
+    """.trimIndent()
+
+    private fun containsCodeChallenge(body: JsonObject) {
+        assertNotNull(body["code_challenge"])
+        assertEquals(PKCEConstants.CHALLENGE_METHOD, body["code_challenge_method"]?.jsonPrimitive?.content)
     }
 
     private fun Auth.sessionSource() = (sessionStatus.value as SessionStatus.Authenticated).source

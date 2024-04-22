@@ -10,6 +10,7 @@ import io.github.jan.supabase.gotrue.auth
 import io.github.jan.supabase.gotrue.generateCodeChallenge
 import io.github.jan.supabase.gotrue.generateCodeVerifier
 import io.github.jan.supabase.gotrue.providers.AuthProvider
+import io.github.jan.supabase.gotrue.putCaptchaToken
 import io.github.jan.supabase.gotrue.user.UserSession
 import io.github.jan.supabase.putJsonObject
 import kotlinx.serialization.json.JsonObject
@@ -40,6 +41,7 @@ data object OTP: AuthProvider<OTP.Config, Unit> {
         var phone: String? = null,
         var data: JsonObject? = null,
         var createUser: Boolean = true,
+        var captchaToken: String? = null
     ) {
 
         /**
@@ -87,6 +89,7 @@ data object OTP: AuthProvider<OTP.Config, Unit> {
                 put("code_challenge", it)
                 put("code_challenge_method", "s256")
             }
+            otpConfig.captchaToken?.let { putCaptchaToken(it) }
         }) {
             redirectUrl?.let { url.parameters.append("redirect_to", it) }
         }
@@ -97,6 +100,6 @@ data object OTP: AuthProvider<OTP.Config, Unit> {
         onSuccess: suspend (UserSession) -> Unit,
         redirectUrl: String?,
         config: (Config.() -> Unit)?
-    ): Unit? = login(supabaseClient, onSuccess, redirectUrl, config)
+    ): Unit = login(supabaseClient, onSuccess, redirectUrl, config)
 
 }

@@ -5,6 +5,7 @@ import io.github.jan.supabase.annotations.SupabaseExperimental
 import io.github.jan.supabase.annotations.SupabaseInternal
 import io.github.jan.supabase.gotrue.AuthImpl
 import io.github.jan.supabase.gotrue.FlowType
+import io.github.jan.supabase.gotrue.PKCEConstants
 import io.github.jan.supabase.gotrue.auth
 import io.github.jan.supabase.gotrue.generateCodeChallenge
 import io.github.jan.supabase.gotrue.generateCodeVerifier
@@ -90,7 +91,7 @@ sealed interface DefaultAuthProvider<C, R> : AuthProvider<C, R> {
             putJsonObject(body)
             codeChallenge?.let {
                 put("code_challenge", it)
-                put("code_challenge_method", "s256")
+                put("code_challenge_method", PKCEConstants.CHALLENGE_METHOD)
             }
         }) {
             redirectUrl?.let { redirectTo(it) }
