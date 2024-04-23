@@ -272,7 +272,6 @@ class AuthTest {
                 assertEquals(expectedProvider.name, body["provider"]?.jsonPrimitive?.content)
                 assertEquals(expectedAccessToken, body["access_token"]?.jsonPrimitive?.content)
                 assertEquals(expectedNonce, body["nonce"]?.jsonPrimitive?.content)
-                containsCodeChallenge(body)
                 respond(
                     sampleUserSession(),
                     headers = headersOf(HttpHeaders.ContentType, ContentType.Application.Json.toString())
@@ -287,6 +286,7 @@ class AuthTest {
                 accessToken = expectedAccessToken
             }
             assertNotNull(client.auth.currentSessionOrNull(), "Session should not be null")
+            assertEquals(client.auth.sessionSource(), SessionSource.SignIn(IDToken))
         }
     }
 
