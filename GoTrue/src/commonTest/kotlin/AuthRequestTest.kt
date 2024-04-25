@@ -290,6 +290,63 @@ class AuthTest {
         }
     }
 
+    @Test
+    fun testSignInAnonymously() {
+        runTest {
+            val captchaToken = "captchaToken"
+            val userData = buildJsonObject {
+                put("key", "value")
+            }
+            val client = createMockedSupabaseClient(configuration = configuration) {
+                assertMethodIs(HttpMethod.Post, it.method)
+                assertPathIs("/signup", it.url.pathAfterVersion())
+                val body = it.body.toJsonElement().jsonObject
+                val metaSecurity = body["gotrue_meta_security"]!!.jsonObject
+                assertEquals(captchaToken, metaSecurity["captcha_token"]?.jsonPrimitive?.content)
+                assertEquals(userData, body["data"]!!.jsonObject)
+                respond(
+                    sampleUserSession(),
+                    headers = headersOf(HttpHeaders.ContentType, ContentType.Application.Json.toString())
+                )
+            }
+            client.auth.signInAnonymously(
+                captchaToken = captchaToken,
+                data = userData
+            )
+            assertNotNull(client.auth.currentSessionOrNull(), "Session should not be null")
+            assertEquals(client.auth.sessionSource(), SessionSource.AnonymousSignIn)
+        }
+    }
+
+    @Test
+    fun testLinkIdentity() {
+        runTest {
+            val expectedProvider = Google
+            val expectedRedirectUrl = "https://example.com"
+            val expectedScopes = listOf("scope1", "scope2")
+            val expectedUrlParams = mapOf("key" to "value")
+            val client = createMockedSupabaseClient(configuration = configuration) {
+                val params = it.url.parameters
+                assertEquals(expectedRedirectUrl, params["redirect_to"])
+                assertMethodIs(HttpMethod.Get, it.method)
+                assertPathIs("/user/identities/authorize", it.url.pathAfterVersion())
+                assertEquals(expectedProvider.name, params["provider"])
+                assertNotNull(params["code_challenge"])
+                assertEquals(PKCEConstants.CHALLENGE_METHOD, params["code_challenge_method"])
+                assertEquals(expectedScopes.joinToString(" "), params["scopes"])
+                assertEquals("value", params["key"])
+                respond(
+                    sampleUserSession(),
+                    headers = headersOf(HttpHeaders.ContentType, ContentType.Application.Json.toString())
+                )
+            }
+            client.auth.linkIdentity(expectedProvider, redirectUrl = expectedRedirectUrl) {
+                scopes.addAll(expectedScopes)
+                queryParams.putAll(expectedUrlParams)
+            }
+        }
+    }
+
     private fun sampleUserObject(email: String? = null, phone: String? = null) = """
         {
             "id": "id",
