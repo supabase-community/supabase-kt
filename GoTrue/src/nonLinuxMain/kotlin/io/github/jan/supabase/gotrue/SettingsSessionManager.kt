@@ -19,8 +19,6 @@ class SettingsSessionManager(
     private val key: String = SETTINGS_KEY,
 ) : SessionManager {
 
-    private val suspendSettings = settings.toSuspendSettings()
-
     init {
         checkForOldSession()
     }
@@ -36,6 +34,8 @@ class SettingsSessionManager(
             settings.remove(SETTINGS_KEY)
         }
     }
+
+    private val suspendSettings = settings.toSuspendSettings()
 
     @OptIn(ExperimentalSettingsApi::class)
     override suspend fun saveSession(session: UserSession) {
