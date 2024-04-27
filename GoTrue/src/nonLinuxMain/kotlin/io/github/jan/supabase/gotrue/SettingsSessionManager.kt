@@ -10,21 +10,41 @@ import kotlinx.serialization.encodeToString
 
 /**
  * A [SessionManager] that uses the [Settings] API.
+ *
+ * @param settings The [Settings] instance to use. Defaults to [createDefaultSettings].
+ * @param key The key to use for saving the session.
  */
 class SettingsSessionManager(
-    settings: Settings = createDefaultSettings()
+    private val settings: Settings = createDefaultSettings(),
+    private val key: String = SETTINGS_KEY,
 ) : SessionManager {
 
     private val suspendSettings = settings.toSuspendSettings()
 
+    init {
+        checkForOldSession()
+    }
+
+    private fun checkForOldSession() {
+        if (key == SETTINGS_KEY) return
+
+        val oldSession = settings.getStringOrNull(SETTINGS_KEY)
+        val newSession = settings.getStringOrNull(key)
+
+        if (oldSession != null && newSession == null) {
+            settings.putString(key, oldSession)
+            settings.remove(SETTINGS_KEY)
+        }
+    }
+
     @OptIn(ExperimentalSettingsApi::class)
     override suspend fun saveSession(session: UserSession) {
-        suspendSettings.putString(SETTINGS_KEY, supabaseJson.encodeToString(session))
+        suspendSettings.putString(key, supabaseJson.encodeToString(session))
     }
 
     @OptIn(ExperimentalSettingsApi::class)
     override suspend fun loadSession(): UserSession? {
-        val session = suspendSettings.getStringOrNull(SETTINGS_KEY) ?: return null
+        val session = suspendSettings.getStringOrNull(key) ?: return null
         return try {
             supabaseJson.decodeFromString(session)
         } catch(e: Exception) {
@@ -35,7 +55,7 @@ class SettingsSessionManager(
 
     @OptIn(ExperimentalSettingsApi::class)
     override suspend fun deleteSession() {
-        suspendSettings.remove(SETTINGS_KEY)
+        suspendSettings.remove(key)
     }
 
     companion object {

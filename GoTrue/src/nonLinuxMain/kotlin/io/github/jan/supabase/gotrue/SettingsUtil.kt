@@ -13,6 +13,16 @@ fun createDefaultSettings() = try {
 }
 
 @SupabaseInternal
-actual fun Auth.createDefaultSessionManager(): SessionManager = if(!IS_NODE) SettingsSessionManager() else MemorySessionManager()
+fun createDefaultSettingsKey(supabaseUrl: String) =
+    "sb-${supabaseUrl.removeSuffix("/").replace('/', '-').replace('.', '-')}"
+
+@SupabaseInternal
+actual fun Auth.createDefaultSessionManager(): SessionManager =
+    if(!IS_NODE)
+        SettingsSessionManager(
+            key = "${createDefaultSettingsKey(supabaseClient.supabaseUrl)}-auth-token",
+        )
+    else
+        MemorySessionManager()
 @SupabaseInternal
 actual fun Auth.createDefaultCodeVerifierCache(): CodeVerifierCache = if(!IS_NODE) SettingsCodeVerifierCache() else MemoryCodeVerifierCache()
