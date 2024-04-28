@@ -340,9 +340,13 @@ class AuthTest {
                     headers = headersOf(HttpHeaders.ContentType, ContentType.Application.Json.toString())
                 )
             }
-            client.auth.linkIdentity(expectedProvider, redirectUrl = expectedRedirectUrl) {
-                scopes.addAll(expectedScopes)
-                queryParams.putAll(expectedUrlParams)
+            try {
+                client.auth.linkIdentity(expectedProvider, redirectUrl = expectedRedirectUrl) {
+                    scopes.addAll(expectedScopes)
+                    queryParams.putAll(expectedUrlParams)
+                }
+            } catch(e: RuntimeException) {
+                // Ignore, throws an exception because it cannot open a browser
             }
         }
     }

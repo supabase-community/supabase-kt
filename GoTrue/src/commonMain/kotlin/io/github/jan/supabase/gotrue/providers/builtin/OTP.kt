@@ -33,7 +33,7 @@ data object OTP: AuthProvider<OTP.Config, Unit> {
      * @param phone The phone number of the user
      * @param data Additional data to store with the user
      * @param createUser Whether to create a new user if the user doesn't exist
-     *
+     * @param captchaToken The captcha token for the request
      */
     class Config(
         @PublishedApi internal val serializer: SupabaseSerializer,
