@@ -70,12 +70,7 @@ sealed interface BucketApi {
     suspend fun uploadToSignedUrl(path: String, token: String, data: ByteArray, upsert: Boolean = false
     ): String {
         require(data.isNotEmpty()) { "The data to upload should not be empty" }
-        return uploadToSignedUrl(
-            path,
-            token,
-            UploadData(ByteReadChannel(data), data.size.toLong()),
-            upsert
-        )
+        return uploadToSignedUrl(path, token, UploadData(ByteReadChannel(data), data.size.toLong()), upsert)
     }
 
     /**
