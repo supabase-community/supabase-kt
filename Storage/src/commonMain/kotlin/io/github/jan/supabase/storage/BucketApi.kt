@@ -65,6 +65,7 @@ sealed interface BucketApi {
      * @param data The data to upload
      * @param upsert Whether to overwrite an existing file
      * @return the key of the uploaded file
+     * @throws IllegalArgumentException if data to upload is empty
      */
     suspend fun uploadToSignedUrl(path: String, token: String, data: ByteArray, upsert: Boolean = false
     ): String {
@@ -102,6 +103,7 @@ sealed interface BucketApi {
      * @param data The new data
      * @param upsert Whether to overwrite an existing file
      * @return the key to the updated file
+     * @throws IllegalArgumentException if data to upload is empty
      * @throws RestException or one of its subclasses if receiving an error response
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
