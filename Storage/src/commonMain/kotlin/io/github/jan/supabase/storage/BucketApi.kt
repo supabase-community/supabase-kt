@@ -66,17 +66,16 @@ sealed interface BucketApi {
      * @param upsert Whether to overwrite an existing file
      * @return the key of the uploaded file
      */
-    suspend fun uploadToSignedUrl(
-        path: String,
-        token: String,
-        data: ByteArray,
-        upsert: Boolean = false
-    ): String = uploadToSignedUrl(
-        path,
-        token,
-        UploadData(ByteReadChannel(data), data.size.toLong()),
-        upsert
-    )
+    suspend fun uploadToSignedUrl(path: String, token: String, data: ByteArray, upsert: Boolean = false
+    ): String {
+        require(data.isNotEmpty()) { "The data to upload should not be empty" }
+        return uploadToSignedUrl(
+            path,
+            token,
+            UploadData(ByteReadChannel(data), data.size.toLong()),
+            upsert
+        )
+    }
 
     /**
      * Uploads a file in [bucketId] under [path] using a presigned url
@@ -107,8 +106,10 @@ sealed interface BucketApi {
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
-    suspend fun update(path: String, data: ByteArray, upsert: Boolean = false): String =
-        update(path, UploadData(ByteReadChannel(data), data.size.toLong()), upsert)
+    suspend fun update(path: String, data: ByteArray, upsert: Boolean = false): String {
+        require(data.isNotEmpty()) { "The data to upload should not be empty" }
+        return update(path, UploadData(ByteReadChannel(data), data.size.toLong()), upsert)
+    }
 
     /**
      * Updates a file in [bucketId] under [path]
@@ -179,11 +180,7 @@ sealed interface BucketApi {
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
-    suspend fun createSignedUrl(
-        path: String,
-        expiresIn: Duration,
-        transform: ImageTransformation.() -> Unit = {}
-    ): String
+    suspend fun createSignedUrl(path: String, expiresIn: Duration, transform: ImageTransformation.() -> Unit = {}): String
 
     /**
      * Creates signed urls for all specified paths. The urls will expire after [expiresIn]
