@@ -90,12 +90,7 @@ sealed interface BucketApi {
      * @throws HttpRequestException on network related issues
      * @throws HttpRequestException on network related issues
      */
-    suspend fun uploadToSignedUrl(
-        path: String,
-        token: String,
-        data: UploadData,
-        upsert: Boolean = false
-    ): String
+    suspend fun uploadToSignedUrl(path: String, token: String, data: UploadData, upsert: Boolean = false): String
 
     /**
      * Updates a file in [bucketId] under [path]
@@ -204,8 +199,7 @@ sealed interface BucketApi {
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
-    suspend fun createSignedUrls(expiresIn: Duration, vararg paths: String) =
-        createSignedUrls(expiresIn, paths.toList())
+    suspend fun createSignedUrls(expiresIn: Duration, vararg paths: String) = createSignedUrls(expiresIn, paths.toList())
 
     /**
      * Downloads a file from [bucketId] under [path]
@@ -216,10 +210,7 @@ sealed interface BucketApi {
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
-    suspend fun downloadAuthenticated(
-        path: String,
-        transform: ImageTransformation.() -> Unit = {}
-    ): ByteArray
+    suspend fun downloadAuthenticated(path: String, transform: ImageTransformation.() -> Unit = {}): ByteArray
 
     /**
      * Downloads a file from [bucketId] under [path]
@@ -230,11 +221,7 @@ sealed interface BucketApi {
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
-    suspend fun downloadAuthenticated(
-        path: String,
-        channel: ByteWriteChannel,
-        transform: ImageTransformation.() -> Unit = {}
-    )
+    suspend fun downloadAuthenticated(path: String, channel: ByteWriteChannel, transform: ImageTransformation.() -> Unit = {})
 
     /**
      * Downloads a file from [bucketId] under [path] using the public url
@@ -245,10 +232,7 @@ sealed interface BucketApi {
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
-    suspend fun downloadPublic(
-        path: String,
-        transform: ImageTransformation.() -> Unit = {}
-    ): ByteArray
+    suspend fun downloadPublic(path: String, transform: ImageTransformation.() -> Unit = {}): ByteArray
 
     /**
      * Downloads a file from [bucketId] under [path] using the public url
@@ -259,11 +243,7 @@ sealed interface BucketApi {
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
-    suspend fun downloadPublic(
-        path: String,
-        channel: ByteWriteChannel,
-        transform: ImageTransformation.() -> Unit = {}
-    )
+    suspend fun downloadPublic(path: String, channel: ByteWriteChannel, transform: ImageTransformation.() -> Unit = {})
 
 
     /**
@@ -341,8 +321,6 @@ sealed interface BucketApi {
  */
 fun BucketApi.authenticatedRequest(path: String): Pair<String, String> {
     val url = authenticatedUrl(path)
-    val token =
-        supabaseClient.storage.config.jwtToken ?: supabaseClient.pluginManager.getPluginOrNull(Auth)
-            ?.currentAccessTokenOrNull() ?: supabaseClient.supabaseKey
+    val token = supabaseClient.storage.config.jwtToken ?: supabaseClient.pluginManager.getPluginOrNull(Auth)?.currentAccessTokenOrNull() ?: supabaseClient.supabaseKey
     return token to url
 }
