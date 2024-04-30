@@ -7,6 +7,7 @@ import io.github.jan.supabase.annotations.SupabaseInternal
 import io.github.jan.supabase.exceptions.HttpRequestException
 import io.github.jan.supabase.logging.d
 import io.github.jan.supabase.logging.e
+import io.github.jan.supabase.logging.w
 import io.github.jan.supabase.supabaseJson
 import io.ktor.client.HttpClient
 import io.ktor.client.HttpClientConfig
@@ -25,6 +26,7 @@ import io.ktor.client.statement.HttpResponse
 import io.ktor.client.statement.HttpStatement
 import io.ktor.http.encodedPath
 import io.ktor.serialization.kotlinx.json.json
+import kotlin.coroutines.cancellation.CancellationException
 import kotlin.time.Duration.Companion.milliseconds
 
 private const val HTTPS_PORT = 443
@@ -58,6 +60,9 @@ class KtorSupabaseHttpClient @SupabaseInternal constructor(
         } catch(e: HttpRequestTimeoutException) {
             SupabaseClient.LOGGER.e { "${request.method.value} request to endpoint $endPoint timed out after $requestTimeout ms" }
             throw e
+        } catch(e: CancellationException) {
+            SupabaseClient.LOGGER.w { "${request.method.value} request to endpoint $endPoint was cancelled"}
+            throw e
         } catch(e: Exception) {
             SupabaseClient.LOGGER.e { "${request.method.value} request to endpoint $endPoint failed with exception ${e.message}" }
             throw HttpRequestException(e.message ?: "", request)
@@ -75,11 +80,13 @@ class KtorSupabaseHttpClient @SupabaseInternal constructor(
             url(url)
             builder()
         }
-
         val response = try {
             httpClient.prepareRequest(url, builder)
         } catch(e: HttpRequestTimeoutException) {
             SupabaseClient.LOGGER.e { "Request timed out after $requestTimeout ms on url $url" }
+            throw e
+        } catch(e: CancellationException) {
+            SupabaseClient.LOGGER.w { "Request was cancelled on url $url" }
             throw e
         } catch(e: Exception) {
             SupabaseClient.LOGGER.e { "Request failed with ${e.message} on url $url" }
