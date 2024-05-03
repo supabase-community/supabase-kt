@@ -134,7 +134,7 @@ internal class AuthImpl(
         config: ExternalAuthConfigDefaults.() -> Unit
     ): String? {
         val automaticallyOpen = ExternalAuthConfigDefaults().apply(config).automaticallyOpenUrl
-        val fetchUrl: suspend (String) -> String = { redirectTo: String ->
+        val fetchUrl: suspend (String?) -> String = { redirectTo: String? ->
             val url = getOAuthUrl(provider, redirectTo, "user/identities/authorize", config)
             val response = api.rawRequest(url) {
                 method = HttpMethod.Get
@@ -147,11 +147,7 @@ internal class AuthImpl(
         startExternalAuth(
             redirectUrl = redirectUrl,
             getUrl = {
-                val url = getOAuthUrl(provider, it, "user/identities/authorize", config)
-                val response = api.rawRequest(url) {
-                    method = HttpMethod.Get
-                }
-                response.request.url.toString()
+                fetchUrl(it)
             },
             onSessionSuccess = {
                 importSession(it, source = SessionSource.UserIdentitiesChanged(it))
