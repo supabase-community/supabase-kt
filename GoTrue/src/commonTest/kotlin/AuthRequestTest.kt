@@ -2,6 +2,7 @@ import io.github.jan.supabase.SupabaseClientBuilder
 import io.github.jan.supabase.gotrue.Auth
 import io.github.jan.supabase.gotrue.AuthConfig
 import io.github.jan.supabase.gotrue.FlowType
+import io.github.jan.supabase.gotrue.OtpType
 import io.github.jan.supabase.gotrue.PKCEConstants
 import io.github.jan.supabase.gotrue.SessionSource
 import io.github.jan.supabase.gotrue.SessionStatus
@@ -348,6 +349,205 @@ class AuthTest {
             } catch(e: RuntimeException) {
                 // Ignore, throws an exception because it cannot open a browser
             }
+        }
+    }
+
+    @Test
+    fun testUnlinkIdentity() {
+        runTest {
+            val expectedIdentityId = "identityId"
+            val client = createMockedSupabaseClient(configuration = configuration) {
+                assertMethodIs(HttpMethod.Delete, it.method)
+                assertPathIs("/user/identities/$expectedIdentityId", it.url.pathAfterVersion())
+                respond(
+                    sampleUserObject(),
+                    headers = headersOf(HttpHeaders.ContentType, ContentType.Application.Json.toString())
+                )
+            }
+            client.auth.unlinkIdentity(expectedIdentityId)
+        }
+    }
+
+    @Test
+    fun testRetrieveSSOUrlWithDomain() {
+        runTest {
+            val expectedRedirectUrl = "https://example.com"
+            val expectedDomain = "https://example.com"
+            val expectedCaptchaToken = "captchaToken"
+            val expectedUrl = "https://ssourl.com"
+            val client = createMockedSupabaseClient(configuration = configuration) {
+                assertMethodIs(HttpMethod.Post, it.method)
+                assertPathIs("/sso", it.url.pathAfterVersion())
+                val body = it.body.toJsonElement().jsonObject
+                assertEquals(expectedRedirectUrl, body["redirect_to"]!!.jsonPrimitive.content)
+                val metaSecurity = body["gotrue_meta_security"]!!.jsonObject
+                assertEquals(expectedDomain, body["domain"]?.jsonPrimitive?.content)
+                assertEquals(expectedCaptchaToken, metaSecurity["captcha_token"]?.jsonPrimitive?.content)
+                respond(
+                    """
+                    {
+                        "url": "$expectedUrl"
+                    }
+                    """.trimIndent(),
+                    headers = headersOf(HttpHeaders.ContentType, ContentType.Application.Json.toString())
+                )
+            }
+            val result = client.auth.retrieveSSOUrl(redirectUrl = expectedRedirectUrl) {
+                this.domain = expectedDomain
+                this.captchaToken = expectedCaptchaToken
+            }
+            assertEquals(expectedUrl, result.url)
+        }
+    }
+
+    @Test
+    fun testRetrieveSSOUrlWithProviderId() {
+        runTest {
+            val expectedRedirectUrl = "https://example.com"
+            val expectedProviderId = "providerId"
+            val expectedCaptchaToken = "captchaToken"
+            val expectedUrl = "https://ssourl.com"
+            val client = createMockedSupabaseClient(configuration = configuration) {
+                assertMethodIs(HttpMethod.Post, it.method)
+                assertPathIs("/sso", it.url.pathAfterVersion())
+                val body = it.body.toJsonElement().jsonObject
+                assertEquals(expectedRedirectUrl, body["redirect_to"]!!.jsonPrimitive.content)
+                val metaSecurity = body["gotrue_meta_security"]!!.jsonObject
+                assertEquals(expectedProviderId, body["provider_id"]?.jsonPrimitive?.content)
+                assertEquals(expectedCaptchaToken, metaSecurity["captcha_token"]?.jsonPrimitive?.content)
+                respond(
+                    """
+                    {
+                        "url": "$expectedUrl"
+                    }
+                    """.trimIndent(),
+                    headers = headersOf(HttpHeaders.ContentType, ContentType.Application.Json.toString())
+                )
+            }
+            val result = client.auth.retrieveSSOUrl(redirectUrl = expectedRedirectUrl) {
+                this.providerId = expectedProviderId
+                this.captchaToken = expectedCaptchaToken
+            }
+            assertEquals(expectedUrl, result.url)
+        }
+    }
+
+    @Test
+    fun testUpdateUser() {
+        runTest {
+            val expectedEmail = "example@email.com"
+            val expectedPhone = "+1234567890"
+            val expectedData = buildJsonObject {
+                put("key", "value")
+            }
+            val expectedPassword = "password"
+            val client = createMockedSupabaseClient(configuration = configuration) {
+                assertMethodIs(HttpMethod.Put, it.method)
+                assertPathIs("/user", it.url.pathAfterVersion())
+                val body = it.body.toJsonElement().jsonObject
+                assertEquals(expectedEmail, body["email"]?.jsonPrimitive?.content)
+                assertEquals(expectedPhone, body["phone"]?.jsonPrimitive?.content)
+                assertEquals(expectedData, body["data"]!!.jsonObject)
+                assertEquals(expectedPassword, body["password"]?.jsonPrimitive?.content)
+                respond(
+                    sampleUserObject(email = expectedEmail, phone = expectedPhone),
+                    headers = headersOf(
+                        HttpHeaders.ContentType,
+                        ContentType.Application.Json.toString()
+                    )
+                )
+            }
+            val user = client.auth.updateUser {
+                email = expectedEmail
+                phone = expectedPhone
+                data = expectedData
+                password = expectedPassword
+            }
+            assertEquals(expectedEmail, user.email, "Email should be equal")
+            assertEquals(expectedPhone, user.phone, "Phone should be equal")
+        }
+    }
+
+    @Test
+    fun testResendEmail() {
+        runTest {
+            val expectedEmail = "example@email.com"
+            val expectedType = OtpType.Email.SIGNUP
+            val expectedCaptchaToken = "captchaToken"
+            val client = createMockedSupabaseClient(configuration = configuration) {
+                assertMethodIs(HttpMethod.Post, it.method)
+                assertPathIs("/resend", it.url.pathAfterVersion())
+                val body = it.body.toJsonElement().jsonObject
+                val metaSecurity = body["gotrue_meta_security"]!!.jsonObject
+                assertEquals(expectedCaptchaToken, metaSecurity["captcha_token"]?.jsonPrimitive?.content)
+                assertEquals(expectedEmail, body["email"]?.jsonPrimitive?.content)
+                assertEquals(expectedType.name.lowercase(), body["type"]?.jsonPrimitive?.content)
+                respond(
+                    sampleUserObject(email = expectedEmail),
+                    headers = headersOf(
+                        HttpHeaders.ContentType,
+                        ContentType.Application.Json.toString()
+                    )
+                )
+            }
+            client.auth.resendEmail(expectedType, expectedEmail, expectedCaptchaToken)
+        }
+    }
+
+    @Test
+    fun testResendPhone() {
+        runTest {
+            val expectedPhone = "+1234567890"
+            val expectedType = OtpType.Phone.PHONE_CHANGE
+            val expectedCaptchaToken = "captchaToken"
+            val client = createMockedSupabaseClient(configuration = configuration) {
+                assertMethodIs(HttpMethod.Post, it.method)
+                assertPathIs("/resend", it.url.pathAfterVersion())
+                val body = it.body.toJsonElement().jsonObject
+                val metaSecurity = body["gotrue_meta_security"]!!.jsonObject
+                assertEquals(expectedCaptchaToken, metaSecurity["captcha_token"]?.jsonPrimitive?.content)
+                assertEquals(expectedPhone, body["phone"]?.jsonPrimitive?.content)
+                assertEquals(expectedType.name.lowercase(), body["type"]?.jsonPrimitive?.content)
+                respond(
+                    sampleUserObject(email = expectedPhone),
+                    headers = headersOf(
+                        HttpHeaders.ContentType,
+                        ContentType.Application.Json.toString()
+                    )
+                )
+            }
+            client.auth.resendPhone(expectedType, expectedPhone, expectedCaptchaToken)
+        }
+    }
+
+    @Test
+    fun testResetPasswordForEmail() {
+        runTest {
+            val expectedEmail = "example@email.com"
+            val expectedCaptchaToken = "captchaToken"
+            val expectedRedirectUrl = "https://example.com"
+            val client = createMockedSupabaseClient(configuration = configuration) {
+                assertMethodIs(HttpMethod.Post, it.method)
+                assertPathIs("/recover", it.url.pathAfterVersion())
+                val params = it.url.parameters
+                val body = it.body.toJsonElement().jsonObject
+                val metaSecurity = body["gotrue_meta_security"]!!.jsonObject
+                assertEquals(
+                    expectedCaptchaToken,
+                    metaSecurity["captcha_token"]?.jsonPrimitive?.content
+                )
+                assertEquals(expectedEmail, body["email"]?.jsonPrimitive?.content)
+                assertEquals(expectedRedirectUrl, params["redirect_to"])
+                containsCodeChallenge(body)
+                respond(
+                    sampleUserObject(email = expectedEmail),
+                    headers = headersOf(
+                        HttpHeaders.ContentType,
+                        ContentType.Application.Json.toString()
+                    )
+                )
+            }
+            client.auth.resetPasswordForEmail(expectedEmail, expectedRedirectUrl, expectedCaptchaToken)
         }
     }
 
