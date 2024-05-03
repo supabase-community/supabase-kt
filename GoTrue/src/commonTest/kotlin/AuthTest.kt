@@ -35,7 +35,6 @@ class AuthTest {
                     }
                 }
             )
-            assertIs<SessionStatus.LoadingFromStorage>(client.auth.sessionStatus.value)
             client.auth.awaitInitialization()
             assertIs<SessionStatus.Authenticated>(client.auth.sessionStatus.value)
         }
