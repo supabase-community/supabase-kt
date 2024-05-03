@@ -5,7 +5,7 @@ import io.github.jan.supabase.gotrue.FlowType
 import io.github.jan.supabase.gotrue.OtpType
 import io.github.jan.supabase.gotrue.PKCEConstants
 import io.github.jan.supabase.gotrue.SessionSource
-import io.github.jan.supabase.gotrue.SessionStatus
+import io.github.jan.supabase.gotrue.SignOutScope
 import io.github.jan.supabase.gotrue.auth
 import io.github.jan.supabase.gotrue.minimalSettings
 import io.github.jan.supabase.gotrue.providers.Google
@@ -17,13 +17,12 @@ import io.github.jan.supabase.testing.assertMethodIs
 import io.github.jan.supabase.testing.assertPathIs
 import io.github.jan.supabase.testing.createMockedSupabaseClient
 import io.github.jan.supabase.testing.pathAfterVersion
+import io.github.jan.supabase.testing.respondJson
 import io.github.jan.supabase.testing.toJsonElement
 import io.ktor.client.engine.mock.respond
-import io.ktor.http.ContentType
-import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
-import io.ktor.http.headersOf
 import kotlinx.coroutines.test.runTest
+import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.jsonObject
@@ -34,7 +33,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 
-class AuthTest {
+class AuthRequestTest {
 
     private val configuration: SupabaseClientBuilder.() -> Unit = {
         install(Auth) {
@@ -65,9 +64,8 @@ class AuthTest {
                 assertEquals(captchaToken, metaSecurity["captcha_token"]?.jsonPrimitive?.content)
                 assertEquals(userData, body["data"]!!.jsonObject)
                 containsCodeChallenge(body)
-                respond(
-                    sampleUserObject(email = expectedEmail),
-                    headers = headersOf(HttpHeaders.ContentType, ContentType.Application.Json.toString())
+                respondJson(
+                    sampleUserObject(email = expectedEmail)
                 )
             }
             val user = client.auth.signUpWith(Email, redirectUrl = expectedUrl) {
@@ -99,9 +97,8 @@ class AuthTest {
                 assertEquals(captchaToken, metaSecurity["captcha_token"]?.jsonPrimitive?.content)
                 assertEquals(userData, body["data"]!!.jsonObject)
                 containsCodeChallenge(body)
-                respond(
-                    sampleUserSession(),
-                    headers = headersOf(HttpHeaders.ContentType, ContentType.Application.Json.toString())
+                respondJson(
+                    sampleUserSession()
                 )
             }
             val user = client.auth.signUpWith(Email) {
@@ -135,9 +132,8 @@ class AuthTest {
                 assertEquals(captchaToken, metaSecurity["captcha_token"]?.jsonPrimitive?.content)
                 assertEquals(userData, body["data"]!!.jsonObject)
                 containsCodeChallenge(body)
-                respond(
-                    sampleUserSession(),
-                    headers = headersOf(HttpHeaders.ContentType, ContentType.Application.Json.toString())
+                respondJson(
+                    sampleUserSession()
                 )
             }
             val user = client.auth.signUpWith(Phone) {
@@ -174,9 +170,8 @@ class AuthTest {
                 assertEquals(captchaToken, metaSecurity["captcha_token"]?.jsonPrimitive?.content)
                 assertEquals(userData, body["data"]!!.jsonObject)
                 containsCodeChallenge(body)
-                respond(
-                    sampleUserObject(phone = expectedPhone),
-                    headers = headersOf(HttpHeaders.ContentType, ContentType.Application.Json.toString())
+                respondJson(
+                    sampleUserObject(phone = expectedPhone)
                 )
             }
             val user = client.auth.signUpWith(Phone, redirectUrl = expectedUrl) {
@@ -273,9 +268,8 @@ class AuthTest {
                 assertEquals(expectedProvider.name, body["provider"]?.jsonPrimitive?.content)
                 assertEquals(expectedAccessToken, body["access_token"]?.jsonPrimitive?.content)
                 assertEquals(expectedNonce, body["nonce"]?.jsonPrimitive?.content)
-                respond(
-                    sampleUserSession(),
-                    headers = headersOf(HttpHeaders.ContentType, ContentType.Application.Json.toString())
+                respondJson(
+                    sampleUserSession()
                 )
             }
             client.auth.signInWith(IDToken) {
@@ -305,9 +299,8 @@ class AuthTest {
                 val metaSecurity = body["gotrue_meta_security"]!!.jsonObject
                 assertEquals(captchaToken, metaSecurity["captcha_token"]?.jsonPrimitive?.content)
                 assertEquals(userData, body["data"]!!.jsonObject)
-                respond(
-                    sampleUserSession(),
-                    headers = headersOf(HttpHeaders.ContentType, ContentType.Application.Json.toString())
+                respondJson(
+                    sampleUserSession()
                 )
             }
             client.auth.signInAnonymously(
@@ -336,18 +329,14 @@ class AuthTest {
                 assertEquals(PKCEConstants.CHALLENGE_METHOD, params["code_challenge_method"])
                 assertEquals(expectedScopes.joinToString(" "), params["scopes"])
                 assertEquals("value", params["key"])
-                respond(
-                    sampleUserSession(),
-                    headers = headersOf(HttpHeaders.ContentType, ContentType.Application.Json.toString())
+                respondJson(
+                    sampleUserSession()
                 )
             }
-            try {
-                client.auth.linkIdentity(expectedProvider, redirectUrl = expectedRedirectUrl) {
-                    scopes.addAll(expectedScopes)
-                    queryParams.putAll(expectedUrlParams)
-                }
-            } catch(e: RuntimeException) {
-                // Ignore, throws an exception because it cannot open a browser
+            client.auth.linkIdentity(expectedProvider, redirectUrl = expectedRedirectUrl) {
+                scopes.addAll(expectedScopes)
+                queryParams.putAll(expectedUrlParams)
+                automaticallyOpenUrl = false
             }
         }
     }
@@ -359,9 +348,8 @@ class AuthTest {
             val client = createMockedSupabaseClient(configuration = configuration) {
                 assertMethodIs(HttpMethod.Delete, it.method)
                 assertPathIs("/user/identities/$expectedIdentityId", it.url.pathAfterVersion())
-                respond(
-                    sampleUserObject(),
-                    headers = headersOf(HttpHeaders.ContentType, ContentType.Application.Json.toString())
+                respondJson(
+                    sampleUserObject()
                 )
             }
             client.auth.unlinkIdentity(expectedIdentityId)
@@ -383,13 +371,12 @@ class AuthTest {
                 val metaSecurity = body["gotrue_meta_security"]!!.jsonObject
                 assertEquals(expectedDomain, body["domain"]?.jsonPrimitive?.content)
                 assertEquals(expectedCaptchaToken, metaSecurity["captcha_token"]?.jsonPrimitive?.content)
-                respond(
+                respondJson(
                     """
                     {
                         "url": "$expectedUrl"
                     }
-                    """.trimIndent(),
-                    headers = headersOf(HttpHeaders.ContentType, ContentType.Application.Json.toString())
+                    """.trimIndent()
                 )
             }
             val result = client.auth.retrieveSSOUrl(redirectUrl = expectedRedirectUrl) {
@@ -415,13 +402,12 @@ class AuthTest {
                 val metaSecurity = body["gotrue_meta_security"]!!.jsonObject
                 assertEquals(expectedProviderId, body["provider_id"]?.jsonPrimitive?.content)
                 assertEquals(expectedCaptchaToken, metaSecurity["captcha_token"]?.jsonPrimitive?.content)
-                respond(
+                respondJson(
                     """
                     {
                         "url": "$expectedUrl"
                     }
-                    """.trimIndent(),
-                    headers = headersOf(HttpHeaders.ContentType, ContentType.Application.Json.toString())
+                    """.trimIndent()
                 )
             }
             val result = client.auth.retrieveSSOUrl(redirectUrl = expectedRedirectUrl) {
@@ -449,12 +435,8 @@ class AuthTest {
                 assertEquals(expectedPhone, body["phone"]?.jsonPrimitive?.content)
                 assertEquals(expectedData, body["data"]!!.jsonObject)
                 assertEquals(expectedPassword, body["password"]?.jsonPrimitive?.content)
-                respond(
-                    sampleUserObject(email = expectedEmail, phone = expectedPhone),
-                    headers = headersOf(
-                        HttpHeaders.ContentType,
-                        ContentType.Application.Json.toString()
-                    )
+                respondJson(
+                    sampleUserObject(email = expectedEmail, phone = expectedPhone)
                 )
             }
             val user = client.auth.updateUser {
@@ -482,12 +464,8 @@ class AuthTest {
                 assertEquals(expectedCaptchaToken, metaSecurity["captcha_token"]?.jsonPrimitive?.content)
                 assertEquals(expectedEmail, body["email"]?.jsonPrimitive?.content)
                 assertEquals(expectedType.name.lowercase(), body["type"]?.jsonPrimitive?.content)
-                respond(
-                    sampleUserObject(email = expectedEmail),
-                    headers = headersOf(
-                        HttpHeaders.ContentType,
-                        ContentType.Application.Json.toString()
-                    )
+                respondJson(
+                    sampleUserObject(email = expectedEmail)
                 )
             }
             client.auth.resendEmail(expectedType, expectedEmail, expectedCaptchaToken)
@@ -508,12 +486,8 @@ class AuthTest {
                 assertEquals(expectedCaptchaToken, metaSecurity["captcha_token"]?.jsonPrimitive?.content)
                 assertEquals(expectedPhone, body["phone"]?.jsonPrimitive?.content)
                 assertEquals(expectedType.name.lowercase(), body["type"]?.jsonPrimitive?.content)
-                respond(
-                    sampleUserObject(email = expectedPhone),
-                    headers = headersOf(
-                        HttpHeaders.ContentType,
-                        ContentType.Application.Json.toString()
-                    )
+                respondJson(
+                    sampleUserObject(email = expectedPhone)
                 )
             }
             client.auth.resendPhone(expectedType, expectedPhone, expectedCaptchaToken)
@@ -539,15 +513,131 @@ class AuthTest {
                 assertEquals(expectedEmail, body["email"]?.jsonPrimitive?.content)
                 assertEquals(expectedRedirectUrl, params["redirect_to"])
                 containsCodeChallenge(body)
-                respond(
-                    sampleUserObject(email = expectedEmail),
-                    headers = headersOf(
-                        HttpHeaders.ContentType,
-                        ContentType.Application.Json.toString()
-                    )
+                respondJson(
+                    sampleUserObject(email = expectedEmail)
                 )
             }
             client.auth.resetPasswordForEmail(expectedEmail, expectedRedirectUrl, expectedCaptchaToken)
+        }
+    }
+
+    @Test
+    fun testReauthenticate() {
+        runTest {
+            val client = createMockedSupabaseClient(configuration = configuration) {
+                assertMethodIs(HttpMethod.Get, it.method)
+                assertPathIs("/reauthenticate", it.url.pathAfterVersion())
+                respond("")
+            }
+            client.auth.reauthenticate()
+        }
+    }
+
+    @Test
+    fun testVerifyEmailOtp() {
+        runTest {
+            val expectedType = OtpType.Email.EMAIL
+            val expectedToken = "token"
+            val expectedEmail = "example@email.com"
+            val expectedCaptchaToken = "captchaToken"
+            val client = createMockedSupabaseClient(configuration = configuration) {
+                assertMethodIs(HttpMethod.Post, it.method)
+                assertPathIs("/verify", it.url.pathAfterVersion())
+                val body = it.body.toJsonElement().jsonObject
+                val metaSecurity = body["gotrue_meta_security"]!!.jsonObject
+                assertEquals(
+                    expectedCaptchaToken,
+                    metaSecurity["captcha_token"]?.jsonPrimitive?.content
+                )
+                assertEquals(expectedToken, body["token"]?.jsonPrimitive?.content)
+                assertEquals(expectedEmail, body["email"]?.jsonPrimitive?.content)
+                assertEquals(expectedType.name.lowercase(), body["type"]?.jsonPrimitive?.content)
+                respondJson(
+                    sampleUserSession()
+                )
+            }
+            client.auth.verifyEmailOtp(expectedType, expectedEmail, expectedToken, expectedCaptchaToken)
+        }
+    }
+
+    @Test
+    fun testVerifyPhoneOtp() {
+        runTest {
+            val expectedType = OtpType.Phone.SMS
+            val expectedToken = "token"
+            val expectedPhone = "+1234567890"
+            val expectedCaptchaToken = "captchaToken"
+            val client = createMockedSupabaseClient(configuration = configuration) {
+                assertMethodIs(HttpMethod.Post, it.method)
+                assertPathIs("/verify", it.url.pathAfterVersion())
+                val body = it.body.toJsonElement().jsonObject
+                val metaSecurity = body["gotrue_meta_security"]!!.jsonObject
+                assertEquals(
+                    expectedCaptchaToken,
+                    metaSecurity["captcha_token"]?.jsonPrimitive?.content
+                )
+                assertEquals(expectedToken, body["token"]?.jsonPrimitive?.content)
+                assertEquals(expectedPhone, body["phone"]?.jsonPrimitive?.content)
+                assertEquals(expectedType.name.lowercase(), body["type"]?.jsonPrimitive?.content)
+                respondJson(
+                    sampleUserSession()
+                )
+            }
+            client.auth.verifyPhoneOtp(expectedType, expectedPhone, expectedToken, expectedCaptchaToken)
+        }
+    }
+
+    @Test
+    fun testRetrieveUser() {
+        runTest {
+            val expectedJWT = "token"
+            val client = createMockedSupabaseClient(configuration = configuration) {
+                assertMethodIs(HttpMethod.Get, it.method)
+                assertPathIs("/user", it.url.pathAfterVersion())
+                assertEquals("Bearer $expectedJWT", it.headers["Authorization"])
+                respondJson(
+                    sampleUserObject()
+                )
+            }
+            val user = client.auth.retrieveUser(expectedJWT)
+            assertNotNull(user, "User should not be null")
+        }
+    }
+
+    @Test
+    fun testSignOut() {
+        runTest {
+            val expectedScope = SignOutScope.LOCAL
+            val client = createMockedSupabaseClient(configuration = configuration) {
+                assertMethodIs(HttpMethod.Post, it.method)
+                assertPathIs("/logout", it.url.pathAfterVersion())
+                val parameters = it.url.parameters
+                assertEquals(expectedScope.name.lowercase(), parameters["scope"])
+                respond("")
+            }
+            client.auth.importSession(Json.decodeFromString(sampleUserSession()))
+            assertNotNull(client.auth.currentSessionOrNull(), "Session should not be null")
+            client.auth.signOut(expectedScope)
+            assertNull(client.auth.currentSessionOrNull(), "Session should be null")
+        }
+    }
+
+    @Test
+    fun testRefreshSession() {
+        runTest {
+            val expectedRefreshToken = "refreshToken"
+            val client = createMockedSupabaseClient(configuration = configuration) {
+                assertMethodIs(HttpMethod.Post, it.method)
+                assertPathIs("/token", it.url.pathAfterVersion())
+                val parameters = it.url.parameters
+                assertEquals("refresh_token", parameters["grant_type"])
+                val body = it.body.toJsonElement().jsonObject
+                assertEquals(expectedRefreshToken, body["refresh_token"]?.jsonPrimitive?.content)
+                respondJson(
+                    sampleUserSession()
+                )
+            }
+            client.auth.refreshSession(expectedRefreshToken)
         }
     }
 
@@ -573,10 +663,6 @@ class AuthTest {
         assertNotNull(body["code_challenge"])
         assertEquals(PKCEConstants.CHALLENGE_METHOD, body["code_challenge_method"]?.jsonPrimitive?.content)
     }
-
-    private fun Auth.sessionSource() = (sessionStatus.value as SessionStatus.Authenticated).source
-
-    private inline fun <reified T> Auth.sessionSourceAs() = sessionSource() as T
 
 }
 
