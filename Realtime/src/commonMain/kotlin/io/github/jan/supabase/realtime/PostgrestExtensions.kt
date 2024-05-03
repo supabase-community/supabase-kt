@@ -53,7 +53,7 @@ inline fun <reified Data : Any, Value> PostgrestQueryBuilder.selectSingleValueAs
  * @param primaryKey the primary key of the [Data] type
  * @param filter the filter to apply to the select query
  */
-inline fun <reified Data : Any> PostgrestQueryBuilder.selectListAsFlow(
+inline fun <reified Data : Any> PostgrestQueryBuilder.selectAsFlow(
     primaryKey: PrimaryKey<Data>,
     filter: FilterOperation? = null,
 ): Flow<List<Data>> {
@@ -62,8 +62,8 @@ inline fun <reified Data : Any> PostgrestQueryBuilder.selectListAsFlow(
     val channel = realtime.channel("$schema:$table:$id")
     return flow {
         val dataFlow = channel.postgresListDataFlow(
-            schema = this@selectListAsFlow.schema,
-            table = this@selectListAsFlow.table,
+            schema = this@selectAsFlow.schema,
+            table = this@selectAsFlow.table,
             primaryKey = primaryKey,
             filter = filter
         )
@@ -80,7 +80,7 @@ inline fun <reified Data : Any> PostgrestQueryBuilder.selectListAsFlow(
  * @param primaryKey the primary key of the [Data] type
  * @param filter the filter to apply to the select query
  */
-inline fun <reified Data : Any, Value> PostgrestQueryBuilder.selectListAsFlow(
+inline fun <reified Data : Any, Value> PostgrestQueryBuilder.selectAsFlow(
     primaryKey: KProperty1<Data, Value>,
     filter: FilterOperation? = null,
-): Flow<List<Data>> = selectListAsFlow(PrimaryKey(primaryKey.name) { primaryKey.get(it).toString() }, filter)
+): Flow<List<Data>> = selectAsFlow(PrimaryKey(primaryKey.name) { primaryKey.get(it).toString() }, filter)
