@@ -1,5 +1,5 @@
 [versions]
-kotlin = "2.0.0-RC1"
+kotlin = "2.0.0-RC2"
 ktor = "2.3.10"
 dokka = "1.9.20"
 kotlinx-datetime = "0.5.0"
@@ -20,7 +20,7 @@ moshi = "1.15.1"
 jackson = "2.17.0"
 browser = "1.8.0"
 googleid = "1.1.0"
-compose = "1.6.2"
+compose = "1.6.10-rc01"
 androidsvg = "1.4"
 imageloader = "1.7.8"
 coil = "2.6.0"
@@ -37,6 +37,7 @@ maven-publish = { id = "com.vanniktech.maven.publish", version.ref = "maven-publ
 detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
 
 compose = { id = "org.jetbrains.compose", version.ref = "compose" }
+compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 
 native-cocoapods = { id = "org.jetbrains.kotlin.native.cocoapods", version.ref = "kotlin" }
 
