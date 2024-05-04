@@ -22,8 +22,7 @@ inline fun <reified Data : Any> PostgrestQueryBuilder.selectSingleValueAsFlow(
     crossinline filter: PostgrestFilterBuilder.() -> Unit
 ): Flow<Data> {
     val realtime = postgrest.supabaseClient.realtime as RealtimeImpl
-    val id = realtime.nextIncrementId()
-    val channel = realtime.channel(channelName ?: "$schema:$table:$id")
+    val channel = realtime.channel(channelName ?: defaultChannelName(schema, table, realtime))
     return flow {
         val dataFlow = channel.postgresSingleDataFlow(
             schema = this@selectSingleValueAsFlow.schema,
@@ -64,8 +63,7 @@ inline fun <reified Data : Any> PostgrestQueryBuilder.selectAsFlow(
     filter: FilterOperation? = null,
 ): Flow<List<Data>> {
     val realtime = postgrest.supabaseClient.realtime as RealtimeImpl
-    val id = realtime.nextIncrementId()
-    val channel = realtime.channel(channelName ?: "$schema:$table:$id")
+    val channel = realtime.channel(channelName ?: defaultChannelName(schema, table, realtime))
     return flow {
         val dataFlow = channel.postgresListDataFlow(
             schema = this@selectAsFlow.schema,
@@ -92,3 +90,6 @@ inline fun <reified Data : Any, Value> PostgrestQueryBuilder.selectAsFlow(
     channelName: String? = null,
     filter: FilterOperation? = null,
 ): Flow<List<Data>> = selectAsFlow(PrimaryKey(primaryKey.name) { primaryKey.get(it).toString() }, channelName, filter)
+
+@PublishedApi
+internal fun defaultChannelName(schema: String, table: String, realtimeImpl: RealtimeImpl) = "$schema:$table:${realtimeImpl.nextIncrementId()}"
