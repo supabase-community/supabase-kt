@@ -14,7 +14,7 @@ import kotlin.reflect.KProperty1
  * This function listens for changes in the table and emits the new value whenever a change occurs.
  * @param primaryKey the primary key of the [Data] type
  * @param filter the filter to apply to the select query
- * @param channelName the name of the channel to use for the realtime updates. If null, a channel name following the format "schema:table:id" will be generated
+ * @param channelName the name of the channel to use for the realtime updates. If null, a channel name following the format "schema:table:id" will be used
  */
 inline fun <reified Data : Any> PostgrestQueryBuilder.selectSingleValueAsFlow(
     primaryKey: PrimaryKey<Data>,
@@ -43,7 +43,7 @@ inline fun <reified Data : Any> PostgrestQueryBuilder.selectSingleValueAsFlow(
  * This function listens for changes in the table and emits the new value whenever a change occurs.
  * @param primaryKey the primary key of the [Data] type
  * @param filter the filter to apply to the select query
- * @param channelName the name of the channel to use for the realtime updates. If null, a channel name following the format "schema:table:id" will be generated
+ * @param channelName the name of the channel to use for the realtime updates. If null, a channel name following the format "schema:table:id" will be used
  */
 inline fun <reified Data : Any, Value> PostgrestQueryBuilder.selectSingleValueAsFlow(
     primaryKey: KProperty1<Data, Value>,
@@ -56,7 +56,7 @@ inline fun <reified Data : Any, Value> PostgrestQueryBuilder.selectSingleValueAs
  * This function listens for changes in the table and emits the new list whenever a change occurs.
  * @param primaryKey the primary key of the [Data] type
  * @param filter the filter to apply to the select query
- * @param channelName the name of the channel to use for the realtime updates. If null, a channel name following the format "schema:table:id" will be generated
+ * @param channelName the name of the channel to use for the realtime updates. If null, a channel name following the format "schema:table:id" will be used
  */
 inline fun <reified Data : Any> PostgrestQueryBuilder.selectAsFlow(
     primaryKey: PrimaryKey<Data>,
@@ -85,7 +85,7 @@ inline fun <reified Data : Any> PostgrestQueryBuilder.selectAsFlow(
  * This function listens for changes in the table and emits the new list whenever a change occurs.
  * @param primaryKey the primary key of the [Data] type
  * @param filter the filter to apply to the select query
- * @param channelName the name of the channel to use for the realtime updates. If null, a channel name following the format "schema:table:id" will be generated
+ * @param channelName the name of the channel to use for the realtime updates. If null, a channel name following the format "schema:table:id" will be used
  */
 inline fun <reified Data : Any, Value> PostgrestQueryBuilder.selectAsFlow(
     primaryKey: KProperty1<Data, Value>,
