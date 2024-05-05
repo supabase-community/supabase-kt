@@ -80,11 +80,37 @@ class AuthTest {
         }
     }
 
-    private fun userSession(expiresIn: Long = 3600) = UserSession(
-        accessToken = "accessToken",
-        refreshToken = "refreshToken",
-        expiresIn = expiresIn,
-        tokenType = "Bearer"
-    )
+    @Test
+    fun testAutoRefreshSession() {
+        runTest {
+            val newSession = userSession()
+            val client = createMockedSupabaseClient(configuration = {
+                install(Auth) {
+                    minimalSettings(
+                        autoLoadFromStorage = false,
+                        alwaysAutoRefresh = false,
+                        autoSaveToStorage = false
+                    )
+                }
+            }) {
+                respondJson(newSession)
+            }
+            client.auth.awaitInitialization()
+            assertIs<SessionStatus.NotAuthenticated>(client.auth.sessionStatus.value)
+            val session = userSession(0)
+            client.auth.importSession(session)
+            assertIs<SessionStatus.Authenticated>(client.auth.sessionStatus.value)
+            assertEquals(session.expiresIn, client.auth.currentSessionOrNull()?.expiresIn) //The session shouldn't be refreshed automatically as alwaysAutoRefresh is false
+            client.auth.startAutoRefreshForCurrentSession()
+            assertEquals(newSession.expiresIn, client.auth.currentSessionOrNull()?.expiresIn)
+        }
+    }
 
 }
+
+fun userSession(expiresIn: Long = 3600) = UserSession(
+    accessToken = "accessToken",
+    refreshToken = "refreshToken",
+    expiresIn = expiresIn,
+    tokenType = "Bearer"
+)
