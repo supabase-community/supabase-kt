@@ -5,11 +5,11 @@ import io.github.jan.supabase.annotations.SupabaseExperimental
 import io.github.jan.supabase.annotations.SupabaseInternal
 import io.github.jan.supabase.gotrue.AuthImpl
 import io.github.jan.supabase.gotrue.FlowType
-import io.github.jan.supabase.gotrue.PKCEConstants
 import io.github.jan.supabase.gotrue.auth
 import io.github.jan.supabase.gotrue.generateCodeChallenge
 import io.github.jan.supabase.gotrue.generateCodeVerifier
 import io.github.jan.supabase.gotrue.providers.AuthProvider
+import io.github.jan.supabase.gotrue.putCodeChallenge
 import io.github.jan.supabase.gotrue.redirectTo
 import io.github.jan.supabase.gotrue.user.UserSession
 import io.github.jan.supabase.putJsonObject
@@ -20,7 +20,6 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.decodeFromJsonElement
-import kotlinx.serialization.json.put
 
 /**
  * A default authentication provider
@@ -89,9 +88,8 @@ sealed interface DefaultAuthProvider<C, R> : AuthProvider<C, R> {
         }
         val response = gotrue.api.postJson(url, buildJsonObject {
             putJsonObject(body)
-            codeChallenge?.let {
-                put("code_challenge", it)
-                put("code_challenge_method", PKCEConstants.CHALLENGE_METHOD)
+            if (codeChallenge != null) {
+                putCodeChallenge(codeChallenge)
             }
         }) {
             redirectUrl?.let { redirectTo(it) }
