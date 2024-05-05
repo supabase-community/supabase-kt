@@ -290,7 +290,7 @@ sealed interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
     /**
      * Imports a user session and starts auto-refreshing if [autoRefresh] is true
      */
-    suspend fun importSession(session: UserSession, autoRefresh: Boolean = true, source: SessionSource = SessionSource.Unknown)
+    suspend fun importSession(session: UserSession, autoRefresh: Boolean = config.alwaysAutoRefresh, source: SessionSource = SessionSource.Unknown)
 
     /**
      * Imports the jwt token and retrieves the user profile.
