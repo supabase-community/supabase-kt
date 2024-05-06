@@ -1,5 +1,6 @@
 package io.github.jan.supabase.realtime
 
+import io.github.jan.supabase.annotations.SupabaseExperimental
 import io.github.jan.supabase.postgrest.query.PostgrestQueryBuilder
 import io.github.jan.supabase.postgrest.query.filter.FilterOperation
 import io.github.jan.supabase.postgrest.query.filter.PostgrestFilterBuilder
@@ -16,6 +17,7 @@ import kotlin.reflect.KProperty1
  * @param filter the filter to apply to the select query
  * @param channelName the name of the channel to use for the realtime updates. If null, a channel name following the format "schema:table:id" will be used
  */
+@SupabaseExperimental
 inline fun <reified Data : Any> PostgrestQueryBuilder.selectSingleValueAsFlow(
     primaryKey: PrimaryKey<Data>,
     channelName: String? = null,
@@ -44,6 +46,7 @@ inline fun <reified Data : Any> PostgrestQueryBuilder.selectSingleValueAsFlow(
  * @param filter the filter to apply to the select query
  * @param channelName the name of the channel to use for the realtime updates. If null, a channel name following the format "schema:table:id" will be used
  */
+@SupabaseExperimental
 inline fun <reified Data : Any, Value> PostgrestQueryBuilder.selectSingleValueAsFlow(
     primaryKey: KProperty1<Data, Value>,
     channelName: String? = null,
@@ -57,6 +60,7 @@ inline fun <reified Data : Any, Value> PostgrestQueryBuilder.selectSingleValueAs
  * @param filter the filter to apply to the select query
  * @param channelName the name of the channel to use for the realtime updates. If null, a channel name following the format "schema:table:id" will be used
  */
+@SupabaseExperimental
 inline fun <reified Data : Any> PostgrestQueryBuilder.selectAsFlow(
     primaryKey: PrimaryKey<Data>,
     channelName: String? = null,
@@ -85,6 +89,7 @@ inline fun <reified Data : Any> PostgrestQueryBuilder.selectAsFlow(
  * @param filter the filter to apply to the select query
  * @param channelName the name of the channel to use for the realtime updates. If null, a channel name following the format "schema:table:id" will be used
  */
+@SupabaseExperimental
 inline fun <reified Data : Any, Value> PostgrestQueryBuilder.selectAsFlow(
     primaryKey: KProperty1<Data, Value>,
     channelName: String? = null,
