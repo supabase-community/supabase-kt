@@ -144,12 +144,13 @@ sealed interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
      * @param provider The OAuth provider
      * @param redirectUrl The redirect url to use. If you don't specify this, the platform specific will be used, like deeplinks on android.
      * @param config Extra configuration
+     * @return The OAuth url to open in the browser if [ExternalAuthConfigDefaults.automaticallyOpenUrl] is false, otherwise null.
      */
     suspend fun linkIdentity(
         provider: OAuthProvider,
         redirectUrl: String? = defaultRedirectUrl(),
         config: ExternalAuthConfigDefaults.() -> Unit = {}
-    )
+    ): String?
 
     /**
      * Unlinks an OAuth Identity from an existing user.
@@ -289,7 +290,7 @@ sealed interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
     /**
      * Imports a user session and starts auto-refreshing if [autoRefresh] is true
      */
-    suspend fun importSession(session: UserSession, autoRefresh: Boolean = true, source: SessionSource = SessionSource.Unknown)
+    suspend fun importSession(session: UserSession, autoRefresh: Boolean = config.alwaysAutoRefresh, source: SessionSource = SessionSource.Unknown)
 
     /**
      * Imports the jwt token and retrieves the user profile.

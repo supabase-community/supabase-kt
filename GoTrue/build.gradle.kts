@@ -48,6 +48,7 @@ kotlin {
             languageSettings.optIn("kotlin.RequiresOptIn")
             languageSettings.optIn("io.github.jan.supabase.annotations.SupabaseInternal")
             languageSettings.optIn("io.github.jan.supabase.annotations.SupabaseExperimental")
+            compilerOptions.freeCompilerArgs.add("-Xexpect-actual-classes")
         }
         val commonMain by getting {
             dependencies {
@@ -75,6 +76,7 @@ kotlin {
         val commonTest by getting {
             dependencies {
                 implementation(libs.bundles.testing)
+                implementation(project(":test-common"))
             }
         }
         val jvmMain by getting {
