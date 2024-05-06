@@ -63,7 +63,7 @@ class KtorSupabaseHttpClient @SupabaseInternal constructor(
             SupabaseClient.LOGGER.e { "${request.method.value} request to endpoint $endPoint was cancelled"}
             throw e
         } catch(e: Exception) {
-            SupabaseClient.LOGGER.e { "${request.method.value} request to endpoint $endPoint failed with exception ${e.message}" }
+            SupabaseClient.LOGGER.e(e) { "${request.method.value} request to endpoint $endPoint failed with exception ${e.message}" }
             throw HttpRequestException(e.message ?: "", request)
         }
         val responseTime = (response.responseTime.timestamp - response.requestTime.timestamp).milliseconds
@@ -88,7 +88,7 @@ class KtorSupabaseHttpClient @SupabaseInternal constructor(
             SupabaseClient.LOGGER.e { "Request was cancelled on url $url" }
             throw e
         } catch(e: Exception) {
-            SupabaseClient.LOGGER.e { "Request failed with ${e.message} on url $url" }
+            SupabaseClient.LOGGER.e(e) { "Request failed with ${e.message} on url $url" }
             throw HttpRequestException(e.message ?: "", request)
         }
         return response
