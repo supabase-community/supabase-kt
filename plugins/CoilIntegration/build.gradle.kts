@@ -1,6 +1,6 @@
 plugins {
-    alias(libs.plugins.kotlin.multiplatform)
-    alias(libs.plugins.android.library)
+    id(libs.plugins.kotlin.multiplatform.get().pluginId)
+    id(libs.plugins.android.library.get().pluginId)
 }
 
 description = "Extends supabase-kt with a Coil integration for easy image loading"
