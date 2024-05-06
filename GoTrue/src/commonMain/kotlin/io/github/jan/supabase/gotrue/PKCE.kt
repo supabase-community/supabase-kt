@@ -8,7 +8,7 @@ import kotlin.io.encoding.ExperimentalEncodingApi
 
 internal object PKCEConstants {
     const val VERIFIER_LENGTH = 64
-    const val CHALLENGE_METHOD = "S256"
+    const val CHALLENGE_METHOD = "s256"
 }
 
 @OptIn(ExperimentalEncodingApi::class)
