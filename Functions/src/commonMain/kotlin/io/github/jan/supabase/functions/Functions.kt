@@ -148,7 +148,7 @@ class Functions(override val config: Config, override val supabaseClient: Supaba
         /**
          * The default region to use when invoking a function
          */
-        var defaultRegion: FunctionRegion = FunctionRegion.Any
+        var defaultRegion: FunctionRegion = FunctionRegion.ANY
 
     }
 
