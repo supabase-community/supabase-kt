@@ -36,9 +36,16 @@ fun KotlinMultiplatformExtension.jvmTargets() {
     }
 }
 
+fun KotlinMultiplatformExtension.jsTarget() {
+    js {
+        browser()
+        nodejs()
+    }
+}
+
 fun KotlinMultiplatformExtension.allTargets() {
     jvmTargets()
-    js()
+    jsTarget()
     iosTargets()
     watchosTargets()
     tvosTargets()
@@ -47,6 +54,6 @@ fun KotlinMultiplatformExtension.allTargets() {
 
 fun KotlinMultiplatformExtension.composeTargets() {
     jvmTargets()
-    js()
+    jsTarget()
     iosTargets()
 }

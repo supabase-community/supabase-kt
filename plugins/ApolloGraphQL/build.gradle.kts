@@ -13,10 +13,11 @@ repositories {
 kotlin {
     defaultConfig()
     jvmTargets()
-    js()
+    jsTarget()
     iosTargets()
     macosTargets()
-    watchosTargets()
+    watchosArm64()
+    watchosSimulatorArm64()
     tvosTargets()
     sourceSets {
         val commonMain by getting {
