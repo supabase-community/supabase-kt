@@ -9,7 +9,7 @@ fun Project.configureAndroidTarget(module: String) {
     extensions.configure(LibraryExtension::class) {
         compileSdk = 34
         sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
-        namespace = "${extra["base-group"]}.$module.library"
+        namespace = "${extra["base-group"].toString().replace("-", ".")}.$module.library"
         defaultConfig {
             minSdk = 21
         }
