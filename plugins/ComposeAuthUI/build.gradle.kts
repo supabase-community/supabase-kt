@@ -20,7 +20,7 @@ kotlin {
     defaultConfig()
     applyDefaultHierarchyTemplate {
         common {
-            group("noJvm") {
+            group("nonJvm") {
                 withIos()
                 withJs()
             }
