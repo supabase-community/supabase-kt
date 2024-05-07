@@ -21,11 +21,6 @@ kotlin {
                 api(libs.ktor.client.websockets)
             }
         }
-        val jvmMain by getting
-        val androidMain by getting
-        val jsMain by getting
-        val iosMain by getting
-        val iosSimulatorArm64Main by getting
     }
 }
 

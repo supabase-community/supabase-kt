@@ -111,8 +111,6 @@ kotlin {
                 api(libs.android.lifecycle.process)
             }
         }
-        val appleMain by getting
-        val macosMain by getting
     }
 }
 

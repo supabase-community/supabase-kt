@@ -16,7 +16,8 @@ kotlin {
     androidTarget {
         publishLibraryVariants("release", "debug")
     }
-    sourceSets {       val commonMain by getting {
+    sourceSets {
+        val commonMain by getting {
             dependencies {
                 implementation(project(":"))
                 api(libs.bundles.jackson)

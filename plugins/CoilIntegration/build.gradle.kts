@@ -16,7 +16,6 @@ kotlin {
     androidTarget {
         publishLibraryVariants("release", "debug")
     }
-
     sourceSets {
         val commonMain by getting {
             dependencies {
