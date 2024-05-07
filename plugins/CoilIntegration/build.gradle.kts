@@ -27,4 +27,4 @@ kotlin {
     }
 }
 
-configureAndroidTarget("coil")
+configureAndroidTarget()

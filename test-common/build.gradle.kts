@@ -33,4 +33,4 @@ kotlin {
     }
 }
 
-configureAndroidTarget("testing")
+configureAndroidTarget()

@@ -57,4 +57,4 @@ kotlin {
     }
 }
 
-configureAndroidTarget("storage")
+configureAndroidTarget()

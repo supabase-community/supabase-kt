@@ -49,7 +49,7 @@ kotlin {
     }
 }
 
-configureAndroidTarget("compose.auth")
+configureAndroidTarget()
 
 //see https://github.com/JetBrains/compose-multiplatform/issues/4739
 tasks.withType<LintModelWriterTask> {

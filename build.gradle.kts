@@ -116,4 +116,4 @@ kotlin {
     }
 }
 
-configureAndroidTarget("supabase")
+configureAndroidTarget()

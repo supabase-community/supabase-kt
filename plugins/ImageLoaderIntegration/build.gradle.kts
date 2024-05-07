@@ -25,4 +25,4 @@ kotlin {
     }
 }
 
-configureAndroidTarget("imageloader")
+configureAndroidTarget()

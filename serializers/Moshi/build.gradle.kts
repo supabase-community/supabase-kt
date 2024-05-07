@@ -27,4 +27,4 @@ kotlin {
     }
 }
 
-configureAndroidTarget("serializer.moshi")
+configureAndroidTarget()

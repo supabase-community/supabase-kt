@@ -85,4 +85,4 @@ kotlin {
     }
 }
 
-configureAndroidTarget("gotrue")
+configureAndroidTarget()

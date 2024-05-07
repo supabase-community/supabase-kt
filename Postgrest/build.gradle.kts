@@ -35,4 +35,4 @@ kotlin {
     }
 }
 
-configureAndroidTarget("postgrest")
+configureAndroidTarget()

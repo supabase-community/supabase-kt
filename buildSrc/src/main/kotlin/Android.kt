@@ -5,11 +5,11 @@ import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.extra
 import org.gradle.kotlin.dsl.get
 
-fun Project.configureAndroidTarget(module: String) {
+fun Project.configureAndroidTarget() {
     extensions.configure(LibraryExtension::class) {
         compileSdk = 34
         sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
-        namespace = "${extra["base-group"].toString().replace("-", ".")}.$module.library"
+        namespace = "${extra["base-group"].toString().replace("-", ".")}.${this@configureAndroidTarget.name.replace("-", "")}.library"
         defaultConfig {
             minSdk = 21
         }

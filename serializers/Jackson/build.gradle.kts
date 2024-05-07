@@ -25,4 +25,4 @@ kotlin {
     }
 }
 
-configureAndroidTarget("serializer.jackson")
+configureAndroidTarget()

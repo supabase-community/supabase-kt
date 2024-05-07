@@ -29,4 +29,4 @@ kotlin {
     }
 }
 
-configureAndroidTarget("realtime")
+configureAndroidTarget()
