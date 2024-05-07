@@ -13,7 +13,6 @@ repositories {
 @OptIn(org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi::class)
 kotlin {
     defaultConfig()
-    println("2")
     allTargets()
     sourceSets {
         val commonMain by getting {
