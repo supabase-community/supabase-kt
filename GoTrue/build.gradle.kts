@@ -23,11 +23,12 @@ kotlin {
                 //withMingw() - not supported
             }
             group("nonDesktop") {
-                withAndroidTarget()
+                //withAndroidTarget() android has its own implementation
                 withIos()
                 withTvos()
                 withWatchos()
                 withMingw()
+                withJs()
             }
         }
     }
