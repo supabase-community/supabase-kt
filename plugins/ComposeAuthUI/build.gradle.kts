@@ -18,6 +18,14 @@ repositories {
 @OptIn(org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi::class)
 kotlin {
     defaultConfig()
+    applyDefaultHierarchyTemplate {
+        common {
+            group("noJvm") {
+                withIos()
+                withJs()
+            }
+        }
+    }
     composeTargets()
     sourceSets {
         val commonMain by getting {
@@ -27,19 +35,10 @@ kotlin {
                 implementation(compose.material3)
             }
         }
-        val nonJvmMain by creating {
-            dependsOn(commonMain)
-        }
         val androidMain by getting {
             dependencies {
                 implementation(libs.androidsvg)
             }
-        }
-        val iosMain by getting {
-            dependsOn(nonJvmMain)
-        }
-        val jsMain by getting {
-            dependsOn(nonJvmMain)
         }
     }
 }

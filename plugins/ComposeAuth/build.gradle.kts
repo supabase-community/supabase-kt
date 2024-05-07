@@ -19,6 +19,14 @@ repositories {
 @OptIn(org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi::class)
 kotlin {
     defaultConfig()
+    applyDefaultHierarchyTemplate {
+        common {
+            group("noDefault") {
+                withJvm()
+                withJs()
+            }
+        }
+    }
     composeTargets()
     sourceSets {
         val commonMain by getting {
@@ -28,9 +36,6 @@ kotlin {
                 implementation(libs.krypto)
             }
         }
-        val noDefaultMain by creating {
-            dependsOn(commonMain)
-        }
         val androidMain by getting {
             dependencies {
                 api(libs.android.google.id)
@@ -38,13 +43,6 @@ kotlin {
                 api(libs.androidx.credentials.play.services)
                 implementation(libs.androidx.activity.compose)
             }
-        }
-        val jvmMain by getting {
-            dependsOn(noDefaultMain)
-        }
-        val appleMain by getting
-        val jsMain by getting {
-            dependsOn(noDefaultMain)
         }
     }
 }
