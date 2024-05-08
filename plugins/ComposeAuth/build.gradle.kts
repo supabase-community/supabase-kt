@@ -3,8 +3,8 @@ import com.android.build.gradle.internal.lint.LintModelWriterTask
 import com.android.build.gradle.internal.tasks.LintModelMetadataTask
 
 plugins {
-    alias(libs.plugins.kotlin.multiplatform)
-    alias(libs.plugins.android.library)
+    id(libs.plugins.kotlin.multiplatform.get().pluginId)
+    id(libs.plugins.android.library.get().pluginId)
     alias(libs.plugins.compose)
     alias(libs.plugins.compose.compiler)
 }
@@ -18,44 +18,23 @@ repositories {
 
 @OptIn(org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi::class)
 kotlin {
-    applyDefaultHierarchyTemplate()
-    jvmToolchain(8)
-    jvm()
-    androidTarget {
-        publishLibraryVariants("release", "debug")
-    }
-    js(IR) {
-        browser {
-            testTask {
-                enabled = false
-            }
-        }
-        nodejs {
-            testTask {
-                enabled = false
+    defaultConfig()
+    applyDefaultHierarchyTemplate {
+        common {
+            group("noDefault") {
+                withJvm()
+                withJs()
             }
         }
     }
-    iosX64()
-    iosArm64()
-    iosSimulatorArm64()
-
+    composeTargets()
     sourceSets {
-        all {
-            languageSettings.optIn("kotlin.RequiresOptIn")
-            languageSettings.optIn("io.github.jan.supabase.annotations.SupabaseInternal")
-            languageSettings.optIn("io.github.jan.supabase.annotations.SupabaseExperimental")
-            compilerOptions.freeCompilerArgs.add("-Xexpect-actual-classes")
-        }
         val commonMain by getting {
             dependencies {
                 api(project(":gotrue-kt"))
                 implementation(compose.runtime)
                 implementation(libs.krypto)
             }
-        }
-        val noDefaultMain by creating {
-            dependsOn(commonMain)
         }
         val androidMain by getting {
             dependencies {
@@ -65,28 +44,10 @@ kotlin {
                 implementation(libs.androidx.activity.compose)
             }
         }
-        val jvmMain by getting {
-            dependsOn(noDefaultMain)
-        }
-        val appleMain by getting
-        val jsMain by getting {
-            dependsOn(noDefaultMain)
-        }
     }
 }
 
-android {
-    namespace = "io.github.jan.supabase.compose.auth"
-    compileSdk = 34
-    sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
-    defaultConfig {
-        minSdk = 21
-    }
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
-    }
-}
+configureAndroidTarget()
 
 //see https://github.com/JetBrains/compose-multiplatform/issues/4739
 tasks.withType<LintModelWriterTask> {

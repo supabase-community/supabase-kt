@@ -1,4 +1,6 @@
-import java.net.URL
+@file:OptIn(ExperimentalKotlinGradlePluginApi::class)
+
+import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 
 val excludedModules = listOf("plugins", "serializers", "test-common")
 
@@ -11,13 +13,14 @@ buildscript {
 }
 
 plugins {
-    alias(libs.plugins.kotlin.multiplatform)
-    alias(libs.plugins.android.library)
-    alias(libs.plugins.dokka)
+    id(libs.plugins.kotlin.multiplatform.get().pluginId)
+    id(libs.plugins.android.library.get().pluginId)
+    id(libs.plugins.detekt.get().pluginId)
+    id(libs.plugins.dokka.get().pluginId)
     alias(libs.plugins.kotlinx.plugin.serialization)
-    alias(libs.plugins.maven.publish)
-    alias(libs.plugins.detekt)
+    id(libs.plugins.maven.publish.get().pluginId)
 }
+
 allprojects {
     repositories {
         google()
@@ -29,47 +32,17 @@ allprojects {
         }
     }
 }
+
 submodules {
     apply(plugin = "org.jetbrains.dokka")
     apply(plugin = "org.jetbrains.kotlin.plugin.serialization")
     apply(plugin = "kotlinx-atomicfu")
     apply(plugin = "com.vanniktech.maven.publish")
 
-    group = "io.github.jan-tennert.supabase"
+    group = extra["base-group"].toString()
     version = extra["supabase-version"].toString()
 
-    mavenPublishing {
-        publishToMavenCentral(com.vanniktech.maven.publish.SonatypeHost.S01)
-
-        signAllPublications()
-        coordinates("io.github.jan-tennert.supabase", this@submodules.name, extra["supabase-version"].toString())
-
-        pom {
-            name.set(this@submodules.name)
-            description.set(this@submodules.description ?: "A Kotlin Multiplatform Supabase SDK")
-            inceptionYear.set("2024")
-            url.set("https://github.com/supabase-community/supabase-kt/")
-            licenses {
-                license {
-                    name = "MIT License"
-                    url = "https://github.com/supabase-community/supabase-kt/blob/master/LICENSE"
-                    distribution = "https://github.com/supabase-community/supabase-kt/blob/master/LICENSE"
-                }
-            }
-            developers {
-                developer {
-                    id = "TheRealJan"
-                    name = "Jan Tennert"
-                    url = "https://github.com/jan-tennert/"
-                }
-            }
-            scm {
-                url = "https://github.com/supabase-community/supabase-kt/"
-                connection = "scm:git:git://github.com/supabase-community/supabase-kt.git"
-                developerConnection = "scm:git:ssh://git@github.com/supabase-community/supabase-kt.git"
-            }
-        }
-    }
+    applyPublishing()
 }
 
 tasks.register("detektAll") {
@@ -105,83 +78,16 @@ val buildConfigGenerator by tasks.registering(Sync::class) {
 configure(allprojects.filter { it.name != "bom" && it.name !in excludedModules }) {
     apply(plugin = "io.gitlab.arturbosch.detekt")
 
-    detekt {
-        buildUponDefaultConfig = true
-        config.setFrom(files("$rootDir/detekt.yml"))
-        //baseline = file("$rootDir/config/detekt/baseline.xml")
-    }
+    applyDokkaWithConfiguration()
+    applyDetektWithConfiguration()
 
-    tasks.withType<io.gitlab.arturbosch.detekt.Detekt>().configureEach {
-        jvmTarget = "1.8"
-        reports {
-            xml.required = true
-            html.required = true
-            txt.required = true
-            sarif.required = true
-            md.required = true
-        }
-        basePath = rootDir.absolutePath
-    }
-    tasks.withType<org.jetbrains.dokka.gradle.DokkaTaskPartial>().configureEach {
-        dokkaSourceSets.configureEach {
-            sourceLink {
-                val name = when(moduleName.get()) {
-                    "functions-kt" -> "Functions"
-                    "gotrue-kt" -> "GoTrue"
-                    "postgrest-kt" -> "Postgrest"
-                    "realtime-kt" -> "Realtime"
-                    "storage-kt" -> "Storage"
-                    "apollo-graphql" -> "plugins/ApolloGraphQL"
-                    else -> ""
-                }
-                localDirectory = projectDir.resolve("src")
-                remoteUrl = URL("https://github.com/supabase-community/supabase-kt/tree/master/$name/src")
-                remoteLineSuffix = "#L"
-            }
-        }
-    }
 }
 
 @OptIn(org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi::class)
 kotlin {
-    applyDefaultHierarchyTemplate()
-    jvmToolchain(8)
-    jvm()
-    androidTarget {
-        publishLibraryVariants("release", "debug")
-    }
-    js(IR) {
-        browser {
-            testTask {
-                enabled = false
-            }
-        }
-        nodejs {
-            testTask {
-                enabled = false
-            }
-        }
-    }
-    iosX64()
-    iosArm64()
-    iosSimulatorArm64()
-    mingwX64()
-    macosX64()
-    macosArm64()
-    linuxX64()
-    watchosArm64()
-    watchosX64()
-    watchosSimulatorArm64()
-    tvosX64()
-    tvosArm64()
-    tvosSimulatorArm64()
+    defaultConfig()
+    allTargets()
     sourceSets {
-        all {
-            languageSettings.optIn("kotlin.RequiresOptIn")
-            languageSettings.optIn("io.github.jan.supabase.annotations.SupabaseInternal")
-            languageSettings.optIn("io.github.jan.supabase.annotations.SupabaseExperimental")
-            compilerOptions.freeCompilerArgs.add("-Xexpect-actual-classes")
-        }
         val commonMain by getting {
             kotlin.srcDir(
                 // convert the task to a file-provider
@@ -205,23 +111,7 @@ kotlin {
                 api(libs.android.lifecycle.process)
             }
         }
-        val appleMain by getting
-        val macosMain by getting
     }
 }
 
-android {
-    compileSdk = 34
-    sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
-    namespace = "io.github.jan.supabase.library"
-    defaultConfig {
-        minSdk = 21
-    }
-    lint {
-        abortOnError = false
-    }
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
-    }
-}
+configureAndroidTarget()
