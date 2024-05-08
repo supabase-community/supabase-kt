@@ -38,7 +38,11 @@ fun KotlinMultiplatformExtension.jvmTargets() {
 
 fun KotlinMultiplatformExtension.jsTarget() {
     js {
-        browser()
+        browser {
+            testTask {
+                enabled = false
+            }
+        }
         nodejs()
     }
 }
