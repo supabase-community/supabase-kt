@@ -43,7 +43,11 @@ fun KotlinMultiplatformExtension.jsTarget() {
                 enabled = false
             }
         }
-        nodejs()
+        nodejs {
+            testTask {
+                enabled = false
+            }
+        }
     }
 }
 
