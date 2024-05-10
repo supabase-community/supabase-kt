@@ -21,7 +21,7 @@ data class UserSession(
     val expiresIn: Long,
     @SerialName("token_type")
     val tokenType: String,
-    val user: UserInfo?,
+    val user: UserInfo? = null,
     @SerialName("type")
     val type: String = "",
     val expiresAt: Instant = Clock.System.now() + (expiresIn.seconds),

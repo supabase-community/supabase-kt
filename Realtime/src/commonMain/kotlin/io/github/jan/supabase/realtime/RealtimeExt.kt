@@ -50,30 +50,13 @@ inline fun <reified Data> RealtimeChannel.presenceDataFlow(): Flow<List<Data>> {
  * @param primaryKey the primary key of the [Data] type
  * @return a [Flow] of the current data in a list. This list is updated and emitted whenever a change occurs.
  */
-suspend inline fun <reified Data : Any> RealtimeChannel.postgresListDataFlow(
+inline fun <reified Data : Any> RealtimeChannel.postgresListDataFlow(
     schema: String = "public",
     table: String,
     filter: FilterOperation? = null,
     primaryKey: PrimaryKey<Data>
 ): Flow<List<Data>> {
     val cache = AtomicMutableMap<String, Data>()
-    val initialData = try {
-        val result = supabaseClient.postgrest.from(schema, table).select {
-            filter?.let {
-                filter {
-                    this.filter(it)
-                }
-            }
-        }
-        val data = result.decodeList<Data>()
-        data.forEach {
-            val key = primaryKey.producer(it)
-            cache[key] = it
-        }
-        data
-    } catch (e: NotFoundRestException) {
-        error("Table with name $table not found")
-    }
     val changeFlow = postgresChangeFlow<PostgresAction>(schema) {
         this.table = table
         filter?.let {
@@ -81,6 +64,23 @@ suspend inline fun <reified Data : Any> RealtimeChannel.postgresListDataFlow(
         }
     }
     return channelFlow {
+        val initialData = try {
+            val result = supabaseClient.postgrest.from(schema, table).select {
+                filter?.let {
+                    filter {
+                        this.filter(it)
+                    }
+                }
+            }
+            val data = result.decodeList<Data>()
+            data.forEach {
+                val key = primaryKey.producer(it)
+                cache[key] = it
+            }
+            data
+        } catch (e: NotFoundRestException) {
+            error("Table with name $table not found")
+        }
         trySend(initialData)
         changeFlow.collect {
             when (it) {
@@ -117,7 +117,7 @@ suspend inline fun <reified Data : Any> RealtimeChannel.postgresListDataFlow(
  * @param primaryKey the primary key of the [Data] type
  * @return a [Flow] of the current data in a list. This list is updated and emitted whenever a change occurs.
  */
-suspend inline fun <reified Data : Any, Value> RealtimeChannel.postgresListDataFlow(
+inline fun <reified Data : Any, Value> RealtimeChannel.postgresListDataFlow(
     schema: String = "public",
     table: String,
     filter: FilterOperation? = null,

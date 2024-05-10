@@ -9,4 +9,4 @@ import kotlinx.serialization.Serializable
  * @param path The path of the file
  */
 @Serializable
-data class SignedUrl(val error: String?, val signedURL: String, val path: String)
+data class SignedUrl(val error: String? = null, val signedURL: String, val path: String)

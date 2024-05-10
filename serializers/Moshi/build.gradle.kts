@@ -1,6 +1,6 @@
 plugins {
-    kotlin("multiplatform")
-    id("com.android.library")
+    id(libs.plugins.kotlin.multiplatform.get().pluginId)
+    id(libs.plugins.android.library.get().pluginId)
 }
 
 description = "Extends supabase-kt with a Moshi Serializer"
@@ -11,18 +11,12 @@ repositories {
 
 @OptIn(org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi::class)
 kotlin {
-    applyDefaultHierarchyTemplate()
-    jvmToolchain(8)
+    defaultConfig()
     jvm()
     androidTarget {
         publishLibraryVariants("release", "debug")
     }
     sourceSets {
-        all {
-            languageSettings.optIn("kotlin.RequiresOptIn")
-            languageSettings.optIn("io.github.jan.supabase.annotations.SupabaseInternal")
-            languageSettings.optIn("io.github.jan.supabase.annotations.SupabaseExperimental")
-        }
         val commonMain by getting {
             dependencies {
                 implementation(project(":"))
@@ -33,15 +27,4 @@ kotlin {
     }
 }
 
-android {
-    compileSdk = 34
-    sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
-    namespace = "io.github.jan.supabase.serializer.moshi.library"
-    defaultConfig {
-        minSdk = 21
-    }
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
-    }
-}
+configureAndroidTarget()

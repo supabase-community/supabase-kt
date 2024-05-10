@@ -1,5 +1,7 @@
 package io.github.jan.supabase.gotrue.providers
 
+import io.github.jan.supabase.gotrue.Auth
+
 /**
  * Configuration for external authentication providers like Google, Twitter, etc.
  */
@@ -19,5 +21,10 @@ open class ExternalAuthConfigDefaults {
      * Additional query parameters to send to the external provider
      */
     val queryParams = mutableMapOf<String, String>()
+
+    /**
+     * Automatically open the URL in the browser. Only applies to [Auth.linkIdentity].
+     */
+    var automaticallyOpenUrl: Boolean = true
 
 }

@@ -36,11 +36,15 @@ sealed interface BucketApi {
      * @param data The data to upload
      * @param upsert Whether to overwrite an existing file
      * @return the key to the uploaded file
+     * @throws IllegalArgumentException if data to upload is empty
      * @throws RestException or one of its subclasses if receiving an error response
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
-    suspend fun upload(path: String, data: ByteArray, upsert: Boolean = false): String = upload(path, UploadData(ByteReadChannel(data), data.size.toLong()), upsert)
+    suspend fun upload(path: String, data: ByteArray, upsert: Boolean = false): String {
+        require(data.isNotEmpty()) { "The data to upload should not be empty" }
+        return upload(path, UploadData(ByteReadChannel(data), data.size.toLong()), upsert)
+    }
 
     /**
      * Uploads a file in [bucketId] under [path]
@@ -61,8 +65,13 @@ sealed interface BucketApi {
      * @param data The data to upload
      * @param upsert Whether to overwrite an existing file
      * @return the key of the uploaded file
+     * @throws IllegalArgumentException if data to upload is empty
      */
-    suspend fun uploadToSignedUrl(path: String, token: String, data: ByteArray, upsert: Boolean = false): String = uploadToSignedUrl(path, token, UploadData(ByteReadChannel(data), data.size.toLong()), upsert)
+    suspend fun uploadToSignedUrl(path: String, token: String, data: ByteArray, upsert: Boolean = false
+    ): String {
+        require(data.isNotEmpty()) { "The data to upload should not be empty" }
+        return uploadToSignedUrl(path, token, UploadData(ByteReadChannel(data), data.size.toLong()), upsert)
+    }
 
     /**
      * Uploads a file in [bucketId] under [path] using a presigned url
@@ -84,11 +93,15 @@ sealed interface BucketApi {
      * @param data The new data
      * @param upsert Whether to overwrite an existing file
      * @return the key to the updated file
+     * @throws IllegalArgumentException if data to upload is empty
      * @throws RestException or one of its subclasses if receiving an error response
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
-    suspend fun update(path: String, data: ByteArray, upsert: Boolean = false): String = update(path, UploadData(ByteReadChannel(data), data.size.toLong()), upsert)
+    suspend fun update(path: String, data: ByteArray, upsert: Boolean = false): String {
+        require(data.isNotEmpty()) { "The data to upload should not be empty" }
+        return update(path, UploadData(ByteReadChannel(data), data.size.toLong()), upsert)
+    }
 
     /**
      * Updates a file in [bucketId] under [path]
@@ -104,6 +117,7 @@ sealed interface BucketApi {
 
     /**
      * Deletes all files in [bucketId] with in [paths]
+     * @param paths The paths to delete
      * @throws RestException or one of its subclasses if receiving an error response
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
@@ -112,6 +126,7 @@ sealed interface BucketApi {
 
     /**
      * Deletes all files in [bucketId] with in [paths]
+     * @param paths The paths to delete
      * @throws RestException or one of its subclasses if receiving an error response
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
@@ -120,19 +135,25 @@ sealed interface BucketApi {
 
     /**
      * Moves a file under [from] to [to]
+     * @param from The path to move from
+     * @param to The path to move to
+     * @param destinationBucket The bucket to move the file to. If null, the file will be moved within the same bucket
      * @throws RestException or one of its subclasses if receiving an error response
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
-    suspend fun move(from: String, to: String)
+    suspend fun move(from: String, to: String, destinationBucket: String? = null)
 
     /**
      * Copies a file under [from] to [to]
+     * @param from The path to copy from
+     * @param to The path to copy to
+     * @param destinationBucket The destination bucket to copy to. If null, the current bucket is used
      * @throws RestException or one of its subclasses if receiving an error response
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
-    suspend fun copy(from: String, to: String)
+    suspend fun copy(from: String, to: String, destinationBucket: String? = null)
 
     /**
      * Creates a signed url to upload without authentication.
@@ -227,7 +248,10 @@ sealed interface BucketApi {
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
-    suspend fun list(prefix: String = "", filter: BucketListFilter.() -> Unit = {}): List<BucketItem>
+    suspend fun list(
+        prefix: String = "",
+        filter: BucketListFilter.() -> Unit = {}
+    ): List<BucketItem>
 
     /**
      * Changes the bucket's public status to [public]
@@ -268,6 +292,15 @@ sealed interface BucketApi {
      * @throws HttpRequestException on network related issues
      */
     fun publicRenderUrl(path: String, transform: ImageTransformation.() -> Unit = {}): String
+
+    companion object {
+
+        /**
+         * The header to use for upserting files
+         */
+        const val UPSERT_HEADER = "x-upsert"
+
+    }
 
 }
 

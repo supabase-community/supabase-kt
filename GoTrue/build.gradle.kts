@@ -1,7 +1,7 @@
 plugins {
    // alias(libs.plugins.complete.kotlin)
-    alias(libs.plugins.kotlin.multiplatform)
-    alias(libs.plugins.android.library)
+    id(libs.plugins.kotlin.multiplatform.get().pluginId)
+    id(libs.plugins.android.library.get().pluginId)
 }
 
 description = "Extends supabase-kt with a Auth Client"
@@ -12,140 +12,58 @@ repositories {
 
 @OptIn(org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi::class)
 kotlin {
-    applyDefaultHierarchyTemplate()
-    jvmToolchain(8)
-    jvm()
-    androidTarget {
-        publishLibraryVariants("release", "debug")
-    }
-    js(IR) {
-        browser {
-            testTask {
-                enabled = false
+    defaultConfig()
+    applyDefaultHierarchyTemplate {
+        common {
+            settingsGroup()
+            group("desktop") {
+                withJvm()
+                withMacos()
+                withLinux()
+                //withMingw() - not supported
             }
-        }
-        nodejs {
-            testTask {
-                enabled = false
-            }
-        }
-    }
-    wasmJs {
-        browser {
-            testTask {
-                enabled = false
-            }
-        }
-        nodejs {
-            testTask {
-                enabled = false
+            group("nonDesktop") {
+                //withAndroidTarget() android has its own implementation
+                withIos()
+                withTvos()
+                withWatchos()
+                withMingw()
+                withJs()
             }
         }
     }
-    iosX64()
-    iosArm64()
-    iosSimulatorArm64()
-   // mingwX64()
-  //  macosX64()
-    macosArm64()
-   // linuxX64()
-    watchosArm64()
-    watchosX64()
-    watchosSimulatorArm64()
-    tvosX64()
-    tvosArm64()
-    tvosSimulatorArm64()
+    allTargets()
     sourceSets {
-        all {
-            languageSettings.optIn("kotlin.RequiresOptIn")
-            languageSettings.optIn("io.github.jan.supabase.annotations.SupabaseInternal")
-            languageSettings.optIn("io.github.jan.supabase.annotations.SupabaseExperimental")
-        }
         val commonMain by getting {
             dependencies {
                 api(project(":"))
                 implementation(libs.krypto)
-         //       api(libs.cache4k)
             }
         }
-        val desktopMain by creating {
-            dependsOn(commonMain)
+        val desktopMain by getting {
             dependencies {
                 api(libs.ktor.server.core)
                 api(libs.ktor.server.cio)
             }
         }
-        val nonDesktopMain by creating {
-            dependsOn(commonMain)
-        }
-        val nonLinuxMain by creating {
-            dependsOn(commonMain)
+        val settingsMain by getting {
             dependencies {
-                api(libs.multiplatform.settings.no.arg) //the coroutines dependency is not supported on wasm-js
+                api(libs.bundles.multiplatform.settings)
             }
         }
         val commonTest by getting {
             dependencies {
                 implementation(libs.bundles.testing)
+                implementation(project(":test-common"))
             }
         }
-        val jvmMain by getting {
-            dependsOn(nonLinuxMain)
-            dependsOn(desktopMain)
-        }
         val androidMain by getting {
-            dependsOn(nonLinuxMain)
             dependencies {
                 api(libs.androidx.startup.runtime)
                 api(libs.androidx.browser)
             }
         }
-        /*val mingwMain by getting {
-            dependsOn(nonLinuxMain)
-            dependsOn(nonDesktopMain) //no ktor server engine supports the windows target
-            //dependsOn(desktopMain)
-        }*/
-        val appleMain by getting {
-            dependsOn(nonLinuxMain)
-        }
-        val jsMain by getting {
-            dependsOn(nonLinuxMain)
-            dependsOn(nonDesktopMain)
-        }
-        val wasmJsMain by getting {
-            dependsOn(nonLinuxMain)
-            dependsOn(nonDesktopMain)
-        }
-        /*val linuxMain by getting {
-            dependsOn(desktopMain)
-        }*/
-        val iosMain by getting {
-            dependsOn(nonDesktopMain)
-        }
-        val tvosMain by getting {
-            dependsOn(nonDesktopMain)
-        }
-        val watchosMain by getting {
-            dependsOn(nonDesktopMain)
-        }
-        val macosMain by getting {
-            dependsOn(desktopMain)
-        }
     }
 }
 
-android {
-    compileSdk = 34
-    sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
-    namespace = "io.github.jan.supabase.gotrue.library"
-    defaultConfig {
-        minSdk = 21
-    }
-    lint {
-        abortOnError = false
-    }
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
-    }
-}
+configureAndroidTarget()
