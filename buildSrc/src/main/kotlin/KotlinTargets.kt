@@ -1,4 +1,5 @@
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
+import org.jetbrains.kotlin.gradle.targets.js.dsl.ExperimentalWasmDsl
 
 fun KotlinMultiplatformExtension.iosTargets() {
     iosX64()
@@ -24,9 +25,9 @@ fun KotlinMultiplatformExtension.macosTargets() {
 }
 
 fun KotlinMultiplatformExtension.desktopTargets() {
-    mingwX64()
+   // mingwX64()
     macosTargets()
-    linuxX64()
+   // linuxX64()
 }
 
 fun KotlinMultiplatformExtension.jvmTargets() {
@@ -51,6 +52,22 @@ fun KotlinMultiplatformExtension.jsTarget() {
     }
 }
 
+fun KotlinMultiplatformExtension.wasmJsTarget() {
+    wasmJs {
+        browser {
+            testTask {
+                enabled = false
+            }
+        }
+        nodejs {
+            testTask {
+                enabled = false
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalWasmDsl::class)
 fun KotlinMultiplatformExtension.allTargets() {
     jvmTargets()
     jsTarget()
@@ -58,10 +75,12 @@ fun KotlinMultiplatformExtension.allTargets() {
     watchosTargets()
     tvosTargets()
     desktopTargets()
+    wasmJsTarget()
 }
 
 fun KotlinMultiplatformExtension.composeTargets() {
     jvmTargets()
     jsTarget()
     iosTargets()
+    wasmJsTarget()
 }
