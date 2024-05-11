@@ -1,6 +1,6 @@
 [versions]
 kotlin = "2.0.0-RC3"
-ktor = "3.0.0-wasm2"
+ktor = "3.0.0-beta-2-eap-932"
 dokka = "1.9.20"
 kotlinx-datetime = "0.5.0"
 kermit = "2.0.3"
@@ -97,7 +97,7 @@ imageloader = { module = "io.github.qdsfdhvh:image-loader", version.ref = "image
 
 [bundles]
 ktor-client = ["ktor-client-core", "ktor-client-content-negotiation", "ktor-json"]
-multiplatform-settings = ["multiplatform-settings-no-arg", "multiplatform-settings-coroutines"]
+multiplatform-settings = ["multiplatform-settings-no-arg"] # no multiplatform-settings-coroutines as there is no wasm-js support
 testing = ["kotlinx-coroutines-test", "multiplatform-settings-test", "ktor-client-mock", "kotlin-test"]
 moshi = ["moshi", "moshi-kotlin"]
 jackson = ["jackson", "jackson-kotlin"]

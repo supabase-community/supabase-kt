@@ -25,9 +25,9 @@ fun KotlinMultiplatformExtension.macosTargets() {
 }
 
 fun KotlinMultiplatformExtension.desktopTargets() {
-   // mingwX64()
+    mingwX64()
     macosTargets()
-   // linuxX64()
+    linuxX64()
 }
 
 fun KotlinMultiplatformExtension.jvmTargets() {

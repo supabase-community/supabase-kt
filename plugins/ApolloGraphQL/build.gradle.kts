@@ -18,6 +18,7 @@ kotlin {
     macosTargets()
     watchosArm64()
     watchosSimulatorArm64()
+    wasmJsTarget()
     tvosTargets()
     sourceSets {
         val commonMain by getting {

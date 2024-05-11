@@ -24,6 +24,7 @@ kotlin {
             group("noDefault") {
                 withJvm()
                 withJs()
+                withWasmJs()
             }
         }
     }
