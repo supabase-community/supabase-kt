@@ -19,7 +19,7 @@ sealed interface OtpType {
         /**
          * Magic link OTP type
          *
-         * **Note: If you verify an OTP using [Auth.verifyEmailOtp] you can use [Email.EMAIL] to cover all email OTP types**
+         * **Note: If you verify an OTP using [Auth.verifyEmailOtp] you can use [Email.EMAIL] to cover both the [MAGIC_LINK] and [SIGNUP] OTP types**
          *
          * if you want to resend an OTP, use the according type. In this case [MAGIC_LINK]
          */
@@ -27,7 +27,7 @@ sealed interface OtpType {
         /**
          * OTP type for signing up
          *
-         * **Note: If you verify an OTP using [Auth.verifyEmailOtp] you can use [Email.EMAIL] to cover all email OTP types**
+         * **Note: If you verify an OTP using [Auth.verifyEmailOtp] you can use [Email.EMAIL] to cover both the [MAGIC_LINK] and [SIGNUP] OTP types**
          *
          * if you want to resend an OTP, use the according type. In this case [SIGNUP]
          */
