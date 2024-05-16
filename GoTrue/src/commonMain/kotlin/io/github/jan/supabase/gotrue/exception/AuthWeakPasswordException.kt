@@ -13,7 +13,7 @@ class AuthWeakPasswordException(
     description,
 ) {
 
-    companion object {
+    internal companion object {
         const val CODE = "weak_password"
     }
 

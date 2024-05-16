@@ -8,7 +8,7 @@ class AuthSessionMissingException: AuthRestException(
     message = "Session not found. This can happen if the user was logged out or deleted."
 ) {
 
-    companion object {
+    internal companion object {
         const val CODE = "session_not_found"
     }
 
