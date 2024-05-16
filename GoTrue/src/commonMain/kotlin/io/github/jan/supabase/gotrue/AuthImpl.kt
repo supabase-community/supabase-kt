@@ -486,7 +486,13 @@ internal class AuthImpl(
     private fun checkErrorCodes(error: GoTrueErrorResponse): RestException? {
         return when (error.error) {
             AuthWeakPasswordException.CODE -> AuthWeakPasswordException(error.error, error.weakPassword?.reasons ?: emptyList())
-            AuthSessionMissingException.CODE -> AuthSessionMissingException() //TODO: Sign-out
+            AuthSessionMissingException.CODE -> {
+                authScope.launch {
+                    Auth.logger.e { "Received session not found api error. Clearing session..." }
+                    clearSession()
+                }
+                AuthSessionMissingException()
+            }
             else -> null
         }
     }
