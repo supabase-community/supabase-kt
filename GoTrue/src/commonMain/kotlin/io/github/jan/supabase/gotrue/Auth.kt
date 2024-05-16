@@ -4,6 +4,7 @@ import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.exceptions.HttpRequestException
 import io.github.jan.supabase.exceptions.RestException
 import io.github.jan.supabase.gotrue.admin.AdminApi
+import io.github.jan.supabase.gotrue.exception.AuthWeakPasswordException
 import io.github.jan.supabase.gotrue.mfa.MfaApi
 import io.github.jan.supabase.gotrue.providers.AuthProvider
 import io.github.jan.supabase.gotrue.providers.ExternalAuthConfigDefaults
@@ -79,12 +80,14 @@ sealed interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
      *
      * Example:
      * ```kotlin
-     * val result = gotrue.signUpWith(Email) {
+     * val result = auth.signUpWith(Email) {
      *    email = "example@email.com"
      *    password = "password"
      * }
+     * ```
      * or
-     * gotrue.signUpWith(Google) // Opens the browser to login with google
+     * ```kotlin
+     * auth.signUpWith(Google) // Opens the browser to login with google
      * ```
      *
      * @param provider the provider to use for signing up. E.g. [Email], [Phone] or [Google]
@@ -94,6 +97,7 @@ sealed interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
      * @throws RestException or one of its subclasses if receiving an error response
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
+     * @throws AuthWeakPasswordException if using the [Email] or [Phone] provider and the password is too weak. You can get the reasons via [AuthWeakPasswordException.reasons]
      */
     suspend fun <C, R, Provider : AuthProvider<C, R>> signUpWith(
         provider: Provider,
@@ -106,12 +110,14 @@ sealed interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
      *
      * Example:
      * ```kotlin
-     * val result = gotrue.signInWith(Email) {
+     * val result = auth.signInWith(Email) {
      *    email = "example@email.com"
      *    password = "password"
      * }
+     * ```
      * or
-     * gotrue.signInWith(Google) // Opens the browser to login with google
+     * ```kotlin
+     * auth.signInWith(Google) // Opens the browser to login with google
      * ```
      *
      * @param provider the provider to use for signing in. E.g. [Email], [Phone] or [Google]
