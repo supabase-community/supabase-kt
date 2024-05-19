@@ -376,10 +376,10 @@ internal class AuthImpl(
         source: SessionSource
     ) {
         if (!autoRefresh) {
-            _sessionStatus.value = SessionStatus.Authenticated(session, source)
             if (session.refreshToken.isNotBlank() && session.expiresIn != 0L && config.autoSaveToStorage) {
                 sessionManager.saveSession(session)
             }
+            _sessionStatus.value = SessionStatus.Authenticated(session, source)
             return
         }
         if (session.expiresAt <= Clock.System.now()) {
@@ -388,8 +388,8 @@ internal class AuthImpl(
                 { importSession(session) }
             )
         } else {
-            _sessionStatus.value = SessionStatus.Authenticated(session, source)
             if (config.autoSaveToStorage) sessionManager.saveSession(session)
+            _sessionStatus.value = SessionStatus.Authenticated(session, source)
             sessionJob?.cancel()
             sessionJob = authScope.launch {
                 delayBeforeExpiry(session)
