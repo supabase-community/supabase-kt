@@ -6,12 +6,12 @@ For information about supported Kotlin targets, see the corresponding module REA
 
 [Migrating from version 1.4.X to 2.0.0](/MIGRATION.md)
 
-*Note: [WASM](https://github.com/supabase-community/supabase-kt/issues/86) build available: [2.3.0-wasm0](https://github.com/supabase-community/supabase-kt/releases/tag/2.2.2-wasm0)*
+*Note: [WASM](https://github.com/supabase-community/supabase-kt/issues/86) build available: [2.4.2-wasm0](https://github.com/supabase-community/supabase-kt/releases/tag/2.2.2-wasm0)*
 
 [![](https://img.shields.io/github/release/supabase-community/supabase-kt?label=stable)](https://github.com/supabase-community/supabase-kt/releases) 
 [![](https://badgen.net/github/release/supabase-community/supabase-kt?label=prerelease)](https://central.sonatype.com/search?q=io.github.jan.supabase&smo=true) 
-[![Kotlin](https://img.shields.io/badge/kotlin-2.0.0--RC2-blue.svg?logo=kotlin)](http://kotlinlang.org) 
-![https://img.shields.io/badge/ktor-2.3.10-blue](https://img.shields.io/badge/ktor-2.3.10-blue)
+[![Kotlin](https://img.shields.io/badge/kotlin-2.0.0--RC3-blue.svg?logo=kotlin)](http://kotlinlang.org) 
+![https://img.shields.io/badge/ktor-2.3.11-blue](https://img.shields.io/badge/ktor-2.3.10-blue)
 [![slack](https://img.shields.io/badge/slack-%23supabase--kt-purple.svg?logo=slack)](https://kotlinlang.slack.com/archives/C06QXPC7064)
 
 ### Links
