@@ -15,6 +15,7 @@ import io.github.jan.supabase.postgrest.request.UpdateRequest
 import io.github.jan.supabase.postgrest.result.PostgrestResult
 import io.ktor.client.plugins.HttpRequestTimeoutException
 import kotlinx.serialization.json.jsonArray
+import kotlinx.serialization.json.jsonObject
 
 /**
  * The main class to build a postgrest request
@@ -79,16 +80,19 @@ class PostgrestQueryBuilder(
     suspend inline fun <reified T : Any> upsert(
         values: List<T>,
         onConflict: String? = null,
-        defaultToNull: Boolean = false,
+        defaultToNull: Boolean = true,
         ignoreDuplicates: Boolean = false,
         request: PostgrestRequestBuilder.() -> Unit = {}
     ): PostgrestResult {
         val requestBuilder = postgrestRequest(postgrest.config.propertyConversionMethod, request)
+        val body = postgrest.serializer.encodeToJsonElement(values).jsonArray
+        val columns = body.map { it.jsonObject.keys }.flatten().distinct()
+        requestBuilder._params["columns"] = listOf(columns.joinToString(","))
         onConflict?.let {
             requestBuilder._params["on_conflict"] = listOf(it)
         }
         val insertRequest = InsertRequest(
-            body = postgrest.serializer.encodeToJsonElement(values).jsonArray,
+            body = body,
             upsert = true,
             returning = requestBuilder.returning,
             count = requestBuilder.count,
@@ -126,7 +130,7 @@ class PostgrestQueryBuilder(
     suspend inline fun <reified T : Any> upsert(
         value: T,
         onConflict: String? = null,
-        defaultToNull: Boolean = false,
+        defaultToNull: Boolean = true,
         ignoreDuplicates: Boolean = false,
         request: PostgrestRequestBuilder.() -> Unit = {}
     ): PostgrestResult = upsert(listOf(value), onConflict, defaultToNull, ignoreDuplicates, request)

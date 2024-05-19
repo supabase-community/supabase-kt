@@ -1,6 +1,6 @@
 plugins {
-    alias(libs.plugins.kotlin.multiplatform)
-    alias(libs.plugins.android.library)
+    id(libs.plugins.kotlin.multiplatform.get().pluginId)
+    id(libs.plugins.android.library.get().pluginId)
 }
 
 description = "Extends supabase-kt with a Coil integration for easy image loading"
@@ -12,18 +12,11 @@ repositories {
 
 @OptIn(org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi::class)
 kotlin {
-    applyDefaultHierarchyTemplate()
+    defaultConfig()
     androidTarget {
-        jvmToolchain(8)
         publishLibraryVariants("release", "debug")
     }
-
     sourceSets {
-        all {
-            languageSettings.optIn("kotlin.RequiresOptIn")
-            languageSettings.optIn("io.github.jan.supabase.annotations.SupabaseInternal")
-            languageSettings.optIn("io.github.jan.supabase.annotations.SupabaseExperimental")
-        }
         val commonMain by getting {
             dependencies {
                 api(project(":storage-kt"))
@@ -33,15 +26,4 @@ kotlin {
     }
 }
 
-android {
-    namespace = "io.github.jan.supabase.coil"
-    compileSdk = 34
-    sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
-    defaultConfig {
-        minSdk = 21
-    }
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
-    }
-}
+configureAndroidTarget()

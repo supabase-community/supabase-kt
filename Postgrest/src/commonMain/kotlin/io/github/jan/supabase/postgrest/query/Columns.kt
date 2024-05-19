@@ -21,7 +21,7 @@ value class Columns @PublishedApi internal constructor(val value: String) {
          * Select all columns given in the [value] parameter
          * @param value The columns to select, separated by a comma
          */
-        fun raw(value: String) = Columns(value)
+        fun raw(value: String) = Columns(value.clean())
 
         /**
          * Select all columns given in the [columns] parameter
@@ -40,6 +40,21 @@ value class Columns @PublishedApi internal constructor(val value: String) {
          * @param T The type of the columns to select
          */
         inline fun <reified T> type() = list(classPropertyNames<T>())
+
+        private fun String.clean(): String {
+            var quoted = false
+            val regex = Regex("\\s")
+            return this.map {
+                if (it == '"') {
+                    quoted = !quoted
+                }
+                if (regex.matches(it.toString()) && !quoted) {
+                    ""
+                } else {
+                    it
+                }
+            }.joinToString("")
+        }
 
     }
 

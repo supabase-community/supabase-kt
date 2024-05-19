@@ -6,6 +6,10 @@ pluginManagement {
     }
 }
 
+plugins {
+    id("org.gradle.toolchains.foojay-resolver-convention") version("0.8.0")
+}
+
 include("GoTrue")
 include("Postgrest")
 include("Storage")
@@ -15,6 +19,7 @@ include("bom")
 
 include("test")
 include("test-w")
+include("test-common")
 
 include(":serializers:Moshi")
 project(":serializers:Moshi").name = "serializer-moshi"

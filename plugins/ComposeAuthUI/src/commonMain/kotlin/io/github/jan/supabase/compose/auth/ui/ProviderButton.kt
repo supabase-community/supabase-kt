@@ -44,8 +44,8 @@ fun ProviderIcon(provider: OAuthProvider, contentDescription: String?, modifier:
  */
 @SupabaseExperimental
 @Composable
-fun RowScope.ProviderButtonContent(provider: OAuthProvider, text: String = "Login in with ${provider.name.capitalize()}") {
-    ProviderIcon(provider, "Login in with ${provider.name}", Modifier.size(DEFAULT_ICON_SIZE))
+fun RowScope.ProviderButtonContent(provider: OAuthProvider, text: String = "Login with ${provider.name.capitalize()}") {
+    ProviderIcon(provider, "Login with ${provider.name}", Modifier.size(DEFAULT_ICON_SIZE))
     Spacer(Modifier.width(8.dp))
     Text(text)
 }

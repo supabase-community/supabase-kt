@@ -12,11 +12,6 @@ import io.github.jan.supabase.plugins.CustomSerializationConfig
 actual class AuthConfig : CustomSerializationConfig, AuthConfigDefaults() {
 
     /**
-     * Whether to stop auto-refresh on focus loss, and resume it on focus again
-     */
-    var enableLifecycleCallbacks: Boolean = true
-
-    /**
      * The action to use for the OAuth flow. Can be overriden per-request in the [ExternalAuthConfig]
      */
     var defaultExternalAuthAction: ExternalAuthAction = ExternalAuthAction.DEFAULT

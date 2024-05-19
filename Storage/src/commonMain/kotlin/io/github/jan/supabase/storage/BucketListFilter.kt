@@ -48,8 +48,8 @@ class BucketListFilter {
         }
         column?.let {
             putJsonObject("sortBy") {
-                put("column", it)
-                put("order", it)
+                put("column", column)
+                put("order", order)
             }
         }
     }
