@@ -20,10 +20,10 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.VisualTransformation
-import io.github.jan.supabase.annotations.SupabaseExperimental
 import io.github.jan.supabase.compose.auth.ui.AuthIcons
 import io.github.jan.supabase.compose.auth.ui.FormComponent
 import io.github.jan.supabase.compose.auth.ui.FormValidator
+import io.github.jan.supabase.compose.auth.ui.annotations.AuthUiExperimental
 import io.github.jan.supabase.compose.auth.ui.rememberCallIcon
 
 private const val DEFAULT_MASK = "+## ### #########"
@@ -54,7 +54,7 @@ private const val DEFAULT_MASK_CHAR = '#'
  * @param formKey The key to store the validity of the phone field in the AuthState. Defaults to "EMAIL".
  * @param mandatory Whether the form field is mandatory or not. If false, will not affect the [AuthState.validForm] value. You can also make this value dynamic and only make the field mandatory, if e.g. the [value] is not empty. Default is true.
  */
-@SupabaseExperimental
+@AuthUiExperimental
 @Composable
 fun PhoneField(
     value: String,
@@ -143,7 +143,7 @@ fun PhoneField(
  * @param formKey The key to store the validity of the phone field in the AuthState. Defaults to "EMAIL".
  * @param mandatory Whether the form field is mandatory or not. If false, will not affect the [AuthState.validForm] value. You can also make this value dynamic and only make the field mandatory, if e.g. the [value] is not empty. Default is true.
  */
-@SupabaseExperimental
+@AuthUiExperimental
 @Composable
 fun PhoneField(
     value: TextFieldValue,
@@ -232,7 +232,7 @@ fun PhoneField(
  * @param formKey The key to store the validity of the phone field in the AuthState. Defaults to "EMAIL".
  * @param mandatory Whether the form field is mandatory or not. If false, will not affect the [AuthState.validForm] value. You can also make this value dynamic and only make the field mandatory, if e.g. the [value] is not empty. Default is true.
  */
-@SupabaseExperimental
+@AuthUiExperimental
 @Composable
 fun OutlinedPhoneField(
     value: TextFieldValue,
@@ -321,7 +321,7 @@ fun OutlinedPhoneField(
  * @param formKey The key to store the validity of the phone field in the AuthState. Defaults to "EMAIL".
  * @param mandatory Whether the form field is mandatory or not. If false, will not affect the [AuthState.validForm] value. You can also make this value dynamic and only make the field mandatory, if e.g. the [value] is not empty. Default is true.
  */
-@SupabaseExperimental
+@AuthUiExperimental
 @Composable
 fun OutlinedPhoneField(
     value: String,

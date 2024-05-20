@@ -5,7 +5,7 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.input.OffsetMapping
 import androidx.compose.ui.text.input.TransformedText
 import androidx.compose.ui.text.input.VisualTransformation
-import io.github.jan.supabase.annotations.SupabaseExperimental
+import io.github.jan.supabase.compose.auth.ui.annotations.AuthUiExperimental
 
 /**
  * Represents a phone number visual transformation.
@@ -14,7 +14,7 @@ import io.github.jan.supabase.annotations.SupabaseExperimental
  * @param maskNumber The character used in the mask to represent a digit.
  *
  */
-@SupabaseExperimental
+@AuthUiExperimental
 class PhoneVisualTransformation(val mask: String, val maskNumber: Char) : VisualTransformation {
 
     private val maxLength = mask.count { it == maskNumber }

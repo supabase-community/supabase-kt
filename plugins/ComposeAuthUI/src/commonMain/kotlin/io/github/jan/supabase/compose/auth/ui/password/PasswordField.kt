@@ -25,9 +25,9 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.VisualTransformation
-import io.github.jan.supabase.annotations.SupabaseExperimental
 import io.github.jan.supabase.compose.auth.ui.AuthIcons
 import io.github.jan.supabase.compose.auth.ui.FormComponent
+import io.github.jan.supabase.compose.auth.ui.annotations.AuthUiExperimental
 import io.github.jan.supabase.compose.auth.ui.rememberLockIcon
 import io.github.jan.supabase.compose.auth.ui.rememberVisibilityIcon
 import io.github.jan.supabase.compose.auth.ui.rememberVisibilityOffIcon
@@ -55,7 +55,7 @@ import io.github.jan.supabase.compose.auth.ui.rememberVisibilityOffIcon
  * @param formKey The key to store the validity of the password field in the AuthState. Defaults to "EMAIL".
  * @param mandatory Whether the form field is mandatory or not. If false, will not affect the [AuthState.validForm] value. You can also make this value dynamic and only make the field mandatory, if e.g. the [value] is not empty. Default is true.
  */
-@SupabaseExperimental
+@AuthUiExperimental
 @ExperimentalMaterial3Api
 @Composable
 fun PasswordField(
@@ -141,7 +141,7 @@ fun PasswordField(
  * @param formKey The key to store the validity of the password field in the AuthState. Defaults to "EMAIL".
  * @param mandatory Whether the form field is mandatory or not. If false, will not affect the [AuthState.validForm] value. You can also make this value dynamic and only make the field mandatory, if e.g. the [value] is not empty. Default is true.
  */
-@SupabaseExperimental
+@AuthUiExperimental
 @ExperimentalMaterial3Api
 @Composable
 fun PasswordField(
@@ -228,7 +228,7 @@ fun PasswordField(
  * @param formKey The key to store the validity of the password field in the AuthState. Defaults to "EMAIL".
  * @param mandatory Whether the form field is mandatory or not. If false, will not affect the [AuthState.validForm] value. You can also make this value dynamic and only make the field mandatory, if e.g. the [value] is not empty. Default is true.
  */
-@SupabaseExperimental
+@AuthUiExperimental
 @ExperimentalMaterial3Api
 @Composable
 fun OutlinedPasswordField(
@@ -314,7 +314,7 @@ fun OutlinedPasswordField(
  * @param formKey The key to store the validity of the password field in the AuthState. Defaults to "EMAIL".
  * @param mandatory Whether the form field is mandatory or not. If false, will not affect the [AuthState.validForm] value. You can also make this value dynamic and only make the field mandatory, if e.g. the [value] is not empty. Default is true.
  */
-@SupabaseExperimental
+@AuthUiExperimental
 @ExperimentalMaterial3Api
 @Composable
 fun OutlinedPasswordField(

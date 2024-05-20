@@ -20,10 +20,10 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
-import io.github.jan.supabase.annotations.SupabaseExperimental
 import io.github.jan.supabase.compose.auth.ui.AuthIcons
 import io.github.jan.supabase.compose.auth.ui.FormComponent
 import io.github.jan.supabase.compose.auth.ui.FormValidator
+import io.github.jan.supabase.compose.auth.ui.annotations.AuthUiExperimental
 import io.github.jan.supabase.compose.auth.ui.rememberMailIcon
 
 /**
@@ -50,7 +50,7 @@ import io.github.jan.supabase.compose.auth.ui.rememberMailIcon
  * @param mandatory Whether the form field is mandatory or not. If false, will not affect the [AuthState.validForm] value. You can also make this value dynamic and only make the field mandatory, if e.g. the [value] is not empty. Default is true.
  */
 @ExperimentalMaterial3Api
-@SupabaseExperimental
+@AuthUiExperimental
 @Composable
 fun EmailField(
     value: String,
@@ -130,7 +130,7 @@ fun EmailField(
  * @param formKey The key to store the validity of the email field in the AuthState. Defaults to "EMAIL".
  * @param mandatory Whether the form field is mandatory or not. If false, will not affect the [AuthState.validForm] value. You can also make this value dynamic and only make the field mandatory, if e.g. the [value] is not empty. Default is true.
  */
-@SupabaseExperimental
+@AuthUiExperimental
 @ExperimentalMaterial3Api
 @Composable
 fun EmailField(
@@ -211,7 +211,7 @@ fun EmailField(
  * @param formKey The key to store the validity of the email field in the AuthState. Defaults to "EMAIL".
  * @param mandatory Whether the form field is mandatory or not. If false, will not affect the [AuthState.validForm] value. You can also make this value dynamic and only make the field mandatory, if e.g. the [value] is not empty. Default is true.
  */
-@SupabaseExperimental
+@AuthUiExperimental
 @ExperimentalMaterial3Api
 @Composable
 fun OutlinedEmailField(
@@ -292,7 +292,7 @@ fun OutlinedEmailField(
  * @param formKey The key to store the validity of the email field in the AuthState. Defaults to "EMAIL".
  * @param mandatory Whether the form field is mandatory or not. If false, will not affect the [AuthState.validForm] value. You can also make this value dynamic and only make the field mandatory, if e.g. the [value] is not empty. Default is true.
  */
-@SupabaseExperimental
+@AuthUiExperimental
 @ExperimentalMaterial3Api
 @Composable
 fun OutlinedEmailField(
