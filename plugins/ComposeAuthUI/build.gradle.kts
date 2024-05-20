@@ -31,7 +31,7 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 api(compose.ui)
-                implementation(project(":gotrue-kt"))
+                api(project(":gotrue-kt"))
                 implementation(compose.material3)
             }
         }
