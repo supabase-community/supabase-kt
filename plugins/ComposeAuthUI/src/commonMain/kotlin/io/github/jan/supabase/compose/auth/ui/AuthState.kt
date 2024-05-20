@@ -6,13 +6,13 @@ import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.saveable.mapSaver
 import androidx.compose.runtime.saveable.rememberSaveable
-import io.github.jan.supabase.annotations.SupabaseExperimental
 import io.github.jan.supabase.annotations.SupabaseInternal
+import io.github.jan.supabase.compose.auth.ui.annotations.AuthUiExperimental
 
 /**
  * Represents the state of auth forms.
  */
-@SupabaseExperimental
+@AuthUiExperimental
 class AuthState(
     states: Map<String, Boolean> = emptyMap()
 ) {
@@ -65,6 +65,7 @@ class AuthState(
 /**
  * Local composition for [AuthState]. Use [AuthForm] for automatic saving and restoring.
  */
+@AuthUiExperimental
 val LocalAuthState = compositionLocalOf {
     AuthState() //possibly to throw an error here
 }
@@ -74,6 +75,7 @@ val LocalAuthState = compositionLocalOf {
  * @param state The [AuthState] to provide.
  * @param content The content to provide the [AuthState] to.
  */
+@AuthUiExperimental
 @Composable
 fun AuthForm(
     state: AuthState = rememberSaveable(saver = AuthState.SAVER) { AuthState() },
