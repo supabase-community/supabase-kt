@@ -5,10 +5,16 @@ import io.ktor.client.statement.request
 
 /**
  * Base class for all response-related exceptions
- * @param error The error returned by supabase
- * @param description The error description returned by supabase
+ *
+ * Plugins may extend this class to provide more specific exceptions
+ * @param error The error returned by Supabase
+ * @param description The error description returned by Supabase
+ * @see UnauthorizedRestException
+ * @see BadRequestRestException
+ * @see NotFoundRestException
+ * @see UnknownRestException
  */
-sealed class RestException(val error: String, val description: String?, message: String): Exception(message) {
+open class RestException(val error: String, val description: String?, message: String): Exception(message) {
 
     constructor(error: String, response: HttpResponse, message: String? = null): this(error, message, """
         $error${message?.let { " ($it)" } ?: ""}

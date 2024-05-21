@@ -10,6 +10,8 @@ import io.github.jan.supabase.exceptions.UnauthorizedRestException
 import io.github.jan.supabase.exceptions.UnknownRestException
 import io.github.jan.supabase.gotrue.admin.AdminApi
 import io.github.jan.supabase.gotrue.admin.AdminApiImpl
+import io.github.jan.supabase.gotrue.exception.AuthSessionMissingException
+import io.github.jan.supabase.gotrue.exception.AuthWeakPasswordException
 import io.github.jan.supabase.gotrue.mfa.MfaApi
 import io.github.jan.supabase.gotrue.mfa.MfaApiImpl
 import io.github.jan.supabase.gotrue.providers.AuthProvider
@@ -460,6 +462,7 @@ internal class AuthImpl(
     override suspend fun parseErrorResponse(response: HttpResponse): RestException {
         val errorBody =
             response.bodyOrNull<GoTrueErrorResponse>() ?: GoTrueErrorResponse("Unknown error", "")
+        checkErrorCodes(errorBody)?.let { return it }
         return when (response.status) {
             HttpStatusCode.Unauthorized -> UnauthorizedRestException(
                 errorBody.error,
@@ -471,13 +474,26 @@ internal class AuthImpl(
                 response,
                 errorBody.description
             )
-
             HttpStatusCode.UnprocessableEntity -> BadRequestRestException(
                 errorBody.error,
                 response,
                 errorBody.description
             )
             else -> UnknownRestException(errorBody.error, response)
+        }
+    }
+
+    private fun checkErrorCodes(error: GoTrueErrorResponse): RestException? {
+        return when (error.error) {
+            AuthWeakPasswordException.CODE -> AuthWeakPasswordException(error.error, error.weakPassword?.reasons ?: emptyList())
+            AuthSessionMissingException.CODE -> {
+                authScope.launch {
+                    Auth.logger.e { "Received session not found api error. Clearing session..." }
+                    clearSession()
+                }
+                AuthSessionMissingException()
+            }
+            else -> null
         }
     }
 
