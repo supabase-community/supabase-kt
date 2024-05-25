@@ -30,7 +30,7 @@ For information about supported Kotlin targets, see the corresponding module REA
 
 # Installation
 
-### Add one ore more modules to your project
+### Add one or more modules to your project
 
 **Available modules**: `gotrue-kt`, `postgrest-kt`, `functions-kt`, `storage-kt`, `realtime-kt`, `apollo-graphql`, `compose-auth`, `compose-auth-ui`, `coil-integration`, `imageloader-integration`
 
