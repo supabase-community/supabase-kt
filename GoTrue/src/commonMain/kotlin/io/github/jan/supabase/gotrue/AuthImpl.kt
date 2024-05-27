@@ -50,6 +50,7 @@ import kotlinx.serialization.json.encodeToJsonElement
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.put
 import kotlin.math.floor
+import kotlin.time.Duration.Companion.seconds
 
 @PublishedApi
 internal class AuthImpl(
@@ -421,12 +422,15 @@ internal class AuthImpl(
     }
 
     private suspend fun delayBeforeExpiry(session: UserSession) {
-        val expiresIn = session.expiresAt - Clock.System.now()
+        val timeAtBeginningOfSession = session.expiresAt - session.expiresIn.seconds
 
-        @Suppress("MagicNumber")
-        val beforeExpiryTime =
-            floor(expiresIn.inWholeMilliseconds * 4.0f / 5.0f).toLong() //always refresh 20% before expiry
-        delay(beforeExpiryTime)
+        // 80% of the way to session.expiresAt
+        val targetRefreshTime = timeAtBeginningOfSession + (session.expiresIn.seconds * 0.8)
+
+        val delayDuration = targetRefreshTime - Clock.System.now()
+
+        // if the delayDuration is negative, delay() will not delay
+        delay(delayDuration)
     }
 
     private suspend fun handleExpiredSession(session: UserSession, autoRefresh: Boolean = true) {
