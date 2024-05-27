@@ -1,7 +1,7 @@
 package io.github.jan.supabase.gotrue.exception
 
 /**
- * Exception thrown when a session is not found.
+ * Exception thrown on sign-up if the password is too weak
  * @param description The description of the exception.
  * @param reasons The reasons why the password is weak.
  */
