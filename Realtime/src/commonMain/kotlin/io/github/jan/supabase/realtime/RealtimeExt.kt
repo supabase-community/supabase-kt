@@ -30,11 +30,12 @@ data class PrimaryKey<Data>(val columnName: String, val producer: (Data) -> Stri
 inline fun <reified Data> RealtimeChannel.presenceDataFlow(): Flow<List<Data>> {
     val cache = AtomicMutableMap<String, Data>()
     return presenceChangeFlow().map {
-        it.joins.forEach { (key, presence) ->
-            cache[key] = presence.stateAs<Data>(supabaseClient.realtime.serializer)
-        }
+        // order matters here, leaves events must happen first for updates to work properly
         it.leaves.forEach { (key, _) ->
             cache.remove(key)
+        }
+        it.joins.forEach { (key, presence) ->
+            cache[key] = presence.stateAs<Data>(supabaseClient.realtime.serializer)
         }
         cache.values.toList()
     }
