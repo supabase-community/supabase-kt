@@ -49,8 +49,9 @@ import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.encodeToJsonElement
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.put
-import kotlin.math.floor
 import kotlin.time.Duration.Companion.seconds
+
+private const val SESSION_REFRESH_THRESHOLD = 0.8
 
 @PublishedApi
 internal class AuthImpl(
@@ -425,7 +426,7 @@ internal class AuthImpl(
         val timeAtBeginningOfSession = session.expiresAt - session.expiresIn.seconds
 
         // 80% of the way to session.expiresAt
-        val targetRefreshTime = timeAtBeginningOfSession + (session.expiresIn.seconds * 0.8)
+        val targetRefreshTime = timeAtBeginningOfSession + (session.expiresIn.seconds * SESSION_REFRESH_THRESHOLD)
 
         val delayDuration = targetRefreshTime - Clock.System.now()
 
