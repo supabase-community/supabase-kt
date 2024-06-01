@@ -140,22 +140,30 @@ class PostgrestQueryBuilder(
      *
      * @param values The values to insert, will automatically get serialized into json.
      * @param request Additional filtering to apply to the query
+     * @param defaultToNull Make missing fields default to `null`.
+     * Otherwise, use the default value for the column. This only applies when
+     * inserting new rows, not when merging with existing rows under
      * @throws RestException or one of its subclasses if receiving an error response
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
     suspend inline fun <reified T : Any> insert(
         values: List<T>,
+        defaultToNull: Boolean = true,
         request: PostgrestRequestBuilder.() -> Unit = {}
     ): PostgrestResult {
         val requestBuilder = postgrestRequest(postgrest.config.propertyConversionMethod, request)
+        val body = postgrest.serializer.encodeToJsonElement(values).jsonArray
+        val columns = body.map { it.jsonObject.keys }.flatten().distinct()
+        requestBuilder._params["columns"] = listOf(columns.joinToString(","))
         val insertRequest = InsertRequest(
-            body = postgrest.serializer.encodeToJsonElement(values).jsonArray,
+            body = body,
             returning = requestBuilder.returning,
             count = requestBuilder.count,
             urlParams = requestBuilder.params.mapToFirstValue(),
             schema = schema,
-            headers = requestBuilder.headers.build()
+            headers = requestBuilder.headers.build(),
+            defaultToNull = defaultToNull
         )
         return RestRequestExecutor.execute(postgrest = postgrest, path = table, request = insertRequest)
     }
@@ -165,14 +173,18 @@ class PostgrestQueryBuilder(
      *
      * @param value The value to insert, will automatically get serialized into json.
      * @param request Additional filtering to apply to the query
+     * @param defaultToNull Make missing fields default to `null`.
+     * Otherwise, use the default value for the column. This only applies when
+     * inserting new rows, not when merging with existing rows under
      * @throws RestException or one of its subclasses if receiving an error response
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
     suspend inline fun <reified T : Any> insert(
         value: T,
+        defaultToNull: Boolean = true,
         request: PostgrestRequestBuilder.() -> Unit = {}
-    ) = insert(listOf(value), request)
+    ) = insert(listOf(value), defaultToNull, request)
 
     /**
      * Executes an update operation on the [table].
