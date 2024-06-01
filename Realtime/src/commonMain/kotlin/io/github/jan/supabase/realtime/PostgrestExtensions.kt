@@ -22,6 +22,20 @@ inline fun <reified Data : Any> PostgrestQueryBuilder.selectSingleValueAsFlow(
     primaryKey: PrimaryKey<Data>,
     channelName: String? = null,
     crossinline filter: PostgrestFilterBuilder.() -> Unit
+): Flow<Data> = selectSingleValueAsFlow(listOf(primaryKey), channelName, filter)
+
+/**
+ * Executes vertical filtering with select on [PostgrestQueryBuilder.table] and [PostgrestQueryBuilder.schema] and returns a [Flow] of a single value matching the [filter].
+ * This function listens for changes in the table and emits the new value whenever a change occurs.
+ * @param primaryKeys the list of primary key of the [Data] type
+ * @param filter the filter to apply to the select query
+ * @param channelName the name of the channel to use for the realtime updates. If null, a channel name following the format "schema:table:id" will be used
+ */
+@SupabaseExperimental
+inline fun <reified Data : Any> PostgrestQueryBuilder.selectSingleValueAsFlow(
+    primaryKeys: List<PrimaryKey<Data>>,
+    channelName: String? = null,
+    crossinline filter: PostgrestFilterBuilder.() -> Unit
 ): Flow<Data> {
     val realtime = postgrest.supabaseClient.realtime as RealtimeImpl
     val channel = realtime.channel(channelName ?: defaultChannelName(schema, table, realtime))
@@ -29,7 +43,7 @@ inline fun <reified Data : Any> PostgrestQueryBuilder.selectSingleValueAsFlow(
         val dataFlow = channel.postgresSingleDataFlow(
             schema = this@selectSingleValueAsFlow.schema,
             table = this@selectSingleValueAsFlow.table,
-            primaryKey = primaryKey,
+            primaryKeys = primaryKeys,
             filter = filter
         )
         channel.subscribe()
@@ -65,6 +79,19 @@ inline fun <reified Data : Any> PostgrestQueryBuilder.selectAsFlow(
     primaryKey: PrimaryKey<Data>,
     channelName: String? = null,
     filter: FilterOperation? = null,
+): Flow<List<Data>> = selectAsFlow(listOf(primaryKey), channelName, filter)
+/**
+ * Executes vertical filtering with select on [PostgrestQueryBuilder.table] and [PostgrestQueryBuilder.schema] and returns a [Flow] of a list of values matching the [filter].
+ * This function listens for changes in the table and emits the new list whenever a change occurs.
+ * @param primaryKeys the list of primary key of the [Data] type
+ * @param filter the filter to apply to the select query
+ * @param channelName the name of the channel to use for the realtime updates. If null, a channel name following the format "schema:table:id" will be used
+ */
+@SupabaseExperimental
+inline fun <reified Data : Any> PostgrestQueryBuilder.selectAsFlow(
+    primaryKeys: List<PrimaryKey<Data>>,
+    channelName: String? = null,
+    filter: FilterOperation? = null,
 ): Flow<List<Data>> {
     val realtime = postgrest.supabaseClient.realtime as RealtimeImpl
     val channel = realtime.channel(channelName ?: defaultChannelName(schema, table, realtime))
@@ -72,7 +99,7 @@ inline fun <reified Data : Any> PostgrestQueryBuilder.selectAsFlow(
         val dataFlow = channel.postgresListDataFlow(
             schema = this@selectAsFlow.schema,
             table = this@selectAsFlow.table,
-            primaryKey = primaryKey,
+            primaryKeys = primaryKeys,
             filter = filter
         )
         channel.subscribe()

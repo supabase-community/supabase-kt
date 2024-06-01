@@ -21,6 +21,12 @@ import kotlin.reflect.KProperty1
  */
 data class PrimaryKey<Data>(val columnName: String, val producer: (Data) -> String)
 
+fun <Data> List<PrimaryKey<Data>>.producer(data: Data): String =
+    fold("") { value, pk -> value + pk.producer(data) }
+
+val <Data> List<PrimaryKey<Data>>.columnName: String
+    get() = fold("") { value, pk -> value + pk.columnName }
+
 /**
  * Listens for presence changes and caches the presences based on their keys. This function automatically handles joins and leaves.
  *
@@ -56,6 +62,23 @@ inline fun <reified Data : Any> RealtimeChannel.postgresListDataFlow(
     table: String,
     filter: FilterOperation? = null,
     primaryKey: PrimaryKey<Data>
+): Flow<List<Data>> = postgresListDataFlow(schema, table, filter, listOf(primaryKey))
+
+/**
+ * This function retrieves the initial data from the table and then listens for changes. It automatically handles inserts, updates and deletes.
+ *
+ * If you want more control, use the [postgresChangeFlow] function.
+ * @param schema the schema of the table
+ * @param table the table name
+ * @param filter an optional filter to filter the data
+ * @param primaryKey the primary key of the [Data] type
+ * @return a [Flow] of the current data in a list. This list is updated and emitted whenever a change occurs.
+ */
+inline fun <reified Data : Any> RealtimeChannel.postgresListDataFlow(
+    schema: String = "public",
+    table: String,
+    filter: FilterOperation? = null,
+    primaryKeys: List<PrimaryKey<Data>>
 ): Flow<List<Data>> {
     val cache = AtomicMutableMap<String, Data>()
     val changeFlow = postgresChangeFlow<PostgresAction>(schema) {
@@ -75,7 +98,7 @@ inline fun <reified Data : Any> RealtimeChannel.postgresListDataFlow(
             }
             val data = result.decodeList<Data>()
             data.forEach {
-                val key = primaryKey.producer(it)
+                val key = primaryKeys.producer(it)
                 cache[key] = it
             }
             data
@@ -87,17 +110,17 @@ inline fun <reified Data : Any> RealtimeChannel.postgresListDataFlow(
             when (it) {
                 is PostgresAction.Insert -> {
                     val data = it.decodeRecord<Data>()
-                    val key = primaryKey.producer(data)
+                    val key = primaryKeys.producer(data)
                     cache[key] = data
                 }
                 is PostgresAction.Update -> {
                     val data = it.decodeRecord<Data>()
-                    val key = primaryKey.producer(data)
+                    val key = primaryKeys.producer(data)
                     cache[key] = data
                 }
                 is PostgresAction.Delete -> {
                     cache.remove(
-                        it.oldRecord[primaryKey.columnName]?.jsonPrimitive?.content
+                        it.oldRecord[primaryKeys.columnName]?.jsonPrimitive?.content
                             ?: error("No primary key found")
                     )
                 }
@@ -149,6 +172,23 @@ suspend inline fun <reified Data : Any> RealtimeChannel.postgresSingleDataFlow(
     table: String,
     primaryKey: PrimaryKey<Data>,
     crossinline filter: PostgrestFilterBuilder.() -> Unit
+): Flow<Data> = postgresSingleDataFlow(schema, table, listOf(primaryKey), filter)
+
+/**
+ * This function retrieves the initial data for a single value and then listens for changes on that value. It automatically handles updates and closes the flow on the delete event.
+ *
+ * If you want more control, use the [postgresChangeFlow] function.
+ * @param schema the schema of the table
+ * @param table the table name
+ * @param filter filter the the value you want to listen to
+ * @param primaryKeys the list of primary key of the [Data] type
+ * @return a [Flow] of the current data. This flow emits a new value whenever a change occurs.
+ */
+suspend inline fun <reified Data : Any> RealtimeChannel.postgresSingleDataFlow(
+    schema: String = "public",
+    table: String,
+    primaryKeys: List<PrimaryKey<Data>>,
+    crossinline filter: PostgrestFilterBuilder.() -> Unit
 ): Flow<Data> {
     val (key, initialData) = try {
         val result = supabaseClient.postgrest.from(schema, table).select {
@@ -157,13 +197,13 @@ suspend inline fun <reified Data : Any> RealtimeChannel.postgresSingleDataFlow(
             filter(filter)
         }
         val data = result.decodeAs<Data>()
-        primaryKey.producer(data) to data
+        primaryKeys.producer(data) to data
     } catch (e: UnknownRestException) {
         error("Data matching filter and table name $table not found")
     }
     val changeFlow = postgresChangeFlow<PostgresAction>(schema) {
         this.table = table
-        filter(primaryKey.columnName, FilterOperator.EQ, key)
+        filter(primaryKeys.columnName, FilterOperator.EQ, key)
     }
     return channelFlow {
         trySend(initialData)
