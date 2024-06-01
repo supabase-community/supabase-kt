@@ -1,4 +1,5 @@
 @file:Suppress("MatchingDeclarationName")
+
 package io.github.jan.supabase.realtime
 
 import io.github.jan.supabase.collections.AtomicMutableMap
@@ -21,10 +22,10 @@ import kotlin.reflect.KProperty1
  */
 data class PrimaryKey<Data>(val columnName: String, val producer: (Data) -> String)
 
-fun <Data> List<PrimaryKey<Data>>.producer(data: Data): String =
+private fun <Data> List<PrimaryKey<Data>>.producer(data: Data): String =
     fold("") { value, pk -> value + pk.producer(data) }
 
-val <Data> List<PrimaryKey<Data>>.columnName: String
+private val <Data> List<PrimaryKey<Data>>.columnName: String
     get() = fold("") { value, pk -> value + pk.columnName }
 
 /**
@@ -113,17 +114,20 @@ inline fun <reified Data : Any> RealtimeChannel.postgresListDataFlow(
                     val key = primaryKeys.producer(data)
                     cache[key] = data
                 }
+
                 is PostgresAction.Update -> {
                     val data = it.decodeRecord<Data>()
                     val key = primaryKeys.producer(data)
                     cache[key] = data
                 }
+
                 is PostgresAction.Delete -> {
                     cache.remove(
                         it.oldRecord[primaryKeys.columnName]?.jsonPrimitive?.content
                             ?: error("No primary key found")
                     )
                 }
+
                 else -> {}
             }
             trySend(cache.values.toList())
@@ -152,7 +156,7 @@ inline fun <reified Data : Any, Value> RealtimeChannel.postgresListDataFlow(
     schema = schema,
     primaryKey = PrimaryKey(
         primaryKey.name
-    ){
+    ) {
         primaryKey.get(it).toString()
     }
 )
@@ -213,13 +217,16 @@ suspend inline fun <reified Data : Any> RealtimeChannel.postgresSingleDataFlow(
                     val data = it.decodeRecord<Data>()
                     trySend(data)
                 }
+
                 is PostgresAction.Update -> {
                     val data = it.decodeRecord<Data>()
                     trySend(data)
                 }
+
                 is PostgresAction.Delete -> {
                     close()
                 }
+
                 else -> {}
             }
         }
