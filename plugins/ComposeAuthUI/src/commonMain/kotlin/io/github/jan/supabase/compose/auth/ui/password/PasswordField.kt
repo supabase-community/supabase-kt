@@ -45,6 +45,7 @@ import io.github.jan.supabase.compose.auth.ui.rememberVisibilityOffIcon
  * @param leadingIcon The leading icon for the password field. Defaults to an email icon.
  * @param singleLine Whether the password field should be a single line or multiline. Defaults to true.
  * @param enabled Whether the password field should be enabled for user interaction. Defaults to true.
+ * @param isError Whether the password field should display an error state. Defaults to null.
  * @param interactionSource The interaction source for the password field. Defaults to MutableInteractionSource.
  * @param textStyle The text style for the password field. Defaults to LocalTextStyle.current.
  * @param shape The shape of the password field. Defaults to TextFieldDefaults.shape.
@@ -69,6 +70,7 @@ fun PasswordField(
     readOnly: Boolean = false,
     enabled: Boolean = true,
     singleLine: Boolean = true,
+    isError: Boolean? = null,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     textStyle: TextStyle = LocalTextStyle.current,
     shape: Shape = TextFieldDefaults.shape,
@@ -102,7 +104,7 @@ fun PasswordField(
             keyboardOptions = keyboardOptions,
             keyboardActions = keyboardActions,
             singleLine = singleLine,
-            isError = ruleResults.firstUnfulfilled() != null && value.isNotEmpty(),
+            isError = isError ?: (ruleResults.firstUnfulfilled() != null && value.isNotEmpty()),
             modifier = modifier,
             leadingIcon = leadingIcon,
             trailingIcon = { trailingIcon?.invoke(showPassword) },
@@ -131,6 +133,7 @@ fun PasswordField(
  * @param leadingIcon The leading icon for the password field. Defaults to an email icon.
  * @param singleLine Whether the password field should be a single line or multiline. Defaults to true.
  * @param enabled Whether the password field should be enabled for user interaction. Defaults to true.
+ * @param isError Whether the password field should display an error state. Defaults to null.
  * @param interactionSource The interaction source for the password field. Defaults to MutableInteractionSource.
  * @param textStyle The text style for the password field. Defaults to LocalTextStyle.current.
  * @param shape The shape of the password field. Defaults to TextFieldDefaults.shape.
@@ -155,6 +158,7 @@ fun PasswordField(
     readOnly: Boolean = false,
     enabled: Boolean = true,
     singleLine: Boolean = true,
+    isError: Boolean? = null,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     textStyle: TextStyle = LocalTextStyle.current,
     shape: Shape = TextFieldDefaults.shape,
@@ -189,7 +193,7 @@ fun PasswordField(
             keyboardOptions = keyboardOptions,
             keyboardActions = keyboardActions,
             singleLine = singleLine,
-            isError = ruleResults.firstUnfulfilled() != null && value.text.isNotEmpty(),
+            isError = isError ?: (ruleResults.firstUnfulfilled() != null && value.text.isNotEmpty()),
             modifier = modifier,
             leadingIcon = leadingIcon,
             trailingIcon = { trailingIcon?.invoke(showPassword) },
@@ -218,6 +222,7 @@ fun PasswordField(
  * @param leadingIcon The leading icon for the password field. Defaults to an email icon.
  * @param singleLine Whether the password field should be a single line or multiline. Defaults to true.
  * @param enabled Whether the password field should be enabled for user interaction. Defaults to true.
+ * @param isError Whether the password field should display an error state. Defaults to null.
  * @param interactionSource The interaction source for the password field. Defaults to MutableInteractionSource.
  * @param textStyle The text style for the password field. Defaults to LocalTextStyle.current.
  * @param shape The shape of the password field. Defaults to TextFieldDefaults.shape.
@@ -242,6 +247,7 @@ fun OutlinedPasswordField(
     readOnly: Boolean = false,
     enabled: Boolean = true,
     singleLine: Boolean = true,
+    isError: Boolean? = null,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     textStyle: TextStyle = LocalTextStyle.current,
     shape: Shape = OutlinedTextFieldDefaults.shape,
@@ -275,7 +281,7 @@ fun OutlinedPasswordField(
             keyboardOptions = keyboardOptions,
             keyboardActions = keyboardActions,
             singleLine = singleLine,
-            isError = ruleResults.firstUnfulfilled() != null && value.isNotEmpty(),
+            isError = isError ?: (ruleResults.firstUnfulfilled() != null && value.isNotEmpty()),
             modifier = modifier,
             leadingIcon = leadingIcon,
             trailingIcon = { trailingIcon?.invoke(showPassword) },
@@ -304,6 +310,7 @@ fun OutlinedPasswordField(
  * @param leadingIcon The leading icon for the password field. Defaults to an email icon.
  * @param singleLine Whether the password field should be a single line or multiline. Defaults to true.
  * @param enabled Whether the password field should be enabled for user interaction. Defaults to true.
+ * @param isError Whether the password field should display an error state. Defaults to null.
  * @param interactionSource The interaction source for the password field. Defaults to MutableInteractionSource.
  * @param textStyle The text style for the password field. Defaults to LocalTextStyle.current.
  * @param shape The shape of the password field. Defaults to TextFieldDefaults.shape.
@@ -327,6 +334,7 @@ fun OutlinedPasswordField(
     keyboardOptions: KeyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
     readOnly: Boolean = false,
     enabled: Boolean = true,
+    isError: Boolean? = null,
     singleLine: Boolean = true,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     textStyle: TextStyle = LocalTextStyle.current,
@@ -361,7 +369,7 @@ fun OutlinedPasswordField(
             keyboardOptions = keyboardOptions,
             keyboardActions = keyboardActions,
             singleLine = singleLine,
-            isError = ruleResults.firstUnfulfilled() != null && value.text.isNotEmpty(),
+            isError = isError ?: (ruleResults.firstUnfulfilled() != null && value.text.isNotEmpty()),
             modifier = modifier,
             leadingIcon = leadingIcon,
             trailingIcon = { trailingIcon?.invoke(showPassword) },
