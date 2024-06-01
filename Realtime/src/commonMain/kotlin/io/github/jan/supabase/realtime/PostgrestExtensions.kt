@@ -113,7 +113,25 @@ inline fun <reified Data : Any, Value> PostgrestQueryBuilder.selectAsFlow(
     channelName: String? = null,
     filter: FilterOperation? = null,
 ): Flow<List<Data>> =
-    selectAsFlow(PrimaryKey(primaryKey.name) { primaryKey.get(it).toString() }, channelName, filter)
+    selectAsFlow(listOf(primaryKey), channelName, filter)
+
+/**
+ * Executes vertical filtering with select on [PostgrestQueryBuilder.table] and [PostgrestQueryBuilder.schema] and returns a [Flow] of a list of values matching the [filter].
+ * This function listens for changes in the table and emits the new list whenever a change occurs.
+ * @param primaryKeys the list of primary key of the [Data] type
+ * @param filter the filter to apply to the select query
+ * @param channelName the name of the channel to use for the realtime updates. If null, a channel name following the format "schema:table:id" will be used
+ */
+@SupabaseExperimental
+inline fun <reified Data : Any, Value> PostgrestQueryBuilder.selectAsFlow(
+    primaryKeys: List<KProperty1<Data, Value>>,
+    channelName: String? = null,
+    filter: FilterOperation? = null,
+): Flow<List<Data>> =
+    selectAsFlow(primaryKeys.map { primaryKey ->
+        PrimaryKey(primaryKey.name) { primaryKey.get(it).toString() }
+    }, channelName, filter)
+
 
 @PublishedApi
 internal fun defaultChannelName(schema: String, table: String, realtimeImpl: RealtimeImpl) =

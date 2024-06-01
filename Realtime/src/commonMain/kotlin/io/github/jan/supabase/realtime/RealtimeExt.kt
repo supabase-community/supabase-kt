@@ -153,14 +153,29 @@ inline fun <reified Data : Any, Value> RealtimeChannel.postgresListDataFlow(
     table: String,
     filter: FilterOperation? = null,
     primaryKey: KProperty1<Data, Value>,
+): Flow<List<Data>> = postgresListDataFlow(schema, table, filter, listOf(primaryKey))
+
+/**
+ * This function retrieves the initial data from the table and then listens for changes. It automatically handles inserts, updates and deletes.
+ *
+ * If you want more control, use the [postgresChangeFlow] function.
+ * @param schema the schema of the table
+ * @param table the table name
+ * @param filter an optional filter to filter the data
+ * @param primaryKeys the list of primary keys of the [Data] type
+ * @return a [Flow] of the current data in a list. This list is updated and emitted whenever a change occurs.
+ */
+inline fun <reified Data : Any, Value> RealtimeChannel.postgresListDataFlow(
+    schema: String = "public",
+    table: String,
+    filter: FilterOperation? = null,
+    primaryKeys: List<KProperty1<Data, Value>>,
 ): Flow<List<Data>> = postgresListDataFlow<Data>(
     filter = filter,
     table = table,
     schema = schema,
-    primaryKey = PrimaryKey(
-        primaryKey.name
-    ) {
-        primaryKey.get(it).toString()
+    primaryKeys = primaryKeys.map { primaryKey ->
+        PrimaryKey(primaryKey.name) { primaryKey.get(it).toString() }
     }
 )
 
