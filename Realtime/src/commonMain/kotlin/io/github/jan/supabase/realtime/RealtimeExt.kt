@@ -22,10 +22,12 @@ import kotlin.reflect.KProperty1
  */
 data class PrimaryKey<Data>(val columnName: String, val producer: (Data) -> String)
 
-private fun <Data> List<PrimaryKey<Data>>.producer(data: Data): String =
+@PublishedApi
+internal fun <Data> List<PrimaryKey<Data>>.producer(data: Data): String =
     fold("") { value, pk -> value + pk.producer(data) }
 
-private val <Data> List<PrimaryKey<Data>>.columnName: String
+@PublishedApi
+internal val <Data> List<PrimaryKey<Data>>.columnName: String
     get() = fold("") { value, pk -> value + pk.columnName }
 
 /**
