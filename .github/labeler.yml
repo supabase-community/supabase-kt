@@ -26,6 +26,10 @@ plugins:
   - changed-files:
       - any-glob-to-any-file: plugins/**
 
+samples:
+  - changed-files:
+      - any-glob-to-any-file: samples/**
+
 serializers:
   - changed-files:
       - any-glob-to-any-file: serializers/**
