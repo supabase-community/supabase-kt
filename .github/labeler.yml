@@ -1,0 +1,44 @@
+core:
+  - changed-files:
+      - any-glob-to-any-file: src/**
+
+realtime:
+  - changed-files:
+      - any-glob-to-any-file: Realtime/**
+
+functions:
+  - changed-files:
+      - any-glob-to-any-file: Functions/**
+
+postgrest:
+  - changed-files:
+      - any-glob-to-any-file: Postgrest/**
+
+auth:
+  - changed-files:
+      - any-glob-to-any-file: GoTrue/**
+
+storage:
+  - changed-files:
+      - any-glob-to-any-file: Storage/**
+
+plugins:
+  - changed-files:
+      - any-glob-to-any-file: plugins/**
+
+serializers:
+  - changed-files:
+      - any-glob-to-any-file: serializers/**
+
+documentation:
+  - changed-files:
+      - any-glob-to-any-file: '**/*.md'
+
+build file:
+  - changed-files:
+      - any-glob-to-any-file:
+          - '**/*.gradle.kts'
+          - 'gradle.properties'
+          - 'gradlew'
+          - 'gradlew.bat'
+          - '**/gradle/**'
