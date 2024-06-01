@@ -27,10 +27,6 @@ data class PrimaryKey<Data>(val columnName: String, val producer: (Data) -> Stri
 internal fun <Data> List<PrimaryKey<Data>>.producer(data: Data): String =
     fold("") { value, pk -> value + pk.producer(data) }
 
-@PublishedApi
-internal val <Data> List<PrimaryKey<Data>>.columnName: String
-    get() = fold("") { value, pk -> value + pk.columnName }
-
 /**
  * Listens for presence changes and caches the presences based on their keys. This function automatically handles joins and leaves.
  *
@@ -177,7 +173,7 @@ inline fun <reified Data : Any, Value> RealtimeChannel.postgresListDataFlow(
     table = table,
     schema = schema,
     primaryKeys = primaryKeys.map { primaryKey ->
-        PrimaryKey(primaryKey.name) { primaryKey.get(it).toString() }
+        PrimaryKey(supabaseClient.postgrest.config.propertyConversionMethod.invoke(primaryKey)) { primaryKey.get(it).toString() }
     }
 )
 
@@ -255,7 +251,7 @@ suspend inline fun <reified Data, Value> RealtimeChannel.postgresSingleDataFlow(
     schema = schema,
     table = table,
     filter = filter,
-    primaryKey = PrimaryKey(primaryKey.name) {
+    primaryKey = PrimaryKey(supabaseClient.postgrest.config.propertyConversionMethod.invoke(primaryKey)) {
         primaryKey.get(it).toString()
     }
 )

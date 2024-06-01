@@ -131,7 +131,7 @@ inline fun <reified Data : Any, Value> PostgrestQueryBuilder.selectAsFlow(
     filter: FilterOperation? = null,
 ): Flow<List<Data>> =
     selectAsFlow(primaryKeys.map { primaryKey ->
-        PrimaryKey(primaryKey.name) { primaryKey.get(it).toString() }
+        PrimaryKey(postgrest.config.propertyConversionMethod.invoke(primaryKey)) { primaryKey.get(it).toString() }
     }, channelName, filter)
 
 
