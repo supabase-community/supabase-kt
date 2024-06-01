@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.onCompletion
+import kotlin.jvm.JvmName
 import kotlin.reflect.KProperty1
 
 /**
@@ -123,6 +124,7 @@ inline fun <reified Data : Any, Value> PostgrestQueryBuilder.selectAsFlow(
  * @param channelName the name of the channel to use for the realtime updates. If null, a channel name following the format "schema:table:id" will be used
  */
 @SupabaseExperimental
+@JvmName("selectAsFlowMultiplePks")
 inline fun <reified Data : Any, Value> PostgrestQueryBuilder.selectAsFlow(
     primaryKeys: List<KProperty1<Data, Value>>,
     channelName: String? = null,

@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.serialization.json.jsonPrimitive
+import kotlin.jvm.JvmName
 import kotlin.reflect.KProperty1
 
 /**
@@ -165,6 +166,7 @@ inline fun <reified Data : Any, Value> RealtimeChannel.postgresListDataFlow(
  * @param primaryKeys the list of primary keys of the [Data] type
  * @return a [Flow] of the current data in a list. This list is updated and emitted whenever a change occurs.
  */
+@JvmName("postgresListDataFlowMultiplePks")
 inline fun <reified Data : Any, Value> RealtimeChannel.postgresListDataFlow(
     schema: String = "public",
     table: String,
