@@ -45,7 +45,7 @@ import io.github.jan.supabase.compose.auth.ui.rememberVisibilityOffIcon
  * @param leadingIcon The leading icon for the password field. Defaults to an email icon.
  * @param singleLine Whether the password field should be a single line or multiline. Defaults to true.
  * @param enabled Whether the password field should be enabled for user interaction. Defaults to true.
- * @param isError Whether the password field should display an error state. Defaults to null.
+ * @param isError Whether the password field should display an error state. Defaults to null (handled automatically).
  * @param interactionSource The interaction source for the password field. Defaults to MutableInteractionSource.
  * @param textStyle The text style for the password field. Defaults to LocalTextStyle.current.
  * @param shape The shape of the password field. Defaults to TextFieldDefaults.shape.
@@ -133,7 +133,7 @@ fun PasswordField(
  * @param leadingIcon The leading icon for the password field. Defaults to an email icon.
  * @param singleLine Whether the password field should be a single line or multiline. Defaults to true.
  * @param enabled Whether the password field should be enabled for user interaction. Defaults to true.
- * @param isError Whether the password field should display an error state. Defaults to null.
+ * @param isError Whether the password field should display an error state. Defaults to null (handled automatically).
  * @param interactionSource The interaction source for the password field. Defaults to MutableInteractionSource.
  * @param textStyle The text style for the password field. Defaults to LocalTextStyle.current.
  * @param shape The shape of the password field. Defaults to TextFieldDefaults.shape.
@@ -222,7 +222,7 @@ fun PasswordField(
  * @param leadingIcon The leading icon for the password field. Defaults to an email icon.
  * @param singleLine Whether the password field should be a single line or multiline. Defaults to true.
  * @param enabled Whether the password field should be enabled for user interaction. Defaults to true.
- * @param isError Whether the password field should display an error state. Defaults to null.
+ * @param isError Whether the password field should display an error state. Defaults to null (handled automatically).
  * @param interactionSource The interaction source for the password field. Defaults to MutableInteractionSource.
  * @param textStyle The text style for the password field. Defaults to LocalTextStyle.current.
  * @param shape The shape of the password field. Defaults to TextFieldDefaults.shape.
@@ -310,7 +310,7 @@ fun OutlinedPasswordField(
  * @param leadingIcon The leading icon for the password field. Defaults to an email icon.
  * @param singleLine Whether the password field should be a single line or multiline. Defaults to true.
  * @param enabled Whether the password field should be enabled for user interaction. Defaults to true.
- * @param isError Whether the password field should display an error state. Defaults to null.
+ * @param isError Whether the password field should display an error state. Defaults to null (handled automatically).
  * @param interactionSource The interaction source for the password field. Defaults to MutableInteractionSource.
  * @param textStyle The text style for the password field. Defaults to LocalTextStyle.current.
  * @param shape The shape of the password field. Defaults to TextFieldDefaults.shape.

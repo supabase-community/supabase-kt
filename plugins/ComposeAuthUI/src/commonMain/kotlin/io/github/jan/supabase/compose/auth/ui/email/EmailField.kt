@@ -39,7 +39,7 @@ import io.github.jan.supabase.compose.auth.ui.rememberMailIcon
  * @param keyboardActions The keyboard actions for the email field. Defaults to KeyboardActions.Default.
  * @param leadingIcon The leading icon for the email field. Defaults to an email icon.
  * @param singleLine Whether the email field should be a single line or multiline. Defaults to true.
- * @param isError Whether the email field should display an error state. Defaults to null.
+ * @param isError Whether the email field should display an error state. Defaults to null (handled automatically).
  * @param enabled Whether the email field should be enabled for user interaction. Defaults to true.
  * @param interactionSource The interaction source for the email field. Defaults to MutableInteractionSource.
  * @param textStyle The text style for the email field. Defaults to LocalTextStyle.current.
@@ -122,7 +122,7 @@ fun EmailField(
  * @param keyboardActions The keyboard actions for the email field. Defaults to KeyboardActions.Default.
  * @param leadingIcon The leading icon for the email field. Defaults to an email icon.
  * @param singleLine Whether the email field should be a single line or multiline. Defaults to true.
- * @param isError Whether the email field should display an error state. Defaults to null.
+ * @param isError Whether the email field should display an error state. Defaults to null (handled automatically).
  * @param enabled Whether the email field should be enabled for user interaction. Defaults to true.
  * @param interactionSource The interaction source for the email field. Defaults to MutableInteractionSource.
  * @param textStyle The text style for the email field. Defaults to LocalTextStyle.current.
@@ -206,7 +206,7 @@ fun EmailField(
  * @param leadingIcon The leading icon for the email field. Defaults to an email icon.
  * @param singleLine Whether the email field should be a single line or multiline. Defaults to true.
  * @param enabled Whether the email field should be enabled for user interaction. Defaults to true.
- * @param isError Whether the email field should display an error state. Defaults to null.
+ * @param isError Whether the email field should display an error state. Defaults to null (handled automatically).
  * @param interactionSource The interaction source for the email field. Defaults to MutableInteractionSource.
  * @param textStyle The text style for the email field. Defaults to LocalTextStyle.current.
  * @param shape The shape of the email field. Defaults to TextFieldDefaults.shape.
@@ -289,7 +289,7 @@ fun OutlinedEmailField(
  * @param leadingIcon The leading icon for the email field. Defaults to an email icon.
  * @param singleLine Whether the email field should be a single line or multiline. Defaults to true.
  * @param enabled Whether the email field should be enabled for user interaction. Defaults to true.
- * @param isError Whether the email field should display an error state. Defaults to null.
+ * @param isError Whether the email field should display an error state. Defaults to null (handled automatically).
  * @param interactionSource The interaction source for the email field. Defaults to MutableInteractionSource.
  * @param textStyle The text style for the email field. Defaults to LocalTextStyle.current.
  * @param shape The shape of the email field. Defaults to TextFieldDefaults.shape.
