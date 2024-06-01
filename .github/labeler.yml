@@ -26,6 +26,10 @@ plugins:
   - changed-files:
       - any-glob-to-any-file: plugins/**
 
+tests:
+  - changed-files:
+      - any-glob-to-any-file: '**/*test/**'
+
 samples:
   - changed-files:
       - any-glob-to-any-file: samples/**
