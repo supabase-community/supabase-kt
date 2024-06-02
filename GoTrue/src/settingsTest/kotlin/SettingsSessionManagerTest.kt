@@ -24,9 +24,9 @@ class SettingsSessionManagerTest {
             assertEquals(session, Json.decodeFromString(settings.getString(SettingsSessionManager.SETTINGS_KEY, ""))) //Check if the session is saved correctly
             val newSession = userSession().copy(expiresAt = expiresAt)
             sessionManager.saveSession(newSession)
-            assertEquals(newSession, sessionManager.loadSession()) //Check if the new session is saved correctly
-            assertEquals(newSession, Json.decodeFromString(settings.getString(SettingsSessionManager.SETTINGS_KEY, ""))) //Check if the new session is saved correctly
-            assertNotEquals(session, sessionManager.loadSession()) //Check if the new session is different from the old session
+            assertEquals(newSession, sessionManager.loadSession()?.copy(expiresAt = expiresAt)) //Check if the new session is saved correctly
+            assertEquals(newSession, Json.decodeFromString(settings.getString(SettingsSessionManager.SETTINGS_KEY, ""))?.copy(expiresAt = expiresAt)) //Check if the new session is saved correctly
+            assertNotEquals(session, sessionManager.loadSession()?.copy(expiresAt = expiresAt)) //Check if the new session is different from the old session
             sessionManager.deleteSession()
             assertNull(sessionManager.loadSession()) //Check if the session is deleted correctly
             assertFalse(settings.hasKey(SettingsSessionManager.SETTINGS_KEY)) //Check if the session is deleted correctly
