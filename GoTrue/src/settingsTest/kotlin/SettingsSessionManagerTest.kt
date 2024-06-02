@@ -20,7 +20,7 @@ class SettingsSessionManagerTest {
             val session = userSession().copy(expiresAt = expiresAt)
             val settings = MapSettings(SettingsSessionManager.SETTINGS_KEY to Json.encodeToString(session))
             val sessionManager = SettingsSessionManager(settings)
-            assertEquals(session, sessionManager.loadSession().copy(expiresAt = expiresAt)) //Check if the session is loaded correctly
+            assertEquals(session, sessionManager.loadSession()?.copy(expiresAt = expiresAt)) //Check if the session is loaded correctly
             assertEquals(session, Json.decodeFromString(settings.getString(SettingsSessionManager.SETTINGS_KEY, ""))) //Check if the session is saved correctly
             val newSession = userSession().copy(expiresAt = expiresAt)
             sessionManager.saveSession(newSession)
