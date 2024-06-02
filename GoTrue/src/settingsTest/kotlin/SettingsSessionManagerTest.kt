@@ -1,5 +1,6 @@
 import com.russhwolf.settings.MapSettings
 import io.github.jan.supabase.gotrue.SettingsSessionManager
+import io.github.jan.supabase.gotrue.user.UserSession
 import kotlinx.coroutines.test.runTest
 import kotlinx.datetime.Clock
 import kotlinx.serialization.encodeToString
@@ -25,7 +26,10 @@ class SettingsSessionManagerTest {
             val newSession = userSession().copy(expiresAt = expiresAt)
             sessionManager.saveSession(newSession)
             assertEquals(newSession, sessionManager.loadSession()?.copy(expiresAt = expiresAt)) //Check if the new session is saved correctly
-            assertEquals(newSession, Json.decodeFromString(settings.getString(SettingsSessionManager.SETTINGS_KEY, ""))?.copy(expiresAt = expiresAt)) //Check if the new session is saved correctly
+            assertEquals(newSession,
+                Json.decodeFromString<UserSession>(settings.getString(SettingsSessionManager.SETTINGS_KEY, ""))
+                    .copy(expiresAt = expiresAt)
+            ) //Check if the new session is saved correctly
             assertNotEquals(session, sessionManager.loadSession()?.copy(expiresAt = expiresAt)) //Check if the new session is different from the old session
             sessionManager.deleteSession()
             assertNull(sessionManager.loadSession()) //Check if the session is deleted correctly
