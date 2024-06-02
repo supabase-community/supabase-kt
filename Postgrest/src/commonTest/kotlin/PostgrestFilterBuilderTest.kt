@@ -152,6 +152,66 @@ class PostgrestFilterBuilderTest {
     }
 
     @Test
+    fun and_referenced_table() {
+        val filter = filterToString {
+            and(referencedTable = "shops") {
+                eq("id", 1)
+                eq("id", 2)
+            }
+        }
+        assertEquals("shops.and=(id.eq.1,id.eq.2)", filter)
+    }
+
+    @Test
+    fun or_referenced_table() {
+        val filter = filterToString {
+            or(referencedTable = "shops") {
+                eq("id", 1)
+                eq("id", 2)
+            }
+        }
+        assertEquals("shops.or=(id.eq.1,id.eq.2)", filter)
+    }
+
+    @Test
+    fun and_negated() {
+        val filter = filterToString {
+            and(negate = true) {
+                eq("id", 1)
+                eq("id", 2)
+            }
+        }
+        assertEquals("not.and=(id.eq.1,id.eq.2)", filter)
+    }
+
+    @Test
+    fun or_negated() {
+        val filter = filterToString {
+            or(negate = true) {
+                eq("id", 1)
+                eq("id", 2)
+            }
+        }
+        assertEquals("not.or=(id.eq.1,id.eq.2)", filter)
+    }
+
+    @Test
+    fun and_empty() {
+        val filter = filterToString {
+            and { }
+        }
+        assertEquals("", filter)
+    }
+
+    @Test
+    fun or_empty() {
+        val filter = filterToString {
+            or { }
+        }
+        assertEquals("", filter)
+    }
+
+    @Test
     fun sl() {
         val filter = filterToString {
             sl("id", 1L to 10L)

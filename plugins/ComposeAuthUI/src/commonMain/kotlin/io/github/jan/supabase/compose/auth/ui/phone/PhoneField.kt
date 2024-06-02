@@ -20,10 +20,10 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.VisualTransformation
-import io.github.jan.supabase.annotations.SupabaseExperimental
 import io.github.jan.supabase.compose.auth.ui.AuthIcons
 import io.github.jan.supabase.compose.auth.ui.FormComponent
 import io.github.jan.supabase.compose.auth.ui.FormValidator
+import io.github.jan.supabase.compose.auth.ui.annotations.AuthUiExperimental
 import io.github.jan.supabase.compose.auth.ui.rememberCallIcon
 
 private const val DEFAULT_MASK = "+## ### #########"
@@ -44,6 +44,7 @@ private const val DEFAULT_MASK_CHAR = '#'
  * @param leadingIcon The leading icon for the phone field. Defaults to an email icon.
  * @param singleLine Whether the phone field should be a single line or multiline. Defaults to true.
  * @param enabled Whether the phone field should be enabled for user interaction. Defaults to true.
+ * @param isError Whether the phone field should display an error state. Defaults to null (handled automatically).
  * @param interactionSource The interaction source for the phone field. Defaults to MutableInteractionSource.
  * @param textStyle The text style for the phone field. Defaults to LocalTextStyle.current.
  * @param shape The shape of the phone field. Defaults to TextFieldDefaults.shape.
@@ -54,7 +55,7 @@ private const val DEFAULT_MASK_CHAR = '#'
  * @param formKey The key to store the validity of the phone field in the AuthState. Defaults to "EMAIL".
  * @param mandatory Whether the form field is mandatory or not. If false, will not affect the [AuthState.validForm] value. You can also make this value dynamic and only make the field mandatory, if e.g. the [value] is not empty. Default is true.
  */
-@SupabaseExperimental
+@AuthUiExperimental
 @Composable
 fun PhoneField(
     value: String,
@@ -76,6 +77,7 @@ fun PhoneField(
     },
     singleLine: Boolean = true,
     enabled: Boolean = true,
+    isError: Boolean? = null,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     textStyle: TextStyle = LocalTextStyle.current,
     shape: Shape = TextFieldDefaults.shape,
@@ -104,7 +106,7 @@ fun PhoneField(
             keyboardActions = keyboardActions,
             leadingIcon = leadingIcon,
             singleLine = singleLine,
-            isError = !isValidPhone && value.isNotEmpty(),
+            isError = isError ?: (!isValidPhone && value.isNotEmpty()),
             interactionSource = interactionSource,
             textStyle = textStyle,
             shape = shape,
@@ -132,6 +134,7 @@ fun PhoneField(
  * @param keyboardActions The keyboard actions for the phone field. Defaults to KeyboardActions.Default.
  * @param leadingIcon The leading icon for the phone field. Defaults to an email icon.
  * @param singleLine Whether the phone field should be a single line or multiline. Defaults to true.
+ * @param isError Whether the phone field should display an error state. Defaults to null (handled automatically).
  * @param enabled Whether the phone field should be enabled for user interaction. Defaults to true.
  * @param interactionSource The interaction source for the phone field. Defaults to MutableInteractionSource.
  * @param textStyle The text style for the phone field. Defaults to LocalTextStyle.current.
@@ -143,7 +146,7 @@ fun PhoneField(
  * @param formKey The key to store the validity of the phone field in the AuthState. Defaults to "EMAIL".
  * @param mandatory Whether the form field is mandatory or not. If false, will not affect the [AuthState.validForm] value. You can also make this value dynamic and only make the field mandatory, if e.g. the [value] is not empty. Default is true.
  */
-@SupabaseExperimental
+@AuthUiExperimental
 @Composable
 fun PhoneField(
     value: TextFieldValue,
@@ -165,6 +168,7 @@ fun PhoneField(
     },
     singleLine: Boolean = true,
     enabled: Boolean = true,
+    isError: Boolean? = null,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     textStyle: TextStyle = LocalTextStyle.current,
     shape: Shape = TextFieldDefaults.shape,
@@ -193,7 +197,7 @@ fun PhoneField(
             keyboardActions = keyboardActions,
             leadingIcon = leadingIcon,
             singleLine = singleLine,
-            isError = !isValidPhone && value.text.isNotEmpty(),
+            isError = isError ?: (!isValidPhone && value.text.isNotEmpty()),
             interactionSource = interactionSource,
             textStyle = textStyle,
             shape = shape,
@@ -222,6 +226,7 @@ fun PhoneField(
  * @param leadingIcon The leading icon for the phone field. Defaults to an email icon.
  * @param singleLine Whether the phone field should be a single line or multiline. Defaults to true.
  * @param enabled Whether the phone field should be enabled for user interaction. Defaults to true.
+ * @param isError Whether the phone field should display an error state. Defaults to null (handled automatically).
  * @param interactionSource The interaction source for the phone field. Defaults to MutableInteractionSource.
  * @param textStyle The text style for the phone field. Defaults to LocalTextStyle.current.
  * @param shape The shape of the phone field. Defaults to TextFieldDefaults.shape.
@@ -232,7 +237,7 @@ fun PhoneField(
  * @param formKey The key to store the validity of the phone field in the AuthState. Defaults to "EMAIL".
  * @param mandatory Whether the form field is mandatory or not. If false, will not affect the [AuthState.validForm] value. You can also make this value dynamic and only make the field mandatory, if e.g. the [value] is not empty. Default is true.
  */
-@SupabaseExperimental
+@AuthUiExperimental
 @Composable
 fun OutlinedPhoneField(
     value: TextFieldValue,
@@ -254,6 +259,7 @@ fun OutlinedPhoneField(
     },
     singleLine: Boolean = true,
     enabled: Boolean = true,
+    isError: Boolean? = null,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     textStyle: TextStyle = LocalTextStyle.current,
     shape: Shape = OutlinedTextFieldDefaults.shape,
@@ -282,7 +288,7 @@ fun OutlinedPhoneField(
             keyboardActions = keyboardActions,
             leadingIcon = leadingIcon,
             singleLine = singleLine,
-            isError = !isValidPhone && value.text.isNotEmpty(),
+            isError = isError ?: (!isValidPhone && value.text.isNotEmpty()),
             interactionSource = interactionSource,
             textStyle = textStyle,
             shape = shape,
@@ -311,6 +317,7 @@ fun OutlinedPhoneField(
  * @param leadingIcon The leading icon for the phone field. Defaults to an email icon.
  * @param singleLine Whether the phone field should be a single line or multiline. Defaults to true.
  * @param enabled Whether the phone field should be enabled for user interaction. Defaults to true.
+ * @param isError Whether the phone field should display an error state. Defaults to null (handled automatically).
  * @param interactionSource The interaction source for the phone field. Defaults to MutableInteractionSource.
  * @param textStyle The text style for the phone field. Defaults to LocalTextStyle.current.
  * @param shape The shape of the phone field. Defaults to TextFieldDefaults.shape.
@@ -321,7 +328,7 @@ fun OutlinedPhoneField(
  * @param formKey The key to store the validity of the phone field in the AuthState. Defaults to "EMAIL".
  * @param mandatory Whether the form field is mandatory or not. If false, will not affect the [AuthState.validForm] value. You can also make this value dynamic and only make the field mandatory, if e.g. the [value] is not empty. Default is true.
  */
-@SupabaseExperimental
+@AuthUiExperimental
 @Composable
 fun OutlinedPhoneField(
     value: String,
@@ -343,6 +350,7 @@ fun OutlinedPhoneField(
     },
     singleLine: Boolean = true,
     enabled: Boolean = true,
+    isError: Boolean? = null,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     textStyle: TextStyle = LocalTextStyle.current,
     shape: Shape = OutlinedTextFieldDefaults.shape,
@@ -368,7 +376,7 @@ fun OutlinedPhoneField(
             keyboardActions = keyboardActions,
             leadingIcon = leadingIcon,
             singleLine = singleLine,
-            isError = !isValidPhone && value.isNotEmpty(),
+            isError = isError ?: (!isValidPhone && value.isNotEmpty()),
             interactionSource = interactionSource,
             textStyle = textStyle,
             shape = shape,

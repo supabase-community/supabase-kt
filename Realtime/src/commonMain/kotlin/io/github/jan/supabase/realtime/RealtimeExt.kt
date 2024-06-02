@@ -1,7 +1,7 @@
 @file:Suppress("MatchingDeclarationName")
+
 package io.github.jan.supabase.realtime
 
-import io.github.jan.supabase.annotations.SupabaseExperimental
 import io.github.jan.supabase.collections.AtomicMutableMap
 import io.github.jan.supabase.exceptions.NotFoundRestException
 import io.github.jan.supabase.exceptions.UnknownRestException
@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.serialization.json.jsonPrimitive
+import kotlin.jvm.JvmName
 import kotlin.reflect.KProperty1
 
 /**
@@ -22,21 +23,25 @@ import kotlin.reflect.KProperty1
  */
 data class PrimaryKey<Data>(val columnName: String, val producer: (Data) -> String)
 
+@PublishedApi
+internal fun <Data> List<PrimaryKey<Data>>.producer(data: Data): String =
+    fold("") { value, pk -> value + pk.producer(data) }
+
 /**
  * Listens for presence changes and caches the presences based on their keys. This function automatically handles joins and leaves.
  *
  * If you want more control, use the [presenceChangeFlow] function.
  * @return a [Flow] of the current presences in a list. This list is updated and emitted whenever a presence joins or leaves.
  */
-@SupabaseExperimental
 inline fun <reified Data> RealtimeChannel.presenceDataFlow(): Flow<List<Data>> {
     val cache = AtomicMutableMap<String, Data>()
     return presenceChangeFlow().map {
-        it.joins.forEach { (key, presence) ->
-            cache[key] = presence.stateAs<Data>(supabaseClient.realtime.serializer)
-        }
+        // order matters here, leaves events must happen first for updates to work properly
         it.leaves.forEach { (key, _) ->
             cache.remove(key)
+        }
+        it.joins.forEach { (key, presence) ->
+            cache[key] = presence.stateAs<Data>(supabaseClient.realtime.serializer)
         }
         cache.values.toList()
     }
@@ -52,31 +57,30 @@ inline fun <reified Data> RealtimeChannel.presenceDataFlow(): Flow<List<Data>> {
  * @param primaryKey the primary key of the [Data] type
  * @return a [Flow] of the current data in a list. This list is updated and emitted whenever a change occurs.
  */
-@SupabaseExperimental
-suspend inline fun <reified Data : Any> RealtimeChannel.postgresListDataFlow(
+inline fun <reified Data : Any> RealtimeChannel.postgresListDataFlow(
     schema: String = "public",
     table: String,
     filter: FilterOperation? = null,
     primaryKey: PrimaryKey<Data>
+): Flow<List<Data>> = postgresListDataFlow(schema, table, filter, listOf(primaryKey))
+
+/**
+ * This function retrieves the initial data from the table and then listens for changes. It automatically handles inserts, updates and deletes.
+ *
+ * If you want more control, use the [postgresChangeFlow] function.
+ * @param schema the schema of the table
+ * @param table the table name
+ * @param filter an optional filter to filter the data
+ * @param primaryKeys the list of primary key of the [Data] type
+ * @return a [Flow] of the current data in a list. This list is updated and emitted whenever a change occurs.
+ */
+inline fun <reified Data : Any> RealtimeChannel.postgresListDataFlow(
+    schema: String = "public",
+    table: String,
+    filter: FilterOperation? = null,
+    primaryKeys: List<PrimaryKey<Data>>
 ): Flow<List<Data>> {
     val cache = AtomicMutableMap<String, Data>()
-    val initialData = try {
-        val result = supabaseClient.postgrest.from(schema, table).select {
-            filter?.let {
-                filter {
-                    this.filter(it)
-                }
-            }
-        }
-        val data = result.decodeList<Data>()
-        data.forEach {
-            val key = primaryKey.producer(it)
-            cache[key] = it
-        }
-        data
-    } catch (e: NotFoundRestException) {
-        error("Table with name $table not found")
-    }
     val changeFlow = postgresChangeFlow<PostgresAction>(schema) {
         this.table = table
         filter?.let {
@@ -84,25 +88,46 @@ suspend inline fun <reified Data : Any> RealtimeChannel.postgresListDataFlow(
         }
     }
     return channelFlow {
+        val initialData = try {
+            val result = supabaseClient.postgrest.from(schema, table).select {
+                filter?.let {
+                    filter {
+                        this.filter(it)
+                    }
+                }
+            }
+            val data = result.decodeList<Data>()
+            data.forEach {
+                val key = primaryKeys.producer(it)
+                cache[key] = it
+            }
+            data
+        } catch (e: NotFoundRestException) {
+            error("Table with name $table not found")
+        }
         trySend(initialData)
         changeFlow.collect {
             when (it) {
                 is PostgresAction.Insert -> {
                     val data = it.decodeRecord<Data>()
-                    val key = primaryKey.producer(data)
+                    val key = primaryKeys.producer(data)
                     cache[key] = data
                 }
+
                 is PostgresAction.Update -> {
                     val data = it.decodeRecord<Data>()
-                    val key = primaryKey.producer(data)
+                    val key = primaryKeys.producer(data)
                     cache[key] = data
                 }
+
                 is PostgresAction.Delete -> {
                     cache.remove(
-                        it.oldRecord[primaryKey.columnName]?.jsonPrimitive?.content
-                            ?: error("No primary key found")
+                        primaryKeys.map { key ->
+                            it.oldRecord[key.columnName]?.jsonPrimitive?.content
+                        }.joinToString { "" }
                     )
                 }
+
                 else -> {}
             }
             trySend(cache.values.toList())
@@ -120,20 +145,35 @@ suspend inline fun <reified Data : Any> RealtimeChannel.postgresListDataFlow(
  * @param primaryKey the primary key of the [Data] type
  * @return a [Flow] of the current data in a list. This list is updated and emitted whenever a change occurs.
  */
-@SupabaseExperimental
-suspend inline fun <reified Data : Any, Value> RealtimeChannel.postgresListDataFlow(
+inline fun <reified Data : Any, Value> RealtimeChannel.postgresListDataFlow(
     schema: String = "public",
     table: String,
     filter: FilterOperation? = null,
     primaryKey: KProperty1<Data, Value>,
+): Flow<List<Data>> = postgresListDataFlow(schema, table, filter, listOf(primaryKey))
+
+/**
+ * This function retrieves the initial data from the table and then listens for changes. It automatically handles inserts, updates and deletes.
+ *
+ * If you want more control, use the [postgresChangeFlow] function.
+ * @param schema the schema of the table
+ * @param table the table name
+ * @param filter an optional filter to filter the data
+ * @param primaryKeys the list of primary keys of the [Data] type
+ * @return a [Flow] of the current data in a list. This list is updated and emitted whenever a change occurs.
+ */
+@JvmName("postgresListDataFlowMultiplePks")
+inline fun <reified Data : Any, Value> RealtimeChannel.postgresListDataFlow(
+    schema: String = "public",
+    table: String,
+    filter: FilterOperation? = null,
+    primaryKeys: List<KProperty1<Data, Value>>,
 ): Flow<List<Data>> = postgresListDataFlow<Data>(
     filter = filter,
     table = table,
     schema = schema,
-    primaryKey = PrimaryKey(
-        primaryKey.name
-    ){
-        primaryKey.get(it).toString()
+    primaryKeys = primaryKeys.map { primaryKey ->
+        PrimaryKey(supabaseClient.postgrest.config.propertyConversionMethod.invoke(primaryKey)) { primaryKey.get(it).toString() }
     }
 )
 
@@ -147,7 +187,6 @@ suspend inline fun <reified Data : Any, Value> RealtimeChannel.postgresListDataF
  * @param primaryKey the primary key of the [Data] type
  * @return a [Flow] of the current data. This flow emits a new value whenever a change occurs.
  */
-@SupabaseExperimental
 suspend inline fun <reified Data : Any> RealtimeChannel.postgresSingleDataFlow(
     schema: String = "public",
     table: String,
@@ -177,13 +216,16 @@ suspend inline fun <reified Data : Any> RealtimeChannel.postgresSingleDataFlow(
                     val data = it.decodeRecord<Data>()
                     trySend(data)
                 }
+
                 is PostgresAction.Update -> {
                     val data = it.decodeRecord<Data>()
                     trySend(data)
                 }
+
                 is PostgresAction.Delete -> {
                     close()
                 }
+
                 else -> {}
             }
         }
@@ -200,7 +242,6 @@ suspend inline fun <reified Data : Any> RealtimeChannel.postgresSingleDataFlow(
  * @param primaryKey the primary key of the [Data] type
  * @return a [Flow] of the current data. This flow emits a new value whenever a change occurs.
  */
-@SupabaseExperimental
 suspend inline fun <reified Data, Value> RealtimeChannel.postgresSingleDataFlow(
     schema: String = "public",
     table: String,
@@ -210,7 +251,7 @@ suspend inline fun <reified Data, Value> RealtimeChannel.postgresSingleDataFlow(
     schema = schema,
     table = table,
     filter = filter,
-    primaryKey = PrimaryKey(primaryKey.name) {
+    primaryKey = PrimaryKey(supabaseClient.postgrest.config.propertyConversionMethod.invoke(primaryKey)) {
         primaryKey.get(it).toString()
     }
 )

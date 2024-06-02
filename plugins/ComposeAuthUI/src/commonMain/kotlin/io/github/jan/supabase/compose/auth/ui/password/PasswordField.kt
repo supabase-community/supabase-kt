@@ -25,9 +25,9 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.VisualTransformation
-import io.github.jan.supabase.annotations.SupabaseExperimental
 import io.github.jan.supabase.compose.auth.ui.AuthIcons
 import io.github.jan.supabase.compose.auth.ui.FormComponent
+import io.github.jan.supabase.compose.auth.ui.annotations.AuthUiExperimental
 import io.github.jan.supabase.compose.auth.ui.rememberLockIcon
 import io.github.jan.supabase.compose.auth.ui.rememberVisibilityIcon
 import io.github.jan.supabase.compose.auth.ui.rememberVisibilityOffIcon
@@ -45,6 +45,7 @@ import io.github.jan.supabase.compose.auth.ui.rememberVisibilityOffIcon
  * @param leadingIcon The leading icon for the password field. Defaults to an email icon.
  * @param singleLine Whether the password field should be a single line or multiline. Defaults to true.
  * @param enabled Whether the password field should be enabled for user interaction. Defaults to true.
+ * @param isError Whether the password field should display an error state. Defaults to null (handled automatically).
  * @param interactionSource The interaction source for the password field. Defaults to MutableInteractionSource.
  * @param textStyle The text style for the password field. Defaults to LocalTextStyle.current.
  * @param shape The shape of the password field. Defaults to TextFieldDefaults.shape.
@@ -55,7 +56,7 @@ import io.github.jan.supabase.compose.auth.ui.rememberVisibilityOffIcon
  * @param formKey The key to store the validity of the password field in the AuthState. Defaults to "EMAIL".
  * @param mandatory Whether the form field is mandatory or not. If false, will not affect the [AuthState.validForm] value. You can also make this value dynamic and only make the field mandatory, if e.g. the [value] is not empty. Default is true.
  */
-@SupabaseExperimental
+@AuthUiExperimental
 @ExperimentalMaterial3Api
 @Composable
 fun PasswordField(
@@ -69,6 +70,7 @@ fun PasswordField(
     readOnly: Boolean = false,
     enabled: Boolean = true,
     singleLine: Boolean = true,
+    isError: Boolean? = null,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     textStyle: TextStyle = LocalTextStyle.current,
     shape: Shape = TextFieldDefaults.shape,
@@ -102,7 +104,7 @@ fun PasswordField(
             keyboardOptions = keyboardOptions,
             keyboardActions = keyboardActions,
             singleLine = singleLine,
-            isError = ruleResults.firstUnfulfilled() != null && value.isNotEmpty(),
+            isError = isError ?: (ruleResults.firstUnfulfilled() != null && value.isNotEmpty()),
             modifier = modifier,
             leadingIcon = leadingIcon,
             trailingIcon = { trailingIcon?.invoke(showPassword) },
@@ -131,6 +133,7 @@ fun PasswordField(
  * @param leadingIcon The leading icon for the password field. Defaults to an email icon.
  * @param singleLine Whether the password field should be a single line or multiline. Defaults to true.
  * @param enabled Whether the password field should be enabled for user interaction. Defaults to true.
+ * @param isError Whether the password field should display an error state. Defaults to null (handled automatically).
  * @param interactionSource The interaction source for the password field. Defaults to MutableInteractionSource.
  * @param textStyle The text style for the password field. Defaults to LocalTextStyle.current.
  * @param shape The shape of the password field. Defaults to TextFieldDefaults.shape.
@@ -141,7 +144,7 @@ fun PasswordField(
  * @param formKey The key to store the validity of the password field in the AuthState. Defaults to "EMAIL".
  * @param mandatory Whether the form field is mandatory or not. If false, will not affect the [AuthState.validForm] value. You can also make this value dynamic and only make the field mandatory, if e.g. the [value] is not empty. Default is true.
  */
-@SupabaseExperimental
+@AuthUiExperimental
 @ExperimentalMaterial3Api
 @Composable
 fun PasswordField(
@@ -155,6 +158,7 @@ fun PasswordField(
     readOnly: Boolean = false,
     enabled: Boolean = true,
     singleLine: Boolean = true,
+    isError: Boolean? = null,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     textStyle: TextStyle = LocalTextStyle.current,
     shape: Shape = TextFieldDefaults.shape,
@@ -189,7 +193,7 @@ fun PasswordField(
             keyboardOptions = keyboardOptions,
             keyboardActions = keyboardActions,
             singleLine = singleLine,
-            isError = ruleResults.firstUnfulfilled() != null && value.text.isNotEmpty(),
+            isError = isError ?: (ruleResults.firstUnfulfilled() != null && value.text.isNotEmpty()),
             modifier = modifier,
             leadingIcon = leadingIcon,
             trailingIcon = { trailingIcon?.invoke(showPassword) },
@@ -218,6 +222,7 @@ fun PasswordField(
  * @param leadingIcon The leading icon for the password field. Defaults to an email icon.
  * @param singleLine Whether the password field should be a single line or multiline. Defaults to true.
  * @param enabled Whether the password field should be enabled for user interaction. Defaults to true.
+ * @param isError Whether the password field should display an error state. Defaults to null (handled automatically).
  * @param interactionSource The interaction source for the password field. Defaults to MutableInteractionSource.
  * @param textStyle The text style for the password field. Defaults to LocalTextStyle.current.
  * @param shape The shape of the password field. Defaults to TextFieldDefaults.shape.
@@ -228,7 +233,7 @@ fun PasswordField(
  * @param formKey The key to store the validity of the password field in the AuthState. Defaults to "EMAIL".
  * @param mandatory Whether the form field is mandatory or not. If false, will not affect the [AuthState.validForm] value. You can also make this value dynamic and only make the field mandatory, if e.g. the [value] is not empty. Default is true.
  */
-@SupabaseExperimental
+@AuthUiExperimental
 @ExperimentalMaterial3Api
 @Composable
 fun OutlinedPasswordField(
@@ -242,6 +247,7 @@ fun OutlinedPasswordField(
     readOnly: Boolean = false,
     enabled: Boolean = true,
     singleLine: Boolean = true,
+    isError: Boolean? = null,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     textStyle: TextStyle = LocalTextStyle.current,
     shape: Shape = OutlinedTextFieldDefaults.shape,
@@ -275,7 +281,7 @@ fun OutlinedPasswordField(
             keyboardOptions = keyboardOptions,
             keyboardActions = keyboardActions,
             singleLine = singleLine,
-            isError = ruleResults.firstUnfulfilled() != null && value.isNotEmpty(),
+            isError = isError ?: (ruleResults.firstUnfulfilled() != null && value.isNotEmpty()),
             modifier = modifier,
             leadingIcon = leadingIcon,
             trailingIcon = { trailingIcon?.invoke(showPassword) },
@@ -304,6 +310,7 @@ fun OutlinedPasswordField(
  * @param leadingIcon The leading icon for the password field. Defaults to an email icon.
  * @param singleLine Whether the password field should be a single line or multiline. Defaults to true.
  * @param enabled Whether the password field should be enabled for user interaction. Defaults to true.
+ * @param isError Whether the password field should display an error state. Defaults to null (handled automatically).
  * @param interactionSource The interaction source for the password field. Defaults to MutableInteractionSource.
  * @param textStyle The text style for the password field. Defaults to LocalTextStyle.current.
  * @param shape The shape of the password field. Defaults to TextFieldDefaults.shape.
@@ -314,7 +321,7 @@ fun OutlinedPasswordField(
  * @param formKey The key to store the validity of the password field in the AuthState. Defaults to "EMAIL".
  * @param mandatory Whether the form field is mandatory or not. If false, will not affect the [AuthState.validForm] value. You can also make this value dynamic and only make the field mandatory, if e.g. the [value] is not empty. Default is true.
  */
-@SupabaseExperimental
+@AuthUiExperimental
 @ExperimentalMaterial3Api
 @Composable
 fun OutlinedPasswordField(
@@ -327,6 +334,7 @@ fun OutlinedPasswordField(
     keyboardOptions: KeyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
     readOnly: Boolean = false,
     enabled: Boolean = true,
+    isError: Boolean? = null,
     singleLine: Boolean = true,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     textStyle: TextStyle = LocalTextStyle.current,
@@ -361,7 +369,7 @@ fun OutlinedPasswordField(
             keyboardOptions = keyboardOptions,
             keyboardActions = keyboardActions,
             singleLine = singleLine,
-            isError = ruleResults.firstUnfulfilled() != null && value.text.isNotEmpty(),
+            isError = isError ?: (ruleResults.firstUnfulfilled() != null && value.text.isNotEmpty()),
             modifier = modifier,
             leadingIcon = leadingIcon,
             trailingIcon = { trailingIcon?.invoke(showPassword) },

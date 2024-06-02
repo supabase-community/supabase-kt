@@ -10,6 +10,8 @@ import io.github.jan.supabase.exceptions.UnauthorizedRestException
 import io.github.jan.supabase.exceptions.UnknownRestException
 import io.github.jan.supabase.gotrue.admin.AdminApi
 import io.github.jan.supabase.gotrue.admin.AdminApiImpl
+import io.github.jan.supabase.gotrue.exception.AuthSessionMissingException
+import io.github.jan.supabase.gotrue.exception.AuthWeakPasswordException
 import io.github.jan.supabase.gotrue.mfa.MfaApi
 import io.github.jan.supabase.gotrue.mfa.MfaApiImpl
 import io.github.jan.supabase.gotrue.providers.AuthProvider
@@ -49,8 +51,9 @@ import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.encodeToJsonElement
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.put
-import kotlinx.serialization.json.putJsonObject
-import kotlin.math.floor
+import kotlin.time.Duration.Companion.seconds
+
+private const val SESSION_REFRESH_THRESHOLD = 0.8
 
 @PublishedApi
 internal class AuthImpl(
@@ -115,11 +118,7 @@ internal class AuthImpl(
     override suspend fun signInAnonymously(data: JsonObject?, captchaToken: String?) {
         val response = api.postJson("signup", buildJsonObject {
             data?.let { put("data", it) }
-            captchaToken?.let {
-                putJsonObject("gotrue_meta_security") {
-                    put("captcha_token", captchaToken)
-                }
-            }
+            captchaToken?.let(::putCaptchaToken)
         })
         val session = response.safeBody<UserSession>()
         importSession(session, source = SessionSource.AnonymousSignIn)
@@ -133,28 +132,34 @@ internal class AuthImpl(
         importSession(it, source = SessionSource.SignUp(provider))
     }, redirectUrl, config)
 
-    @SupabaseExperimental
     override suspend fun linkIdentity(
         provider: OAuthProvider,
         redirectUrl: String?,
         config: ExternalAuthConfigDefaults.() -> Unit
-    ) {
+    ): String? {
+        val automaticallyOpen = ExternalAuthConfigDefaults().apply(config).automaticallyOpenUrl
+        val fetchUrl: suspend (String?) -> String = { redirectTo: String? ->
+            val url = getOAuthUrl(provider, redirectTo, "user/identities/authorize", config)
+            val response = api.rawRequest(url) {
+                method = HttpMethod.Get
+            }
+            response.request.url.toString()
+        }
+        if(!automaticallyOpen) {
+            return fetchUrl(redirectUrl ?: "")
+        }
         startExternalAuth(
             redirectUrl = redirectUrl,
             getUrl = {
-                val url = getOAuthUrl(provider, it, "user/identities/authorize", config)
-                val response = api.rawRequest(url) {
-                    method = HttpMethod.Get
-                }
-                response.request.url.toString()
+                fetchUrl(it)
             },
             onSessionSuccess = {
                 importSession(it, source = SessionSource.UserIdentitiesChanged(it))
             }
         )
+        return null
     }
 
-    @SupabaseExperimental
     override suspend fun unlinkIdentity(identityId: String, updateLocalUser: Boolean) {
         api.delete("user/identities/$identityId")
         if (updateLocalUser) {
@@ -179,23 +184,11 @@ internal class AuthImpl(
             "Either domain or providerId must be set, not both"
         }
 
-        var codeChallenge: String? = null
-        if (this.config.flowType == FlowType.PKCE) {
-            val codeVerifier = generateCodeVerifier()
-            codeVerifierCache.saveCodeVerifier(codeVerifier)
-            codeChallenge = generateCodeChallenge(codeVerifier)
-        }
+        val codeChallenge: String? = preparePKCEIfEnabled()
         return api.postJson("sso", buildJsonObject {
             redirectUrl?.let { put("redirect_to", it) }
-            createdConfig.captchaToken?.let {
-                put("gotrue_meta_security", buildJsonObject {
-                    put("captcha_token", it)
-                })
-            }
-            codeChallenge?.let {
-                put("code_challenge", it)
-                put("code_challenge_method", "s256")
-            }
+            createdConfig.captchaToken?.let(::putCaptchaToken)
+            codeChallenge?.let(::putCodeChallenge)
             createdConfig.domain?.let {
                 put("domain", it)
             }
@@ -205,24 +198,16 @@ internal class AuthImpl(
         }).body()
     }
 
-    override suspend fun modifyUser(
+    override suspend fun updateUser(
         updateCurrentUser: Boolean,
         redirectUrl: String?,
         config: UserUpdateBuilder.() -> Unit
     ): UserInfo {
         val updateBuilder = UserUpdateBuilder(serializer = serializer).apply(config)
-        var codeChallenge: String? = null
-        if (this.config.flowType == FlowType.PKCE && updateBuilder.email != null) {
-            val codeVerifier = generateCodeVerifier()
-            codeVerifierCache.saveCodeVerifier(codeVerifier)
-            codeChallenge = generateCodeChallenge(codeVerifier)
-        }
+        val codeChallenge = preparePKCEIfEnabled()
         val body = buildJsonObject {
             putJsonObject(supabaseJson.encodeToJsonElement(updateBuilder).jsonObject)
-            codeChallenge?.let {
-                put("code_challenge", it)
-                put("code_challenge_method", "s256")
-            }
+            codeChallenge?.let(::putCodeChallenge)
         }.toString()
         val response = api.putJson("user", body) {
             redirectUrl?.let { url.parameters.append("redirect_to", it) }
@@ -249,11 +234,7 @@ internal class AuthImpl(
     override suspend fun resendEmail(type: OtpType.Email, email: String, captchaToken: String?) =
         resend(type.type) {
             put("email", email)
-            captchaToken?.let {
-                putJsonObject("gotrue_meta_security") {
-                    put("captcha_token", captchaToken)
-                }
-            }
+            captchaToken?.let(::putCaptchaToken)
         }
 
     override suspend fun resendPhone(
@@ -262,11 +243,7 @@ internal class AuthImpl(
         captchaToken: String?
     ) = resend(type.type) {
         put("phone", phone)
-        captchaToken?.let {
-            putJsonObject("gotrue_meta_security") {
-                put("captcha_token", captchaToken)
-            }
-        }
+        captchaToken?.let(::putCaptchaToken)
     }
 
     override suspend fun resetPasswordForEmail(
@@ -277,23 +254,11 @@ internal class AuthImpl(
         require(email.isNotBlank()) {
             "Email must not be blank"
         }
-        var codeChallenge: String? = null
-        if (this.config.flowType == FlowType.PKCE) {
-            val codeVerifier = generateCodeVerifier()
-            codeVerifierCache.saveCodeVerifier(codeVerifier)
-            codeChallenge = generateCodeChallenge(codeVerifier)
-        }
+        val codeChallenge = preparePKCEIfEnabled()
         val body = buildJsonObject {
             put("email", email)
-            captchaToken?.let {
-                putJsonObject("gotrue_meta_security") {
-                    put("captcha_token", captchaToken)
-                }
-            }
-            codeChallenge?.let {
-                put("code_challenge", it)
-                put("code_challenge_method", "s256")
-            }
+            captchaToken?.let(::putCaptchaToken)
+            codeChallenge?.let(::putCodeChallenge)
         }.toString()
         api.postJson("recover", body) {
             redirectUrl?.let { url.encodedParameters.append("redirect_to", it) }
@@ -328,11 +293,7 @@ internal class AuthImpl(
         val body = buildJsonObject {
             put("type", type)
             put("token", token)
-            captchaToken?.let {
-                putJsonObject("gotrue_meta_security") {
-                    put("captcha_token", captchaToken)
-                }
-            }
+            captchaToken?.let(::putCaptchaToken)
             additionalData()
         }
         val response = api.postJson("verify", body)
@@ -419,10 +380,10 @@ internal class AuthImpl(
         source: SessionSource
     ) {
         if (!autoRefresh) {
-            _sessionStatus.value = SessionStatus.Authenticated(session, source)
             if (session.refreshToken.isNotBlank() && session.expiresIn != 0L && config.autoSaveToStorage) {
                 sessionManager.saveSession(session)
             }
+            _sessionStatus.value = SessionStatus.Authenticated(session, source)
             return
         }
         if (session.expiresAt <= Clock.System.now()) {
@@ -431,8 +392,8 @@ internal class AuthImpl(
                 { importSession(session) }
             )
         } else {
-            _sessionStatus.value = SessionStatus.Authenticated(session, source)
             if (config.autoSaveToStorage) sessionManager.saveSession(session)
+            _sessionStatus.value = SessionStatus.Authenticated(session, source)
             sessionJob?.cancel()
             sessionJob = authScope.launch {
                 delayBeforeExpiry(session)
@@ -464,12 +425,15 @@ internal class AuthImpl(
     }
 
     private suspend fun delayBeforeExpiry(session: UserSession) {
-        val expiresIn = session.expiresAt - Clock.System.now()
+        val timeAtBeginningOfSession = session.expiresAt - session.expiresIn.seconds
 
-        @Suppress("MagicNumber")
-        val beforeExpiryTime =
-            floor(expiresIn.inWholeMilliseconds * 4.0f / 5.0f).toLong() //always refresh 20% before expiry
-        delay(beforeExpiryTime)
+        // 80% of the way to session.expiresAt
+        val targetRefreshTime = timeAtBeginningOfSession + (session.expiresIn.seconds * SESSION_REFRESH_THRESHOLD)
+
+        val delayDuration = targetRefreshTime - Clock.System.now()
+
+        // if the delayDuration is negative, delay() will not delay
+        delay(delayDuration)
     }
 
     private suspend fun handleExpiredSession(session: UserSession, autoRefresh: Boolean = true) {
@@ -503,6 +467,7 @@ internal class AuthImpl(
     override suspend fun parseErrorResponse(response: HttpResponse): RestException {
         val errorBody =
             response.bodyOrNull<GoTrueErrorResponse>() ?: GoTrueErrorResponse("Unknown error", "")
+        checkErrorCodes(errorBody)?.let { return it }
         return when (response.status) {
             HttpStatusCode.Unauthorized -> UnauthorizedRestException(
                 errorBody.error,
@@ -514,13 +479,26 @@ internal class AuthImpl(
                 response,
                 errorBody.description
             )
-
             HttpStatusCode.UnprocessableEntity -> BadRequestRestException(
                 errorBody.error,
                 response,
                 errorBody.description
             )
             else -> UnknownRestException(errorBody.error, response)
+        }
+    }
+
+    private fun checkErrorCodes(error: GoTrueErrorResponse): RestException? {
+        return when (error.error) {
+            AuthWeakPasswordException.CODE -> AuthWeakPasswordException(error.error, error.weakPassword?.reasons ?: emptyList())
+            AuthSessionMissingException.CODE -> {
+                authScope.launch {
+                    Auth.logger.e { "Received session not found api error. Clearing session..." }
+                    clearSession()
+                }
+                AuthSessionMissingException()
+            }
+            else -> null
         }
     }
 
@@ -532,13 +510,10 @@ internal class AuthImpl(
         additionalConfig: ExternalAuthConfigDefaults.() -> Unit
     ): String {
         val config = ExternalAuthConfigDefaults().apply(additionalConfig)
-        if (this.config.flowType == FlowType.PKCE) {
-            val codeVerifier = generateCodeVerifier()
-            authScope.launch {
-                supabaseClient.auth.codeVerifierCache.saveCodeVerifier(codeVerifier)
-            }
-            config.queryParams["code_challenge"] = generateCodeChallenge(codeVerifier)
-            config.queryParams["code_challenge_method"] = "S256"
+        val codeChallenge = preparePKCEIfEnabled()
+        codeChallenge?.let {
+            config.queryParams["code_challenge"] = it
+            config.queryParams["code_challenge_method"] = PKCEConstants.CHALLENGE_METHOD
         }
         return resolveUrl(buildString {
             append("$url?provider=${provider.name}&redirect_to=$redirectUrl")
@@ -565,6 +540,18 @@ internal class AuthImpl(
 
     fun resetLoadingState() {
         _sessionStatus.value = SessionStatus.LoadingFromStorage
+    }
+
+    /**
+     * Prepares PKCE if enabled and returns the code challenge.
+     */
+    private fun preparePKCEIfEnabled(): String? {
+        if (this.config.flowType != FlowType.PKCE) return null
+        val codeVerifier = generateCodeVerifier()
+        authScope.launch {
+            supabaseClient.auth.codeVerifierCache.saveCodeVerifier(codeVerifier)
+        }
+        return generateCodeChallenge(codeVerifier)
     }
 
 }

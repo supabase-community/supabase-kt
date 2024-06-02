@@ -28,9 +28,9 @@ interface CodeVerifierCache {
 /**
  * A [CodeVerifierCache] that uses the [AtomicRef] API.
  */
-class MemoryCodeVerifierCache: CodeVerifierCache {
+class MemoryCodeVerifierCache(codeVerifier: String? = null): CodeVerifierCache {
 
-    private var codeVerifier by atomic<String?>(null)
+    private var codeVerifier by atomic(codeVerifier)
 
     override suspend fun saveCodeVerifier(codeVerifier: String) {
         this.codeVerifier = codeVerifier

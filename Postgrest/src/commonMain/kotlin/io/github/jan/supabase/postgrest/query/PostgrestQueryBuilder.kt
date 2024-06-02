@@ -15,6 +15,7 @@ import io.github.jan.supabase.postgrest.request.UpdateRequest
 import io.github.jan.supabase.postgrest.result.PostgrestResult
 import io.ktor.client.plugins.HttpRequestTimeoutException
 import kotlinx.serialization.json.jsonArray
+import kotlinx.serialization.json.jsonObject
 
 /**
  * The main class to build a postgrest request
@@ -29,7 +30,7 @@ class PostgrestQueryBuilder(
      * Executes vertical filtering with select on [table]
      *
      * @param columns The columns to retrieve, defaults to [Columns.ALL]. You can also use [Columns.list], [Columns.type] or [Columns.raw] to specify the columns
-     * @param head If true, select will delete the selected data.
+     * @param head If true, no body will be returned. Useful when using count.
      * @param request Additional filtering to apply to the query
      * @return PostgrestResult which is either an error, an empty JsonArray or the data you requested as an JsonArray
      * @throws RestException or one of its subclasses if receiving an error response
@@ -79,16 +80,19 @@ class PostgrestQueryBuilder(
     suspend inline fun <reified T : Any> upsert(
         values: List<T>,
         onConflict: String? = null,
-        defaultToNull: Boolean = false,
+        defaultToNull: Boolean = true,
         ignoreDuplicates: Boolean = false,
         request: PostgrestRequestBuilder.() -> Unit = {}
     ): PostgrestResult {
         val requestBuilder = postgrestRequest(postgrest.config.propertyConversionMethod, request)
+        val body = postgrest.serializer.encodeToJsonElement(values).jsonArray
+        val columns = body.map { it.jsonObject.keys }.flatten().distinct()
+        requestBuilder._params["columns"] = listOf(columns.joinToString(","))
         onConflict?.let {
             requestBuilder._params["on_conflict"] = listOf(it)
         }
         val insertRequest = InsertRequest(
-            body = postgrest.serializer.encodeToJsonElement(values).jsonArray,
+            body = body,
             upsert = true,
             returning = requestBuilder.returning,
             count = requestBuilder.count,
@@ -126,7 +130,7 @@ class PostgrestQueryBuilder(
     suspend inline fun <reified T : Any> upsert(
         value: T,
         onConflict: String? = null,
-        defaultToNull: Boolean = false,
+        defaultToNull: Boolean = true,
         ignoreDuplicates: Boolean = false,
         request: PostgrestRequestBuilder.() -> Unit = {}
     ): PostgrestResult = upsert(listOf(value), onConflict, defaultToNull, ignoreDuplicates, request)
@@ -136,22 +140,30 @@ class PostgrestQueryBuilder(
      *
      * @param values The values to insert, will automatically get serialized into json.
      * @param request Additional filtering to apply to the query
+     * @param defaultToNull Make missing fields default to `null`.
+     * Otherwise, use the default value for the column. This only applies when
+     * inserting new rows, not when merging with existing rows under
      * @throws RestException or one of its subclasses if receiving an error response
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
     suspend inline fun <reified T : Any> insert(
         values: List<T>,
+        defaultToNull: Boolean = true,
         request: PostgrestRequestBuilder.() -> Unit = {}
     ): PostgrestResult {
         val requestBuilder = postgrestRequest(postgrest.config.propertyConversionMethod, request)
+        val body = postgrest.serializer.encodeToJsonElement(values).jsonArray
+        val columns = body.map { it.jsonObject.keys }.flatten().distinct()
+        requestBuilder._params["columns"] = listOf(columns.joinToString(","))
         val insertRequest = InsertRequest(
-            body = postgrest.serializer.encodeToJsonElement(values).jsonArray,
+            body = body,
             returning = requestBuilder.returning,
             count = requestBuilder.count,
             urlParams = requestBuilder.params.mapToFirstValue(),
             schema = schema,
-            headers = requestBuilder.headers.build()
+            headers = requestBuilder.headers.build(),
+            defaultToNull = defaultToNull
         )
         return RestRequestExecutor.execute(postgrest = postgrest, path = table, request = insertRequest)
     }
@@ -161,14 +173,18 @@ class PostgrestQueryBuilder(
      *
      * @param value The value to insert, will automatically get serialized into json.
      * @param request Additional filtering to apply to the query
+     * @param defaultToNull Make missing fields default to `null`.
+     * Otherwise, use the default value for the column. This only applies when
+     * inserting new rows, not when merging with existing rows under
      * @throws RestException or one of its subclasses if receiving an error response
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
     suspend inline fun <reified T : Any> insert(
         value: T,
+        defaultToNull: Boolean = true,
         request: PostgrestRequestBuilder.() -> Unit = {}
-    ) = insert(listOf(value), request)
+    ) = insert(listOf(value), defaultToNull, request)
 
     /**
      * Executes an update operation on the [table].

@@ -5,7 +5,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
-import io.github.jan.supabase.annotations.SupabaseExperimental
+import io.github.jan.supabase.compose.auth.ui.annotations.AuthUiExperimental
 
 /**
  * A component that represents a form field.
@@ -14,7 +14,7 @@ import io.github.jan.supabase.annotations.SupabaseExperimental
  * @param mandatory Whether the form field is mandatory or not. If false, will not affect the [AuthState.validForm] value. Default is true.
  * @param content The composable function that defines the content of the form field and receives a mutable state object as a parameter.
  */
-@SupabaseExperimental
+@AuthUiExperimental
 @Composable
 fun FormComponent(key: String, mandatory: Boolean = true, content: @Composable (valid: MutableState<Boolean>) -> Unit) {
     val state = LocalAuthState.current

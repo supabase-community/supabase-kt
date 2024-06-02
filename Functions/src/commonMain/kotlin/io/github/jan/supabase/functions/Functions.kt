@@ -18,6 +18,7 @@ import io.github.jan.supabase.plugins.SupabasePluginProvider
 import io.github.jan.supabase.serializer.KotlinXSerializer
 import io.ktor.client.plugins.HttpRequestTimeoutException
 import io.ktor.client.request.HttpRequestBuilder
+import io.ktor.client.request.header
 import io.ktor.client.request.setBody
 import io.ktor.client.statement.HttpResponse
 import io.ktor.client.statement.bodyAsText
@@ -61,12 +62,16 @@ class Functions(override val config: Config, override val supabaseClient: Supaba
      * Invokes a remote edge function. The authorization token is automatically added to the request.
      * @param function The function to invoke
      * @param builder The request builder to configure the request
+     * @param region The region where the function is invoked
      * @throws RestException or one of its subclasses if receiving an error response
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
-    suspend inline operator fun invoke(function: String, crossinline builder: HttpRequestBuilder.() -> Unit): HttpResponse {
-        return api.post(function, builder)
+    suspend inline operator fun invoke(function: String, region: FunctionRegion = config.defaultRegion, crossinline builder: HttpRequestBuilder.() -> Unit): HttpResponse {
+        return api.post(function) {
+            builder()
+            header("x-region", region.value)
+        }
     }
 
     /**
@@ -75,12 +80,14 @@ class Functions(override val config: Config, override val supabaseClient: Supaba
      * @param function The function to invoke
      * @param body The body of the request
      * @param headers Headers to add to the request
+     * @param region The region where the function is invoked
      * @throws RestException or one of its subclasses if receiving an error response
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
-    suspend inline operator fun <reified T : Any> invoke(function: String, body: T, headers: Headers = Headers.Empty): HttpResponse = invoke(function) {
+    suspend inline operator fun <reified T : Any> invoke(function: String, body: T, region: FunctionRegion = config.defaultRegion, headers: Headers = Headers.Empty): HttpResponse = invoke(function) {
         this.headers.appendAll(headers)
+        header("x-region", region.value)
         setBody(serializer.encode(body))
     }
 
@@ -88,21 +95,35 @@ class Functions(override val config: Config, override val supabaseClient: Supaba
      * Invokes a remote edge function. The authorization token is automatically added to the request.
      * @param function The function to invoke
      * @param headers Headers to add to the request
+     * @param region The region where the function is invoked
      * @throws RestException or one of its subclasses if receiving an error response
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
-    suspend inline operator fun invoke(function: String, headers: Headers = Headers.Empty): HttpResponse = invoke(function) {
+    suspend inline operator fun invoke(function: String, region: FunctionRegion = config.defaultRegion, headers: Headers = Headers.Empty): HttpResponse = invoke(function) {
         this.headers.appendAll(headers)
+        header("x-region", region.value)
     }
 
     /**
      * Builds an [EdgeFunction] which can be invoked multiple times
      * @param function The function name
      * @param headers Headers to add to the requests when invoking the function
+     * @param region The region where the function is invoked
      */
     @OptIn(SupabaseInternal::class)
-    fun buildEdgeFunction(function: String, headers: Headers = Headers.Empty) = EdgeFunction(function, headers, supabaseClient)
+    fun buildEdgeFunction(
+        function: String,
+        region: FunctionRegion = config.defaultRegion,
+        headers: Headers = Headers.Empty
+    ) = EdgeFunction(
+        functionName = function,
+        headers = Headers.build {
+            appendAll(headers)
+            append("x-region", region.value)
+        },
+        supabaseClient = supabaseClient
+    )
 
     override suspend fun parseErrorResponse(response: HttpResponse): RestException {
         val error = response.bodyAsText()
@@ -123,6 +144,11 @@ class Functions(override val config: Config, override val supabaseClient: Supaba
     class Config : MainConfig(), CustomSerializationConfig {
 
         override var serializer: SupabaseSerializer? = null
+
+        /**
+         * The default region to use when invoking a function
+         */
+        var defaultRegion: FunctionRegion = FunctionRegion.ANY
 
     }
 

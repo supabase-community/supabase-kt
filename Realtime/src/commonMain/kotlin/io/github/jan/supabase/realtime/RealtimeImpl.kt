@@ -38,7 +38,7 @@ import kotlinx.coroutines.sync.withLock
 import kotlinx.serialization.json.buildJsonObject
 import kotlin.time.Duration.Companion.milliseconds
 
-internal class RealtimeImpl(override val supabaseClient: SupabaseClient, override val config: Realtime.Config) : Realtime {
+@PublishedApi internal class RealtimeImpl(override val supabaseClient: SupabaseClient, override val config: Realtime.Config) : Realtime {
 
     private var ws: DefaultClientWebSocketSession? = null
     @Suppress("MagicNumber")
@@ -63,6 +63,7 @@ internal class RealtimeImpl(override val supabaseClient: SupabaseClient, overrid
 
     override var serializer = config.serializer ?: supabaseClient.defaultSerializer
     private val websocketUrl = realtimeWebsocketUrl()
+    private var incrementId by atomic(0)
 
     override suspend fun connect() = connect(false)
 
@@ -282,6 +283,10 @@ internal class RealtimeImpl(override val supabaseClient: SupabaseClient, overrid
             delay(msPerEvent.milliseconds)
             inThrottle = false
         }
+    }
+
+    fun nextIncrementId(): Int {
+        return incrementId++
     }
 
 }

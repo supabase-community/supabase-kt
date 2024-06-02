@@ -1,10 +1,10 @@
 package io.github.jan.supabase.gotrue
 
 import io.github.jan.supabase.SupabaseClient
-import io.github.jan.supabase.annotations.SupabaseExperimental
 import io.github.jan.supabase.exceptions.HttpRequestException
 import io.github.jan.supabase.exceptions.RestException
 import io.github.jan.supabase.gotrue.admin.AdminApi
+import io.github.jan.supabase.gotrue.exception.AuthWeakPasswordException
 import io.github.jan.supabase.gotrue.mfa.MfaApi
 import io.github.jan.supabase.gotrue.providers.AuthProvider
 import io.github.jan.supabase.gotrue.providers.ExternalAuthConfigDefaults
@@ -80,12 +80,14 @@ sealed interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
      *
      * Example:
      * ```kotlin
-     * val result = gotrue.signUpWith(Email) {
+     * val result = auth.signUpWith(Email) {
      *    email = "example@email.com"
      *    password = "password"
      * }
+     * ```
      * or
-     * gotrue.signUpWith(Google) // Opens the browser to login with google
+     * ```kotlin
+     * auth.signUpWith(Google) // Opens the browser to login with google
      * ```
      *
      * @param provider the provider to use for signing up. E.g. [Email], [Phone] or [Google]
@@ -95,6 +97,7 @@ sealed interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
      * @throws RestException or one of its subclasses if receiving an error response
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
+     * @throws AuthWeakPasswordException if using the [Email] or [Phone] provider and the password is too weak. You can get the reasons via [AuthWeakPasswordException.reasons]
      */
     suspend fun <C, R, Provider : AuthProvider<C, R>> signUpWith(
         provider: Provider,
@@ -107,12 +110,14 @@ sealed interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
      *
      * Example:
      * ```kotlin
-     * val result = gotrue.signInWith(Email) {
+     * val result = auth.signInWith(Email) {
      *    email = "example@email.com"
      *    password = "password"
      * }
+     * ```
      * or
-     * gotrue.signInWith(Google) // Opens the browser to login with google
+     * ```kotlin
+     * auth.signInWith(Google) // Opens the browser to login with google
      * ```
      *
      * @param provider the provider to use for signing in. E.g. [Email], [Phone] or [Google]
@@ -131,12 +136,11 @@ sealed interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
     /**
      * Signs in the user without any credentials. This will create a new user session with a new access token.
      *
-     * If you want to upgrade this anonymous user to a real user, use [linkIdentity] to link an OAuth identity or [modifyUser] to add an email or phone.
+     * If you want to upgrade this anonymous user to a real user, use [linkIdentity] to link an OAuth identity or [updateUser] to add an email or phone.
      *
      * @param data Extra data for the user
      * @param captchaToken The captcha token to use
      */
-    @SupabaseExperimental
     suspend fun signInAnonymously(data: JsonObject? = null, captchaToken: String? = null)
 
     /**
@@ -146,20 +150,19 @@ sealed interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
      * @param provider The OAuth provider
      * @param redirectUrl The redirect url to use. If you don't specify this, the platform specific will be used, like deeplinks on android.
      * @param config Extra configuration
+     * @return The OAuth url to open in the browser if [ExternalAuthConfigDefaults.automaticallyOpenUrl] is false, otherwise null.
      */
-    @SupabaseExperimental
     suspend fun linkIdentity(
         provider: OAuthProvider,
         redirectUrl: String? = defaultRedirectUrl(),
         config: ExternalAuthConfigDefaults.() -> Unit = {}
-    )
+    ): String?
 
     /**
      * Unlinks an OAuth Identity from an existing user.
      * @param identityId The id of the OAuth identity
      * @param updateLocalUser Whether to delete the identity from the local user or not
      */
-    @SupabaseExperimental
     suspend fun unlinkIdentity(
         identityId: String,
         updateLocalUser: Boolean = true
@@ -180,11 +183,26 @@ sealed interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
-    suspend fun modifyUser(
+    suspend fun updateUser(
         updateCurrentUser: Boolean = true,
         redirectUrl: String? = defaultRedirectUrl(),
         config: UserUpdateBuilder.() -> Unit
     ): UserInfo
+
+    /**
+     * Modifies the current user
+     * @param updateCurrentUser Whether to update the current user in the [SupabaseClient]
+     * @param config The configuration to use
+     * @throws RestException or one of its subclasses if receiving an error response
+     * @throws HttpRequestTimeoutException if the request timed out
+     * @throws HttpRequestException on network related issues
+     */
+    @Deprecated("Use updateUser instead")
+    suspend fun modifyUser(
+        updateCurrentUser: Boolean = true,
+        redirectUrl: String? = defaultRedirectUrl(),
+        config: UserUpdateBuilder.() -> Unit
+    ): UserInfo = updateUser(updateCurrentUser, redirectUrl, config)
 
     /**
      * Resends an existing signup confirmation email, email change email
@@ -278,7 +296,7 @@ sealed interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
     /**
      * Imports a user session and starts auto-refreshing if [autoRefresh] is true
      */
-    suspend fun importSession(session: UserSession, autoRefresh: Boolean = true, source: SessionSource = SessionSource.Unknown)
+    suspend fun importSession(session: UserSession, autoRefresh: Boolean = config.alwaysAutoRefresh, source: SessionSource = SessionSource.Unknown)
 
     /**
      * Imports the jwt token and retrieves the user profile.

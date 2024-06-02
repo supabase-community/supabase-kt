@@ -2,6 +2,8 @@ package io.github.jan.supabase.storage
 
 import io.github.jan.supabase.putJsonObject
 import io.github.jan.supabase.safeBody
+import io.github.jan.supabase.storage.BucketApi.Companion.UPSERT_HEADER
+import io.github.jan.supabase.storage.resumable.ResumableCache
 import io.github.jan.supabase.storage.resumable.ResumableClientImpl
 import io.ktor.client.call.body
 import io.ktor.client.request.HttpRequestBuilder
@@ -26,13 +28,14 @@ import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.put
 import kotlinx.serialization.json.putJsonArray
+import kotlinx.serialization.json.putJsonObject
 import kotlin.time.Duration
 
-internal class BucketApiImpl(override val bucketId: String, val storage: StorageImpl) : BucketApi {
+internal class BucketApiImpl(override val bucketId: String, val storage: StorageImpl, resumableCache: ResumableCache) : BucketApi {
 
     override val supabaseClient = storage.supabaseClient
 
-    override val resumable = ResumableClientImpl(this, storage.config.resumable.cache)
+    override val resumable = ResumableClientImpl(this, resumableCache)
 
     override suspend fun update(path: String, data: UploadData, upsert: Boolean): String =
         uploadOrUpdate(
@@ -50,7 +53,7 @@ internal class BucketApiImpl(override val bucketId: String, val storage: Storage
 
     override suspend fun createSignedUploadUrl(path: String): UploadSignedUrl {
         val result = storage.api.post("object/upload/sign/$bucketId/$path")
-        val urlPath = result.body<JsonObject>()["url"]?.jsonPrimitive?.content
+        val urlPath = result.body<JsonObject>()["url"]?.jsonPrimitive?.content?.substring(1)
             ?: error("Expected a url in create upload signed url response")
         val url = Url(storage.resolveUrl(urlPath))
         return UploadSignedUrl(
@@ -74,19 +77,21 @@ internal class BucketApiImpl(override val bucketId: String, val storage: Storage
         })
     }
 
-    override suspend fun move(from: String, to: String) {
+    override suspend fun move(from: String, to: String, destinationBucket: String?) {
         storage.api.postJson("object/move", buildJsonObject {
             put("bucketId", bucketId)
             put("sourceKey", from)
             put("destinationKey", to)
+            destinationBucket?.let { put("destinationBucket", it) }
         })
     }
 
-    override suspend fun copy(from: String, to: String) {
+    override suspend fun copy(from: String, to: String, destinationBucket: String?) {
         storage.api.postJson("object/copy", buildJsonObject {
             put("bucketId", bucketId)
             put("sourceKey", from)
             put("destinationKey", to)
+            destinationBucket?.let { put("destinationBucket", it) }
         })
     }
 
@@ -98,12 +103,12 @@ internal class BucketApiImpl(override val bucketId: String, val storage: Storage
         val transformation = ImageTransformation().apply(transform)
         val body = storage.api.postJson("object/sign/$bucketId/$path", buildJsonObject {
             put("expiresIn", expiresIn.inWholeSeconds)
-            transformation.width?.let { put("width", it) }
-            transformation.height?.let { put("height", it) }
-            transformation.resize?.let { put("resize", it.name.lowercase()) }
+            putJsonObject("transform") {
+                putImageTransformation(transformation)
+            }
         }).body<JsonObject>()
-        return body["signedURL"]?.jsonPrimitive?.content?.substring(1)
-            ?: error("Expected signed url in response")
+        return storage.resolveUrl(body["signedURL"]?.jsonPrimitive?.content?.substring(1)
+            ?: error("Expected signed url in response"))
     }
 
     override suspend fun createSignedUrls(
@@ -221,7 +226,7 @@ internal class BucketApiImpl(override val bucketId: String, val storage: Storage
                 override fun readFrom(): ByteReadChannel = data.stream
             })
             header(HttpHeaders.ContentType, ContentType.defaultForFilePath(path))
-            header("x-upsert", upsert.toString())
+            header(UPSERT_HEADER, upsert.toString())
             extra()
         }.body<JsonObject>()["Key"]?.jsonPrimitive?.content
             ?: error("Expected a key in a upload response")
