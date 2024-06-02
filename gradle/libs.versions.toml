@@ -23,7 +23,7 @@ googleid = "1.1.0"
 compose = "1.6.10"
 androidsvg = "1.4"
 imageloader = "1.8.0"
-coil = "2.6.0"
+coil = "3.0.0-alpha06"
 okio = "3.9.0"
 credentials = "1.2.2"
 
@@ -92,7 +92,8 @@ jackson-kotlin = { module = "com.fasterxml.jackson.module:jackson-module-kotlin"
 
 androidsvg = { module = "com.caverock:androidsvg-aar", version.ref = "androidsvg" }
 
-coil = { module = "io.coil-kt:coil", version.ref = "coil" }
+coil = { module = "io.coil-kt.coil3:coil", version.ref = "coil" }
+coil-network-core = { module = "io.coil-kt.coil3:coil-network-core", version.ref = "coil" }
 imageloader = { module = "io.github.qdsfdhvh:image-loader", version.ref = "imageloader" }
 
 [bundles]
@@ -101,3 +102,4 @@ multiplatform-settings = ["multiplatform-settings-no-arg", "multiplatform-settin
 testing = ["kotlinx-coroutines-test", "multiplatform-settings-test", "ktor-client-mock", "kotlin-test"]
 moshi = ["moshi", "moshi-kotlin"]
 jackson = ["jackson", "jackson-kotlin"]
+coil = ["coil", "coil-network-core"]

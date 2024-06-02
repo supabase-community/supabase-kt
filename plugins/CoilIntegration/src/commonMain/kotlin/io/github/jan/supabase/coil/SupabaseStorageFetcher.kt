@@ -1,10 +1,13 @@
 package io.github.jan.supabase.coil
 
-import android.net.Uri
-import coil.ImageLoader
-import coil.fetch.FetchResult
-import coil.fetch.Fetcher
-import coil.request.Options
+import coil3.Extras
+import coil3.ImageLoader
+import coil3.annotation.ExperimentalCoilApi
+import coil3.fetch.FetchResult
+import coil3.fetch.Fetcher
+import coil3.network.httpHeaders
+import coil3.request.Options
+import coil3.toUri
 import io.github.jan.supabase.logging.d
 import io.github.jan.supabase.storage.Storage
 import io.github.jan.supabase.storage.StorageItem
@@ -17,6 +20,7 @@ internal class SupabaseStorageFetcher(
     private val imageLoader: ImageLoader
 ) : Fetcher {
 
+    @OptIn(ExperimentalCoilApi::class)
     override suspend fun fetch(): FetchResult? {
         CoilIntegration.logger.d { "Received fetcher request for item $item" }
         val bucket = storage[item.bucketId]
@@ -25,12 +29,17 @@ internal class SupabaseStorageFetcher(
         } else {
             null to bucket.publicUrl(item.path)
         }
-        val headers = if (item.authenticated) {
-            options.headers.newBuilder().set("Authorization", "Bearer $token").build()
-        } else {
-            options.headers
+        val extras = options.extras.newBuilder()
+        if (item.authenticated) {
+            extras[Extras.Key.httpHeaders] = options.httpHeaders.newBuilder().apply {
+                set("Authorization", "Bearer $token")
+            }.build()
         }
-        val (fetcher, _) = imageLoader.components.newFetcher(Uri.parse(url), options.copy(headers = headers), imageLoader) ?: error("No fetcher found for $url")
+        val (fetcher, _) = imageLoader.components.newFetcher(
+            url.toUri(),
+            options.copy(extras = extras.build()),
+            imageLoader
+        ) ?: error("No fetcher found for $url")
         return fetcher.fetch()
     }
 
