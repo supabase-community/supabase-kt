@@ -28,7 +28,7 @@ plugins:
 
 tests:
   - changed-files:
-      - any-glob-to-any-file: '**/*test/**'
+      - any-glob-to-any-file: '**/*Test/**'
 
 samples:
   - changed-files:
