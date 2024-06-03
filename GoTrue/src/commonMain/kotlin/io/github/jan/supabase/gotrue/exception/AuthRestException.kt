@@ -7,6 +7,13 @@ import io.github.jan.supabase.exceptions.RestException
  */
 open class AuthRestException(errorCode: String, message: String): RestException(
     error = errorCode,
-    description = null,
+    description = "Auth API error: $errorCode",
     message = message
-)
+) {
+
+    /**
+     * The error code of the rest exception. If [errorCode] is not a known [AuthErrorCode], this will be null. Then, use [error] instead to get the raw unknown error code.
+     */
+    val errorCode: AuthErrorCode? = AuthErrorCode.fromValue(errorCode)
+
+}
