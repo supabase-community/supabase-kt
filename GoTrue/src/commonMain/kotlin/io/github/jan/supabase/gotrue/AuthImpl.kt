@@ -10,6 +10,7 @@ import io.github.jan.supabase.exceptions.UnauthorizedRestException
 import io.github.jan.supabase.exceptions.UnknownRestException
 import io.github.jan.supabase.gotrue.admin.AdminApi
 import io.github.jan.supabase.gotrue.admin.AdminApiImpl
+import io.github.jan.supabase.gotrue.exception.AuthRestException
 import io.github.jan.supabase.gotrue.exception.AuthSessionMissingException
 import io.github.jan.supabase.gotrue.exception.AuthWeakPasswordException
 import io.github.jan.supabase.gotrue.mfa.MfaApi
@@ -470,27 +471,27 @@ internal class AuthImpl(
         checkErrorCodes(errorBody)?.let { return it }
         return when (response.status) {
             HttpStatusCode.Unauthorized -> UnauthorizedRestException(
-                errorBody.error,
+                errorBody.error ?: "Unauthorized",
                 response,
                 errorBody.description
             )
             HttpStatusCode.BadRequest -> BadRequestRestException(
-                errorBody.error,
+                errorBody.error ?: "Bad Request",
                 response,
                 errorBody.description
             )
             HttpStatusCode.UnprocessableEntity -> BadRequestRestException(
-                errorBody.error,
+                errorBody.error ?: "Unprocessable Entity",
                 response,
                 errorBody.description
             )
-            else -> UnknownRestException(errorBody.error, response)
+            else -> UnknownRestException(errorBody.error ?: "Unknown Error", response)
         }
     }
 
     private fun checkErrorCodes(error: GoTrueErrorResponse): RestException? {
         return when (error.error) {
-            AuthWeakPasswordException.CODE -> AuthWeakPasswordException(error.error, error.weakPassword?.reasons ?: emptyList())
+            AuthWeakPasswordException.CODE -> AuthWeakPasswordException(error.description, error.weakPassword?.reasons ?: emptyList())
             AuthSessionMissingException.CODE -> {
                 authScope.launch {
                     Auth.logger.e { "Received session not found api error. Clearing session..." }
@@ -498,7 +499,9 @@ internal class AuthImpl(
                 }
                 AuthSessionMissingException()
             }
-            else -> null
+            else -> {
+                error.error?.let { AuthRestException(it, error.description) }
+            }
         }
     }
 
