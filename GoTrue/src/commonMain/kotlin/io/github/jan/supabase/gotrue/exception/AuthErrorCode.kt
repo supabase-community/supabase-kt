@@ -2,7 +2,7 @@ package io.github.jan.supabase.gotrue.exception
 
 /**
  * Enum class for error codes returned by the Auth API.
- * @param value The actual error code returned by the API. Equivalent to the [AuthRestException.error] property.e.
+ * @param value The actual error code returned by the API. Equivalent to the [AuthRestException.error] property.
  */
 enum class AuthErrorCode(val value: String) {
     UnexpectedFailure("unexpected_failure"),
