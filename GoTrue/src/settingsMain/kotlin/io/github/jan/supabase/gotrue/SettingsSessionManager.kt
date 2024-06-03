@@ -7,6 +7,7 @@ import io.github.jan.supabase.gotrue.user.UserSession
 import io.github.jan.supabase.logging.e
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonBuilder
 
 private val settingsJson = Json {
     encodeDefaults = true
@@ -17,6 +18,7 @@ private val settingsJson = Json {
  *
  * @param settings The [Settings] instance to use. Defaults to [createDefaultSettings].
  * @param key The key to use for saving the session.
+ * @param json The [Json] instance to use for serialization. Defaults to [settingsJson]. **Important: [JsonBuilder.encodeDefaults] must be set to true.**
  */
 class SettingsSessionManager(
     private val settings: Settings = createDefaultSettings(),
