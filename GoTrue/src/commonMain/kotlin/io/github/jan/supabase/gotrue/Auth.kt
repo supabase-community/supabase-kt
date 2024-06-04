@@ -141,6 +141,9 @@ sealed interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
      *
      * @param data Extra data for the user
      * @param captchaToken The captcha token to use
+     * @throws RestException or one of its subclasses if receiving an error response. If the error response contains a error code, an [AuthRestException] will be thrown which can be used to easier identify the problem.
+     * @throws HttpRequestTimeoutException if the request timed out
+     * @throws HttpRequestException on network related issues
      */
     suspend fun signInAnonymously(data: JsonObject? = null, captchaToken: String? = null)
 
@@ -152,6 +155,9 @@ sealed interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
      * @param redirectUrl The redirect url to use. If you don't specify this, the platform specific will be used, like deeplinks on android.
      * @param config Extra configuration
      * @return The OAuth url to open in the browser if [ExternalAuthConfigDefaults.automaticallyOpenUrl] is false, otherwise null.
+     * @throws RestException or one of its subclasses if receiving an error response. If the error response contains a error code, an [AuthRestException] will be thrown which can be used to easier identify the problem.
+     * @throws HttpRequestTimeoutException if the request timed out
+     * @throws HttpRequestException on network related issues
      */
     suspend fun linkIdentity(
         provider: OAuthProvider,
@@ -163,6 +169,9 @@ sealed interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
      * Unlinks an OAuth Identity from an existing user.
      * @param identityId The id of the OAuth identity
      * @param updateLocalUser Whether to delete the identity from the local user or not
+     * @throws RestException or one of its subclasses if receiving an error response. If the error response contains a error code, an [AuthRestException] will be thrown which can be used to easier identify the problem.
+     * @throws HttpRequestTimeoutException if the request timed out
+     * @throws HttpRequestException on network related issues
      */
     suspend fun unlinkIdentity(
         identityId: String,
@@ -173,6 +182,9 @@ sealed interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
      * Retrieves the sso url for the given [config]
      * @param redirectUrl The redirect url to use
      * @param config The configuration to use
+     * @throws RestException or one of its subclasses if receiving an error response. If the error response contains a error code, an [AuthRestException] will be thrown which can be used to easier identify the problem.
+     * @throws HttpRequestTimeoutException if the request timed out
+     * @throws HttpRequestException on network related issues
      */
     suspend fun retrieveSSOUrl(redirectUrl: String? = defaultRedirectUrl(), config: SSO.Config.() -> Unit): SSO.Result
 
@@ -340,6 +352,9 @@ sealed interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
      * Exchanges a code for a session. Used when using the [FlowType.PKCE] flow
      * @param code The code to exchange
      * @param saveSession Whether to save the session in storage
+     * @throws RestException or one of its subclasses if receiving an error response. If the error response contains a error code, an [AuthRestException] will be thrown which can be used to easier identify the problem.
+     * @throws HttpRequestTimeoutException if the request timed out
+     * @throws HttpRequestException on network related issues
      */
     suspend fun exchangeCodeForSession(code: String, saveSession: Boolean = true): UserSession
 
