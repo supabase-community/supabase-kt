@@ -92,7 +92,7 @@ val iosMain by getting {
 
 **Note:** It is recommended to use the same Ktor version as supabase-kt:
 
-![https://img.shields.io/badge/ktor-2.3.10-blue](https://img.shields.io/badge/ktor-2.3.10-blue)
+![https://img.shields.io/badge/ktor-2.3.11-blue](https://img.shields.io/badge/ktor-2.3.11-blue)
 
 # Main Modules
 
