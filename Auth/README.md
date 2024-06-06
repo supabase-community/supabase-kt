@@ -1,4 +1,4 @@
-# Supabase-kt GoTrue
+# Supabase-kt Auth
 
 Extends Supabase-kt with a multiplatform GoTrue client.
 

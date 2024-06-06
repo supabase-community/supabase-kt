@@ -9,7 +9,7 @@ plugins {
     alias(libs.plugins.compose.compiler)
 }
 
-description = "Extends gotrue-kt with Native Auth composables"
+description = "Extends auth-kt with Native Auth composables"
 
 repositories {
     mavenCentral()
