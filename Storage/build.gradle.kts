@@ -22,7 +22,7 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
-                api(project(":gotrue-kt"))
+                api(project(":auth-kt"))
             }
         }
         val commonTest by getting {

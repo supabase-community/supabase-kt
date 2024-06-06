@@ -364,7 +364,7 @@ internal class AuthImpl(
         val response = api.postJson("token?grant_type=refresh_token", body) {
             headers.remove("Authorization")
         }
-        return response.safeBody("GoTrue#refreshSession")
+        return response.safeBody("Auth#refreshSession")
     }
 
     override suspend fun refreshCurrentSession() {
@@ -467,7 +467,7 @@ internal class AuthImpl(
 
     override suspend fun parseErrorResponse(response: HttpResponse): RestException {
         val errorBody =
-            response.bodyOrNull<GoTrueErrorResponse>() ?: GoTrueErrorResponse("Unknown error", "")
+            response.bodyOrNull<AuthErrorResponse>() ?: AuthErrorResponse("Unknown error", "")
         checkErrorCodes(errorBody)?.let { return it }
         return when (response.status) {
             HttpStatusCode.Unauthorized -> UnauthorizedRestException(
@@ -489,7 +489,7 @@ internal class AuthImpl(
         }
     }
 
-    private fun checkErrorCodes(error: GoTrueErrorResponse): RestException? {
+    private fun checkErrorCodes(error: AuthErrorResponse): RestException? {
         return when (error.error) {
             AuthWeakPasswordException.CODE -> AuthWeakPasswordException(error.description, error.weakPassword?.reasons ?: emptyList())
             AuthSessionMissingException.CODE -> {

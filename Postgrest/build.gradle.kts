@@ -16,7 +16,7 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
-                api(project(":gotrue-kt"))
+                api(project(":auth-kt"))
                 api(libs.kotlin.reflect)
             }
         }

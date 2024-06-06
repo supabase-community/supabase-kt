@@ -12,8 +12,8 @@ import kotlinx.serialization.json.decodeFromJsonElement
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 
-@Serializable(with = GoTrueErrorResponse.Companion::class)
-internal data class GoTrueErrorResponse(
+@Serializable(with = AuthErrorResponse.Companion::class)
+internal data class AuthErrorResponse(
     val error: String?,
     val description: String = "",
     val weakPassword: WeakPassword? = null
@@ -24,13 +24,13 @@ internal data class GoTrueErrorResponse(
         val reasons: List<String>
     )
 
-    companion object : KSerializer<GoTrueErrorResponse> {
+    companion object : KSerializer<AuthErrorResponse> {
 
-        override val descriptor = buildClassSerialDescriptor("GoTrueErrorResponse") {
+        override val descriptor = buildClassSerialDescriptor("AuthErrorResponse") {
             element("error", String.serializer().descriptor)
         }
 
-        override fun deserialize(decoder: Decoder): GoTrueErrorResponse {
+        override fun deserialize(decoder: Decoder): AuthErrorResponse {
             decoder as JsonDecoder
             val json = decoder.decodeJsonElement()
             val error = json.jsonObject["error_code"]?.jsonPrimitive?.content
@@ -38,10 +38,10 @@ internal data class GoTrueErrorResponse(
             val weakPassword = if(json.jsonObject.containsKey("weak_password")) {
                 Json.decodeFromJsonElement<WeakPassword>(json.jsonObject["weak_password"]!!)
             } else null
-            return GoTrueErrorResponse(error, description, weakPassword)
+            return AuthErrorResponse(error, description, weakPassword)
         }
 
-        override fun serialize(encoder: Encoder, value: GoTrueErrorResponse) {
+        override fun serialize(encoder: Encoder, value: AuthErrorResponse) {
             throw UnsupportedOperationException()
         }
 
