@@ -31,7 +31,7 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 api(compose.ui)
-                api(project(":auth-kt"))
+                api(project(":${Constants.AUTH_ARTIFACT_ID}"))
                 implementation(compose.material3)
             }
         }

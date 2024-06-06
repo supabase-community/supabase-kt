@@ -1,6 +1,6 @@
 # Supabase-kt Auth
 
-Extends Supabase-kt with a multiplatform GoTrue client.
+Extends Supabase-kt with a multiplatform Auth client.
 
 Supported targets:
 
@@ -61,4 +61,4 @@ val supabase = createSupabaseClient(
 
 # Usage
 
-See [GoTrue documentation](https://supabase.com/docs/reference/kotlin/auth-signup) for usage
+See [Auth documentation](https://supabase.com/docs/reference/kotlin/auth-signup) for usage

@@ -16,7 +16,7 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
-                api(project(":auth-kt"))
+                api(project(":${Constants.AUTH_ARTIFACT_ID}"))
                 api(libs.kotlin.reflect)
             }
         }
