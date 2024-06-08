@@ -9,7 +9,7 @@ plugins {
     alias(libs.plugins.compose.compiler)
 }
 
-description = "Extends gotrue-kt with Native Auth composables"
+description = "Extends auth-kt with Native Auth composables"
 
 repositories {
     mavenCentral()
@@ -31,7 +31,7 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
-                api(project(":gotrue-kt"))
+                api(project(":auth-kt"))
                 implementation(compose.runtime)
                 implementation(libs.krypto)
             }

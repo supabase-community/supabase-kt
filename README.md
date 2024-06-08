@@ -96,7 +96,7 @@ val iosMain by getting {
 
 # Main Modules
 
-#### [Authentication](/GoTrue)
+#### [Authentication](/Auth)
 
 #### [Database/Postgrest](/Postgrest)
 

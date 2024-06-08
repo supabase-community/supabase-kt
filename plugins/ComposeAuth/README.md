@@ -1,6 +1,6 @@
 # Supabase-kt Compose Auth
 
-Extends gotrue-kt with Native Auth composables for Compose Multiplatform
+Extends auth-kt with Native Auth composables for Compose Multiplatform
 
 Supported targets:
 
@@ -10,7 +10,7 @@ Supported targets:
 
 > Note: iOS support is experimental and needs feedback
 >
-> ☑️ = Has no support for neither Google nor Apple Native Auth, relies on gotrue-kt for OAuth.
+> ☑️ = Has no support for neither Google nor Apple Native Auth, relies on auth-kt for OAuth.
 
 <details>
 

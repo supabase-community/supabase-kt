@@ -31,7 +31,7 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 api(compose.ui)
-                api(project(":gotrue-kt"))
+                api(project(":auth-kt"))
                 implementation(compose.material3)
             }
         }

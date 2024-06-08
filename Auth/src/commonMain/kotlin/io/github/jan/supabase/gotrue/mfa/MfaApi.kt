@@ -16,7 +16,7 @@ import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.put
 
 /**
- * An interface for interacting with Multi-Factor Authentication Api in GoTrue.
+ * An interface for interacting with Multi-Factor Authentication Api in Supabase Auth.
  */
 sealed interface MfaApi {
 
@@ -74,7 +74,7 @@ sealed interface MfaApi {
      * Creates a new MFA challenge and immediately verifies it
      * @param factorId The id of the MFA factor to verify
      * @param code The code to verify
-     * @param saveSession Whether to save the session after verification in GoTrue
+     * @param saveSession Whether to save the session after verification in Supabase Auth
      */
     suspend fun createChallengeAndVerify(factorId: String, code: String, saveSession: Boolean = true): UserSession {
         val challenge = createChallenge(factorId)
@@ -86,7 +86,7 @@ sealed interface MfaApi {
      * @param factorId The id of the MFA factor to verify
      * @param challengeId The id of the challenge to verify
      * @param code The code to verify
-     * @param saveSession Whether to save the session after verification in GoTrue
+     * @param saveSession Whether to save the session after verification in Supabase Auth
      */
     suspend fun verifyChallenge(factorId: String, challengeId: String, code: String, saveSession: Boolean = true): UserSession
 

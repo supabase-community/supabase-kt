@@ -6,9 +6,9 @@ import io.github.jan.supabase.logging.d
 import kotlinx.serialization.json.jsonObject
 
 internal fun noDeeplinkError(arg: String): Nothing = error("""
-        Trying to use a deeplink as a redirect url, but no deeplink $arg is set in the GoTrueConfig.
-        If you want to use deep linking, set the scheme and host in the GoTrueConfig:
-        install(GoTrue) {
+        Trying to use a deeplink as a redirect url, but no deeplink $arg is set in the AuthConfig.
+        If you want to use deep linking, set the scheme and host in the AuthConfig:
+        install(Auth) {
             scheme = "YOUR_SCHEME"
             host = "YOUR_HOST"
         }

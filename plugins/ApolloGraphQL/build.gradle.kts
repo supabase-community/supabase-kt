@@ -23,7 +23,7 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 api(project(":"))
-                api(project(":gotrue-kt"))
+                api(project(":auth-kt"))
                 api(libs.apollo.kotlin)
             }
         }
