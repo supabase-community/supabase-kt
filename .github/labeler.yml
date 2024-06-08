@@ -16,7 +16,7 @@ postgrest:
 
 auth:
   - changed-files:
-      - any-glob-to-any-file: GoTrue/src/**
+      - any-glob-to-any-file: Auth/src/**
 
 storage:
   - changed-files:

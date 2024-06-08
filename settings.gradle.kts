@@ -10,7 +10,7 @@ plugins {
     id("org.gradle.toolchains.foojay-resolver-convention") version("0.8.0")
 }
 
-include("GoTrue")
+include("Auth")
 include("Postgrest")
 include("Storage")
 include("Realtime")
@@ -31,7 +31,7 @@ include(":plugins:ComposeAuth")
 include(":plugins:ComposeAuthUI")
 include(":plugins:CoilIntegration")
 include(":plugins:ImageLoaderIntegration")
-project(":GoTrue").name = System.getenv("AUTH_ARTIFACT_ID") ?: "auth-kt"
+project(":Auth").name = System.getenv("AUTH_ARTIFACT_ID") ?: "auth-kt"
 project(":Postgrest").name = "postgrest-kt"
 project(":Storage").name = "storage-kt"
 project(":Realtime").name = "realtime-kt"
