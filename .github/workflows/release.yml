@@ -31,6 +31,10 @@ jobs:
           cache-read-only: true
       - name: Publish
         run: ./gradlew publishAllPublicationsToMavenCentral
+      - name: Close and release
+        if: inputs.close_and_release
+        run: ./gradlew releaseRepository --configuration-cache
+      # Remove next version:
       - name: Publish old gotrue artifact
         run: ./gradlew :gotrue-kt:publishAllPublicationsToMavenCentral
         env:
