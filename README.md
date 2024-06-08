@@ -118,7 +118,7 @@ val iosMain by getting {
 
 #### [Compose-ImageLoader Integration](/plugins/ImageLoaderIntegration) - Provides a [Compose ImageLoader](https://github.com/qdsfdhvh/compose-imageloader) Integration for displaying images stored in Supabase Storage.
 
-# Demos
+# Samples
 
 - [Chat Demo (Desktop/Android/iOS/Browser)](https://github.com/supabase-community/supabase-kt/tree/master/demos/chat-demo-mpp)
 - [File Upload Demo (Desktop/Android)](https://github.com/supabase-community/supabase-kt/tree/master/demos/file-upload)
