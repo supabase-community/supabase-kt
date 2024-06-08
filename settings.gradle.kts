@@ -31,7 +31,7 @@ include(":plugins:ComposeAuth")
 include(":plugins:ComposeAuthUI")
 include(":plugins:CoilIntegration")
 include(":plugins:ImageLoaderIntegration")
-project(":Auth").name = System.getenv("AUTH_ARTIFACT_ID") ?: "auth-kt"
+project(":Auth").name = "auth-kt"
 project(":Postgrest").name = "postgrest-kt"
 project(":Storage").name = "storage-kt"
 project(":Realtime").name = "realtime-kt"

@@ -34,11 +34,3 @@ jobs:
       - name: Close and release
         if: inputs.close_and_release
         run: ./gradlew releaseRepository --configuration-cache
-      # Remove next version:
-      - name: Publish old gotrue artifact
-        run: ./gradlew :gotrue-kt:publishAllPublicationsToMavenCentral
-        env:
-          AUTH_ARTIFACT_ID: gotrue-kt
-      - name: Close and release
-        if: inputs.close_and_release
-        run: ./gradlew releaseRepository --configuration-cache

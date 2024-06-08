@@ -31,7 +31,7 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
-                api(project(":${Constants.AUTH_ARTIFACT_ID}"))
+                api(project(":auth-kt"))
                 implementation(compose.runtime)
                 implementation(libs.krypto)
             }

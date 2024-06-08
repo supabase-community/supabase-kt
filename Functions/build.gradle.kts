@@ -16,7 +16,7 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 api(project(":"))
-                api(project(":${Constants.AUTH_ARTIFACT_ID}"))
+                api(project(":auth-kt"))
             }
         }
     }
