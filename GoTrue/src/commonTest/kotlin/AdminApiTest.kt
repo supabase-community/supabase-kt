@@ -1,9 +1,12 @@
 import io.github.jan.supabase.SupabaseClientBuilder
 import io.github.jan.supabase.gotrue.Auth
 import io.github.jan.supabase.gotrue.SignOutScope
+import io.github.jan.supabase.gotrue.admin.LinkType
+import io.github.jan.supabase.gotrue.admin.generateLinkFor
 import io.github.jan.supabase.gotrue.auth
 import io.github.jan.supabase.gotrue.minimalSettings
 import io.github.jan.supabase.gotrue.user.UserInfo
+import io.github.jan.supabase.gotrue.user.UserMfaFactor
 import io.github.jan.supabase.testing.assertMethodIs
 import io.github.jan.supabase.testing.assertPathIs
 import io.github.jan.supabase.testing.createMockedSupabaseClient
@@ -189,6 +192,223 @@ class AdminApiTest {
             val users = client.auth.admin.retrieveUsers(page = page, perPage = perPage)
             assertEquals(1, users.size)
             assertEquals("email", users.first().email)
+        }
+    }
+
+    @Test
+    fun testRetrieveUserById() {
+        runTest {
+            val uid = "uid"
+            val email = "email"
+            val client = createMockedSupabaseClient(
+                configuration = configuration
+            ) {
+                assertPathIs("/admin/users/$uid", it.url.pathAfterVersion())
+                assertMethodIs(HttpMethod.Get, it.method)
+                respondJson(
+                    Json.encodeToString(
+                        UserInfo(
+                            id = uid,
+                            email = email,
+                            appMetadata = null,
+                            userMetadata = null,
+                            createdAt = Clock.System.now(),
+                            updatedAt = Clock.System.now(),
+                            confirmedAt = Clock.System.now(),
+                            aud = "aud",
+                        )
+                    )
+                )
+            }
+            val user = client.auth.admin.retrieveUserById(uid)
+            assertEquals(email, user.email)
+        }
+    }
+
+    @Test
+    fun testDeleteUser() {
+        runTest {
+            val uid = "uid"
+            val client = createMockedSupabaseClient(
+                configuration = configuration
+            ) {
+                assertPathIs("/admin/users/$uid", it.url.pathAfterVersion())
+                assertMethodIs(HttpMethod.Delete, it.method)
+                respond("")
+            }
+            client.auth.admin.deleteUser(uid)
+        }
+    }
+
+    @Test
+    fun testInviteUserById() {
+        runTest {
+            val email = "email"
+            val redirectTo = "https://example.com"
+            val data = buildJsonObject {
+                put("type", "user")
+            }
+            val client = createMockedSupabaseClient(
+                configuration = configuration
+            ) {
+                assertPathIs("/invite", it.url.pathAfterVersion())
+                assertMethodIs(HttpMethod.Post, it.method)
+                val body = it.body.toJsonElement().jsonObject
+                val params = it.url.parameters
+                assertEquals(email, body["email"]?.jsonPrimitive?.content)
+                assertEquals(redirectTo, params["redirect_to"])
+                assertEquals(data, body["data"]?.jsonObject)
+                respond("")
+            }
+            client.auth.admin.inviteUserByEmail(
+                email = email,
+                redirectTo = redirectTo,
+                data = data
+            )
+        }
+    }
+
+    @Test
+    fun testUpdateUserById() {
+        runTest {
+            val uid = "uid"
+            val email = "email"
+            val userMetadata = buildJsonObject {
+                put("type", "user")
+            }
+            val appMetadata = buildJsonObject {
+                put("type", "app")
+            }
+            val banDuration = "300ms"
+            val role = "admin"
+            val phone = "+123456789"
+            val client = createMockedSupabaseClient(
+                configuration = configuration
+            ) {
+                assertPathIs("/admin/users/$uid", it.url.pathAfterVersion())
+                assertMethodIs(HttpMethod.Put, it.method)
+                val body = it.body.toJsonElement().jsonObject
+                assertEquals(email, body["email"]?.jsonPrimitive?.content)
+                assertEquals(userMetadata, body["user_metadata"]?.jsonObject)
+                assertEquals(appMetadata, body["app_metadata"]?.jsonObject)
+                assertEquals(banDuration, body["ban_duration"]?.jsonPrimitive?.content)
+                assertEquals(role, body["role"]?.jsonPrimitive?.content)
+                assertEquals(phone, body["phone"]?.jsonPrimitive?.content)
+                respondJson(
+                    Json.encodeToString(
+                        UserInfo(
+                            id = uid,
+                            email = email,
+                            appMetadata = appMetadata,
+                            userMetadata = userMetadata,
+                            createdAt = Clock.System.now(),
+                            updatedAt = Clock.System.now(),
+                            confirmedAt = Clock.System.now(),
+                            phone = phone,
+                            aud = "aud",
+                        )
+                    )
+                )
+            }
+            val updatedUser = client.auth.admin.updateUserById(uid) {
+                this.email = email
+                this.userMetadata = userMetadata
+                this.appMetadata = appMetadata
+                this.banDuration = banDuration
+                this.role = role
+                this.phone = phone
+            }
+            assertEquals(email, updatedUser.email)
+            assertEquals(phone, updatedUser.phone)
+            assertEquals(appMetadata, updatedUser.appMetadata)
+            assertEquals(userMetadata, updatedUser.userMetadata)
+        }
+    }
+
+    @Test
+    fun testDeleteFactor() {
+        runTest {
+            val uid = "uid"
+            val factorId = "factorId"
+            val client = createMockedSupabaseClient(
+                configuration = configuration
+            ) {
+                assertPathIs("/admin/users/$uid/factors/$factorId", it.url.pathAfterVersion())
+                assertMethodIs(HttpMethod.Delete, it.method)
+                respond("")
+            }
+            client.auth.admin.deleteFactor(uid, factorId)
+        }
+    }
+
+    @Test
+    fun testRetrieveFactors() {
+        runTest {
+            val uid = "uid"
+            val factor = UserMfaFactor(
+                id = uid,
+                createdAt = Clock.System.now(),
+                updatedAt = Clock.System.now(),
+                status = "status",
+                friendlyName = "friendlyName",
+                factorType = "factorType",
+            )
+            val client = createMockedSupabaseClient(
+                configuration = configuration
+            ) {
+                assertPathIs("/admin/users/$uid/factors", it.url.pathAfterVersion())
+                assertMethodIs(HttpMethod.Get, it.method)
+                respondJson(
+                    Json.encodeToJsonElement(
+                        listOf(
+                            factor
+                        )
+                    )ad
+                )
+            }
+            val factors = client.auth.admin.retrieveFactors(uid)
+            assertEquals(factor, factors.first())
+        }
+    }
+
+    @Test
+    fun testGenerateLinkFor() {
+        runTest {
+            val email = "email"
+            val redirectTo = "https://example.com"
+            val client = createMockedSupabaseClient(
+                configuration = configuration
+            ) {
+                assertPathIs("/admin/generate_link", it.url.pathAfterVersion())
+                assertMethodIs(HttpMethod.Post, it.method)
+                val body = it.body.toJsonElement().jsonObject
+                val params = it.url.parameters
+                assertEquals("magiclink", body["type"]?.jsonPrimitive?.content)
+                assertEquals(email, body["email"]?.jsonPrimitive?.content)
+                assertEquals(redirectTo, params["redirect_to"])
+                respondJson(
+                    Json.encodeToString(
+                        UserInfo(
+                            id = "id",
+                            email = email,
+                            createdAt = Clock.System.now(),
+                            updatedAt = Clock.System.now(),
+                            confirmedAt = Clock.System.now(),
+                            aud = "aud",
+                            actionLink = "https://example.com"
+                        )
+                    )
+                )
+            }
+            val (link, user) = client.auth.admin.generateLinkFor(
+                linkType = LinkType.MagicLink,
+                redirectTo = redirectTo,
+                config = {
+                    this.email = email
+                }
+            )
+            assertEquals("https://example.com", link)
+            assertEquals(email, user.email)
         }
     }
 
