@@ -363,7 +363,7 @@ class AdminApiTest {
                         listOf(
                             factor
                         )
-                    )ad
+                    )
                 )
             }
             val factors = client.auth.admin.retrieveFactors(uid)
