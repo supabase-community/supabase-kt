@@ -179,6 +179,7 @@ class AuthTest {
             assertEquals(session, client.auth.currentSessionOrNull())
             assertEquals(expectedUser, client.auth.currentUserOrNull())
             assertEquals(expectedIdentities, client.auth.currentIdentitiesOrNull())
+            client.auth.clearSession()
             assertNull(client.auth.currentSessionOrNull())
         }
     }
