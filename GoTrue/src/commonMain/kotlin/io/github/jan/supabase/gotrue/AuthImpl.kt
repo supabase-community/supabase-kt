@@ -55,6 +55,7 @@ import kotlinx.serialization.json.put
 import kotlin.time.Duration.Companion.seconds
 
 private const val SESSION_REFRESH_THRESHOLD = 0.8
+private val SIGNOUT_IGNORE_CODES = listOf(401, 403, 404)
 
 @PublishedApi
 internal class AuthImpl(
@@ -278,7 +279,7 @@ internal class AuthImpl(
                 }
             } catch(e: RestException) {
                 val errorCode = if(e is AuthRestException) e.statusCode else if(e is UnknownRestException) e.statusCode else -1
-                if(errorCode in listOf(401, 403, 404)) {
+                if(errorCode in SIGNOUT_IGNORE_CODES) {
                     Auth.logger.d { "Received error code $errorCode while signing out user. This can happen if the user doesn't exist anymore or the JWT is invalid/expired. Proceeding to clean up local data..." }
                 } else throw e
             }
