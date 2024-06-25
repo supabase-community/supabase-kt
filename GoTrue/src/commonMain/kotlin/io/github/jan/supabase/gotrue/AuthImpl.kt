@@ -277,7 +277,7 @@ internal class AuthImpl(
                     parameter("scope", scope.name.lowercase())
                 }
             } catch(e: RestException) {
-                val errorCode = if(e is AuthRestException) e.statusCode else if(e is UnknownRestException) e.errorCode else -1
+                val errorCode = if(e is AuthRestException) e.statusCode else if(e is UnknownRestException) e.statusCode else -1
                 if(errorCode in listOf(401, 403, 404)) {
                     Auth.logger.d { "Received error code $errorCode while signing out user. This can happen if the user doesn't exist anymore or the JWT is invalid/expired. Proceeding to clean up local data..." }
                 } else throw e
@@ -492,7 +492,7 @@ internal class AuthImpl(
                 response,
                 errorBody.description
             )
-            else -> UnknownRestException(errorBody.error ?: "Unknown Error", response, errorCode = response.status.value)
+            else -> UnknownRestException(errorBody.error ?: "Unknown Error", response, statusCode = response.status.value)
         }
     }
 
