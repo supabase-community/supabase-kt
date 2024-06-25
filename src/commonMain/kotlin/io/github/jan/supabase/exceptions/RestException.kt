@@ -43,4 +43,4 @@ class NotFoundRestException(error: String, response: HttpResponse, message: Stri
 /**
  * Thrown for all other response codes
  */
-class UnknownRestException(error: String, response: HttpResponse, message: String? = null): RestException(error, response, message)
+class UnknownRestException(error: String, response: HttpResponse, message: String? = null, val errorCode: Int = -1): RestException(error, response, message)

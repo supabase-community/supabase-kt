@@ -272,8 +272,15 @@ internal class AuthImpl(
 
     override suspend fun signOut(scope: SignOutScope) {
         if (currentSessionOrNull() != null) {
-            api.post("logout") {
-                parameter("scope", scope.name.lowercase())
+            try {
+                api.post("logout") {
+                    parameter("scope", scope.name.lowercase())
+                }
+            } catch(e: RestException) {
+                val errorCode = if(e is AuthRestException) e.statusCode else if(e is UnknownRestException) e.errorCode else -1
+                if(errorCode in listOf(401, 403, 404)) {
+                    Auth.logger.d { "Received error code $errorCode while signing out user. This can happen if the user doesn't exist anymore or the JWT is invalid/expired. Proceeding to clean up local data..." }
+                } else throw e
             }
             Auth.logger.d { "Logged out session in Supabase" }
         } else {
@@ -468,7 +475,7 @@ internal class AuthImpl(
     override suspend fun parseErrorResponse(response: HttpResponse): RestException {
         val errorBody =
             response.bodyOrNull<GoTrueErrorResponse>() ?: GoTrueErrorResponse("Unknown error", "")
-        checkErrorCodes(errorBody)?.let { return it }
+        checkErrorCodes(errorBody, response)?.let { return it }
         return when (response.status) {
             HttpStatusCode.Unauthorized -> UnauthorizedRestException(
                 errorBody.error ?: "Unauthorized",
@@ -485,11 +492,11 @@ internal class AuthImpl(
                 response,
                 errorBody.description
             )
-            else -> UnknownRestException(errorBody.error ?: "Unknown Error", response)
+            else -> UnknownRestException(errorBody.error ?: "Unknown Error", response, errorCode = response.status.value)
         }
     }
 
-    private fun checkErrorCodes(error: GoTrueErrorResponse): RestException? {
+    private fun checkErrorCodes(error: GoTrueErrorResponse, response: HttpResponse): RestException? {
         return when (error.error) {
             AuthWeakPasswordException.CODE -> AuthWeakPasswordException(error.description, error.weakPassword?.reasons ?: emptyList())
             AuthSessionMissingException.CODE -> {
@@ -500,7 +507,7 @@ internal class AuthImpl(
                 AuthSessionMissingException()
             }
             else -> {
-                error.error?.let { AuthRestException(it, error.description) }
+                error.error?.let { AuthRestException(it, error.description, response.status.value) }
             }
         }
     }

@@ -7,7 +7,7 @@ import io.github.jan.supabase.exceptions.RestException
  * @property errorCode The error code of the rest exception. This should be a known [AuthErrorCode]. If it is not, use [error] instead.
  * @param message The message of the rest exception.
  */
-open class AuthRestException(errorCode: String, message: String): RestException(
+open class AuthRestException(errorCode: String, message: String, val statusCode: Int = -1): RestException(
     error = errorCode,
     description = "Auth API error: $errorCode",
     message = message
