@@ -55,6 +55,8 @@ import kotlinx.serialization.json.put
 import kotlin.time.Duration.Companion.seconds
 
 private const val SESSION_REFRESH_THRESHOLD = 0.8
+@Suppress("MagicNumber") // see #631
+private val SIGNOUT_IGNORE_CODES = listOf(401, 403, 404)
 
 @PublishedApi
 internal class AuthImpl(
@@ -272,8 +274,14 @@ internal class AuthImpl(
 
     override suspend fun signOut(scope: SignOutScope) {
         if (currentSessionOrNull() != null) {
-            api.post("logout") {
-                parameter("scope", scope.name.lowercase())
+            try {
+                api.post("logout") {
+                    parameter("scope", scope.name.lowercase())
+                }
+            } catch(e: RestException) {
+                if(e.statusCode in SIGNOUT_IGNORE_CODES) {
+                    Auth.logger.d { "Received error code ${e.statusCode} while signing out user. This can happen if the user doesn't exist anymore or the JWT is invalid/expired. Proceeding to clean up local data..." }
+                } else throw e
             }
             Auth.logger.d { "Logged out session in Supabase" }
         } else {
@@ -468,7 +476,7 @@ internal class AuthImpl(
     override suspend fun parseErrorResponse(response: HttpResponse): RestException {
         val errorBody =
             response.bodyOrNull<GoTrueErrorResponse>() ?: GoTrueErrorResponse("Unknown error", "")
-        checkErrorCodes(errorBody)?.let { return it }
+        checkErrorCodes(errorBody, response)?.let { return it }
         return when (response.status) {
             HttpStatusCode.Unauthorized -> UnauthorizedRestException(
                 errorBody.error ?: "Unauthorized",
@@ -489,18 +497,18 @@ internal class AuthImpl(
         }
     }
 
-    private fun checkErrorCodes(error: GoTrueErrorResponse): RestException? {
+    private fun checkErrorCodes(error: GoTrueErrorResponse, response: HttpResponse): RestException? {
         return when (error.error) {
-            AuthWeakPasswordException.CODE -> AuthWeakPasswordException(error.description, error.weakPassword?.reasons ?: emptyList())
+            AuthWeakPasswordException.CODE -> AuthWeakPasswordException(error.description, response.status.value, error.weakPassword?.reasons ?: emptyList())
             AuthSessionMissingException.CODE -> {
                 authScope.launch {
                     Auth.logger.e { "Received session not found api error. Clearing session..." }
                     clearSession()
                 }
-                AuthSessionMissingException()
+                AuthSessionMissingException(response.status.value)
             }
             else -> {
-                error.error?.let { AuthRestException(it, error.description) }
+                error.error?.let { AuthRestException(it, error.description, response.status.value) }
             }
         }
     }
