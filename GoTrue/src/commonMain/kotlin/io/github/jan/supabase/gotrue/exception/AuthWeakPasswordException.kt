@@ -7,10 +7,12 @@ package io.github.jan.supabase.gotrue.exception
  */
 class AuthWeakPasswordException(
     description: String,
+    statusCode: Int,
     val reasons: List<String>
 ) : AuthRestException(
     CODE,
     description,
+    statusCode
 ) {
 
     internal companion object {

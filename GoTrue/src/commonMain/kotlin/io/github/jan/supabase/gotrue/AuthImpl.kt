@@ -279,9 +279,8 @@ internal class AuthImpl(
                     parameter("scope", scope.name.lowercase())
                 }
             } catch(e: RestException) {
-                val errorCode = if(e is AuthRestException) e.statusCode else if(e is UnknownRestException) e.statusCode else -1
-                if(errorCode in SIGNOUT_IGNORE_CODES || e is UnauthorizedRestException) {
-                    Auth.logger.d { "Received error code $errorCode while signing out user. This can happen if the user doesn't exist anymore or the JWT is invalid/expired. Proceeding to clean up local data..." }
+                if(e.statusCode in SIGNOUT_IGNORE_CODES) {
+                    Auth.logger.d { "Received error code ${e.statusCode} while signing out user. This can happen if the user doesn't exist anymore or the JWT is invalid/expired. Proceeding to clean up local data..." }
                 } else throw e
             }
             Auth.logger.d { "Logged out session in Supabase" }
@@ -494,19 +493,19 @@ internal class AuthImpl(
                 response,
                 errorBody.description
             )
-            else -> UnknownRestException(errorBody.error ?: "Unknown Error", response, statusCode = response.status.value)
+            else -> UnknownRestException(errorBody.error ?: "Unknown Error", response)
         }
     }
 
     private fun checkErrorCodes(error: GoTrueErrorResponse, response: HttpResponse): RestException? {
         return when (error.error) {
-            AuthWeakPasswordException.CODE -> AuthWeakPasswordException(error.description, error.weakPassword?.reasons ?: emptyList())
+            AuthWeakPasswordException.CODE -> AuthWeakPasswordException(error.description, response.status.value, error.weakPassword?.reasons ?: emptyList())
             AuthSessionMissingException.CODE -> {
                 authScope.launch {
                     Auth.logger.e { "Received session not found api error. Clearing session..." }
                     clearSession()
                 }
-                AuthSessionMissingException()
+                AuthSessionMissingException(response.status.value)
             }
             else -> {
                 error.error?.let { AuthRestException(it, error.description, response.status.value) }

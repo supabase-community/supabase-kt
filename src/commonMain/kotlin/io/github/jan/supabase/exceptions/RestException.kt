@@ -9,14 +9,15 @@ import io.ktor.client.statement.request
  * Plugins may extend this class to provide more specific exceptions
  * @param error The error returned by Supabase
  * @param description The error description returned by Supabase
+ * @param statusCode The HTTP status code of the rest exception.
  * @see UnauthorizedRestException
  * @see BadRequestRestException
  * @see NotFoundRestException
  * @see UnknownRestException
  */
-open class RestException(val error: String, val description: String?, message: String): Exception(message) {
+open class RestException(val error: String, val description: String?, val statusCode: Int, message: String): Exception(message) {
 
-    constructor(error: String, response: HttpResponse, message: String? = null): this(error, message, """
+    constructor(error: String, response: HttpResponse, message: String? = null): this(error, message, response.status.value, """
         $error${message?.let { " ($it)" } ?: ""}
         URL: ${response.request.url}
         Headers: ${response.request.headers.entries()}
@@ -44,4 +45,4 @@ class NotFoundRestException(error: String, response: HttpResponse, message: Stri
  * Thrown for all other response codes
  * @property statusCode The HTTP status code
  */
-class UnknownRestException(error: String, response: HttpResponse, message: String? = null, val statusCode: Int = -1): RestException(error, response, message)
+class UnknownRestException(error: String, response: HttpResponse, message: String? = null): RestException(error, response, message)
