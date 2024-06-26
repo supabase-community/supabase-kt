@@ -43,6 +43,5 @@ class NotFoundRestException(error: String, response: HttpResponse, message: Stri
 
 /**
  * Thrown for all other response codes
- * @property statusCode The HTTP status code
  */
 class UnknownRestException(error: String, response: HttpResponse, message: String? = null): RestException(error, response, message)
