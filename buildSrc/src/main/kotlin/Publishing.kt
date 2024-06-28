@@ -50,8 +50,8 @@ fun Project.applyPublishing() {
 
 fun MavenArtifactRepository.sonatypeAuth() {
     credentials {
-        username = System.getenv("TOKEN_NAME") as String
-        password = System.getenv("TOKEN_KEY") as String
+        username = System.getenv("TOKEN_NAME")
+        password = System.getenv("TOKEN_KEY")
     }
     authentication {
         create<BasicAuthentication>("basic")
