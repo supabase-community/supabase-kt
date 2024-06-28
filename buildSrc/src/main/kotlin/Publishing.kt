@@ -1,7 +1,11 @@
 import com.vanniktech.maven.publish.MavenPublishBaseExtension
 import org.gradle.api.Project
+import org.gradle.api.artifacts.repositories.MavenArtifactRepository
+import org.gradle.authentication.http.BasicAuthentication
 import org.gradle.kotlin.dsl.configure
+import org.gradle.kotlin.dsl.create
 import org.gradle.kotlin.dsl.extra
+import org.gradle.kotlin.dsl.repositories
 
 fun Project.applyPublishing() {
     extensions.configure(MavenPublishBaseExtension::class) {
@@ -35,5 +39,21 @@ fun Project.applyPublishing() {
                 developerConnection.set("scm:git:ssh://git@github.com/supabase-community/supabase-kt.git")
             }
         }
+        repositories {
+            maven {
+                name = "SonatypeMaven"
+                sonatypeAuth()
+            }
+        }
+    }
+}
+
+fun MavenArtifactRepository.sonatypeAuth() {
+    credentials {
+        username = System.getenv("TOKEN_NAME") as String
+        password = System.getenv("TOKEN_KEY") as String
+    }
+    authentication {
+        create<BasicAuthentication>("basic")
     }
 }
