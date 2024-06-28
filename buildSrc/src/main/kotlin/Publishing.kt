@@ -6,6 +6,7 @@ import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.create
 import org.gradle.kotlin.dsl.extra
 import org.gradle.kotlin.dsl.repositories
+import java.net.URI
 
 fun Project.applyPublishing() {
     extensions.configure(MavenPublishBaseExtension::class) {
@@ -49,6 +50,7 @@ fun Project.applyPublishing() {
 }
 
 fun MavenArtifactRepository.sonatypeAuth() {
+    url = URI("https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/")
     credentials {
         username = System.getenv("TOKEN_NAME")
         password = System.getenv("TOKEN_KEY")
