@@ -32,7 +32,7 @@ tests:
 
 samples:
   - changed-files:
-      - any-glob-to-any-file: samples/**
+      - any-glob-to-any-file: sample/**
 
 serializers:
   - changed-files:
