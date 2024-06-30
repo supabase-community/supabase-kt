@@ -97,13 +97,9 @@ val iosMain by getting {
 ## Main Modules
 
 - [Authentication](/GoTrue)
-
 - [Database/Postgrest](/Postgrest)
-
 - [Storage](/Storage)
-
 - [Realtime](/Realtime)
-
 - [Functions (Edge Functions)](/Functions)
 
 ### Plugins
