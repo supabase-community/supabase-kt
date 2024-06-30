@@ -47,7 +47,7 @@ kotlin {
     }
 }
 
-configureAndroidTarget()
+configureLibraryAndroidTarget()
 
 //see https://github.com/JetBrains/compose-multiplatform/issues/4739
 tasks.withType<LintModelWriterTask> {
