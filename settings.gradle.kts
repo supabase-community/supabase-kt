@@ -35,6 +35,7 @@ include(":plugins:CoilIntegration")
 include(":plugins:ImageLoaderIntegration")
 
 // Samples
+println("LibrariesOnly: ${System.getProperty("LibrariesOnly")}")
 if (System.getProperty("LibrariesOnly") != "true") {
     include(":sample:chat-demo-mpp:common")
     include(":sample:chat-demo-mpp:web")

@@ -33,4 +33,4 @@ jobs:
           cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
           cache-read-only: true
       - name: Test supabase-kt
-        run: ./gradlew -PLibrariesOnly=true ${{ matrix.command }} --stacktrace --configuration-cache
+        run: ./gradlew -DLibrariesOnly=true ${{ matrix.command }} --stacktrace --configuration-cache
