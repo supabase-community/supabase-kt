@@ -120,7 +120,7 @@ val iosMain by getting {
 
 # Samples
 
-- [Chat Demo (Desktop/Android/iOS/Browser)](https://github.com/supabase-community/supabase-kt/tree/master/demos/chat-demo-mpp)
+- [Chat Demo (Desktop/Android/iOS/Browser)](https://github.com/supabase-community/supabase-kt/tree/master/sample/chat-demo-mpp)
 - [File Upload Demo (Desktop/Android)](https://github.com/supabase-community/supabase-kt/tree/master/demos/file-upload)
 - [Android Native Google login & in-app OAuth (Android)](https://github.com/supabase-community/supabase-kt/tree/master/demos/android-login)
 - [Multi-Factor Authentication (Desktop/Android/Browser)](https://github.com/supabase-community/supabase-kt/tree/master/demos/multi-factor-authentication)
