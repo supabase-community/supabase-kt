@@ -2,7 +2,7 @@
 
 plugins {
     id(libs.plugins.kotlin.multiplatform.get().pluginId)
-    alias(libs.plugins.compose)
+    id(libs.plugins.compose.plugin.get().pluginId)
     alias(libs.plugins.compose.compiler)
     id(libs.plugins.android.library.get().pluginId)
     alias(libs.plugins.kotlinx.plugin.serialization)

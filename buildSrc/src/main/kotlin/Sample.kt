@@ -1,3 +1,7 @@
+import org.gradle.api.Project
+import org.gradle.kotlin.dsl.configure
+import org.jetbrains.compose.desktop.DesktopExtension
+import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.plugin.KotlinDependencyHandler
 
 enum class SupabaseModule(val module: String) {
@@ -13,5 +17,20 @@ enum class SupabaseModule(val module: String) {
 fun KotlinDependencyHandler.addModules(vararg modules: SupabaseModule) {
     modules.forEach {
         api(project(":${it.module}"))
+    }
+}
+
+fun Project.configureComposeDesktop(
+    name: String,
+) {
+    extensions.configure(DesktopExtension::class) {
+        application {
+            mainClass = "MainKt"
+            nativeDistributions {
+                targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
+                packageName = name
+                packageVersion = "1.0.0"
+            }
+        }
     }
 }

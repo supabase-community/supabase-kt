@@ -14,4 +14,5 @@ dependencies {
     implementation(libs.detekt.gradle)
     implementation(libs.dokka.gradle)
     implementation(libs.publishing.gradle)
+    implementation(libs.compose.gradle)
 }

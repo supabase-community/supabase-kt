@@ -1,6 +1,6 @@
 plugins {
     id(libs.plugins.kotlin.multiplatform.get().pluginId)
-    alias(libs.plugins.compose)
+    id(libs.plugins.compose.plugin.get().pluginId)
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.kotlinx.plugin.serialization)
 }
@@ -23,6 +23,3 @@ kotlin {
     }
 }
 
-compose.experimental {
-    web.application {}
-}

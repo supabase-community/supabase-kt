@@ -36,11 +36,7 @@ include(":plugins:ImageLoaderIntegration")
 
 // Samples
 if (System.getProperty("LibrariesOnly") != "true") {
-    include(":sample:chat-demo-mpp:common")
-    include(":sample:chat-demo-mpp:web")
-    include(":sample:chat-demo-mpp:ios")
-    include(":sample:chat-demo-mpp:desktop")
-    include(":sample:chat-demo-mpp:android")
+    includeSample("chat-demo-mpp", "common", "web", "ios", "desktop", "android")
 }
 
 // Renames
@@ -56,3 +52,8 @@ project(":plugins:CoilIntegration").name = "coil-integration"
 project(":plugins:ImageLoaderIntegration").name = "imageloader-integration"
 rootProject.name = "supabase-kt"
 
+fun includeSample(name: String, vararg targets: String) {
+    targets.forEach {
+        include(":sample:$name:$it")
+    }
+}
