@@ -8,7 +8,7 @@ body:
     attributes:
       label: General info
       options:
-        - label: I checked the [troubleshooting](https://github.com/supabase-community/supabase-kt/blob/master/TROUBLESHOOTING.MD) page for similar problems
+        - label: I checked the [troubleshooting](https://github.com/supabase-community/supabase-kt/blob/master/TROUBLESHOOTING.md) page for similar problems
           required: true
   - type: textarea
     id: question

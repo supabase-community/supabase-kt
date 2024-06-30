@@ -26,7 +26,7 @@ For information about supported Kotlin targets, see the corresponding module REA
 
 [Dokka documentation for the latest version](https://supabase-community.github.io/supabase-kt/)
 
-[Troubleshooting](/TROUBLESHOOTING.MD)
+[Troubleshooting](/TROUBLESHOOTING)
 
 # Installation
 
@@ -94,29 +94,28 @@ val iosMain by getting {
 
 ![https://img.shields.io/badge/ktor-2.3.11-blue](https://img.shields.io/badge/ktor-2.3.11-blue)
 
-# Main Modules
+## Main Modules
 
-#### [Authentication](/GoTrue)
+- [Authentication](/GoTrue)
 
-#### [Database/Postgrest](/Postgrest)
+- [Database/Postgrest](/Postgrest)
 
-#### [Storage](/Storage)
+- [Storage](/Storage)
 
-#### [Realtime](/Realtime)
+- [Realtime](/Realtime)
 
-#### [Functions (Edge Functions)](/Functions)
+- [Functions (Edge Functions)](/Functions)
 
 ### Plugins
 
-#### [Apollo GraphQL integration](/plugins/ApolloGraphQL) - Creates an [Apollo GraphQL Client](https://github.com/apollographql/apollo-kotlin) for interacting with the Supabase API.
+- [Apollo GraphQL integration](/plugins/ApolloGraphQL) - Creates an [Apollo GraphQL Client](https://github.com/apollographql/apollo-kotlin) for interacting with the Supabase API.
+- [Compose Auth](/plugins/ComposeAuth) - Provides easy Native Google & Apple Auth for Compose Multiplatform targets.
+- [Compose Auth UI](/plugins/ComposeAuthUI) - Provides UI Components for Compose Multiplatform.
+- [Coil Integration](/plugins/CoilIntegration) - Provides a [Coil](https://github.com/coil-kt/coil) Integration for displaying images stored in Supabase Storage.
+- [Compose-ImageLoader Integration](/plugins/ImageLoaderIntegration) - Provides a [Compose ImageLoader](https://github.com/qdsfdhvh/compose-imageloader) Integration for displaying images stored in Supabase Storage.
 
-#### [Compose Auth](/plugins/ComposeAuth) - Provides easy Native Google & Apple Auth for Compose Multiplatform targets.
-
-#### [Compose Auth UI](/plugins/ComposeAuthUI) - Provides UI Components for Compose Multiplatform.
-
-#### [Coil Integration](/plugins/CoilIntegration) - Provides a [Coil](https://github.com/coil-kt/coil) Integration for displaying images stored in Supabase Storage.
-
-#### [Compose-ImageLoader Integration](/plugins/ImageLoaderIntegration) - Provides a [Compose ImageLoader](https://github.com/qdsfdhvh/compose-imageloader) Integration for displaying images stored in Supabase Storage.
+### Miscellanous
+- [Supabase Edge Functions Kotlin](https://github.com/manriif/supabase-edge-functions-kt) - Build, serve and deploy Supabase Edge Functions with Kotlin and Gradle.
 
 # Samples
 
