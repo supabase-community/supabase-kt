@@ -33,7 +33,7 @@ Open project settings
 Go to `Build phases` section, create New Run Script Phase with this value
 ```cmd
 cd "$SRCROOT/.."
-./gradlew :common:embedAndSignAppleFrameworkForXcode
+./gradlew :sample:chat-demo-mpp:common:embedAndSignAppleFrameworkForXcode
 ```
 <img width="650" alt="Screenshot 2023-12-29 at 13 02 54" src="https://github.com/hieuwu/supabase-kt/assets/43868345/9563bd68-96c9-4e98-b38a-d03bd595e413">
 
