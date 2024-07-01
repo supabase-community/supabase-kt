@@ -26,9 +26,14 @@ imageloader = "1.8.1"
 coil = "2.6.0"
 okio = "3.9.0"
 credentials = "1.2.2"
+koin = "3.4.3"
+androidx-core = "1.10.1"
+androidx-compat = "1.6.1"
+androidx-lifecycle = "2.6.1"
 
 [plugins]
 kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
+kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }
 kotlinx-plugin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 complete-kotlin = { id = "com.louiscad.complete-kotlin", version.ref = "complete-kotlin" }
@@ -36,7 +41,7 @@ android-library = { id = "com.android.library", version.ref = "agp" }
 maven-publish = { id = "com.vanniktech.maven.publish", version.ref = "maven-publish" }
 detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
 
-compose = { id = "org.jetbrains.compose", version.ref = "compose" }
+compose-plugin = { id = "org.jetbrains.compose", version.ref = "compose" }
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 
 native-cocoapods = { id = "org.jetbrains.kotlin.native.cocoapods", version.ref = "kotlin" }
@@ -56,8 +61,12 @@ android-gradle-plugin = { module = "com.android.tools.build:gradle", version.ref
 detekt-gradle = { module = "io.gitlab.arturbosch.detekt:detekt-gradle-plugin", version.ref = "detekt" }
 dokka-gradle = { module = "org.jetbrains.dokka:dokka-gradle-plugin", version.ref = "dokka" }
 publishing-gradle = { module = "com.vanniktech:gradle-maven-publish-plugin", version.ref = "maven-publish" }
+compose-gradle = { module = "org.jetbrains.compose:compose-gradle-plugin", version.ref = "compose" }
 
 ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
+ktor-client-cio = { module = "io.ktor:ktor-client-cio", version.ref = "ktor" }
+ktor-client-js = { module = "io.ktor:ktor-client-js", version.ref = "ktor" }
+ktor-client-ios = { module = "io.ktor:ktor-client-darwin", version.ref = "ktor" }
 ktor-client-content-negotiation = { module = "io.ktor:ktor-client-content-negotiation", version.ref = "ktor" }
 ktor-client-websockets = { module = "io.ktor:ktor-client-websockets", version.ref = "ktor" }
 ktor-client-mock = { module = "io.ktor:ktor-client-mock", version.ref = "ktor" }
@@ -71,6 +80,10 @@ android-lifecycle-process = { module = "androidx.lifecycle:lifecycle-process", v
 androidx-browser = { module = "androidx.browser:browser", version.ref = "browser" }
 androidx-startup-runtime = { module = "androidx.startup:startup-runtime", version.ref = "androidx-startup" }
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activity-compose" }
+androidx-core = { module = "androidx.core:core-ktx", version.ref = "androidx-core" }
+androidx-compat = { module = "androidx.appcompat:appcompat", version.ref = "androidx-compat" }
+androidx-lifecycle-viewmodel-ktx = { module = "androidx.lifecycle:lifecycle-viewmodel-ktx", version.ref = "androidx-lifecycle" }
+androidx-lifecycle-viewmodel-compose = { module = "androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "androidx-lifecycle" }
 android-google-id = { module = "com.google.android.libraries.identity.googleid:googleid", version.ref = "googleid" }
 androidx-credentials = { module = "androidx.credentials:credentials", version.ref = "credentials" }
 androidx-credentials-play-services = { module = "androidx.credentials:credentials-play-services-auth", version.ref = "credentials" }
@@ -94,6 +107,9 @@ androidsvg = { module = "com.caverock:androidsvg-aar", version.ref = "androidsvg
 
 coil = { module = "io.coil-kt:coil", version.ref = "coil" }
 imageloader = { module = "io.github.qdsfdhvh:image-loader", version.ref = "imageloader" }
+
+koin-core = { module = "io.insert-koin:koin-core", version.ref = "koin" }
+koin-android = { module = "io.insert-koin:koin-android", version.ref = "koin" }
 
 [bundles]
 ktor-client = ["ktor-client-core", "ktor-client-content-negotiation", "ktor-json"]

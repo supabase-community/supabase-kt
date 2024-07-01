@@ -27,4 +27,4 @@ jobs:
           cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
           cache-read-only: false
       - name: Test supabase-kt
-        run: ./gradlew build test --stacktrace --configuration-cache --scan
+        run: ./gradlew -DLibrariesOnly=true build test --stacktrace --configuration-cache --scan
