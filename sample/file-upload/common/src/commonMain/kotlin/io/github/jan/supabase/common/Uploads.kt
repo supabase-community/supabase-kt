@@ -2,6 +2,7 @@ package io.github.jan.supabase.common
 
 import io.github.jan.supabase.storage.resumable.Fingerprint
 import io.github.jan.supabase.storage.resumable.ResumableUploadState
+import io.github.vinceglb.filekit.core.PlatformFile
 import io.ktor.utils.io.ByteReadChannel
 
 sealed interface UploadState {
@@ -13,12 +14,4 @@ sealed interface UploadState {
 
 }
 
-expect class MPFile {
-
-    val name: String
-    val extension: String
-    val source: String
-    val size: Long
-    val dataProducer: suspend (offset: Long) -> ByteReadChannel
-
-}
+expect val PlatformFile.dataProducer: suspend (offset: Long) -> ByteReadChannel

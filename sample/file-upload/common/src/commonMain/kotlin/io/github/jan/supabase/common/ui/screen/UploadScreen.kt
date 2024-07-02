@@ -33,7 +33,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -42,9 +41,10 @@ import androidx.compose.ui.unit.dp
 import io.github.jan.supabase.common.UploadState
 import io.github.jan.supabase.common.UploadViewModel
 import io.github.jan.supabase.common.ui.components.UploadCard
-import io.github.jan.supabase.common.ui.dialog.MPFilePicker
 import io.github.jan.supabase.common.ui.utils.applyDragging
 import io.github.jan.supabase.storage.resumable.Fingerprint
+import io.github.vinceglb.filekit.compose.rememberFilePickerLauncher
+import io.github.vinceglb.filekit.core.PickerType
 
 @OptIn(ExperimentalFoundationApi::class, ExperimentalComposeUiApi::class)
 @Composable
@@ -55,7 +55,13 @@ fun UploadScreen(viewModel: UploadViewModel) {
     val states by viewModel.uploadItems.collectAsState(emptyList())
     val isDragging = remember { mutableStateOf(false) }
     val selected = remember { mutableStateListOf<Fingerprint>() }
-    var showFileDialog by remember { mutableStateOf(false) }
+    val fileLauncher = rememberFilePickerLauncher(
+        type = PickerType.File()
+    ) { file ->
+        file?.let {
+            viewModel.queueUpload(file, file.name)
+        }
+    }
     Column {
         LazyVerticalGrid(
             columns = GridCells.Adaptive(150.dp),
@@ -119,7 +125,7 @@ fun UploadScreen(viewModel: UploadViewModel) {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
             Column(
                 modifier = Modifier.clickable {
-                    showFileDialog = true
+                    fileLauncher.launch()
                 },
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
@@ -134,19 +140,12 @@ fun UploadScreen(viewModel: UploadViewModel) {
         }
     }
 
-
-    MPFilePicker(showFileDialog, {
-        viewModel.queueUpload(it, it.name)
-    }) {
-        showFileDialog = false
-    }
-
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.BottomEnd
     ) {
         FloatingActionButton({
-            showFileDialog = true
+            fileLauncher.launch()
         }, Modifier.padding(10.dp)) {
             Icon(Icons.Filled.UploadFile, contentDescription = null)
         }

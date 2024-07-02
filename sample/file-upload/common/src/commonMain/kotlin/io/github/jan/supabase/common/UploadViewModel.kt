@@ -1,13 +1,13 @@
 package io.github.jan.supabase.common
 
 import androidx.compose.ui.ExperimentalComposeUiApi
-import co.touchlab.kermit.Logger
 import io.github.jan.supabase.annotations.SupabaseInternal
+import io.github.jan.supabase.collections.AtomicMutableMap
 import io.github.jan.supabase.storage.UploadStatus
 import io.github.jan.supabase.storage.resumable.Fingerprint
 import io.github.jan.supabase.storage.resumable.ResumableClient
 import io.github.jan.supabase.storage.resumable.ResumableUpload
-import io.github.jan.supabase.collections.AtomicMutableMap
+import io.github.vinceglb.filekit.core.PlatformFile
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -29,8 +29,8 @@ class UploadViewModel(
     val uploadItems = MutableStateFlow<List<UploadState>>(emptyList())
     private val uploads = AtomicMutableMap<Fingerprint, ResumableUpload>()
 
-    fun queueUpload(file: MPFile, path: String) {
-        val fingerprint = Fingerprint(file.source, file.size)
+    fun queueUpload(file: PlatformFile, path: String) {
+        val fingerprint = Fingerprint(file.path ?: file.name, file.getSize() ?: error("Invalid file"))
         if(uploadItems.value.any { it.fingerprint == fingerprint }) {
             return
         }
@@ -39,8 +39,8 @@ class UploadViewModel(
             kotlin.runCatching {
                 val upload = resumableClient.createOrContinueUpload(
                     file.dataProducer,
-                    file.source,
-                    file.size,
+                    file.path ?: file.name,
+                    file.getSize() ?: error("Invalid file"),
                     path,
                     true
                 )
@@ -65,17 +65,17 @@ class UploadViewModel(
     @OptIn(ExperimentalComposeUiApi::class)
     fun queueUploadFromURIs(paths: List<String>) {
         coroutineScope.launch(Dispatchers.Default) {
-            parseFileTreeFromURIs(paths).forEach { file ->
-                queueUpload(file, file.name)
-            }
+          /*  parseFileTreeFromURIs(paths).forEach { file ->
+          //      queueUpload(file, file.name)
+            }*/
         }
     }
 
     fun queueUploadFromPath(path: String) {
         coroutineScope.launch(Dispatchers.Default) {
-            parseFileTreeFromPath(path).forEach { file ->
-                queueUpload(file, file.name)
-            }
+           /* parseFileTreeFromPath(path).forEach { file ->
+         //       queueUpload(file, file.name)
+            }*/
         }
     }
 

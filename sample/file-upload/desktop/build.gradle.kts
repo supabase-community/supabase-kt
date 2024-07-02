@@ -1,9 +1,10 @@
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 
 plugins {
-    kotlin("multiplatform")
-    id("org.jetbrains.compose")
-    kotlin("plugin.serialization")
+    id(libs.plugins.kotlin.multiplatform.get().pluginId)
+    id(libs.plugins.compose.plugin.get().pluginId)
+    alias(libs.plugins.compose.compiler)
+    alias(libs.plugins.kotlinx.plugin.serialization)
 }
 
 group = "io.github.jan.supabase"
@@ -11,14 +12,14 @@ version = "1.0-SNAPSHOT"
 
 
 kotlin {
+    jvmToolchain(8)
     jvm {
-        jvmToolchain(8)
         withJava()
     }
     sourceSets {
         val jvmMain by getting {
             dependencies {
-                implementation(project(":common"))
+                implementation(project(":sample:file-upload:common"))
                 implementation(compose.desktop.currentOs)
             }
         }

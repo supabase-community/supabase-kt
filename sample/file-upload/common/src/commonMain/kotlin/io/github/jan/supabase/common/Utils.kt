@@ -3,13 +3,14 @@ package io.github.jan.supabase.common
 import androidx.compose.ui.ExperimentalComposeUiApi
 import io.github.jan.supabase.storage.resumable.ResumableClient
 import io.github.jan.supabase.storage.resumable.ResumableUpload
+import io.github.vinceglb.filekit.core.PlatformFile
 import io.ktor.utils.io.ByteReadChannel
 import kotlinx.coroutines.Deferred
 
 @OptIn(ExperimentalComposeUiApi::class)
-expect fun parseFileTreeFromURIs(paths: List<String>): List<MPFile>
+expect fun parseFileTreeFromURIs(paths: List<String>): List<PlatformFile>
 
-expect fun parseFileTreeFromPath(path: String): List<MPFile>
+expect fun parseFileTreeFromPath(path: String): List<PlatformFile>
 
 suspend fun ByteReadChannel.readAllBytes(size: Long): ByteArray {
     val buffer = ByteArray(size.toInt())

@@ -3,12 +3,10 @@ package io.github.jan.supabase.common
 import io.github.jan.supabase.storage.continuePreviousFileUploads
 import io.github.jan.supabase.storage.resumable.ResumableClient
 import io.github.jan.supabase.storage.resumable.ResumableUpload
+import io.github.vinceglb.filekit.core.PlatformFile
 import kotlinx.coroutines.Deferred
-import java.net.URI
-import java.nio.file.Paths
-import kotlin.io.path.isDirectory
 
-actual fun parseFileTreeFromPath(path: String): List<MPFile> {
+actual fun parseFileTreeFromPath(path: String): List<PlatformFile> =emptyList() /*{
     val file = Paths.get(path)
     return if(file.isDirectory()) {
         //file.listDirectoryEntries()
@@ -16,9 +14,9 @@ actual fun parseFileTreeFromPath(path: String): List<MPFile> {
     } else {
         listOf(MPFile(file))
     }
-}
+}*/
 
-actual fun parseFileTreeFromURIs(paths: List<String>): List<MPFile> {
+actual fun parseFileTreeFromURIs(paths: List<String>): List<PlatformFile> = emptyList()/*{
     return paths.mapNotNull {
         val file = Paths.get(URI(it))
         if (file.isDirectory()) {
@@ -27,6 +25,6 @@ actual fun parseFileTreeFromURIs(paths: List<String>): List<MPFile> {
             MPFile(file)
         }
     }
-}
+}*/
 
 actual suspend fun ResumableClient.continuePreviousPlatformUploads(): List<Deferred<ResumableUpload>> = continuePreviousFileUploads()

@@ -1,20 +1,20 @@
 @file:OptIn(org.jetbrains.compose.ExperimentalComposeLibrary::class)
 
 plugins {
-    kotlin("multiplatform")
-    id("org.jetbrains.compose")
-    id("com.android.library")
-    kotlin("plugin.serialization")
+    id(libs.plugins.kotlin.multiplatform.get().pluginId)
+    id(libs.plugins.compose.plugin.get().pluginId)
+    alias(libs.plugins.compose.compiler)
+    id(libs.plugins.android.library.get().pluginId)
+    alias(libs.plugins.kotlinx.plugin.serialization)
 }
 
 group = "io.github.jan.supabase"
 version = "1.0-SNAPSHOT"
 
 kotlin {
+    jvmToolchain(8)
     android()
-    jvm("desktop") {
-        jvmToolchain(8)
-    }
+    jvm("desktop")
     sourceSets {
         val commonMain by getting {
             dependencies {
@@ -22,14 +22,16 @@ kotlin {
                 api(compose.foundation)
                 api(compose.material3)
                 api(compose.materialIconsExtended)
-                api(libs.bundles.supabase)
+                addModules(SupabaseModule.STORAGE)
                 api(libs.koin.core)
-                api(libs.filepicker)
+                api(libs.filekit.core)
+                api(libs.filekit.compose)
+          //      api(libs.filepicker)
             }
         }
         val nonJsMain by creating {
             dependencies {
-                api(libs.ktor.cio)
+                api(libs.ktor.client.cio)
             }
         }
         val androidMain by getting {
