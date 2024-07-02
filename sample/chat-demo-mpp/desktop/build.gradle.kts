@@ -25,4 +25,4 @@ kotlin {
     }
 }
 
-configureComposeDesktop("chat-demo-mpp")
+compose.desktop.configureComposeDesktop("chat-demo-mpp")
