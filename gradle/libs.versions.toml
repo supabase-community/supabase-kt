@@ -30,6 +30,7 @@ koin = "3.4.3"
 androidx-core = "1.10.1"
 androidx-compat = "1.6.1"
 androidx-lifecycle = "2.6.1"
+filekit = "0.6.1"
 
 [plugins]
 kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
@@ -87,7 +88,6 @@ androidx-lifecycle-viewmodel-compose = { module = "androidx.lifecycle:lifecycle-
 android-google-id = { module = "com.google.android.libraries.identity.googleid:googleid", version.ref = "googleid" }
 androidx-credentials = { module = "androidx.credentials:credentials", version.ref = "credentials" }
 androidx-credentials-play-services = { module = "androidx.credentials:credentials-play-services-auth", version.ref = "credentials" }
-
 multiplatform-settings-no-arg = { module = "com.russhwolf:multiplatform-settings-no-arg", version.ref = "multiplatform-settings" }
 multiplatform-settings-coroutines = { module = "com.russhwolf:multiplatform-settings-coroutines", version.ref = "multiplatform-settings" }
 multiplatform-settings-test = { module = "com.russhwolf:multiplatform-settings-test", version.ref = "multiplatform-settings" }
@@ -108,8 +108,11 @@ androidsvg = { module = "com.caverock:androidsvg-aar", version.ref = "androidsvg
 coil = { module = "io.coil-kt:coil", version.ref = "coil" }
 imageloader = { module = "io.github.qdsfdhvh:image-loader", version.ref = "imageloader" }
 
+# Sample dependencies
 koin-core = { module = "io.insert-koin:koin-core", version.ref = "koin" }
 koin-android = { module = "io.insert-koin:koin-android", version.ref = "koin" }
+filekit-core = { module = "io.github.vinceglb:filekit-core", version.ref = "filekit" }
+filekit-compose = { module = "io.github.vinceglb:filekit-compose", version.ref = "filekit" }
 
 [bundles]
 ktor-client = ["ktor-client-core", "ktor-client-content-negotiation", "ktor-json"]

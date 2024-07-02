@@ -37,6 +37,7 @@ include(":plugins:ImageLoaderIntegration")
 // Samples
 if (System.getProperty("LibrariesOnly") != "true") {
     includeSample("chat-demo-mpp", "common", "web", "ios", "desktop", "android")
+    includeSample("file-upload", "common", "desktop", "android")
 }
 
 // Renames
