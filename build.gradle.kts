@@ -40,7 +40,7 @@ submodules {
     apply(plugin = "com.vanniktech.maven.publish")
 
     group = extra["base-group"].toString()
-    version = extra["supabase-version"].toString()
+    version = supabaseVersion
 
     applyPublishing()
 }

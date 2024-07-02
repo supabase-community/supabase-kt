@@ -137,12 +137,7 @@ val iosMain by getting {
 
 # Contribution
 
-### How to contribute
-
-1. Fork the repository
-2. Create a branch
-3. Make your changes
-4. Submit a pull request with your new branch
+Checkout the [contribution guidelines](/CONTRIBUTING.md) for more information.
 
 # Credits
 
