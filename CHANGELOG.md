@@ -111,3 +111,52 @@ This requires both `Realtime` and `Postgrest` to be installed within the Supabas
 ### Functions
 
 - Add new `region` parameter to invoke functions which allows changing the region where the Edge Function will be invoked in. Defaults to `Functions.Config#defaultRegion` (which is `FunctionRegion.ANY`) by @jan-tennert in #580 
+
+## 2.3.1 - April 20, 2024
+
+### Storage
+
+- Make the default value for `Storage.Config.resumable#cache` `null` to prevent a NullPointerException in testing enviroments. (If it's set to null, the default cache implementation will be used)
+- Fix `BucketApi#createSignedUploadUrl` returning an invalid url
+- Fix `BucketApi#createSignedUrl` not correctly adding transformation parameters
+- Fix `BucketApi#createSignedUrl` returning an invalid url
+- Fix `BucketListFilter#sortBy` not working correctly
+- Add missing `destinationBucket` parameter to `BucketApi#copy` and `BucketApi#move` by @jan-tennert in #562
+
+### Auth
+
+- Move `enableLifecycleCallbacks` to the common source set (still only used on Android) by @jan-tennert in #561
+- Add `AuthConfig#minimalSettings` (useful for servers or testing, disabling session storage and uses only in-memory caches) by @jan-tennert in #561
+
+### Realtime
+
+- Remove the suspend modifier for `RealtimeChannel#postgresListDataFlow` by @jan-tennert in #563
+- When a postgres flow is closed, the joining payload will now be correctly cleaned by @jan-tennert in #563
+
+## 2.3.0 - April 15, 2024
+
+### Core
+
+- Update Kotlin to `2.0.0-RC1`
+
+### Postgrest
+
+- Add referenced table parameter to `or` and `and` by @jan-tennert in https://github.com/supabase-community/supabase-kt/pull/551
+- Fix nested `or` blocks working incorrectly
+- Auto remove line breaks and white spaces when unquoted on Columns.Raw by @iruizmar in https://github.com/supabase-community/supabase-kt/pull/544
+- Add support for using GET when calling database functions by @jan-tennert in https://github.com/supabase-community/supabase-kt/pull/538
+  There is now a `method` parameter which takes in a `RpcMethod`. This can either be `POST`, `HEAD` or `GET`. The head parameter has been removed.
+
+### Realtime
+
+- Stabilize new flow presence and postgres methods by @jan-tennert in #535
+
+### Auth
+
+- Stabilize linking identities and signing in anonymously by @jan-tennert in #535
+- Rename `Auth#modifyUser` to `Auth#updateUser` by @jan-tennert in https://github.com/supabase-community/supabase-kt/pull/534
+- Return full a full `UserInfo` on sign up by @jan-tennert in https://github.com/supabase-community/supabase-kt/pull/528
+  The `signUpWith` method will now return a `UserInfo` object for the `Email`, `Phone` and `IDToken` instead of separate Result objects.
+- Allow customizing the custom tab intent on Android by @jan-tennert in https://github.com/supabase-community/supabase-kt/pull/529
+
+
