@@ -7,7 +7,9 @@ Thank you for considering contributing to this project! This document outlines t
 1. Fork the repository
 2. Clone the forked repository
 3. Create a new branch
-4. Make your changes
+4. Make your changes \
+If making changes, please make sure to follow the [Kotlin coding conventions](https://kotlinlang.org/docs/coding-conventions.html). \
+4 spaces for indentation and no `*` imports should be used.
 5. Submit a pull request with your new branch
 
 The target branch for pull requests is `master`.
