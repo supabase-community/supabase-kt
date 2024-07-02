@@ -137,7 +137,7 @@ val iosMain by getting {
 
 # Contribution
 
-Checkout the [Contribution guidelines](/CONTRIBUTING.md) for more information.
+Checkout the [contribution guidelines](/CONTRIBUTING.md) for more information.
 
 # Credits
 

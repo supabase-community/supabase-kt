@@ -20,7 +20,7 @@ You can do one of two things:
 ```shell
 ./gradlew -DLibrariesOnly=true -DDisableSigning=true -DSupabaseVersion="customVersion" publishToMavenLocal
 ```
-Replace `customVersion` with the version you want to use. Then, in your project, add the following to your `build.gradle.kts` file:
+Replace `customVersion` with a unique version like `2.5.0-local-1` (to prevent version clashing with offical versions, if using the maven local repository). Then, in your project, add the following to your `build.gradle.kts` file:
 ```kotlin
 repositories {
     mavenLocal()
