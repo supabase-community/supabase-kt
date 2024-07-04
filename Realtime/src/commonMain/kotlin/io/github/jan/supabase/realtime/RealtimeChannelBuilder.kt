@@ -11,6 +11,7 @@ class RealtimeChannelBuilder @PublishedApi internal constructor(private val topi
 
     private var broadcastJoinConfig = BroadcastJoinConfig(acknowledgeBroadcasts = false, receiveOwnBroadcasts = false)
     private var presenceJoinConfig = PresenceJoinConfig("")
+    private var isPrivate = false
 
     /**
      * Sets the broadcast join config
@@ -27,13 +28,22 @@ class RealtimeChannelBuilder @PublishedApi internal constructor(private val topi
         presenceJoinConfig = PresenceJoinConfig("").apply(block)
     }
 
+    /**
+     * Sets the private join config
+     * @param value Whether this channel should be private.
+     */
+    fun isPrivate(value: Boolean) {
+        isPrivate = value
+    }
+
     @SupabaseInternal
     fun build(): RealtimeChannel {
         return RealtimeChannelImpl(
             realtimeImpl,
             topic,
             broadcastJoinConfig,
-            presenceJoinConfig
+            presenceJoinConfig,
+            isPrivate
         )
     }
 
