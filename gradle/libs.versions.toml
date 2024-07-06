@@ -4,9 +4,9 @@ ktor = "2.3.12"
 dokka = "1.9.20"
 kotlinx-datetime = "0.6.0"
 kermit = "2.0.4"
-atomicfu = "0.24.0"
+atomicfu = "0.25.0"
 coroutines = "1.8.1"
-android-lifecycle = "2.8.2"
+android-lifecycle = "2.8.3"
 androidx-startup = "1.1.1"
 androidx-activity-compose = "1.9.0"
 multiplatform-settings = "1.1.1"
@@ -26,10 +26,10 @@ imageloader = "1.8.1"
 coil = "2.6.0"
 okio = "3.9.0"
 credentials = "1.2.2"
-koin = "3.4.3"
-androidx-core = "1.10.1"
-androidx-compat = "1.6.1"
-androidx-lifecycle = "2.6.1"
+koin = "3.5.0"
+androidx-core = "1.13.1"
+androidx-compat = "1.7.0"
+androidx-lifecycle = "2.8.3"
 filekit = "0.6.1"
 
 [plugins]
@@ -46,9 +46,9 @@ compose-plugin = { id = "org.jetbrains.compose", version.ref = "compose" }
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 
 native-cocoapods = { id = "org.jetbrains.kotlin.native.cocoapods", version.ref = "kotlin" }
+kotlinx-atomicfu = { id = "org.jetbrains.kotlinx.atomicfu", version.ref = "atomicfu" }
 
 [libraries]
-kotlinx-atomicfu-plugin = { module = "org.jetbrains.kotlinx:atomicfu-gradle-plugin", version.ref = "atomicfu" }
 kotlinx-atomicfu = { module = "org.jetbrains.kotlinx:atomicfu", version.ref = "atomicfu" }
 kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinx-datetime" }
 kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }

@@ -6,12 +6,6 @@ val excludedModules = listOf("plugins", "serializers", "test-common")
 
 fun submodules(init: Project.() -> Unit) = configure(allprojects.filter { it.name !in excludedModules }, init)
 
-buildscript {
-    dependencies {
-        classpath(libs.kotlinx.atomicfu.plugin)
-    }
-}
-
 plugins {
     id(libs.plugins.kotlin.multiplatform.get().pluginId)
     id(libs.plugins.android.library.get().pluginId)
@@ -19,6 +13,7 @@ plugins {
     id(libs.plugins.dokka.get().pluginId)
     alias(libs.plugins.kotlinx.plugin.serialization)
     id(libs.plugins.maven.publish.get().pluginId)
+    alias(libs.plugins.kotlinx.atomicfu)
 }
 
 allprojects {
@@ -36,11 +31,11 @@ allprojects {
 submodules {
     apply(plugin = "org.jetbrains.dokka")
     apply(plugin = "org.jetbrains.kotlin.plugin.serialization")
-    apply(plugin = "kotlinx-atomicfu")
+    apply(plugin = "org.jetbrains.kotlinx.atomicfu")
     apply(plugin = "com.vanniktech.maven.publish")
 
     group = extra["base-group"].toString()
-    version = extra["supabase-version"].toString()
+    version = supabaseVersion
 
     applyPublishing()
 }

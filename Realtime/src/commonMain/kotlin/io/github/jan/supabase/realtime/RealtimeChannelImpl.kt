@@ -35,6 +35,7 @@ internal class RealtimeChannelImpl(
     override val topic: String,
     private val broadcastJoinConfig: BroadcastJoinConfig,
     private val presenceJoinConfig: PresenceJoinConfig,
+    private val isPrivate: Boolean,
 ) : RealtimeChannel {
 
     private val clientChanges = AtomicMutableList<PostgresJoinConfig>()
@@ -64,7 +65,7 @@ internal class RealtimeChannelImpl(
             if(it.expiresAt > Clock.System.now()) it.accessToken else null
         }
         val postgrestChanges = clientChanges.toList()
-        val joinConfig = RealtimeJoinPayload(RealtimeJoinConfig(broadcastJoinConfig, presenceJoinConfig, postgrestChanges))
+        val joinConfig = RealtimeJoinPayload(RealtimeJoinConfig(broadcastJoinConfig, presenceJoinConfig, postgrestChanges, isPrivate))
         val joinConfigObject = buildJsonObject {
             putJsonObject(Json.encodeToJsonElement(joinConfig).jsonObject)
             currentJwt?.let {
