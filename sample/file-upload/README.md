@@ -16,7 +16,7 @@ Then you need to specify your bucket id, Supabase url and key in [supabaseModule
 
 # Running
 
-To run the app, you need to run the following commands:
+To run the app, you need to run the following command in the root directory of the project:
 
     ./gradlew :sample:file-upload:desktop:runDistributable (Desktop)
 
