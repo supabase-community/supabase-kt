@@ -38,7 +38,6 @@ kotlin {
                 api(libs.koin.core)
                 api(libs.filekit.core)
                 api(libs.filekit.compose)
-          //      api(libs.filepicker)
             }
         }
         val nonJsMain by getting {
