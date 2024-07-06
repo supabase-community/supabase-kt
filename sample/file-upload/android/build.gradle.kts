@@ -6,13 +6,13 @@ plugins {
     alias(libs.plugins.kotlinx.plugin.serialization)
 }
 
-group "io.github.jan.supabase"
-version "1.0-SNAPSHOT"
+group = "io.github.jan.supabase"
+version = "1.0-SNAPSHOT"
 
 dependencies {
     implementation(project(":sample:file-upload:common"))
     implementation(libs.androidx.activity.compose)
-    implementation("com.google.accompanist:accompanist-permissions:0.31.3-beta")
+    implementation(libs.accompanist.permissions)
 }
 
 android {

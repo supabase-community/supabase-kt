@@ -1,4 +1,8 @@
-@file:OptIn(org.jetbrains.compose.ExperimentalComposeLibrary::class)
+@file:OptIn(ExperimentalComposeLibrary::class, ExperimentalKotlinGradlePluginApi::class)
+
+import org.jetbrains.compose.ExperimentalComposeLibrary
+import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
+
 
 plugins {
     id(libs.plugins.kotlin.multiplatform.get().pluginId)
@@ -13,8 +17,16 @@ version = "1.0-SNAPSHOT"
 
 kotlin {
     jvmToolchain(8)
-    android()
+    androidTarget()
     jvm("desktop")
+    applyDefaultHierarchyTemplate {
+        common {
+            group("nonJs") {
+                withJvm()
+                withAndroidTarget()
+            }
+        }
+    }
     sourceSets {
         val commonMain by getting {
             dependencies {
@@ -29,13 +41,12 @@ kotlin {
           //      api(libs.filepicker)
             }
         }
-        val nonJsMain by creating {
+        val nonJsMain by getting {
             dependencies {
                 api(libs.ktor.client.cio)
             }
         }
         val androidMain by getting {
-            dependsOn(nonJsMain)
             dependencies {
                 api(libs.androidx.compat)
                 api(libs.androidx.core)
@@ -45,7 +56,6 @@ kotlin {
             }
         }
         val desktopMain by getting {
-            dependsOn(nonJsMain)
             dependencies {
                 api(compose.preview)
             }

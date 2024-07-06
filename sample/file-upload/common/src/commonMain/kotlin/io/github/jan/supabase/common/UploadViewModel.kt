@@ -65,17 +65,17 @@ class UploadViewModel(
     @OptIn(ExperimentalComposeUiApi::class)
     fun queueUploadFromURIs(paths: List<String>) {
         coroutineScope.launch(Dispatchers.Default) {
-          /*  parseFileTreeFromURIs(paths).forEach { file ->
-          //      queueUpload(file, file.name)
-            }*/
+            parseFileTreeFromURIs(paths).forEach { file ->
+                queueUpload(file, file.name)
+            }
         }
     }
 
     fun queueUploadFromPath(path: String) {
         coroutineScope.launch(Dispatchers.Default) {
-           /* parseFileTreeFromPath(path).forEach { file ->
-         //       queueUpload(file, file.name)
-            }*/
+            parseFileTreeFromPath(path).forEach { file ->
+                queueUpload(file, file.name)
+            }
         }
     }
 
