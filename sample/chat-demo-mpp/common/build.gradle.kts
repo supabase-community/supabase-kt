@@ -75,4 +75,4 @@ kotlin {
     }
 }
 
-configureLibraryAndroidTarget("io.github.jan.supabase.common", 26, JavaVersion.VERSION_11)
+configureLibraryAndroidTarget("io.github.jan.supabase.common", 26, JavaVersion.VERSION_1_8)

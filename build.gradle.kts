@@ -4,7 +4,10 @@ import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 
 val excludedModules = listOf("plugins", "serializers", "test-common")
 
-fun submodules(init: Project.() -> Unit) = configure(allprojects.filter { it.name !in excludedModules }, init)
+fun libraryModules(withBom: Boolean = true, init: Project.() -> Unit) = configure(
+    allprojects.filter { it.name !in excludedModules && !it.path.contains("sample") && if(withBom) true else it.name != "bom" },
+    init
+)
 
 plugins {
     id(libs.plugins.kotlin.multiplatform.get().pluginId)
@@ -28,7 +31,7 @@ allprojects {
     }
 }
 
-submodules {
+libraryModules {
     apply(plugin = "org.jetbrains.dokka")
     apply(plugin = "org.jetbrains.kotlin.plugin.serialization")
     apply(plugin = "org.jetbrains.kotlinx.atomicfu")
@@ -41,8 +44,18 @@ submodules {
 }
 
 tasks.register("detektAll") {
-    configure(allprojects.filter { it.name != "bom" && it.name !in excludedModules }) {
+    libraryModules(false) {
         this@register.dependsOn(tasks.withType<io.gitlab.arturbosch.detekt.Detekt>())
+    }
+}
+
+// Configure Gradle Task to build all sample submodules at once
+configure(allprojects.filter { it.parent?.name == "sample" }) {
+    val children = this.childProjects
+    this.tasks.register("buildAll") {
+        children.values.forEach { child ->
+            this.dependsOn(child.tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>())
+        }
     }
 }
 
@@ -70,12 +83,11 @@ val buildConfigGenerator by tasks.registering(Sync::class) {
     into(layout.buildDirectory.dir("generated-src/kotlin/"))
 }
 
-configure(allprojects.filter { it.name != "bom" && it.name !in excludedModules }) {
+libraryModules(false) {
     apply(plugin = "io.gitlab.arturbosch.detekt")
 
     applyDokkaWithConfiguration()
     applyDetektWithConfiguration()
-
 }
 
 @OptIn(org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi::class)
