@@ -14,4 +14,9 @@ dependencies {
     implementation(libs.androidx.activity.compose)
 }
 
-configureApplicationAndroidTarget()
+android {
+    configureApplicationAndroidTarget()
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
+}
