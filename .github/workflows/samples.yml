@@ -30,5 +30,5 @@ jobs:
         with:
           cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
           cache-read-only: github.ref != 'refs/heads/master'
-      - name: Build sample ${{ matrix.sample }
+      - name: Build sample ${{ matrix.sample }}
         run: ./gradlew :sample:${{ matrix.sample }}:buildAll --stacktrace --configuration-cache
