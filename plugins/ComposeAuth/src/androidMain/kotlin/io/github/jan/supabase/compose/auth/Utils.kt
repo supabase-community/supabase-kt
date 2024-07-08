@@ -9,7 +9,7 @@ internal fun getSignInWithGoogleOptions(
     config: GoogleLoginConfig?,
     nonce: String? = null
 ): GetSignInWithGoogleOption {
-    val signInWithGoogleOption = GetSignInWithGoogleOption.Builder(config!!.serverClientId)
+    val signInWithGoogleOption = GetSignInWithGoogleOption.Builder(config?.serverClientId ?: error("Trying to use Google Auth without setting the serverClientId"))
     signInWithGoogleOption.setNonce(nonce)
     return signInWithGoogleOption.build()
 }
