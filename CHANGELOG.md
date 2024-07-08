@@ -1,5 +1,15 @@
 # Changelog
 
+## 2.5.2 - July 08, 2024
+
+### Realtime
+- fix(realtime): add private to Realtime by @grdsdev in https://github.com/supabase-community/supabase-kt/pull/642
+Add support for specifying if a channel is private via `RealtimeChannelBuilder#isPrivate`
+
+### Compose Auth
+- Fix Google sign in prompt in composeAuth by @Aaron246 in https://github.com/supabase-community/supabase-kt/pull/648
+- fix(auth): fix sign in with Apple in ComposeAuth by @grdsdev in https://github.com/supabase-community/supabase-kt/pull/654
+
 ## 2.5.1 - June 28, 2024
 
 ### Auth
