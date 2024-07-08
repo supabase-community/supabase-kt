@@ -3,24 +3,15 @@ package io.github.jan.supabase.compose.auth
 import android.app.Activity
 import android.content.Context
 import android.content.ContextWrapper
-import com.google.android.libraries.identity.googleid.GetGoogleIdOption
+import com.google.android.libraries.identity.googleid.GetSignInWithGoogleOption
 
-internal fun getGoogleIDOptions(
+internal fun getSignInWithGoogleOptions(
     config: GoogleLoginConfig?,
-    filterByAuthorizedAccounts: Boolean,
     nonce: String? = null
-): GetGoogleIdOption {
-    val googleIdOption = GetGoogleIdOption.Builder()
-    config?.let { options ->
-        googleIdOption.setServerClientId(options.serverClientId)
-        googleIdOption.setFilterByAuthorizedAccounts(filterByAuthorizedAccounts)
-        googleIdOption.setNonce(nonce)
-
-        options.associateLinkedAccounts?.let {
-            googleIdOption.associateLinkedAccounts(it.first, it.second)
-        }
-    }
-    return googleIdOption.build()
+): GetSignInWithGoogleOption {
+    val signInWithGoogleOption = GetSignInWithGoogleOption.Builder(config?.serverClientId ?: error("Trying to use Google Auth without setting the serverClientId"))
+    signInWithGoogleOption.setNonce(nonce)
+    return signInWithGoogleOption.build()
 }
 
 internal fun Context.getActivity(): Activity? = when (this) {
