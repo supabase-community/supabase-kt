@@ -269,6 +269,16 @@ sealed interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
     suspend fun verifyEmailOtp(type: OtpType.Email, email: String, token: String, captchaToken: String? = null)
 
     /**
+     * Verifies a email otp token hash received via email
+     * @param type The type of the verification
+     * @param tokenHash The token hash used to verify
+     * @throws RestException or one of its subclasses if receiving an error response. If the error response contains a error code, an [AuthRestException] will be thrown which can be used to easier identify the problem.
+     * @throws HttpRequestTimeoutException if the request timed out
+     * @throws HttpRequestException on network related issues
+     */
+    suspend fun verifyEmailOtp(type: OtpType.Email, tokenHash: String, captchaToken: String? = null)
+
+    /**
      * Verifies a phone/sms otp
      * @param type The type of the verification
      * @param token The otp to verify

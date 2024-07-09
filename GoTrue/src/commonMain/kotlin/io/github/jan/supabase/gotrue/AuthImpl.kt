@@ -295,13 +295,13 @@ internal class AuthImpl(
 
     private suspend fun verify(
         type: String,
-        token: String,
+        token: String?,
         captchaToken: String?,
         additionalData: JsonObjectBuilder.() -> Unit
     ) {
         val body = buildJsonObject {
             put("type", type)
-            put("token", token)
+            token?.let { put("token", it) }
             captchaToken?.let(::putCaptchaToken)
             additionalData()
         }
@@ -317,6 +317,14 @@ internal class AuthImpl(
         captchaToken: String?
     ) = verify(type.type, token, captchaToken) {
         put("email", email)
+    }
+
+    override suspend fun verifyEmailOtp(
+        type: OtpType.Email,
+        tokenHash: String,
+        captchaToken: String?
+    ) = verify(type.type, null, captchaToken) {
+        put("token_hash", tokenHash)
     }
 
     override suspend fun verifyPhoneOtp(
