@@ -76,7 +76,7 @@ import kotlin.time.Duration.Companion.milliseconds
         _status.value = Realtime.Status.CONNECTING
         val realtimeUrl = websocketUrl
         try {
-            ws = supabaseClient.httpClient.webSocketSession(realtimeUrl)
+            ws = config.websocketSessionProvider?.invoke() ?: supabaseClient.httpClient.webSocketSession(realtimeUrl)
             _status.value = Realtime.Status.CONNECTED
             Realtime.logger.i { "Connected to realtime websocket!" }
             listenForMessages()

@@ -12,6 +12,7 @@ import io.github.jan.supabase.plugins.MainPlugin
 import io.github.jan.supabase.plugins.SupabasePluginProvider
 import io.github.jan.supabase.serializer.KotlinXSerializer
 import io.github.jan.supabase.supabaseJson
+import io.ktor.client.plugins.websocket.DefaultClientWebSocketSession
 import io.ktor.client.plugins.websocket.WebSockets
 import io.ktor.serialization.kotlinx.KotlinxWebsocketSerializationConverter
 import kotlinx.coroutines.flow.StateFlow
@@ -113,6 +114,7 @@ sealed interface Realtime : MainPlugin<Realtime.Config>, CustomSerializationPlug
         var disconnectOnSessionLoss: Boolean = true,
         var connectOnSubscribe: Boolean = true,
         var disconnectOnNoSubscriptions: Boolean = true,
+        var websocketSessionProvider: (suspend () -> DefaultClientWebSocketSession)? = null,
         @Deprecated("This property is deprecated and will be removed in a future version.") var eventsPerSecond: Int = 10,
     ): MainConfig(), CustomSerializationConfig {
 

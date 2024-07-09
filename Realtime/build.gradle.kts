@@ -21,6 +21,13 @@ kotlin {
                 api(libs.ktor.client.websockets)
             }
         }
+        val commonTest by getting {
+            dependencies {
+                implementation("io.ktor:ktor-server-test-host:2.3.12")
+                implementation(project(":test-common"))
+                implementation(libs.bundles.testing)
+            }
+        }
     }
 }
 
