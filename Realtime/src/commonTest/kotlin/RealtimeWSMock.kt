@@ -4,11 +4,13 @@ import io.github.jan.supabase.createSupabaseClient
 import io.github.jan.supabase.logging.LogLevel
 import io.github.jan.supabase.realtime.Realtime
 import io.github.jan.supabase.supabaseJson
-import io.ktor.client.plugins.websocket.*
-import io.ktor.serialization.kotlinx.*
-import io.ktor.server.testing.*
-import io.ktor.server.websocket.*
+import io.ktor.client.plugins.websocket.webSocket
+import io.ktor.serialization.kotlinx.KotlinxWebsocketSerializationConverter
+import io.ktor.server.testing.ApplicationTestBuilder
+import io.ktor.server.testing.testApplication
+import io.ktor.server.websocket.DefaultWebSocketServerSession
 import io.ktor.server.websocket.WebSockets
+import io.ktor.server.websocket.webSocket
 
 fun ApplicationTestBuilder.configureServer(
     handler: suspend DefaultWebSocketServerSession.() -> Unit

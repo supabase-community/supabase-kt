@@ -1,6 +1,6 @@
 import io.github.jan.supabase.realtime.RealtimeMessage
 import io.github.jan.supabase.realtime.realtime
-import io.ktor.server.websocket.*
+import io.ktor.server.websocket.receiveDeserialized
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
 import kotlin.test.Test
