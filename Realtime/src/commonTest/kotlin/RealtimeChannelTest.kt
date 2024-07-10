@@ -4,7 +4,7 @@ import io.github.jan.supabase.gotrue.minimalSettings
 import io.github.jan.supabase.realtime.RealtimeJoinPayload
 import io.github.jan.supabase.realtime.RealtimeMessage
 import io.github.jan.supabase.realtime.channel
-import io.ktor.server.websocket.*
+import io.ktor.server.websocket.receiveDeserialized
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.decodeFromJsonElement
 import kotlinx.serialization.json.jsonPrimitive
