@@ -561,6 +561,31 @@ class AuthRequestTest {
     }
 
     @Test
+    fun testVerifyEmailOtpWithTokenHash() {
+        runTest {
+            val expectedType = OtpType.Email.EMAIL
+            val expectedTokenHash = "hash"
+            val expectedCaptchaToken = "captchaToken"
+            val client = createMockedSupabaseClient(configuration = configuration) {
+                assertMethodIs(HttpMethod.Post, it.method)
+                assertPathIs("/verify", it.url.pathAfterVersion())
+                val body = it.body.toJsonElement().jsonObject
+                val metaSecurity = body["gotrue_meta_security"]!!.jsonObject
+                assertEquals(
+                    expectedCaptchaToken,
+                    metaSecurity["captcha_token"]?.jsonPrimitive?.content
+                )
+                assertEquals(expectedTokenHash, body["token_hash"]?.jsonPrimitive?.content)
+                assertEquals(expectedType.name.lowercase(), body["type"]?.jsonPrimitive?.content)
+                respondJson(
+                    sampleUserSession()
+                )
+            }
+            client.auth.verifyEmailOtp(expectedType, tokenHash = expectedTokenHash, captchaToken = expectedCaptchaToken)
+        }
+    }
+
+    @Test
     fun testVerifyPhoneOtp() {
         runTest {
             val expectedType = OtpType.Phone.SMS
