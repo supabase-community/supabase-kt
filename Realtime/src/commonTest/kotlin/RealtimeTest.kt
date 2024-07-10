@@ -1,33 +1,33 @@
-import io.github.jan.supabase.createSupabaseClient
-import io.github.jan.supabase.logging.LogLevel
-import io.github.jan.supabase.realtime.Realtime
+import io.github.jan.supabase.realtime.RealtimeMessage
 import io.github.jan.supabase.realtime.realtime
-import io.ktor.client.plugins.websocket.WebSockets
-import io.ktor.client.plugins.websocket.webSocket
-import io.ktor.server.testing.testApplication
+import io.ktor.server.websocket.*
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.put
 import kotlin.test.Test
+import kotlin.test.assertEquals
 
 class RealtimeTest {
 
     @Test
-    fun test() {
-        testApplication {
-            val client = createClient {
-                install(WebSockets)
+    fun testSendingRealtimeMessages() {
+        val expectedMessage = RealtimeMessage(
+            topic = "realtimeTopic",
+            event = "realtimeEvent",
+            payload = buildJsonObject {
+                put("key", "value")
+            },
+            ref = "realtimeRef"
+        )
+        createTestClient(
+            wsHandler = {
+                val message = this.receiveDeserialized<RealtimeMessage>()
+                assertEquals(expectedMessage, message)
+            },
+            supabaseHandler = {
+                it.realtime.connect()
+                it.realtime.send(expectedMessage)
             }
-            client.webSocket("/") {
-                val supabase = createSupabaseClient("", "") {
-                    defaultLogLevel = LogLevel.DEBUG
-                    install(Realtime) {
-                        websocketSessionProvider = {
-                            this@webSocket
-                        }
-                    }
-                }
-                supabase.realtime.connect()
-                //send(Json.encodeToString(RealtimeMessage("topic", "event", buildJsonObject {  }, null)))
-            }
-        }
+        )
     }
 
 }
