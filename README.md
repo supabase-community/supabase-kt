@@ -121,6 +121,7 @@ val iosMain by getting {
 - [Multi-Factor Authentication (Desktop/Android/Browser)](https://github.com/supabase-community/supabase-kt/tree/master/demos/multi-factor-authentication)
 - [Multiplatform Deep Linking (Desktop/Android)](https://github.com/supabase-community/supabase-kt/tree/master/demos/multiplatform-deeplinks)
 - [Groceries Store App (Android)](https://github.com/hieuwu/android-groceries-store)
+- [RESTful Service (Spring Boot)](https://github.com/hieuwu/supa-spring-kt)
 
 # Need help?
 
