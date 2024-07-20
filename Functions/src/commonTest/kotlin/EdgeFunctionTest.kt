@@ -1,10 +1,5 @@
-import io.github.jan.supabase.SupabaseClientBuilder
 import io.github.jan.supabase.functions.FunctionRegion
-import io.github.jan.supabase.functions.Functions
 import io.github.jan.supabase.functions.functions
-import io.github.jan.supabase.gotrue.Auth
-import io.github.jan.supabase.gotrue.auth
-import io.github.jan.supabase.gotrue.minimalSettings
 import io.github.jan.supabase.testing.createMockedSupabaseClient
 import io.github.jan.supabase.testing.pathAfterVersion
 import io.github.jan.supabase.testing.toJsonElement
@@ -19,55 +14,7 @@ import kotlinx.serialization.json.put
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
-internal val configuration: SupabaseClientBuilder.() -> Unit = {
-    install(Functions)
-}
-
-class FunctionsTest {
-
-    @Test
-    fun testAuthorizationHeaderAuth() {
-        runTest {
-            val expectedJWT = "jwt"
-            val supabase = createMockedSupabaseClient(
-                configuration ={
-                    install(Auth) {
-                        minimalSettings()
-                    }
-                    configuration()
-                },
-                requestHandler = {
-                    assertEquals("Bearer $expectedJWT", it.headers[HttpHeaders.Authorization])
-                    respond("")
-                }
-            )
-            supabase.auth.importAuthToken(expectedJWT)
-            supabase.functions.invoke(
-                function = ""
-            )
-        }
-    }
-
-    @Test
-    fun testAuthorizationHeaderCustomToken() {
-        runTest {
-            val expectedJWT = "jwt"
-            val supabase = createMockedSupabaseClient(
-                configuration = {
-                    install(Functions) {
-                        jwtToken = expectedJWT
-                    }
-                },
-                requestHandler = {
-                    assertEquals("Bearer $expectedJWT", it.headers[HttpHeaders.Authorization])
-                    respond("")
-                }
-            )
-            supabase.functions.invoke(
-                function = ""
-            )
-        }
-    }
+class EdgeFunctionTest {
 
     @Test
     fun testInvokingWithoutBody() {
@@ -87,11 +34,8 @@ class FunctionsTest {
                     respond("")
                 }
             )
-            supabase.functions.invoke(
-                function = expectedName,
-                region = expectedRegion,
-                headers = expectedHeaders
-            )
+            val function = supabase.functions.buildEdgeFunction(expectedName, expectedRegion, expectedHeaders)
+            function()
         }
     }
 
@@ -117,12 +61,8 @@ class FunctionsTest {
                     respond("")
                 }
             )
-            supabase.functions.invoke(
-                function = expectedName,
-                region = expectedRegion,
-                body = expectedBody,
-                headers = expectedHeaders
-            )
+            val function = supabase.functions.buildEdgeFunction(expectedName, expectedRegion, expectedHeaders)
+            function(expectedBody)
         }
     }
 
