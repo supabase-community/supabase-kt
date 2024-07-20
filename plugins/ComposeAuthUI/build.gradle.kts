@@ -5,7 +5,7 @@ import com.android.build.gradle.internal.tasks.LintModelMetadataTask
 plugins {
     id(libs.plugins.kotlin.multiplatform.get().pluginId)
     id(libs.plugins.android.library.get().pluginId)
-    alias(libs.plugins.compose)
+    id(libs.plugins.compose.plugin.get().pluginId)
     alias(libs.plugins.compose.compiler)
 }
 
@@ -32,7 +32,7 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 api(compose.ui)
-                implementation(project(":gotrue-kt"))
+                api(project(":gotrue-kt"))
                 implementation(compose.material3)
             }
         }
@@ -44,7 +44,7 @@ kotlin {
     }
 }
 
-configureAndroidTarget()
+configureLibraryAndroidTarget()
 
 //see https://github.com/JetBrains/compose-multiplatform/issues/4739
 tasks.withType<LintModelWriterTask> {

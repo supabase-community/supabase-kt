@@ -3,12 +3,16 @@ import org.gradle.api.Project
 import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.extra
 
+val Project.supabaseVersion get() = System.getProperty("SupabaseVersion") ?: extra["supabase-version"].toString()
+
 fun Project.applyPublishing() {
     extensions.configure(MavenPublishBaseExtension::class) {
         publishToMavenCentral(com.vanniktech.maven.publish.SonatypeHost.S01)
 
-        signAllPublications()
-        coordinates(extra["base-group"].toString(), this@applyPublishing.name, extra["supabase-version"].toString())
+        if (System.getProperty("DisableSigning") != "true") {
+            signAllPublications()
+        }
+        coordinates(extra["base-group"].toString(), this@applyPublishing.name, supabaseVersion)
 
         pom {
             name.set(this@applyPublishing.name)

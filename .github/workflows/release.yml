@@ -10,8 +10,10 @@ on:
 env:
   ORG_GRADLE_PROJECT_signingInMemoryKey: ${{ secrets.GPG_SIGNING_KEY }}
   ORG_GRADLE_PROJECT_signingInMemoryKeyPassword: ${{ secrets.GPG_SIGNING_PASSPHRASE }}
-  ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.OSSRH_USERNAME }}
-  ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.OSSRH_PASSWORD }}
+  #ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.OSSRH_USERNAME }}
+  #ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.OSSRH_PASSWORD }}
+  ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.TOKEN_NAME }}
+  ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.TOKEN_KEY }}
 
 jobs:
   publish:
@@ -30,7 +32,7 @@ jobs:
           cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
           cache-read-only: true
       - name: Publish
-        run: ./gradlew publishAllPublicationsToMavenCentral
+        run: ./gradlew -DLibrariesOnly=true publishAllPublicationsToMavenCentral
       - name: Close and release
         if: inputs.close_and_release
-        run: ./gradlew releaseRepository --configuration-cache
+        run: ./gradlew -DLibrariesOnly=true releaseRepository --configuration-cache

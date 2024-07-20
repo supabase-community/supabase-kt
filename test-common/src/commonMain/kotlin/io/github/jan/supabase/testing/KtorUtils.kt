@@ -6,6 +6,7 @@ import io.ktor.client.engine.mock.toByteArray
 import io.ktor.client.request.HttpResponseData
 import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
+import io.ktor.http.HttpStatusCode
 import io.ktor.http.content.OutgoingContent
 import io.ktor.http.headersOf
 import kotlinx.serialization.encodeToString
@@ -16,8 +17,8 @@ suspend fun OutgoingContent.toJsonElement(): JsonElement {
     return Json.decodeFromString(toByteArray().decodeToString())
 }
 
-fun MockRequestHandleScope.respondJson(json: String): HttpResponseData {
-    return respond(json, headers = headersOf(HttpHeaders.ContentType, ContentType.Application.Json.toString()))
+fun MockRequestHandleScope.respondJson(json: String, code: HttpStatusCode = HttpStatusCode.OK): HttpResponseData {
+    return respond(json, headers = headersOf(HttpHeaders.ContentType, ContentType.Application.Json.toString()), status = code)
 }
 
-inline fun <reified T> MockRequestHandleScope.respondJson(json: T): HttpResponseData = respondJson(Json.encodeToString(json))
+inline fun <reified T> MockRequestHandleScope.respondJson(json: T, code: HttpStatusCode = HttpStatusCode.OK): HttpResponseData = respondJson(Json.encodeToString(json), code)

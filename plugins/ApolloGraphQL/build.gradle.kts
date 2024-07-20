@@ -31,4 +31,4 @@ kotlin {
     }
 }
 
-configureAndroidTarget()
+configureLibraryAndroidTarget()

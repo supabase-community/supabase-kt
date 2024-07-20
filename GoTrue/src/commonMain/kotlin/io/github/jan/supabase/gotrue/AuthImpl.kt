@@ -10,6 +10,9 @@ import io.github.jan.supabase.exceptions.UnauthorizedRestException
 import io.github.jan.supabase.exceptions.UnknownRestException
 import io.github.jan.supabase.gotrue.admin.AdminApi
 import io.github.jan.supabase.gotrue.admin.AdminApiImpl
+import io.github.jan.supabase.gotrue.exception.AuthRestException
+import io.github.jan.supabase.gotrue.exception.AuthSessionMissingException
+import io.github.jan.supabase.gotrue.exception.AuthWeakPasswordException
 import io.github.jan.supabase.gotrue.mfa.MfaApi
 import io.github.jan.supabase.gotrue.mfa.MfaApiImpl
 import io.github.jan.supabase.gotrue.providers.AuthProvider
@@ -49,7 +52,11 @@ import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.encodeToJsonElement
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.put
-import kotlin.math.floor
+import kotlin.time.Duration.Companion.seconds
+
+private const val SESSION_REFRESH_THRESHOLD = 0.8
+@Suppress("MagicNumber") // see #631
+private val SIGNOUT_IGNORE_CODES = listOf(401, 403, 404)
 
 @PublishedApi
 internal class AuthImpl(
@@ -267,8 +274,14 @@ internal class AuthImpl(
 
     override suspend fun signOut(scope: SignOutScope) {
         if (currentSessionOrNull() != null) {
-            api.post("logout") {
-                parameter("scope", scope.name.lowercase())
+            try {
+                api.post("logout") {
+                    parameter("scope", scope.name.lowercase())
+                }
+            } catch(e: RestException) {
+                if(e.statusCode in SIGNOUT_IGNORE_CODES) {
+                    Auth.logger.d { "Received error code ${e.statusCode} while signing out user. This can happen if the user doesn't exist anymore or the JWT is invalid/expired. Proceeding to clean up local data..." }
+                } else throw e
             }
             Auth.logger.d { "Logged out session in Supabase" }
         } else {
@@ -282,13 +295,13 @@ internal class AuthImpl(
 
     private suspend fun verify(
         type: String,
-        token: String,
+        token: String?,
         captchaToken: String?,
         additionalData: JsonObjectBuilder.() -> Unit
     ) {
         val body = buildJsonObject {
             put("type", type)
-            put("token", token)
+            token?.let { put("token", it) }
             captchaToken?.let(::putCaptchaToken)
             additionalData()
         }
@@ -304,6 +317,14 @@ internal class AuthImpl(
         captchaToken: String?
     ) = verify(type.type, token, captchaToken) {
         put("email", email)
+    }
+
+    override suspend fun verifyEmailOtp(
+        type: OtpType.Email,
+        tokenHash: String,
+        captchaToken: String?
+    ) = verify(type.type, null, captchaToken) {
+        put("token_hash", tokenHash)
     }
 
     override suspend fun verifyPhoneOtp(
@@ -421,12 +442,15 @@ internal class AuthImpl(
     }
 
     private suspend fun delayBeforeExpiry(session: UserSession) {
-        val expiresIn = session.expiresAt - Clock.System.now()
+        val timeAtBeginningOfSession = session.expiresAt - session.expiresIn.seconds
 
-        @Suppress("MagicNumber")
-        val beforeExpiryTime =
-            floor(expiresIn.inWholeMilliseconds * 4.0f / 5.0f).toLong() //always refresh 20% before expiry
-        delay(beforeExpiryTime)
+        // 80% of the way to session.expiresAt
+        val targetRefreshTime = timeAtBeginningOfSession + (session.expiresIn.seconds * SESSION_REFRESH_THRESHOLD)
+
+        val delayDuration = targetRefreshTime - Clock.System.now()
+
+        // if the delayDuration is negative, delay() will not delay
+        delay(delayDuration)
     }
 
     private suspend fun handleExpiredSession(session: UserSession, autoRefresh: Boolean = true) {
@@ -460,24 +484,40 @@ internal class AuthImpl(
     override suspend fun parseErrorResponse(response: HttpResponse): RestException {
         val errorBody =
             response.bodyOrNull<GoTrueErrorResponse>() ?: GoTrueErrorResponse("Unknown error", "")
+        checkErrorCodes(errorBody, response)?.let { return it }
         return when (response.status) {
             HttpStatusCode.Unauthorized -> UnauthorizedRestException(
-                errorBody.error,
+                errorBody.error ?: "Unauthorized",
                 response,
                 errorBody.description
             )
             HttpStatusCode.BadRequest -> BadRequestRestException(
-                errorBody.error,
+                errorBody.error ?: "Bad Request",
                 response,
                 errorBody.description
             )
-
             HttpStatusCode.UnprocessableEntity -> BadRequestRestException(
-                errorBody.error,
+                errorBody.error ?: "Unprocessable Entity",
                 response,
                 errorBody.description
             )
-            else -> UnknownRestException(errorBody.error, response)
+            else -> UnknownRestException(errorBody.error ?: "Unknown Error", response)
+        }
+    }
+
+    private fun checkErrorCodes(error: GoTrueErrorResponse, response: HttpResponse): RestException? {
+        return when (error.error) {
+            AuthWeakPasswordException.CODE -> AuthWeakPasswordException(error.description, response.status.value, error.weakPassword?.reasons ?: emptyList())
+            AuthSessionMissingException.CODE -> {
+                authScope.launch {
+                    Auth.logger.e { "Received session not found api error. Clearing session..." }
+                    clearSession()
+                }
+                AuthSessionMissingException(response.status.value)
+            }
+            else -> {
+                error.error?.let { AuthRestException(it, error.description, response.status.value) }
+            }
         }
     }
 
