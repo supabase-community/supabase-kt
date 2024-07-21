@@ -6,6 +6,7 @@ import android.provider.OpenableColumns
 import io.github.vinceglb.filekit.core.PlatformFile
 import io.ktor.util.cio.toByteReadChannel
 import io.ktor.utils.io.ByteReadChannel
+import io.ktor.utils.io.discard
 
 actual val PlatformFile.dataProducer: suspend (offset: Long) -> ByteReadChannel
     get() {
