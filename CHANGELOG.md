@@ -1,5 +1,14 @@
 # Changelog
 
+## 2.5.3 - July 21, 2024
+
+### Auth
+
+- Add support for verifying a token hash by @jan-tennert in https://github.com/supabase-community/supabase-kt/pull/657
+
+### Miscellaneous
+- Add link to a RESTful service sample built with supabase-kt by @hieuwu in https://github.com/supabase-community/supabase-kt/pull/664
+
 ## 2.5.2 - July 08, 2024
 
 ### Realtime
