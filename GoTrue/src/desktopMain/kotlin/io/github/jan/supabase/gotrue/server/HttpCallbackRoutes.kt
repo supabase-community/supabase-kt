@@ -6,10 +6,10 @@ import io.github.jan.supabase.logging.d
 import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.response.respondText
-import io.ktor.server.routing.RootRoute
+import io.ktor.server.routing.RootRouting
 import io.ktor.server.routing.get
 
-internal fun RootRoute.configureRoutes(
+internal fun RootRouting.configureRoutes(
     auth: Auth,
     onSuccess: suspend (UserSession) -> Unit,
 ) {
