@@ -18,6 +18,8 @@ For information about supported Kotlin targets, see the corresponding module REA
 
 [Documentation](https://supabase.com/docs/reference/kotlin/introduction)
 
+[Samples](#samples)
+
 [Getting started with Android and Supabase [Video]](https://www.youtube.com/watch?v=_iXUVJ6HTHU)
 
 [Quickstart](https://supabase.com/docs/guides/getting-started/quickstarts/kotlin)
@@ -115,13 +117,25 @@ val iosMain by getting {
 
 # Samples
 
-- [Chat Demo (Desktop/Android/iOS/Browser)](/sample/chat-demo-mpp)
-- [File Upload Demo (Desktop/Android)](/sample/file-upload)
-- [Android Native Google login & in-app OAuth (Android)](https://github.com/supabase-community/supabase-kt/tree/master/demos/android-login)
-- [Multi-Factor Authentication (Desktop/Android/Browser)](https://github.com/supabase-community/supabase-kt/tree/master/demos/multi-factor-authentication)
-- [Multiplatform Deep Linking (Desktop/Android)](https://github.com/supabase-community/supabase-kt/tree/master/demos/multiplatform-deeplinks)
-- [Groceries Store App (Android)](https://github.com/hieuwu/android-groceries-store)
-- [RESTful Service (Spring Boot)](https://github.com/hieuwu/supa-spring-kt)
+### Multiplatform Applications
+
+**Official Samples**
+
+- [Chat Demo](/sample/chat-demo-mpp) *(Desktop/Android/iOS/Browser)* - A simple chat application using the Auth, Postgrest and Realtime module.
+- [File Upload Demo](/sample/file-upload) *(Desktop/Android)* - A simple bulk file upload application using the Storage module.
+- [Android Native Google login & in-app OAuth](https://github.com/supabase-community/supabase-kt/tree/master/demos/android-login) *(Android)* - A simple Android application showcasing Native Google login and in-app OAuth.
+- [Multi-Factor Authentication](https://github.com/supabase-community/supabase-kt/tree/master/demos/multi-factor-authentication) *(Desktop/Android/Browser)* - A simple application showcasing Multi-Factor Authentication.
+- [Multiplatform Deep Linking](https://github.com/supabase-community/supabase-kt/tree/master/demos/multiplatform-deeplinks) *(Desktop/Android)* - A simple application showcasing deep linking on Desktop and Android.
+
+**Community Samples**
+
+- [Groceries Store App](https://github.com/hieuwu/android-groceries-store) *(Android)*
+ 
+### Server-side
+
+**Community Samples**
+
+- [RESTful Service](https://github.com/hieuwu/supa-spring-kt) *(Spring Boot)*
 
 # Need help?
 
