@@ -131,7 +131,7 @@ val iosMain by getting {
 
 - [Groceries Store App](https://github.com/hieuwu/android-groceries-store) *(Android)*
  
-### Server-side
+### Server-side Applications
 
 **Community Samples**
 
