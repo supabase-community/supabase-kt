@@ -54,7 +54,7 @@ configure(allprojects.filter { it.parent?.name == "sample" }) {
     val children = this.childProjects
     this.tasks.register("buildAll") {
         children.values.forEach { child ->
-            this.dependsOn(child.tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>())
+            this.dependsOn(child.tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask<*>>())
         }
     }
 }
