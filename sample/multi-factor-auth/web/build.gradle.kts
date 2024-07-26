@@ -1,9 +1,10 @@
 import org.jetbrains.compose.compose
 
 plugins {
-    kotlin("multiplatform")
-    id("org.jetbrains.compose")
-    kotlin("plugin.serialization")
+    id(libs.plugins.compose.plugin.get().pluginId)
+    alias(libs.plugins.compose.compiler)
+    id(libs.plugins.kotlin.multiplatform.get().pluginId)
+    alias(libs.plugins.kotlinx.plugin.serialization)
 }
 
 group = "io.github.jan.supabase"
@@ -19,7 +20,7 @@ kotlin {
     sourceSets {
         val jsMain by getting {
             dependencies {
-                implementation(project(":common"))
+                implementation(project(":sample:multi-factor-auth:common"))
             }
         }
     }
