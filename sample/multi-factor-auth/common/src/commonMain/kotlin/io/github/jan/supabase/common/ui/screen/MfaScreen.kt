@@ -4,7 +4,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import io.github.jan.supabase.common.AppViewModel
-import io.github.jan.supabase.gotrue.gotrue
 
 @Composable
 fun MfaScreen(viewModel: AppViewModel) {

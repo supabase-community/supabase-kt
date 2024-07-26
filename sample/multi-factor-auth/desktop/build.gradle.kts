@@ -1,4 +1,3 @@
-import org.jetbrains.compose.compose
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 
 plugins {
@@ -13,8 +12,8 @@ version = "1.0-SNAPSHOT"
 
 
 kotlin {
+    jvmToolchain(8)
     jvm {
-        jvmToolchain(8)
         withJava()
     }
     sourceSets {

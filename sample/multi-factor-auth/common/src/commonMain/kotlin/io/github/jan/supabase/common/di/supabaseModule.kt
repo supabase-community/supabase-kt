@@ -1,11 +1,11 @@
 package io.github.jan.supabase.common.di
 
 import io.github.jan.supabase.createSupabaseClient
-import io.github.jan.supabase.gotrue.GoTrue
-import io.github.jan.supabase.gotrue.GoTrueConfig
+import io.github.jan.supabase.gotrue.Auth
+import io.github.jan.supabase.gotrue.AuthConfig
 import org.koin.dsl.module
 
-expect fun GoTrueConfig.platformGoTrueConfig()
+expect fun AuthConfig.platformGoTrueConfig()
 
 val supabaseModule = module {
     single {
@@ -13,7 +13,7 @@ val supabaseModule = module {
             supabaseUrl = "YOUR_URL",
             supabaseKey = "YOUR_KEY"
         ) {
-            install(GoTrue) {
+            install(Auth) {
                 platformGoTrueConfig()
             }
         }

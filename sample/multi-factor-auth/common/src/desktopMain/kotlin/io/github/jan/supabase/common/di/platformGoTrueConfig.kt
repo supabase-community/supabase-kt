@@ -1,7 +1,7 @@
 package io.github.jan.supabase.common.di
 
-import io.github.jan.supabase.gotrue.GoTrueConfig
+import io.github.jan.supabase.gotrue.AuthConfig
 
-actual fun GoTrueConfig.platformGoTrueConfig() {
-    htmlTitle = "Chat App"
+actual fun AuthConfig.platformGoTrueConfig() {
+    httpCallbackConfig { htmlTitle = "Chat App" }
 }

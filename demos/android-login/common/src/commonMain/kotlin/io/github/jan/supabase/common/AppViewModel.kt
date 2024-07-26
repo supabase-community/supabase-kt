@@ -3,7 +3,7 @@ package io.github.jan.supabase.common
 
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.annotations.SupabaseInternal
-import io.github.jan.supabase.gotrue.gotrue
+import io.github.jan.supabase.gotrue.auth
 import io.github.jan.supabase.gotrue.parseFragmentAndImportSession
 import io.github.jan.supabase.gotrue.providers.Google
 import io.github.jan.supabase.gotrue.providers.builtin.Email
@@ -22,7 +22,7 @@ class AppViewModel(
     val supabaseClient: SupabaseClient,
 ) : MPViewModel() {
 
-    val sessionStatus = supabaseClient.gotrue.sessionStatus
+    val sessionStatus = supabaseClient.auth.sessionStatus
     val loginAlert = MutableStateFlow<String?>(null)
 
     //Auth
@@ -30,7 +30,7 @@ class AppViewModel(
     fun signUp(email: String, password: String) {
         coroutineScope.launch {
             kotlin.runCatching {
-                supabaseClient.gotrue.signUpWith(Email) {
+                supabaseClient.auth.signUpWith(Email) {
                     this.email = email
                     this.password = password
                 }
@@ -45,7 +45,7 @@ class AppViewModel(
     fun login(email: String, password: String) {
         coroutineScope.launch {
             kotlin.runCatching {
-                supabaseClient.gotrue.loginWith(Email) {
+                supabaseClient.auth.loginWith(Email) {
                     this.email = email
                     this.password = password
                 }
@@ -59,7 +59,7 @@ class AppViewModel(
     fun loginWithIdToken(idToken: String) {
         coroutineScope.launch {
             kotlin.runCatching {
-                supabaseClient.gotrue.loginWith(IDToken)  {
+                supabaseClient.auth.loginWith(IDToken)  {
                     this.idToken = idToken
                     provider = Google
                 }
@@ -73,7 +73,7 @@ class AppViewModel(
     fun parseFragment(fragment: String) {
         coroutineScope.launch {
             kotlin.runCatching {
-                supabaseClient.gotrue.parseFragmentAndImportSession(fragment)
+                supabaseClient.auth.parseFragmentAndImportSession(fragment)
             }.onFailure {
                 it.printStackTrace()
             }
@@ -83,7 +83,7 @@ class AppViewModel(
     fun loginWithGoogle() {
         coroutineScope.launch {
             kotlin.runCatching {
-                supabaseClient.gotrue.loginWith(Google)
+                supabaseClient.auth.loginWith(Google)
             }
         }
     }
@@ -91,7 +91,7 @@ class AppViewModel(
     fun logout() {
         coroutineScope.launch {
             kotlin.runCatching {
-                supabaseClient.gotrue.logout()
+                supabaseClient.auth.logout()
             }
         }
     }

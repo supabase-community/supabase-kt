@@ -1,6 +1,6 @@
 package io.github.jan.supabase.common.di
 
-import io.github.jan.supabase.gotrue.GoTrueConfig
+import io.github.jan.supabase.gotrue.AuthConfig
 
-actual fun GoTrueConfig.platformGoTrueConfig() {
+actual fun AuthConfig.platformGoTrueConfig() {
 }

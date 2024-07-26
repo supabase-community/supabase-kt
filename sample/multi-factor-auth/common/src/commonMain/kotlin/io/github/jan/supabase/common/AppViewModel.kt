@@ -1,10 +1,9 @@
 package io.github.jan.supabase.common
 
 
-import co.touchlab.kermit.Logger
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.exceptions.RestException
-import io.github.jan.supabase.gotrue.gotrue
+import io.github.jan.supabase.gotrue.auth
 import io.github.jan.supabase.gotrue.mfa.FactorType
 import io.github.jan.supabase.gotrue.mfa.MfaFactor
 import io.github.jan.supabase.gotrue.providers.Google
@@ -23,10 +22,10 @@ class AppViewModel(
     val supabaseClient: SupabaseClient
 ) : MPViewModel() {
 
-    val sessionStatus = supabaseClient.gotrue.sessionStatus
+    val sessionStatus = supabaseClient.auth.sessionStatus
     val loginAlert = MutableStateFlow<String?>(null)
-    val isLoggedInUsingMfa = supabaseClient.gotrue.mfa.loggedInUsingMfaFlow
-    val mfaEnabled = supabaseClient.gotrue.mfa.isMfaEnabledFlow
+    val isLoggedInUsingMfa = supabaseClient.auth.mfa.loggedInUsingMfaFlow
+    val mfaEnabled = supabaseClient.auth.mfa.isMfaEnabledFlow
     val enrolledFactor = MutableStateFlow<MfaFactor<FactorType.TOTP.Response>?>(null)
 
     //Auth
@@ -34,7 +33,7 @@ class AppViewModel(
     fun signUp(email: String, password: String) {
         coroutineScope.launch {
             kotlin.runCatching {
-                supabaseClient.gotrue.signUpWith(Email) {
+                supabaseClient.auth.signUpWith(Email) {
                     this.email = email
                     this.password = password
                 }
@@ -49,7 +48,7 @@ class AppViewModel(
     fun login(email: String, password: String) {
         coroutineScope.launch {
             kotlin.runCatching {
-                supabaseClient.gotrue.loginWith(Email) {
+                supabaseClient.auth.signInWith(Email) {
                     this.email = email
                     this.password = password
                 }
@@ -63,7 +62,7 @@ class AppViewModel(
     fun loginWithGoogle() {
         coroutineScope.launch {
             kotlin.runCatching {
-                supabaseClient.gotrue.loginWith(Google)
+                supabaseClient.auth.signInWith(Google)
             }
         }
     }
@@ -72,7 +71,7 @@ class AppViewModel(
         enrolledFactor.value = null
         coroutineScope.launch {
             kotlin.runCatching {
-                supabaseClient.gotrue.invalidateSession()
+                supabaseClient.auth.signOut()
             }
         }
     }
@@ -82,8 +81,8 @@ class AppViewModel(
         enrolledFactor.value = null
         coroutineScope.launch {
             kotlin.runCatching {
-                supabaseClient.gotrue.mfa.unenroll(supabaseClient.gotrue.mfa.verifiedFactors.firstOrNull()?.id ?: supabaseClient.gotrue.mfa.retrieveFactorsForCurrentUser().first { it.isVerified }.id)
-                supabaseClient.gotrue.retrieveUserForCurrentSession(true)
+                supabaseClient.auth.mfa.unenroll(supabaseClient.auth.mfa.verifiedFactors.firstOrNull()?.id ?: supabaseClient.auth.mfa.retrieveFactorsForCurrentUser().first { it.isVerified }.id)
+                supabaseClient.auth.retrieveUserForCurrentSession(true)
             }
         }
     }
@@ -91,7 +90,7 @@ class AppViewModel(
     fun enrollFactor() {
         coroutineScope.launch {
             kotlin.runCatching {
-                supabaseClient.gotrue.mfa.enroll(FactorType.TOTP)
+                supabaseClient.auth.mfa.enroll(FactorType.TOTP)
             }.onSuccess {
                 enrolledFactor.value = it
             }.onFailure {
@@ -104,8 +103,8 @@ class AppViewModel(
     fun createAndVerifyChallenge(code: String) {
         coroutineScope.launch {
             kotlin.runCatching {
-                val factor = enrolledFactor.value?.id ?: supabaseClient.gotrue.mfa.verifiedFactors.firstOrNull()?.id ?: supabaseClient.gotrue.mfa.retrieveFactorsForCurrentUser().first { it.isVerified }.id
-                supabaseClient.gotrue.mfa.createChallengeAndVerify(
+                val factor = enrolledFactor.value?.id ?: supabaseClient.auth.mfa.verifiedFactors.firstOrNull()?.id ?: supabaseClient.auth.mfa.retrieveFactorsForCurrentUser().first { it.isVerified }.id
+                supabaseClient.auth.mfa.createChallengeAndVerify(
                     factorId = factor,
                     code = code
                 )

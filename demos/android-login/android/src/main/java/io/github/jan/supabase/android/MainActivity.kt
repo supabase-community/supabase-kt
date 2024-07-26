@@ -19,7 +19,7 @@ import io.github.jan.supabase.common.ui.screen.OAuthScreen
 import io.github.jan.supabase.compose.auth.composable.rememberLoginWithGoogle
 import io.github.jan.supabase.compose.auth.composeAuth
 import io.github.jan.supabase.gotrue.SessionStatus
-import io.github.jan.supabase.gotrue.gotrue
+import io.github.jan.supabase.gotrue.auth
 import io.github.jan.supabase.gotrue.handleDeeplinks
 import io.github.jan.supabase.gotrue.providers.Spotify
 import org.koin.android.ext.android.inject
@@ -62,7 +62,7 @@ class MainActivity : ComponentActivity() {
                         }
                         if (showInAppGoogleWebView) {
                             OAuthScreen(
-                                url = supabaseClient.gotrue.oAuthUrl(
+                                url = supabaseClient.auth.oAuthUrl(
                                     Spotify,
                                     "http://localhost"
                                 ),

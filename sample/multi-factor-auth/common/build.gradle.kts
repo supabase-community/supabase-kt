@@ -1,5 +1,5 @@
 @file:OptIn(org.jetbrains.compose.ExperimentalComposeLibrary::class)
-import org.jetbrains.compose.compose
+import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 
 plugins {
     id(libs.plugins.android.library.get().pluginId)
@@ -12,13 +12,21 @@ plugins {
 group = "io.github.jan.supabase"
 version = "1.0-SNAPSHOT"
 
+@OptIn(ExperimentalKotlinGradlePluginApi::class)
 kotlin {
-    android()
-    jvm("desktop") {
-        jvmToolchain(8)
-    }
+    jvmToolchain(8)
+    androidTarget()
+    jvm("desktop")
     js(IR) {
         browser()
+    }
+    applyDefaultHierarchyTemplate {
+        common {
+            group("nonJs") {
+                withJvm()
+                withAndroidTarget()
+            }
+        }
     }
     sourceSets {
         val commonMain by getting {
@@ -27,24 +35,25 @@ kotlin {
                 api(compose.foundation)
                 api(compose.material3)
                 api(compose.materialIconsExtended)
-                api(libs.bundles.supabase)
+                addModules(SupabaseModule.GOTRUE)
                 api(libs.koin.core)
             }
         }
-        val nonJsMain by creating {
+        val nonJsMain by getting {
             dependencies {
-                api(libs.ktor.cio)
+                api(libs.ktor.client.cio)
             }
         }
         val androidMain by getting {
-            dependsOn(nonJsMain)
             dependencies {
                 api(libs.androidx.compat)
                 api(libs.androidx.core)
                 api(libs.koin.android)
                 api(libs.androidx.lifecycle.viewmodel.ktx)
                 api(libs.androidx.lifecycle.viewmodel.compose)
-                api(libs.bundles.coil)
+                api(libs.coil.svg)
+                api(libs.coil.compose)
+                api(libs.coil)
             }
         }
         val desktopMain by getting {
@@ -55,7 +64,7 @@ kotlin {
         }
         val jsMain by getting {
             dependencies {
-                api(libs.ktor.js)
+                api(libs.ktor.client.js)
             }
         }
     }
