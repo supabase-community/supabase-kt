@@ -71,7 +71,8 @@ ImageLoader.Builder(context)
     .build()
 ```
 
-You can also replace the default Coil Image Loader in your application. For Compose Multiplatform Applications, you can use the `setSingletonImageLoaderFactory` composable function:
+You can also replace the default Coil Image Loader in your application. 
+For Compose Multiplatform Applications using the `coil-compose` dependency, you can use the `setSingletonImageLoaderFactory` composable function:
 ```kotlin
 setSingletonImageLoaderFactory { platformContext ->
     ImageLoader.Builder(platformContext)
@@ -84,6 +85,7 @@ setSingletonImageLoaderFactory { platformContext ->
 }
 ```
 You call this composable before any `Image` composable is used. Presumably in your `Root` composable.
+
 See the [Coil documentation](https://coil-kt.github.io/coil/getting_started/#image-loaders) for more information.
 
 ### Display images from Supabase Storage
