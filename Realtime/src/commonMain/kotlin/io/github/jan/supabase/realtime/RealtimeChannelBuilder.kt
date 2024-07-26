@@ -13,6 +13,11 @@ class RealtimeChannelBuilder @PublishedApi internal constructor(private val topi
     private var presenceJoinConfig = PresenceJoinConfig("")
 
     /**
+     * Whether this channel should be private.
+     */
+    var isPrivate = false
+
+    /**
      * Sets the broadcast join config
      */
     fun broadcast(block: BroadcastJoinConfig.() -> Unit) {
@@ -33,7 +38,8 @@ class RealtimeChannelBuilder @PublishedApi internal constructor(private val topi
             realtimeImpl,
             topic,
             broadcastJoinConfig,
-            presenceJoinConfig
+            presenceJoinConfig,
+            isPrivate
         )
     }
 

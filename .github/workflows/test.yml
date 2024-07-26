@@ -4,6 +4,9 @@ on:
   pull_request:
     branches:
       - '*'
+  push:
+    branches:
+      - 'master'
 
 jobs:
   test:
@@ -31,6 +34,6 @@ jobs:
         uses: gradle/actions/setup-gradle@v3.1.0
         with:
           cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
-          cache-read-only: true
+          cache-read-only: ${{ github.ref != 'refs/heads/master' }}
       - name: Test supabase-kt
-        run: ./gradlew ${{ matrix.command }} --stacktrace --configuration-cache
+        run: ./gradlew -DLibrariesOnly=true ${{ matrix.command }} --stacktrace --configuration-cache

@@ -4,27 +4,27 @@ core:
 
 realtime:
   - changed-files:
-      - any-glob-to-any-file: Realtime/**
+      - any-glob-to-any-file: Realtime/src/**
 
 functions:
   - changed-files:
-      - any-glob-to-any-file: Functions/**
+      - any-glob-to-any-file: Functions/src/**
 
 postgrest:
   - changed-files:
-      - any-glob-to-any-file: Postgrest/**
+      - any-glob-to-any-file: Postgrest/src/**
 
 auth:
   - changed-files:
-      - any-glob-to-any-file: GoTrue/**
+      - any-glob-to-any-file: GoTrue/src/**
 
 storage:
   - changed-files:
-      - any-glob-to-any-file: Storage/**
+      - any-glob-to-any-file: Storage/src/**
 
 plugins:
   - changed-files:
-      - any-glob-to-any-file: plugins/**
+      - any-glob-to-any-file: plugins/src/**
 
 tests:
   - changed-files:
@@ -32,7 +32,7 @@ tests:
 
 samples:
   - changed-files:
-      - any-glob-to-any-file: samples/**
+      - any-glob-to-any-file: sample/**
 
 serializers:
   - changed-files:

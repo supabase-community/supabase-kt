@@ -4,6 +4,7 @@ import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.exceptions.HttpRequestException
 import io.github.jan.supabase.exceptions.RestException
 import io.github.jan.supabase.gotrue.admin.AdminApi
+import io.github.jan.supabase.gotrue.exception.AuthRestException
 import io.github.jan.supabase.gotrue.exception.AuthWeakPasswordException
 import io.github.jan.supabase.gotrue.mfa.MfaApi
 import io.github.jan.supabase.gotrue.providers.AuthProvider
@@ -94,7 +95,7 @@ sealed interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
      * @param redirectUrl The redirect url to use. If you don't specify this, the platform specific will be used, like deeplinks on android.
      * @param config The configuration to use for the sign-up.
      * @return The result of the sign-up (e.g. the user id) or null if auto-confirm is enabled (resulting in a login)
-     * @throws RestException or one of its subclasses if receiving an error response
+     * @throws RestException or one of its subclasses if receiving an error response. If the error response contains a error code, an [AuthRestException] will be thrown which can be used to easier identify the problem.
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      * @throws AuthWeakPasswordException if using the [Email] or [Phone] provider and the password is too weak. You can get the reasons via [AuthWeakPasswordException.reasons]
@@ -123,7 +124,7 @@ sealed interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
      * @param provider the provider to use for signing in. E.g. [Email], [Phone] or [Google]
      * @param redirectUrl The redirect url to use. If you don't specify this, the platform specific will be used, like deeplinks on android.
      * @param config The configuration to use for the sign-in.
-     * @throws RestException or one of its subclasses if receiving an error response
+     * @throws RestException or one of its subclasses if receiving an error response. If the error response contains a error code, an [AuthRestException] will be thrown which can be used to easier identify the problem.
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
@@ -140,6 +141,9 @@ sealed interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
      *
      * @param data Extra data for the user
      * @param captchaToken The captcha token to use
+     * @throws RestException or one of its subclasses if receiving an error response. If the error response contains a error code, an [AuthRestException] will be thrown which can be used to easier identify the problem.
+     * @throws HttpRequestTimeoutException if the request timed out
+     * @throws HttpRequestException on network related issues
      */
     suspend fun signInAnonymously(data: JsonObject? = null, captchaToken: String? = null)
 
@@ -151,6 +155,9 @@ sealed interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
      * @param redirectUrl The redirect url to use. If you don't specify this, the platform specific will be used, like deeplinks on android.
      * @param config Extra configuration
      * @return The OAuth url to open in the browser if [ExternalAuthConfigDefaults.automaticallyOpenUrl] is false, otherwise null.
+     * @throws RestException or one of its subclasses if receiving an error response. If the error response contains a error code, an [AuthRestException] will be thrown which can be used to easier identify the problem.
+     * @throws HttpRequestTimeoutException if the request timed out
+     * @throws HttpRequestException on network related issues
      */
     suspend fun linkIdentity(
         provider: OAuthProvider,
@@ -162,6 +169,9 @@ sealed interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
      * Unlinks an OAuth Identity from an existing user.
      * @param identityId The id of the OAuth identity
      * @param updateLocalUser Whether to delete the identity from the local user or not
+     * @throws RestException or one of its subclasses if receiving an error response. If the error response contains a error code, an [AuthRestException] will be thrown which can be used to easier identify the problem.
+     * @throws HttpRequestTimeoutException if the request timed out
+     * @throws HttpRequestException on network related issues
      */
     suspend fun unlinkIdentity(
         identityId: String,
@@ -172,6 +182,9 @@ sealed interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
      * Retrieves the sso url for the given [config]
      * @param redirectUrl The redirect url to use
      * @param config The configuration to use
+     * @throws RestException or one of its subclasses if receiving an error response. If the error response contains a error code, an [AuthRestException] will be thrown which can be used to easier identify the problem.
+     * @throws HttpRequestTimeoutException if the request timed out
+     * @throws HttpRequestException on network related issues
      */
     suspend fun retrieveSSOUrl(redirectUrl: String? = defaultRedirectUrl(), config: SSO.Config.() -> Unit): SSO.Result
 
@@ -179,7 +192,7 @@ sealed interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
      * Modifies the current user
      * @param updateCurrentUser Whether to update the current user in the [SupabaseClient]
      * @param config The configuration to use
-     * @throws RestException or one of its subclasses if receiving an error response
+     * @throws RestException or one of its subclasses if receiving an error response. If the error response contains a error code, an [AuthRestException] will be thrown which can be used to easier identify the problem.
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
@@ -193,7 +206,7 @@ sealed interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
      * Modifies the current user
      * @param updateCurrentUser Whether to update the current user in the [SupabaseClient]
      * @param config The configuration to use
-     * @throws RestException or one of its subclasses if receiving an error response
+     * @throws RestException or one of its subclasses if receiving an error response. If the error response contains a error code, an [AuthRestException] will be thrown which can be used to easier identify the problem.
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
@@ -209,7 +222,7 @@ sealed interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
      * @param type The email otp type
      * @param email The email to resend the otp to
      * @param captchaToken The captcha token to use
-     * @throws RestException or one of its subclasses if receiving an error response
+     * @throws RestException or one of its subclasses if receiving an error response. If the error response contains a error code, an [AuthRestException] will be thrown which can be used to easier identify the problem.
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
@@ -220,7 +233,7 @@ sealed interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
      * @param type The phone otp type
      * @param phone The phone to resend the otp to
      * @param captchaToken The captcha token to use
-     * @throws RestException or one of its subclasses if receiving an error response
+     * @throws RestException or one of its subclasses if receiving an error response. If the error response contains a error code, an [AuthRestException] will be thrown which can be used to easier identify the problem.
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
@@ -230,7 +243,7 @@ sealed interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
      * Sends a password reset email to the user with the specified [email]
      * @param email The email to send the password reset email to
      * @param redirectUrl The redirect url to use. If you don't specify this, the platform specific will be used, like deeplinks on android.
-     * @throws RestException or one of its subclasses if receiving an error response
+     * @throws RestException or one of its subclasses if receiving an error response. If the error response contains a error code, an [AuthRestException] will be thrown which can be used to easier identify the problem.
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
@@ -238,7 +251,7 @@ sealed interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
 
     /**
      * Sends a nonce to the user's email (preferred) or phone
-     * @throws RestException or one of its subclasses if receiving an error response
+     * @throws RestException or one of its subclasses if receiving an error response. If the error response contains a error code, an [AuthRestException] will be thrown which can be used to easier identify the problem.
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
@@ -249,18 +262,28 @@ sealed interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
      * @param type The type of the verification
      * @param email The email to verify
      * @param token The token used to verify
-     * @throws RestException or one of its subclasses if receiving an error response
+     * @throws RestException or one of its subclasses if receiving an error response. If the error response contains a error code, an [AuthRestException] will be thrown which can be used to easier identify the problem.
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
     suspend fun verifyEmailOtp(type: OtpType.Email, email: String, token: String, captchaToken: String? = null)
 
     /**
+     * Verifies a email otp token hash received via email
+     * @param type The type of the verification
+     * @param tokenHash The token hash used to verify
+     * @throws RestException or one of its subclasses if receiving an error response. If the error response contains a error code, an [AuthRestException] will be thrown which can be used to easier identify the problem.
+     * @throws HttpRequestTimeoutException if the request timed out
+     * @throws HttpRequestException on network related issues
+     */
+    suspend fun verifyEmailOtp(type: OtpType.Email, tokenHash: String, captchaToken: String? = null)
+
+    /**
      * Verifies a phone/sms otp
      * @param type The type of the verification
      * @param token The otp to verify
      * @param phone The phone number the token was sent to
-     * @throws RestException or one of its subclasses if receiving an error response
+     * @throws RestException or one of its subclasses if receiving an error response. If the error response contains a error code, an [AuthRestException] will be thrown which can be used to easier identify the problem.
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
@@ -268,7 +291,7 @@ sealed interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
 
     /**
      * Retrieves the user attached to the specified [jwt]
-     * @throws RestException or one of its subclasses if receiving an error response
+     * @throws RestException or one of its subclasses if receiving an error response. If the error response contains a error code, an [AuthRestException] will be thrown which can be used to easier identify the problem.
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
@@ -277,7 +300,7 @@ sealed interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
     /**
      * Retrieves the current user with the current session
      * @param updateSession Whether to update [sessionStatus] with the updated user, if [sessionStatus] is [SessionStatus.Authenticated]
-     * @throws RestException or one of its subclasses if receiving an error response
+     * @throws RestException or one of its subclasses if receiving an error response. If the error response contains a error code, an [AuthRestException] will be thrown which can be used to easier identify the problem.
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
@@ -286,7 +309,7 @@ sealed interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
     /**
      * Signs out the current user, which means [sessionStatus] will be [SessionStatus.NotAuthenticated] and the access token will be revoked
      * @param scope The scope of the sign-out.
-     * @throws RestException or one of its subclasses if receiving an error response
+     * @throws RestException or one of its subclasses if receiving an error response. If the error response contains a error code, an [AuthRestException] will be thrown which can be used to easier identify the problem.
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      * @see SignOutScope
@@ -316,7 +339,7 @@ sealed interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
      * Refreshes a session using the refresh token
      * @param refreshToken The refresh token to use
      * @return A new session
-     * @throws RestException or one of its subclasses if receiving an error response
+     * @throws RestException or one of its subclasses if receiving an error response. If the error response contains a error code, an [AuthRestException] will be thrown which can be used to easier identify the problem.
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
@@ -324,7 +347,7 @@ sealed interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
 
     /**
      * Refreshes the current session
-     * @throws RestException or one of its subclasses if receiving an error response
+     * @throws RestException or one of its subclasses if receiving an error response. If the error response contains a error code, an [AuthRestException] will be thrown which can be used to easier identify the problem.
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
@@ -339,6 +362,9 @@ sealed interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
      * Exchanges a code for a session. Used when using the [FlowType.PKCE] flow
      * @param code The code to exchange
      * @param saveSession Whether to save the session in storage
+     * @throws RestException or one of its subclasses if receiving an error response. If the error response contains a error code, an [AuthRestException] will be thrown which can be used to easier identify the problem.
+     * @throws HttpRequestTimeoutException if the request timed out
+     * @throws HttpRequestException on network related issues
      */
     suspend fun exchangeCodeForSession(code: String, saveSession: Boolean = true): UserSession
 

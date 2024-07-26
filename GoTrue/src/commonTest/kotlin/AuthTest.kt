@@ -5,12 +5,15 @@ import io.github.jan.supabase.gotrue.SessionStatus
 import io.github.jan.supabase.gotrue.auth
 import io.github.jan.supabase.gotrue.minimalSettings
 import io.github.jan.supabase.gotrue.providers.Github
+import io.github.jan.supabase.gotrue.user.Identity
+import io.github.jan.supabase.gotrue.user.UserInfo
 import io.github.jan.supabase.gotrue.user.UserSession
 import io.github.jan.supabase.testing.createMockedSupabaseClient
 import io.github.jan.supabase.testing.pathAfterVersion
 import io.github.jan.supabase.testing.respondJson
 import io.ktor.http.Url
 import kotlinx.coroutines.test.runTest
+import kotlinx.serialization.json.buildJsonObject
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertIs
@@ -151,6 +154,47 @@ class AuthTest {
             )
         }
 
+    }
+
+    @Test
+    fun testSessionMethods() {
+        runTest {
+            val client = createMockedSupabaseClient(configuration = configuration)
+            client.auth.awaitInitialization()
+            val expectedIdentities = listOf(Identity("id", buildJsonObject {  }, provider = "provider", userId = "userId"))
+            val expectedUser = UserInfo(
+                id = "id",
+                aud = "aud",
+                identities = expectedIdentities
+            )
+            val session = UserSession(
+                accessToken = "accessToken",
+                refreshToken = "refreshToken",
+                expiresIn = 3600,
+                tokenType = "Bearer",
+                user = expectedUser
+            )
+            client.auth.importSession(session)
+            assertEquals(session, (client.auth.sessionStatus.value as SessionStatus.Authenticated).session)
+            assertEquals(session, client.auth.currentSessionOrNull())
+            assertEquals(expectedUser, client.auth.currentUserOrNull())
+            assertEquals(expectedIdentities, client.auth.currentIdentitiesOrNull())
+            client.auth.clearSession()
+            assertNull(client.auth.currentSessionOrNull())
+        }
+    }
+
+    @Test
+    fun testClearSession() {
+        runTest {
+            val client = createMockedSupabaseClient(configuration = configuration)
+            client.auth.awaitInitialization()
+            val session = userSession()
+            client.auth.importSession(session)
+            assertIs<SessionStatus.Authenticated>(client.auth.sessionStatus.value)
+            client.auth.clearSession()
+            assertIs<SessionStatus.NotAuthenticated>(client.auth.sessionStatus.value)
+        }
     }
 
 }

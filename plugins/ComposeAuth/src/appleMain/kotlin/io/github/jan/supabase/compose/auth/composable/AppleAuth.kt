@@ -7,6 +7,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import io.github.jan.supabase.compose.auth.ComposeAuth
 import io.github.jan.supabase.compose.auth.hash
 import io.github.jan.supabase.compose.auth.signInWithApple
+import kotlinx.cinterop.BetaInteropApi
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import platform.AuthenticationServices.ASAuthorization
@@ -19,8 +20,9 @@ import platform.AuthenticationServices.ASAuthorizationScopeEmail
 import platform.AuthenticationServices.ASAuthorizationScopeFullName
 import platform.AuthenticationServices.ASPresentationAnchor
 import platform.Foundation.NSError
+import platform.Foundation.NSString
 import platform.Foundation.NSUTF8StringEncoding
-import platform.Foundation.base64EncodedStringWithOptions
+import platform.Foundation.create
 import platform.UIKit.UIApplication
 import platform.UIKit.UIWindow
 import platform.UIKit.UIWindowScene
@@ -35,18 +37,18 @@ import platform.darwin.NSObject
  * @param fallback Fallback function for unsupported platforms
  * @return [NativeSignInState]
  */
+@BetaInteropApi
 @OptIn(ExperimentalStdlibApi::class)
 @Composable
 actual fun ComposeAuth.rememberSignInWithApple(
     onResult: (NativeSignInResult) -> Unit,
     fallback: suspend () -> Unit
 ): NativeSignInState {
-
     val state = remember { NativeSignInState(this.serializer) }
     val scope = rememberCoroutineScope()
 
     LaunchedEffect(key1 = state.status) {
-        if(state.status is NativeSignInStatus.Started) {
+        if (state.status is NativeSignInStatus.Started) {
             try {
                 if (config.appleLoginConfig != null) {
                     val status = state.status as NativeSignInStatus.Started
@@ -54,7 +56,8 @@ actual fun ComposeAuth.rememberSignInWithApple(
                     val hashedNonce = status.nonce?.hash()
 
                     val request = appleIDProvider.createRequest().apply {
-                        requestedScopes = listOf(ASAuthorizationScopeFullName, ASAuthorizationScopeEmail)
+                        requestedScopes =
+                            listOf(ASAuthorizationScopeFullName, ASAuthorizationScopeEmail)
                         nonce = hashedNonce
                     }
 
@@ -71,7 +74,7 @@ actual fun ComposeAuth.rememberSignInWithApple(
                 } else {
                     fallback.invoke()
                 }
-            } catch(e: Exception) {
+            } catch (e: Exception) {
                 onResult.invoke(NativeSignInResult.Error(e.message ?: "error"))
             } finally {
                 state.reset()
@@ -82,6 +85,7 @@ actual fun ComposeAuth.rememberSignInWithApple(
     return state
 }
 
+@BetaInteropApi
 internal fun ComposeAuth.authorizationController(
     scope: CoroutineScope,
     status: NativeSignInStatus.Started,
@@ -95,14 +99,14 @@ internal fun ComposeAuth.authorizationController(
             try {
                 val credentials =
                     didCompleteWithAuthorization.credential as? ASAuthorizationAppleIDCredential
-                credentials?.identityToken?.base64EncodedStringWithOptions(
-                    NSUTF8StringEncoding
-                )?.let { idToken ->
-                    scope.launch {
-                        signInWithApple(idToken, status.nonce, status.extraData)
-                        onResult.invoke(NativeSignInResult.Success)
+                credentials?.identityToken
+                    ?.let { NSString.create(it, encoding = NSUTF8StringEncoding)?.toString() }
+                    ?.let { idToken ->
+                        scope.launch {
+                            signInWithApple(idToken, status.nonce, status.extraData)
+                            onResult.invoke(NativeSignInResult.Success)
+                        }
                     }
-                }
             } catch (e: Exception) {
                 onResult.invoke(NativeSignInResult.Error(e.message ?: "error"))
             }

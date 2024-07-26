@@ -17,7 +17,7 @@ import com.google.android.libraries.identity.googleid.GoogleIdTokenParsingExcept
 import io.github.jan.supabase.compose.auth.ComposeAuth
 import io.github.jan.supabase.compose.auth.applicationContext
 import io.github.jan.supabase.compose.auth.getActivity
-import io.github.jan.supabase.compose.auth.getGoogleIDOptions
+import io.github.jan.supabase.compose.auth.getSignInWithGoogleOptions
 import io.github.jan.supabase.compose.auth.hash
 import io.github.jan.supabase.compose.auth.signInWithGoogle
 import io.github.jan.supabase.logging.d
@@ -139,11 +139,10 @@ private suspend fun tryRequest(
     context: android.content.Context,
     activity: android.app.Activity,
     config: ComposeAuth.Config,
-    nonce: String?,
-    withFilter: Boolean
+    nonce: String?
 ): GetCredentialResponse {
     val request = GetCredentialRequest.Builder()
-        .addCredentialOption(getGoogleIDOptions(config.googleLoginConfig, withFilter, nonce))
+        .addCredentialOption(getSignInWithGoogleOptions(config.googleLoginConfig, nonce))
         .build()
     return CredentialManager.create(context).getCredential(activity, request)
 }
@@ -155,12 +154,9 @@ private suspend fun makeRequest(
     nonce: String?
 ): GetCredentialResponse? {
     return try {
-        ComposeAuth.logger.d { "Trying to get Google ID Token Credential with only authorized accounts" }
-        tryRequest(context, activity, config, nonce, true)
+        ComposeAuth.logger.d { "Trying to get Google ID Token Credential" }
+        tryRequest(context, activity, config, nonce)
     } catch(e: GetCredentialCancellationException) {
         return null
-    } catch(e: GetCredentialException) {
-        ComposeAuth.logger.d { "Error while trying to get Google ID Token Credential. Retrying without only authorized accounts" }
-        tryRequest(context, activity, config, nonce, false)
     }
 }

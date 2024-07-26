@@ -5,18 +5,25 @@ import com.russhwolf.settings.Settings
 import com.russhwolf.settings.coroutines.toSuspendSettings
 import io.github.jan.supabase.gotrue.user.UserSession
 import io.github.jan.supabase.logging.e
-import io.github.jan.supabase.supabaseJson
 import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonBuilder
+
+private val settingsJson = Json {
+    encodeDefaults = true
+}
 
 /**
  * A [SessionManager] that uses the [Settings] API.
  *
  * @param settings The [Settings] instance to use. Defaults to [createDefaultSettings].
  * @param key The key to use for saving the session.
+ * @param json The [Json] instance to use for serialization. Defaults to [settingsJson]. **Important: [JsonBuilder.encodeDefaults] must be set to true.**
  */
 class SettingsSessionManager(
     private val settings: Settings = createDefaultSettings(),
     private val key: String = SETTINGS_KEY,
+    private val json: Json = settingsJson
 ) : SessionManager {
 
     init {
@@ -39,14 +46,14 @@ class SettingsSessionManager(
 
     @OptIn(ExperimentalSettingsApi::class)
     override suspend fun saveSession(session: UserSession) {
-        suspendSettings.putString(key, supabaseJson.encodeToString(session))
+        suspendSettings.putString(key, json.encodeToString(session))
     }
 
     @OptIn(ExperimentalSettingsApi::class)
     override suspend fun loadSession(): UserSession? {
         val session = suspendSettings.getStringOrNull(key) ?: return null
         return try {
-            supabaseJson.decodeFromString(session)
+            json.decodeFromString(session)
         } catch(e: Exception) {
             Auth.logger.e(e) { "Failed to load session" }
             null

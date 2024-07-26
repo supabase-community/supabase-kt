@@ -4,13 +4,10 @@ import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 
 val excludedModules = listOf("plugins", "serializers", "test-common")
 
-fun submodules(init: Project.() -> Unit) = configure(allprojects.filter { it.name !in excludedModules }, init)
-
-buildscript {
-    dependencies {
-        classpath(libs.kotlinx.atomicfu.plugin)
-    }
-}
+fun libraryModules(withBom: Boolean = true, init: Project.() -> Unit) = configure(
+    allprojects.filter { it.name !in excludedModules && !it.path.contains("sample") && if(withBom) true else it.name != "bom" },
+    init
+)
 
 plugins {
     id(libs.plugins.kotlin.multiplatform.get().pluginId)
@@ -19,6 +16,7 @@ plugins {
     id(libs.plugins.dokka.get().pluginId)
     alias(libs.plugins.kotlinx.plugin.serialization)
     id(libs.plugins.maven.publish.get().pluginId)
+    alias(libs.plugins.kotlinx.atomicfu)
 }
 
 allprojects {
@@ -33,21 +31,31 @@ allprojects {
     }
 }
 
-submodules {
+libraryModules {
     apply(plugin = "org.jetbrains.dokka")
     apply(plugin = "org.jetbrains.kotlin.plugin.serialization")
-    apply(plugin = "kotlinx-atomicfu")
+    apply(plugin = "org.jetbrains.kotlinx.atomicfu")
     apply(plugin = "com.vanniktech.maven.publish")
 
     group = extra["base-group"].toString()
-    version = extra["supabase-version"].toString()
+    version = supabaseVersion
 
     applyPublishing()
 }
 
 tasks.register("detektAll") {
-    configure(allprojects.filter { it.name != "bom" && it.name !in excludedModules }) {
+    libraryModules(false) {
         this@register.dependsOn(tasks.withType<io.gitlab.arturbosch.detekt.Detekt>())
+    }
+}
+
+// Configure Gradle Task to build all sample submodules at once
+configure(allprojects.filter { it.parent?.name == "sample" }) {
+    val children = this.childProjects
+    this.tasks.register("buildAll") {
+        children.values.forEach { child ->
+            this.dependsOn(child.tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>())
+        }
     }
 }
 
@@ -75,12 +83,11 @@ val buildConfigGenerator by tasks.registering(Sync::class) {
     into(layout.buildDirectory.dir("generated-src/kotlin/"))
 }
 
-configure(allprojects.filter { it.name != "bom" && it.name !in excludedModules }) {
+libraryModules(false) {
     apply(plugin = "io.gitlab.arturbosch.detekt")
 
     applyDokkaWithConfiguration()
     applyDetektWithConfiguration()
-
 }
 
 @OptIn(org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi::class)
@@ -114,4 +121,4 @@ kotlin {
     }
 }
 
-configureAndroidTarget()
+configureLibraryAndroidTarget()
