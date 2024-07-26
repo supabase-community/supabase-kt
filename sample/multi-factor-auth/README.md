@@ -15,7 +15,7 @@ If you want to try out Google OAuth, set it up in the Supabase dashboard and add
 
 # Running
 
-To run the app, you need to run the following commands:
+To run the app, you need to run the following commands in the root directory of the project:
 
     ./gradlew :sample:multi-factor-auth:desktop:runDistributable (Desktop)
     ./gradlew :sample:multi-factor-auth:web:jsBrowserDevelopmentRun (JS Canvas)

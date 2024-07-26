@@ -1,5 +1,3 @@
-import org.jetbrains.compose.desktop.application.dsl.TargetFormat
-
 plugins {
     id(libs.plugins.compose.plugin.get().pluginId)
     alias(libs.plugins.compose.compiler)
@@ -27,13 +25,4 @@ kotlin {
     }
 }
 
-compose.desktop {
-    application {
-        mainClass = "MainKt"
-        nativeDistributions {
-            targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
-            packageName = "demo"
-            packageVersion = "1.0.0"
-        }
-    }
-}
+compose.desktop.configureComposeDesktop("multi-factor-auth")

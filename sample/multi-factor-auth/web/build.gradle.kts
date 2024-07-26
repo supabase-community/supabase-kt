@@ -1,5 +1,3 @@
-import org.jetbrains.compose.compose
-
 plugins {
     id(libs.plugins.compose.plugin.get().pluginId)
     alias(libs.plugins.compose.compiler)
@@ -24,8 +22,4 @@ kotlin {
             }
         }
     }
-}
-
-compose.experimental {
-    web.application {}
 }
