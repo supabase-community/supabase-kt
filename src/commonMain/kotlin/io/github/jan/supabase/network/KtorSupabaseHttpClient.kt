@@ -15,7 +15,6 @@ import io.ktor.client.plugins.DefaultRequest
 import io.ktor.client.plugins.HttpRequestTimeoutException
 import io.ktor.client.plugins.HttpTimeout
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
-import io.ktor.client.plugins.websocket.webSocketSession
 import io.ktor.client.request.HttpRequestBuilder
 import io.ktor.client.request.headers
 import io.ktor.client.request.prepareRequest
@@ -93,8 +92,6 @@ class KtorSupabaseHttpClient @SupabaseInternal constructor(
         }
         return response
     }
-
-    suspend fun webSocketSession(url: String, block: HttpRequestBuilder.() -> Unit = {}) = httpClient.webSocketSession(url, block)
 
     fun close() = httpClient.close()
 
