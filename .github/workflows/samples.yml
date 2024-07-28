@@ -14,7 +14,8 @@ jobs:
       matrix:
         sample: [
           'chat-demo-mpp',
-          'file-upload'
+          'file-upload',
+          'multi-factor-auth'
         ]
     runs-on: macos-latest
     steps:
