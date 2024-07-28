@@ -40,7 +40,7 @@ internal class RealtimeChannelImpl(
 
     private val clientChanges = AtomicMutableList<PostgresJoinConfig>()
     @SupabaseInternal
-    override val callbackManager = CallbackManagerImpl(realtimeImpl)
+    override val callbackManager = CallbackManagerImpl(realtimeImpl.serializer)
     private val _status = MutableStateFlow(RealtimeChannel.Status.UNSUBSCRIBED)
     override val status = _status.asStateFlow()
 
