@@ -72,7 +72,7 @@ internal class CallbackManagerImpl(
     }
 
     override fun removeCallbackById(id: Long) {
-        callbacks.removeAll { it.id == id }
+        callbacks.indexOfFirst { it.id == id }.takeIf { it != -1 }?.let { callbacks.removeAt(it) }
     }
 
     override fun setServerChanges(changes: List<PostgresJoinConfig>) {
