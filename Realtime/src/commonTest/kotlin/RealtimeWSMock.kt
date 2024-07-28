@@ -83,8 +83,8 @@ suspend fun createTestClient(
         }
         launch {
             wsHandler(serverChannel, clientChannel)
-        }
-    }.join()
+        }.join()
+    }
     supabase.close()
     serverChannel.close()
     serverChannel.cancel()

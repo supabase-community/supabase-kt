@@ -3,6 +3,9 @@ package io.github.jan.supabase.realtime.websocket
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.websocket.webSocketSession
 
+/**
+ * Implementation of [RealtimeWebsocketFactory] using Ktor's [HttpClient].
+ */
 class KtorRealtimeWebsocketFactory(
     private val httpClient: HttpClient,
     ): RealtimeWebsocketFactory {

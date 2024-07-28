@@ -8,6 +8,9 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.job
 
+/**
+ * Implementation of [RealtimeWebsocket] using Ktor's [DefaultClientWebSocketSession].
+ */
 class KtorRealtimeWebsocket(
     private val ws: DefaultClientWebSocketSession
 ): RealtimeWebsocket {

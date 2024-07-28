@@ -1,18 +1,27 @@
 import io.github.jan.supabase.gotrue.Auth
 import io.github.jan.supabase.gotrue.auth
 import io.github.jan.supabase.gotrue.minimalSettings
+import io.github.jan.supabase.realtime.Presence
 import io.github.jan.supabase.realtime.Realtime
 import io.github.jan.supabase.realtime.RealtimeChannel
 import io.github.jan.supabase.realtime.RealtimeChannel.Companion.CHANNEL_EVENT_REPLY
 import io.github.jan.supabase.realtime.RealtimeChannel.Companion.CHANNEL_EVENT_SYSTEM
 import io.github.jan.supabase.realtime.RealtimeJoinPayload
 import io.github.jan.supabase.realtime.RealtimeMessage
+import io.github.jan.supabase.realtime.broadcastFlow
 import io.github.jan.supabase.realtime.channel
+import io.github.jan.supabase.realtime.presenceChangeFlow
 import io.github.jan.supabase.realtime.realtime
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.flow.collectIndexed
+import kotlinx.coroutines.flow.take
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.decodeFromJsonElement
+import kotlinx.serialization.json.int
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.put
@@ -191,13 +200,88 @@ class RealtimeChannelTest {
     fun testSendingPresenceUnsubscribed() {
         runTest {
             createTestClient(
-                wsHandler = { i, o ->
+                wsHandler = { _, _ ->
                 },
                 supabaseHandler = {
                     val channel = it.channel("channelId")
                     assertFailsWith<IllegalStateException> {
                         channel.track(buildJsonObject {  })
                     }
+                }
+            )
+        }
+    }
+
+    @Test
+    fun testReceivingBroadcasts() {
+        val event = "event"
+        val channelId = "channelId"
+        val amount = 10
+        runTest {
+            createTestClient(
+                wsHandler = { i, o ->
+                    handleSubscribe(i, o, channelId)
+                    for(i in 0..amount) {
+                        o.sendBroadcast(channelId, event, buildJsonObject { put("key", i) })
+                    }
+                },
+                supabaseHandler = {
+                    val channel = it.channel("channelId")
+                    coroutineScope {
+                        launch {
+                            val broadcastFlow = channel.broadcastFlow<JsonObject>(event)
+                            broadcastFlow.take(amount).collectIndexed { index, value ->
+                                assertEquals(index, value["key"]?.jsonPrimitive?.int)
+                            }
+                        }
+                        launch {
+                            channel.subscribe(true)
+                        }
+                    }.join()
+                }
+            )
+        }
+    }
+
+    @Test
+    fun testReceivingPresence() {
+        val event = "event"
+        val channelId = "channelId"
+        val amount = 10
+        runTest {
+            createTestClient(
+                wsHandler = { i, o ->
+                    handleSubscribe(i, o, channelId)
+                    for(i in 0..amount) {
+                        o.sendPresence(
+                            channelId,
+                            mapOf("userId" to Presence(i.toString(), buildJsonObject { put("key", i) })),
+                            mapOf("userId" to Presence((i-1).toString(), buildJsonObject { put("key", i-1) })
+                        ))
+                    }
+                },
+                supabaseHandler = {
+                    val channel = it.channel("channelId")
+                    coroutineScope {
+                        launch {
+                            val broadcastFlow = channel.presenceChangeFlow()
+                            broadcastFlow.take(amount).collectIndexed { index, value ->
+                                val joins =  value.joins
+                                val leaves = value.leaves
+                                assertEquals(1, joins.size)
+                                assertEquals(1, leaves.size)
+                                assertEquals("userId", joins.keys.first())
+                                assertEquals("userId", leaves.keys.first())
+                                assertEquals(index.toString(), joins.values.first().presenceRef)
+                                assertEquals((index-1).toString(), leaves.values.first().presenceRef)
+                                assertEquals(index, joins.values.first().state["key"]?.jsonPrimitive?.int)
+                                assertEquals(index-1, leaves.values.first().state["key"]?.jsonPrimitive?.int)
+                            }
+                        }
+                        launch {
+                            channel.subscribe(true)
+                        }
+                    }.join()
                 }
             )
         }
