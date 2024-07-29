@@ -1,7 +1,9 @@
 import io.github.jan.supabase.gotrue.Auth
 import io.github.jan.supabase.gotrue.user.UserSession
 import io.github.jan.supabase.putJsonObject
+import io.github.jan.supabase.realtime.PostgresJoinConfig
 import io.github.jan.supabase.realtime.Presence
+import io.github.jan.supabase.realtime.RealtimeChannel
 import io.github.jan.supabase.realtime.RealtimeChannel.Companion.CHANNEL_EVENT_PRESENCE_DIFF
 import io.github.jan.supabase.realtime.RealtimeChannel.Companion.CHANNEL_EVENT_SYSTEM
 import io.github.jan.supabase.realtime.RealtimeMessage
@@ -40,6 +42,14 @@ suspend fun SendChannel<RealtimeMessage>.sendPresence(channelId: String, joins: 
     send(RealtimeMessage("realtime:$channelId", CHANNEL_EVENT_PRESENCE_DIFF, buildJsonObject {
         put("joins", transformPresenceMap(joins))
         put("leaves", transformPresenceMap(leaves))
+    }, ""))
+}
+
+suspend fun SendChannel<RealtimeMessage>.handleSubscribeWithPostgres(channelId: String, postgresServerChanges: List<PostgresJoinConfig>) {
+    send(RealtimeMessage("realtime:$channelId", RealtimeChannel.CHANNEL_EVENT_REPLY, buildJsonObject {
+        put("response", buildJsonObject {
+            put("postgres_changes", Json.encodeToJsonElement(postgresServerChanges))
+        })
     }, ""))
 }
 
