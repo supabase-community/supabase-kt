@@ -16,7 +16,7 @@ data class RealtimeJoinConfig(
     val broadcast: BroadcastJoinConfig,
     val presence: PresenceJoinConfig,
     @SerialName("postgres_changes")
-    val postgrestChanges: List<PostgresJoinConfig>,
+    val postgresChanges: List<PostgresJoinConfig>,
     @SerialName("private")
     var isPrivate: Boolean
 )

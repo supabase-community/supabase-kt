@@ -1,6 +1,11 @@
 import io.github.jan.supabase.gotrue.Auth
 import io.github.jan.supabase.gotrue.auth
 import io.github.jan.supabase.gotrue.minimalSettings
+import io.github.jan.supabase.postgrest.query.filter.FilterOperation
+import io.github.jan.supabase.postgrest.query.filter.FilterOperator
+import io.github.jan.supabase.realtime.CallbackManagerImpl
+import io.github.jan.supabase.realtime.PostgresAction
+import io.github.jan.supabase.realtime.PostgresJoinConfig
 import io.github.jan.supabase.realtime.Presence
 import io.github.jan.supabase.realtime.Realtime
 import io.github.jan.supabase.realtime.RealtimeChannel
@@ -10,22 +15,32 @@ import io.github.jan.supabase.realtime.RealtimeJoinPayload
 import io.github.jan.supabase.realtime.RealtimeMessage
 import io.github.jan.supabase.realtime.broadcastFlow
 import io.github.jan.supabase.realtime.channel
+import io.github.jan.supabase.realtime.postgresChangeFlow
 import io.github.jan.supabase.realtime.presenceChangeFlow
 import io.github.jan.supabase.realtime.realtime
+import io.github.jan.supabase.testing.assertPathIs
+import io.github.jan.supabase.testing.pathAfterVersion
+import io.github.jan.supabase.testing.toJsonElement
+import io.ktor.client.engine.mock.respond
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collectIndexed
 import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.boolean
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.decodeFromJsonElement
+import kotlinx.serialization.json.encodeToJsonElement
 import kotlinx.serialization.json.int
+import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.put
 import kotlin.test.Test
+import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 
@@ -197,6 +212,37 @@ class RealtimeChannelTest {
     }
 
     @Test
+    fun testSendingBroadcastsUnsubscribed() {
+        runTest {
+            val expectedEvent = "event"
+            val expectedMessage = buildJsonObject {
+                put("key", "value")
+            }
+            val expectedChannelId = "channelId"
+            val isPrivate = true
+            createTestClient(
+                wsHandler = { _, _ ->
+                },
+                supabaseHandler = {
+                    val channel = it.channel(expectedChannelId) {
+                        this.isPrivate = isPrivate
+                    }
+                    channel.broadcast(expectedEvent, expectedMessage)
+                },
+                mockEngineHandler = {
+                    assertPathIs("/api/broadcast", it.url.pathAfterVersion())
+                    val body = it.body.toJsonElement().jsonObject["messages"]?.jsonArray?.firstOrNull()?.jsonObject ?: error("No messages in body")
+                    assertEquals(expectedEvent, body["event"]?.jsonPrimitive?.content)
+                    assertEquals(expectedMessage, body["payload"]?.jsonObject)
+                    assertEquals(isPrivate, body["private"]?.jsonPrimitive?.boolean)
+                    assertEquals(expectedChannelId, body["topic"]?.jsonPrimitive?.content)
+                    respond("")
+                }
+            )
+        }
+    }
+
+    @Test
     fun testSendingPresenceUnsubscribed() {
         runTest {
             createTestClient(
@@ -245,7 +291,6 @@ class RealtimeChannelTest {
 
     @Test
     fun testReceivingPresence() {
-        val event = "event"
         val channelId = "channelId"
         val amount = 10
         runTest {
@@ -264,8 +309,8 @@ class RealtimeChannelTest {
                     val channel = it.channel("channelId")
                     coroutineScope {
                         launch {
-                            val broadcastFlow = channel.presenceChangeFlow()
-                            broadcastFlow.take(amount).collectIndexed { index, value ->
+                            val presenceFlow = channel.presenceChangeFlow()
+                            presenceFlow.take(amount).collectIndexed { index, value ->
                                 val joins =  value.joins
                                 val leaves = value.leaves
                                 assertEquals(1, joins.size)
@@ -284,6 +329,70 @@ class RealtimeChannelTest {
                     }.join()
                 }
             )
+        }
+    }
+
+    @Test
+    fun testSubscribingWithPostgresChanges() {
+        val channelId = "channelId"
+        val expectedTable = "table"
+        val expectedSchema = "public"
+        val expectedFilter = "id=eq.1"
+        val events = listOf("INSERT", "UPDATE", "DELETE", "*")
+        for(event in events) { //Test if all events are correctly handled using the type parameter
+            val postgresServerChanges = listOf(PostgresJoinConfig(expectedSchema, expectedTable, expectedFilter, event, 0L))
+            runTest {
+                createTestClient(
+                    wsHandler = { i, o ->
+                        val message = i.receive()
+                        assertEquals("realtime:$channelId", message.topic)
+                        assertEquals(RealtimeChannel.CHANNEL_EVENT_JOIN, message.event)
+                        val payload = Json.decodeFromJsonElement<RealtimeJoinPayload>(message.payload)
+                        val postgresChanges = payload.config.postgresChanges
+                        assertEquals(1, postgresChanges.size)
+                        assertEquals(expectedTable, postgresChanges.first().table)
+                        assertEquals(expectedSchema, postgresChanges.first().schema)
+                        assertEquals(expectedFilter, postgresChanges.first().filter)
+                        assertEquals(event, postgresChanges.first().event)
+                        o.send(RealtimeMessage("realtime:$channelId", RealtimeChannel.CHANNEL_EVENT_REPLY, buildJsonObject {
+                            put("response", buildJsonObject {
+                                put("postgres_changes", Json.encodeToJsonElement(postgresServerChanges))
+                            })
+                        }, ""))
+                    },
+                    supabaseHandler = {
+                        val channel = it.channel(channelId)
+                        val postgresFlow = channel.flowFromEventType(event, expectedSchema, expectedTable, FilterOperation("id", FilterOperator.EQ, 1))
+                        channel.subscribe(true)
+                        assertEquals(RealtimeChannel.Status.SUBSCRIBED, channel.status.value)
+                        assertContentEquals(postgresServerChanges, (channel.callbackManager as CallbackManagerImpl).serverChanges)
+                    }
+                )
+            }
+        }
+    }
+
+    //For more complex tests we need integration tests
+
+    private fun RealtimeChannel.flowFromEventType(event: String, schema: String, table: String, filter: FilterOperation): Flow<PostgresAction> {
+        when(event) {
+            "INSERT" -> return postgresChangeFlow<PostgresAction.Insert>(schema) {
+                this.table = table
+                filter(filter)
+            }
+            "UPDATE" -> return postgresChangeFlow<PostgresAction.Update>(schema) {
+                this.table = table
+                filter(filter)
+            }
+            "DELETE" -> return postgresChangeFlow<PostgresAction.Delete>(schema) {
+                this.table = table
+                filter(filter)
+            }
+            "*" -> return postgresChangeFlow<PostgresAction>(schema) {
+                this.table = table
+                filter(filter)
+            }
+            else -> error("Unknown event type $event")
         }
     }
 

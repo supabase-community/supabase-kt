@@ -165,7 +165,7 @@ internal class RealtimeChannelImpl(
         if(status.value != RealtimeChannel.Status.SUBSCRIBED) {
             val response = httpClient.postJson(
                 url = broadcastUrl,
-                body = BroadcastApiBody(listOf(BroadcastApiMessage(subTopic, event, message)))
+                body = BroadcastApiBody(listOf(BroadcastApiMessage(subTopic, event, message, isPrivate)))
             ) {
                 headers {
                     append("apikey", realtimeImpl.supabaseClient.supabaseKey)

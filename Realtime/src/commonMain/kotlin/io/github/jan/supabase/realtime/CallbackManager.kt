@@ -34,6 +34,7 @@ internal class CallbackManagerImpl(
 
     private var nextId by atomic(0L)
     private var _serverChanges by atomic(listOf<PostgresJoinConfig>())
+    val serverChanges: List<PostgresJoinConfig> get() = _serverChanges
     private val callbacks = AtomicMutableList<RealtimeCallback<*>>()
 
     override fun addBroadcastCallback(event: String, callback: (JsonObject) -> Unit): Long {
