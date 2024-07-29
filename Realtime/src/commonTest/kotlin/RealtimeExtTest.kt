@@ -30,6 +30,7 @@ data class DummyData(val key: Int, val content: String = "")
 
 class RealtimeExtTest {
 
+    //The way this works is that we trigger presence events via the callback manager and then check if the flow receives the correct data
     @Test
     fun testPresenceDataFlow() {
         runTest {
