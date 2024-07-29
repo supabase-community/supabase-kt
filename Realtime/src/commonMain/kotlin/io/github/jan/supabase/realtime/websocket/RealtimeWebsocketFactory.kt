@@ -1,12 +1,12 @@
 package io.github.jan.supabase.realtime.websocket
 
-import io.github.jan.supabase.annotations.SupabaseExperimental
+import io.github.jan.supabase.annotations.SupabaseInternal
 
 /**
  * Interface for creating a websocket connection to the Supabase Realtime service.
  */
 @OptIn(ExperimentalSubclassOptIn::class)
-@SubclassOptInRequired(SupabaseExperimental::class)
+@SubclassOptInRequired(SupabaseInternal::class)
 interface RealtimeWebsocketFactory {
 
     /**

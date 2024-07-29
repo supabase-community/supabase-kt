@@ -114,7 +114,7 @@ sealed interface Realtime : MainPlugin<Realtime.Config>, CustomSerializationPlug
         var reconnectDelay: Duration = 7.seconds,
         var disconnectOnSessionLoss: Boolean = true,
         var connectOnSubscribe: Boolean = true,
-        var websocketFactory: RealtimeWebsocketFactory? = null,
+        @property:SupabaseInternal var websocketFactory: RealtimeWebsocketFactory? = null,
         var disconnectOnNoSubscriptions: Boolean = true,
         @Deprecated("This property is deprecated and will be removed in a future version.") var eventsPerSecond: Int = 10,
     ): MainConfig(), CustomSerializationConfig {
