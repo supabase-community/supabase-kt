@@ -1,4 +1,6 @@
 import io.github.jan.supabase.postgrest.Postgrest
+import io.github.jan.supabase.postgrest.query.filter.FilterOperation
+import io.github.jan.supabase.postgrest.query.filter.FilterOperator
 import io.github.jan.supabase.realtime.CallbackManager
 import io.github.jan.supabase.realtime.PostgresAction
 import io.github.jan.supabase.realtime.PostgresJoinConfig
@@ -8,6 +10,7 @@ import io.github.jan.supabase.realtime.postgresListDataFlow
 import io.github.jan.supabase.realtime.postgresSingleDataFlow
 import io.github.jan.supabase.realtime.presenceDataFlow
 import io.github.jan.supabase.serializer.KotlinXSerializer
+import io.github.jan.supabase.testing.pathAfterVersion
 import io.ktor.client.engine.mock.respond
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.collectIndexed
@@ -76,13 +79,19 @@ class RealtimeExtTest {
     @Test
     fun testPostgresListDataFlow() { //Maybe there is a better way to test this
         runTest {
+            val filter = FilterOperation("id", FilterOperator.EQ, "0")
             createTestClient(
                 wsHandler = { i, o ->
                     handleSubscribe(i, o, "channelId")
                 },
                 supabaseHandler = {
                     val channel = it.channel("channelId")
-                    val dataFlow = channel.postgresListDataFlow("public", "table", primaryKey = DummyData::key)
+                    val dataFlow = channel.postgresListDataFlow(
+                        "public",
+                        "table",
+                        filter = filter,
+                        primaryKey = DummyData::key
+                    )
                     val initialData = dataFlow.first() //The initial data has to be waited for first because otherwise the callbacks are not registered yet
                     assertContentEquals(listOf(DummyData(0, "content")), initialData)
                     //Now we can test updates
@@ -99,7 +108,7 @@ class RealtimeExtTest {
                         }
                         launch {
                             channel.subscribe(true)
-                            channel.callbackManager.setServerChanges(listOf(PostgresJoinConfig("public", "table", null, "*", 0)))
+                            channel.callbackManager.setServerChanges(listOf(PostgresJoinConfig("public", "table", "id=eq.0", "*", 0)))
                             channel.callbackManager.triggerPostgresChange<PostgresAction.Update>(DummyData(0, "content4"), DummyData(0, "content")) //2.
                             channel.callbackManager.triggerPostgresChange<PostgresAction.Insert>(DummyData(1, "content2"), null) //3.
                             channel.callbackManager.triggerPostgresChange<PostgresAction.Update>(DummyData(0, "content3"), DummyData(0, "content")) //4.
@@ -108,6 +117,9 @@ class RealtimeExtTest {
                     }.join()
                 },
                 mockEngineHandler = {
+                    assertEquals("/table", it.url.pathAfterVersion())
+                    val urlFilter = it.url.parameters["id"]
+                    assertEquals("eq.0", urlFilter)
                     respond(Json.encodeToJsonElement(listOf(DummyData(0, "content"))).toString()) //1.
                 },
                 supabaseConfig = {
@@ -127,7 +139,7 @@ class RealtimeExtTest {
                 supabaseHandler = {
                     val channel = it.channel("channelId")
                     val dataFlow = channel.postgresSingleDataFlow("public", "table", primaryKey = DummyData::key) {
-                        //Does not really matter
+                        eq("id", 0)
                     }
                     val initialData = dataFlow.first() //The initial data has to be waited for first because otherwise the callbacks are not registered yet
                     assertEquals(DummyData(0, "content"), initialData)
@@ -147,6 +159,9 @@ class RealtimeExtTest {
                     }.join()
                 },
                 mockEngineHandler = {
+                    assertEquals("/table", it.url.pathAfterVersion())
+                    val urlFilter = it.url.parameters["id"]
+                    assertEquals("eq.0", urlFilter)
                     respond(Json.encodeToJsonElement(DummyData(0, "content")).toString()) //1.
                 },
                 supabaseConfig = {
