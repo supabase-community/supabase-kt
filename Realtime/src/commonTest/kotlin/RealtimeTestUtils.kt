@@ -19,6 +19,9 @@ import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.encodeToJsonElement
 import kotlinx.serialization.json.put
 import kotlin.time.Duration.Companion.hours
+import kotlin.time.Duration.Companion.seconds
+
+val FLOW_TIMEOUT = 6.seconds
 
 suspend fun Auth.importAuthTokenValid(token: String) {
     importSession(UserSession(token, "", expiresAt = Clock.System.now() + 1.hours, expiresIn = 1.hours.inWholeSeconds, tokenType = ""))

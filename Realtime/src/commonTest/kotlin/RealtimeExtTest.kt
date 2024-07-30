@@ -54,7 +54,7 @@ class RealtimeExtTest {
                     coroutineScope {
                         launch {
                             val broadcastFlow = channel.presenceDataFlow<DummyData>()
-                            broadcastFlow.test {
+                            broadcastFlow.test(FLOW_TIMEOUT) {
                                 assertContentEquals(firstPresenceList, awaitItem())
                                 assertContentEquals(secondPresenceList, awaitItem())
                                 assertContentEquals(emptyList(), awaitItem())
@@ -92,7 +92,7 @@ class RealtimeExtTest {
                     //Now we can test updates
                     coroutineScope {
                         launch {
-                            dataFlow.test {
+                            dataFlow.test(FLOW_TIMEOUT) {
                                 assertContentEquals(listOf(DummyData(0, "first")), awaitItem()) //1.
                                 assertContentEquals(listOf(DummyData(0, "second")), awaitItem()) //2.
                                 assertContentEquals(listOf(DummyData(0, "second"), DummyData(1, "third")), awaitItem())//3.
@@ -140,7 +140,7 @@ class RealtimeExtTest {
                     //Now we can test updates
                     coroutineScope {
                         launch {
-                            dataFlow.test {
+                            dataFlow.test(FLOW_TIMEOUT) {
                                 assertEquals(DummyData(0, "content"), awaitItem()) //1.
                                 assertEquals(DummyData(0, "content4"), awaitItem()) //2.
                                 awaitComplete() //The flow will complete after the deletion

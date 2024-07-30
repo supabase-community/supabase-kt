@@ -275,7 +275,7 @@ class RealtimeChannelTest {
                     coroutineScope {
                         launch {
                             val broadcastFlow = channel.broadcastFlow<JsonObject>(event)
-                            broadcastFlow.test {
+                            broadcastFlow.test(FLOW_TIMEOUT) {
                                 for(i in 0..amount) {
                                     assertEquals(i, awaitItem()["key"]?.jsonPrimitive?.int)
                                 }
@@ -311,7 +311,7 @@ class RealtimeChannelTest {
                     coroutineScope {
                         launch {
                             val presenceFlow = channel.presenceChangeFlow()
-                            presenceFlow.test {
+                            presenceFlow.test(FLOW_TIMEOUT) {
                                 for(index in 0..amount) {
                                     val value = awaitItem()
                                     val joins =  value.joins
