@@ -12,14 +12,20 @@ group = "io.github.jan.supabase"
 version = "1.0-SNAPSHOT"
 
 kotlin {
-    applyDefaultHierarchyTemplate()
+    applyDefaultHierarchyTemplate {
+        common {
+            group("jvmAndAndroid") {
+                withJvm()
+                withAndroidTarget()
+            }
+        }
+    }
     androidTarget()
     jvmToolchain(8)
     jvm("desktop")
     js(IR) {
         browser()
     }
-
     listOf(
         iosArm64(),
         iosSimulatorArm64(),
@@ -40,14 +46,12 @@ kotlin {
                 api(libs.koin.core)
             }
         }
-        val nonJsMain by creating {
-            dependsOn(commonMain)
+        val jvmAndAndroidMain by getting {
             dependencies {
                 api(libs.ktor.client.cio)
             }
         }
         val androidMain by getting {
-            dependsOn(nonJsMain)
             dependencies {
                 api(libs.androidx.compat)
                 api(libs.androidx.core)
@@ -57,7 +61,6 @@ kotlin {
             }
         }
         val desktopMain by getting {
-            dependsOn(nonJsMain)
             dependencies {
                 api(compose.preview)
             }
