@@ -1,3 +1,4 @@
+import app.cash.turbine.test
 import io.github.jan.supabase.gotrue.Auth
 import io.github.jan.supabase.gotrue.auth
 import io.github.jan.supabase.gotrue.minimalSettings
@@ -24,8 +25,6 @@ import io.github.jan.supabase.testing.toJsonElement
 import io.ktor.client.engine.mock.respond
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.collectIndexed
-import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.json.Json
@@ -276,8 +275,10 @@ class RealtimeChannelTest {
                     coroutineScope {
                         launch {
                             val broadcastFlow = channel.broadcastFlow<JsonObject>(event)
-                            broadcastFlow.take(amount).collectIndexed { index, value ->
-                                assertEquals(index, value["key"]?.jsonPrimitive?.int)
+                            broadcastFlow.test {
+                                for(i in 0..amount) {
+                                    assertEquals(i, awaitItem()["key"]?.jsonPrimitive?.int)
+                                }
                             }
                         }
                         launch {
@@ -310,17 +311,20 @@ class RealtimeChannelTest {
                     coroutineScope {
                         launch {
                             val presenceFlow = channel.presenceChangeFlow()
-                            presenceFlow.take(amount).collectIndexed { index, value ->
-                                val joins =  value.joins
-                                val leaves = value.leaves
-                                assertEquals(1, joins.size)
-                                assertEquals(1, leaves.size)
-                                assertEquals("userId", joins.keys.first())
-                                assertEquals("userId", leaves.keys.first())
-                                assertEquals(index.toString(), joins.values.first().presenceRef)
-                                assertEquals((index-1).toString(), leaves.values.first().presenceRef)
-                                assertEquals(index, joins.values.first().state["key"]?.jsonPrimitive?.int)
-                                assertEquals(index-1, leaves.values.first().state["key"]?.jsonPrimitive?.int)
+                            presenceFlow.test {
+                                for(index in 0..amount) {
+                                    val value = awaitItem()
+                                    val joins =  value.joins
+                                    val leaves = value.leaves
+                                    assertEquals(1, joins.size)
+                                    assertEquals(1, leaves.size)
+                                    assertEquals("userId", joins.keys.first())
+                                    assertEquals("userId", leaves.keys.first())
+                                    assertEquals(index.toString(), joins.values.first().presenceRef)
+                                    assertEquals((index-1).toString(), leaves.values.first().presenceRef)
+                                    assertEquals(index, joins.values.first().state["key"]?.jsonPrimitive?.int)
+                                    assertEquals(index-1, leaves.values.first().state["key"]?.jsonPrimitive?.int)
+                                }
                             }
                         }
                         launch {

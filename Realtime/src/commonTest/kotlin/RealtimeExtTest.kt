@@ -1,3 +1,4 @@
+import app.cash.turbine.test
 import io.github.jan.supabase.postgrest.Postgrest
 import io.github.jan.supabase.postgrest.query.filter.FilterOperation
 import io.github.jan.supabase.postgrest.query.filter.FilterOperator
@@ -13,10 +14,7 @@ import io.github.jan.supabase.serializer.KotlinXSerializer
 import io.github.jan.supabase.testing.pathAfterVersion
 import io.ktor.client.engine.mock.respond
 import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.flow.collectIndexed
-import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runTest
 import kotlinx.datetime.Clock
@@ -56,12 +54,10 @@ class RealtimeExtTest {
                     coroutineScope {
                         launch {
                             val broadcastFlow = channel.presenceDataFlow<DummyData>()
-                            broadcastFlow.take(3).collectIndexed { index, value ->
-                                when(index) {
-                                    0 -> assertContentEquals(firstPresenceList, value)
-                                    1 -> assertContentEquals(secondPresenceList, value)
-                                    2 -> assertContentEquals(emptyList(), value)
-                                }
+                            broadcastFlow.test {
+                                assertContentEquals(firstPresenceList, awaitItem())
+                                assertContentEquals(secondPresenceList, awaitItem())
+                                assertContentEquals(emptyList(), awaitItem())
                             }
                         }
                         launch {
@@ -92,26 +88,24 @@ class RealtimeExtTest {
                         filter = filter,
                         primaryKey = DummyData::key
                     )
-                    val initialData = dataFlow.first() //The initial data has to be waited for first because otherwise the callbacks are not registered yet
-                    assertContentEquals(listOf(DummyData(0, "content")), initialData)
+                    dataFlow.first() //The initial data has to be waited for first because otherwise the callbacks are not registered yet
                     //Now we can test updates
                     coroutineScope {
                         launch {
-                            dataFlow.drop(1).take(4).collectIndexed { index, value ->
-                                when(index) {
-                                    0 -> assertContentEquals(listOf(DummyData(0, "content4")), value) //2.
-                                    1 -> assertContentEquals(listOf(DummyData(0, "content4"), DummyData(1, "content2")), value)//3.
-                                    2 -> assertContentEquals(listOf(DummyData(0, "content3"), DummyData(1, "content2")), value)//4.
-                                    3 -> assertContentEquals(listOf(DummyData(0, "content3")), value) //5.
-                                }
+                            dataFlow.test {
+                                assertContentEquals(listOf(DummyData(0, "first")), awaitItem()) //1.
+                                assertContentEquals(listOf(DummyData(0, "second")), awaitItem()) //2.
+                                assertContentEquals(listOf(DummyData(0, "second"), DummyData(1, "third")), awaitItem())//3.
+                                assertContentEquals(listOf(DummyData(0, "fourth"), DummyData(1, "third")), awaitItem())//4.
+                                assertContentEquals(listOf(DummyData(0, "fourth")), awaitItem()) //5.
                             }
                         }
                         launch {
                             channel.subscribe(true)
                             channel.callbackManager.setServerChanges(listOf(PostgresJoinConfig("public", "table", "id=eq.0", "*", 0)))
-                            channel.callbackManager.triggerPostgresChange<PostgresAction.Update>(DummyData(0, "content4"), DummyData(0, "content")) //2.
-                            channel.callbackManager.triggerPostgresChange<PostgresAction.Insert>(DummyData(1, "content2"), null) //3.
-                            channel.callbackManager.triggerPostgresChange<PostgresAction.Update>(DummyData(0, "content3"), DummyData(0, "content")) //4.
+                            channel.callbackManager.triggerPostgresChange<PostgresAction.Update>(DummyData(0, "second"), DummyData(0, "first")) //2.
+                            channel.callbackManager.triggerPostgresChange<PostgresAction.Insert>(DummyData(1, "third"), null) //3.
+                            channel.callbackManager.triggerPostgresChange<PostgresAction.Update>(DummyData(0, "fourth"), DummyData(0, "second")) //4.
                             channel.callbackManager.triggerPostgresChange<PostgresAction.Delete>(null, DummyData(1)) //5.
                         }
                     }.join()
@@ -120,7 +114,7 @@ class RealtimeExtTest {
                     assertEquals("/table", it.url.pathAfterVersion())
                     val urlFilter = it.url.parameters["id"]
                     assertEquals("eq.0", urlFilter)
-                    respond(Json.encodeToJsonElement(listOf(DummyData(0, "content"))).toString()) //1.
+                    respond(Json.encodeToJsonElement(listOf(DummyData(0, "first"))).toString()) //1.
                 },
                 supabaseConfig = {
                     install(Postgrest)
@@ -141,13 +135,15 @@ class RealtimeExtTest {
                     val dataFlow = channel.postgresSingleDataFlow("public", "table", primaryKey = DummyData::key) {
                         eq("id", 0)
                     }
-                    val initialData = dataFlow.first() //The initial data has to be waited for first because otherwise the callbacks are not registered yet
-                    assertEquals(DummyData(0, "content"), initialData)
+                    dataFlow.first() //The initial data has to be waited for first because otherwise the callbacks are not registered yet
+
                     //Now we can test updates
                     coroutineScope {
                         launch {
-                            dataFlow.drop(1).collect { value ->
-                                assertEquals(DummyData(0, "content4"), value) //2.
+                            dataFlow.test {
+                                assertEquals(DummyData(0, "content"), awaitItem()) //1.
+                                assertEquals(DummyData(0, "content4"), awaitItem()) //2.
+                                awaitComplete() //The flow will complete after the deletion
                             }
                         }
                         launch {
