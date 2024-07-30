@@ -36,7 +36,7 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
-                api(project(":"))
+                addModules(SupabaseModule.SUPABASE)
                 implementation(libs.krypto)
             }
         }

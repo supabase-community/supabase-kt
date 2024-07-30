@@ -3,6 +3,7 @@ import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.plugin.KotlinDependencyHandler
 
 enum class SupabaseModule(val module: String) {
+    SUPABASE("supabase-kt"),
     GOTRUE("gotrue-kt"),
     STORAGE("storage-kt"),
     REALTIME("realtime-kt"),

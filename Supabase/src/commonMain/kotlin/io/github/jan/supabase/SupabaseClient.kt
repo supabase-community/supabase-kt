@@ -6,7 +6,6 @@ import io.github.jan.supabase.logging.LogLevel
 import io.github.jan.supabase.logging.SupabaseLogger
 import io.github.jan.supabase.logging.i
 import io.github.jan.supabase.network.KtorSupabaseHttpClient
-import io.github.jan.supabase.plugins.MainPlugin
 import io.github.jan.supabase.plugins.PluginManager
 import io.github.jan.supabase.plugins.SupabasePlugin
 import io.ktor.client.HttpClientConfig
