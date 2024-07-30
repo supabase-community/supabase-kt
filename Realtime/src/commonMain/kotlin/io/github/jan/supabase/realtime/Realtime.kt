@@ -10,6 +10,7 @@ import io.github.jan.supabase.plugins.CustomSerializationPlugin
 import io.github.jan.supabase.plugins.MainConfig
 import io.github.jan.supabase.plugins.MainPlugin
 import io.github.jan.supabase.plugins.SupabasePluginProvider
+import io.github.jan.supabase.realtime.websocket.RealtimeWebsocketFactory
 import io.github.jan.supabase.serializer.KotlinXSerializer
 import io.github.jan.supabase.supabaseJson
 import io.ktor.client.plugins.websocket.WebSockets
@@ -95,7 +96,7 @@ sealed interface Realtime : MainPlugin<Realtime.Config>, CustomSerializationPlug
     suspend fun send(message: RealtimeMessage)
 
     /**
-     * @property websocketConfig Custom configuration for the ktor websocket
+     * @property websocketConfig Custom configuration for the Ktor Websocket Client. This only applies if [Realtime.Config.websocketFactory] is null.
      * @property secure Whether to use wss or ws. Defaults to [SupabaseClient.useHTTPS] when null
      * @property disconnectOnSessionLoss Whether to disconnect from the websocket when the session is lost. Defaults to true
      * @property reconnectDelay The delay between reconnect attempts. Defaults to 7 seconds
@@ -103,6 +104,7 @@ sealed interface Realtime : MainPlugin<Realtime.Config>, CustomSerializationPlug
      * @property connectOnSubscribe Whether to connect to the websocket when subscribing to a channel. Defaults to true
      * @property disconnectOnNoSubscriptions Whether to disconnect from the websocket when there are no more subscriptions. Defaults to true
      * @property serializer A serializer used for serializing/deserializing objects e.g. in [PresenceAction.decodeJoinsAs] or [RealtimeChannel.broadcast]. Defaults to [KotlinXSerializer]
+     * @property websocketFactory A custom websocket factory. If this is set, the [websocketConfig] will be ignored
      */
     data class Config(
         var websocketConfig: WebSockets.Config.() -> Unit = {},
@@ -111,6 +113,7 @@ sealed interface Realtime : MainPlugin<Realtime.Config>, CustomSerializationPlug
         var reconnectDelay: Duration = 7.seconds,
         var disconnectOnSessionLoss: Boolean = true,
         var connectOnSubscribe: Boolean = true,
+        @property:SupabaseInternal var websocketFactory: RealtimeWebsocketFactory? = null,
         var disconnectOnNoSubscriptions: Boolean = true,
     ): MainConfig(), CustomSerializationConfig {
 
@@ -131,10 +134,12 @@ sealed interface Realtime : MainPlugin<Realtime.Config>, CustomSerializationPlug
 
         override fun createConfig(init: Config.() -> Unit) = Config().apply(init)
         override fun setup(builder: SupabaseClientBuilder, config: Config) {
-            builder.httpConfig {
-                install(WebSockets) {
-                    contentConverter = KotlinxWebsocketSerializationConverter(supabaseJson)
-                    config.websocketConfig(this)
+            if(config.websocketFactory == null) {
+                builder.httpConfig {
+                    install(WebSockets) {
+                        contentConverter = KotlinxWebsocketSerializationConverter(supabaseJson)
+                        config.websocketConfig(this)
+                    }
                 }
             }
         }

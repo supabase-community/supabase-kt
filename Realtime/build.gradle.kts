@@ -21,6 +21,13 @@ kotlin {
                 api(libs.ktor.client.websockets)
             }
         }
+        val commonTest by getting {
+            dependencies {
+                implementation(project(":test-common"))
+                implementation(libs.bundles.testing)
+                implementation(libs.turbine)
+            }
+        }
     }
 }
 
