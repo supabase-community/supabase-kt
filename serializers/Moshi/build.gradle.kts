@@ -19,7 +19,7 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
-                implementation(project(":"))
+                addModules(SupabaseModule.SUPABASE)
                 implementation(libs.kotlin.reflect)
                 implementation(libs.bundles.moshi)
             }
