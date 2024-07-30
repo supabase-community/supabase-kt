@@ -29,6 +29,7 @@ kotlin {
                 withWatchos()
                 withMingw()
                 withJs()
+                withWasmJs()
             }
         }
     }

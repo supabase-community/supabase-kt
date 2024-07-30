@@ -5,6 +5,7 @@ import android.content.res.AssetFileDescriptor
 import android.net.Uri
 import io.github.jan.supabase.storage.resumable.ResumableClient
 import io.ktor.utils.io.ByteReadChannel
+import io.ktor.utils.io.discard
 import io.ktor.utils.io.jvm.javaio.toByteReadChannel
 
 /**

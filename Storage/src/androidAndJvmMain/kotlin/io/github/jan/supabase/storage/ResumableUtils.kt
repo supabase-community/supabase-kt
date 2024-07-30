@@ -3,6 +3,7 @@ package io.github.jan.supabase.storage
 import io.github.jan.supabase.storage.resumable.Fingerprint
 import io.github.jan.supabase.storage.resumable.ResumableClient
 import io.ktor.util.cio.readChannel
+import io.ktor.utils.io.discard
 import java.io.File
 import java.nio.file.Path
 import kotlin.io.path.absolutePathString

@@ -2,7 +2,8 @@ package io.github.jan.supabase.gotrue
 
 import com.russhwolf.settings.ExperimentalSettingsApi
 import com.russhwolf.settings.Settings
-import com.russhwolf.settings.coroutines.toSuspendSettings
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 /**
  * A [CodeVerifierCache] that uses the [Settings] API.
@@ -31,22 +32,26 @@ class SettingsCodeVerifierCache(
         }
     }
 
-    @OptIn(ExperimentalSettingsApi::class)
-    private val suspendSettings = settings.toSuspendSettings()
 
     @OptIn(ExperimentalSettingsApi::class, ExperimentalSettingsApi::class)
     override suspend fun saveCodeVerifier(codeVerifier: String) {
-        suspendSettings.putString(key, codeVerifier)
+        withContext(Dispatchers.Default) {
+            settings.putString(key, codeVerifier)
+        }
     }
 
     @OptIn(ExperimentalSettingsApi::class)
     override suspend fun loadCodeVerifier(): String? {
-        return suspendSettings.getStringOrNull(key)
+        return withContext(Dispatchers.Default) {
+            settings.getStringOrNull(key)
+        }
     }
 
     @OptIn(ExperimentalSettingsApi::class)
     override suspend fun deleteCodeVerifier() {
-        suspendSettings.remove(key)
+        withContext(Dispatchers.Default) {
+            settings.remove(key)
+        }
     }
 
     companion object {

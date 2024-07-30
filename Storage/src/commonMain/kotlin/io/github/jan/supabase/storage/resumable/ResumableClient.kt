@@ -21,6 +21,7 @@ import io.ktor.http.defaultForFilePath
 import io.ktor.http.isSuccess
 import io.ktor.utils.io.ByteReadChannel
 import io.ktor.utils.io.core.toByteArray
+import io.ktor.utils.io.discard
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope

@@ -2,9 +2,11 @@ package io.github.jan.supabase.gotrue
 
 import com.russhwolf.settings.ExperimentalSettingsApi
 import com.russhwolf.settings.Settings
-import com.russhwolf.settings.coroutines.toSuspendSettings
 import io.github.jan.supabase.gotrue.user.UserSession
 import io.github.jan.supabase.logging.e
+import io.github.jan.supabase.supabaseJson
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonBuilder
@@ -42,16 +44,18 @@ class SettingsSessionManager(
         }
     }
 
-    private val suspendSettings = settings.toSuspendSettings()
-
     @OptIn(ExperimentalSettingsApi::class)
     override suspend fun saveSession(session: UserSession) {
-        suspendSettings.putString(key, json.encodeToString(session))
+        withContext(Dispatchers.Default) {
+            settings.putString(key, json.encodeToString(session))
+        }
     }
 
     @OptIn(ExperimentalSettingsApi::class)
     override suspend fun loadSession(): UserSession? {
-        val session = suspendSettings.getStringOrNull(key) ?: return null
+        val session = withContext(Dispatchers.Default) {
+            settings.getStringOrNull(key)
+        } ?: return null
         return try {
             json.decodeFromString(session)
         } catch(e: Exception) {
@@ -62,7 +66,9 @@ class SettingsSessionManager(
 
     @OptIn(ExperimentalSettingsApi::class)
     override suspend fun deleteSession() {
-        suspendSettings.remove(key)
+        withContext(Dispatchers.Default) {
+            settings.remove(key)
+        }
     }
 
     companion object {
