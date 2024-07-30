@@ -14,19 +14,26 @@ import io.github.jan.supabase.logging.i
 import io.github.jan.supabase.logging.w
 import io.github.jan.supabase.realtime.websocket.KtorRealtimeWebsocketFactory
 import io.github.jan.supabase.realtime.websocket.RealtimeWebsocket
+import io.github.jan.supabase.supabaseJson
+import io.ktor.client.plugins.websocket.DefaultClientWebSocketSession
+import io.ktor.client.plugins.websocket.sendSerialized
 import io.ktor.client.statement.HttpResponse
 import io.ktor.http.URLProtocol
 import io.ktor.http.path
+import io.ktor.websocket.Frame
+import io.ktor.websocket.readText
 import kotlinx.atomicfu.atomic
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.isActive
+import kotlinx.coroutines.job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -38,7 +45,6 @@ import kotlin.time.Duration.Companion.milliseconds
     private val websocketFactory = config.websocketFactory ?: KtorRealtimeWebsocketFactory(supabaseClient.httpClient.httpClient)
     private var ws: RealtimeWebsocket? = null
     @Suppress("MagicNumber")
-    private val msPerEvent = 1000 / config.eventsPerSecond
     private val _status = MutableStateFlow(Realtime.Status.DISCONNECTED)
     override val status: StateFlow<Realtime.Status> = _status.asStateFlow()
     private val _subscriptions = AtomicMutableMap<String, RealtimeChannel>()
@@ -50,7 +56,6 @@ import kotlin.time.Duration.Companion.milliseconds
     var messageJob: Job? = null
     var ref by atomic(0)
     var heartbeatRef by atomic(0)
-    var inThrottle by atomic(false)
     override val apiVersion: Int
         get() = Realtime.API_VERSION
 
@@ -265,17 +270,7 @@ import kotlin.time.Duration.Companion.milliseconds
     }
 
     override suspend fun send(message: RealtimeMessage) {
-        if(message.event !in listOf("broadcast", "presence", "postgres_changes") || msPerEvent < 0) {
-            ws?.send(message)
-            return
-        }
-        if(inThrottle) throw RealtimeRateLimitException(config.eventsPerSecond)
         ws?.send(message)
-        scope.launch {
-            inThrottle = true
-            delay(msPerEvent.milliseconds)
-            inThrottle = false
-        }
     }
 
     fun nextIncrementId(): Int {

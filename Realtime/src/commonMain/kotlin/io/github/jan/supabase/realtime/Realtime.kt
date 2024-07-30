@@ -102,7 +102,6 @@ sealed interface Realtime : MainPlugin<Realtime.Config>, CustomSerializationPlug
      * @property reconnectDelay The delay between reconnect attempts. Defaults to 7 seconds
      * @property heartbeatInterval The interval between heartbeat messages. Defaults to 15 seconds
      * @property connectOnSubscribe Whether to connect to the websocket when subscribing to a channel. Defaults to true
-     * @property eventsPerSecond The maximum amount of events per second (client-side rate-limiting). Defaults to 10 (100 ms per event). Set to a negative number to disable rate-limiting.
      * @property disconnectOnNoSubscriptions Whether to disconnect from the websocket when there are no more subscriptions. Defaults to true
      * @property serializer A serializer used for serializing/deserializing objects e.g. in [PresenceAction.decodeJoinsAs] or [RealtimeChannel.broadcast]. Defaults to [KotlinXSerializer]
      * @property websocketFactory A custom websocket factory. If this is set, the [websocketConfig] will be ignored
@@ -116,7 +115,6 @@ sealed interface Realtime : MainPlugin<Realtime.Config>, CustomSerializationPlug
         var connectOnSubscribe: Boolean = true,
         @property:SupabaseInternal var websocketFactory: RealtimeWebsocketFactory? = null,
         var disconnectOnNoSubscriptions: Boolean = true,
-        @Deprecated("This property is deprecated and will be removed in a future version.") var eventsPerSecond: Int = 10,
     ): MainConfig(), CustomSerializationConfig {
 
         override var serializer: SupabaseSerializer? = null
