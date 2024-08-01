@@ -501,7 +501,7 @@ class BucketApiTest {
                     content = """
                     { 
                         "Key": "someBucket/$expectedPath",
-                        "Id": "someId",
+                        "Id": "someId"
                     }
                     """.trimIndent(),
                     headers = headersOf(
