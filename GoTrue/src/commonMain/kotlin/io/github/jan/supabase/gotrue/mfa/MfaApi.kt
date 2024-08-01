@@ -2,8 +2,10 @@ package io.github.jan.supabase.gotrue.mfa
 
 import io.github.jan.supabase.gotrue.AuthImpl
 import io.github.jan.supabase.gotrue.SessionStatus
+import io.github.jan.supabase.gotrue.providers.builtin.Phone
 import io.github.jan.supabase.gotrue.user.UserMfaFactor
 import io.github.jan.supabase.gotrue.user.UserSession
+import io.github.jan.supabase.putJsonObject
 import io.github.jan.supabase.safeBody
 import io.ktor.client.call.body
 import io.ktor.util.decodeBase64String
@@ -57,27 +59,31 @@ sealed interface MfaApi {
      * @return MfaEnrollResponse containing the id of the MFA factor, the type of MFA factor and the data of the MFA factor (like QR-Code for TOTP)
      * @see FactorType
      */
-    suspend fun <Response> enroll(factorType: FactorType<Response>, issuer: String? = null, friendlyName: String? = null): MfaFactor<Response>
+    suspend fun <Config, Response> enroll(factorType: FactorType<Config, Response>, friendlyName: String? = null, config: Config.() -> Unit): MfaFactor<Response>
 
     /**
      * Unenrolls an MFA factor
      * @param factorId The id of the MFA factor to unenroll
+     * @param phone The phone number to unenroll. Only required for the [FactorType.SMS] factor type
      */
-    suspend fun unenroll(factorId: String)
+    suspend fun unenroll(factorId: String, phone: String? = null,)
 
     /**
      * Creates a new MFA challenge, which can be used to verify the user's code using [verifyChallenge]
+     * @param factorId The id of the MFA factor to verify
+     * @param channel The channel to send the challenge to. Defaults to SMS (only applies to the [FactorType.SMS] factor type)
      */
-    suspend fun createChallenge(factorId: String): MfaChallenge
+    suspend fun createChallenge(factorId: String, channel: Phone.Channel = Phone.Channel.SMS): MfaChallenge
 
     /**
      * Creates a new MFA challenge and immediately verifies it
      * @param factorId The id of the MFA factor to verify
      * @param code The code to verify
-     * @param saveSession Whether to save the session after verification in GoTrue
+     * @param saveSession Whether to save the session after verification in Supabase Auth
+     * @param channel The channel to send the challenge to. Defaults to SMS (only applies to the [FactorType.SMS] factor type)
      */
-    suspend fun createChallengeAndVerify(factorId: String, code: String, saveSession: Boolean = true): UserSession {
-        val challenge = createChallenge(factorId)
+    suspend fun createChallengeAndVerify(factorId: String, code: String, channel: Phone.Channel = Phone.Channel.SMS, saveSession: Boolean = true): UserSession {
+        val challenge = createChallenge(factorId, channel)
         return verifyChallenge(factorId, challenge.id, code, saveSession)
     }
 
@@ -127,14 +133,10 @@ internal class MfaApiImpl(
 
     val api = auth.api
 
-    override suspend fun <Response> enroll(
-        factorType: FactorType<Response>,
-        issuer: String?,
-        friendlyName: String?
-    ): MfaFactor<Response> {
+    override suspend fun <Config, Response> enroll(factorType: FactorType<Config, Response>, friendlyName: String?, config: Config.() -> Unit): MfaFactor<Response> {
         val result = api.postJson("factors", buildJsonObject {
             put("factor_type", factorType.value)
-            issuer?.let { put("issuer", it) }
+            putJsonObject(factorType.encodeConfig(config))
             friendlyName?.let { put("friendly_name", it) }
         })
         val json = result.body<JsonObject>()
@@ -146,9 +148,10 @@ internal class MfaApiImpl(
         )
     }
 
-
-    override suspend fun createChallenge(factorId: String): MfaChallenge {
-        val result = api.post("factors/$factorId/challenge")
+    override suspend fun createChallenge(factorId: String, channel: Phone.Channel): MfaChallenge {
+        val result = api.postJson("factors/$factorId/challenge", buildJsonObject {
+            put("channel", channel.value)
+        })
         return result.safeBody()
     }
 
@@ -169,7 +172,8 @@ internal class MfaApiImpl(
         return session
     }
 
-    override suspend fun unenroll(factorId: String) {
+    override suspend fun unenroll(factorId: String, phone: String?) {
+        //TODO: Add phone number to request
         api.delete("factors/$factorId")
     }
 
