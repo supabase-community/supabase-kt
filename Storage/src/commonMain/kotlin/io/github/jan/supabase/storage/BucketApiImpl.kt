@@ -37,7 +37,7 @@ internal class BucketApiImpl(override val bucketId: String, val storage: Storage
 
     override val resumable = ResumableClientImpl(this, resumableCache)
 
-    override suspend fun update(path: String, data: UploadData, upsert: Boolean): String =
+    override suspend fun update(path: String, data: UploadData, upsert: Boolean): FileUploadResponse =
         uploadOrUpdate(
             HttpMethod.Put, bucketId, path, data, upsert
         )
@@ -47,7 +47,7 @@ internal class BucketApiImpl(override val bucketId: String, val storage: Storage
         token: String,
         data: UploadData,
         upsert: Boolean
-    ): String {
+    ): FileUploadResponse {
         return uploadToSignedUrl(path, token, data, upsert) {}
     }
 
@@ -64,7 +64,7 @@ internal class BucketApiImpl(override val bucketId: String, val storage: Storage
         )
     }
 
-    override suspend fun upload(path: String, data: UploadData, upsert: Boolean): String =
+    override suspend fun upload(path: String, data: UploadData, upsert: Boolean): FileUploadResponse =
         uploadOrUpdate(
             HttpMethod.Post, bucketId, path, data, upsert
         )
@@ -217,8 +217,8 @@ internal class BucketApiImpl(override val bucketId: String, val storage: Storage
         data: UploadData,
         upsert: Boolean,
         extra: HttpRequestBuilder.() -> Unit = {}
-    ): String {
-        return storage.api.request("object/$bucket/$path") {
+    ): FileUploadResponse {
+        val response = storage.api.request("object/$bucket/$path") {
             this.method = method
             setBody(object : OutgoingContent.ReadChannelContent() {
                 override val contentType: ContentType = ContentType.defaultForFilePath(path)
@@ -228,8 +228,12 @@ internal class BucketApiImpl(override val bucketId: String, val storage: Storage
             header(HttpHeaders.ContentType, ContentType.defaultForFilePath(path))
             header(UPSERT_HEADER, upsert.toString())
             extra()
-        }.body<JsonObject>()["Key"]?.jsonPrimitive?.content
+        }.body<JsonObject>()
+        val key = response["Key"]?.jsonPrimitive?.content
             ?: error("Expected a key in a upload response")
+        val id = response["Id"]?.jsonPrimitive?.content
+            ?: error("Expected an id in a upload response")
+        return FileUploadResponse(id, path, key)
     }
 
     internal suspend fun uploadToSignedUrl(
@@ -238,8 +242,8 @@ internal class BucketApiImpl(override val bucketId: String, val storage: Storage
         data: UploadData,
         upsert: Boolean,
         extra: HttpRequestBuilder.() -> Unit = {}
-    ): String {
-        return storage.api.put("object/upload/sign/$bucketId/$path") {
+    ): FileUploadResponse {
+        val response = storage.api.put("object/upload/sign/$bucketId/$path") {
             parameter("token", token)
             setBody(object : OutgoingContent.ReadChannelContent() {
                 override val contentType: ContentType = ContentType.defaultForFilePath(path)
@@ -249,8 +253,11 @@ internal class BucketApiImpl(override val bucketId: String, val storage: Storage
             header(HttpHeaders.ContentType, ContentType.defaultForFilePath(path))
             header("x-upsert", upsert.toString())
             extra()
-        }.body<JsonObject>()["Key"]?.jsonPrimitive?.content
+        }.body<JsonObject>()
+        val key = response["Key"]?.jsonPrimitive?.content
             ?: error("Expected a key in a upload response")
+        val id = response["Id"]?.jsonPrimitive?.content ?: error("Expected an id in a upload response")
+        return FileUploadResponse(id, path, key)
     }
 
     override suspend fun changePublicStatusTo(public: Boolean) = storage.updateBucket(bucketId) {
