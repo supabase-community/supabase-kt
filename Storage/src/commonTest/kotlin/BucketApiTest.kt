@@ -1,6 +1,7 @@
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.SupabaseClientBuilder
 import io.github.jan.supabase.storage.BucketApi
+import io.github.jan.supabase.storage.FileUploadResponse
 import io.github.jan.supabase.storage.ImageTransformation
 import io.github.jan.supabase.storage.Storage
 import io.github.jan.supabase.storage.resumable.MemoryResumableCache
@@ -485,7 +486,7 @@ class BucketApiTest {
         urlPath: String,
         expectedPath: String = "data.png",
         extra: suspend MockRequestHandleScope.(HttpRequestData) -> Unit,
-        request: suspend (client: SupabaseClient, expectedPath: String, data: ByteArray) -> String
+        request: suspend (client: SupabaseClient, expectedPath: String, data: ByteArray) -> FileUploadResponse
     ) {
         runTest {
             val expectedData = byteArrayOf(1, 2, 3)
@@ -499,7 +500,8 @@ class BucketApiTest {
                 respond(
                     content = """
                     { 
-                        "Key": "$expectedPath"
+                        "Key": "someBucket/$expectedPath",
+                        "Id": "someId"
                     }
                     """.trimIndent(),
                     headers = headersOf(
@@ -508,8 +510,10 @@ class BucketApiTest {
                     )
                 )
             }
-            val key = request(client, expectedPath, expectedData)
-            assertEquals(expectedPath, key, "Key should be $expectedPath")
+            val response = request(client, expectedPath, expectedData)
+            assertEquals("someBucket/$expectedPath", response.key, "Key should be $expectedPath")
+            assertEquals("someId", response.id, "Id should be someId")
+            assertEquals(expectedPath, response.path, "Path should be $expectedPath")
         }
     }
 
