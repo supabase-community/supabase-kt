@@ -40,7 +40,7 @@ internal class RealtimeChannelImpl(
 
     private val clientChanges = AtomicMutableList<PostgresJoinConfig>()
     @SupabaseInternal
-    override val callbackManager = CallbackManagerImpl(realtimeImpl)
+    override val callbackManager = CallbackManagerImpl(realtimeImpl.serializer)
     private val _status = MutableStateFlow(RealtimeChannel.Status.UNSUBSCRIBED)
     override val status = _status.asStateFlow()
 
@@ -165,7 +165,7 @@ internal class RealtimeChannelImpl(
         if(status.value != RealtimeChannel.Status.SUBSCRIBED) {
             val response = httpClient.postJson(
                 url = broadcastUrl,
-                body = BroadcastApiBody(listOf(BroadcastApiMessage(subTopic, event, message)))
+                body = BroadcastApiBody(listOf(BroadcastApiMessage(subTopic, event, message, isPrivate)))
             ) {
                 headers {
                     append("apikey", realtimeImpl.supabaseClient.supabaseKey)

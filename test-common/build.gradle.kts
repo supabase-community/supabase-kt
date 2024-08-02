@@ -16,7 +16,7 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
-                implementation(project(":"))
+                addModules(SupabaseModule.SUPABASE)
                 implementation(libs.bundles.testing)
             }
         }
