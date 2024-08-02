@@ -22,7 +22,7 @@ import kotlinx.coroutines.flow.callbackFlow
  * @throws HttpRequestTimeoutException if the request timed out
  * @throws HttpRequestException on network related issues
  */
-fun BucketApi.updateAsFlow(path: String, data: UploadData, upsert: Boolean): Flow<UploadStatus> = callbackFlow {
+fun BucketApi.updateAsFlow(path: String, data: UploadData, upsert: Boolean = false): Flow<UploadStatus> = callbackFlow {
     this@updateAsFlow as BucketApiImpl
     val key = uploadOrUpdate(HttpMethod.Put, bucketId, path, data, upsert) {
         onUpload { bytesSentTotal, contentLength ->
@@ -61,7 +61,7 @@ fun BucketApi.uploadToSignedUrlAsFlow(
     path: String,
     token: String,
     data: UploadData,
-    upsert: Boolean
+    upsert: Boolean = false
 ): Flow<UploadStatus> {
     return callbackFlow {
         this@uploadToSignedUrlAsFlow as BucketApiImpl
@@ -95,7 +95,7 @@ fun BucketApi.uploadToSignedUrlAsFlow(path: String, token: String, data: ByteArr
  * @throws HttpRequestTimeoutException if the request timed out
  * @throws HttpRequestException on network related issues
  */
-fun BucketApi.uploadAsFlow(path: String, data: UploadData, upsert: Boolean): Flow<UploadStatus> {
+fun BucketApi.uploadAsFlow(path: String, data: UploadData, upsert: Boolean = false): Flow<UploadStatus> {
     return callbackFlow {
         this@uploadAsFlow as BucketApiImpl
         val key = uploadOrUpdate(HttpMethod.Post, bucketId, path, data, upsert) {
