@@ -29,6 +29,7 @@ kotlin {
             dependencies {
                 implementation(project(":test-common"))
                 implementation(libs.bundles.testing)
+                implementation(libs.turbine)
             }
         }
         val settingsMain by getting {

@@ -372,64 +372,12 @@ class BucketApiTest {
 
     @Test
     fun testDownloadAuthenticatedWithTransform() {
-        runTest {
-            val expectedPath = "data.png"
-            val expectedData = byteArrayOf(1, 2, 3)
-            val expectedHeight = 100
-            val expectedWidth = 100
-            val expectedQuality = 80
-            val expectedResize = ImageTransformation.Resize.COVER
-            val expectedFormat = "origin"
-            val client = createMockedSupabaseClient(configuration = configureClient) {
-                assertMethodIs(HttpMethod.Get, it.method)
-                assertPathIs("/render/image/authenticated/$bucketId/$expectedPath", it.url.pathAfterVersion())
-                val content = it.url.parameters
-                assertEquals(expectedWidth.toString(), content["width"], "Width should be $expectedWidth")
-                assertEquals(expectedHeight.toString(), content["height"], "Height should be $expectedHeight")
-                assertEquals(expectedQuality.toString(), content["quality"], "Quality should be $expectedQuality")
-                assertEquals(expectedResize.name.lowercase(), content["resize"], "Resize should be ${expectedResize.name.lowercase()}")
-                assertEquals(expectedFormat, content["format"], "Format should be $expectedFormat")
-                respond(expectedData)
-            }
-            val data = client.storage[bucketId].downloadAuthenticated(expectedPath) {
-                size(expectedWidth, expectedHeight)
-                format = expectedFormat
-                quality = expectedQuality
-                resize = expectedResize
-            }
-            assertContentEquals(expectedData, data, "Data should be [1, 2, 3]")
-        }
+        testDownloadWithTransform(authenticated = true)
     }
 
     @Test
     fun testDownloadPublicWithTransform() {
-        runTest {
-            val expectedPath = "data.png"
-            val expectedData = byteArrayOf(1, 2, 3)
-            val expectedHeight = 100
-            val expectedWidth = 100
-            val expectedQuality = 80
-            val expectedResize = ImageTransformation.Resize.COVER
-            val expectedFormat = "origin"
-            val client = createMockedSupabaseClient(configuration = configureClient) {
-                assertMethodIs(HttpMethod.Get, it.method)
-                assertPathIs("/render/image/public/$bucketId/$expectedPath", it.url.pathAfterVersion())
-                val content = it.url.parameters
-                assertEquals(expectedWidth.toString(), content["width"], "Width should be $expectedWidth")
-                assertEquals(expectedHeight.toString(), content["height"], "Height should be $expectedHeight")
-                assertEquals(expectedQuality.toString(), content["quality"], "Quality should be $expectedQuality")
-                assertEquals(expectedResize.name.lowercase(), content["resize"], "Resize should be ${expectedResize.name.lowercase()}")
-                assertEquals(expectedFormat, content["format"], "Format should be $expectedFormat")
-                respond(expectedData)
-            }
-            val data = client.storage[bucketId].downloadPublic(expectedPath) {
-                size(expectedWidth, expectedHeight)
-                format = expectedFormat
-                quality = expectedQuality
-                resize = expectedResize
-            }
-            assertContentEquals(expectedData, data, "Data should be [1, 2, 3]")
-        }
+        testDownloadWithTransform(authenticated = false)
     }
 
     @Test
@@ -478,6 +426,40 @@ class BucketApiTest {
                 sortBy(expectedColumn, expectedOrder)
             }
          //   assertContentEquals(expectedData, data, "Data should be $expectedData")
+        }
+    }
+
+    private fun testDownloadWithTransform(
+        authenticated: Boolean
+    ) {
+        runTest {
+            val expectedPath = "data.png"
+            val expectedData = byteArrayOf(1, 2, 3)
+            val expectedHeight = 100
+            val expectedWidth = 100
+            val expectedQuality = 80
+            val expectedResize = ImageTransformation.Resize.COVER
+            val expectedFormat = "origin"
+            val client = createMockedSupabaseClient(configuration = configureClient) {
+                assertMethodIs(HttpMethod.Get, it.method)
+                val path = if(authenticated) "authenticated" else "public"
+                assertPathIs("/render/image/$path/$bucketId/$expectedPath", it.url.pathAfterVersion())
+                val content = it.url.parameters
+                assertEquals(expectedWidth.toString(), content["width"], "Width should be $expectedWidth")
+                assertEquals(expectedHeight.toString(), content["height"], "Height should be $expectedHeight")
+                assertEquals(expectedQuality.toString(), content["quality"], "Quality should be $expectedQuality")
+                assertEquals(expectedResize.name.lowercase(), content["resize"], "Resize should be ${expectedResize.name.lowercase()}")
+                assertEquals(expectedFormat, content["format"], "Format should be $expectedFormat")
+                respond(expectedData)
+            }
+            val transform: ImageTransformation.() -> Unit = {
+                size(expectedWidth, expectedHeight)
+                format = expectedFormat
+                quality = expectedQuality
+                resize = expectedResize
+            }
+            val data = if(authenticated) client.storage[bucketId].downloadAuthenticated(expectedPath, transform) else client.storage[bucketId].downloadPublic(expectedPath, transform)
+            assertContentEquals(expectedData, data, "Data should be [1, 2, 3]")
         }
     }
 
