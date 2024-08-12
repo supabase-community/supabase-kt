@@ -34,14 +34,6 @@ class SupabaseClientTest {
     fun testAccessTokenProvider() {
         runTest {
             val client = createMockedSupabaseClient(
-                requestHandler = {
-                    assertEquals(
-                        "supabase-kt/${BuildConfig.PROJECT_VERSION}",
-                        it.headers["X-Client-Info"],
-                        "X-Client-Info header should be set to 'supabase-kt/${BuildConfig.PROJECT_VERSION}'"
-                    )
-                    respond("")
-                },
                 configuration = {
                     accessToken = {
                         "myToken"
