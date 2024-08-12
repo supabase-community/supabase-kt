@@ -60,30 +60,28 @@ sealed class FactorType<Config, Response>(val value: String) {
     }
 
     /**
-     * TOTP (timed one-time password) MFA factor
+     * Phone MFA factor
      */
-    data object SMS : FactorType<SMS.Config, SMS.Response>("sms") {
+    data object Phone : FactorType<Phone.Config, Phone.Response>("phone") {
 
         /**
-
+         * @param phone Phone number of the MFA factor in E.164 format. Used to send messages
          */
         @Serializable
         data class Response(
-            @SerialName("phone_number")
             val phone: String
         )
 
         /**
-         * @param phone The phone number to send the SMS to
+         * @param phone The phone number to send the SMS to. Number should conform to E.164 format
          */
         @Serializable
         data class Config(
-            @SerialName("phone_number")
             var phone: String? = null,
         )
 
         override suspend fun decodeResponse(json: JsonObject): Response {
-            return Response(json["phone_number"]?.jsonPrimitive?.contentOrNull ?: error("No 'phone_number' entry found in factor response"))
+            return Response(json["phone"]?.jsonPrimitive?.contentOrNull ?: error("No 'phone' entry found in factor response"))
         }
 
         override suspend fun encodeConfig(config: Config.() -> Unit): JsonObject {

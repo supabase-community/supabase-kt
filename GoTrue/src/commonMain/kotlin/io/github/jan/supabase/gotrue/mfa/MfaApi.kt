@@ -1,5 +1,6 @@
 package io.github.jan.supabase.gotrue.mfa
 
+import io.github.jan.supabase.gotrue.Auth
 import io.github.jan.supabase.gotrue.AuthImpl
 import io.github.jan.supabase.gotrue.SessionStatus
 import io.github.jan.supabase.gotrue.providers.builtin.Phone
@@ -23,13 +24,31 @@ import kotlinx.serialization.json.put
 sealed interface MfaApi {
 
     /**
-     * Checks whether the current session was authenticated with MFA or the user has a verified MFA factor.
+     * The current MFA status of the user
+     * @see MfaStatus
      */
+    val status: MfaStatus
+
+    /**
+     * The current MFA status of the user as a flow. This flow will emit a new status any time [Auth.sessionStatus] changes.
+     *
+     * Note that if the user has verified a factor on another device and the user hasn't been updated on this device, [MfaStatus.active] will return false.
+     * You can use [Auth.retrieveUserForCurrentSession] to update the user and this property will update.
+     */
+    val statusFlow: Flow<MfaStatus>
+
+    /**
+     * Checks whether the current session was authenticated with MFA or the user has a verified MFA factor. Note that if the user has verified a factor on another device and the user hasn't been updated on this device, this will return false.
+     * You can use [Auth.retrieveUserForCurrentSession] to update the user and this property will update.
+     */
+    @Deprecated("Use statusFlow instead", ReplaceWith("statusFlow"))
     val isMfaEnabledFlow: Flow<Boolean>
 
     /**
-     * Checks whether the user has a verified MFA factor.
+     * Checks whether the user has a verified MFA factor. Note that if the user has verified a factor on another device and the user hasn't been updated on this device, this will return false.
+     * You can use [Auth.retrieveUserForCurrentSession] to update the user and this property will update.
      */
+    @Deprecated("Use status.enabled instead", ReplaceWith("status.enabled"))
     val isMfaEnabled: Boolean
         get() {
             val mfaLevel = getAuthenticatorAssuranceLevel()
@@ -38,24 +57,26 @@ sealed interface MfaApi {
 
     /**
      * Returns all verified factors from the current user session. If the user has no verified factors or there is no session, an empty list is returned.
+     * To fetch up-to-date factors, use [retrieveFactorsForCurrentUser].
      */
     val verifiedFactors: List<UserMfaFactor>
 
     /**
      * Checks whether the current session is authenticated with MFA
      */
+    @Deprecated("Use status.active instead", ReplaceWith("status.active"))
     val loggedInUsingMfa: Boolean
         get() = getAuthenticatorAssuranceLevel().current == AuthenticatorAssuranceLevel.AAL2
 
     /**
      * Checks whether the current session is authenticated with MFA
      */
+    @Deprecated("Use statusFlow instead", ReplaceWith("statusFlow"))
     val loggedInUsingMfaFlow: Flow<Boolean>
 
     /**
      * @param factorType The type of MFA factor to enroll. Currently only supports TOTP.
-     * @param issuer Domain which the user is enrolling with
-     * @param friendlyName Human readable name assigned to a device
+     * @param friendlyName Human-readable name assigned to a device
      * @return MfaEnrollResponse containing the id of the MFA factor, the type of MFA factor and the data of the MFA factor (like QR-Code for TOTP)
      * @see FactorType
      */
@@ -64,26 +85,27 @@ sealed interface MfaApi {
     /**
      * Unenrolls an MFA factor
      * @param factorId The id of the MFA factor to unenroll
-     * @param phone The phone number to unenroll. Only required for the [FactorType.SMS] factor type
      */
-    suspend fun unenroll(factorId: String, phone: String? = null,)
+    suspend fun unenroll(factorId: String)
 
     /**
      * Creates a new MFA challenge, which can be used to verify the user's code using [verifyChallenge]
      * @param factorId The id of the MFA factor to verify
-     * @param channel The channel to send the challenge to. Defaults to SMS (only applies to the [FactorType.SMS] factor type)
+     * @param channel The channel to send the challenge to. Defaults to SMS (only applies to the [FactorType.Phone] factor type)
      */
-    suspend fun createChallenge(factorId: String, channel: Phone.Channel = Phone.Channel.SMS): MfaChallenge
+    suspend fun createChallenge(factorId: String, channel: Phone.Channel? = null): MfaChallenge
 
     /**
      * Creates a new MFA challenge and immediately verifies it
      * @param factorId The id of the MFA factor to verify
      * @param code The code to verify
      * @param saveSession Whether to save the session after verification in Supabase Auth
-     * @param channel The channel to send the challenge to. Defaults to SMS (only applies to the [FactorType.SMS] factor type)
+     * @param channel The channel to send the challenge to. Defaults to SMS (only applies to the [FactorType.Phone] factor type)
      */
     suspend fun createChallengeAndVerify(factorId: String, code: String, channel: Phone.Channel = Phone.Channel.SMS, saveSession: Boolean = true): UserSession {
         val challenge = createChallenge(factorId, channel)
+        // Phone challenges cannot be verified immediately
+        if(challenge.factorType == "phone") error("Cannot verify a phone challenge immediately")
         return verifyChallenge(factorId, challenge.id, code, saveSession)
     }
 
@@ -97,7 +119,7 @@ sealed interface MfaApi {
     suspend fun verifyChallenge(factorId: String, challengeId: String, code: String, saveSession: Boolean = true): UserSession
 
     /**
-     * Retrieves all factors for the current user
+     * Retrieves all factors for the current user. This will make a network request to fetch the factors. Use [verifiedFactors] to get the factors from the current session.
      */
     suspend fun retrieveFactorsForCurrentUser(): List<UserMfaFactor>
 
@@ -108,28 +130,38 @@ sealed interface MfaApi {
 
 }
 
+@Suppress("DEPRECATION")
 internal class MfaApiImpl(
     val auth: AuthImpl
 ) : MfaApi {
 
-    override val isMfaEnabledFlow: Flow<Boolean> = auth.sessionStatus.map {
-        when(it) {
-            is SessionStatus.Authenticated -> isMfaEnabled
-            SessionStatus.LoadingFromStorage -> false
-            SessionStatus.NetworkError -> false
-            is SessionStatus.NotAuthenticated -> false
+    override val status: MfaStatus
+        get() {
+            val (current, next) = getAuthenticatorAssuranceLevel()
+            return MfaStatus(
+                enabled = next == AuthenticatorAssuranceLevel.AAL2,
+                active = current == AuthenticatorAssuranceLevel.AAL2
+            )
+        }
+
+    override val statusFlow: Flow<MfaStatus> = auth.sessionStatus.map {
+        if(it is SessionStatus.Authenticated) {
+            val (current, next) = getAuthenticatorAssuranceLevel()
+            MfaStatus(
+                enabled = next == AuthenticatorAssuranceLevel.AAL2,
+                active = current == AuthenticatorAssuranceLevel.AAL2
+            )
+        } else {
+            MfaStatus(false, false)
         }
     }
-    override val loggedInUsingMfaFlow: Flow<Boolean> = auth.sessionStatus.map {
-        when(it) {
-            is SessionStatus.Authenticated -> loggedInUsingMfa
-            SessionStatus.LoadingFromStorage -> false
-            SessionStatus.NetworkError -> false
-            is SessionStatus.NotAuthenticated -> false
-        }
-    }
+
+    @Deprecated("Use statusFlow instead", replaceWith = ReplaceWith("statusFlow"))
+    override val isMfaEnabledFlow: Flow<Boolean> = statusFlow.map { it.enabled }
+    @Deprecated("Use statusFlow instead", replaceWith = ReplaceWith("statusFlow"))
+    override val loggedInUsingMfaFlow: Flow<Boolean> = statusFlow.map { it.active }
     override val verifiedFactors: List<UserMfaFactor>
-        get() = (auth.sessionStatus.value as? SessionStatus.Authenticated)?.session?.user?.factors?.filter(UserMfaFactor::isVerified) ?: emptyList()
+        get() = auth.currentUserOrNull()?.factors?.filter(UserMfaFactor::isVerified) ?: emptyList()
 
     val api = auth.api
 
@@ -148,9 +180,11 @@ internal class MfaApiImpl(
         )
     }
 
-    override suspend fun createChallenge(factorId: String, channel: Phone.Channel): MfaChallenge {
+    override suspend fun createChallenge(factorId: String, channel: Phone.Channel?): MfaChallenge {
         val result = api.postJson("factors/$factorId/challenge", buildJsonObject {
-            put("channel", channel.value)
+            if (channel != null) {
+                put("channel", channel.value)
+            }
         })
         return result.safeBody()
     }
@@ -172,8 +206,7 @@ internal class MfaApiImpl(
         return session
     }
 
-    override suspend fun unenroll(factorId: String, phone: String?) {
-        //TODO: Add phone number to request
+    override suspend fun unenroll(factorId: String) {
         api.delete("factors/$factorId")
     }
 
@@ -188,7 +221,7 @@ internal class MfaApiImpl(
 
 
     override suspend fun retrieveFactorsForCurrentUser(): List<UserMfaFactor> {
-        return auth.retrieveUser(auth.currentAccessTokenOrNull() ?: error("Current session is null")).factors
+        return auth.retrieveUserForCurrentSession().factors
     }
 
 }
