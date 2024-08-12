@@ -11,4 +11,4 @@ package io.github.jan.supabase
  * Create another client if you wish to use Supabase Auth and third-party
  * authentications concurrently in the same application.
  */
-typealias AccessTokenProvider = () -> String
+typealias AccessTokenProvider = suspend () -> String
