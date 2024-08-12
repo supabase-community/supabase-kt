@@ -1,7 +1,9 @@
 import io.github.jan.supabase.storage.BucketListFilter
+import kotlinx.serialization.json.int
 import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
 import kotlin.test.Test
-import kotlin.test.assertContains
+import kotlin.test.assertEquals
 
 class BucketListFilterTest {
 
@@ -14,12 +16,11 @@ class BucketListFilterTest {
             sortBy("name", "asc")
         }
         val filterJson = filter.build()
-        assertContains(filterJson, "limit")
-        assertContains(filterJson, "offset")
-        assertContains(filterJson, "search")
-        assertContains(filterJson, "sortBy")
-        assertContains(filterJson["sortBy"]!!.jsonObject, "column")
-        assertContains(filterJson["sortBy"]!!.jsonObject, "order")
+        assertEquals(10, filterJson["limit"]!!.jsonPrimitive.int)
+        assertEquals(0, filterJson["offset"]!!.jsonPrimitive.int)
+        assertEquals("string", filterJson["search"]!!.jsonPrimitive.content)
+        assertEquals("name", filterJson["sortBy"]!!.jsonObject["column"]!!.jsonPrimitive.content)
+        assertEquals("asc", filterJson["sortBy"]!!.jsonObject["order"]!!.jsonPrimitive.content)
     }
 
 }

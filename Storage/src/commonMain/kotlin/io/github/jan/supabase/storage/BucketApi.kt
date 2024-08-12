@@ -41,7 +41,7 @@ sealed interface BucketApi {
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
-    suspend fun upload(path: String, data: ByteArray, upsert: Boolean = false): String {
+    suspend fun upload(path: String, data: ByteArray, upsert: Boolean = false): FileUploadResponse {
         require(data.isNotEmpty()) { "The data to upload should not be empty" }
         return upload(path, UploadData(ByteReadChannel(data), data.size.toLong()), upsert)
     }
@@ -56,7 +56,7 @@ sealed interface BucketApi {
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
-    suspend fun upload(path: String, data: UploadData, upsert: Boolean = false): String
+    suspend fun upload(path: String, data: UploadData, upsert: Boolean = false): FileUploadResponse
 
     /**
      * Uploads a file in [bucketId] under [path] using a presigned url
@@ -68,7 +68,7 @@ sealed interface BucketApi {
      * @throws IllegalArgumentException if data to upload is empty
      */
     suspend fun uploadToSignedUrl(path: String, token: String, data: ByteArray, upsert: Boolean = false
-    ): String {
+    ): FileUploadResponse {
         require(data.isNotEmpty()) { "The data to upload should not be empty" }
         return uploadToSignedUrl(path, token, UploadData(ByteReadChannel(data), data.size.toLong()), upsert)
     }
@@ -85,7 +85,7 @@ sealed interface BucketApi {
      * @throws HttpRequestException on network related issues
      * @throws HttpRequestException on network related issues
      */
-    suspend fun uploadToSignedUrl(path: String, token: String, data: UploadData, upsert: Boolean = false): String
+    suspend fun uploadToSignedUrl(path: String, token: String, data: UploadData, upsert: Boolean = false): FileUploadResponse
 
     /**
      * Updates a file in [bucketId] under [path]
@@ -98,7 +98,7 @@ sealed interface BucketApi {
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
-    suspend fun update(path: String, data: ByteArray, upsert: Boolean = false): String {
+    suspend fun update(path: String, data: ByteArray, upsert: Boolean = false): FileUploadResponse {
         require(data.isNotEmpty()) { "The data to upload should not be empty" }
         return update(path, UploadData(ByteReadChannel(data), data.size.toLong()), upsert)
     }
@@ -113,7 +113,7 @@ sealed interface BucketApi {
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
-    suspend fun update(path: String, data: UploadData, upsert: Boolean = false): String
+    suspend fun update(path: String, data: UploadData, upsert: Boolean = false): FileUploadResponse
 
     /**
      * Deletes all files in [bucketId] with in [paths]
