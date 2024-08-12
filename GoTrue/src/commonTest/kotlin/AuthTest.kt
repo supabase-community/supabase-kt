@@ -16,6 +16,7 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.json.buildJsonObject
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 import kotlin.test.assertIs
 import kotlin.test.assertNull
 
@@ -43,6 +44,22 @@ class AuthTest {
             )
             client.auth.awaitInitialization()
             assertIs<SessionStatus.Authenticated>(client.auth.sessionStatus.value)
+        }
+    }
+
+    @Test
+    fun testErrorWhenUsingAccessToken() {
+        runTest {
+            assertFailsWith<IllegalStateException> {
+                createMockedSupabaseClient(
+                    configuration = {
+                        accessToken = {
+                            "myToken"
+                        }
+                        install(Auth)
+                    }
+                )
+            }
         }
     }
 
