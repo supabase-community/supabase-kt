@@ -80,7 +80,7 @@ sealed interface MfaApi {
      * @return MfaEnrollResponse containing the id of the MFA factor, the type of MFA factor and the data of the MFA factor (like QR-Code for TOTP)
      * @see FactorType
      */
-    suspend fun <Config, Response> enroll(factorType: FactorType<Config, Response>, friendlyName: String? = null, config: Config.() -> Unit): MfaFactor<Response>
+    suspend fun <Config, Response> enroll(factorType: FactorType<Config, Response>, friendlyName: String? = null, config: Config.() -> Unit = {}): MfaFactor<Response>
 
     /**
      * Unenrolls an MFA factor

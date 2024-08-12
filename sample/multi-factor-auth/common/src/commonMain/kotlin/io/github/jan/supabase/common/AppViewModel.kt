@@ -24,8 +24,7 @@ class AppViewModel(
 
     val sessionStatus = supabaseClient.auth.sessionStatus
     val loginAlert = MutableStateFlow<String?>(null)
-    val isLoggedInUsingMfa = supabaseClient.auth.mfa.loggedInUsingMfaFlow
-    val mfaEnabled = supabaseClient.auth.mfa.isMfaEnabledFlow
+    val statusFlow = supabaseClient.auth.mfa.statusFlow
     val enrolledFactor = MutableStateFlow<MfaFactor<FactorType.TOTP.Response>?>(null)
 
     //Auth
