@@ -39,7 +39,7 @@ sealed interface SupabaseClient {
     val pluginManager: PluginManager
 
     /**
-     * The http client used to interact with the supabase api
+     * The http client used to interact with the Supabase api
      */
     val httpClient: KtorSupabaseHttpClient
 
@@ -52,6 +52,9 @@ sealed interface SupabaseClient {
      * The default serializer used to serialize and deserialize custom data types.
      */
     val defaultSerializer: SupabaseSerializer
+
+    @SupabaseInternal
+    val accessTokenProvider: AccessTokenProvider?
 
     /**
      * Releases all resources held by the [httpClient] and all plugins the [pluginManager]
@@ -88,6 +91,7 @@ internal class SupabaseClientImpl(
     requestTimeout: Long,
     httpEngine: HttpClientEngine?,
     override val defaultSerializer: SupabaseSerializer,
+    override val accessTokenProvider: AccessTokenProvider?,
 ) : SupabaseClient {
 
     init {

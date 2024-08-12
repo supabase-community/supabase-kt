@@ -55,6 +55,12 @@ data object Slack : OAuthProvider() {
 
 }
 
+data object SlackOIDC : OAuthProvider() {
+
+    override val name = "slack_oidc"
+
+}
+
 data object Twitch : OAuthProvider() {
 
     override val name = "twitch"
