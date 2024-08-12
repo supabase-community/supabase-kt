@@ -87,6 +87,7 @@ internal class AuthImpl(
         get() = Auth.key
 
     override fun init() {
+        if(supabaseClient.accessTokenProvider != null) error("The Auth plugin is not available when using a custom access token provider. Please uninstall the Auth plugin.")
         setupPlatform()
         if (config.autoLoadFromStorage) {
             authScope.launch {

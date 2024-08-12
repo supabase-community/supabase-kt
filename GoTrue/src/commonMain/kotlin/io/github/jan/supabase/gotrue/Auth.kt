@@ -442,7 +442,7 @@ sealed interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
  * The Auth plugin handles everything related to Supabase's authentication system
  */
 val SupabaseClient.auth: Auth
-    get() = if(accessTokenProvider == null) pluginManager.getPlugin(Auth) else error("The Auth plugin is not available when using a custom access token provider")
+    get() = pluginManager.getPlugin(Auth)
 
 private suspend fun Auth.tryToGetUser(jwt: String) = try {
     retrieveUser(jwt)
