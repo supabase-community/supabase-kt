@@ -31,6 +31,20 @@ class SupabaseClientTest {
     }
 
     @Test
+    fun testAccessTokenProvider() {
+        runTest {
+            val client = createMockedSupabaseClient(
+                configuration = {
+                    accessToken = {
+                        "myToken"
+                    }
+                }
+            )
+            assertEquals("myToken", client.accessToken?.invoke())
+        }
+    }
+
+    @Test
     fun testDefaultLogLevel() {
         createMockedSupabaseClient(
             configuration = {
