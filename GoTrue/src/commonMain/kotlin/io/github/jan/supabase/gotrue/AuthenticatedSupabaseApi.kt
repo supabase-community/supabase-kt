@@ -21,13 +21,9 @@ class AuthenticatedSupabaseApi @SupabaseInternal constructor(
 ): SupabaseApi(resolveUrl, parseErrorResponse, supabaseClient) {
 
     override suspend fun rawRequest(url: String, builder: HttpRequestBuilder.() -> Unit): HttpResponse {
-        val customAccessToken = if(supabaseClient.accessTokenProvider != null) {
-            supabaseClient.accessTokenProvider!!()
-        } else null
+        val accessToken = supabaseClient.accessToken(jwtToken) ?: error("No access token available")
         return super.rawRequest(url) {
-            // 1. A custom token in the plugin config 2. The token from a third party provider 3. The token from the current session (Supabase Auth) 4. The default token from the client
-            val jwtToken = jwtToken ?: customAccessToken ?: supabaseClient.pluginManager.getPluginOrNull(Auth)?.currentAccessTokenOrNull() ?: supabaseClient.supabaseKey
-            bearerAuth(jwtToken)
+            bearerAuth(accessToken)
             builder()
             defaultRequest?.invoke(this)
         }

@@ -53,8 +53,11 @@ sealed interface SupabaseClient {
      */
     val defaultSerializer: SupabaseSerializer
 
+    /**
+     * The custom access token provider used to provide custom access tokens for requests. Configured within the [SupabaseClientBuilder]
+     */
     @SupabaseInternal
-    val accessTokenProvider: AccessTokenProvider?
+    val customAccessToken: AccessTokenProvider?
 
     /**
      * Releases all resources held by the [httpClient] and all plugins the [pluginManager]
@@ -91,7 +94,7 @@ internal class SupabaseClientImpl(
     requestTimeout: Long,
     httpEngine: HttpClientEngine?,
     override val defaultSerializer: SupabaseSerializer,
-    override val accessTokenProvider: AccessTokenProvider?,
+    override val customAccessToken: AccessTokenProvider?,
 ) : SupabaseClient {
 
     init {
