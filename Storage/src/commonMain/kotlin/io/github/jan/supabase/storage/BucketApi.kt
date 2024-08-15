@@ -3,7 +3,7 @@ package io.github.jan.supabase.storage
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.exceptions.HttpRequestException
 import io.github.jan.supabase.exceptions.RestException
-import io.github.jan.supabase.gotrue.accessToken
+import io.github.jan.supabase.gotrue.resolveAccessToken
 import io.github.jan.supabase.storage.resumable.ResumableClient
 import io.ktor.client.plugins.HttpRequestTimeoutException
 import io.ktor.utils.io.ByteReadChannel
@@ -316,6 +316,6 @@ sealed interface BucketApi {
  */
 suspend fun BucketApi.authenticatedRequest(path: String): Pair<String, String> {
     val url = authenticatedUrl(path)
-    val token = supabaseClient.accessToken(supabaseClient.storage) ?: error("No access token available")
+    val token = supabaseClient.resolveAccessToken(supabaseClient.storage) ?: error("No access token available")
     return token to url
 }

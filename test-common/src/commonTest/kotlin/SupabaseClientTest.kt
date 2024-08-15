@@ -40,7 +40,7 @@ class SupabaseClientTest {
                     }
                 }
             )
-            assertEquals("myToken", client.customAccessToken?.invoke())
+            assertEquals("myToken", client.accessToken?.invoke())
         }
     }
 

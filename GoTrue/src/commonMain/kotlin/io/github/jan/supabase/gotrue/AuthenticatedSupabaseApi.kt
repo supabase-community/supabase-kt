@@ -21,7 +21,7 @@ class AuthenticatedSupabaseApi @SupabaseInternal constructor(
 ): SupabaseApi(resolveUrl, parseErrorResponse, supabaseClient) {
 
     override suspend fun rawRequest(url: String, builder: HttpRequestBuilder.() -> Unit): HttpResponse {
-        val accessToken = supabaseClient.accessToken(jwtToken) ?: error("No access token available")
+        val accessToken = supabaseClient.resolveAccessToken(jwtToken) ?: error("No access token available")
         return super.rawRequest(url) {
             bearerAuth(accessToken)
             builder()

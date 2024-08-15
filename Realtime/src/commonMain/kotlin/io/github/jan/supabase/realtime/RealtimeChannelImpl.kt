@@ -3,7 +3,7 @@ package io.github.jan.supabase.realtime
 import io.github.jan.supabase.annotations.SupabaseInternal
 import io.github.jan.supabase.collections.AtomicMutableList
 import io.github.jan.supabase.decodeIfNotEmptyOrDefault
-import io.github.jan.supabase.gotrue.accessToken
+import io.github.jan.supabase.gotrue.resolveAccessToken
 import io.github.jan.supabase.logging.d
 import io.github.jan.supabase.logging.e
 import io.github.jan.supabase.logging.w
@@ -60,7 +60,7 @@ internal class RealtimeChannelImpl(
         }
         _status.value = RealtimeChannel.Status.SUBSCRIBING
         Realtime.logger.d { "Subscribing to channel $topic" }
-        val currentJwt = supabaseClient.accessToken(realtimeImpl, keyAsFallback = false)
+        val currentJwt = supabaseClient.resolveAccessToken(realtimeImpl, keyAsFallback = false)
         val postgrestChanges = clientChanges.toList()
         val joinConfig = RealtimeJoinPayload(RealtimeJoinConfig(broadcastJoinConfig, presenceJoinConfig, postgrestChanges, isPrivate))
         val joinConfigObject = buildJsonObject {

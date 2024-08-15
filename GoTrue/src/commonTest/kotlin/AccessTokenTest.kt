@@ -1,7 +1,7 @@
 import io.github.jan.supabase.gotrue.Auth
-import io.github.jan.supabase.gotrue.accessToken
 import io.github.jan.supabase.gotrue.auth
 import io.github.jan.supabase.gotrue.minimalSettings
+import io.github.jan.supabase.gotrue.resolveAccessToken
 import io.github.jan.supabase.testing.createMockedSupabaseClient
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
@@ -21,7 +21,7 @@ class AccessTokenTest {
                 }
             )
             client.auth.importAuthToken("myAuth") //this should be ignored as per plugin tokens override the used access token
-            assertEquals("myJwtToken", client.accessToken("myJwtToken"))
+            assertEquals("myJwtToken", client.resolveAccessToken("myJwtToken"))
         }
     }
 
@@ -29,7 +29,7 @@ class AccessTokenTest {
     fun testAccessTokenWithKeyAsFallback() {
         runTest {
             val client = createMockedSupabaseClient(supabaseKey = "myKey")
-            assertEquals("myKey", client.accessToken())
+            assertEquals("myKey", client.resolveAccessToken())
         }
     }
 
@@ -37,7 +37,7 @@ class AccessTokenTest {
     fun testAccessTokenWithoutKey() {
         runTest {
             val client = createMockedSupabaseClient()
-            assertNull(client.accessToken(keyAsFallback = false))
+            assertNull(client.resolveAccessToken(keyAsFallback = false))
         }
     }
 
@@ -51,7 +51,7 @@ class AccessTokenTest {
                     }
                 }
             )
-            assertEquals("myCustomToken", client.accessToken())
+            assertEquals("myCustomToken", client.resolveAccessToken())
         }
     }
 
@@ -66,7 +66,7 @@ class AccessTokenTest {
                 }
             )
             client.auth.importAuthToken("myAuth")
-            assertEquals("myAuth", client.accessToken())
+            assertEquals("myAuth", client.resolveAccessToken())
         }
     }
 

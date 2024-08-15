@@ -87,7 +87,7 @@ internal class AuthImpl(
         get() = Auth.key
 
     init {
-        if(supabaseClient.customAccessToken != null) error("The Auth plugin is not available when using a custom access token provider. Please uninstall the Auth plugin.")
+        if(supabaseClient.accessToken != null) error("The Auth plugin is not available when using a custom access token provider. Please uninstall the Auth plugin.")
     }
 
     override fun init() {
