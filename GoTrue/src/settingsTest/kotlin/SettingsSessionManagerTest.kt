@@ -23,7 +23,7 @@ class SettingsSessionManagerTest {
             val sessionManager = SettingsSessionManager(settings)
             assertEquals(session, sessionManager.loadSession()) //Check if the session is loaded correctly
             assertEquals(session, json.decodeFromString(settings.getString(SettingsSessionManager.SETTINGS_KEY, ""))) //Check if the session is saved correctly
-            val newSession = userSession(200)
+            val newSession = userSession(expiresIn = 200)
             sessionManager.saveSession(newSession)
             assertEquals(newSession, sessionManager.loadSession()) //Check if the new session is saved correctly
             assertEquals(newSession,

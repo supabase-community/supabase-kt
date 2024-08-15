@@ -102,7 +102,7 @@ class AuthTest {
             }
             client.auth.awaitInitialization()
             assertIs<SessionStatus.NotAuthenticated>(client.auth.sessionStatus.value)
-            val session = userSession(0)
+            val session = userSession(expiresIn = 0)
             client.auth.importSession(session)
             assertIs<SessionStatus.Authenticated>(client.auth.sessionStatus.value)
             assertEquals(newSession.expiresIn, client.auth.currentSessionOrNull()?.expiresIn)
@@ -126,7 +126,7 @@ class AuthTest {
             }
             client.auth.awaitInitialization()
             assertIs<SessionStatus.NotAuthenticated>(client.auth.sessionStatus.value)
-            val session = userSession(0)
+            val session = userSession(expiresIn = 0)
             client.auth.importSession(session)
             assertIs<SessionStatus.Authenticated>(client.auth.sessionStatus.value)
             assertEquals(session.expiresIn, client.auth.currentSessionOrNull()?.expiresIn) //The session shouldn't be refreshed automatically as alwaysAutoRefresh is false
@@ -216,9 +216,10 @@ class AuthTest {
 
 }
 
-fun userSession(expiresIn: Long = 3600) = UserSession(
-    accessToken = "accessToken",
+fun userSession(customToken: String = "accessToken", expiresIn: Long = 3600, user: UserInfo? = null) = UserSession(
+    accessToken = customToken,
     refreshToken = "refreshToken",
     expiresIn = expiresIn,
-    tokenType = "Bearer"
+    tokenType = "Bearer",
+    user = user
 )
