@@ -7,4 +7,4 @@ package io.github.jan.supabase
  * function may be called concurrently and many times. Use memoization and
  * locking techniques if this is not supported by the client libraries.
  */
-typealias AccessTokenProvider = suspend () -> String
+typealias AccessTokenProvider = suspend () -> String?
