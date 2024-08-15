@@ -16,6 +16,7 @@ include("Postgrest")
 include("Storage")
 include("Realtime")
 include("Functions")
+include("Supabase")
 include("bom")
 
 // Test module
@@ -38,6 +39,7 @@ include(":plugins:ImageLoaderIntegration")
 if (System.getProperty("LibrariesOnly") != "true") {
     includeSample("chat-demo-mpp", "common", "web", "ios", "desktop", "android")
     includeSample("file-upload", "common", "desktop", "android")
+    includeSample("multi-factor-auth", "common", "desktop", "android", "web")
 }
 
 // Renames
@@ -46,6 +48,7 @@ project(":Postgrest").name = "postgrest-kt"
 project(":Storage").name = "storage-kt"
 project(":Realtime").name = "realtime-kt"
 project(":Functions").name = "functions-kt"
+project(":Supabase").name = "supabase-kt"
 project(":plugins:ApolloGraphQL").name = "apollo-graphql"
 project(":plugins:ComposeAuth").name = "compose-auth"
 project(":plugins:ComposeAuthUI").name = "compose-auth-ui"

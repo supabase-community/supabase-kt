@@ -3,7 +3,7 @@ package io.github.jan.supabase.storage
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.exceptions.HttpRequestException
 import io.github.jan.supabase.exceptions.RestException
-import io.github.jan.supabase.gotrue.Auth
+import io.github.jan.supabase.gotrue.resolveAccessToken
 import io.github.jan.supabase.storage.resumable.ResumableClient
 import io.ktor.client.plugins.HttpRequestTimeoutException
 import io.ktor.utils.io.ByteReadChannel
@@ -41,7 +41,7 @@ sealed interface BucketApi {
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
-    suspend fun upload(path: String, data: ByteArray, upsert: Boolean = false): String {
+    suspend fun upload(path: String, data: ByteArray, upsert: Boolean = false): FileUploadResponse {
         require(data.isNotEmpty()) { "The data to upload should not be empty" }
         return upload(path, UploadData(ByteReadChannel(data), data.size.toLong()), upsert)
     }
@@ -56,7 +56,7 @@ sealed interface BucketApi {
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
-    suspend fun upload(path: String, data: UploadData, upsert: Boolean = false): String
+    suspend fun upload(path: String, data: UploadData, upsert: Boolean = false): FileUploadResponse
 
     /**
      * Uploads a file in [bucketId] under [path] using a presigned url
@@ -68,7 +68,7 @@ sealed interface BucketApi {
      * @throws IllegalArgumentException if data to upload is empty
      */
     suspend fun uploadToSignedUrl(path: String, token: String, data: ByteArray, upsert: Boolean = false
-    ): String {
+    ): FileUploadResponse {
         require(data.isNotEmpty()) { "The data to upload should not be empty" }
         return uploadToSignedUrl(path, token, UploadData(ByteReadChannel(data), data.size.toLong()), upsert)
     }
@@ -85,7 +85,7 @@ sealed interface BucketApi {
      * @throws HttpRequestException on network related issues
      * @throws HttpRequestException on network related issues
      */
-    suspend fun uploadToSignedUrl(path: String, token: String, data: UploadData, upsert: Boolean = false): String
+    suspend fun uploadToSignedUrl(path: String, token: String, data: UploadData, upsert: Boolean = false): FileUploadResponse
 
     /**
      * Updates a file in [bucketId] under [path]
@@ -98,7 +98,7 @@ sealed interface BucketApi {
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
-    suspend fun update(path: String, data: ByteArray, upsert: Boolean = false): String {
+    suspend fun update(path: String, data: ByteArray, upsert: Boolean = false): FileUploadResponse {
         require(data.isNotEmpty()) { "The data to upload should not be empty" }
         return update(path, UploadData(ByteReadChannel(data), data.size.toLong()), upsert)
     }
@@ -113,7 +113,7 @@ sealed interface BucketApi {
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
-    suspend fun update(path: String, data: UploadData, upsert: Boolean = false): String
+    suspend fun update(path: String, data: UploadData, upsert: Boolean = false): FileUploadResponse
 
     /**
      * Deletes all files in [bucketId] with in [paths]
@@ -314,8 +314,8 @@ sealed interface BucketApi {
  * **Authentication: Bearer <your_access_token>**
  * @param path The path to download
  */
-fun BucketApi.authenticatedRequest(path: String): Pair<String, String> {
+suspend fun BucketApi.authenticatedRequest(path: String): Pair<String, String> {
     val url = authenticatedUrl(path)
-    val token = supabaseClient.storage.config.jwtToken ?: supabaseClient.pluginManager.getPluginOrNull(Auth)?.currentAccessTokenOrNull() ?: supabaseClient.supabaseKey
+    val token = supabaseClient.resolveAccessToken(supabaseClient.storage) ?: error("No access token available")
     return token to url
 }

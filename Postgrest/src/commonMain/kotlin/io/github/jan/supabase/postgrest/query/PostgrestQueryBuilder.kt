@@ -43,7 +43,7 @@ class PostgrestQueryBuilder(
         request: @PostgrestFilterDSL PostgrestRequestBuilder.() -> Unit = {}
     ): PostgrestResult {
         val requestBuilder = postgrestRequest(postgrest.config.propertyConversionMethod) {
-            request(); _params["select"] = listOf(columns.value)
+            request(); params["select"] = listOf(columns.value)
         }
         val selectRequest = SelectRequest(
             head = head,
@@ -87,9 +87,9 @@ class PostgrestQueryBuilder(
         val requestBuilder = postgrestRequest(postgrest.config.propertyConversionMethod, request)
         val body = postgrest.serializer.encodeToJsonElement(values).jsonArray
         val columns = body.map { it.jsonObject.keys }.flatten().distinct()
-        requestBuilder._params["columns"] = listOf(columns.joinToString(","))
+        requestBuilder.params["columns"] = listOf(columns.joinToString(","))
         onConflict?.let {
-            requestBuilder._params["on_conflict"] = listOf(it)
+            requestBuilder.params["on_conflict"] = listOf(it)
         }
         val insertRequest = InsertRequest(
             body = body,
@@ -155,7 +155,7 @@ class PostgrestQueryBuilder(
         val requestBuilder = postgrestRequest(postgrest.config.propertyConversionMethod, request)
         val body = postgrest.serializer.encodeToJsonElement(values).jsonArray
         val columns = body.map { it.jsonObject.keys }.flatten().distinct()
-        requestBuilder._params["columns"] = listOf(columns.joinToString(","))
+        requestBuilder.params["columns"] = listOf(columns.joinToString(","))
         val insertRequest = InsertRequest(
             body = body,
             returning = requestBuilder.returning,

@@ -31,7 +31,7 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
-                api(project(":gotrue-kt"))
+                addModules(SupabaseModule.GOTRUE)
                 implementation(compose.runtime)
                 implementation(libs.krypto)
             }

@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.5.4 - July 27, 2024
+
+### Realtime
+- Fix deletion in `postgresListDataFlow` not working correctly by @jan-tennert in https://github.com/supabase-community/supabase-kt/pull/671
+
 ## 2.5.3 - July 21, 2024
 
 ### Auth

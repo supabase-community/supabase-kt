@@ -16,7 +16,7 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
-                api(project(":gotrue-kt"))
+                addModules(SupabaseModule.GOTRUE)
                 api(libs.kotlin.reflect)
             }
         }

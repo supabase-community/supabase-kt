@@ -124,7 +124,7 @@ inline fun <reified Data : Any> RealtimeChannel.postgresListDataFlow(
                     cache.remove(
                         primaryKeys.map { key ->
                             it.oldRecord[key.columnName]?.jsonPrimitive?.content
-                        }.joinToString { "" }
+                        }.joinToString("")
                     )
                 }
 

@@ -3,7 +3,7 @@ package io.github.jan.supabase.realtime
 import io.github.jan.supabase.annotations.SupabaseInternal
 import io.github.jan.supabase.collections.AtomicMutableList
 import io.github.jan.supabase.decodeIfNotEmptyOrDefault
-import io.github.jan.supabase.gotrue.Auth
+import io.github.jan.supabase.gotrue.resolveAccessToken
 import io.github.jan.supabase.logging.d
 import io.github.jan.supabase.logging.e
 import io.github.jan.supabase.logging.w
@@ -17,7 +17,6 @@ import io.ktor.http.headers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
-import kotlinx.datetime.Clock
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.buildJsonObject
@@ -40,7 +39,7 @@ internal class RealtimeChannelImpl(
 
     private val clientChanges = AtomicMutableList<PostgresJoinConfig>()
     @SupabaseInternal
-    override val callbackManager = CallbackManagerImpl(realtimeImpl)
+    override val callbackManager = CallbackManagerImpl(realtimeImpl.serializer)
     private val _status = MutableStateFlow(RealtimeChannel.Status.UNSUBSCRIBED)
     override val status = _status.asStateFlow()
 
@@ -61,9 +60,7 @@ internal class RealtimeChannelImpl(
         }
         _status.value = RealtimeChannel.Status.SUBSCRIBING
         Realtime.logger.d { "Subscribing to channel $topic" }
-        val currentJwt = realtimeImpl.config.jwtToken ?: supabaseClient.pluginManager.getPluginOrNull(Auth)?.currentSessionOrNull()?.let {
-            if(it.expiresAt > Clock.System.now()) it.accessToken else null
-        }
+        val currentJwt = supabaseClient.resolveAccessToken(realtimeImpl, keyAsFallback = false)
         val postgrestChanges = clientChanges.toList()
         val joinConfig = RealtimeJoinPayload(RealtimeJoinConfig(broadcastJoinConfig, presenceJoinConfig, postgrestChanges, isPrivate))
         val joinConfigObject = buildJsonObject {
@@ -165,7 +162,7 @@ internal class RealtimeChannelImpl(
         if(status.value != RealtimeChannel.Status.SUBSCRIBED) {
             val response = httpClient.postJson(
                 url = broadcastUrl,
-                body = BroadcastApiBody(listOf(BroadcastApiMessage(subTopic, event, message)))
+                body = BroadcastApiBody(listOf(BroadcastApiMessage(subTopic, event, message, isPrivate)))
             ) {
                 headers {
                     append("apikey", realtimeImpl.supabaseClient.supabaseKey)

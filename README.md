@@ -6,12 +6,12 @@ For information about supported Kotlin targets, see the corresponding module REA
 
 [Migrating from version 1.4.X to 2.0.0](/MIGRATION.md)
 
-*Note: [WASM](https://github.com/supabase-community/supabase-kt/issues/86) build available: [2.4.2-wasm0](https://github.com/supabase-community/supabase-kt/releases/tag/2.4.1-wasm0)*
+*Note: [WASM](https://github.com/supabase-community/supabase-kt/issues/86) build available: [2.5.4-wasm0](https://github.com/supabase-community/supabase-kt/releases/tag/2.5.4-wasm0)*
 
 [![](https://img.shields.io/github/release/supabase-community/supabase-kt?label=stable)](https://github.com/supabase-community/supabase-kt/releases) 
 [![](https://badgen.net/github/release/supabase-community/supabase-kt?label=prerelease)](https://central.sonatype.com/search?q=io.github.jan.supabase&smo=true) 
-[![Kotlin](https://img.shields.io/badge/kotlin-2.0.0-blue.svg?logo=kotlin)](http://kotlinlang.org) 
-![https://img.shields.io/badge/ktor-2.3.11-blue](https://img.shields.io/badge/ktor-2.3.11-blue)
+[![Kotlin](https://img.shields.io/badge/kotlin-2.0.10-blue.svg?logo=kotlin)](http://kotlinlang.org) 
+![https://img.shields.io/badge/ktor-2.3.12-blue](https://img.shields.io/badge/ktor-2.3.12-blue)
 [![slack](https://img.shields.io/badge/slack-%23supabase--kt-purple.svg?logo=slack)](https://kotlinlang.slack.com/archives/C06QXPC7064)
 
 ### Links
@@ -94,7 +94,7 @@ val iosMain by getting {
 
 **Note:** It is recommended to use the same Ktor version as supabase-kt:
 
-![https://img.shields.io/badge/ktor-2.3.11-blue](https://img.shields.io/badge/ktor-2.3.11-blue)
+![https://img.shields.io/badge/ktor-2.3.12-blue](https://img.shields.io/badge/ktor-2.3.12-blue)
 
 ## Main Modules
 
@@ -124,7 +124,7 @@ val iosMain by getting {
 - [Chat Demo](/sample/chat-demo-mpp) *(Desktop/Android/iOS/Browser)* - A simple chat application using the Auth, Postgrest and Realtime module.
 - [File Upload Demo](/sample/file-upload) *(Desktop/Android)* - A simple bulk file upload application using the Storage module.
 - [Android Native Google login & in-app OAuth](https://github.com/supabase-community/supabase-kt/tree/master/demos/android-login) *(Android)* - A simple Android application showcasing Native Google login and in-app OAuth.
-- [Multi-Factor Authentication](https://github.com/supabase-community/supabase-kt/tree/master/demos/multi-factor-authentication) *(Desktop/Android/Browser)* - A simple application showcasing Multi-Factor Authentication.
+- [Multi-Factor Authentication](/sample/multi-factor-auth) *(Desktop/Android/Browser)* - A simple application showcasing Multi-Factor Authentication.
 - [Multiplatform Deep Linking](https://github.com/supabase-community/supabase-kt/tree/master/demos/multiplatform-deeplinks) *(Desktop/Android)* - A simple application showcasing deep linking on Desktop and Android.
 
 **Community Samples**

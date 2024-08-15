@@ -1,15 +1,15 @@
 [versions]
 accompanist-permissions = "0.35.1-alpha"
-kotlin = "2.0.0"
+kotlin = "2.0.10"
 ktor = "2.3.12"
 dokka = "1.9.20"
 kotlinx-datetime = "0.6.0"
 kermit = "2.0.4"
 atomicfu = "0.25.0"
 coroutines = "1.8.1"
-android-lifecycle = "2.8.3"
+android-lifecycle = "2.8.4"
 androidx-startup = "1.1.1"
-androidx-activity-compose = "1.9.0"
+androidx-activity-compose = "1.9.1"
 multiplatform-settings = "1.1.1"
 complete-kotlin = "1.1.0"
 agp = "8.3.2"
@@ -30,7 +30,7 @@ credentials = "1.2.2"
 koin = "3.5.6"
 androidx-core = "1.13.1"
 androidx-compat = "1.7.0"
-androidx-lifecycle = "2.8.3"
+androidx-lifecycle = "2.8.4"
 filekit = "0.7.0"
 
 [plugins]
@@ -105,6 +105,7 @@ jackson = { module = "com.fasterxml.jackson.core:jackson-core", version.ref = "j
 jackson-kotlin = { module = "com.fasterxml.jackson.module:jackson-module-kotlin", version.ref = "jackson" }
 
 androidsvg = { module = "com.caverock:androidsvg-aar", version.ref = "androidsvg" }
+turbine = { module = "app.cash.turbine:turbine", version = "1.1.0" }
 
 coil = { module = "io.coil-kt.coil3:coil", version.ref = "coil" }
 coil-network-core = { module = "io.coil-kt.coil3:coil-network-core", version.ref = "coil" }
@@ -116,6 +117,8 @@ koin-android = { module = "io.insert-koin:koin-android", version.ref = "koin" }
 filekit-core = { module = "io.github.vinceglb:filekit-core", version.ref = "filekit" }
 filekit-compose = { module = "io.github.vinceglb:filekit-compose", version.ref = "filekit" }
 accompanist-permissions = { module = "com.google.accompanist:accompanist-permissions", version.ref = "accompanist-permissions" }
+coil-svg = { module = "io.coil-kt:coil-svg", version.ref = "coil" }
+coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coil" }
 
 [bundles]
 ktor-client = ["ktor-client-core", "ktor-client-content-negotiation", "ktor-json"]

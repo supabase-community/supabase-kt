@@ -1,7 +1,9 @@
 package io.github.jan.supabase.realtime
 
+import io.github.jan.supabase.SupabaseSerializer
 import io.github.jan.supabase.annotations.SupabaseInternal
 import io.github.jan.supabase.collections.AtomicMutableList
+import io.github.jan.supabase.serializer.KotlinXSerializer
 import kotlinx.atomicfu.atomic
 import kotlinx.serialization.json.JsonObject
 
@@ -27,11 +29,12 @@ sealed interface CallbackManager {
 }
 
 internal class CallbackManagerImpl(
-    private val realtime: Realtime
+    private val serializer: SupabaseSerializer = KotlinXSerializer()
 ) : CallbackManager {
 
     private var nextId by atomic(0L)
     private var _serverChanges by atomic(listOf<PostgresJoinConfig>())
+    val serverChanges: List<PostgresJoinConfig> get() = _serverChanges
     private val callbacks = AtomicMutableList<RealtimeCallback<*>>()
 
     override fun addBroadcastCallback(event: String, callback: (JsonObject) -> Unit): Long {
@@ -62,7 +65,7 @@ internal class CallbackManagerImpl(
 
     override fun triggerPresenceDiff(joins: Map<String, Presence>, leaves: Map<String, Presence>) {
         val presenceCallbacks = callbacks.filterIsInstance<RealtimeCallback.PresenceCallback>()
-        presenceCallbacks.forEach { it.callback(PresenceActionImpl(realtime.serializer, joins, leaves)) }
+        presenceCallbacks.forEach { it.callback(PresenceActionImpl(serializer, joins, leaves)) }
     }
 
     override fun addPresenceCallback(callback: (PresenceAction) -> Unit): Long {
@@ -72,7 +75,7 @@ internal class CallbackManagerImpl(
     }
 
     override fun removeCallbackById(id: Long) {
-        callbacks.removeAll { it.id == id }
+        callbacks.indexOfFirst { it.id == id }.takeIf { it != -1 }?.let { callbacks.removeAt(it) }
     }
 
     override fun setServerChanges(changes: List<PostgresJoinConfig>) {
