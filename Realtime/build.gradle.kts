@@ -16,9 +16,16 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
-                api(project(":gotrue-kt"))
+                addModules(SupabaseModule.GOTRUE)
                 api(project(":postgrest-kt"))
                 api(libs.ktor.client.websockets)
+            }
+        }
+        val commonTest by getting {
+            dependencies {
+                implementation(project(":test-common"))
+                implementation(libs.bundles.testing)
+                implementation(libs.turbine)
             }
         }
     }

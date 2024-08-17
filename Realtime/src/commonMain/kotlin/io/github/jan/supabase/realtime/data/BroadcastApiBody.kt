@@ -1,5 +1,6 @@
 package io.github.jan.supabase.realtime.data
 
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonObject
 
@@ -12,5 +13,7 @@ internal data class BroadcastApiBody(
 internal data class BroadcastApiMessage(
     val topic: String,
     val event: String,
-    val payload: JsonObject
+    val payload: JsonObject,
+    @SerialName("private")
+    val isPrivate: Boolean
 )

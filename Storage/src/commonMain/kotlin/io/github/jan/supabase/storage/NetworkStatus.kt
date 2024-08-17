@@ -45,9 +45,9 @@ sealed interface UploadStatus {
 
     /**
      * Represents the success of an upload
-     * @param key The key of the uploaded file
+     * @param response The response of the upload
      */
     @JvmInline
-    value class Success(val key: String) : UploadStatus
+    value class Success(val response: FileUploadResponse) : UploadStatus
 
 }

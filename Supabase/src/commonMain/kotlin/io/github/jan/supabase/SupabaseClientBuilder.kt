@@ -66,6 +66,19 @@ class SupabaseClientBuilder @PublishedApi internal constructor(private val supab
      */
     var defaultSerializer: SupabaseSerializer = KotlinXSerializer(Json { ignoreUnknownKeys = true })
 
+    /**
+     * Optional function for using a third-party authentication system with
+     * Supabase. The function should return an access token or ID token (JWT) by
+     * obtaining it from the third-party auth client library. Note that this
+     * function may be called concurrently and many times. Use memoization and
+     * locking techniques if this is not supported by the client libraries.
+     *
+     * When set, the Auth plugin from `auth-kt` cannot be used.
+     * Create another client if you wish to use Supabase Auth and third-party
+     * authentications concurrently in the same application.
+     */
+    var accessToken: AccessTokenProvider? = null
+
     private val httpConfigOverrides = mutableListOf<HttpClientConfig<*>.() -> Unit>()
     private val plugins = mutableMapOf<String, ((SupabaseClient) -> SupabasePlugin<*>)>()
 
@@ -95,7 +108,8 @@ class SupabaseClientBuilder @PublishedApi internal constructor(private val supab
             useHTTPS,
             requestTimeout.inWholeMilliseconds,
             httpEngine,
-            defaultSerializer
+            defaultSerializer,
+            accessToken
         )
     }
 

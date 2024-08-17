@@ -1,6 +1,6 @@
 [versions]
 accompanist-permissions = "0.35.1-alpha"
-kotlin = "2.0.0"
+kotlin = "2.0.10"
 ktor = "3.0.0-beta-2"
 dokka = "1.9.20"
 kotlinx-datetime = "0.6.0"
@@ -105,6 +105,7 @@ jackson = { module = "com.fasterxml.jackson.core:jackson-core", version.ref = "j
 jackson-kotlin = { module = "com.fasterxml.jackson.module:jackson-module-kotlin", version.ref = "jackson" }
 
 androidsvg = { module = "com.caverock:androidsvg-aar", version.ref = "androidsvg" }
+turbine = { module = "app.cash.turbine:turbine", version = "1.1.0" }
 
 coil = { module = "io.coil-kt:coil", version.ref = "coil" }
 imageloader = { module = "io.github.qdsfdhvh:image-loader", version.ref = "imageloader" }

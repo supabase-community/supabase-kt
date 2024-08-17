@@ -1,6 +1,7 @@
 @file:Suppress("UndocumentedPublicProperty", "ConstructorParameterNaming")
 package io.github.jan.supabase.postgrest.query
 
+import io.github.jan.supabase.annotations.SupabaseExperimental
 import io.github.jan.supabase.annotations.SupabaseInternal
 import io.github.jan.supabase.gotrue.PostgrestFilterDSL
 import io.github.jan.supabase.postgrest.PropertyConversionMethod
@@ -27,10 +28,8 @@ class PostgrestRequestBuilder(@PublishedApi internal val propertyConversionMetho
      */
     var returning: Returning = Returning.Minimal
         private set
-    @PublishedApi internal val _params: MutableMap<String, List<String>> = mutableMapOf()
-    @PublishedApi internal val headers: HeadersBuilder = HeadersBuilder()
-    val params: Map<String, List<String>>
-        get() = _params.toMap()
+    @SupabaseExperimental val params: MutableMap<String, List<String>> = mutableMapOf()
+    @SupabaseExperimental val headers: HeadersBuilder = HeadersBuilder()
 
     /**
      * Setting [count] allows to use [PostgrestResult.countOrNull] to get the total amount of items in the database.
@@ -68,10 +67,10 @@ class PostgrestRequestBuilder(@PublishedApi internal val propertyConversionMetho
      */
     fun order(column: String, order: Order, nullsFirst: Boolean = false, referencedTable: String? = null) {
         val key = if (referencedTable == null) "order" else "$referencedTable.order"
-        val orderEntry = _params[key]?.firstOrNull()
+        val orderEntry = params[key]?.firstOrNull()
         val existingOrder = if (orderEntry == null) "" else "$orderEntry,"
         val newOrder = "$existingOrder${column}.${order.value}.${if (nullsFirst) "nullsfirst" else "nullslast"}"
-        _params[key] = listOf(newOrder)
+        params[key] = listOf(newOrder)
     }
 
     /**
@@ -81,7 +80,7 @@ class PostgrestRequestBuilder(@PublishedApi internal val propertyConversionMetho
      */
     fun limit(count: Long, referencedTable: String? = null) {
         val key = if (referencedTable == null) "limit" else "$referencedTable.limit"
-        _params[key] = listOf(count.toString())
+        params[key] = listOf(count.toString())
     }
 
     /**
@@ -94,8 +93,8 @@ class PostgrestRequestBuilder(@PublishedApi internal val propertyConversionMetho
         val keyOffset = if (referencedTable == null) "offset" else "$referencedTable.offset"
         val keyLimit = if (referencedTable == null) "limit" else "$referencedTable.limit"
 
-        _params[keyOffset] = listOf(from.toString())
-        _params[keyLimit] = listOf((to - from + 1).toString())
+        params[keyOffset] = listOf(from.toString())
+        params[keyLimit] = listOf((to - from + 1).toString())
     }
 
     /**
@@ -157,7 +156,7 @@ class PostgrestRequestBuilder(@PublishedApi internal val propertyConversionMetho
      * @param block The filter block
      */
     inline fun filter(block: @PostgrestFilterDSL PostgrestFilterBuilder.() -> Unit) {
-        val filter = PostgrestFilterBuilder(propertyConversionMethod, _params)
+        val filter = PostgrestFilterBuilder(propertyConversionMethod, params)
         filter.block()
     }
 

@@ -22,13 +22,14 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
-                api(project(":gotrue-kt"))
+                addModules(SupabaseModule.GOTRUE)
             }
         }
         val commonTest by getting {
             dependencies {
                 implementation(project(":test-common"))
                 implementation(libs.bundles.testing)
+                implementation(libs.turbine)
             }
         }
         val settingsMain by getting {

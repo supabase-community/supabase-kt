@@ -6,6 +6,7 @@ import io.github.jan.supabase.logging.d
 import io.github.jan.supabase.logging.e
 import io.github.jan.supabase.logging.w
 import io.github.jan.supabase.storage.BucketApi
+import io.github.jan.supabase.storage.FileUploadResponse
 import io.github.jan.supabase.storage.Storage
 import io.github.jan.supabase.storage.UploadStatus
 import io.github.jan.supabase.storage.resumable.ResumableClient.Companion.TUS_VERSION
@@ -140,7 +141,7 @@ internal class ResumableUploadImpl(
                 _stateFlow.value = ResumableUploadState(fingerprint, cacheEntry, UploadStatus.Progress(offset, size), paused)
             }
             if(offset != serverOffset) error("Upload offset does not match server offset")
-            _stateFlow.value = ResumableUploadState(fingerprint, cacheEntry, UploadStatus.Success(path), false)
+            _stateFlow.value = ResumableUploadState(fingerprint, cacheEntry, UploadStatus.Success(FileUploadResponse(path = path)), false)
             removeFromCache()
             dataStream.cancel()
         }

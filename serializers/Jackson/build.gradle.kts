@@ -19,7 +19,7 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
-                implementation(project(":"))
+                addModules(SupabaseModule.SUPABASE)
                 api(libs.bundles.jackson)
             }
         }

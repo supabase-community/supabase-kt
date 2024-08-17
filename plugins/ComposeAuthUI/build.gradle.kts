@@ -32,7 +32,7 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 api(compose.ui)
-                api(project(":gotrue-kt"))
+                addModules(SupabaseModule.GOTRUE)
                 implementation(compose.material3)
             }
         }

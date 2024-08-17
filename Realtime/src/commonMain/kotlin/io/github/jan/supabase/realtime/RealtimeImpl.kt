@@ -12,6 +12,8 @@ import io.github.jan.supabase.logging.d
 import io.github.jan.supabase.logging.e
 import io.github.jan.supabase.logging.i
 import io.github.jan.supabase.logging.w
+import io.github.jan.supabase.realtime.websocket.KtorRealtimeWebsocketFactory
+import io.github.jan.supabase.realtime.websocket.RealtimeWebsocket
 import io.github.jan.supabase.supabaseJson
 import io.ktor.client.plugins.websocket.DefaultClientWebSocketSession
 import io.ktor.client.plugins.websocket.sendSerialized
@@ -40,9 +42,9 @@ import kotlin.time.Duration.Companion.milliseconds
 
 @PublishedApi internal class RealtimeImpl(override val supabaseClient: SupabaseClient, override val config: Realtime.Config) : Realtime {
 
-    private var ws: DefaultClientWebSocketSession? = null
+    private val websocketFactory = config.websocketFactory ?: KtorRealtimeWebsocketFactory(supabaseClient.httpClient.httpClient)
+    private var ws: RealtimeWebsocket? = null
     @Suppress("MagicNumber")
-    private val msPerEvent = 1000 / config.eventsPerSecond
     private val _status = MutableStateFlow(Realtime.Status.DISCONNECTED)
     override val status: StateFlow<Realtime.Status> = _status.asStateFlow()
     private val _subscriptions = AtomicMutableMap<String, RealtimeChannel>()
@@ -54,7 +56,6 @@ import kotlin.time.Duration.Companion.milliseconds
     var messageJob: Job? = null
     var ref by atomic(0)
     var heartbeatRef by atomic(0)
-    var inThrottle by atomic(false)
     override val apiVersion: Int
         get() = Realtime.API_VERSION
 
@@ -74,9 +75,8 @@ import kotlin.time.Duration.Companion.milliseconds
         }
         if (status.value == Realtime.Status.CONNECTED) return
         _status.value = Realtime.Status.CONNECTING
-        val realtimeUrl = websocketUrl
         try {
-            ws = supabaseClient.httpClient.webSocketSession(realtimeUrl)
+            ws = websocketFactory.create(websocketUrl)
             _status.value = Realtime.Status.CONNECTED
             Realtime.logger.i { "Connected to realtime websocket!" }
             listenForMessages()
@@ -87,7 +87,7 @@ import kotlin.time.Duration.Companion.milliseconds
         } catch(e: Exception) {
             Realtime.logger.e(e) { """
                 Error while trying to connect to realtime websocket. Trying again in ${config.reconnectDelay}
-                URL: $realtimeUrl
+                URL: $websocketUrl
                 """.trimIndent() }
             scope.launch {
                 disconnect()
@@ -127,9 +127,8 @@ import kotlin.time.Duration.Companion.milliseconds
         messageJob = scope.launch {
             try {
                 ws?.let {
-                    for (frame in it.incoming) {
-                        val message = frame as? Frame.Text ?: continue
-                        onMessage(message.readText())
+                    while(ws?.hasIncomingMessages == true) {
+                        onMessage(ws?.receive() ?: return@launch)
                     }
                 }
             } catch(e: Exception) {
@@ -158,15 +157,14 @@ import kotlin.time.Duration.Companion.milliseconds
     override fun disconnect() {
         Realtime.logger.d { "Closing websocket connection" }
         messageJob?.cancel()
-        ws?.cancel()
+        ws?.disconnect()
         ws = null
         heartbeatJob?.cancel()
         _status.value = Realtime.Status.DISCONNECTED
     }
 
-    private fun onMessage(stringMessage: String) {
-        val message = supabaseJson.decodeFromString<RealtimeMessage>(stringMessage)
-        Realtime.logger.d { "Received message $stringMessage" }
+    private fun onMessage(message: RealtimeMessage) {
+        Realtime.logger.d { "Received message $message" }
         val channel = subscriptions[message.topic] as? RealtimeChannelImpl
         if(message.ref?.toIntOrNull() == heartbeatRef) {
             Realtime.logger.i { "Heartbeat received" }
@@ -234,11 +232,11 @@ import kotlin.time.Duration.Companion.milliseconds
     }
 
     override suspend fun close() {
-        ws?.cancel()
+        disconnect()
     }
 
     override suspend fun block() {
-        ws?.coroutineContext?.job?.join() ?: error("No connection available")
+        ws?.blockUntilDisconnect() ?: error("No connection available")
     }
 
     override suspend fun parseErrorResponse(response: HttpResponse): RestException {
@@ -272,17 +270,7 @@ import kotlin.time.Duration.Companion.milliseconds
     }
 
     override suspend fun send(message: RealtimeMessage) {
-        if(message.event !in listOf("broadcast", "presence", "postgres_changes") || msPerEvent < 0) {
-            ws?.sendSerialized(message)
-            return
-        }
-        if(inThrottle) throw RealtimeRateLimitException(config.eventsPerSecond)
-        ws?.sendSerialized(message)
-        scope.launch {
-            inThrottle = true
-            delay(msPerEvent.milliseconds)
-            inThrottle = false
-        }
+        ws?.send(message)
     }
 
     fun nextIncrementId(): Int {

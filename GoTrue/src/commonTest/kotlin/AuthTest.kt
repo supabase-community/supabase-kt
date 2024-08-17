@@ -16,6 +16,7 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.json.buildJsonObject
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 import kotlin.test.assertIs
 import kotlin.test.assertNull
 
@@ -43,6 +44,22 @@ class AuthTest {
             )
             client.auth.awaitInitialization()
             assertIs<SessionStatus.Authenticated>(client.auth.sessionStatus.value)
+        }
+    }
+
+    @Test
+    fun testErrorWhenUsingAccessToken() {
+        runTest {
+            assertFailsWith<IllegalStateException> {
+                createMockedSupabaseClient(
+                    configuration = {
+                        accessToken = {
+                            "myToken"
+                        }
+                        install(Auth)
+                    }
+                )
+            }
         }
     }
 
@@ -85,7 +102,7 @@ class AuthTest {
             }
             client.auth.awaitInitialization()
             assertIs<SessionStatus.NotAuthenticated>(client.auth.sessionStatus.value)
-            val session = userSession(0)
+            val session = userSession(expiresIn = 0)
             client.auth.importSession(session)
             assertIs<SessionStatus.Authenticated>(client.auth.sessionStatus.value)
             assertEquals(newSession.expiresIn, client.auth.currentSessionOrNull()?.expiresIn)
@@ -109,7 +126,7 @@ class AuthTest {
             }
             client.auth.awaitInitialization()
             assertIs<SessionStatus.NotAuthenticated>(client.auth.sessionStatus.value)
-            val session = userSession(0)
+            val session = userSession(expiresIn = 0)
             client.auth.importSession(session)
             assertIs<SessionStatus.Authenticated>(client.auth.sessionStatus.value)
             assertEquals(session.expiresIn, client.auth.currentSessionOrNull()?.expiresIn) //The session shouldn't be refreshed automatically as alwaysAutoRefresh is false
@@ -199,9 +216,10 @@ class AuthTest {
 
 }
 
-fun userSession(expiresIn: Long = 3600) = UserSession(
-    accessToken = "accessToken",
+fun userSession(customToken: String = "accessToken", expiresIn: Long = 3600, user: UserInfo? = null) = UserSession(
+    accessToken = customToken,
     refreshToken = "refreshToken",
     expiresIn = expiresIn,
-    tokenType = "Bearer"
+    tokenType = "Bearer",
+    user = user
 )

@@ -20,11 +20,13 @@ class AuthenticatedSupabaseApi @SupabaseInternal constructor(
     private val jwtToken: String? = null // Can be configured plugin-wide. By default, all plugins use the token from the current session
 ): SupabaseApi(resolveUrl, parseErrorResponse, supabaseClient) {
 
-    override suspend fun rawRequest(url: String, builder: HttpRequestBuilder.() -> Unit): HttpResponse = super.rawRequest(url) {
-        val jwtToken = jwtToken ?: supabaseClient.pluginManager.getPluginOrNull(Auth)?.currentAccessTokenOrNull() ?: supabaseClient.supabaseKey
-        bearerAuth(jwtToken)
-        builder()
-        defaultRequest?.invoke(this)
+    override suspend fun rawRequest(url: String, builder: HttpRequestBuilder.() -> Unit): HttpResponse {
+        val accessToken = supabaseClient.resolveAccessToken(jwtToken) ?: error("No access token available")
+        return super.rawRequest(url) {
+            bearerAuth(accessToken)
+            builder()
+            defaultRequest?.invoke(this)
+        }
     }
 
     suspend fun rawRequest(builder: HttpRequestBuilder.() -> Unit): HttpResponse = rawRequest("", builder)

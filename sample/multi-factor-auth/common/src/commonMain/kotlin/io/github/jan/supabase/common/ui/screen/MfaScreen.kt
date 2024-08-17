@@ -4,16 +4,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import io.github.jan.supabase.common.AppViewModel
+import io.github.jan.supabase.gotrue.mfa.MfaStatus
 
 @Composable
 fun MfaScreen(viewModel: AppViewModel) {
-    val isLoggedInUsingMfa by viewModel.isLoggedInUsingMfa.collectAsState(false)
-    val mfaEnabled by viewModel.mfaEnabled.collectAsState(false)
+    val status by viewModel.statusFlow.collectAsState(MfaStatus(false, false))
     when {
-        isLoggedInUsingMfa && mfaEnabled -> { //only when logged in using mfa & mfa enabled
+        status.enabled && status.active -> { //only when logged in using mfa & mfa enabled
             AppScreen(viewModel)
         }
-        mfaEnabled && !isLoggedInUsingMfa -> { //show only when mfa enabled & not logged in using mfa
+        status.enabled && !status.active -> { //show only when mfa enabled & not logged in using mfa
             MfaLoginScreen(viewModel)
         }
         else -> { //show only when logged in using mfa and mfa disabled or not set up

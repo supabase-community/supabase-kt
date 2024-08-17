@@ -22,7 +22,7 @@ import kotlinx.coroutines.flow.callbackFlow
  * @throws HttpRequestTimeoutException if the request timed out
  * @throws HttpRequestException on network related issues
  */
-fun BucketApi.updateAsFlow(path: String, data: UploadData, upsert: Boolean): Flow<UploadStatus> = callbackFlow {
+fun BucketApi.updateAsFlow(path: String, data: UploadData, upsert: Boolean = false): Flow<UploadStatus> = callbackFlow {
     this@updateAsFlow as BucketApiImpl
     val key = uploadOrUpdate(HttpMethod.Put, bucketId, path, data, upsert) {
         onUpload { bytesSentTotal, contentLength ->
@@ -61,7 +61,7 @@ fun BucketApi.uploadToSignedUrlAsFlow(
     path: String,
     token: String,
     data: UploadData,
-    upsert: Boolean
+    upsert: Boolean = false
 ): Flow<UploadStatus> {
     return callbackFlow {
         this@uploadToSignedUrlAsFlow as BucketApiImpl
@@ -95,7 +95,7 @@ fun BucketApi.uploadToSignedUrlAsFlow(path: String, token: String, data: ByteArr
  * @throws HttpRequestTimeoutException if the request timed out
  * @throws HttpRequestException on network related issues
  */
-fun BucketApi.uploadAsFlow(path: String, data: UploadData, upsert: Boolean): Flow<UploadStatus> {
+fun BucketApi.uploadAsFlow(path: String, data: UploadData, upsert: Boolean = false): Flow<UploadStatus> {
     return callbackFlow {
         this@uploadAsFlow as BucketApiImpl
         val key = uploadOrUpdate(HttpMethod.Post, bucketId, path, data, upsert) {
@@ -131,7 +131,7 @@ fun BucketApi.updateAsFlow(path: String, data: ByteArray, upsert: Boolean = fals
  */
 fun BucketApi.downloadAuthenticatedAsFlow(
     path: String,
-    transform: ImageTransformation.() -> Unit
+    transform: ImageTransformation.() -> Unit = {}
 ): Flow<DownloadStatus> {
     return callbackFlow {
         this@downloadAuthenticatedAsFlow as BucketApiImpl
@@ -160,7 +160,7 @@ fun BucketApi.downloadAuthenticatedAsFlow(
 fun BucketApi.downloadAuthenticatedAsFlow(
     path: String,
     channel: ByteWriteChannel,
-    transform: ImageTransformation.() -> Unit
+    transform: ImageTransformation.() -> Unit = {}
 ): Flow<DownloadStatus> {
     this as BucketApiImpl
     return flowChannelDownloadRequest(path, channel, false, transform)
@@ -175,7 +175,7 @@ fun BucketApi.downloadAuthenticatedAsFlow(
  * @throws HttpRequestTimeoutException if the request timed out
  * @throws HttpRequestException on network related issues
  */
-fun BucketApi.downloadPublicAsFlow(path: String, transform: ImageTransformation.() -> Unit): Flow<DownloadStatus> {
+fun BucketApi.downloadPublicAsFlow(path: String, transform: ImageTransformation.() -> Unit = {}): Flow<DownloadStatus> {
     return callbackFlow {
         this@downloadPublicAsFlow as BucketApiImpl
         val data = storage.api.rawRequest {
@@ -203,7 +203,7 @@ fun BucketApi.downloadPublicAsFlow(path: String, transform: ImageTransformation.
 fun BucketApi.downloadPublicAsFlow(
     path: String,
     channel: ByteWriteChannel,
-    transform: ImageTransformation.() -> Unit
+    transform: ImageTransformation.() -> Unit = {}
 ): Flow<DownloadStatus> {
     this as BucketApiImpl
     return flowChannelDownloadRequest(path, channel, true, transform)

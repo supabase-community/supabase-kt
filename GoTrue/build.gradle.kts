@@ -37,7 +37,7 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
-                api(project(":"))
+                addModules(SupabaseModule.SUPABASE)
                 implementation(libs.krypto)
             }
         }
@@ -55,6 +55,7 @@ kotlin {
         val commonTest by getting {
             dependencies {
                 implementation(libs.bundles.testing)
+                implementation(libs.turbine)
                 implementation(project(":test-common"))
             }
         }
