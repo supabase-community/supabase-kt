@@ -26,6 +26,13 @@ kotlin {
                 api(libs.apollo.kotlin)
             }
         }
+        val commonTest by getting {
+            dependencies {
+                implementation(libs.bundles.testing)
+                implementation(project(":test-common"))
+                implementation(libs.apollo.mockserver)
+            }
+        }
     }
 }
 
