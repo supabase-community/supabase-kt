@@ -14,7 +14,7 @@ multiplatform-settings = "1.1.1"
 complete-kotlin = "1.1.0"
 agp = "8.3.2"
 maven-publish = "0.29.0"
-apollo-kotlin = "3.8.5"
+apollo-kotlin = "4.0.0"
 korlibs = "4.0.10"
 detekt = "1.23.6"
 moshi = "1.15.1"
@@ -93,7 +93,7 @@ multiplatform-settings-no-arg = { module = "com.russhwolf:multiplatform-settings
 multiplatform-settings-coroutines = { module = "com.russhwolf:multiplatform-settings-coroutines", version.ref = "multiplatform-settings" }
 multiplatform-settings-test = { module = "com.russhwolf:multiplatform-settings-test", version.ref = "multiplatform-settings" }
 
-apollo-kotlin = { module = "com.apollographql.apollo3:apollo-runtime", version.ref = "apollo-kotlin" }
+apollo-kotlin = { module = "com.apollographql.apollo:apollo-runtime", version.ref = "apollo-kotlin" }
 
 krypto = { module = "com.soywiz.korlibs.krypto:krypto", version.ref = "korlibs" }
 okio = { module = "com.squareup.okio:okio", version.ref = "okio" }

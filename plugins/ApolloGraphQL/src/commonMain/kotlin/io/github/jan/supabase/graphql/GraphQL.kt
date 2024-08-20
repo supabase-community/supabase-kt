@@ -1,21 +1,14 @@
 package io.github.jan.supabase.graphql
 
-import com.apollographql.apollo3.ApolloClient
-import com.apollographql.apollo3.network.http.HttpInterceptor
-import com.apollographql.apollo3.network.http.HttpInterceptorChain
+import com.apollographql.apollo.ApolloClient
 import io.github.jan.supabase.BuildConfig
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.exceptions.RestException
-import io.github.jan.supabase.gotrue.Auth
 import io.github.jan.supabase.logging.SupabaseLogger
-import io.github.jan.supabase.logging.d
 import io.github.jan.supabase.plugins.MainConfig
 import io.github.jan.supabase.plugins.MainPlugin
 import io.github.jan.supabase.plugins.SupabasePluginProvider
 import io.ktor.client.statement.HttpResponse
-import io.ktor.http.HttpHeaders
-import com.apollographql.apollo3.api.http.HttpRequest as ApolloHttpRequest
-import com.apollographql.apollo3.api.http.HttpResponse as ApolloHttpResponse
 
 /**
  * Adds an Apollo GraphQL client to supabase-kt with all necessary headers automatically managed.
@@ -78,27 +71,12 @@ internal class GraphQLImpl(override val config: GraphQL.Config, override val sup
         serverUrl(config.customUrl ?: resolveUrl())
         addHttpHeader("apikey", supabaseClient.supabaseKey)
         addHttpHeader("X-Client-Info", "supabase-kt/${BuildConfig.PROJECT_VERSION}")
-        addHttpInterceptor(ApolloHttpInterceptor())
+        addHttpInterceptor(ApolloHttpInterceptor(supabaseClient, config))
         apply(config.apolloConfiguration)
     }.build()
 
     override suspend fun parseErrorResponse(response: HttpResponse): RestException {
         throw UnsupportedOperationException("Use apolloClient for GraphQL requests")
-    }
-
-    inner class ApolloHttpInterceptor: HttpInterceptor {
-        override suspend fun intercept(
-            request: ApolloHttpRequest,
-            chain: HttpInterceptorChain
-        ): ApolloHttpResponse {
-            GraphQL.logger.d { "Intercepting Apollo request with url ${request.url}" }
-            val accessToken = config.jwtToken ?: supabaseClient.pluginManager.getPluginOrNull(Auth)?.currentAccessTokenOrNull() ?: supabaseClient.supabaseKey
-            val newRequest = request.newBuilder().apply {
-                addHeader(HttpHeaders.Authorization, "Bearer $accessToken")
-            }
-            return chain.proceed(newRequest.build())
-        }
-
     }
 
 
