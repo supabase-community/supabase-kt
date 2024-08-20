@@ -30,7 +30,6 @@ kotlin {
             dependencies {
                 implementation(libs.bundles.testing)
                 implementation(project(":test-common"))
-                implementation(libs.apollo.mockserver)
             }
         }
     }

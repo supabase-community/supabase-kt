@@ -32,7 +32,6 @@ androidx-core = "1.13.1"
 androidx-compat = "1.7.0"
 androidx-lifecycle = "2.8.4"
 filekit = "0.7.0"
-apollo-mockserver = "0.0.3"
 
 [plugins]
 kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
@@ -95,7 +94,6 @@ multiplatform-settings-coroutines = { module = "com.russhwolf:multiplatform-sett
 multiplatform-settings-test = { module = "com.russhwolf:multiplatform-settings-test", version.ref = "multiplatform-settings" }
 
 apollo-kotlin = { module = "com.apollographql.apollo:apollo-runtime", version.ref = "apollo-kotlin" }
-apollo-mockserver = { module = "com.apollographql.mockserver:apollo-mockserver", version.ref = "apollo-mockserver" }
 
 krypto = { module = "com.soywiz.korlibs.krypto:krypto", version.ref = "korlibs" }
 okio = { module = "com.squareup.okio:okio", version.ref = "okio" }
