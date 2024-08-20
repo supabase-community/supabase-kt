@@ -7,6 +7,7 @@ import com.apollographql.apollo.network.http.HttpInterceptorChain
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.gotrue.Auth
 import io.github.jan.supabase.gotrue.auth
+import io.github.jan.supabase.gotrue.minimalSettings
 import io.github.jan.supabase.graphql.ApolloHttpInterceptor
 import io.github.jan.supabase.graphql.GraphQL
 import io.github.jan.supabase.graphql.graphql
@@ -36,7 +37,9 @@ class ApolloHttpInterceptorTest {
             val supabaseClient = createMockedSupabaseClient(
                 configuration = {
                     install(GraphQL)
-                    install(Auth)
+                    install(Auth) {
+                        minimalSettings()
+                    }
                 }
             )
             supabaseClient.auth.importAuthToken("testtoken")

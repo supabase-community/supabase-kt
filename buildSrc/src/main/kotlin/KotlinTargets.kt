@@ -1,3 +1,6 @@
+import org.gradle.kotlin.dsl.assign
+import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 
 fun KotlinMultiplatformExtension.iosTargets() {
@@ -29,11 +32,23 @@ fun KotlinMultiplatformExtension.desktopTargets() {
     linuxX64()
 }
 
-fun KotlinMultiplatformExtension.jvmTargets() {
-    jvm()
+fun KotlinMultiplatformExtension.configuredJvmTarget() {
+    jvm {
+        compilerOptions.jvmTarget = JvmTarget.JVM_1_8
+    }
+}
+
+fun KotlinMultiplatformExtension.configuredAndroidTarget() {
     androidTarget {
         publishLibraryVariants("release", "debug")
+        compilerOptions.jvmTarget = JvmTarget.JVM_1_8
     }
+}
+
+@OptIn(ExperimentalKotlinGradlePluginApi::class)
+fun KotlinMultiplatformExtension.jvmTargets() {
+    configuredAndroidTarget()
+    configuredJvmTarget()
 }
 
 fun KotlinMultiplatformExtension.jsTarget() {
