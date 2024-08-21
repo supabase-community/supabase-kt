@@ -41,9 +41,9 @@ sealed interface BucketApi {
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
-    suspend fun upload(path: String, data: ByteArray, upsert: Boolean = false): FileUploadResponse {
+    suspend fun upload(path: String, data: ByteArray, upsert: Boolean = false, options: FileOptionBuilder.() -> Unit = {}): FileUploadResponse {
         require(data.isNotEmpty()) { "The data to upload should not be empty" }
-        return upload(path, UploadData(ByteReadChannel(data), data.size.toLong()), upsert)
+        return upload(path, UploadData(ByteReadChannel(data), data.size.toLong()), upsert, options)
     }
 
     /**
@@ -56,7 +56,7 @@ sealed interface BucketApi {
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
-    suspend fun upload(path: String, data: UploadData, upsert: Boolean = false): FileUploadResponse
+    suspend fun upload(path: String, data: UploadData, upsert: Boolean = false, options: FileOptionBuilder.() -> Unit = {}): FileUploadResponse
 
     /**
      * Uploads a file in [bucketId] under [path] using a presigned url
@@ -67,10 +67,15 @@ sealed interface BucketApi {
      * @return the key of the uploaded file
      * @throws IllegalArgumentException if data to upload is empty
      */
-    suspend fun uploadToSignedUrl(path: String, token: String, data: ByteArray, upsert: Boolean = false
+    suspend fun uploadToSignedUrl(
+        path: String,
+        token: String,
+        data: ByteArray,
+        upsert: Boolean = false,
+        options: FileOptionBuilder.() -> Unit = {}
     ): FileUploadResponse {
         require(data.isNotEmpty()) { "The data to upload should not be empty" }
-        return uploadToSignedUrl(path, token, UploadData(ByteReadChannel(data), data.size.toLong()), upsert)
+        return uploadToSignedUrl(path, token, UploadData(ByteReadChannel(data), data.size.toLong()), upsert, options)
     }
 
     /**
@@ -85,7 +90,7 @@ sealed interface BucketApi {
      * @throws HttpRequestException on network related issues
      * @throws HttpRequestException on network related issues
      */
-    suspend fun uploadToSignedUrl(path: String, token: String, data: UploadData, upsert: Boolean = false): FileUploadResponse
+    suspend fun uploadToSignedUrl(path: String, token: String, data: UploadData, upsert: Boolean = false, options: FileOptionBuilder.() -> Unit = {}): FileUploadResponse
 
     /**
      * Updates a file in [bucketId] under [path]
@@ -98,9 +103,9 @@ sealed interface BucketApi {
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
-    suspend fun update(path: String, data: ByteArray, upsert: Boolean = false): FileUploadResponse {
+    suspend fun update(path: String, data: ByteArray, upsert: Boolean = false, options: FileOptionBuilder.() -> Unit = {}): FileUploadResponse {
         require(data.isNotEmpty()) { "The data to upload should not be empty" }
-        return update(path, UploadData(ByteReadChannel(data), data.size.toLong()), upsert)
+        return update(path, UploadData(ByteReadChannel(data), data.size.toLong()), upsert, options)
     }
 
     /**
@@ -113,7 +118,7 @@ sealed interface BucketApi {
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
-    suspend fun update(path: String, data: UploadData, upsert: Boolean = false): FileUploadResponse
+    suspend fun update(path: String, data: UploadData, upsert: Boolean = false, options: FileOptionBuilder.() -> Unit = {}): FileUploadResponse
 
     /**
      * Deletes all files in [bucketId] with in [paths]
@@ -242,8 +247,8 @@ sealed interface BucketApi {
 
 
     /**
-     * Searches for buckets with the given [prefix] and [filter]
-     * @return The filtered buckets
+     * Searches for files with the given [prefix] and [filter]
+     * @return The filtered bucket items
      * @throws RestException or one of its subclasses if receiving an error response
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
@@ -252,6 +257,25 @@ sealed interface BucketApi {
         prefix: String = "",
         filter: BucketListFilter.() -> Unit = {}
     ): List<BucketItem>
+
+    /**
+     * Returns information about the file under [path]
+     * @param path The path to get information about
+     * @return The file object
+     * @throws RestException or one of its subclasses if receiving an error response
+     * @throws HttpRequestTimeoutException if the request timed out
+     * @throws HttpRequestException on network related issues
+     */
+    suspend fun info(path: String): FileObjectV2
+
+    /**
+     * Checks if a file exists under [path]
+     * @return true if the file exists, false otherwise
+     * @throws RestException or one of its subclasses if receiving an error response
+     * @throws HttpRequestTimeoutException if the request timed out
+     * @throws HttpRequestException on network related issues
+     */
+    suspend fun exists(path: String): Boolean
 
     /**
      * Changes the bucket's public status to [public]

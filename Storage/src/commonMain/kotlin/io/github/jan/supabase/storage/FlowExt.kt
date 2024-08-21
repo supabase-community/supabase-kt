@@ -22,9 +22,9 @@ import kotlinx.coroutines.flow.callbackFlow
  * @throws HttpRequestTimeoutException if the request timed out
  * @throws HttpRequestException on network related issues
  */
-fun BucketApi.updateAsFlow(path: String, data: UploadData, upsert: Boolean = false): Flow<UploadStatus> = callbackFlow {
+fun BucketApi.updateAsFlow(path: String, data: UploadData, upsert: Boolean = false, options: FileOptionBuilder.() -> Unit = {}): Flow<UploadStatus> = callbackFlow {
     this@updateAsFlow as BucketApiImpl
-    val key = uploadOrUpdate(HttpMethod.Put, bucketId, path, data, upsert) {
+    val key = uploadOrUpdate(HttpMethod.Put, bucketId, path, data, upsert, options) {
         onUpload { bytesSentTotal, contentLength ->
             trySend(UploadStatus.Progress(bytesSentTotal, contentLength))
         }
@@ -43,8 +43,8 @@ fun BucketApi.updateAsFlow(path: String, data: UploadData, upsert: Boolean = fal
  * @throws HttpRequestTimeoutException if the request timed out
  * @throws HttpRequestException on network related issues
  */
-fun BucketApi.uploadAsFlow(path: String, data: ByteArray, upsert: Boolean = false): Flow<UploadStatus> = uploadAsFlow(path, UploadData(
-    ByteReadChannel(data), data.size.toLong()), upsert)
+fun BucketApi.uploadAsFlow(path: String, data: ByteArray, upsert: Boolean = false, options: FileOptionBuilder.() -> Unit = {}): Flow<UploadStatus> = uploadAsFlow(path, UploadData(
+    ByteReadChannel(data), data.size.toLong()), upsert, options)
 
 /**
  * Uploads a file in [bucketId] under [path] using a presigned url
@@ -61,11 +61,12 @@ fun BucketApi.uploadToSignedUrlAsFlow(
     path: String,
     token: String,
     data: UploadData,
-    upsert: Boolean = false
+    upsert: Boolean = false,
+    options: FileOptionBuilder.() -> Unit = {}
 ): Flow<UploadStatus> {
     return callbackFlow {
         this@uploadToSignedUrlAsFlow as BucketApiImpl
-        val key = uploadToSignedUrl(path, token, data, upsert) {
+        val key = uploadToSignedUrl(path, token, data, upsert, options) {
             onUpload { bytesSentTotal, contentLength ->
                 trySend(UploadStatus.Progress(bytesSentTotal, contentLength))
             }
@@ -83,7 +84,7 @@ fun BucketApi.uploadToSignedUrlAsFlow(
  * @param upsert Whether to overwrite an existing file
  * @return A flow that emits the upload progress and at last the key to the uploaded file
  */
-fun BucketApi.uploadToSignedUrlAsFlow(path: String, token: String, data: ByteArray, upsert: Boolean = false): Flow<UploadStatus> = uploadToSignedUrlAsFlow(path, token, UploadData(ByteReadChannel(data), data.size.toLong()), upsert)
+fun BucketApi.uploadToSignedUrlAsFlow(path: String, token: String, data: ByteArray, upsert: Boolean = false, options: FileOptionBuilder.() -> Unit = {}): Flow<UploadStatus> = uploadToSignedUrlAsFlow(path, token, UploadData(ByteReadChannel(data), data.size.toLong()), upsert, options)
 
 /**
  * Updates a file in [bucketId] under [path]
@@ -95,10 +96,10 @@ fun BucketApi.uploadToSignedUrlAsFlow(path: String, token: String, data: ByteArr
  * @throws HttpRequestTimeoutException if the request timed out
  * @throws HttpRequestException on network related issues
  */
-fun BucketApi.uploadAsFlow(path: String, data: UploadData, upsert: Boolean = false): Flow<UploadStatus> {
+fun BucketApi.uploadAsFlow(path: String, data: UploadData, upsert: Boolean = false, options: FileOptionBuilder.() -> Unit = {}): Flow<UploadStatus> {
     return callbackFlow {
         this@uploadAsFlow as BucketApiImpl
-        val key = uploadOrUpdate(HttpMethod.Post, bucketId, path, data, upsert) {
+        val key = uploadOrUpdate(HttpMethod.Post, bucketId, path, data, upsert, options) {
             onUpload { bytesSentTotal, contentLength ->
                 trySend(UploadStatus.Progress(bytesSentTotal, contentLength))
             }
@@ -118,7 +119,7 @@ fun BucketApi.uploadAsFlow(path: String, data: UploadData, upsert: Boolean = fal
  * @throws HttpRequestTimeoutException if the request timed out
  * @throws HttpRequestException on network related issues
  */
-fun BucketApi.updateAsFlow(path: String, data: ByteArray, upsert: Boolean = false): Flow<UploadStatus> = updateAsFlow(path, UploadData(ByteReadChannel(data), data.size.toLong()), upsert)
+fun BucketApi.updateAsFlow(path: String, data: ByteArray, upsert: Boolean = false, options: FileOptionBuilder.() -> Unit = {}): Flow<UploadStatus> = updateAsFlow(path, UploadData(ByteReadChannel(data), data.size.toLong()), upsert, options)
 
 /**
  * Downloads a file from [bucketId] under [path]
