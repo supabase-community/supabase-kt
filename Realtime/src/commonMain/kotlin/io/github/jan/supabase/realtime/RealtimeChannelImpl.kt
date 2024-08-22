@@ -269,7 +269,7 @@ internal class RealtimeChannelImpl(
         awaitClose { callbackManager.removeCallbackById(id) }
     }
 
-    override fun RealtimeChannel.presenceChangeFlow(): Flow<PresenceAction> = callbackFlow {
+    override fun presenceChangeFlow(): Flow<PresenceAction> = callbackFlow {
         val callback: (PresenceAction) -> Unit = { action ->
             trySend(action)
         }
