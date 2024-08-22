@@ -155,7 +155,7 @@ import kotlinx.serialization.json.buildJsonObject
         _status.value = Realtime.Status.DISCONNECTED
     }
 
-    private fun onMessage(message: RealtimeMessage) {
+    private suspend fun onMessage(message: RealtimeMessage) {
         Realtime.logger.d { "Received message $message" }
         val channel = subscriptions[message.topic] as? RealtimeChannelImpl
         if(message.ref?.toIntOrNull() == heartbeatRef) {
@@ -198,11 +198,6 @@ import kotlinx.serialization.json.buildJsonObject
             Realtime.logger.d { "No more subscriptions, disconnecting from realtime websocket" }
             disconnect()
         }
-    }
-
-    @SupabaseInternal
-    override fun Realtime.deleteChannel(channel: RealtimeChannel) {
-        _subscriptions.remove(channel.topic)
     }
 
     override suspend fun removeAllChannels() {
