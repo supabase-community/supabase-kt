@@ -14,31 +14,23 @@ import io.github.jan.supabase.logging.i
 import io.github.jan.supabase.logging.w
 import io.github.jan.supabase.realtime.websocket.KtorRealtimeWebsocketFactory
 import io.github.jan.supabase.realtime.websocket.RealtimeWebsocket
-import io.github.jan.supabase.supabaseJson
-import io.ktor.client.plugins.websocket.DefaultClientWebSocketSession
-import io.ktor.client.plugins.websocket.sendSerialized
 import io.ktor.client.statement.HttpResponse
 import io.ktor.http.URLProtocol
 import io.ktor.http.path
-import io.ktor.websocket.Frame
-import io.ktor.websocket.readText
 import kotlinx.atomicfu.atomic
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.isActive
-import kotlinx.coroutines.job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.serialization.json.buildJsonObject
-import kotlin.time.Duration.Companion.milliseconds
 
 @PublishedApi internal class RealtimeImpl(override val supabaseClient: SupabaseClient, override val config: Realtime.Config) : Realtime {
 
@@ -209,7 +201,7 @@ import kotlin.time.Duration.Companion.milliseconds
     }
 
     @SupabaseInternal
-    override fun RealtimeChannel.deleteChannel(channel: RealtimeChannel) {
+    override fun Realtime.deleteChannel(channel: RealtimeChannel) {
         _subscriptions.remove(channel.topic)
     }
 
@@ -227,7 +219,7 @@ import kotlin.time.Duration.Companion.milliseconds
     }
 
     @SupabaseInternal
-    override fun RealtimeChannel.addChannel(channel: RealtimeChannel) {
+    override fun Realtime.addChannel(channel: RealtimeChannel) {
         _subscriptions[channel.topic] = channel
     }
 
