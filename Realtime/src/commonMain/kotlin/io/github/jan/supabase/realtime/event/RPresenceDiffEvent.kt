@@ -11,7 +11,7 @@ import kotlinx.serialization.json.jsonObject
  */
 data object RPresenceDiffEvent : RealtimeEvent {
 
-    override fun handle(channel: RealtimeChannel, message: RealtimeMessage) {
+    override suspend fun handle(channel: RealtimeChannel, message: RealtimeMessage) {
         val joins = message.payload["joins"]?.jsonObject?.decodeIfNotEmptyOrDefault(mapOf<String, Presence>()) ?: emptyMap()
         val leaves = message.payload["leaves"]?.jsonObject?.decodeIfNotEmptyOrDefault(mapOf<String, Presence>()) ?: emptyMap()
         channel.callbackManager.triggerPresenceDiff(joins, leaves)

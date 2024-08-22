@@ -10,7 +10,7 @@ import io.github.jan.supabase.realtime.RealtimeMessage
  */
 data object RErrorEvent : RealtimeEvent {
 
-    override fun handle(channel: RealtimeChannel, message: RealtimeMessage) {
+    override suspend fun handle(channel: RealtimeChannel, message: RealtimeMessage) {
         Realtime.logger.e { "Received an error in channel ${message.topic}. That could be as a result of an invalid access token" }
     }
 

@@ -69,9 +69,6 @@ sealed interface Realtime : MainPlugin<Realtime.Config>, CustomSerializationPlug
     @SupabaseInternal
     fun Realtime.addChannel(channel: RealtimeChannel)
 
-    @SupabaseInternal
-    fun Realtime.deleteChannel(channel: RealtimeChannel)
-
     /**
      * Unsubscribes and removes a channel from the [subscriptions]
      * @param channel The channel to remove

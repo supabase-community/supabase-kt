@@ -73,7 +73,7 @@ internal class RealtimeChannelImpl(
     }
 
     @OptIn(SupabaseInternal::class)
-    fun onMessage(message: RealtimeMessage) {
+    suspend fun onMessage(message: RealtimeMessage) {
         val event = RealtimeEvent.resolveEvent(message)
         if(event == null) {
             Realtime.logger.e { "Received message without event: $message" }

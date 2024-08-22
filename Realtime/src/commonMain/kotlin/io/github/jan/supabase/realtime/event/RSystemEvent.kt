@@ -11,7 +11,7 @@ import kotlinx.serialization.json.jsonPrimitive
  */
 data object RSystemEvent : RealtimeEvent {
 
-    override fun handle(channel: RealtimeChannel, message: RealtimeMessage) {
+    override suspend fun handle(channel: RealtimeChannel, message: RealtimeMessage) {
         Realtime.logger.d { "Subscribed to channel ${message.topic}" }
         channel.updateStatus(RealtimeChannel.Status.SUBSCRIBED)
     }

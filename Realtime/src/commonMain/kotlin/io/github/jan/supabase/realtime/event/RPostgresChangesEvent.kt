@@ -17,7 +17,7 @@ import kotlinx.serialization.json.longOrNull
  */
 data object RPostgresChangesEvent : RealtimeEvent {
 
-    override fun handle(channel: RealtimeChannel, message: RealtimeMessage) {
+    override suspend fun handle(channel: RealtimeChannel, message: RealtimeMessage) {
         val data = message.payload["data"]?.jsonObject ?: return
         val ids = message.payload["ids"]?.jsonArray?.mapNotNull { it.jsonPrimitive.longOrNull } ?: emptyList() //the ids of the matching postgres changes
         val postgresAction = supabaseJson.decodeFromJsonElement<PostgresActionData>(data)

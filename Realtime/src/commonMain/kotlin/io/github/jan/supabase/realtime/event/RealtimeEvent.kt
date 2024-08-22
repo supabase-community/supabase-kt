@@ -13,7 +13,7 @@ internal sealed interface RealtimeEvent {
      * @param channel The channel the event was received on.
      * @param message The message that was received.
      */
-    fun handle(channel: RealtimeChannel, message: RealtimeMessage)
+    suspend fun handle(channel: RealtimeChannel, message: RealtimeMessage)
 
     /**
      * Checks if the event applies to the message.

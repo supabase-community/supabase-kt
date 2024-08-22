@@ -11,7 +11,7 @@ import kotlinx.serialization.json.jsonPrimitive
  */
 data object RSystemReplyEvent : RealtimeEvent {
 
-    override fun handle(channel: RealtimeChannel, message: RealtimeMessage) {
+    override suspend fun handle(channel: RealtimeChannel, message: RealtimeMessage) {
         Realtime.logger.d { "Received system reply: ${message.payload}." }
         if(channel.status.value == RealtimeChannel.Status.UNSUBSCRIBING) {
             channel.updateStatus(RealtimeChannel.Status.UNSUBSCRIBED)

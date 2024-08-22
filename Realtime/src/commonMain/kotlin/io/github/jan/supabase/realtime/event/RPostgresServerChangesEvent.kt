@@ -15,7 +15,7 @@ import kotlinx.serialization.json.jsonObject
  */
 data object RPostgresServerChangesEvent : RealtimeEvent {
 
-    override fun handle(channel: RealtimeChannel, message: RealtimeMessage) {
+    override suspend fun handle(channel: RealtimeChannel, message: RealtimeMessage) {
         val serverPostgresChanges = message.payload["response"]?.jsonObject?.get("postgres_changes")?.jsonArray?.let { Json.decodeFromJsonElement<List<PostgresJoinConfig>>(it) } ?: listOf() //server postgres changes
         channel.callbackManager.setServerChanges(serverPostgresChanges)
         if(channel.status.value != RealtimeChannel.Status.SUBSCRIBED) {

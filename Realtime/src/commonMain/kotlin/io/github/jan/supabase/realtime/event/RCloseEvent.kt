@@ -10,10 +10,8 @@ import io.github.jan.supabase.realtime.RealtimeMessage
  */
 data object RCloseEvent : RealtimeEvent {
 
-    override fun handle(channel: RealtimeChannel, message: RealtimeMessage) {
-        with(channel.realtime) {
-            channel.realtime.deleteChannel(channel)
-        }
+    override suspend fun handle(channel: RealtimeChannel, message: RealtimeMessage) {
+        channel.realtime.removeChannel(channel)
         Realtime.logger.d { "Unsubscribed from channel ${message.topic}" }
     }
 

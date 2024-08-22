@@ -10,7 +10,7 @@ import io.github.jan.supabase.realtime.RealtimeMessage
  */
 data object RPresenceStateEvent : RealtimeEvent {
 
-    override fun handle(channel: RealtimeChannel, message: RealtimeMessage) {
+    override suspend fun handle(channel: RealtimeChannel, message: RealtimeMessage) {
         val joins = message.payload.decodeIfNotEmptyOrDefault(mapOf<String, Presence>())
         channel.callbackManager.triggerPresenceDiff(joins, mapOf())
     }

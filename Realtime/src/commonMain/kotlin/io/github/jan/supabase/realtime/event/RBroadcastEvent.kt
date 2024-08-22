@@ -11,7 +11,7 @@ import kotlinx.serialization.json.jsonPrimitive
  */
 data object RBroadcastEvent : RealtimeEvent {
 
-    override fun handle(channel: RealtimeChannel, message: RealtimeMessage) {
+    override suspend fun handle(channel: RealtimeChannel, message: RealtimeMessage) {
         val event = message.payload["event"]?.jsonPrimitive?.content ?: ""
         channel.callbackManager.triggerBroadcast(event, message.payload["payload"]?.jsonObject ?: JsonObject(mutableMapOf()))
     }

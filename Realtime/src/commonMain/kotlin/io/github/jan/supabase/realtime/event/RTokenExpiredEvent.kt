@@ -11,7 +11,7 @@ import kotlinx.serialization.json.jsonPrimitive
  */
 data object RTokenExpiredEvent : RealtimeEvent {
 
-    override fun handle(channel: RealtimeChannel, message: RealtimeMessage) {
+    override suspend fun handle(channel: RealtimeChannel, message: RealtimeMessage) {
         Realtime.logger.w { "Received token expired event. This should not happen, please report this warning." }
     }
 
