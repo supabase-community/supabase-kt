@@ -1,5 +1,8 @@
 @file:OptIn(org.jetbrains.compose.ExperimentalComposeLibrary::class)
 
+import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
+
+
 plugins {
     id(libs.plugins.kotlin.multiplatform.get().pluginId)
     id(libs.plugins.compose.plugin.get().pluginId)
@@ -12,6 +15,7 @@ group = "io.github.jan.supabase"
 version = "1.0-SNAPSHOT"
 
 kotlin {
+    @OptIn(ExperimentalKotlinGradlePluginApi::class)
     applyDefaultHierarchyTemplate {
         common {
             group("jvmAndAndroid") {

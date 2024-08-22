@@ -114,7 +114,7 @@ complexity:
     includePrivateDeclarations: false
     ignoreOverloaded: false
   CyclomaticComplexMethod:
-    active: false
+    active: true
     threshold: 15
     ignoreSingleWhenExpression: false
     ignoreSimpleWhenEntries: false
@@ -139,12 +139,14 @@ complexity:
     active: true
     threshold: 70
   LongParameterList:
-    active: false
+    active: true
     functionThreshold: 6
     constructorThreshold: 7
     ignoreDefaultParameters: false
     ignoreDataClasses: true
     ignoreAnnotatedParameter: []
+    ignoreAnnotated:
+      - 'Composable'
   MethodOverloading:
     active: false
     threshold: 6
@@ -188,7 +190,7 @@ complexity:
 coroutines:
   active: true
   GlobalCoroutineUsage:
-    active: false
+    active: true
   InjectDispatcher:
     active: false
     dispatcherNames:
