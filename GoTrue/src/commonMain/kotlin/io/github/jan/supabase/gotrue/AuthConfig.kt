@@ -147,6 +147,7 @@ val AuthConfig.deepLinkOrNull: String?
  * @param enableLifecycleCallbacks Whether to stop auto-refresh on focus loss, and resume it on focus again. Currently only supported on Android.
  * @see AuthConfigDefaults
  */
+@Suppress("LongParameterList")
 fun AuthConfigDefaults.minimalSettings(
     alwaysAutoRefresh: Boolean = false,
     autoLoadFromStorage: Boolean = false,
