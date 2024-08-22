@@ -85,6 +85,7 @@ sealed interface SupabaseClient {
 
 }
 
+@Suppress("LongParameterList") //TODO: maybe refactor
 internal class SupabaseClientImpl(
     override val supabaseUrl: String,
     override val supabaseKey: String,
