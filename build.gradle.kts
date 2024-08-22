@@ -45,11 +45,13 @@ libraryModules {
     applyPublishing()
 }
 
-libraryModules(false) {
-    apply(plugin = "io.gitlab.arturbosch.detekt")
+val reportMerge by tasks.registering(io.gitlab.arturbosch.detekt.report.ReportMergeTask::class) {
+    output.set(rootProject.layout.buildDirectory.file("reports/detekt/merge.sarif"))
+}
 
+libraryModules(false) {
     applyDokkaWithConfiguration()
-    applyDetektWithConfiguration()
+    applyDetektWithConfiguration(reportMerge)
 }
 
 tasks.register("detektAll") {

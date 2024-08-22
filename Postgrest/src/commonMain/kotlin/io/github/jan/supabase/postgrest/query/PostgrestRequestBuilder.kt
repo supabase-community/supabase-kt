@@ -132,6 +132,7 @@ class PostgrestRequestBuilder(@PublishedApi internal val propertyConversionMetho
      * @param format - The format of the output, can be `"text"` (default)
      * or `"json"`
      */
+    @Suppress("LongParameterList")
     fun explain(
         analyze: Boolean = false,
         verbose: Boolean = false,

@@ -79,6 +79,7 @@ internal class RealtimeChannelImpl(
     }
 
     @OptIn(SupabaseInternal::class)
+    @Suppress("CyclomaticComplexMethod") //TODO: Refactor this method
     fun onMessage(message: RealtimeMessage) {
         if(message.eventType == null) {
             Realtime.logger.e { "Received message without event type: $message" }
