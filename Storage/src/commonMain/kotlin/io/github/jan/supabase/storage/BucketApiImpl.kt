@@ -16,6 +16,7 @@ import io.ktor.client.statement.bodyAsChannel
 import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
+import io.ktor.http.HttpStatusCode
 import io.ktor.http.Url
 import io.ktor.http.content.OutgoingContent
 import io.ktor.http.defaultForFilePath
@@ -236,7 +237,7 @@ internal class BucketApiImpl(override val bucketId: String, val storage: Storage
             }
             return true
         } catch (e: RestException) {
-            if (e.statusCode in listOf(400, 404)) return false
+            if (e.statusCode in listOf(HttpStatusCode.NotFound.value, HttpStatusCode.BadRequest.value)) return false
             throw e
         }
     }
