@@ -285,6 +285,7 @@ internal class BucketApiImpl(override val bucketId: String, val storage: Storage
         return FileUploadResponse(id, path, key)
     }
 
+    @Suppress("LongParameterList") //TODO: maybe refactor
     @OptIn(ExperimentalEncodingApi::class)
     private fun HttpRequestBuilder.defaultUploadRequest(
         path: String,
