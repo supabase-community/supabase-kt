@@ -3,6 +3,7 @@ package io.github.jan.supabase.storage
 import io.github.jan.supabase.SupabaseSerializer
 import io.github.jan.supabase.decode
 import io.github.jan.supabase.serializer.KotlinXSerializer
+import io.ktor.http.ContentType
 import kotlinx.datetime.Instant
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -18,9 +19,8 @@ import kotlinx.serialization.json.JsonObject
  * @param lastAccessedAt The last access date of the item
  * @param metadata The metadata of the item
  */
-//TODO: Rename to FileObject
 @Serializable
-data class BucketItem(
+data class FileObject(
     val name: String,
     val id: String?,
     @SerialName("updated_at")
@@ -40,6 +40,12 @@ data class BucketItem(
  * @param createdAt The creation date of the item
  * @param lastAccessedAt The last access date of the item
  * @param metadata The metadata of the item
+ * @param size The size of the item
+ * @param contentType The content type of the item
+ * @param etag The etag of the item
+ * @param lastModified The last modified date of the item
+ * @param cacheControl The cache control of the item
+ * @param serializer The serializer to use for decoding the metadata
  */
 @Serializable
 data class FileObjectV2(
@@ -57,7 +63,7 @@ data class FileObjectV2(
     val metadata: JsonObject?,
     val size: Long,
     @SerialName("content_type")
-    val contentType: String,
+    val rawContentType: String,
     val etag: String?,
     @SerialName("last_modified")
     val lastModified: Instant?,
@@ -65,6 +71,10 @@ data class FileObjectV2(
     val cacheControl: String?,
     @Transient @PublishedApi internal val serializer: SupabaseSerializer = KotlinXSerializer()
 ) {
+
+    val contentType by lazy {
+        ContentType.parse(rawContentType)
+    }
 
     inline fun <reified T> decodeMetadata(): T? = metadata?.let { serializer.decode(it.toString()) }
 

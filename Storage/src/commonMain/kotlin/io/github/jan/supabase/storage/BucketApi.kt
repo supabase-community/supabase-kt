@@ -256,7 +256,7 @@ sealed interface BucketApi {
     suspend fun list(
         prefix: String = "",
         filter: BucketListFilter.() -> Unit = {}
-    ): List<BucketItem>
+    ): List<FileObject>
 
     /**
      * Returns information about the file under [path]

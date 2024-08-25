@@ -217,7 +217,7 @@ internal class BucketApiImpl(override val bucketId: String, val storage: Storage
     override suspend fun list(
         prefix: String,
         filter: BucketListFilter.() -> Unit
-    ): List<BucketItem> {
+    ): List<FileObject> {
         return storage.api.postJson("object/list/$bucketId", buildJsonObject {
             put("prefix", prefix)
             putJsonObject(BucketListFilter().apply(filter).build())
@@ -225,8 +225,8 @@ internal class BucketApiImpl(override val bucketId: String, val storage: Storage
     }
 
     override suspend fun info(path: String): FileObjectV2 {
-        val response = storage.api.get("object/info/public/$bucketId/$path")
-        return response.safeBody()
+        val response = storage.api.get("object/info/$bucketId/$path")
+        return response.safeBody<FileObjectV2>().copy(serializer = storage.serializer)
     }
 
     override suspend fun exists(path: String): Boolean {
