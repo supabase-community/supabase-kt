@@ -248,7 +248,6 @@ sealed interface BucketApi {
 
     /**
      * Searches for files with the given [prefix] and [filter]
-     * @return The filtered bucket items
      * @throws RestException or one of its subclasses if receiving an error response
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
