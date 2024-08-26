@@ -89,8 +89,9 @@ class BucketApiTest {
                 )
             },
             request = { client, expectedPath, data, meta ->
-                client.storage[bucketId].upload(expectedPath, data, upsert = true) {
+                client.storage[bucketId].upload(expectedPath, data) {
                     userMetadata = meta
+                    upsert = true
                 }
             }
         )
@@ -115,8 +116,9 @@ class BucketApiTest {
                 )
             },
             request = { client, expectedPath, data, meta ->
-                client.storage[bucketId].uploadToSignedUrl(path = expectedPath, token = expectedToken, data = data, upsert = false) {
+                client.storage[bucketId].uploadToSignedUrl(path = expectedPath, token = expectedToken, data = data) {
                     userMetadata = meta
+                    upsert = false
                 }
             }
         )
@@ -141,8 +143,9 @@ class BucketApiTest {
                 )
             },
             request = { client, expectedPath, data, meta ->
-                client.storage[bucketId].uploadToSignedUrl(path = expectedPath, token = expectedToken, data = data, upsert = true) {
+                client.storage[bucketId].uploadToSignedUrl(path = expectedPath, token = expectedToken, data = data) {
                     userMetadata = meta
+                    upsert = true
                 }
             }
         )
@@ -181,8 +184,9 @@ class BucketApiTest {
                 )
             },
             request = { client, expectedPath, data, meta ->
-                client.storage[bucketId].update(expectedPath, data, upsert = true) {
+                client.storage[bucketId].update(expectedPath, data) {
                     userMetadata = meta
+                    upsert = true
                 }
             }
         )

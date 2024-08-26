@@ -34,36 +34,33 @@ sealed interface BucketApi {
      * Uploads a file in [bucketId] under [path]
      * @param path The path to upload the file to
      * @param data The data to upload
-     * @param upsert Whether to overwrite an existing file
      * @return the key to the uploaded file
      * @throws IllegalArgumentException if data to upload is empty
      * @throws RestException or one of its subclasses if receiving an error response
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
-    suspend fun upload(path: String, data: ByteArray, upsert: Boolean = false, options: FileOptionBuilder.() -> Unit = {}): FileUploadResponse {
+    suspend fun upload(path: String, data: ByteArray, options: FileOptionBuilder.() -> Unit = {}): FileUploadResponse {
         require(data.isNotEmpty()) { "The data to upload should not be empty" }
-        return upload(path, UploadData(ByteReadChannel(data), data.size.toLong()), upsert, options)
+        return upload(path, UploadData(ByteReadChannel(data), data.size.toLong()), options)
     }
 
     /**
      * Uploads a file in [bucketId] under [path]
      * @param path The path to upload the file to
      * @param data The data to upload
-     * @param upsert Whether to overwrite an existing file
      * @return the key to the uploaded file
      * @throws RestException or one of its subclasses if receiving an error response
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
-    suspend fun upload(path: String, data: UploadData, upsert: Boolean = false, options: FileOptionBuilder.() -> Unit = {}): FileUploadResponse
+    suspend fun upload(path: String, data: UploadData, options: FileOptionBuilder.() -> Unit = {}): FileUploadResponse
 
     /**
      * Uploads a file in [bucketId] under [path] using a presigned url
      * @param path The path to upload the file to
-     * @param token The presigned url token
+     * @param token The pre-signed url token
      * @param data The data to upload
-     * @param upsert Whether to overwrite an existing file
      * @return the key of the uploaded file
      * @throws IllegalArgumentException if data to upload is empty
      */
@@ -71,11 +68,10 @@ sealed interface BucketApi {
         path: String,
         token: String,
         data: ByteArray,
-        upsert: Boolean = false,
         options: FileOptionBuilder.() -> Unit = {}
     ): FileUploadResponse {
         require(data.isNotEmpty()) { "The data to upload should not be empty" }
-        return uploadToSignedUrl(path, token, UploadData(ByteReadChannel(data), data.size.toLong()), upsert, options)
+        return uploadToSignedUrl(path, token, UploadData(ByteReadChannel(data), data.size.toLong()), options)
     }
 
     /**
@@ -83,42 +79,39 @@ sealed interface BucketApi {
      * @param path The path to upload the file to
      * @param token The presigned url token
      * @param data The data to upload
-     * @param upsert Whether to overwrite an existing file
      * @return the key of the uploaded file
      * @throws RestException or one of its subclasses if receiving an error response
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      * @throws HttpRequestException on network related issues
      */
-    suspend fun uploadToSignedUrl(path: String, token: String, data: UploadData, upsert: Boolean = false, options: FileOptionBuilder.() -> Unit = {}): FileUploadResponse
+    suspend fun uploadToSignedUrl(path: String, token: String, data: UploadData, options: FileOptionBuilder.() -> Unit = {}): FileUploadResponse
 
     /**
      * Updates a file in [bucketId] under [path]
      * @param path The path to update the file to
      * @param data The new data
-     * @param upsert Whether to overwrite an existing file
      * @return the key to the updated file
      * @throws IllegalArgumentException if data to upload is empty
      * @throws RestException or one of its subclasses if receiving an error response
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
-    suspend fun update(path: String, data: ByteArray, upsert: Boolean = false, options: FileOptionBuilder.() -> Unit = {}): FileUploadResponse {
+    suspend fun update(path: String, data: ByteArray, options: FileOptionBuilder.() -> Unit = {}): FileUploadResponse {
         require(data.isNotEmpty()) { "The data to upload should not be empty" }
-        return update(path, UploadData(ByteReadChannel(data), data.size.toLong()), upsert, options)
+        return update(path, UploadData(ByteReadChannel(data), data.size.toLong()), options)
     }
 
     /**
      * Updates a file in [bucketId] under [path]
      * @param path The path to update the file to
      * @param data The new data
-     * @param upsert Whether to overwrite an existing file
      * @return the key to the updated file
      * @throws RestException or one of its subclasses if receiving an error response
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
-    suspend fun update(path: String, data: UploadData, upsert: Boolean = false, options: FileOptionBuilder.() -> Unit = {}): FileUploadResponse
+    suspend fun update(path: String, data: UploadData, options: FileOptionBuilder.() -> Unit = {}): FileUploadResponse
 
     /**
      * Deletes all files in [bucketId] with in [paths]

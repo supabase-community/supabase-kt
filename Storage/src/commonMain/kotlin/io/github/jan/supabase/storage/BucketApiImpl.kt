@@ -44,21 +44,19 @@ internal class BucketApiImpl(override val bucketId: String, val storage: Storage
     override suspend fun update(
         path: String,
         data: UploadData,
-        upsert: Boolean,
         options: FileOptionBuilder.() -> Unit
     ): FileUploadResponse =
         uploadOrUpdate(
-            HttpMethod.Put, bucketId, path, data, upsert, options
+            HttpMethod.Put, bucketId, path, data, options
         )
 
     override suspend fun uploadToSignedUrl(
         path: String,
         token: String,
         data: UploadData,
-        upsert: Boolean,
         options: FileOptionBuilder.() -> Unit
     ): FileUploadResponse {
-        return uploadToSignedUrl(path, token, data, upsert, options) {}
+        return uploadToSignedUrl(path, token, data, options) {}
     }
 
     override suspend fun createSignedUploadUrl(path: String): UploadSignedUrl {
@@ -77,11 +75,10 @@ internal class BucketApiImpl(override val bucketId: String, val storage: Storage
     override suspend fun upload(
         path: String,
         data: UploadData,
-        upsert: Boolean,
         options: FileOptionBuilder.() -> Unit
     ): FileUploadResponse =
         uploadOrUpdate(
-            HttpMethod.Post, bucketId, path, data, upsert, options
+            HttpMethod.Post, bucketId, path, data, options
         )
 
     override suspend fun delete(paths: Collection<String>) {
@@ -249,14 +246,13 @@ internal class BucketApiImpl(override val bucketId: String, val storage: Storage
         bucket: String,
         path: String,
         data: UploadData,
-        upsert: Boolean,
         options: FileOptionBuilder.() -> Unit,
         extra: HttpRequestBuilder.() -> Unit = {}
     ): FileUploadResponse {
         val optionBuilder = FileOptionBuilder(storage.serializer).apply(options)
         val response = storage.api.request("object/$bucket/$path") {
             this.method = method
-            defaultUploadRequest(path, data, upsert, optionBuilder, extra)
+            defaultUploadRequest(path, data, optionBuilder, extra)
         }.body<JsonObject>()
         val key = response["Key"]?.jsonPrimitive?.content
             ?: error("Expected a key in a upload response")
@@ -271,14 +267,13 @@ internal class BucketApiImpl(override val bucketId: String, val storage: Storage
         path: String,
         token: String,
         data: UploadData,
-        upsert: Boolean,
         options: FileOptionBuilder.() -> Unit,
         extra: HttpRequestBuilder.() -> Unit = {}
     ): FileUploadResponse {
         val optionBuilder = FileOptionBuilder(storage.serializer).apply(options)
         val response = storage.api.put("object/upload/sign/$bucketId/$path") {
             parameter("token", token)
-            defaultUploadRequest(path, data, upsert, optionBuilder, extra)
+            defaultUploadRequest(path, data, optionBuilder, extra)
         }.body<JsonObject>()
         val key = response["Key"]?.jsonPrimitive?.content
             ?: error("Expected a key in a upload response")
@@ -291,17 +286,16 @@ internal class BucketApiImpl(override val bucketId: String, val storage: Storage
     private fun HttpRequestBuilder.defaultUploadRequest(
         path: String,
         data: UploadData,
-        upsert: Boolean,
         optionBuilder: FileOptionBuilder,
         extra: HttpRequestBuilder.() -> Unit
     ) {
         setBody(object : OutgoingContent.ReadChannelContent() {
-            override val contentType: ContentType = ContentType.defaultForFilePath(path)
+            override val contentType: ContentType = optionBuilder.contentType ?: ContentType.defaultForFilePath(path)
             override val contentLength: Long = data.size
             override fun readFrom(): ByteReadChannel = data.stream
         })
-        header(HttpHeaders.ContentType, ContentType.defaultForFilePath(path))
-        header(UPSERT_HEADER, upsert.toString())
+        header(HttpHeaders.ContentType, optionBuilder.contentType ?: ContentType.defaultForFilePath(path))
+        header(UPSERT_HEADER, optionBuilder.upsert.toString())
         optionBuilder.userMetadata?.let {
             header("x-metadata", Base64.Default.encode(it.toString().encodeToByteArray()).also((::println)))
         }
