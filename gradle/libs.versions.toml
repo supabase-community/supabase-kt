@@ -1,6 +1,6 @@
 [versions]
 accompanist-permissions = "0.35.1-alpha"
-kotlin = "2.0.10"
+kotlin = "2.0.20"
 ktor = "2.3.12"
 dokka = "1.9.20"
 kotlinx-datetime = "0.6.1"
