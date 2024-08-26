@@ -1,5 +1,5 @@
 [versions]
-accompanist-permissions = "0.35.1-alpha"
+accompanist-permissions = "0.35.2-beta"
 kotlin = "2.0.10"
 ktor = "2.3.12"
 dokka = "1.9.20"
