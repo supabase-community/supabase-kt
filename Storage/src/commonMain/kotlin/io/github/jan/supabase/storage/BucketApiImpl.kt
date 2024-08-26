@@ -297,7 +297,7 @@ internal class BucketApiImpl(override val bucketId: String, val storage: Storage
         header(HttpHeaders.ContentType, optionBuilder.contentType ?: ContentType.defaultForFilePath(path))
         header(UPSERT_HEADER, optionBuilder.upsert.toString())
         optionBuilder.userMetadata?.let {
-            header("x-metadata", Base64.Default.encode(it.toString().encodeToByteArray()).also((::println)))
+            header("x-metadata", Base64.Default.encode(it.toString().encodeToByteArray()))
         }
         extra()
     }
