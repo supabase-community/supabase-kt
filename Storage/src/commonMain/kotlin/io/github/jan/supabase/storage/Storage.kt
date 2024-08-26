@@ -131,7 +131,7 @@ sealed interface Storage : MainPlugin<Storage.Config>, CustomSerializationPlugin
         data class Resumable(
             var cache: ResumableCache? = null,
             var retryTimeout: Duration = 5.seconds,
-            var onlyUpdateStateAfterChunk: Boolean = false,
+            var onlyUpdateStateAfterChunk: Boolean = false
         ) {
 
             /**
