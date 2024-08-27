@@ -31,6 +31,11 @@ sealed interface RealtimeChannel {
      */
     val supabaseClient: SupabaseClient
 
+    /**
+     * The realtime instance
+     */
+    val realtime: Realtime
+
     @SupabaseInternal
     val callbackManager: CallbackManager
 
@@ -101,6 +106,9 @@ sealed interface RealtimeChannel {
 
     @SupabaseInternal
     fun RealtimeChannel.removePostgresChange(data: PostgresJoinConfig)
+
+    @SupabaseInternal
+    fun updateStatus(status: Status)
 
     /**
      * Represents the status of a channel
