@@ -14,8 +14,11 @@ import io.github.jan.supabase.realtime.data.PostgresActionData
 import io.github.jan.supabase.supabaseJson
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.headers
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
@@ -28,6 +31,8 @@ import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.longOrNull
 import kotlinx.serialization.json.put
 import kotlinx.serialization.json.putJsonObject
+import kotlin.reflect.KClass
+import kotlin.reflect.KType
 
 internal class RealtimeChannelImpl(
     private val realtimeImpl: RealtimeImpl,
@@ -217,6 +222,59 @@ internal class RealtimeChannelImpl(
                 put("event", "untrack")
             }, (++realtimeImpl.ref).toString())
         )
+    }
+
+    override fun <T : PostgresAction> RealtimeChannel.postgresChangeFlowInternal(
+        action: KClass<T>,
+        schema: String,
+        filter: PostgresChangeFilter.() -> Unit
+    ): Flow<T> {
+        if(status.value == RealtimeChannel.Status.SUBSCRIBED) error("You cannot call postgresChangeFlow after joining the channel")
+        val event = when(action) {
+            PostgresAction.Insert::class -> "INSERT"
+            PostgresAction.Update::class -> "UPDATE"
+            PostgresAction.Delete::class -> "DELETE"
+            PostgresAction.Select::class -> "SELECT"
+            PostgresAction::class -> "*"
+            else -> error("Unknown event type $action")
+        }
+        val postgrestBuilder = PostgresChangeFilter(event, schema).apply(filter)
+        val config = postgrestBuilder.buildConfig()
+        addPostgresChange(config)
+        return callbackFlow {
+            val callback: (PostgresAction) -> Unit = {
+                if (action.isInstance(it)) {
+                    trySend(it as T)
+                }
+            }
+
+            val id = callbackManager.addPostgresCallback(config, callback)
+            awaitClose {
+                callbackManager.removeCallbackById(id)
+                removePostgresChange(config)
+            }
+        }
+    }
+
+    override fun <T : Any> RealtimeChannel.broadcastFlowInternal(type: KType, event: String): Flow<T> = callbackFlow {
+        val id = callbackManager.addBroadcastCallback(event) {
+            val decodedValue = try {
+                supabaseClient.realtime.serializer.decode<T>(type, it.toString())
+            } catch(e: Exception) {
+                Realtime.logger.e(e) { "Couldn't decode $it as $type. The corresponding handler wasn't called" }
+                null
+            }
+            decodedValue?.let { value -> trySend(value) }
+        }
+        awaitClose { callbackManager.removeCallbackById(id) }
+    }
+
+    override fun presenceChangeFlow(): Flow<PresenceAction> = callbackFlow {
+        val callback: (PresenceAction) -> Unit = { action ->
+            trySend(action)
+        }
+        val id = callbackManager.addPresenceCallback(callback)
+        awaitClose { callbackManager.removeCallbackById(id) }
     }
 
 }
