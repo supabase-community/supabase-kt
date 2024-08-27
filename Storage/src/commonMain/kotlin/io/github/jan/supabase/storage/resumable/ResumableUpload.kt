@@ -71,6 +71,7 @@ sealed interface ResumableUpload {
 
 }
 
+@Suppress("LongParameterList") //TODO: refactor
 internal class ResumableUploadImpl(
     override val fingerprint: Fingerprint,
     private val path: String,

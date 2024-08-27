@@ -17,7 +17,6 @@ import io.github.jan.supabase.realtime.RealtimeMessage
 import io.github.jan.supabase.realtime.broadcastFlow
 import io.github.jan.supabase.realtime.channel
 import io.github.jan.supabase.realtime.postgresChangeFlow
-import io.github.jan.supabase.realtime.presenceChangeFlow
 import io.github.jan.supabase.realtime.realtime
 import io.github.jan.supabase.testing.assertPathIs
 import io.github.jan.supabase.testing.pathAfterVersion

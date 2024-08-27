@@ -1,11 +1,22 @@
 import io.github.jan.supabase.realtime.RealtimeChannel
 import io.github.jan.supabase.realtime.RealtimeMessage
+import io.github.jan.supabase.realtime.event.RBroadcastEvent
+import io.github.jan.supabase.realtime.event.RCloseEvent
+import io.github.jan.supabase.realtime.event.RErrorEvent
+import io.github.jan.supabase.realtime.event.RPostgresChangesEvent
+import io.github.jan.supabase.realtime.event.RPostgresServerChangesEvent
+import io.github.jan.supabase.realtime.event.RPresenceDiffEvent
+import io.github.jan.supabase.realtime.event.RPresenceStateEvent
+import io.github.jan.supabase.realtime.event.RSystemEvent
+import io.github.jan.supabase.realtime.event.RSystemReplyEvent
+import io.github.jan.supabase.realtime.event.RTokenExpiredEvent
+import io.github.jan.supabase.realtime.event.RealtimeEvent
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
-class RealtimeMessageEventTypeTest {
+class RealtimeEventTest {
 
     @Test
     fun testSystemType() {
@@ -17,7 +28,7 @@ class RealtimeMessageEventTypeTest {
             },
             ref = ""
         )
-        assertEquals(RealtimeMessage.EventType.SYSTEM, message.eventType)
+        assertEquals(RSystemEvent, RealtimeEvent.resolveEvent(message))
     }
 
     @Test
@@ -30,7 +41,7 @@ class RealtimeMessageEventTypeTest {
             },
             ref = ""
         )
-        assertEquals(RealtimeMessage.EventType.SYSTEM_REPLY, message.eventType)
+        assertEquals(RSystemReplyEvent, RealtimeEvent.resolveEvent(message))
     }
 
     @Test
@@ -45,7 +56,7 @@ class RealtimeMessageEventTypeTest {
             },
             ref = ""
         )
-        assertEquals(RealtimeMessage.EventType.POSTGRES_SERVER_CHANGES, message.eventType)
+        assertEquals(RPostgresServerChangesEvent, RealtimeEvent.resolveEvent(message))
     }
 
     @Test
@@ -58,7 +69,7 @@ class RealtimeMessageEventTypeTest {
             },
             ref = ""
         )
-        assertEquals(RealtimeMessage.EventType.POSTGRES_CHANGES, message.eventType)
+        assertEquals(RPostgresChangesEvent, RealtimeEvent.resolveEvent(message))
     }
 
     @Test
@@ -71,7 +82,7 @@ class RealtimeMessageEventTypeTest {
             },
             ref = ""
         )
-        assertEquals(RealtimeMessage.EventType.BROADCAST, message.eventType)
+        assertEquals(RBroadcastEvent, RealtimeEvent.resolveEvent(message))
     }
 
     @Test
@@ -84,7 +95,7 @@ class RealtimeMessageEventTypeTest {
             },
             ref = ""
         )
-        assertEquals(RealtimeMessage.EventType.CLOSE, message.eventType)
+        assertEquals(RCloseEvent, RealtimeEvent.resolveEvent(message))
     }
 
     @Test
@@ -97,7 +108,7 @@ class RealtimeMessageEventTypeTest {
             },
             ref = ""
         )
-        assertEquals(RealtimeMessage.EventType.ERROR, message.eventType)
+        assertEquals(RErrorEvent, RealtimeEvent.resolveEvent(message))
     }
 
     @Test
@@ -110,7 +121,7 @@ class RealtimeMessageEventTypeTest {
             },
             ref = ""
         )
-        assertEquals(RealtimeMessage.EventType.PRESENCE_DIFF, message.eventType)
+        assertEquals(RPresenceDiffEvent, RealtimeEvent.resolveEvent(message))
     }
 
     @Test
@@ -123,7 +134,7 @@ class RealtimeMessageEventTypeTest {
             },
             ref = ""
         )
-        assertEquals(RealtimeMessage.EventType.PRESENCE_STATE, message.eventType)
+        assertEquals(RPresenceStateEvent, RealtimeEvent.resolveEvent(message))
     }
 
     @Test
@@ -136,7 +147,7 @@ class RealtimeMessageEventTypeTest {
             },
             ref = ""
         )
-        assertEquals(RealtimeMessage.EventType.TOKEN_EXPIRED, message.eventType)
+        assertEquals(RTokenExpiredEvent, RealtimeEvent.resolveEvent(message))
     }
 
 }

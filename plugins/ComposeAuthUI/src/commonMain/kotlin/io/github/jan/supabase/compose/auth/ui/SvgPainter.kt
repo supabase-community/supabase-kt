@@ -31,6 +31,7 @@ expect fun svgPainter(bytes: ByteArray, density: Density): Painter
 
 @SupabaseInternal
 @Composable
+@Suppress("CyclomaticComplexMethod")
 fun providerPainter(provider: OAuthProvider, density: Density): Painter? {
     val painter by produceState<Painter?>(null) {
         val data = when(provider) {

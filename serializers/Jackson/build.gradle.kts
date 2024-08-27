@@ -12,10 +12,8 @@ repositories {
 @OptIn(org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi::class)
 kotlin {
     defaultConfig()
-    jvm()
-    androidTarget {
-        publishLibraryVariants("release", "debug")
-    }
+    configuredAndroidTarget()
+    configuredJvmTarget()
     sourceSets {
         val commonMain by getting {
             dependencies {
