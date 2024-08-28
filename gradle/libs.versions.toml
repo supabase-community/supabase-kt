@@ -1,9 +1,9 @@
 [versions]
-accompanist-permissions = "0.35.1-alpha"
-kotlin = "2.0.10"
+kotlin = "2.0.20"
+accompanist-permissions = "0.35.2-beta"
 ktor = "2.3.12"
 dokka = "1.9.20"
-kotlinx-datetime = "0.6.0"
+kotlinx-datetime = "0.6.1"
 kermit = "2.0.4"
 atomicfu = "0.25.0"
 coroutines = "1.8.1"
@@ -14,7 +14,7 @@ multiplatform-settings = "1.1.1"
 complete-kotlin = "1.1.0"
 agp = "8.3.2"
 maven-publish = "0.29.0"
-apollo-kotlin = "3.8.5"
+apollo-kotlin = "4.0.0"
 korlibs = "4.0.10"
 detekt = "1.23.6"
 moshi = "1.15.1"
@@ -31,7 +31,7 @@ koin = "3.5.6"
 androidx-core = "1.13.1"
 androidx-compat = "1.7.0"
 androidx-lifecycle = "2.8.4"
-filekit = "0.7.0"
+filekit = "0.8.1"
 
 [plugins]
 kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
@@ -93,7 +93,7 @@ multiplatform-settings-no-arg = { module = "com.russhwolf:multiplatform-settings
 multiplatform-settings-coroutines = { module = "com.russhwolf:multiplatform-settings-coroutines", version.ref = "multiplatform-settings" }
 multiplatform-settings-test = { module = "com.russhwolf:multiplatform-settings-test", version.ref = "multiplatform-settings" }
 
-apollo-kotlin = { module = "com.apollographql.apollo3:apollo-runtime", version.ref = "apollo-kotlin" }
+apollo-kotlin = { module = "com.apollographql.apollo:apollo-runtime", version.ref = "apollo-kotlin" }
 
 krypto = { module = "com.soywiz.korlibs.krypto:krypto", version.ref = "korlibs" }
 okio = { module = "com.squareup.okio:okio", version.ref = "okio" }

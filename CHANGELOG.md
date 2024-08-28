@@ -1,5 +1,70 @@
 # Changelog
 
+## 2.6.0 - August 16, 2024
+
+### Core
+
+- Update Kotlin to `2.0.10`
+
+### Postgrest
+
+- Expose `headers` and `params` in `PostgrestRequestBuilder` by @jan-tennert in #689
+
+You can now set custom headers & url parameters while making a postgrest request
+
+### Auth
+
+- **Add support for third-party auth by @jan-tennert in #688**
+  
+  You can now use third-party auth providers like Firebase Auth instead of Supabase Auth by specifying a `AccessTokenProvider` in the `SupabaseClientBuilder`:
+    ```kotlin
+    val supabase = createSupabaseClient(supabaseUrl, supabaseKey) {
+        accessToken = {
+              //fetch the third party token
+             "my-token"
+        }
+    }
+    ```
+  This will be used for the `Authorization` header and other modules like Realtime and Storage integrations!
+  **Note:** The `Auth` plugin cannot be used in combination and will throw an exception if used when setting `accessToken`.
+- **Changes to Multi-Factor-Authentication by @jan-tennert in #681**
+  - Refactor the syntax for enrolling MFA factors and add support for the Phone factor type:
+    ```kotlin
+    //Enrolling a phone factor
+    val factor = client.auth.mfa.enroll(FactorType.Phone, friendlyName) {
+        phone = "+123456789"
+    }
+    
+    //Enrolling a TOTP factor
+    val factor = client.auth.mfa.enroll(FactorType.TOTP, friendlyName) {
+        issuer = "Issuer"
+    }
+    ```
+  - Add a `channel` parameter to `MfaApi#createChallenge` to allow sending phone MFA messages to either `SMS` or `WHATSAPP`.
+  - Deprecate `MfaApi#loggedInUsingMfa` and `MfaApi#isMfaEnabled` & their flow variants in favor of `MfaApi#status` and `MfaApi#statusFlow`:
+    ```kotlin
+    val (enabled, active) = client.auth.mfa.status
+    
+    //Flow variant
+    client.auth.mfa.statusFlow.collect { (enabled, active) ->
+        processChange(enabled, active)
+    }
+    ```
+- Add `SlackOIDC` `OAuthProvider` by @jan-tennert in #688
+
+### Realtime
+
+- Remove client-side rate-limiting in #678 by @jan-tennert 
+- Fix broadcasting to a private channel via the HTTP API in #673 by @jan-tennert 
+- Fix callbacks not getting removed correctly in the `CallbackManager` in #673 by @jan-tennert 
+- Change internal realtime implementation to be more robust and testable in #673 by @jan-tennert 
+  - Add `Realtime.Config#websocketFactory`: This is highly internal and should be only modified if you know what you are doing
+
+### Storage
+
+- The `StorageApi#authenticatedRequest` method is now suspending
+- All uploading methods will now return a `FileUploadResponse` instead of a `String`, which includes the actual path and some other properties.
+
 ## 2.5.4 - July 27, 2024
 
 ### Realtime

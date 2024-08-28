@@ -30,7 +30,7 @@ internal fun <Data> List<PrimaryKey<Data>>.producer(data: Data): String =
 /**
  * Listens for presence changes and caches the presences based on their keys. This function automatically handles joins and leaves.
  *
- * If you want more control, use the [presenceChangeFlow] function.
+ * If you want more control, use the [RealtimeChannel.presenceChangeFlow] function.
  * @return a [Flow] of the current presences in a list. This list is updated and emitted whenever a presence joins or leaves.
  */
 inline fun <reified Data> RealtimeChannel.presenceDataFlow(): Flow<List<Data>> {
