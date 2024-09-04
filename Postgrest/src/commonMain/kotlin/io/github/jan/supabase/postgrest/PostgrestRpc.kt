@@ -56,7 +56,8 @@ suspend inline fun <reified T : Any> Postgrest.rpc(
         method = method.httpMethod,
         count = requestBuilder.count,
         urlParams = urlParams,
-        body = encodedParameters
+        body = encodedParameters,
+        headers = requestBuilder.headers
     )
     return RestRequestExecutor.execute(postgrest = this, path = "rpc/$function", request = rpcRequest)
 }
@@ -78,7 +79,8 @@ suspend inline fun Postgrest.rpc(
     val rpcRequest = RpcRequest(
         method = method.httpMethod,
         count = requestBuilder.count,
-        urlParams = requestBuilder.params.mapToFirstValue()
+        urlParams = requestBuilder.params.mapToFirstValue(),
+        headers = requestBuilder.headers
     )
     return RestRequestExecutor.execute(postgrest = this, path = "rpc/$function", request = rpcRequest)
 }
