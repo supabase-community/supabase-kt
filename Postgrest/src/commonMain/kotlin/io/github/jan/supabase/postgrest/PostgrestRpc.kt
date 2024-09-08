@@ -57,7 +57,8 @@ suspend inline fun <reified T : Any> Postgrest.rpc(
         count = requestBuilder.count,
         urlParams = urlParams,
         body = encodedParameters,
-        schema = requestBuilder.schema
+        schema = requestBuilder.schema,
+        headers = requestBuilder.headers.build()
     )
     return RestRequestExecutor.execute(postgrest = this, path = "rpc/$function", request = rpcRequest)
 }
@@ -78,7 +79,8 @@ suspend inline fun Postgrest.rpc(
         method = requestBuilder.method.httpMethod,
         count = requestBuilder.count,
         urlParams = requestBuilder.params.mapToFirstValue(),
-        schema = requestBuilder.schema
+        schema = requestBuilder.schema,
+        headers = requestBuilder.headers.build()
     )
     return RestRequestExecutor.execute(postgrest = this, path = "rpc/$function", request = rpcRequest)
 }
