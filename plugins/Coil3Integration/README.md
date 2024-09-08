@@ -3,6 +3,8 @@
 Extends supabase-kt with a Coil3 integration for image loading.
 **Requires supabase-kt `2.7.0` or higher.**
 
+Current supported Coil3 version: `3.0.0-alpha10`
+
 Supported targets:
 
 | Target | **JVM** | **Android** | **JS** | **iOS** | **tvOS** | **watchOS** | **macOS** | **Windows** | **Linux** |
