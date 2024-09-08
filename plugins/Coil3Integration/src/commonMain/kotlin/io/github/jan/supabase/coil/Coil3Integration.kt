@@ -16,21 +16,21 @@ import io.github.jan.supabase.storage.storage
 /**
  * A plugin that implements [Fetcher.Factory] to support using [StorageItem] as data when creating a [ImageRequest] or using it as a model in Compose Multiplatform.
  */
-interface CoilIntegration: SupabasePlugin<CoilIntegration.Config>, Fetcher.Factory<StorageItem> {
+interface Coil3Integration: SupabasePlugin<Coil3Integration.Config>, Fetcher.Factory<StorageItem> {
 
     /**
      * The configuration for the coil integration.
      */
     class Config
 
-    companion object : SupabasePluginProvider<Config, CoilIntegration> {
+    companion object : SupabasePluginProvider<Config, Coil3Integration> {
 
-        override val key = "coil"
+        override val key = "coil3"
 
-        override val logger: SupabaseLogger = SupabaseClient.createLogger("Supabase-CoilIntegration")
+        override val logger: SupabaseLogger = SupabaseClient.createLogger("Supabase-Coil3Integration")
 
-        override fun create(supabaseClient: SupabaseClient, config: Config): CoilIntegration {
-            return CoilIntegrationImpl(supabaseClient, config)
+        override fun create(supabaseClient: SupabaseClient, config: Config): Coil3Integration {
+            return Coil3IntegrationImpl(supabaseClient, config)
         }
 
         override fun createConfig(init: Config.() -> Unit): Config {
@@ -41,21 +41,21 @@ interface CoilIntegration: SupabasePlugin<CoilIntegration.Config>, Fetcher.Facto
 
 }
 
-internal class CoilIntegrationImpl(
+internal class Coil3IntegrationImpl(
     override val supabaseClient: SupabaseClient,
-    override val config: CoilIntegration.Config
-) : CoilIntegration {
+    override val config: Coil3Integration.Config
+) : Coil3Integration {
 
     override fun create(data: StorageItem, options: Options, imageLoader: ImageLoader): Fetcher {
-        CoilIntegration.logger.d { "Creating Storage Fetcher" }
+        Coil3Integration.logger.d { "Creating Storage Fetcher" }
         return SupabaseStorageFetcher(supabaseClient.storage, data, options, imageLoader)
     }
 
 }
 
 /**
- * With the [CoilIntegration] plugin installed, you can use this property to access the coil fetcher factory.
+ * With the [Coil3Integration] plugin installed, you can use this property to access the coil fetcher factory.
  */
 @SupabaseExperimental
-val SupabaseClient.coil: CoilIntegration
-    get() = pluginManager.getPlugin(CoilIntegration)
+val SupabaseClient.coil3: Coil3Integration
+    get() = pluginManager.getPlugin(Coil3Integration)

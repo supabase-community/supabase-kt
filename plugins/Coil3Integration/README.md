@@ -35,7 +35,7 @@ Newest version: [![](https://img.shields.io/github/release/supabase-community/su
 
 ```kotlin
 dependencies {
-    implementation("io.github.jan-tennert.supabase:coil-integration:VERSION")
+    implementation("io.github.jan-tennert.supabase:coil3-integration:VERSION")
 }
 ```
 
@@ -49,7 +49,7 @@ val client = createSupabaseClient(
     install(Storage) {
         //your config
     }
-    install(CoilIntegration)
+    install(Coil3Integration)
 }
 ```
 
@@ -64,7 +64,7 @@ Create a new ImageLoader with the Supabase Fetcher and a [network fetcher](https
 ```kotlin
 ImageLoader.Builder(context)
     .components {
-        add(supabaseClient.coil)
+        add(supabaseClient.coil3)
         //You also need the add the network fetcher factory if you don't have it already
         //Depending on the network artifact you added, this will be different
         add(KtorNetworkFetcherFactory())
@@ -78,7 +78,7 @@ For Compose Multiplatform Applications using the `coil-compose` dependency, you 
 setSingletonImageLoaderFactory { platformContext ->
     ImageLoader.Builder(platformContext)
         .components {
-            add(supabaseClient.coil)
+            add(supabaseClient.coil3)
             //Your network fetcher factory
             add(KtorNetworkFetcherFactory())
         }
