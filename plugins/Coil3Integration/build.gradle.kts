@@ -3,7 +3,7 @@ plugins {
     id(libs.plugins.android.library.get().pluginId)
 }
 
-description = "Extends supabase-kt with a Coil integration for easy image loading"
+description = "Extends supabase-kt with a Coil3 integration for easy image loading"
 
 repositories {
     mavenCentral()
