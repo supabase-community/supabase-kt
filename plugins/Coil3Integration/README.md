@@ -6,7 +6,7 @@ Supported targets:
 
 | Target | **JVM** | **Android** | **JS** | **iOS** | **tvOS** | **watchOS** | **macOS** | **Windows** | **Linux** |
 |--------|---------|-------------|--------|---------|----------|-------------|-----------|-------------|-----------|
-| Status | ❌       | ✅           | ❌      | ❌       | ❌        | ❌           | ❌         | ❌           | ❌         |
+| Status | ✅       | ✅           | ✅      | ✅       | ❌        | ❌           | ❌         | ❌           | ❌         |
 
 <details>
 
@@ -52,21 +52,41 @@ val client = createSupabaseClient(
 }
 ```
 
+If you don't have a coil-network artifact in your dependencies, you will need to add it. See the [Coil documentation](https://coil-kt.github.io/coil/upgrading_to_coil3/#network-images) for more information.
+
 # Usage
 
 ### Add Supabase Fetcher to Coil
 
-Create a new ImageLoader with the Supabase Fetcher. See the [Coil documentation](https://coil-kt.github.io/coil/image_pipeline/) for more information.
+Create a new ImageLoader with the Supabase Fetcher and a [network fetcher](https://coil-kt.github.io/coil/upgrading_to_coil3/#network-images).
 
 ```kotlin
 ImageLoader.Builder(context)
     .components {
         add(supabaseClient.coil)
+        //You also need the add the network fetcher factory if you don't have it already
+        //Depending on the network artifact you added, this will be different
+        add(KtorNetworkFetcherFactory())
     }
     .build()
 ```
 
-You can also replace the default Coil Image Loader in your application. See the [Coil documentation](https://coil-kt.github.io/coil/getting_started/#image-loaders) for more information.
+You can also replace the default Coil Image Loader in your application. 
+For Compose Multiplatform Applications using the `coil-compose` dependency, you can use the `setSingletonImageLoaderFactory` composable function:
+```kotlin
+setSingletonImageLoaderFactory { platformContext ->
+    ImageLoader.Builder(platformContext)
+        .components {
+            add(supabaseClient.coil)
+            //Your network fetcher factory
+            add(KtorNetworkFetcherFactory())
+        }
+        .build()
+}
+```
+You call this composable before any `Image` composable is used. Presumably in your `Root` composable.
+
+See the [Coil documentation](https://coil-kt.github.io/coil/getting_started/#image-loaders) for more information.
 
 ### Display images from Supabase Storage
 
@@ -78,7 +98,7 @@ val request = ImageRequest.Builder(context)
     .build()
 ```
 
-Or if you are using [Jetpack Compose](https://coil-kt.github.io/coil/compose/):
+Or if you are using [Compose Multiplatform](https://coil-kt.github.io/coil/compose/):
 
 ```kotlin
 AsyncImage(

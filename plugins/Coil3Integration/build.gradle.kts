@@ -13,12 +13,12 @@ repositories {
 @OptIn(org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi::class)
 kotlin {
     defaultConfig()
-    configuredAndroidTarget()
+    composeTargets()
     sourceSets {
         val commonMain by getting {
             dependencies {
                 api(project(":storage-kt"))
-                api(libs.coil2)
+                api(libs.bundles.coil3)
             }
         }
     }
