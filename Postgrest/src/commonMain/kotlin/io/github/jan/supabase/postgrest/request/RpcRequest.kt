@@ -1,7 +1,8 @@
 package io.github.jan.supabase.postgrest.request
 
 import io.github.jan.supabase.postgrest.query.Count
-import io.ktor.http.*
+import io.ktor.http.Headers
+import io.ktor.http.HttpMethod
 import kotlinx.serialization.json.JsonElement
 
 @PublishedApi
