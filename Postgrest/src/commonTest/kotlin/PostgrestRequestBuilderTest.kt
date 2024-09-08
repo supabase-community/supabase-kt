@@ -1,8 +1,7 @@
 import io.github.jan.supabase.postgrest.query.Count
 import io.github.jan.supabase.postgrest.query.Order
 import io.github.jan.supabase.postgrest.query.Returning
-import io.github.jan.supabase.postgrest.query.postgrestRequest
-import io.ktor.http.HttpHeaders
+import io.ktor.http.*
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
