@@ -1,6 +1,7 @@
 # Supabase-kt Coil Integration
 
-Extends supabase-kt with a Coil integration for image loading.
+Extends supabase-kt with a Coil3 integration for image loading.
+**Requires supabase-kt `2.7.0` or higher.**
 
 Supported targets:
 
