@@ -42,7 +42,7 @@ enum class RpcMethod(val httpMethod: HttpMethod) {
 suspend inline fun <reified T : Any> Postgrest.rpc(
     function: String,
     parameters: T,
-    request: PostgrestRequestBuilder.() -> Unit = {},
+    request: RpcPostgrestRequestBuilder.() -> Unit = {},
 ): PostgrestResult {
     val encodedParameters = if (parameters is JsonElement) parameters else serializer.encodeToJsonElement(parameters)
     val requestBuilder = RpcPostgrestRequestBuilder(config.defaultSchema, config.propertyConversionMethod).apply(request)
