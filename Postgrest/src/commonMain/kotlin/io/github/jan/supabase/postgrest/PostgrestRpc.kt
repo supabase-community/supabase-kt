@@ -2,8 +2,10 @@
 package io.github.jan.supabase.postgrest
 
 import io.github.jan.supabase.encodeToJsonElement
+import io.github.jan.supabase.exceptions.RestException
 import io.github.jan.supabase.postgrest.executor.RestRequestExecutor
 import io.github.jan.supabase.postgrest.query.PostgrestRequestBuilder
+import io.github.jan.supabase.postgrest.query.request.RpcPostgrestRequestBuilder
 import io.github.jan.supabase.postgrest.request.RpcRequest
 import io.github.jan.supabase.postgrest.result.PostgrestResult
 import io.ktor.http.HttpMethod
@@ -34,29 +36,29 @@ enum class RpcMethod(val httpMethod: HttpMethod) {
  *
  * @param function The name of the function
  * @param parameters The parameters for the function
- * @param method The HTTP method to use. Default is POST
  * @param request Filter the result
  * @throws RestException or one of its subclasses if the request failed
  */
 suspend inline fun <reified T : Any> Postgrest.rpc(
     function: String,
     parameters: T,
-    method: RpcMethod = RpcMethod.POST,
-    request: PostgrestRequestBuilder.() -> Unit = {},
+    request: RpcPostgrestRequestBuilder.() -> Unit = {},
 ): PostgrestResult {
     val encodedParameters = if (parameters is JsonElement) parameters else serializer.encodeToJsonElement(parameters)
-    val requestBuilder = PostgrestRequestBuilder(config.propertyConversionMethod).apply(request)
+    val requestBuilder = RpcPostgrestRequestBuilder(config.defaultSchema, config.propertyConversionMethod).apply(request)
     val urlParams = buildMap {
         putAll(requestBuilder.params.mapToFirstValue())
-        if(method != RpcMethod.POST) {
+        if(requestBuilder.method != RpcMethod.POST) {
             putAll(encodedParameters.jsonObject.mapValues { it.value.toString() })
         }
     }
     val rpcRequest = RpcRequest(
-        method = method.httpMethod,
+        method = requestBuilder.method.httpMethod,
         count = requestBuilder.count,
         urlParams = urlParams,
-        body = encodedParameters
+        body = encodedParameters,
+        schema = requestBuilder.schema,
+        headers = requestBuilder.headers.build()
     )
     return RestRequestExecutor.execute(postgrest = this, path = "rpc/$function", request = rpcRequest)
 }
@@ -65,20 +67,20 @@ suspend inline fun <reified T : Any> Postgrest.rpc(
  * Executes a database function
  *
  * @param function The name of the function
- * @param method The HTTP method to use. Default is POST
  * @param request Filter the result
  * @throws RestException or one of its subclasses if the request failed
  */
 suspend inline fun Postgrest.rpc(
     function: String,
-    method: RpcMethod = RpcMethod.POST,
-    request: PostgrestRequestBuilder.() -> Unit = {}
+    request: RpcPostgrestRequestBuilder.() -> Unit = {}
 ): PostgrestResult {
-    val requestBuilder = PostgrestRequestBuilder(config.propertyConversionMethod).apply(request)
+    val requestBuilder = RpcPostgrestRequestBuilder(config.defaultSchema, config.propertyConversionMethod).apply(request)
     val rpcRequest = RpcRequest(
-        method = method.httpMethod,
+        method = requestBuilder.method.httpMethod,
         count = requestBuilder.count,
-        urlParams = requestBuilder.params.mapToFirstValue()
+        urlParams = requestBuilder.params.mapToFirstValue(),
+        schema = requestBuilder.schema,
+        headers = requestBuilder.headers.build()
     )
     return RestRequestExecutor.execute(postgrest = this, path = "rpc/$function", request = rpcRequest)
 }

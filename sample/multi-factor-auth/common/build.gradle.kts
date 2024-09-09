@@ -51,13 +51,12 @@ kotlin {
                 api(libs.koin.android)
                 api(libs.androidx.lifecycle.viewmodel.ktx)
                 api(libs.androidx.lifecycle.viewmodel.compose)
-                api(libs.coil.svg)
-                api(libs.coil.compose)
-                api(libs.coil)
+                api(libs.coil2.svg)
+                api(libs.coil2.compose)
+                api(libs.coil2)
             }
         }
         val desktopMain by getting {
-            dependsOn(nonJsMain)
             dependencies {
                 api(compose.preview)
             }

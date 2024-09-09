@@ -34,7 +34,9 @@ For information about supported Kotlin targets, see the corresponding module REA
 
 ### Add one or more modules to your project
 
-**Available modules**: `gotrue-kt`, `postgrest-kt`, `functions-kt`, `storage-kt`, `realtime-kt`, `apollo-graphql`, `compose-auth`, `compose-auth-ui`, `coil-integration`, `imageloader-integration`
+**Available modules**: `gotrue-kt`, `postgrest-kt`, `functions-kt`, 
+`storage-kt`, `realtime-kt`, `apollo-graphql`, `compose-auth`, 
+`compose-auth-ui`, `coil-integration`, `coil3-integration`, `imageloader-integration`
 
 ```kotlin
 dependencies {
@@ -109,7 +111,8 @@ val iosMain by getting {
 - [Apollo GraphQL integration](/plugins/ApolloGraphQL) - Creates an [Apollo GraphQL Client](https://github.com/apollographql/apollo-kotlin) for interacting with the Supabase API.
 - [Compose Auth](/plugins/ComposeAuth) - Provides easy Native Google & Apple Auth for Compose Multiplatform targets.
 - [Compose Auth UI](/plugins/ComposeAuthUI) - Provides UI Components for Compose Multiplatform.
-- [Coil Integration](/plugins/CoilIntegration) - Provides a [Coil](https://github.com/coil-kt/coil) Integration for displaying images stored in Supabase Storage.
+- [Coil Integration](/plugins/CoilIntegration) - Provides a [Coil2](https://github.com/coil-kt/coil) Integration for displaying images stored in Supabase Storage. Only supports Android.
+- [Coil3 Integration](/plugins/Coil3Integration) - Provides a [Coil3](https://github.com/coil-kt/coil) Integration for displaying images stored in Supabase Storage. Supports all Compose Multiplatform targets.
 - [Compose-ImageLoader Integration](/plugins/ImageLoaderIntegration) - Provides a [Compose ImageLoader](https://github.com/qdsfdhvh/compose-imageloader) Integration for displaying images stored in Supabase Storage.
 
 ### Miscellaneous

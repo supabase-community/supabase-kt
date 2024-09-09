@@ -2,11 +2,9 @@ package io.github.jan.supabase.gotrue
 
 import com.russhwolf.settings.ExperimentalSettingsApi
 import com.russhwolf.settings.Settings
+import com.russhwolf.settings.coroutines.toSuspendSettings
 import io.github.jan.supabase.gotrue.user.UserSession
 import io.github.jan.supabase.logging.e
-import io.github.jan.supabase.supabaseJson
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonBuilder
@@ -22,6 +20,7 @@ private val settingsJson = Json {
  * @param key The key to use for saving the session.
  * @param json The [Json] instance to use for serialization. Defaults to [settingsJson]. **Important: [JsonBuilder.encodeDefaults] must be set to true.**
  */
+@OptIn(ExperimentalSettingsApi::class)
 class SettingsSessionManager(
     private val settings: Settings = createDefaultSettings(),
     private val key: String = SETTINGS_KEY,
@@ -44,18 +43,14 @@ class SettingsSessionManager(
         }
     }
 
-    @OptIn(ExperimentalSettingsApi::class)
+    private val suspendSettings = settings.toSuspendSettings()
+
     override suspend fun saveSession(session: UserSession) {
-        withContext(Dispatchers.Default) {
-            settings.putString(key, json.encodeToString(session))
-        }
+        suspendSettings.putString(key, json.encodeToString(session))
     }
 
-    @OptIn(ExperimentalSettingsApi::class)
     override suspend fun loadSession(): UserSession? {
-        val session = withContext(Dispatchers.Default) {
-            settings.getStringOrNull(key)
-        } ?: return null
+        val session = suspendSettings.getStringOrNull(key) ?: return null
         return try {
             json.decodeFromString(session)
         } catch(e: Exception) {
@@ -64,11 +59,8 @@ class SettingsSessionManager(
         }
     }
 
-    @OptIn(ExperimentalSettingsApi::class)
     override suspend fun deleteSession() {
-        withContext(Dispatchers.Default) {
-            settings.remove(key)
-        }
+        suspendSettings.remove(key)
     }
 
     companion object {

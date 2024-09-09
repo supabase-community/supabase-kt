@@ -19,6 +19,7 @@ class RpcRequestTest {
             count = Count.EXACT,
             body = JsonArray(listOf()),
             urlParams = mapOf("Key1" to "Value1"),
+            schema = "mySchema"
         )
 
         val count = (sut as RpcRequest).count
@@ -31,7 +32,7 @@ class RpcRequestTest {
                 "count=exact"
             ), sut.prefer
         )
-        assertEquals("", sut.schema)
+        assertEquals("mySchema", sut.schema)
         assertEquals(mapOf("Key1" to "Value1"), sut.urlParams)
         assertEquals(JsonArray(listOf()), sut.body)
     }
@@ -43,6 +44,7 @@ class RpcRequestTest {
             count = Count.EXACT,
             body = JsonArray(listOf()),
             urlParams = mapOf("Key1" to "Value1"),
+            schema = "mySchema"
         )
         val count = (sut as RpcRequest).count
         assertNotNull(count)
@@ -53,7 +55,7 @@ class RpcRequestTest {
                 "count=exact"
             ), sut.prefer
         )
-        assertEquals("", sut.schema)
+        assertEquals("mySchema", sut.schema)
         assertEquals(mapOf("Key1" to "Value1"), sut.urlParams)
         assertEquals(JsonArray(listOf()), sut.body)
     }
@@ -65,6 +67,7 @@ class RpcRequestTest {
             count = null,
             body = JsonArray(listOf()),
             urlParams = mapOf("Key1" to "Value1"),
+            schema = "mySchema"
         )
 
         val count = (sut as RpcRequest).count
@@ -74,7 +77,7 @@ class RpcRequestTest {
             listOf(
             ), sut.prefer
         )
-        assertEquals("", sut.schema)
+        assertEquals("mySchema", sut.schema)
         assertEquals(mapOf("Key1" to "Value1"), sut.urlParams)
         assertEquals(JsonArray(listOf()), sut.body)
     }
@@ -86,6 +89,7 @@ class RpcRequestTest {
             count = null,
             body = null,
             urlParams = mapOf("Key1" to "Value1"),
+            schema = "mySchema"
         )
 
         assertEquals("HEAD", sut.method.value)
@@ -93,7 +97,7 @@ class RpcRequestTest {
             listOf(
             ), sut.prefer
         )
-        assertEquals("", sut.schema)
+        assertEquals("mySchema", sut.schema)
         assertEquals(mapOf("Key1" to "Value1"), sut.urlParams)
         assertNull(sut.body)
     }
@@ -104,6 +108,7 @@ class RpcRequestTest {
             count = null,
             body = JsonArray(listOf()),
             urlParams = mapOf("Key1" to "Value1"),
+            schema = "mySchema"
         )
 
         assertEquals("POST", sut.method.value)
@@ -111,7 +116,7 @@ class RpcRequestTest {
             listOf(
             ), sut.prefer
         )
-        assertEquals("", sut.schema)
+        assertEquals("mySchema", sut.schema)
         assertEquals(mapOf("Key1" to "Value1"), sut.urlParams)
         assertEquals(JsonArray(listOf()), sut.body)
     }

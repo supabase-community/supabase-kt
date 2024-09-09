@@ -1,3 +1,4 @@
+@file:Suppress("UndocumentedPublicProperty")
 package io.github.jan.supabase
 
 /**

@@ -3,7 +3,7 @@ plugins {
     id(libs.plugins.android.library.get().pluginId)
 }
 
-description = "Extends supabase-kt with a Coil integration for easy image loading"
+description = "Extends supabase-kt with a Coil3 integration for easy image loading"
 
 repositories {
     mavenCentral()
@@ -13,12 +13,12 @@ repositories {
 @OptIn(org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi::class)
 kotlin {
     defaultConfig()
-    configuredAndroidTarget()
+    composeTargets()
     sourceSets {
         val commonMain by getting {
             dependencies {
                 api(project(":storage-kt"))
-                api(libs.coil2)
+                api(libs.bundles.coil3)
             }
         }
     }

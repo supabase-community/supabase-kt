@@ -15,7 +15,7 @@ import kotlin.js.JsName
  * A builder for Postgrest requests.
  */
 @PostgrestFilterDSL
-class PostgrestRequestBuilder(@PublishedApi internal val propertyConversionMethod: PropertyConversionMethod) {
+open class PostgrestRequestBuilder(@PublishedApi internal val propertyConversionMethod: PropertyConversionMethod) {
 
     /**
      * The [Count] algorithm to use to count rows in the table or view.
@@ -162,12 +162,4 @@ class PostgrestRequestBuilder(@PublishedApi internal val propertyConversionMetho
     }
 
 }
-
-@SupabaseInternal
-inline fun postgrestRequest(propertyConversionMethod: PropertyConversionMethod = PropertyConversionMethod.CAMEL_CASE_TO_SNAKE_CASE, block: PostgrestRequestBuilder.() -> Unit): PostgrestRequestBuilder {
-    val filter = PostgrestRequestBuilder(propertyConversionMethod)
-    filter.block()
-    return filter
-}
-
 

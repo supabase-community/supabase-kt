@@ -53,7 +53,6 @@ sealed interface Postgrest : MainPlugin<Postgrest.Config>, CustomSerializationPl
 
     /**
      * Creates a new [PostgrestQueryBuilder] for the given schema and table
-     * @param schema The schema to use for the requests
      * @param table The table to use for the requests
      */
     operator fun get(table: String): PostgrestQueryBuilder = from(table)

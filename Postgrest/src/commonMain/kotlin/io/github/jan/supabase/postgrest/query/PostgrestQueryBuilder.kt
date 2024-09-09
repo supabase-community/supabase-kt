@@ -8,6 +8,9 @@ import io.github.jan.supabase.gotrue.PostgrestFilterDSL
 import io.github.jan.supabase.postgrest.Postgrest
 import io.github.jan.supabase.postgrest.executor.RestRequestExecutor
 import io.github.jan.supabase.postgrest.mapToFirstValue
+import io.github.jan.supabase.postgrest.query.request.InsertPostgrestRequestBuilder
+import io.github.jan.supabase.postgrest.query.request.SelectPostgrestRequestBuilder
+import io.github.jan.supabase.postgrest.query.request.UpsertPostgrestRequestBuilder
 import io.github.jan.supabase.postgrest.request.DeleteRequest
 import io.github.jan.supabase.postgrest.request.InsertRequest
 import io.github.jan.supabase.postgrest.request.SelectRequest
@@ -30,8 +33,7 @@ class PostgrestQueryBuilder(
      * Executes vertical filtering with select on [table]
      *
      * @param columns The columns to retrieve, defaults to [Columns.ALL]. You can also use [Columns.list], [Columns.type] or [Columns.raw] to specify the columns
-     * @param head If true, no body will be returned. Useful when using count.
-     * @param request Additional filtering to apply to the query
+     * @param request Additional configurations for the request including filters
      * @return PostgrestResult which is either an error, an empty JsonArray or the data you requested as an JsonArray
      * @throws RestException or one of its subclasses if receiving an error response
      * @throws HttpRequestTimeoutException if the request timed out
@@ -39,14 +41,13 @@ class PostgrestQueryBuilder(
      */
     suspend inline fun select(
         columns: Columns = Columns.ALL,
-        head: Boolean = false,
-        request: @PostgrestFilterDSL PostgrestRequestBuilder.() -> Unit = {}
+        request: @PostgrestFilterDSL SelectPostgrestRequestBuilder.() -> Unit = {}
     ): PostgrestResult {
-        val requestBuilder = postgrestRequest(postgrest.config.propertyConversionMethod) {
+        val requestBuilder = SelectPostgrestRequestBuilder(postgrest.config.propertyConversionMethod).apply {
             request(); params["select"] = listOf(columns.value)
         }
         val selectRequest = SelectRequest(
-            head = head,
+            head = requestBuilder.head,
             count = requestBuilder.count,
             urlParams = requestBuilder.params.mapToFirstValue(),
             schema = schema,
@@ -57,38 +58,28 @@ class PostgrestQueryBuilder(
 
     /**
      * Perform an UPSERT on the table or view. Depending on the column(s) passed
-     * to [onConflict], [upsert] allows you to perform the equivalent of
+     * to [UpsertPostgrestRequestBuilder.onConflict], [upsert] allows you to perform the equivalent of
      * `[insert] if a row with the corresponding onConflict columns doesn't
      * exist, or if it does exist, perform an alternative action depending on
-     * [ignoreDuplicates].
+     * [UpsertPostgrestRequestBuilder.ignoreDuplicates].
      *
      * By default, upserted rows are not returned. To return it, call `[PostgrestRequestBuilder.select]`.
      *
      * @param values The values to insert, will automatically get serialized into json.
-     * @param request Additional filtering to apply to the query
-     * @param onConflict Comma-separated UNIQUE column(s) to specify how
-     *  duplicate rows are determined. Two rows are duplicates if all the
-     * `onConflict` columns are equal.
-     * @param defaultToNull Make missing fields default to `null`.
-     * Otherwise, use the default value for the column. This only applies when
-     * inserting new rows, not when merging with existing rows under
-     * @param ignoreDuplicates If `true`, duplicate rows are ignored. If `false`, duplicate rows are merged with existing rows.
+     * @param request Additional configurations for the request including filters
      * @throws RestException or one of its subclasses if receiving an error response
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
     suspend inline fun <reified T : Any> upsert(
         values: List<T>,
-        onConflict: String? = null,
-        defaultToNull: Boolean = true,
-        ignoreDuplicates: Boolean = false,
-        request: PostgrestRequestBuilder.() -> Unit = {}
+        request: UpsertPostgrestRequestBuilder.() -> Unit = {}
     ): PostgrestResult {
-        val requestBuilder = postgrestRequest(postgrest.config.propertyConversionMethod, request)
+        val requestBuilder = UpsertPostgrestRequestBuilder(postgrest.config.propertyConversionMethod).apply(request)
         val body = postgrest.serializer.encodeToJsonElement(values).jsonArray
         val columns = body.map { it.jsonObject.keys }.flatten().distinct()
         requestBuilder.params["columns"] = listOf(columns.joinToString(","))
-        onConflict?.let {
+        requestBuilder.onConflict?.let {
             requestBuilder.params["on_conflict"] = listOf(it)
         }
         val insertRequest = InsertRequest(
@@ -97,8 +88,8 @@ class PostgrestQueryBuilder(
             returning = requestBuilder.returning,
             count = requestBuilder.count,
             urlParams = requestBuilder.params.mapToFirstValue(),
-            defaultToNull = defaultToNull,
-            ignoreDuplicates = ignoreDuplicates,
+            defaultToNull = requestBuilder.defaultToNull,
+            ignoreDuplicates = requestBuilder.ignoreDuplicates,
             schema = schema,
             headers = requestBuilder.headers.build()
         )
@@ -107,52 +98,38 @@ class PostgrestQueryBuilder(
 
     /**
      * Perform an UPSERT on the table or view. Depending on the column(s) passed
-     * to [onConflict], [upsert] allows you to perform the equivalent of
+     * to [UpsertPostgrestRequestBuilder.onConflict], [upsert] allows you to perform the equivalent of
      * `[insert] if a row with the corresponding onConflict columns doesn't
      * exist, or if it does exist, perform an alternative action depending on
-     * [ignoreDuplicates].
+     * [UpsertPostgrestRequestBuilder.ignoreDuplicates].
      *
      * By default, upserted rows are not returned. To return it, call `[PostgrestRequestBuilder.select]`.
      *
      * @param value The value to insert, will automatically get serialized into json.
      * @param request Additional filtering to apply to the query
-     * @param onConflict Comma-separated UNIQUE column(s) to specify how
-     *  duplicate rows are determined. Two rows are duplicates if all the
-     * `onConflict` columns are equal.
-     * @param defaultToNull Make missing fields default to `null`.
-     * Otherwise, use the default value for the column. This only applies when
-     * inserting new rows, not when merging with existing rows under
-     * @param ignoreDuplicates If `true`, duplicate rows are ignored. If `false`, duplicate rows are merged with existing rows.
      * @throws RestException or one of its subclasses if receiving an error response
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
     suspend inline fun <reified T : Any> upsert(
         value: T,
-        onConflict: String? = null,
-        defaultToNull: Boolean = true,
-        ignoreDuplicates: Boolean = false,
-        request: PostgrestRequestBuilder.() -> Unit = {}
-    ): PostgrestResult = upsert(listOf(value), onConflict, defaultToNull, ignoreDuplicates, request)
+        request: UpsertPostgrestRequestBuilder.() -> Unit = {}
+    ): PostgrestResult = upsert(listOf(value), request)
 
     /**
      * Executes an insert operation on the [table]
      *
      * @param values The values to insert, will automatically get serialized into json.
      * @param request Additional filtering to apply to the query
-     * @param defaultToNull Make missing fields default to `null`.
-     * Otherwise, use the default value for the column. This only applies when
-     * inserting new rows, not when merging with existing rows under
      * @throws RestException or one of its subclasses if receiving an error response
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
     suspend inline fun <reified T : Any> insert(
         values: List<T>,
-        defaultToNull: Boolean = true,
-        request: PostgrestRequestBuilder.() -> Unit = {}
+        request: InsertPostgrestRequestBuilder.() -> Unit = {}
     ): PostgrestResult {
-        val requestBuilder = postgrestRequest(postgrest.config.propertyConversionMethod, request)
+        val requestBuilder = InsertPostgrestRequestBuilder(postgrest.config.propertyConversionMethod).apply(request)
         val body = postgrest.serializer.encodeToJsonElement(values).jsonArray
         val columns = body.map { it.jsonObject.keys }.flatten().distinct()
         requestBuilder.params["columns"] = listOf(columns.joinToString(","))
@@ -163,7 +140,7 @@ class PostgrestQueryBuilder(
             urlParams = requestBuilder.params.mapToFirstValue(),
             schema = schema,
             headers = requestBuilder.headers.build(),
-            defaultToNull = defaultToNull
+            defaultToNull = requestBuilder.defaultToNull
         )
         return RestRequestExecutor.execute(postgrest = postgrest, path = table, request = insertRequest)
     }
@@ -173,18 +150,14 @@ class PostgrestQueryBuilder(
      *
      * @param value The value to insert, will automatically get serialized into json.
      * @param request Additional filtering to apply to the query
-     * @param defaultToNull Make missing fields default to `null`.
-     * Otherwise, use the default value for the column. This only applies when
-     * inserting new rows, not when merging with existing rows under
      * @throws RestException or one of its subclasses if receiving an error response
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
     suspend inline fun <reified T : Any> insert(
         value: T,
-        defaultToNull: Boolean = true,
-        request: PostgrestRequestBuilder.() -> Unit = {}
-    ) = insert(listOf(value), defaultToNull, request)
+        request: InsertPostgrestRequestBuilder.() -> Unit = {}
+    ) = insert(listOf(value), request)
 
     /**
      * Executes an update operation on the [table].
@@ -201,7 +174,7 @@ class PostgrestQueryBuilder(
         crossinline update: PostgrestUpdate.() -> Unit = {},
         request: PostgrestRequestBuilder.() -> Unit = {}
     ): PostgrestResult {
-        val requestBuilder = postgrestRequest(postgrest.config.propertyConversionMethod, request)
+        val requestBuilder = PostgrestRequestBuilder(postgrest.config.propertyConversionMethod).apply(request)
         val updateRequest = UpdateRequest(
             body = buildPostgrestUpdate(postgrest.config.propertyConversionMethod, postgrest.serializer, update),
             returning = requestBuilder.returning,
@@ -228,7 +201,7 @@ class PostgrestQueryBuilder(
         value: T,
         request: PostgrestRequestBuilder.() -> Unit = {}
     ): PostgrestResult {
-        val requestBuilder = postgrestRequest(postgrest.config.propertyConversionMethod, request)
+        val requestBuilder = PostgrestRequestBuilder(postgrest.config.propertyConversionMethod).apply(request)
         val updateRequest = UpdateRequest(
             returning = requestBuilder.returning,
             count = requestBuilder.count,
@@ -253,7 +226,7 @@ class PostgrestQueryBuilder(
     suspend inline fun delete(
         request: PostgrestRequestBuilder.() -> Unit = {}
     ): PostgrestResult {
-        val requestBuilder = postgrestRequest(postgrest.config.propertyConversionMethod, request)
+        val requestBuilder = PostgrestRequestBuilder(postgrest.config.propertyConversionMethod).apply(request)
         val deleteRequest = DeleteRequest(
             returning = requestBuilder.returning,
             count = requestBuilder.count,

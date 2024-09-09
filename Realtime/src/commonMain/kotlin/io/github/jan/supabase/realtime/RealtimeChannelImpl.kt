@@ -160,6 +160,7 @@ internal class RealtimeChannelImpl(
         )
     }
 
+    @Suppress("UNCHECKED_CAST")
     override fun <T : PostgresAction> RealtimeChannel.postgresChangeFlowInternal(
         action: KClass<T>,
         schema: String,
