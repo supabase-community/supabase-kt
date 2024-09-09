@@ -54,7 +54,14 @@ sealed interface OtpType {
      * Phone OTP types
      */
     enum class Phone(override val type: String): OtpType {
+        /**
+         * OTP type for sms messages
+         */
         SMS("sms"),
+
+        /**
+         * OTP type for phone change flows
+         */
         PHONE_CHANGE("phone_change")
     }
 

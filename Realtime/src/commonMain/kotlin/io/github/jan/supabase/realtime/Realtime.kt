@@ -149,8 +149,19 @@ sealed interface Realtime : MainPlugin<Realtime.Config>, CustomSerializationPlug
      * The current status of the realtime connection
      */
     enum class Status {
+        /**
+         * [Realtime] is disconnected from Supabase Realtime
+         */
         DISCONNECTED,
+
+        /**
+         * [Realtime] is connecting to Supabase Realtime
+         */
         CONNECTING,
+
+        /**
+         * [Realtime] is connected to Supabase Realtime
+         */
         CONNECTED,
     }
 

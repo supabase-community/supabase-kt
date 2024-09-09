@@ -78,7 +78,7 @@ comments:
     excludes: ['**/test/**', '**/androidTest/**', '**/commonTest/**', '**/jvmTest/**', '**/androidUnitTest/**', '**/androidInstrumentedTest/**', '**/jsTest/**', '**/iosTest/**', '**/mingwX64Test/**', '**/macosTest/**', '**/appleTest/**', '**/linuxTest/**']
     searchInNestedClass: true
     searchInInnerClass: true
-    searchInInnerObject: true
+    searchInInnerObject: false
     searchInInnerInterface: true
     searchInProtectedClass: false
     ignoreAnnotated:

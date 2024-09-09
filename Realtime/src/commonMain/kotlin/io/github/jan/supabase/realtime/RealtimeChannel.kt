@@ -114,12 +114,30 @@ sealed interface RealtimeChannel {
      * Represents the status of a channel
      */
     enum class Status {
+        /**
+         * The [RealtimeChannel] is currently unsubscribed
+         */
         UNSUBSCRIBED,
+
+        /**
+         * The [RealtimeChannel] is currently in the process of subscribing
+         */
         SUBSCRIBING,
+
+        /**
+         * The [RealtimeChannel] is subscribed
+         */
         SUBSCRIBED,
+
+        /**
+         * The [RealtimeChannel] is in the process of unsubscribing
+         */
         UNSUBSCRIBING,
     }
 
+    /**
+     * @see RealtimeChannel
+     */
     @Suppress("UndocumentedPublicProperty")
     companion object {
         const val CHANNEL_EVENT_JOIN = "phx_join"
