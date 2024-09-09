@@ -57,7 +57,6 @@ kotlin {
             }
         }
         val desktopMain by getting {
-            dependsOn(nonJsMain)
             dependencies {
                 api(compose.preview)
             }
