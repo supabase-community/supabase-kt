@@ -5,5 +5,13 @@ package io.github.jan.supabase.postgrest.query
  * @param value The value to be used in the query
  */
 enum class Order(val value: String) {
-    ASCENDING("asc"), DESCENDING("desc");
+    /**
+     * Order the data ascending
+     */
+    ASCENDING("asc"),
+
+    /**
+     * Order the data descending
+     */
+    DESCENDING("desc");
 }
