@@ -6,7 +6,7 @@ For information about supported Kotlin targets, see the corresponding module REA
 
 [Migrating from version 1.4.X to 2.0.0](/MIGRATION.md)
 
-*Note: The `WASM-JS` target for supported modules only available for version 2.7.0 and above*
+*Note: The `WASM-JS` target for supported modules is only available for version 2.7.0 and above*
 
 [![](https://img.shields.io/github/release/supabase-community/supabase-kt?label=stable)](https://github.com/supabase-community/supabase-kt/releases) 
 [![](https://badgen.net/github/release/supabase-community/supabase-kt?label=prerelease)](https://central.sonatype.com/search?q=io.github.jan.supabase&smo=true) 
