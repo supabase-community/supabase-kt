@@ -100,7 +100,7 @@ __For 2.7.0 and above:__
 [![Ktor](https://img.shields.io/badge/ktor-3.0.0--rc--1-blue)](https://ktor.io/)
 
 __For versions below 2.7.0:__
-[![Ktor](https://img.shields.io/badge/ktor-2.0.12-blue)](https://ktor.io/)
+[![Ktor](https://img.shields.io/badge/ktor-2.3.12-blue)](https://ktor.io/)
 
 ## Main Modules
 
