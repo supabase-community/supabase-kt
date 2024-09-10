@@ -1,7 +1,7 @@
 [versions]
 kotlin = "2.0.20"
 accompanist-permissions = "0.36.0"
-ktor = "3.0.0-beta-2"
+ktor = "3.0.0-rc-1"
 dokka = "1.9.20"
 kotlinx-datetime = "0.6.1"
 kermit = "2.0.4"
@@ -124,7 +124,7 @@ coil2-compose = { module = "io.coil-kt:coil-compose", version.ref = "coil2" }
 
 [bundles]
 ktor-client = ["ktor-client-core", "ktor-client-content-negotiation", "ktor-json"]
-multiplatform-settings = ["multiplatform-settings-no-arg"] # no multiplatform-settings-coroutines as there is no wasm-js support
+multiplatform-settings = ["multiplatform-settings-no-arg", "multiplatform-settings-coroutines"]
 testing = ["kotlinx-coroutines-test", "multiplatform-settings-test", "ktor-client-mock", "kotlin-test"]
 moshi = ["moshi", "moshi-kotlin"]
 jackson = ["jackson", "jackson-kotlin"]

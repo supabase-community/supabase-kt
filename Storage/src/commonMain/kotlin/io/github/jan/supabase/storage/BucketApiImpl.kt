@@ -20,7 +20,6 @@ import io.ktor.http.content.OutgoingContent
 import io.ktor.http.defaultForFilePath
 import io.ktor.utils.io.ByteReadChannel
 import io.ktor.utils.io.ByteWriteChannel
-import io.ktor.utils.io.close
 import io.ktor.utils.io.copyTo
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.add
@@ -176,7 +175,7 @@ internal class BucketApiImpl(override val bucketId: String, val storage: Storage
         }.execute {
             it.bodyAsChannel().copyTo(channel)
         }
-        channel.close()
+        channel.flushAndClose()
     }
 
     internal fun HttpRequestBuilder.prepareDownloadRequest(
