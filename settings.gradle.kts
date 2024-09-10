@@ -23,6 +23,8 @@ include("bom")
 // Test module
 include("test-common")
 
+include("test")
+
 // Serializers
 include(":serializers:Moshi")
 project(":serializers:Moshi").name = "serializer-moshi"
