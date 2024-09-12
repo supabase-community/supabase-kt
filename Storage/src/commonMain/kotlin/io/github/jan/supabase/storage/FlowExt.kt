@@ -26,7 +26,7 @@ fun BucketApi.updateAsFlow(path: String, data: UploadData, upsert: Boolean = fal
     this@updateAsFlow as BucketApiImpl
     val key = uploadOrUpdate(HttpMethod.Put, bucketId, path, data, upsert) {
         onUpload { bytesSentTotal, contentLength ->
-            trySend(UploadStatus.Progress(bytesSentTotal, contentLength))
+            trySend(UploadStatus.Progress(bytesSentTotal, contentLength ?: 0))
         }
     }
     trySend(UploadStatus.Success(key))
@@ -67,7 +67,7 @@ fun BucketApi.uploadToSignedUrlAsFlow(
         this@uploadToSignedUrlAsFlow as BucketApiImpl
         val key = uploadToSignedUrl(path, token, data, upsert) {
             onUpload { bytesSentTotal, contentLength ->
-                trySend(UploadStatus.Progress(bytesSentTotal, contentLength))
+                trySend(UploadStatus.Progress(bytesSentTotal, contentLength ?: 0))
             }
         }
         trySend(UploadStatus.Success(key))
@@ -100,7 +100,7 @@ fun BucketApi.uploadAsFlow(path: String, data: UploadData, upsert: Boolean = fal
         this@uploadAsFlow as BucketApiImpl
         val key = uploadOrUpdate(HttpMethod.Post, bucketId, path, data, upsert) {
             onUpload { bytesSentTotal, contentLength ->
-                trySend(UploadStatus.Progress(bytesSentTotal, contentLength))
+                trySend(UploadStatus.Progress(bytesSentTotal, contentLength ?: 0))
             }
         }
         trySend(UploadStatus.Success(key))
@@ -138,7 +138,7 @@ fun BucketApi.downloadAuthenticatedAsFlow(
         val data = storage.api.rawRequest {
             prepareDownloadRequest(path, false, transform)
             onDownload { bytesSentTotal, contentLength ->
-                trySend(DownloadStatus.Progress(bytesSentTotal, contentLength))
+                trySend(DownloadStatus.Progress(bytesSentTotal, contentLength ?: 0))
             }
         }.body<ByteArray>()
         trySend(DownloadStatus.Success)
@@ -181,7 +181,7 @@ fun BucketApi.downloadPublicAsFlow(path: String, transform: ImageTransformation.
         val data = storage.api.rawRequest {
             prepareDownloadRequest(path, true, transform)
             onDownload { bytesSentTotal, contentLength ->
-                trySend(DownloadStatus.Progress(bytesSentTotal, contentLength))
+                trySend(DownloadStatus.Progress(bytesSentTotal, contentLength ?: 0))
             }
         }.body<ByteArray>()
         trySend(DownloadStatus.Success)
@@ -217,7 +217,7 @@ private fun BucketApiImpl.flowChannelDownloadRequest(
 ): Flow<DownloadStatus> = callbackFlow {
     channelDownloadRequest(path, channel, public, transform) {
         onDownload { bytesSentTotal, contentLength ->
-            trySend(DownloadStatus.Progress(bytesSentTotal, contentLength))
+            trySend(DownloadStatus.Progress(bytesSentTotal, contentLength ?: 0))
         }
     }
     trySend(DownloadStatus.Success)

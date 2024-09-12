@@ -13,7 +13,10 @@ repositories {
 @OptIn(org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi::class)
 kotlin {
     defaultConfig()
-    composeTargets()
+   // composeTargets()
+    jsTarget()
+    jvmTargets()
+    iosTargets()
     sourceSets {
         val commonMain by getting {
             dependencies {

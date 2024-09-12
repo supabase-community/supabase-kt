@@ -4,27 +4,31 @@ Extends Supabase-kt with a multiplatform GoTrue client.
 
 Supported targets:
 
-| Target | **JVM** | **Android** | **JS** | **iOS** | **tvOS** | **watchOS** | **macOS** | **Windows** | **Linux** |
-| ------ | ------- | ----------- | ------ | ------- | -------- | ----------- | --------- | ----------- | --------- |
-|        | ✅      | ✅          | ✅     | ✅      | ☑️       | ☑️          | ✅        | ☑️          | ☑️        |
+| Target | **JVM** | **Android** | **JS** | **Wasm** | **Apple** | **Windows** | **Linux** |
+|--------|---------|-------------|--------|----------|-----------|-------------|-----------|
+| Status | ✅       | ✅           | ✅      | ✅        | ☑️*       | ☑️          | ☑️        |
 
-> Native support is experimental and needs feedback
->
 > ☑️ = No built-in OAuth support. Linux has no support for persistent session storage.
+
+\* **iOS and macOS are fully supported**
 
 <details>
 
 <summary>In-depth Kotlin targets</summary>
 
-**iOS:** iosArm64, iosSimulatorArm64, iosX64
-
 **JS**: Browser, NodeJS
 
-**tvOS**: tvosArm64, tvosX64, tvosSimulatorArm64
+**Wasm**: wasm-js
 
-**watchOS**: watchosArm64, watchosX64, watchosSimulatorArm64
+**Apple:**
 
-**MacOS**: macosX64, macosArm64
+- iOS: iosArm64, iosSimulatorArm64, iosX64
+
+- tvOS: tvosArm64, tvosX64, tvosSimulatorArm64
+
+- watchOS: watchosArm64, watchosX64, watchosSimulatorArm64
+
+- MacOS: macosX64, macosArm64
 
 **Windows**: mingwX64
 

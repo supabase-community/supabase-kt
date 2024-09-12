@@ -17,5 +17,6 @@ fun KotlinHierarchyBuilder.settingsGroup() {
         withJs()
         withMingwX64()
         withApple()
+        withWasmJs()
     }
 }
