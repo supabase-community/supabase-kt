@@ -28,7 +28,7 @@ fun MessageCard(message: Message, own: Boolean, modifier: Modifier, onDelete: ()
             ElevatedCard(modifier = Modifier.widthIn(max = 200.dp), colors = CardDefaults.elevatedCardColors(containerColor = backgroundColor)) {
                 Column(modifier = Modifier.padding(12.dp)) {
                     Text(message.content)
-                    Text(message.creatorId, fontSize = 8.sp, modifier = Modifier.padding(top = 4.dp))
+                    Text("UID: " + message.creatorId, fontSize = 8.sp, modifier = Modifier.padding(top = 4.dp))
                 }
             }
             if(own) {

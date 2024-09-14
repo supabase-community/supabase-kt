@@ -32,7 +32,10 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import io.github.jan.supabase.annotations.SupabaseExperimental
 import io.github.jan.supabase.common.ChatViewModel
+import io.github.jan.supabase.common.ui.components.OTPDialog
+import io.github.jan.supabase.common.ui.components.OTPDialogState
 import io.github.jan.supabase.common.ui.components.PasswordField
+import io.github.jan.supabase.common.ui.components.PasswordRecoveryDialog
 import io.github.jan.supabase.compose.auth.ui.ProviderButtonContent
 import io.github.jan.supabase.compose.auth.ui.annotations.AuthUiExperimental
 import io.github.jan.supabase.gotrue.providers.Google
@@ -41,8 +44,10 @@ import io.github.jan.supabase.gotrue.providers.Google
 @Composable
 fun LoginScreen(viewModel: ChatViewModel) {
     var signUp by remember { mutableStateOf(false) }
-    val loginAlert by viewModel.loginAlert.collectAsState()
+    val loginAlert by viewModel.alert.collectAsState()
     var email by remember { mutableStateOf("") }
+    var otpDialogState by remember { mutableStateOf<OTPDialogState>(OTPDialogState.Invisible) }
+    var showPasswordRecoveryDialog by remember { mutableStateOf(false) }
 
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -90,6 +95,12 @@ fun LoginScreen(viewModel: ChatViewModel) {
             ProviderButtonContent(Google, text = if (signUp) "Sign Up with Google" else "Login with Google")
         }
 
+        TextButton(
+            onClick = { otpDialogState = OTPDialogState.Visible(email) }
+        ) {
+            Text("Login with an OTP")
+        }
+
     }
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.BottomCenter) {
         TextButton(onClick = { signUp = !signUp }) {
@@ -97,17 +108,45 @@ fun LoginScreen(viewModel: ChatViewModel) {
         }
     }
 
+    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.BottomEnd) {
+        TextButton(onClick = { showPasswordRecoveryDialog = true }) {
+            Text("Forgot password?")
+        }
+    }
+
+    if(otpDialogState is OTPDialogState.Visible) {
+        val state = (otpDialogState as OTPDialogState.Visible)
+        OTPDialog(
+            email = state.email,
+            title = state.title,
+            onDismiss = { otpDialogState = OTPDialogState.Invisible },
+            onConfirm = { email, code ->
+                viewModel.loginWithOTP(email, code, state.resetFlow)
+            }
+        )
+    }
+
+    if(showPasswordRecoveryDialog) {
+        PasswordRecoveryDialog(
+            onDismiss = { showPasswordRecoveryDialog = false },
+            onConfirm = { email ->
+                viewModel.resetPassword(email)
+                otpDialogState = OTPDialogState.Visible(title = "Password recovery", email = email, resetFlow = true)
+            }
+        )
+    }
+
     if(loginAlert != null) {
         AlertDialog(
             onDismissRequest = {
-                viewModel.loginAlert.value = null
+                viewModel.alert.value = null
             },
             text = {
                 Text(loginAlert!!)
             },
             confirmButton = {
                 TextButton(onClick = {
-                    viewModel.loginAlert.value = null
+                    viewModel.alert.value = null
                 }) {
                     Text("Ok")
                 }
