@@ -2,6 +2,7 @@ package io.github.jan.supabase.postgrest
 
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.SupabaseSerializer
+import io.github.jan.supabase.exceptions.RestException
 import io.github.jan.supabase.logging.SupabaseLogger
 import io.github.jan.supabase.plugins.CustomSerializationConfig
 import io.github.jan.supabase.plugins.CustomSerializationPlugin
@@ -11,6 +12,9 @@ import io.github.jan.supabase.plugins.SupabasePluginProvider
 import io.github.jan.supabase.postgrest.query.PostgrestQueryBuilder
 import io.github.jan.supabase.postgrest.query.PostgrestRequestBuilder
 import io.github.jan.supabase.postgrest.query.PostgrestUpdate
+import io.github.jan.supabase.postgrest.query.request.RpcPostgrestRequestBuilder
+import io.github.jan.supabase.postgrest.result.PostgrestResult
+import kotlinx.serialization.json.JsonObject
 
 /**
  * Plugin to interact with the supabase Postgrest API
@@ -56,6 +60,32 @@ sealed interface Postgrest : MainPlugin<Postgrest.Config>, CustomSerializationPl
      * @param table The table to use for the requests
      */
     operator fun get(table: String): PostgrestQueryBuilder = from(table)
+
+    /**
+     * Executes a database function
+     *
+     * @param function The name of the function
+     * @param request Filter the result
+     * @throws RestException or one of its subclasses if the request failed
+     */
+    suspend fun rpc(
+        function: String,
+        request: RpcPostgrestRequestBuilder.() -> Unit = {}
+    ): PostgrestResult
+
+    /**
+     * Executes a database function
+     *
+     * @param function The name of the function
+     * @param parameters The parameters for the function
+     * @param request Filter the result
+     * @throws RestException or one of its subclasses if the request failed
+     */
+    suspend fun rpc(
+        function: String,
+        parameters: JsonObject,
+        request: RpcPostgrestRequestBuilder.() -> Unit = {},
+    ): PostgrestResult
 
     /**
      * Config for the Postgrest plugin

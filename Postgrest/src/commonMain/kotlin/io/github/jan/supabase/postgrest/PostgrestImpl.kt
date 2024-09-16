@@ -9,9 +9,14 @@ import io.github.jan.supabase.exceptions.RestException
 import io.github.jan.supabase.exceptions.UnauthorizedRestException
 import io.github.jan.supabase.exceptions.UnknownRestException
 import io.github.jan.supabase.gotrue.authenticatedSupabaseApi
+import io.github.jan.supabase.postgrest.executor.RestRequestExecutor
 import io.github.jan.supabase.postgrest.query.PostgrestQueryBuilder
+import io.github.jan.supabase.postgrest.query.request.RpcPostgrestRequestBuilder
+import io.github.jan.supabase.postgrest.request.RpcRequest
+import io.github.jan.supabase.postgrest.result.PostgrestResult
 import io.ktor.client.statement.HttpResponse
 import io.ktor.http.HttpStatusCode
+import kotlinx.serialization.json.JsonObject
 
 internal class PostgrestImpl(override val supabaseClient: SupabaseClient, override val config: Postgrest.Config) : Postgrest {
 
@@ -49,6 +54,33 @@ internal class PostgrestImpl(override val supabaseClient: SupabaseClient, overri
             HttpStatusCode.BadRequest -> BadRequestRestException(body.message, response, body.details ?: body.hint)
             else -> UnknownRestException(body.message, response, body.details ?: body.hint)
         }
+    }
+
+    override suspend fun rpc(
+        function: String,
+        parameters: JsonObject,
+        request: RpcPostgrestRequestBuilder.() -> Unit
+    ): PostgrestResult = rpc(function, parameters, request)
+
+    override suspend fun rpc(function: String, request: RpcPostgrestRequestBuilder.() -> Unit): PostgrestResult = rpc(function, null, request)
+
+    private suspend fun rpc(function: String, body: JsonObject? = null, request: RpcPostgrestRequestBuilder.() -> Unit): PostgrestResult {
+        val requestBuilder = RpcPostgrestRequestBuilder(config.defaultSchema, config.propertyConversionMethod).apply(request)
+        val urlParams = buildMap {
+            putAll(requestBuilder.params.mapToFirstValue())
+            if(requestBuilder.method != RpcMethod.POST && body != null) {
+                putAll(body.mapValues { it.value.toString() })
+            }
+        }
+        val rpcRequest = RpcRequest(
+            method = requestBuilder.method.httpMethod,
+            count = requestBuilder.count,
+            urlParams = urlParams,
+            body = body,
+            schema = requestBuilder.schema,
+            headers = requestBuilder.headers.build()
+        )
+        return RestRequestExecutor.execute(postgrest = this, path = "rpc/$function", request = rpcRequest)
     }
 
 }
