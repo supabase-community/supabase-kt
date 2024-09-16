@@ -428,7 +428,7 @@ internal class AuthImpl(
         }
     }
 
-    @Suppress("MAGIC_NUMBER")
+    @Suppress("MagicNumber")
     private suspend fun tryImportingSession(
         importRefreshedSession: suspend () -> Unit,
         retry: suspend () -> Unit
