@@ -2,15 +2,14 @@ package io.github.jan.supabase.realtime
 
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.annotations.SupabaseInternal
-import io.github.jan.supabase.decode
 import io.github.jan.supabase.encodeToJsonElement
-import io.github.jan.supabase.logging.e
-import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.jsonObject
+import kotlin.reflect.KClass
+import kotlin.reflect.KType
+import kotlin.reflect.typeOf
 
 /**
  * Represents a realtime channel
@@ -31,6 +30,11 @@ sealed interface RealtimeChannel {
      * The current [SupabaseClient]
      */
     val supabaseClient: SupabaseClient
+
+    /**
+     * The realtime instance
+     */
+    val realtime: Realtime
 
     @SupabaseInternal
     val callbackManager: CallbackManager
@@ -70,22 +74,70 @@ sealed interface RealtimeChannel {
      */
     suspend fun untrack()
 
+    /**
+     * Non-inline variant of [postgresChangeFlow] for implementation and mocking purposes
+     */
+    @SupabaseInternal
+    fun <T : PostgresAction> RealtimeChannel.postgresChangeFlowInternal(action: KClass<T>, schema: String, filter: PostgresChangeFilter.() -> Unit = {}): Flow<T>
+
+    /**
+     * Non-inline variant of [broadcastFlow] for implementation and mocking purposes
+     */
+    @SupabaseInternal
+    fun <T : Any> RealtimeChannel.broadcastFlowInternal(type: KType, event: String): Flow<T>
+
+    /**
+     * Listen for clients joining / leaving the channel using presences
+     *
+     * Example:
+     * ```kotlin
+     * val presenceChangeFlow = channel.presenceChangeFlow()
+     *
+     * presenceChangeFlow.collect {
+     *    val joins = it.decodeJoinsAs<User>()
+     *    val leaves = it.decodeLeavesAs<User>()
+     * }
+     * ```
+     */
+    fun presenceChangeFlow(): Flow<PresenceAction>
+
     @SupabaseInternal
     fun RealtimeChannel.addPostgresChange(data: PostgresJoinConfig)
 
     @SupabaseInternal
     fun RealtimeChannel.removePostgresChange(data: PostgresJoinConfig)
 
+    @SupabaseInternal
+    fun updateStatus(status: Status)
+
     /**
      * Represents the status of a channel
      */
     enum class Status {
+        /**
+         * The [RealtimeChannel] is currently unsubscribed
+         */
         UNSUBSCRIBED,
+
+        /**
+         * The [RealtimeChannel] is currently in the process of subscribing
+         */
         SUBSCRIBING,
+
+        /**
+         * The [RealtimeChannel] is subscribed
+         */
         SUBSCRIBED,
+
+        /**
+         * The [RealtimeChannel] is in the process of unsubscribing
+         */
         UNSUBSCRIBING,
     }
 
+    /**
+     * @see RealtimeChannel
+     */
     @Suppress("UndocumentedPublicProperty")
     companion object {
         const val CHANNEL_EVENT_JOIN = "phx_join"
@@ -105,31 +157,6 @@ sealed interface RealtimeChannel {
 }
 
 /**
- * Listen for clients joining / leaving the channel using presences
- *
- * Example:
- * ```kotlin
- * val presenceChangeFlow = channel.presenceChangeFlow()
- *
- * presenceChangeFlow.collect {
- *    val joins = it.decodeJoinsAs<User>()
- *    val leaves = it.decodeLeavesAs<User>()
- * }
- * ```
- */
-@OptIn(SupabaseInternal::class)
-fun RealtimeChannel.presenceChangeFlow(): Flow<PresenceAction> {
-    return callbackFlow {
-        val callback: (PresenceAction) -> Unit = { action ->
-            trySend(action)
-        }
-
-        val id = callbackManager.addPresenceCallback(callback)
-        awaitClose { callbackManager.removeCallbackById(id) }
-    }
-}
-
-/**
  * Listen for postgres changes in a channel.
  *
  * Example:
@@ -144,34 +171,10 @@ fun RealtimeChannel.presenceChangeFlow(): Flow<PresenceAction> {
  * @param T The event type you want to listen to (e.g. [PostgresAction.Update] for updates or only [PostgresAction] for all)
  * @param schema The schema name of the table that is being monitored. For normal supabase tables that might be "public".
  */
-@OptIn(SupabaseInternal::class)
-inline fun <reified T : PostgresAction> RealtimeChannel.postgresChangeFlow(schema: String, filter: PostgresChangeFilter.() -> Unit = {}): Flow<T> {
-    if(status.value == RealtimeChannel.Status.SUBSCRIBED) error("You cannot call postgresChangeFlow after joining the channel")
-    val event = when(T::class) {
-        PostgresAction.Insert::class -> "INSERT"
-        PostgresAction.Update::class -> "UPDATE"
-        PostgresAction.Delete::class -> "DELETE"
-        PostgresAction.Select::class -> "SELECT"
-        PostgresAction::class -> "*"
-        else -> error("Unknown event type ${T::class}")
-    }
-    val postgrestBuilder = PostgresChangeFilter(event, schema).apply(filter)
-    val config = postgrestBuilder.buildConfig()
-    addPostgresChange(config)
-    return callbackFlow {
-        val callback: (PostgresAction) -> Unit = {
-            if (it is T) {
-                trySend(it)
-            }
-        }
-
-        val id = callbackManager.addPostgresCallback(config, callback)
-        awaitClose {
-            callbackManager.removeCallbackById(id)
-            removePostgresChange(config)
-        }
-    }
-}
+inline fun <reified T : PostgresAction> RealtimeChannel.postgresChangeFlow(
+    schema: String,
+    noinline filter: PostgresChangeFilter.() -> Unit = {}
+): Flow<T> = postgresChangeFlowInternal(T::class, schema, filter)
 
 /**
  * Broadcasts can be messages sent by other clients within the same channel under a specific [event].
@@ -187,18 +190,7 @@ inline fun <reified T : PostgresAction> RealtimeChannel.postgresChangeFlow(schem
  * @param event When a message is sent by another client, it will be sent under a specific event. This is the event that you want to listen to
  */
 @OptIn(SupabaseInternal::class)
-inline fun <reified T : Any> RealtimeChannel.broadcastFlow(event: String): Flow<T> = callbackFlow {
-    val id = callbackManager.addBroadcastCallback(event) {
-        val decodedValue = try {
-            supabaseClient.realtime.serializer.decode<T>(it.toString())
-        } catch(e: Exception) {
-            Realtime.logger.e(e) { "Couldn't decode $this as ${T::class.simpleName}. The corresponding handler wasn't called" }
-            null
-        }
-        decodedValue?.let { value -> trySend(value) }
-    }
-    awaitClose { callbackManager.removeCallbackById(id) }
-}
+inline fun <reified T : Any> RealtimeChannel.broadcastFlow(event: String): Flow<T> = broadcastFlowInternal(typeOf<T>(), event)
 
 /**
  * Sends a message to everyone who joined the channel. Can be used even if you aren't connected to the channel.

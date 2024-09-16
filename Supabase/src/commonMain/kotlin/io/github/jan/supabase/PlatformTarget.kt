@@ -1,10 +1,11 @@
+@file:Suppress("UndocumentedPublicProperty")
 package io.github.jan.supabase
 
 /**
  * Represents a target platform
  */
 enum class PlatformTarget {
-    JVM, ANDROID, JS, WASM, IOS, WINDOWS, MACOS, TVOS, WATCHOS, LINUX;
+    JVM, ANDROID, JS, WASM_JS, IOS, WINDOWS, MACOS, TVOS, WATCHOS, LINUX;
 }
 
 /**

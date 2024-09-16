@@ -4,7 +4,9 @@ This is a demo of a chat app using Compose Multiplatform, Koin and supabase-kt.
 
 **Available platforms:** Android, iOS, Desktop, JS Canvas
 
-**Modules used:** Realtime, GoTrue, Postgrest, Compose Auth UI
+**Modules used:** Realtime, Auth*, Postgrest, Compose Auth UI
+
+* Integrated flows: Password, Google login & password recovery
 
 https://user-images.githubusercontent.com/26686035/216710629-d809ff58-cd3b-449f-877f-4c6c773daec4.mp4
 

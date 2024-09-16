@@ -18,7 +18,7 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 api(project(":storage-kt"))
-                api(libs.coil)
+                api(libs.coil2)
             }
         }
     }

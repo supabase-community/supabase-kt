@@ -152,6 +152,9 @@ class Functions(override val config: Config, override val supabaseClient: Supaba
 
     }
 
+    /**
+     * @see Functions
+     */
     companion object : SupabasePluginProvider<Config, Functions> {
 
         override val key = "functions"
