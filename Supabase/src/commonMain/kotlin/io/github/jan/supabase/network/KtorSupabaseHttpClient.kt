@@ -30,6 +30,11 @@ import kotlin.time.Duration.Companion.milliseconds
 private const val HTTPS_PORT = 443
 
 /**
+ * A function that can be used to override the default request configuration
+ */
+typealias HttpRequestOverride = HttpRequestBuilder.() -> Unit
+
+/**
  * A [SupabaseHttpClient] that uses ktor to send requests
  */
 @OptIn(SupabaseInternal::class)

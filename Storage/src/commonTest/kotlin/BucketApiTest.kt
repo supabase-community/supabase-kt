@@ -1,7 +1,6 @@
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.SupabaseClientBuilder
 import io.github.jan.supabase.storage.BucketApi
-import io.github.jan.supabase.storage.FileObjectV2
 import io.github.jan.supabase.storage.FileUploadResponse
 import io.github.jan.supabase.storage.ImageTransformation
 import io.github.jan.supabase.storage.Storage
@@ -14,20 +13,14 @@ import io.github.jan.supabase.testing.pathAfterVersion
 import io.github.jan.supabase.testing.toJsonElement
 import io.ktor.client.engine.mock.MockRequestHandleScope
 import io.ktor.client.engine.mock.respond
-import io.ktor.client.engine.mock.respondError
-import io.ktor.client.engine.mock.respondOk
 import io.ktor.client.engine.mock.toByteArray
 import io.ktor.client.request.HttpRequestData
 import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
-import io.ktor.http.HttpStatusCode
 import io.ktor.http.headersOf
 import kotlinx.coroutines.test.runTest
 import kotlinx.datetime.Clock
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.int
 import kotlinx.serialization.json.jsonArray
@@ -35,14 +28,11 @@ import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.long
 import kotlinx.serialization.json.put
-import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
 import kotlin.test.Test
 import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
-import kotlin.test.assertFalse
 import kotlin.test.assertNotNull
-import kotlin.test.assertTrue
 import kotlin.time.Duration.Companion.seconds
 
 class BucketApiTest {
@@ -61,10 +51,8 @@ class BucketApiTest {
         testUploadMethod(
             method = HttpMethod.Post,
             urlPath = "/object/$bucketId/data.png",
-            request = { client, expectedPath, data, meta ->
-                client.storage[bucketId].upload(expectedPath, data) {
-                    userMetadata = meta
-                }
+            request = { client, expectedPath, data ->
+                client.storage[bucketId].upload(expectedPath, data)
             },
             extra = {
                 assertEquals(
@@ -88,9 +76,8 @@ class BucketApiTest {
                     "Upsert header should be true"
                 )
             },
-            request = { client, expectedPath, data, meta ->
+            request = { client, expectedPath, data ->
                 client.storage[bucketId].upload(expectedPath, data) {
-                    userMetadata = meta
                     upsert = true
                 }
             }
@@ -115,9 +102,8 @@ class BucketApiTest {
                     "Token should be $expectedToken"
                 )
             },
-            request = { client, expectedPath, data, meta ->
+            request = { client, expectedPath, data ->
                 client.storage[bucketId].uploadToSignedUrl(path = expectedPath, token = expectedToken, data = data) {
-                    userMetadata = meta
                     upsert = false
                 }
             }
@@ -142,9 +128,8 @@ class BucketApiTest {
                     "Token should be $expectedToken"
                 )
             },
-            request = { client, expectedPath, data, meta ->
+            request = { client, expectedPath, data ->
                 client.storage[bucketId].uploadToSignedUrl(path = expectedPath, token = expectedToken, data = data) {
-                    userMetadata = meta
                     upsert = true
                 }
             }
@@ -156,10 +141,8 @@ class BucketApiTest {
         testUploadMethod(
             method = HttpMethod.Put,
             urlPath = "/object/$bucketId/data.png",
-            request = { client, expectedPath, data, meta ->
-                client.storage[bucketId].update(expectedPath, data) {
-                    userMetadata = meta
-                }
+            request = { client, expectedPath, data ->
+                client.storage[bucketId].update(expectedPath, data)
             },
             extra = {
                 assertEquals(
@@ -183,9 +166,8 @@ class BucketApiTest {
                     "Upsert header should be true"
                 )
             },
-            request = { client, expectedPath, data, meta ->
+            request = { client, expectedPath, data ->
                 client.storage[bucketId].update(expectedPath, data) {
-                    userMetadata = meta
                     upsert = true
                 }
             }
@@ -458,69 +440,6 @@ class BucketApiTest {
         }
     }
 
-    @Test
-    fun testInfo() {
-        runTest {
-            val expectedPath = "data.png"
-            val file = FileObjectV2(
-                "data.png",
-                "id",
-                "version",
-                createdAt = Clock.System.now(),
-                metadata = null,
-                size = 0,
-                rawContentType = "image/png",
-                etag = null,
-                lastModified = null,
-                cacheControl = null
-            )
-            val client = createMockedSupabaseClient(configuration = configureClient) {
-                assertMethodIs(HttpMethod.Get, it.method)
-                assertPathIs("/object/info/$bucketId/$expectedPath", it.url.pathAfterVersion())
-                respond(
-                    content = Json.encodeToString(file),
-                    headers = headersOf(
-                        HttpHeaders.ContentType,
-                        ContentType.Application.Json.toString()
-                    )
-                )
-            }
-            val data = client.storage[bucketId].info(expectedPath)
-            assertEquals(file.copy(serializer = client.storage.serializer), data, "Data should be $file")
-        }
-    }
-
-    @Test
-    fun testExistsWithExistingFile() {
-        runTest {
-            val expectedPath = "data.png"
-            val client = createMockedSupabaseClient(configuration = configureClient) {
-                assertMethodIs(HttpMethod.Head, it.method)
-                assertPathIs("/object/$bucketId/$expectedPath", it.url.pathAfterVersion())
-                respondOk()
-            }
-            val exists = client.storage[bucketId].exists(expectedPath)
-            assertTrue { exists }
-        }
-    }
-
-    @Test
-    fun testExistsWithNonExistingFile() {
-        val statusCodes = listOf(404, 400)
-        for(code in statusCodes) {
-            runTest {
-                val expectedPath = "data.png"
-                val client = createMockedSupabaseClient(configuration = configureClient) {
-                    assertMethodIs(HttpMethod.Head, it.method)
-                    assertPathIs("/object/$bucketId/$expectedPath", it.url.pathAfterVersion())
-                    respondError(HttpStatusCode(code, "Not Found"))
-                }
-                val exists = client.storage[bucketId].exists(expectedPath)
-                assertFalse { exists }
-            }
-        }
-    }
-
     private fun testDownloadWithTransform(
         authenticated: Boolean
     ) {
@@ -550,7 +469,7 @@ class BucketApiTest {
                 quality = expectedQuality
                 resize = expectedResize
             }
-            val data = if(authenticated) client.storage[bucketId].downloadAuthenticated(expectedPath, transform) else client.storage[bucketId].downloadPublic(expectedPath, transform)
+            val data = if(authenticated) client.storage[bucketId].downloadAuthenticated(expectedPath) { transform(transform) } else client.storage[bucketId].downloadPublic(expectedPath)  { transform(transform) }
             assertContentEquals(expectedData, data, "Data should be [1, 2, 3]")
         }
     }
@@ -561,7 +480,7 @@ class BucketApiTest {
         urlPath: String,
         expectedPath: String = "data.png",
         extra: suspend MockRequestHandleScope.(HttpRequestData) -> Unit,
-        request: suspend (client: SupabaseClient, expectedPath: String, data: ByteArray, metadata: JsonObject) -> FileUploadResponse
+        request: suspend (client: SupabaseClient, expectedPath: String, data: ByteArray) -> FileUploadResponse
     ) {
         runTest {
             val expectedData = byteArrayOf(1, 2, 3)
@@ -571,8 +490,6 @@ class BucketApiTest {
             val client = createMockedSupabaseClient(configuration = configureClient) {
                 val data = it.body.toByteArray()
                 assertMethodIs(method, it.method)
-                val metadata = Json.decodeFromString<JsonObject>(Base64.decode(it.headers["x-metadata"] ?: error("Metadata should not be null")).decodeToString())
-                assertEquals(expectedMetadata, metadata, "Metadata should be $expectedMetadata")
                 assertPathIs(urlPath, it.url.pathAfterVersion())
                 assertContentEquals(expectedData, data, "Data should be [1, 2, 3]")
                 assertEquals(ContentType.Image.PNG, it.body.contentType, "Content type should be image/png")
@@ -590,7 +507,7 @@ class BucketApiTest {
                     )
                 )
             }
-            val response = request(client, expectedPath, expectedData, expectedMetadata)
+            val response = request(client, expectedPath, expectedData)
             assertEquals("someBucket/$expectedPath", response.key, "Key should be $expectedPath")
             assertEquals("someId", response.id, "Id should be someId")
             assertEquals(expectedPath, response.path, "Path should be $expectedPath")
