@@ -1,13 +1,12 @@
 package io.github.jan.supabase.common
 
 
-import co.touchlab.kermit.Logger
 import io.github.jan.supabase.SupabaseClient
+import io.github.jan.supabase.annotations.SupabaseInternal
 import io.github.jan.supabase.gotrue.gotrue
 import io.github.jan.supabase.gotrue.parseFragmentAndImportSession
 import io.github.jan.supabase.gotrue.providers.Google
 import io.github.jan.supabase.gotrue.providers.builtin.Email
-import io.github.jan.supabase.annotations.SupabaseInternal
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch

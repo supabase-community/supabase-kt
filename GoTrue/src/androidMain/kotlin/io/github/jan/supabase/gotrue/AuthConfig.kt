@@ -1,8 +1,6 @@
 package io.github.jan.supabase.gotrue
 
 import androidx.browser.customtabs.CustomTabsIntent
-import io.github.jan.supabase.gotrue.ExternalAuthAction.Companion.CUSTOM_TABS
-import io.github.jan.supabase.gotrue.ExternalAuthAction.Companion.EXTERNAL_BROWSER
 import io.github.jan.supabase.gotrue.providers.ExternalAuthConfig
 import io.github.jan.supabase.plugins.CustomSerializationConfig
 

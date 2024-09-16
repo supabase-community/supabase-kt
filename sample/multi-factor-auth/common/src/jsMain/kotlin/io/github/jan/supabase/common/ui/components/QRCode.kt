@@ -1,7 +1,6 @@
 package io.github.jan.supabase.common.ui.components
 
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier

@@ -2,7 +2,6 @@
 package io.github.jan.supabase.postgrest.query
 
 import io.github.jan.supabase.annotations.SupabaseExperimental
-import io.github.jan.supabase.annotations.SupabaseInternal
 import io.github.jan.supabase.gotrue.PostgrestFilterDSL
 import io.github.jan.supabase.postgrest.PropertyConversionMethod
 import io.github.jan.supabase.postgrest.query.filter.PostgrestFilterBuilder

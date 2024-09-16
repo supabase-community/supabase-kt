@@ -3,7 +3,6 @@ package io.github.jan.supabase.gotrue.providers.builtin
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.SupabaseSerializer
 import io.github.jan.supabase.encodeToJsonElement
-import io.github.jan.supabase.gotrue.Auth
 import io.github.jan.supabase.gotrue.AuthImpl
 import io.github.jan.supabase.gotrue.FlowType
 import io.github.jan.supabase.gotrue.auth
