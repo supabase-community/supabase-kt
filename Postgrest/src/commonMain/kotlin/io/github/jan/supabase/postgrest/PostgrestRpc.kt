@@ -35,7 +35,7 @@ enum class RpcMethod(val httpMethod: HttpMethod) {
  * @param request Filter the result
  * @throws RestException or one of its subclasses if the request failed
  */
-suspend inline fun <reified T : Any> Postgrest.rpcRequest(
+suspend inline fun <reified T : Any> Postgrest.rpc(
     function: String,
     parameters: T,
     noinline request: RpcRequestBuilder.() -> Unit = {},
