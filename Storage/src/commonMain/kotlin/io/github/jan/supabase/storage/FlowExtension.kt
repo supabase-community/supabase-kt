@@ -14,13 +14,13 @@ import kotlinx.coroutines.flow.callbackFlow
 
 private fun downloadOverride(flowProducer: ProducerScope<DownloadStatus>): HttpRequestOverride = {
     onDownload { bytesSentTotal, contentLength ->
-        flowProducer.trySend(DownloadStatus.Progress(bytesSentTotal, contentLength))
+        flowProducer.trySend(DownloadStatus.Progress(bytesSentTotal, contentLength ?: 0))
     }
 }
 
 private fun uploadOverride(flowProducer: ProducerScope<UploadStatus>): HttpRequestOverride = {
     onUpload { bytesSentTotal, contentLength ->
-        flowProducer.trySend(UploadStatus.Progress(bytesSentTotal, contentLength))
+        flowProducer.trySend(UploadStatus.Progress(bytesSentTotal, contentLength ?: 0))
     }
 }
 
