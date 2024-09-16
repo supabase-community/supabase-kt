@@ -428,6 +428,7 @@ internal class AuthImpl(
         }
     }
 
+    @Suppress("MAGIC_NUMBER")
     private suspend fun tryImportingSession(
         importRefreshedSession: suspend () -> Unit,
         retry: suspend () -> Unit
@@ -435,10 +436,17 @@ internal class AuthImpl(
         try {
             importRefreshedSession()
         } catch (e: RestException) {
-            clearSession()
-            Auth.logger.e(e) { "Couldn't refresh session. The refresh token may have been revoked." }
+            if (e.statusCode in 500..599) {
+                Auth.logger.e(e) { "Couldn't refresh session due to an internal server error. Retrying in ${config.retryDelay} (Status code ${e.statusCode})" }
+                _sessionStatus.value = SessionStatus.NetworkError //possibly rename this to something more generic
+                delay(config.retryDelay)
+                retry()
+            } else {
+                Auth.logger.e(e) { "Couldn't refresh session. The refresh token may have been revoked. Clearing session... (Status code ${e.statusCode})" }
+                clearSession()
+            }
         } catch (e: Exception) {
-            Auth.logger.e(e) { "Couldn't reach supabase. Either the address doesn't exist or the network might not be on. Retrying in ${config.retryDelay}" }
+            Auth.logger.e(e) { "Couldn't reach Supabase. Either the address doesn't exist or the network might not be on. Retrying in ${config.retryDelay}" }
             _sessionStatus.value = SessionStatus.NetworkError
             delay(config.retryDelay)
             retry()
