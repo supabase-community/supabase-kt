@@ -12,7 +12,7 @@ import io.github.jan.supabase.plugins.SupabasePluginProvider
 import io.github.jan.supabase.postgrest.query.PostgrestQueryBuilder
 import io.github.jan.supabase.postgrest.query.PostgrestRequestBuilder
 import io.github.jan.supabase.postgrest.query.PostgrestUpdate
-import io.github.jan.supabase.postgrest.query.request.RpcPostgrestRequestBuilder
+import io.github.jan.supabase.postgrest.query.request.RpcRequestBuilder
 import io.github.jan.supabase.postgrest.result.PostgrestResult
 import kotlinx.serialization.json.JsonObject
 
@@ -70,7 +70,7 @@ sealed interface Postgrest : MainPlugin<Postgrest.Config>, CustomSerializationPl
      */
     suspend fun rpc(
         function: String,
-        request: RpcPostgrestRequestBuilder.() -> Unit = {}
+        request: RpcRequestBuilder.() -> Unit = {}
     ): PostgrestResult
 
     /**
@@ -84,7 +84,7 @@ sealed interface Postgrest : MainPlugin<Postgrest.Config>, CustomSerializationPl
     suspend fun rpc(
         function: String,
         parameters: JsonObject,
-        request: RpcPostgrestRequestBuilder.() -> Unit = {},
+        request: RpcRequestBuilder.() -> Unit = {},
     ): PostgrestResult
 
     /**

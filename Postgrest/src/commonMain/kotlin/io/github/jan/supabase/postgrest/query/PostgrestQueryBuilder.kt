@@ -8,9 +8,9 @@ import io.github.jan.supabase.gotrue.PostgrestFilterDSL
 import io.github.jan.supabase.postgrest.Postgrest
 import io.github.jan.supabase.postgrest.executor.RestRequestExecutor
 import io.github.jan.supabase.postgrest.mapToFirstValue
-import io.github.jan.supabase.postgrest.query.request.InsertPostgrestRequestBuilder
-import io.github.jan.supabase.postgrest.query.request.SelectPostgrestRequestBuilder
-import io.github.jan.supabase.postgrest.query.request.UpsertPostgrestRequestBuilder
+import io.github.jan.supabase.postgrest.query.request.InsertRequestBuilder
+import io.github.jan.supabase.postgrest.query.request.SelectRequestBuilder
+import io.github.jan.supabase.postgrest.query.request.UpsertRequestBuilder
 import io.github.jan.supabase.postgrest.request.DeleteRequest
 import io.github.jan.supabase.postgrest.request.InsertRequest
 import io.github.jan.supabase.postgrest.request.SelectRequest
@@ -41,9 +41,9 @@ class PostgrestQueryBuilder(
      */
     suspend inline fun select(
         columns: Columns = Columns.ALL,
-        request: @PostgrestFilterDSL SelectPostgrestRequestBuilder.() -> Unit = {}
+        request: @PostgrestFilterDSL SelectRequestBuilder.() -> Unit = {}
     ): PostgrestResult {
-        val requestBuilder = SelectPostgrestRequestBuilder(postgrest.config.propertyConversionMethod).apply {
+        val requestBuilder = SelectRequestBuilder(postgrest.config.propertyConversionMethod).apply {
             request(); params["select"] = listOf(columns.value)
         }
         val selectRequest = SelectRequest(
@@ -58,10 +58,10 @@ class PostgrestQueryBuilder(
 
     /**
      * Perform an UPSERT on the table or view. Depending on the column(s) passed
-     * to [UpsertPostgrestRequestBuilder.onConflict], [upsert] allows you to perform the equivalent of
+     * to [UpsertRequestBuilder.onConflict], [upsert] allows you to perform the equivalent of
      * `[insert] if a row with the corresponding onConflict columns doesn't
      * exist, or if it does exist, perform an alternative action depending on
-     * [UpsertPostgrestRequestBuilder.ignoreDuplicates].
+     * [UpsertRequestBuilder.ignoreDuplicates].
      *
      * By default, upserted rows are not returned. To return it, call `[PostgrestRequestBuilder.select]`.
      *
@@ -73,9 +73,9 @@ class PostgrestQueryBuilder(
      */
     suspend inline fun <reified T : Any> upsert(
         values: List<T>,
-        request: UpsertPostgrestRequestBuilder.() -> Unit = {}
+        request: UpsertRequestBuilder.() -> Unit = {}
     ): PostgrestResult {
-        val requestBuilder = UpsertPostgrestRequestBuilder(postgrest.config.propertyConversionMethod).apply(request)
+        val requestBuilder = UpsertRequestBuilder(postgrest.config.propertyConversionMethod).apply(request)
         val body = postgrest.serializer.encodeToJsonElement(values).jsonArray
         val columns = body.map { it.jsonObject.keys }.flatten().distinct()
         requestBuilder.params["columns"] = listOf(columns.joinToString(","))
@@ -98,10 +98,10 @@ class PostgrestQueryBuilder(
 
     /**
      * Perform an UPSERT on the table or view. Depending on the column(s) passed
-     * to [UpsertPostgrestRequestBuilder.onConflict], [upsert] allows you to perform the equivalent of
+     * to [UpsertRequestBuilder.onConflict], [upsert] allows you to perform the equivalent of
      * `[insert] if a row with the corresponding onConflict columns doesn't
      * exist, or if it does exist, perform an alternative action depending on
-     * [UpsertPostgrestRequestBuilder.ignoreDuplicates].
+     * [UpsertRequestBuilder.ignoreDuplicates].
      *
      * By default, upserted rows are not returned. To return it, call `[PostgrestRequestBuilder.select]`.
      *
@@ -113,7 +113,7 @@ class PostgrestQueryBuilder(
      */
     suspend inline fun <reified T : Any> upsert(
         value: T,
-        request: UpsertPostgrestRequestBuilder.() -> Unit = {}
+        request: UpsertRequestBuilder.() -> Unit = {}
     ): PostgrestResult = upsert(listOf(value), request)
 
     /**
@@ -127,9 +127,9 @@ class PostgrestQueryBuilder(
      */
     suspend inline fun <reified T : Any> insert(
         values: List<T>,
-        request: InsertPostgrestRequestBuilder.() -> Unit = {}
+        request: InsertRequestBuilder.() -> Unit = {}
     ): PostgrestResult {
-        val requestBuilder = InsertPostgrestRequestBuilder(postgrest.config.propertyConversionMethod).apply(request)
+        val requestBuilder = InsertRequestBuilder(postgrest.config.propertyConversionMethod).apply(request)
         val body = postgrest.serializer.encodeToJsonElement(values).jsonArray
         val columns = body.map { it.jsonObject.keys }.flatten().distinct()
         requestBuilder.params["columns"] = listOf(columns.joinToString(","))
@@ -156,7 +156,7 @@ class PostgrestQueryBuilder(
      */
     suspend inline fun <reified T : Any> insert(
         value: T,
-        request: InsertPostgrestRequestBuilder.() -> Unit = {}
+        request: InsertRequestBuilder.() -> Unit = {}
     ) = insert(listOf(value), request)
 
     /**

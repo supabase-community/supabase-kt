@@ -7,7 +7,7 @@ import io.github.jan.supabase.postgrest.query.PostgrestRequestBuilder
 /**
  * Request builder for [PostgrestQueryBuilder.insert]
  */
-open class InsertPostgrestRequestBuilder(propertyConversionMethod: PropertyConversionMethod): PostgrestRequestBuilder(propertyConversionMethod) {
+open class InsertRequestBuilder(propertyConversionMethod: PropertyConversionMethod): PostgrestRequestBuilder(propertyConversionMethod) {
 
     /**
      * Make missing fields default to `null`.

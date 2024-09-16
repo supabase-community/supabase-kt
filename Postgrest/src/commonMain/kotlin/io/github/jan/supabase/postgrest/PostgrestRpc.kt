@@ -3,7 +3,7 @@ package io.github.jan.supabase.postgrest
 
 import io.github.jan.supabase.encodeToJsonElement
 import io.github.jan.supabase.exceptions.RestException
-import io.github.jan.supabase.postgrest.query.request.RpcPostgrestRequestBuilder
+import io.github.jan.supabase.postgrest.query.request.RpcRequestBuilder
 import io.github.jan.supabase.postgrest.result.PostgrestResult
 import io.ktor.http.HttpMethod
 import kotlinx.serialization.json.jsonObject
@@ -35,8 +35,8 @@ enum class RpcMethod(val httpMethod: HttpMethod) {
  * @param request Filter the result
  * @throws RestException or one of its subclasses if the request failed
  */
-suspend inline fun <reified T : Any> Postgrest.rpc(
+suspend inline fun <reified T : Any> Postgrest.rpcRequest(
     function: String,
     parameters: T,
-    noinline request: RpcPostgrestRequestBuilder.() -> Unit = {},
+    noinline request: RpcRequestBuilder.() -> Unit = {},
 ): PostgrestResult = rpc(function, serializer.encodeToJsonElement(parameters).jsonObject, request)
