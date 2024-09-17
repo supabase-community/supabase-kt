@@ -20,6 +20,7 @@ private val settingsJson = Json {
  * @param key The key to use for saving the session.
  * @param json The [Json] instance to use for serialization. Defaults to [settingsJson]. **Important: [JsonBuilder.encodeDefaults] must be set to true.**
  */
+@OptIn(ExperimentalSettingsApi::class)
 class SettingsSessionManager(
     private val settings: Settings = createDefaultSettings(),
     private val key: String = SETTINGS_KEY,
@@ -44,12 +45,10 @@ class SettingsSessionManager(
 
     private val suspendSettings = settings.toSuspendSettings()
 
-    @OptIn(ExperimentalSettingsApi::class)
     override suspend fun saveSession(session: UserSession) {
         suspendSettings.putString(key, json.encodeToString(session))
     }
 
-    @OptIn(ExperimentalSettingsApi::class)
     override suspend fun loadSession(): UserSession? {
         val session = suspendSettings.getStringOrNull(key) ?: return null
         return try {
@@ -60,7 +59,6 @@ class SettingsSessionManager(
         }
     }
 
-    @OptIn(ExperimentalSettingsApi::class)
     override suspend fun deleteSession() {
         suspendSettings.remove(key)
     }

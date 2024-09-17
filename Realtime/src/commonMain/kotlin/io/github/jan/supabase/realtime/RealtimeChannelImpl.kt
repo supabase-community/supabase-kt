@@ -2,32 +2,30 @@ package io.github.jan.supabase.realtime
 
 import io.github.jan.supabase.annotations.SupabaseInternal
 import io.github.jan.supabase.collections.AtomicMutableList
-import io.github.jan.supabase.decodeIfNotEmptyOrDefault
 import io.github.jan.supabase.gotrue.resolveAccessToken
 import io.github.jan.supabase.logging.d
 import io.github.jan.supabase.logging.e
-import io.github.jan.supabase.logging.w
 import io.github.jan.supabase.putJsonObject
 import io.github.jan.supabase.realtime.data.BroadcastApiBody
 import io.github.jan.supabase.realtime.data.BroadcastApiMessage
-import io.github.jan.supabase.realtime.data.PostgresActionData
-import io.github.jan.supabase.supabaseJson
+import io.github.jan.supabase.realtime.event.RealtimeEvent
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.headers
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.buildJsonObject
-import kotlinx.serialization.json.decodeFromJsonElement
 import kotlinx.serialization.json.encodeToJsonElement
-import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
-import kotlinx.serialization.json.jsonPrimitive
-import kotlinx.serialization.json.longOrNull
 import kotlinx.serialization.json.put
 import kotlinx.serialization.json.putJsonObject
+import kotlin.reflect.KClass
+import kotlin.reflect.KType
 
 internal class RealtimeChannelImpl(
     private val realtimeImpl: RealtimeImpl,
@@ -42,6 +40,7 @@ internal class RealtimeChannelImpl(
     override val callbackManager = CallbackManagerImpl(realtimeImpl.serializer)
     private val _status = MutableStateFlow(RealtimeChannel.Status.UNSUBSCRIBED)
     override val status = _status.asStateFlow()
+    override val realtime: Realtime = realtimeImpl
 
     override val supabaseClient = realtimeImpl.supabaseClient
 
@@ -79,71 +78,13 @@ internal class RealtimeChannelImpl(
     }
 
     @OptIn(SupabaseInternal::class)
-    @Suppress("CyclomaticComplexMethod") //TODO: Refactor this method
-    fun onMessage(message: RealtimeMessage) {
-        if(message.eventType == null) {
-            Realtime.logger.e { "Received message without event type: $message" }
+    suspend fun onMessage(message: RealtimeMessage) {
+        val event = RealtimeEvent.resolveEvent(message)
+        if(event == null) {
+            Realtime.logger.e { "Received message without event: $message" }
             return
         }
-        when(message.eventType) {
-            RealtimeMessage.EventType.TOKEN_EXPIRED -> {
-                Realtime.logger.w { "Received token expired event. This should not happen, please report this warning." }
-            }
-            RealtimeMessage.EventType.SYSTEM -> {
-                Realtime.logger.d { "Subscribed to channel ${message.topic}" }
-                _status.value = RealtimeChannel.Status.SUBSCRIBED
-            }
-            RealtimeMessage.EventType.SYSTEM_REPLY -> {
-                Realtime.logger.d { "Received system reply: ${message.payload}." }
-                if(status.value == RealtimeChannel.Status.UNSUBSCRIBING) {
-                    _status.value = RealtimeChannel.Status.UNSUBSCRIBED
-                    Realtime.logger.d { "Unsubscribed from channel ${message.topic}" }
-                }
-            }
-            RealtimeMessage.EventType.POSTGRES_SERVER_CHANGES -> { //check if the server postgres_changes match with the client's and add the given id to the postgres change objects (to identify them later in the events)
-                val serverPostgresChanges = message.payload["response"]?.jsonObject?.get("postgres_changes")?.jsonArray?.let { Json.decodeFromJsonElement<List<PostgresJoinConfig>>(it) } ?: listOf() //server postgres changes
-                callbackManager.setServerChanges(serverPostgresChanges)
-                if(status.value != RealtimeChannel.Status.SUBSCRIBED) {
-                    Realtime.logger.d { "Joined channel ${message.topic}" }
-                    _status.value = RealtimeChannel.Status.SUBSCRIBED
-                }
-            }
-            RealtimeMessage.EventType.POSTGRES_CHANGES -> {
-                val data = message.payload["data"]?.jsonObject ?: return
-                val ids = message.payload["ids"]?.jsonArray?.mapNotNull { it.jsonPrimitive.longOrNull } ?: emptyList() //the ids of the matching postgres changes
-                val postgresAction = supabaseJson.decodeFromJsonElement<PostgresActionData>(data)
-                val action = when(data["type"]?.jsonPrimitive?.content ?: "") {
-                    "UPDATE" -> PostgresAction.Update(postgresAction.record ?: error("Received no record on update event"), postgresAction.oldRecord ?: error("Received no old record on update event"), postgresAction.columns, postgresAction.commitTimestamp, realtimeImpl.serializer)
-                    "DELETE" -> PostgresAction.Delete(postgresAction.oldRecord ?: error("Received no old record on delete event"), postgresAction.columns, postgresAction.commitTimestamp, realtimeImpl.serializer)
-                    "INSERT" -> PostgresAction.Insert(postgresAction.record ?: error("Received no record on update event"), postgresAction.columns, postgresAction.commitTimestamp, realtimeImpl.serializer)
-                    "SELECT" -> PostgresAction.Select(postgresAction.record ?: error("Received no record on update event"), postgresAction.columns, postgresAction.commitTimestamp, realtimeImpl.serializer)
-                    else -> error("Unknown event type ${message.event}")
-                }
-                callbackManager.triggerPostgresChange(ids, action)
-            }
-            RealtimeMessage.EventType.BROADCAST -> {
-                val event = message.payload["event"]?.jsonPrimitive?.content ?: ""
-                callbackManager.triggerBroadcast(event, message.payload["payload"]?.jsonObject ?: JsonObject(mutableMapOf()))
-            }
-            RealtimeMessage.EventType.CLOSE -> {
-                realtimeImpl.run {
-                    deleteChannel(this@RealtimeChannelImpl)
-                }
-                Realtime.logger.d { "Unsubscribed from channel ${message.topic}" }
-            }
-            RealtimeMessage.EventType.ERROR -> {
-                Realtime.logger.e { "Received an error in channel ${message.topic}. That could be as a result of an invalid access token" }
-            }
-            RealtimeMessage.EventType.PRESENCE_DIFF -> {
-                val joins = message.payload["joins"]?.jsonObject?.decodeIfNotEmptyOrDefault(mapOf<String, Presence>()) ?: emptyMap()
-                val leaves = message.payload["leaves"]?.jsonObject?.decodeIfNotEmptyOrDefault(mapOf<String, Presence>()) ?: emptyMap()
-                callbackManager.triggerPresenceDiff(joins, leaves)
-            }
-            RealtimeMessage.EventType.PRESENCE_STATE -> {
-                val joins = message.payload.decodeIfNotEmptyOrDefault(mapOf<String, Presence>())
-                callbackManager.triggerPresenceDiff(joins, mapOf())
-            }
-        }
+        event.handle(this, message)
     }
 
     override suspend fun unsubscribe() {
@@ -217,6 +158,64 @@ internal class RealtimeChannelImpl(
                 put("event", "untrack")
             }, (++realtimeImpl.ref).toString())
         )
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    override fun <T : PostgresAction> RealtimeChannel.postgresChangeFlowInternal(
+        action: KClass<T>,
+        schema: String,
+        filter: PostgresChangeFilter.() -> Unit
+    ): Flow<T> {
+        if(status.value == RealtimeChannel.Status.SUBSCRIBED) error("You cannot call postgresChangeFlow after joining the channel")
+        val event = when(action) {
+            PostgresAction.Insert::class -> "INSERT"
+            PostgresAction.Update::class -> "UPDATE"
+            PostgresAction.Delete::class -> "DELETE"
+            PostgresAction.Select::class -> "SELECT"
+            PostgresAction::class -> "*"
+            else -> error("Unknown event type $action")
+        }
+        val postgrestBuilder = PostgresChangeFilter(event, schema).apply(filter)
+        val config = postgrestBuilder.buildConfig()
+        addPostgresChange(config)
+        return callbackFlow {
+            val callback: (PostgresAction) -> Unit = {
+                if (action.isInstance(it)) {
+                    trySend(it as T)
+                }
+            }
+
+            val id = callbackManager.addPostgresCallback(config, callback)
+            awaitClose {
+                callbackManager.removeCallbackById(id)
+                removePostgresChange(config)
+            }
+        }
+    }
+
+    override fun <T : Any> RealtimeChannel.broadcastFlowInternal(type: KType, event: String): Flow<T> = callbackFlow {
+        val id = callbackManager.addBroadcastCallback(event) {
+            val decodedValue = try {
+                supabaseClient.realtime.serializer.decode<T>(type, it.toString())
+            } catch(e: Exception) {
+                Realtime.logger.e(e) { "Couldn't decode $it as $type. The corresponding handler wasn't called" }
+                null
+            }
+            decodedValue?.let { value -> trySend(value) }
+        }
+        awaitClose { callbackManager.removeCallbackById(id) }
+    }
+
+    override fun presenceChangeFlow(): Flow<PresenceAction> = callbackFlow {
+        val callback: (PresenceAction) -> Unit = { action ->
+            trySend(action)
+        }
+        val id = callbackManager.addPresenceCallback(callback)
+        awaitClose { callbackManager.removeCallbackById(id) }
+    }
+
+    override fun updateStatus(status: RealtimeChannel.Status) {
+        _status.value = status
     }
 
 }

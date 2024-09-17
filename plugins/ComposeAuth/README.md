@@ -4,31 +4,21 @@ Extends gotrue-kt with Native Auth composables for Compose Multiplatform
 
 Supported targets:
 
-| Target | **JVM** | **Android** | **JS** | **iOS** | **tvOS** | **watchOS** | **macOS** | **Windows** | **Linux** |
-| ------ | ------- | ----------- | ------ | ------- | -------- | ----------- | --------- | ----------- | --------- |
-|        | ☑️      | ✅          | ☑️     | ✅      | ❌       | ❌          | ❌        | ❌          | ❌        |
+| Target | **JVM** | **Android** | **JS** | **Wasm** | **iOS** |
+|--------|---------|-------------|--------|----------|---------|
+| Status | ✅       | ✅           | ✅      | ✅        | ✅       |
 
-> Note: iOS support is experimental and needs feedback
->
-> ☑️ = Has no support for neither Google nor Apple Native Auth, relies on gotrue-kt for OAuth.
+> Native Google Auth is only supported on Android and Native Apple Auth is only supported on iOS. Other targets or combinations rely on `gotrue-kt` for OAuth.
 
 <details>
 
 <summary>In-depth Kotlin targets</summary>
 
-**iOS:** iosArm64, iosSimulatorArm64, iosX64
+**JS**: Browser
 
-**JS**: Browser, NodeJS
+**Wasm**: wasm-js
 
-**tvOS**: tvosArm64, tvosX64, tvosSimulatorArm64
-
-**watchOS**: watchosArm64, watchosX64, watchosSimulatorArm64
-
-**MacOS**: macosX64, macosArm64
-
-**Windows**: mingwX64
-
-**Linux**: linuxX64
+**iOS**: iosArm64, iosSimulatorArm64, iosX64
 
 </details>
 

@@ -23,6 +23,7 @@ kotlin {
             group("nonJvm") {
                 withIos()
                 withJs()
+                withWasmJs()
             }
         }
     }

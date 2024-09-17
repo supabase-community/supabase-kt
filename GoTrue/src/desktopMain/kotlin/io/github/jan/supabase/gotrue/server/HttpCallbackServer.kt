@@ -1,6 +1,5 @@
 package io.github.jan.supabase.gotrue.server
 
-import io.github.jan.supabase.annotations.SupabaseExperimental
 import io.github.jan.supabase.gotrue.Auth
 import io.github.jan.supabase.gotrue.AuthImpl
 import io.github.jan.supabase.gotrue.openExternalUrl
@@ -11,7 +10,6 @@ import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.ApplicationCall
 import io.ktor.server.application.ApplicationStopPreparing
 import io.ktor.server.cio.CIO
-import io.ktor.server.engine.ApplicationEngineEnvironment
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.response.respondText
 import io.ktor.server.routing.routing
@@ -23,7 +21,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlin.coroutines.resume
 
-@OptIn(SupabaseExperimental::class)
 internal suspend fun createServer(
     url: suspend (redirect: String) -> String,
     auth: Auth,
@@ -41,7 +38,7 @@ internal suspend fun createServer(
     }
     coroutineScope {
         val timeoutScope = launch {
-            val port = server.resolvedConnectors().first().port
+            val port = server.engine.resolvedConnectors().first().port
             Auth.logger.d {
                 "Started OAuth callback server on port $port. Opening url in browser..."
             }
@@ -64,7 +61,7 @@ internal suspend fun createServer(
         }
         launch {
             suspendCancellableCoroutine {
-                server.environment.monitor.subscribe(ApplicationStopPreparing) { _ ->
+                server.monitor.subscribe(ApplicationStopPreparing) { _ ->
                     it.resume(Unit)
                     timeoutScope.cancel()
                 }
@@ -84,14 +81,9 @@ internal suspend fun shutdown(call: ApplicationCall, message: String) {
 
     val latch = CompletableDeferred<Nothing>()
     call.application.launch {
+        application.monitor.raise(ApplicationStopPreparing, environment)
         latch.join()
-
-        environment.monitor.raise(ApplicationStopPreparing, environment)
-        if (environment is ApplicationEngineEnvironment) {
-            environment.stop()
-        } else {
-            application.dispose()
-        }
+        application.dispose()
     }
 
     try {

@@ -7,7 +7,7 @@ import org.jetbrains.kotlin.gradle.targets.js.yarn.YarnRootExtension
 val excludedModules = listOf("plugins", "serializers", "test-common")
 
 fun libraryModules(withBom: Boolean = true, init: Project.() -> Unit) = configure(
-    allprojects.filter { it.name !in excludedModules && !it.path.contains("sample") && if(withBom) true else it.name != "bom" },
+    allprojects.filter { it.name !in excludedModules && !it.path.contains("sample") && if(withBom) true else it.name != "bom" && it.name != it.rootProject.name },
     init
 )
 
