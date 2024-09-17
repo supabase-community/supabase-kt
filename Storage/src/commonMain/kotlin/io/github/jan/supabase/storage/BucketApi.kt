@@ -34,43 +34,47 @@ sealed interface BucketApi {
      * Uploads a file in [bucketId] under [path]
      * @param path The path to upload the file to
      * @param data The data to upload
-     * @param upsert Whether to overwrite an existing file
+     * @param options Additional options for the upload
      * @return the key to the uploaded file
      * @throws IllegalArgumentException if data to upload is empty
      * @throws RestException or one of its subclasses if receiving an error response
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
-    suspend fun upload(path: String, data: ByteArray, upsert: Boolean = false): FileUploadResponse {
+    suspend fun upload(path: String, data: ByteArray, options: UploadOptionBuilder.() -> Unit = {}): FileUploadResponse {
         require(data.isNotEmpty()) { "The data to upload should not be empty" }
-        return upload(path, UploadData(ByteReadChannel(data), data.size.toLong()), upsert)
+        return upload(path, UploadData(ByteReadChannel(data), data.size.toLong()), options)
     }
 
     /**
      * Uploads a file in [bucketId] under [path]
      * @param path The path to upload the file to
      * @param data The data to upload
-     * @param upsert Whether to overwrite an existing file
+     * @param options Additional options for the upload
      * @return the key to the uploaded file
      * @throws RestException or one of its subclasses if receiving an error response
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
-    suspend fun upload(path: String, data: UploadData, upsert: Boolean = false): FileUploadResponse
+    suspend fun upload(path: String, data: UploadData, options: UploadOptionBuilder.() -> Unit = {}): FileUploadResponse
 
     /**
-     * Uploads a file in [bucketId] under [path] using a presigned url
+     * Uploads a file in [bucketId] under [path] using a pre-signed url
      * @param path The path to upload the file to
-     * @param token The presigned url token
+     * @param token The pre-signed url token
      * @param data The data to upload
-     * @param upsert Whether to overwrite an existing file
+     * @param options Additional options for the upload
      * @return the key of the uploaded file
      * @throws IllegalArgumentException if data to upload is empty
      */
-    suspend fun uploadToSignedUrl(path: String, token: String, data: ByteArray, upsert: Boolean = false
+    suspend fun uploadToSignedUrl(
+        path: String,
+        token: String,
+        data: ByteArray,
+        options: UploadOptionBuilder.() -> Unit = {}
     ): FileUploadResponse {
         require(data.isNotEmpty()) { "The data to upload should not be empty" }
-        return uploadToSignedUrl(path, token, UploadData(ByteReadChannel(data), data.size.toLong()), upsert)
+        return uploadToSignedUrl(path, token, UploadData(ByteReadChannel(data), data.size.toLong()), options)
     }
 
     /**
@@ -78,42 +82,42 @@ sealed interface BucketApi {
      * @param path The path to upload the file to
      * @param token The presigned url token
      * @param data The data to upload
-     * @param upsert Whether to overwrite an existing file
+     * @param options Additional options for the upload
      * @return the key of the uploaded file
      * @throws RestException or one of its subclasses if receiving an error response
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      * @throws HttpRequestException on network related issues
      */
-    suspend fun uploadToSignedUrl(path: String, token: String, data: UploadData, upsert: Boolean = false): FileUploadResponse
+    suspend fun uploadToSignedUrl(path: String, token: String, data: UploadData, options: UploadOptionBuilder.() -> Unit = {}): FileUploadResponse
 
     /**
      * Updates a file in [bucketId] under [path]
      * @param path The path to update the file to
      * @param data The new data
-     * @param upsert Whether to overwrite an existing file
+     * @param options Additional options for the upload
      * @return the key to the updated file
      * @throws IllegalArgumentException if data to upload is empty
      * @throws RestException or one of its subclasses if receiving an error response
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
-    suspend fun update(path: String, data: ByteArray, upsert: Boolean = false): FileUploadResponse {
+    suspend fun update(path: String, data: ByteArray, options: UploadOptionBuilder.() -> Unit = {}): FileUploadResponse {
         require(data.isNotEmpty()) { "The data to upload should not be empty" }
-        return update(path, UploadData(ByteReadChannel(data), data.size.toLong()), upsert)
+        return update(path, UploadData(ByteReadChannel(data), data.size.toLong()), options)
     }
 
     /**
      * Updates a file in [bucketId] under [path]
      * @param path The path to update the file to
      * @param data The new data
-     * @param upsert Whether to overwrite an existing file
+     * @param options Additional options for the upload
      * @return the key to the updated file
      * @throws RestException or one of its subclasses if receiving an error response
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
-    suspend fun update(path: String, data: UploadData, upsert: Boolean = false): FileUploadResponse
+    suspend fun update(path: String, data: UploadData, options: UploadOptionBuilder.() -> Unit = {}): FileUploadResponse
 
     /**
      * Deletes all files in [bucketId] with in [paths]
@@ -199,51 +203,50 @@ sealed interface BucketApi {
     /**
      * Downloads a file from [bucketId] under [path]
      * @param path The path to download
-     * @param transform The transformation to apply to the image
+     * @param options Additional options for the download
      * @return The file as a byte array
      * @throws RestException or one of its subclasses if receiving an error response
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
-    suspend fun downloadAuthenticated(path: String, transform: ImageTransformation.() -> Unit = {}): ByteArray
+    suspend fun downloadAuthenticated(path: String, options: DownloadOptionBuilder.() -> Unit = {}): ByteArray
 
     /**
      * Downloads a file from [bucketId] under [path]
      * @param path The path to download
      * @param channel The channel to write the data to
-     * @param transform The transformation to apply to the image
+     * @param options Additional options for the download
      * @throws RestException or one of its subclasses if receiving an error response
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
-    suspend fun downloadAuthenticated(path: String, channel: ByteWriteChannel, transform: ImageTransformation.() -> Unit = {})
+    suspend fun downloadAuthenticated(path: String, channel: ByteWriteChannel, options: DownloadOptionBuilder.() -> Unit = {})
 
     /**
      * Downloads a file from [bucketId] under [path] using the public url
      * @param path The path to download
-     * @param transform The transformation to apply to the image
+     * @param options Additional options for the download
      * @return The file as a byte array
      * @throws RestException or one of its subclasses if receiving an error response
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
-    suspend fun downloadPublic(path: String, transform: ImageTransformation.() -> Unit = {}): ByteArray
+    suspend fun downloadPublic(path: String, options: DownloadOptionBuilder.() -> Unit = {}): ByteArray
 
     /**
      * Downloads a file from [bucketId] under [path] using the public url
      * @param path The path to download
      * @param channel The channel to write the data to
-     * @param transform The transformation to apply to the image
+     * @param options Additional options for the download
      * @throws RestException or one of its subclasses if receiving an error response
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
-    suspend fun downloadPublic(path: String, channel: ByteWriteChannel, transform: ImageTransformation.() -> Unit = {})
+    suspend fun downloadPublic(path: String, channel: ByteWriteChannel, options: DownloadOptionBuilder.() -> Unit = {})
 
 
     /**
-     * Searches for buckets with the given [prefix] and [filter]
-     * @return The filtered buckets
+     * Searches for files with the given [prefix] and [filter]
      * @throws RestException or one of its subclasses if receiving an error response
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
@@ -251,7 +254,7 @@ sealed interface BucketApi {
     suspend fun list(
         prefix: String = "",
         filter: BucketListFilter.() -> Unit = {}
-    ): List<BucketItem>
+    ): List<FileObject>
 
     /**
      * Changes the bucket's public status to [public]

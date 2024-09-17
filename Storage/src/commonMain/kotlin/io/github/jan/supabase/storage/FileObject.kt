@@ -15,7 +15,7 @@ import kotlinx.serialization.json.JsonObject
  * @param metadata The metadata of the item
  */
 @Serializable
-data class BucketItem(
+data class FileObject(
     val name: String,
     val id: String?,
     @SerialName("updated_at")
