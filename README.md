@@ -6,7 +6,7 @@ For information about supported Kotlin targets, see the corresponding module REA
 
 [Migrating from version 1.4.X to 2.0.0](/MIGRATION.md)
 
-*Note: The `WASM-JS` target for supported modules is only available for version 2.7.0 and above*
+*Note: The `WASM-JS` target for supported modules is only available for version 3.0.0 and above*
 
 [![](https://img.shields.io/github/release/supabase-community/supabase-kt?label=stable)](https://github.com/supabase-community/supabase-kt/releases) 
 [![](https://badgen.net/github/release/supabase-community/supabase-kt?label=prerelease)](https://central.sonatype.com/search?q=io.github.jan.supabase&smo=true) 
@@ -96,10 +96,10 @@ val iosMain by getting {
 
 **Note:** It is recommended to use the same Ktor version as supabase-kt:
 
-__For 2.7.0 and above:__
+__For 3.0.0 and above:__
 [![Ktor](https://img.shields.io/badge/ktor-3.0.0--rc--1-blue)](https://ktor.io/)
 
-__For versions below 2.7.0:__
+__For versions below 3.0.0:__
 [![Ktor](https://img.shields.io/badge/ktor-2.3.12-blue)](https://ktor.io/)
 
 ## Main Modules
