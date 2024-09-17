@@ -1,5 +1,6 @@
 package io.github.jan.supabase.storage
 
+import io.github.jan.supabase.exceptions.RestException
 import io.github.jan.supabase.putJsonObject
 import io.github.jan.supabase.safeBody
 import io.github.jan.supabase.storage.BucketApi.Companion.UPSERT_HEADER
@@ -14,6 +15,7 @@ import io.ktor.client.statement.bodyAsChannel
 import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
+import io.ktor.http.HttpStatusCode
 import io.ktor.http.Url
 import io.ktor.http.content.OutgoingContent
 import io.ktor.http.defaultForFilePath
@@ -218,6 +220,23 @@ internal class BucketApiImpl(override val bucketId: String, val storage: Storage
             put("prefix", prefix)
             putJsonObject(BucketListFilter().apply(filter).build())
         }).safeBody()
+    }
+
+    override suspend fun info(path: String): FileObjectV2 {
+        val response = storage.api.get("object/info/$bucketId/$path")
+        return response.safeBody<FileObjectV2>().copy(serializer = storage.serializer)
+    }
+
+    override suspend fun exists(path: String): Boolean {
+        try {
+            storage.api.request("object/$bucketId/$path") {
+                method = HttpMethod.Head
+            }
+            return true
+        } catch (e: RestException) {
+            if (e.statusCode in listOf(HttpStatusCode.NotFound.value, HttpStatusCode.BadRequest.value)) return false
+            throw e
+        }
     }
 
     private fun defaultUploadUrl(path: String) = "object/$bucketId/$path"

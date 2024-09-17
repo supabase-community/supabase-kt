@@ -550,7 +550,7 @@ class BucketApiTest {
                 quality = expectedQuality
                 resize = expectedResize
             }
-            val data = if(authenticated) client.storage[bucketId].downloadAuthenticated(expectedPath, transform) else client.storage[bucketId].downloadPublic(expectedPath, transform)
+            val data = if(authenticated) client.storage[bucketId].downloadAuthenticated(expectedPath) { transform(transform) } else client.storage[bucketId].downloadPublic(expectedPath) { transform(transform) }
             assertContentEquals(expectedData, data, "Data should be [1, 2, 3]")
         }
     }
