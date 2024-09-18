@@ -2,12 +2,12 @@ package io.github.jan.supabase.common
 
 
 import io.github.jan.supabase.SupabaseClient
+import io.github.jan.supabase.auth.auth
+import io.github.jan.supabase.auth.mfa.FactorType
+import io.github.jan.supabase.auth.mfa.MfaFactor
+import io.github.jan.supabase.auth.providers.Google
+import io.github.jan.supabase.auth.providers.builtin.Email
 import io.github.jan.supabase.exceptions.RestException
-import io.github.jan.supabase.gotrue.auth
-import io.github.jan.supabase.gotrue.mfa.FactorType
-import io.github.jan.supabase.gotrue.mfa.MfaFactor
-import io.github.jan.supabase.gotrue.providers.Google
-import io.github.jan.supabase.gotrue.providers.builtin.Email
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch

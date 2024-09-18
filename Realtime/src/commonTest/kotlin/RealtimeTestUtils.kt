@@ -1,5 +1,5 @@
-import io.github.jan.supabase.gotrue.Auth
-import io.github.jan.supabase.gotrue.user.UserSession
+import io.github.jan.supabase.auth.Auth
+import io.github.jan.supabase.auth.user.UserSession
 import io.github.jan.supabase.putJsonObject
 import io.github.jan.supabase.realtime.Presence
 import io.github.jan.supabase.realtime.RealtimeChannel.Companion.CHANNEL_EVENT_PRESENCE_DIFF

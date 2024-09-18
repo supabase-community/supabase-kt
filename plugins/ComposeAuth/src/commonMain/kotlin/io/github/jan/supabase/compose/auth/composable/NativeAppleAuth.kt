@@ -1,9 +1,9 @@
 package io.github.jan.supabase.compose.auth.composable
 
 import androidx.compose.runtime.Composable
+import io.github.jan.supabase.auth.providers.Apple
 import io.github.jan.supabase.compose.auth.ComposeAuth
 import io.github.jan.supabase.compose.auth.fallbackLogin
-import io.github.jan.supabase.gotrue.providers.Apple
 
 /**
  * Composable function that implements Native Apple Auth.

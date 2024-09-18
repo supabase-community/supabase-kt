@@ -1,9 +1,9 @@
 package io.github.jan.supabase.storage
 
 import io.github.jan.supabase.SupabaseClient
+import io.github.jan.supabase.auth.resolveAccessToken
 import io.github.jan.supabase.exceptions.HttpRequestException
 import io.github.jan.supabase.exceptions.RestException
-import io.github.jan.supabase.gotrue.resolveAccessToken
 import io.github.jan.supabase.storage.resumable.ResumableClient
 import io.ktor.client.plugins.HttpRequestTimeoutException
 import io.ktor.utils.io.ByteReadChannel

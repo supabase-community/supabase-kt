@@ -6,7 +6,7 @@ This is a demo of an android app using Google OneTap/Native Sign-In & WebView fo
 
 **Available platforms:** Android
 
-**Modules used:** GoTrue
+**Modules used:** Auth
 
 https://user-images.githubusercontent.com/26686035/235766941-6a62c415-e07e-4d18-9706-0a246e6821eb.mp4
 

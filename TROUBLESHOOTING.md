@@ -77,7 +77,7 @@ Not all Ktor client [engines](https://ktor.io/docs/http-client-engines.html#limi
 
 ### Auth
 
-<details><summary>GoTrue#sessionStatus doesn't change when signing up</summary>
+<details><summary>Auth#sessionStatus doesn't change when signing up</summary>
 
 If you don't have auto confirm enabled, your user has to confirm their email/phone number before they can sign in. Once they confirm, the session status will change.
 On Android and iOS, you can use deeplinking to automatically sign-in when the user clicks on the confirmation link.
