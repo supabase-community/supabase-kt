@@ -38,41 +38,10 @@ sealed interface MfaApi {
     val statusFlow: Flow<MfaStatus>
 
     /**
-     * Checks whether the current session was authenticated with MFA or the user has a verified MFA factor. Note that if the user has verified a factor on another device and the user hasn't been updated on this device, this will return false.
-     * You can use [Auth.retrieveUserForCurrentSession] to update the user and this property will update.
-     */
-    @Deprecated("Use statusFlow instead", ReplaceWith("statusFlow"))
-    val isMfaEnabledFlow: Flow<Boolean>
-
-    /**
-     * Checks whether the user has a verified MFA factor. Note that if the user has verified a factor on another device and the user hasn't been updated on this device, this will return false.
-     * You can use [Auth.retrieveUserForCurrentSession] to update the user and this property will update.
-     */
-    @Deprecated("Use status.enabled instead", ReplaceWith("status.enabled"))
-    val isMfaEnabled: Boolean
-        get() {
-            val mfaLevel = getAuthenticatorAssuranceLevel()
-            return mfaLevel.next == AuthenticatorAssuranceLevel.AAL2
-        }
-
-    /**
      * Returns all verified factors from the current user session. If the user has no verified factors or there is no session, an empty list is returned.
      * To fetch up-to-date factors, use [retrieveFactorsForCurrentUser].
      */
     val verifiedFactors: List<UserMfaFactor>
-
-    /**
-     * Checks whether the current session is authenticated with MFA
-     */
-    @Deprecated("Use status.active instead", ReplaceWith("status.active"))
-    val loggedInUsingMfa: Boolean
-        get() = getAuthenticatorAssuranceLevel().current == AuthenticatorAssuranceLevel.AAL2
-
-    /**
-     * Checks whether the current session is authenticated with MFA
-     */
-    @Deprecated("Use statusFlow instead", ReplaceWith("statusFlow"))
-    val loggedInUsingMfaFlow: Flow<Boolean>
 
     /**
      * @param factorType The type of MFA factor to enroll. Currently only supports TOTP.
@@ -156,10 +125,6 @@ internal class MfaApiImpl(
         }
     }
 
-    @Deprecated("Use statusFlow instead", replaceWith = ReplaceWith("statusFlow"))
-    override val isMfaEnabledFlow: Flow<Boolean> = statusFlow.map { it.enabled }
-    @Deprecated("Use statusFlow instead", replaceWith = ReplaceWith("statusFlow"))
-    override val loggedInUsingMfaFlow: Flow<Boolean> = statusFlow.map { it.active }
     override val verifiedFactors: List<UserMfaFactor>
         get() = auth.currentUserOrNull()?.factors?.filter(UserMfaFactor::isVerified) ?: emptyList()
 
