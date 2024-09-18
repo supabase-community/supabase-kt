@@ -35,4 +35,13 @@ sealed interface ExternalAuthAction {
      */
     data class CustomTabs(val intentBuilder: CustomTabsIntent.Builder.() -> Unit = {}) : ExternalAuthAction
 
+    companion object {
+
+        /**
+         * The default action to use for the OAuth flow
+         */
+        val DEFAULT: ExternalAuthAction = ExternalBrowser
+
+    }
+
 }
