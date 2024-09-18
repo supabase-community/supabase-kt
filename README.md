@@ -34,7 +34,7 @@ For information about supported Kotlin targets, see the corresponding module REA
 
 ### Add one or more modules to your project
 
-**Available modules**: `auth-kt`*, `postgrest-kt`, `functions-kt`, 
+**Available modules**: `gotrue-kt`*, `postgrest-kt`, `functions-kt`, 
 `storage-kt`, `realtime-kt`, `apollo-graphql`, `compose-auth`, 
 `compose-auth-ui`, `coil-integration`, `coil3-integration`, `imageloader-integration`
 
@@ -44,7 +44,7 @@ dependencies {
 }
 ```
 
-\* Before version 3.0.0, the module was called `gotrue-kt`.
+\* After version 3.0.0, the module will be called `auth-kt`.
 
 If you use multiple modules, you can use the bom dependency to get the correct versions for all
 modules:
@@ -106,7 +106,7 @@ __For versions below 3.0.0:__
 
 ## Main Modules
 
-- [Authentication](/Auth)
+- [Authentication](/GoTrue) <!-- Will be renamed after the version 3.0.0 comes out -->
 - [Database/Postgrest](/Postgrest)
 - [Storage](/Storage)
 - [Realtime](/Realtime)
