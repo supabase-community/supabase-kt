@@ -203,21 +203,6 @@ sealed interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
     ): UserInfo
 
     /**
-     * Modifies the current user
-     * @param updateCurrentUser Whether to update the current user in the [SupabaseClient]
-     * @param config The configuration to use
-     * @throws RestException or one of its subclasses if receiving an error response. If the error response contains a error code, an [AuthRestException] will be thrown which can be used to easier identify the problem.
-     * @throws HttpRequestTimeoutException if the request timed out
-     * @throws HttpRequestException on network related issues
-     */
-    @Deprecated("Use updateUser instead")
-    suspend fun modifyUser(
-        updateCurrentUser: Boolean = true,
-        redirectUrl: String? = defaultRedirectUrl(),
-        config: UserUpdateBuilder.() -> Unit
-    ): UserInfo = updateUser(updateCurrentUser, redirectUrl, config)
-
-    /**
      * Resends an existing signup confirmation email, email change email
      * @param type The email otp type
      * @param email The email to resend the otp to
