@@ -25,10 +25,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
+import io.github.jan.supabase.auth.mfa.FactorType
+import io.github.jan.supabase.auth.mfa.MfaFactor
 import io.github.jan.supabase.common.AppViewModel
 import io.github.jan.supabase.common.ui.components.QRCode
-import io.github.jan.supabase.gotrue.mfa.FactorType
-import io.github.jan.supabase.gotrue.mfa.MfaFactor
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

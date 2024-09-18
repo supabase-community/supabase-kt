@@ -3,7 +3,7 @@
 package io.github.jan.supabase.storage.resumable
 
 import io.github.jan.supabase.annotations.SupabaseInternal
-import io.github.jan.supabase.gotrue.Auth
+import io.github.jan.supabase.auth.Auth
 import io.github.jan.supabase.logging.d
 import io.github.jan.supabase.storage.BucketApi
 import io.github.jan.supabase.storage.Storage

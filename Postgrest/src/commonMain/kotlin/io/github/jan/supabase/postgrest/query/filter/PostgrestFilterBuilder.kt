@@ -1,7 +1,7 @@
 @file:Suppress("UndocumentedPublicProperty", "ConstructorParameterNaming")
 package io.github.jan.supabase.postgrest.query.filter
 
-import io.github.jan.supabase.gotrue.PostgrestFilterDSL
+import io.github.jan.supabase.auth.PostgrestFilterDSL
 import io.github.jan.supabase.postgrest.PropertyConversionMethod
 import kotlin.reflect.KProperty1
 

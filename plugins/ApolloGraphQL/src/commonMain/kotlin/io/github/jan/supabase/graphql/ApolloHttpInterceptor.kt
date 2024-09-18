@@ -3,7 +3,7 @@ package io.github.jan.supabase.graphql
 import com.apollographql.apollo.network.http.HttpInterceptor
 import com.apollographql.apollo.network.http.HttpInterceptorChain
 import io.github.jan.supabase.SupabaseClient
-import io.github.jan.supabase.gotrue.resolveAccessToken
+import io.github.jan.supabase.auth.resolveAccessToken
 import io.github.jan.supabase.logging.d
 import io.ktor.http.HttpHeaders
 import com.apollographql.apollo.api.http.HttpRequest as ApolloHttpRequest

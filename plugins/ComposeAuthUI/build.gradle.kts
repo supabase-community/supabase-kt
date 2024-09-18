@@ -32,7 +32,7 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 api(compose.ui)
-                addModules(SupabaseModule.GOTRUE)
+                addModules(SupabaseModule.AUTH)
                 implementation(compose.material3)
             }
         }

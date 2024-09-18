@@ -7,8 +7,9 @@ fun Project.applyDokkaWithConfiguration() {
         dokkaSourceSets.configureEach {
             sourceLink {
                 val name = when(moduleName.get()) {
+                    "supabase-kt" -> "Supabase"
                     "functions-kt" -> "Functions"
-                    "gotrue-kt" -> "GoTrue"
+                    "auth-kt" -> "Auth"
                     "postgrest-kt" -> "Postgrest"
                     "realtime-kt" -> "Realtime"
                     "storage-kt" -> "Storage"
@@ -16,6 +17,7 @@ fun Project.applyDokkaWithConfiguration() {
                     "compose-auth" -> "plugins/ComposeAuth"
                     "compose-auth-ui" -> "plugins/ComposeAuthUI"
                     "coil-integration" -> "plugins/CoilIntegration"
+                    "coil3-integration" -> "plugins/Coil3Integration"
                     "imageloader-integration" -> "plugins/ImageLoaderIntegration"
                     "serializer-moshi" -> "serializers/Moshi"
                     "serializer-jackson" -> "serializers/Jackson"

@@ -1,10 +1,10 @@
 @file:Suppress("UndocumentedPublicProperty")
 package io.github.jan.supabase.postgrest.query
 
+import io.github.jan.supabase.auth.PostgrestFilterDSL
 import io.github.jan.supabase.encodeToJsonElement
 import io.github.jan.supabase.exceptions.HttpRequestException
 import io.github.jan.supabase.exceptions.RestException
-import io.github.jan.supabase.gotrue.PostgrestFilterDSL
 import io.github.jan.supabase.postgrest.Postgrest
 import io.github.jan.supabase.postgrest.executor.RestRequestExecutor
 import io.github.jan.supabase.postgrest.mapToFirstValue

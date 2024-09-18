@@ -1,10 +1,10 @@
 import io.github.jan.supabase.SupabaseClientBuilder
+import io.github.jan.supabase.auth.Auth
+import io.github.jan.supabase.auth.auth
+import io.github.jan.supabase.auth.minimalSettings
 import io.github.jan.supabase.functions.FunctionRegion
 import io.github.jan.supabase.functions.Functions
 import io.github.jan.supabase.functions.functions
-import io.github.jan.supabase.gotrue.Auth
-import io.github.jan.supabase.gotrue.auth
-import io.github.jan.supabase.gotrue.minimalSettings
 import io.github.jan.supabase.testing.createMockedSupabaseClient
 import io.github.jan.supabase.testing.pathAfterVersion
 import io.github.jan.supabase.testing.toJsonElement

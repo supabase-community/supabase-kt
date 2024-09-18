@@ -18,7 +18,7 @@ open class MainConfig {
     var customUrl: String? = null
 
     /**
-     * The jwt token used for this module. If null, the client will use the token from GoTrue's current session
+     * The jwt token used for this module. If null, the client will use the token from Auth's current session
      */
     var jwtToken: String? = null
 

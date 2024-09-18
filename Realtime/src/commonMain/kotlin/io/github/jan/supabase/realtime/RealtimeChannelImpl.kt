@@ -1,8 +1,8 @@
 package io.github.jan.supabase.realtime
 
 import io.github.jan.supabase.annotations.SupabaseInternal
+import io.github.jan.supabase.auth.resolveAccessToken
 import io.github.jan.supabase.collections.AtomicMutableList
-import io.github.jan.supabase.gotrue.resolveAccessToken
 import io.github.jan.supabase.logging.d
 import io.github.jan.supabase.logging.e
 import io.github.jan.supabase.putJsonObject
