@@ -1,5 +1,7 @@
 # Supabase-kt Auth
 
+**Only available for versions 3.0.0 and above. For versions below 3.0.0, checkout the [old README](/GoTrue)**
+
 Extends Supabase-kt with a multiplatform Auth client.
 
 Supported targets:
