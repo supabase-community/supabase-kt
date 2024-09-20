@@ -286,7 +286,7 @@ sealed interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
 
     /**
      * Retrieves the current user with the current session
-     * @param updateSession Whether to update [sessionStatus] with the updated user, if [sessionStatus] is [io.github.jan.supabase.auth.status.SessionStatus.Authenticated]
+     * @param updateSession Whether to update [sessionStatus] with the updated user, if [sessionStatus] is [SessionStatus.Authenticated]
      * @throws RestException or one of its subclasses if receiving an error response. If the error response contains a error code, an [AuthRestException] will be thrown which can be used to easier identify the problem.
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
@@ -294,7 +294,7 @@ sealed interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
     suspend fun retrieveUserForCurrentSession(updateSession: Boolean = false): UserInfo
 
     /**
-     * Signs out the current user, which means [sessionStatus] will be [io.github.jan.supabase.auth.status.SessionStatus.NotAuthenticated] and the access token will be revoked
+     * Signs out the current user, which means [sessionStatus] will be [SessionStatus.NotAuthenticated] and the access token will be revoked
      * @param scope The scope of the sign-out.
      * @throws RestException or one of its subclasses if receiving an error response. If the error response contains a error code, an [AuthRestException] will be thrown which can be used to easier identify the problem.
      * @throws HttpRequestTimeoutException if the request timed out
@@ -341,7 +341,7 @@ sealed interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
     suspend fun refreshCurrentSession()
 
     /**
-     * Deletes the current session from storage and sets [sessionStatus] to [io.github.jan.supabase.auth.status.SessionStatus.NotAuthenticated]
+     * Deletes the current session from storage and sets [sessionStatus] to [SessionStatus.NotAuthenticated]
      */
     suspend fun clearSession()
 
@@ -403,7 +403,7 @@ sealed interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
     /**
      * Blocks the current coroutine until the plugin is initialized.
      *
-     * This will make sure that the [io.github.jan.supabase.auth.status.SessionStatus] is set to [io.github.jan.supabase.auth.status.SessionStatus.Authenticated], [io.github.jan.supabase.auth.status.SessionStatus.NotAuthenticated] or [io.github.jan.supabase.auth.status.SessionStatus.RefreshError].
+     * This will make sure that the [io.github.jan.supabase.auth.status.SessionStatus] is set to [SessionStatus.Authenticated], [SessionStatus.NotAuthenticated] or [SessionStatus.RefreshError].
      */
     suspend fun awaitInitialization()
 
