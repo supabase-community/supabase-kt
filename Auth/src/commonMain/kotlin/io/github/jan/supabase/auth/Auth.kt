@@ -12,6 +12,8 @@ import io.github.jan.supabase.auth.providers.OAuthProvider
 import io.github.jan.supabase.auth.providers.builtin.Email
 import io.github.jan.supabase.auth.providers.builtin.Phone
 import io.github.jan.supabase.auth.providers.builtin.SSO
+import io.github.jan.supabase.auth.status.SessionSource
+import io.github.jan.supabase.auth.status.SessionStatus
 import io.github.jan.supabase.auth.user.UserInfo
 import io.github.jan.supabase.auth.user.UserSession
 import io.github.jan.supabase.auth.user.UserUpdateBuilder
@@ -401,7 +403,7 @@ sealed interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
     /**
      * Blocks the current coroutine until the plugin is initialized.
      *
-     * This will make sure that the [SessionStatus] is set to [SessionStatus.Authenticated], [SessionStatus.NotAuthenticated] or [SessionStatus.NetworkError].
+     * This will make sure that the [SessionStatus] is set to [SessionStatus.Authenticated], [SessionStatus.NotAuthenticated] or [SessionStatus.RefreshError].
      */
     suspend fun awaitInitialization()
 
@@ -412,7 +414,7 @@ sealed interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
         override val logger: SupabaseLogger = SupabaseClient.createLogger("Supabase-Auth")
 
         /**
-         * The gotrue api version to use
+         * The auth api version to use
          */
         const val API_VERSION = 1
 

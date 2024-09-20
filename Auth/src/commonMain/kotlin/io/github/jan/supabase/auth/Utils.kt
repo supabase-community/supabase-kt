@@ -2,6 +2,7 @@ package io.github.jan.supabase.auth
 
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.annotations.SupabaseInternal
+import io.github.jan.supabase.auth.status.SessionSource
 import io.github.jan.supabase.auth.user.UserSession
 import io.github.jan.supabase.logging.d
 import io.ktor.client.request.HttpRequestBuilder

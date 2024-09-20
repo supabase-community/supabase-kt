@@ -50,7 +50,7 @@ open class AuthConfigDefaults : MainConfig() {
     var codeVerifierCache: CodeVerifierCache? = null
 
     /**
-     * The dispatcher used for all gotrue related network requests
+     * The dispatcher used for all auth related network requests
      */
     var coroutineDispatcher: CoroutineDispatcher = Dispatchers.Default
 

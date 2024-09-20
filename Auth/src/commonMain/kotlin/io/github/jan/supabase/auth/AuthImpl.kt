@@ -15,6 +15,9 @@ import io.github.jan.supabase.auth.providers.ExternalAuthConfigDefaults
 import io.github.jan.supabase.auth.providers.OAuthProvider
 import io.github.jan.supabase.auth.providers.builtin.OTP
 import io.github.jan.supabase.auth.providers.builtin.SSO
+import io.github.jan.supabase.auth.status.RefreshFailureCause
+import io.github.jan.supabase.auth.status.SessionSource
+import io.github.jan.supabase.auth.status.SessionStatus
 import io.github.jan.supabase.auth.user.UserInfo
 import io.github.jan.supabase.auth.user.UserSession
 import io.github.jan.supabase.auth.user.UserUpdateBuilder
@@ -64,7 +67,7 @@ internal class AuthImpl(
     override val config: AuthConfig
 ) : Auth {
 
-    private val _sessionStatus = MutableStateFlow<SessionStatus>(SessionStatus.LoadingFromStorage)
+    private val _sessionStatus = MutableStateFlow<SessionStatus>(SessionStatus.Initializing)
     override val sessionStatus: StateFlow<SessionStatus> = _sessionStatus.asStateFlow()
     internal val authScope = CoroutineScope(config.coroutineDispatcher)
     override val sessionManager = config.sessionManager ?: createDefaultSessionManager()
@@ -384,7 +387,7 @@ internal class AuthImpl(
         val response = api.postJson("token?grant_type=refresh_token", body) {
             headers.remove("Authorization")
         }
-        return response.safeBody("GoTrue#refreshSession")
+        return response.safeBody("Auth#refreshSession")
     }
 
     override suspend fun refreshCurrentSession() {
@@ -428,6 +431,7 @@ internal class AuthImpl(
         }
     }
 
+    @Suppress("MagicNumber")
     private suspend fun tryImportingSession(
         importRefreshedSession: suspend () -> Unit,
         retry: suspend () -> Unit
@@ -435,11 +439,18 @@ internal class AuthImpl(
         try {
             importRefreshedSession()
         } catch (e: RestException) {
-            clearSession()
-            Auth.logger.e(e) { "Couldn't refresh session. The refresh token may have been revoked." }
+            if (e.statusCode in 500..599) {
+                Auth.logger.e(e) { "Couldn't refresh session due to an internal server error. Retrying in ${config.retryDelay} (Status code ${e.statusCode})" }
+                _sessionStatus.value = SessionStatus.RefreshFailure(RefreshFailureCause.InternalServerError(e))
+                delay(config.retryDelay)
+                retry()
+            } else {
+                Auth.logger.e(e) { "Couldn't refresh session. The refresh token may have been revoked. Clearing session... (Status code ${e.statusCode})" }
+                clearSession()
+            }
         } catch (e: Exception) {
-            Auth.logger.e(e) { "Couldn't reach supabase. Either the address doesn't exist or the network might not be on. Retrying in ${config.retryDelay}" }
-            _sessionStatus.value = SessionStatus.NetworkError
+            Auth.logger.e(e) { "Couldn't reach Supabase. Either the address doesn't exist or the network might not be on. Retrying in ${config.retryDelay}" }
+            _sessionStatus.value = SessionStatus.RefreshFailure(RefreshFailureCause.NetworkError(e))
             delay(config.retryDelay)
             retry()
         }
@@ -558,11 +569,11 @@ internal class AuthImpl(
     }
 
     override suspend fun awaitInitialization() {
-        sessionStatus.first { it !is SessionStatus.LoadingFromStorage }
+        sessionStatus.first { it !is SessionStatus.Initializing }
     }
 
     fun resetLoadingState() {
-        _sessionStatus.value = SessionStatus.LoadingFromStorage
+        _sessionStatus.value = SessionStatus.Initializing
     }
 
     /**
