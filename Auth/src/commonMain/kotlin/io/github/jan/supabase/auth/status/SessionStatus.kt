@@ -21,6 +21,7 @@ sealed interface SessionStatus {
 
     /**
      * This status means that [Auth] had an error while refreshing the session
+     * @param cause The cause of the error
      */
     data class RefreshFailure(val cause: RefreshFailureCause) : SessionStatus
 
