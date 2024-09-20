@@ -403,7 +403,7 @@ sealed interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
     /**
      * Blocks the current coroutine until the plugin is initialized.
      *
-     * This will make sure that the [io.github.jan.supabase.auth.status.SessionStatus] is set to [SessionStatus.Authenticated], [SessionStatus.NotAuthenticated] or [SessionStatus.RefreshError].
+     * This will make sure that the [SessionStatus] is set to [SessionStatus.Authenticated], [SessionStatus.NotAuthenticated] or [SessionStatus.RefreshError].
      */
     suspend fun awaitInitialization()
 
