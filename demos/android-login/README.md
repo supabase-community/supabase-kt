@@ -1,10 +1,12 @@
+# Deprecation note
+This sample has been deprecated. Checkout the [official video](https://www.youtube.com/watch?v=P_jZMDmodG4&pp=ygUWc3VwYWJhc2UgZ29vZ2xlIGtvdGxpbg%3D%3D) on how to use the Google Credential Manager to natively sign in with Google or checkout [Compose Auth](/plugins/ComposeAuth)
 # Android Login Demo
 
 This is a demo of an android app using Google OneTap/Native Sign-In & WebView for authentication
 
 **Available platforms:** Android
 
-**Modules used:** GoTrue
+**Modules used:** Auth
 
 https://user-images.githubusercontent.com/26686035/235766941-6a62c415-e07e-4d18-9706-0a246e6821eb.mp4
 

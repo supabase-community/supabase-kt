@@ -4,23 +4,27 @@ Extends Supabase-kt with a multiplatform Postgrest client.
 
 Supported targets:
 
-| Target | **JVM** | **Android** | **JS** | **iOS** | **tvOS** | **watchOS** | **macOS** | **Windows** | **Linux** |
-| ------ | ------- | ----------- | ------ | ------- | -------- | ----------- | --------- | ----------- | --------- |
-|        | ✅      | ✅          | ✅     | ✅      | ✅       | ✅          | ✅        | ✅          | ✅        |
+| Target | **JVM** | **Android** | **JS** | **Wasm** | **Apple** | **Windows** | **Linux** |
+|--------|---------|-------------|--------|----------|-----------|-------------|-----------|
+| Status | ✅       | ✅           | ✅      | ✅        | ✅         | ✅           | ✅         |
 
 <details>
 
 <summary>In-depth Kotlin targets</summary>
 
-**iOS:** iosArm64, iosSimulatorArm64, iosX64
-
 **JS**: Browser, NodeJS
 
-**tvOS**: tvosArm64, tvosX64, tvosSimulatorArm64
+**Wasm**: wasm-js
 
-**watchOS**: watchosArm64, watchosX64, watchosSimulatorArm64
+**Apple:**
 
-**MacOS**: macosX64, macosArm64
+- iOS: iosArm64, iosSimulatorArm64, iosX64
+
+- tvOS: tvosArm64, tvosX64, tvosSimulatorArm64
+
+- watchOS: watchosArm64, watchosX64, watchosSimulatorArm64
+
+- MacOS: macosX64, macosArm64
 
 **Windows**: mingwX64
 

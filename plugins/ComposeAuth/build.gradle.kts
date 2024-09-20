@@ -24,6 +24,7 @@ kotlin {
             group("noDefault") {
                 withJvm()
                 withJs()
+                withWasmJs()
             }
         }
     }
@@ -31,7 +32,7 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
-                addModules(SupabaseModule.GOTRUE)
+                addModules(SupabaseModule.AUTH)
                 implementation(compose.runtime)
                 implementation(libs.krypto)
             }

@@ -1,7 +1,6 @@
 package io.github.jan.supabase.common.ui.screen
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -15,7 +14,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -24,14 +22,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.scale
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
+import io.github.jan.supabase.auth.mfa.FactorType
+import io.github.jan.supabase.auth.mfa.MfaFactor
 import io.github.jan.supabase.common.AppViewModel
 import io.github.jan.supabase.common.ui.components.QRCode
-import io.github.jan.supabase.gotrue.mfa.FactorType
-import io.github.jan.supabase.gotrue.mfa.MfaFactor
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

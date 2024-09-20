@@ -3,23 +3,18 @@ package io.github.jan.supabase.common
 
 import co.touchlab.kermit.Logger
 import io.github.jan.supabase.SupabaseClient
+import io.github.jan.supabase.auth.SessionStatus
+import io.github.jan.supabase.common.net.AuthApi
 import io.github.jan.supabase.common.net.Message
 import io.github.jan.supabase.common.net.MessageApi
-import io.github.jan.supabase.gotrue.auth
-import io.github.jan.supabase.gotrue.providers.Google
-import io.github.jan.supabase.gotrue.providers.builtin.Email
-import io.github.jan.supabase.realtime.PostgresAction
-import io.github.jan.supabase.realtime.RealtimeChannel
-import io.github.jan.supabase.realtime.decodeRecord
-import io.github.jan.supabase.realtime.postgresChangeFlow
 import io.github.jan.supabase.realtime.realtime
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import kotlinx.serialization.json.int
-import kotlinx.serialization.json.jsonPrimitive
 
 expect open class MPViewModel() {
 
@@ -28,27 +23,25 @@ expect open class MPViewModel() {
 }
 class ChatViewModel(
     val supabaseClient: SupabaseClient,
-    private val realtimeChannel: RealtimeChannel,
-    private val messageApi: MessageApi
+    private val messageApi: MessageApi,
+    private val authApi: AuthApi
 ) : MPViewModel() {
 
-    val sessionStatus = supabaseClient.auth.sessionStatus
-    val loginAlert = MutableStateFlow<String?>(null)
+    val sessionStatus = authApi.sessionStatus().stateIn(coroutineScope, SharingStarted.Eagerly, SessionStatus.NotAuthenticated(false))
+    val alert = MutableStateFlow<String?>(null)
     val messages = MutableStateFlow<List<Message>>(emptyList())
+    val passwordReset = MutableStateFlow<Boolean>(false)
 
     //Auth
 
     fun signUp(email: String, password: String) {
         coroutineScope.launch {
             kotlin.runCatching {
-                supabaseClient.auth.signUpWith(Email) {
-                    this.email = email
-                    this.password = password
-                }
+                authApi.signUp(email, password)
             }.onSuccess {
-                loginAlert.value = "Successfully registered! Check your E-Mail to verify your account."
+                alert.value = "Successfully registered! Check your E-Mail to verify your account."
             }.onFailure {
-                loginAlert.value = "There was an error while registering: ${it.message}"
+                alert.value = "There was an error while registering: ${it.message}"
             }
         }
     }
@@ -56,13 +49,10 @@ class ChatViewModel(
     fun login(email: String, password: String) {
         coroutineScope.launch {
             kotlin.runCatching {
-                supabaseClient.auth.signInWith(Email) {
-                    this.email = email
-                    this.password = password
-                }
+                authApi.signIn(email, password)
             }.onFailure {
                 it.printStackTrace()
-                loginAlert.value = "There was an error while logging in. Check your credentials and try again."
+                alert.value = "There was an error while logging in. Check your credentials and try again."
             }
         }
     }
@@ -70,7 +60,39 @@ class ChatViewModel(
     fun loginWithGoogle() {
         coroutineScope.launch {
             kotlin.runCatching {
-                supabaseClient.auth.signInWith(Google)
+                authApi.signInWithGoogle()
+            }
+        }
+    }
+
+    fun loginWithOTP(email: String, code: String, reset: Boolean) {
+        coroutineScope.launch {
+            kotlin.runCatching {
+                authApi.verifyOtp(email, code)
+            }.onSuccess {
+                passwordReset.value = reset
+            }.onFailure {
+                alert.value = "There was an error while verifying the OTP: ${it.message}"
+            }
+        }
+    }
+
+    fun resetPassword(email: String) {
+        coroutineScope.launch {
+            kotlin.runCatching {
+                authApi.resetPassword(email)
+            }
+        }
+    }
+
+    fun changePassword(password: String) {
+        coroutineScope.launch {
+            kotlin.runCatching {
+                authApi.changePassword(password)
+            }.onSuccess {
+                alert.value = "Password changed successfully!"
+            }.onFailure {
+                alert.value = "There was an error while changing the password: ${it.message}"
             }
         }
     }
@@ -78,39 +100,23 @@ class ChatViewModel(
     fun logout() {
         coroutineScope.launch {
             kotlin.runCatching {
-                supabaseClient.auth.signOut()
+                authApi.signOut()
                 messages.value = emptyList()
             }
         }
     }
 
     //Realtime
-    fun connectToRealtime() {
+    fun retrieveMessages() {
         coroutineScope.launch {
             kotlin.runCatching {
-                realtimeChannel.postgresChangeFlow<PostgresAction>("public") {
-                    table = "messages"
-                }.onEach {
-                    when(it) {
-                        is PostgresAction.Delete -> messages.value = messages.value.filter { message -> message.id != it.oldRecord["id"]!!.jsonPrimitive.int }
-                        is PostgresAction.Insert -> messages.value = messages.value + it.decodeRecord<Message>()
-                        is PostgresAction.Select -> error("Select should not be possible")
-                        is PostgresAction.Update -> error("Update should not be possible")
+                messageApi.retrieveMessages()
+                    .onEach {
+                        messages.value = it
                     }
-                }.launchIn(coroutineScope)
-
-                realtimeChannel.subscribe()
-
+                    .launchIn(coroutineScope)
             }.onFailure {
-                it.printStackTrace()
-            }
-        }
-    }
-
-    fun disconnectFromRealtime() {
-        coroutineScope.launch {
-            kotlin.runCatching {
-                supabaseClient.realtime.disconnect()
+                Logger.e(it) { "Error while retrieving messages" }
             }
         }
     }
@@ -136,14 +142,10 @@ class ChatViewModel(
         }
     }
 
-    fun retrieveMessages() {
+    fun disconnectFromRealtime() {
         coroutineScope.launch {
             kotlin.runCatching {
-                messageApi.retrieveMessages()
-            }.onSuccess {
-                messages.value = it
-            }.onFailure {
-                Logger.e(it) { "Error while retrieving messages" }
+                supabaseClient.realtime.removeAllChannels()
             }
         }
     }

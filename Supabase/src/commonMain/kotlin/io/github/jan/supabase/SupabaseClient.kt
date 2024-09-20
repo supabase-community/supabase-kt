@@ -14,7 +14,7 @@ import io.ktor.client.engine.HttpClientEngine
 /**
  * The main class to interact with Supabase.
  *
- * To add functionality, add plugins like **GoTrue** or **Functions** within the [SupabaseClientBuilder]
+ * To add functionality, add plugins like **Auth** or **Functions** within the [SupabaseClientBuilder]
  */
 sealed interface SupabaseClient {
 
@@ -85,6 +85,7 @@ sealed interface SupabaseClient {
 
 }
 
+@Suppress("LongParameterList") //TODO: maybe refactor
 internal class SupabaseClientImpl(
     override val supabaseUrl: String,
     override val supabaseKey: String,

@@ -1,7 +1,7 @@
 import app.cash.turbine.test
-import io.github.jan.supabase.gotrue.Auth
-import io.github.jan.supabase.gotrue.auth
-import io.github.jan.supabase.gotrue.minimalSettings
+import io.github.jan.supabase.auth.Auth
+import io.github.jan.supabase.auth.auth
+import io.github.jan.supabase.auth.minimalSettings
 import io.github.jan.supabase.postgrest.query.filter.FilterOperation
 import io.github.jan.supabase.postgrest.query.filter.FilterOperator
 import io.github.jan.supabase.realtime.CallbackManagerImpl
@@ -17,7 +17,6 @@ import io.github.jan.supabase.realtime.RealtimeMessage
 import io.github.jan.supabase.realtime.broadcastFlow
 import io.github.jan.supabase.realtime.channel
 import io.github.jan.supabase.realtime.postgresChangeFlow
-import io.github.jan.supabase.realtime.presenceChangeFlow
 import io.github.jan.supabase.realtime.realtime
 import io.github.jan.supabase.testing.assertPathIs
 import io.github.jan.supabase.testing.pathAfterVersion

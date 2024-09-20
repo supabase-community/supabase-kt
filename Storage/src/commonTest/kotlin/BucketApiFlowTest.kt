@@ -73,7 +73,9 @@ class BucketApiFlowTest {
     @Test
     fun testUpsertAsFlowMethodWithByteArray() {
         testUploadAsFlow(upsert = true) { client, expectedPath, data ->
-            val flow = client.storage[bucketId].uploadAsFlow(expectedPath, data, upsert = true)
+            val flow = client.storage[bucketId].uploadAsFlow(expectedPath, data) {
+                upsert = true
+            }
             testUploadFlowWithByteArray(flow, expectedPath, data)
         }
     }
@@ -95,7 +97,9 @@ class BucketApiFlowTest {
             val channel = ByteReadChannel(bytes)
             val expectedSize = bytes.size.toLong()
             val data = UploadData(channel, expectedSize)
-            val flow = client.storage[bucketId].uploadAsFlow(expectedPath, data, upsert = true)
+            val flow = client.storage[bucketId].uploadAsFlow(expectedPath, data) {
+                upsert = true
+            }
             testUploadFlowWithByteArray(flow, expectedPath, bytes)
         }
     }
@@ -131,7 +135,9 @@ class BucketApiFlowTest {
     @Test
     fun testUpdateUpsertAsFlowMethodWithByteArray() {
         testUpdateAsFlow(upsert = true) { client, expectedPath, data ->
-            val flow = client.storage[bucketId].updateAsFlow(expectedPath, data, upsert = true)
+            val flow = client.storage[bucketId].updateAsFlow(expectedPath, data) {
+                upsert = true
+            }
             testUploadFlowWithByteArray(flow, expectedPath, data)
         }
     }
@@ -153,7 +159,9 @@ class BucketApiFlowTest {
             val channel = ByteReadChannel(bytes)
             val expectedSize = bytes.size.toLong()
             val data = UploadData(channel, expectedSize)
-            val flow = client.storage[bucketId].updateAsFlow(expectedPath, data, upsert = true)
+            val flow = client.storage[bucketId].updateAsFlow(expectedPath, data) {
+                upsert = true
+            }
             testUploadFlowWithByteArray(flow, expectedPath, bytes)
         }
     }
@@ -206,7 +214,9 @@ class BucketApiFlowTest {
             val channel = ByteReadChannel(bytes)
             val expectedSize = bytes.size.toLong()
             val data = UploadData(channel, expectedSize)
-            val flow = client.storage[bucketId].uploadToSignedUrlAsFlow(expectedPath, expectedToken, data, true)
+            val flow = client.storage[bucketId].uploadToSignedUrlAsFlow(expectedPath, expectedToken, data) {
+                upsert = true
+            }
             testUploadFlowWithByteArray(flow, expectedPath, bytes)
         }
     }
@@ -214,7 +224,9 @@ class BucketApiFlowTest {
     @Test
     fun testUpsertToSignedUrlAsFlowMethodByteArray() {
         testUploadToSignedUrl(upsert = true) { client, expectedPath, bytes ->
-            val flow = client.storage[bucketId].uploadToSignedUrlAsFlow(expectedPath, expectedToken, bytes, true)
+            val flow = client.storage[bucketId].uploadToSignedUrlAsFlow(expectedPath, expectedToken, bytes) {
+                upsert = true
+            }
             testUploadFlowWithByteArray(flow, expectedPath, bytes)
         }
     }

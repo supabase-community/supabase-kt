@@ -2,8 +2,7 @@
 package io.github.jan.supabase.postgrest.query
 
 import io.github.jan.supabase.annotations.SupabaseExperimental
-import io.github.jan.supabase.annotations.SupabaseInternal
-import io.github.jan.supabase.gotrue.PostgrestFilterDSL
+import io.github.jan.supabase.auth.PostgrestFilterDSL
 import io.github.jan.supabase.postgrest.PropertyConversionMethod
 import io.github.jan.supabase.postgrest.query.filter.PostgrestFilterBuilder
 import io.github.jan.supabase.postgrest.result.PostgrestResult
@@ -15,7 +14,7 @@ import kotlin.js.JsName
  * A builder for Postgrest requests.
  */
 @PostgrestFilterDSL
-class PostgrestRequestBuilder(@PublishedApi internal val propertyConversionMethod: PropertyConversionMethod) {
+open class PostgrestRequestBuilder(@PublishedApi internal val propertyConversionMethod: PropertyConversionMethod) {
 
     /**
      * The [Count] algorithm to use to count rows in the table or view.
@@ -132,6 +131,7 @@ class PostgrestRequestBuilder(@PublishedApi internal val propertyConversionMetho
      * @param format - The format of the output, can be `"text"` (default)
      * or `"json"`
      */
+    @Suppress("LongParameterList")
     fun explain(
         analyze: Boolean = false,
         verbose: Boolean = false,
@@ -161,12 +161,4 @@ class PostgrestRequestBuilder(@PublishedApi internal val propertyConversionMetho
     }
 
 }
-
-@SupabaseInternal
-inline fun postgrestRequest(propertyConversionMethod: PropertyConversionMethod = PropertyConversionMethod.CAMEL_CASE_TO_SNAKE_CASE, block: PostgrestRequestBuilder.() -> Unit): PostgrestRequestBuilder {
-    val filter = PostgrestRequestBuilder(propertyConversionMethod)
-    filter.block()
-    return filter
-}
-
 

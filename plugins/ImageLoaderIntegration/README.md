@@ -4,27 +4,19 @@ Extends supabase-kt with a [Compose-ImageLoader](https://github.com/qdsfdhvh/com
 
 Supported targets:
 
-| Target | **JVM** | **Android** | **JS** | **iOS** | **tvOS** | **watchOS** | **macOS** | **Windows** | **Linux** |
-|--------|---------|-------------|--------|---------|----------|-------------|-----------|-------------|-----------|
-| Status | ✅       | ✅           | ✅      | ✅       | ❌        | ❌           | ❌         | ❌           | ❌         |
+| Target | **JVM** | **Android** | **JS** | **iOS** |
+|--------|---------|-------------|--------|---------|
+| Status | ✅       | ✅           | ✅      | ✅       |
+
+> Wasm-JS is currently not supported due to a bug in the Compose-ImageLoader library.
 
 <details>
 
 <summary>In-depth Kotlin targets</summary>
 
-**iOS:** iosArm64, iosSimulatorArm64, iosX64
+**JS**: Browser
 
-**JS**: Browser, NodeJS
-
-**tvOS**: tvosArm64, tvosX64, tvosSimulatorArm64
-
-**watchOS**: watchosArm64, watchosX64, watchosSimulatorArm64
-
-**MacOS**: macosX64, macosArm64
-
-**Windows**: mingwX64
-
-**Linux**: linuxX64
+**iOS**: iosArm64, iosSimulatorArm64, iosX64
 
 </details>
 

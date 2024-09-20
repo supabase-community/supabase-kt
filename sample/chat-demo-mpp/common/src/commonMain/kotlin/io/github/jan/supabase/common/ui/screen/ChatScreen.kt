@@ -9,13 +9,15 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Send
-import androidx.compose.material3.Button
-import androidx.compose.material3.Divider
+import androidx.compose.material.icons.automirrored.filled.Logout
+import androidx.compose.material.icons.automirrored.filled.Send
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -29,9 +31,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import io.github.jan.supabase.CurrentPlatformTarget
 import io.github.jan.supabase.PlatformTarget
+import io.github.jan.supabase.auth.user.UserInfo
 import io.github.jan.supabase.common.ChatViewModel
 import io.github.jan.supabase.common.ui.components.MessageCard
-import io.github.jan.supabase.gotrue.user.UserInfo
+import io.github.jan.supabase.common.ui.components.PasswordChangeDialog
 import kotlinx.coroutines.flow.map
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -40,11 +43,12 @@ fun ChatScreen(viewModel: ChatViewModel, user: UserInfo) {
     val messages by viewModel.messages.map { it.reversed() }.collectAsState(emptyList())
     var message by remember { mutableStateOf("") }
     val ownId = user.id
+    val reset by viewModel.passwordReset.collectAsState()
+    val alert by viewModel.alert.collectAsState()
 
     LaunchedEffect(Unit) {
         if(CurrentPlatformTarget in listOf(PlatformTarget.JVM, PlatformTarget.JS, PlatformTarget.ANDROID)) {
             viewModel.retrieveMessages()
-            viewModel.connectToRealtime()
         }
     }
 
@@ -62,7 +66,7 @@ fun ChatScreen(viewModel: ChatViewModel, user: UserInfo) {
                 }
             }
         }
-        Divider(thickness = 1.dp, modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp))
+        HorizontalDivider(thickness = 1.dp, modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp))
         Row(verticalAlignment = Alignment.CenterVertically) {
             TextField(
                 value = message,
@@ -73,18 +77,55 @@ fun ChatScreen(viewModel: ChatViewModel, user: UserInfo) {
                 viewModel.createMessage(message)
                 message = ""
             }, enabled = message.isNotBlank()) {
-                Icon(Icons.Filled.Send, "Send")
+                Icon(Icons.AutoMirrored.Filled.Send, "Send")
             }
         }
     }
 
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.TopStart) {
-        Button({
-            viewModel.disconnectFromRealtime()
-            viewModel.logout()
-        }, enabled = true, modifier = Modifier.padding(5.dp)) {
-            Text("Logout")
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            IconButton({
+                viewModel.disconnectFromRealtime()
+                viewModel.logout()
+            }, modifier = Modifier.padding(5.dp)) {
+                Icon(Icons.AutoMirrored.Filled.Logout, "Logout")
+            }
+            TextButton(
+                onClick = {
+                    viewModel.passwordReset.value = true
+                }
+            ) {
+                Text("Reset password")
+            }
         }
+    }
+
+    if(reset) {
+        PasswordChangeDialog(
+            onDismiss = { viewModel.passwordReset.value = false },
+            onConfirm = { viewModel.changePassword(it) }
+        )
+    }
+
+    if(alert != null) {
+        AlertDialog(
+            onDismissRequest = {
+                viewModel.alert.value = null
+            },
+            title = { Text("Info") },
+            text = { Text(alert!!) },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        viewModel.alert.value = null
+                    }
+                ) {
+                    Text("Ok")
+                }
+            }
+        )
     }
 
 }

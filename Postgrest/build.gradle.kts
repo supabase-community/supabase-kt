@@ -16,13 +16,14 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
-                addModules(SupabaseModule.GOTRUE)
+                addModules(SupabaseModule.AUTH)
                 api(libs.kotlin.reflect)
             }
         }
         val commonTest by getting {
             dependencies {
                 implementation(libs.bundles.testing)
+                implementation(project(":test-common"))
             }
         }
     }

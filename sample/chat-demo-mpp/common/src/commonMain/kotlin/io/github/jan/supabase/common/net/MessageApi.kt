@@ -1,8 +1,11 @@
 package io.github.jan.supabase.common.net
 
 import io.github.jan.supabase.SupabaseClient
-import io.github.jan.supabase.gotrue.auth
+import io.github.jan.supabase.annotations.SupabaseExperimental
+import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.postgrest.postgrest
+import io.github.jan.supabase.realtime.selectAsFlow
+import kotlinx.coroutines.flow.Flow
 import kotlinx.datetime.Instant
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -21,7 +24,7 @@ data class Message(
 
 sealed interface MessageApi {
 
-    suspend fun retrieveMessages(): List<Message>
+    suspend fun retrieveMessages(): Flow<List<Message>>
 
     suspend fun createMessage(content: String): Message
 
@@ -35,7 +38,8 @@ internal class MessageApiImpl(
 
     private val table = client.postgrest["messages"]
 
-    override suspend fun retrieveMessages(): List<Message> = table.select().decodeList()
+    @OptIn(SupabaseExperimental::class)
+    override suspend fun retrieveMessages(): Flow<List<Message>> = table.selectAsFlow(Message::id)
 
     override suspend fun createMessage(content: String): Message {
         val user = (client.auth.currentSessionOrNull() ?: error("No session available")).user ?: error("No user available")

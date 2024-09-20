@@ -1,3 +1,4 @@
+
 pluginManagement {
     repositories {
         google()
@@ -11,7 +12,7 @@ plugins {
 }
 
 // Main Modules
-include("GoTrue")
+include("Auth")
 include("Postgrest")
 include("Storage")
 include("Realtime")
@@ -32,6 +33,7 @@ project(":serializers:Jackson").name = "serializer-jackson"
 include(":plugins:ApolloGraphQL")
 include(":plugins:ComposeAuth")
 include(":plugins:ComposeAuthUI")
+include(":plugins:Coil3Integration")
 include(":plugins:CoilIntegration")
 include(":plugins:ImageLoaderIntegration")
 
@@ -43,7 +45,7 @@ if (System.getProperty("LibrariesOnly") != "true") {
 }
 
 // Renames
-project(":GoTrue").name = "gotrue-kt"
+project(":Auth").name = "auth-kt"
 project(":Postgrest").name = "postgrest-kt"
 project(":Storage").name = "storage-kt"
 project(":Realtime").name = "realtime-kt"
@@ -52,6 +54,7 @@ project(":Supabase").name = "supabase-kt"
 project(":plugins:ApolloGraphQL").name = "apollo-graphql"
 project(":plugins:ComposeAuth").name = "compose-auth"
 project(":plugins:ComposeAuthUI").name = "compose-auth-ui"
+project(":plugins:Coil3Integration").name = "coil3-integration"
 project(":plugins:CoilIntegration").name = "coil-integration"
 project(":plugins:ImageLoaderIntegration").name = "imageloader-integration"
 rootProject.name = "supabase-kt"

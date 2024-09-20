@@ -1,5 +1,8 @@
 @file:OptIn(org.jetbrains.compose.ExperimentalComposeLibrary::class)
 
+import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
+
+
 plugins {
     id(libs.plugins.kotlin.multiplatform.get().pluginId)
     id(libs.plugins.compose.plugin.get().pluginId)
@@ -12,6 +15,7 @@ group = "io.github.jan.supabase"
 version = "1.0-SNAPSHOT"
 
 kotlin {
+    @OptIn(ExperimentalKotlinGradlePluginApi::class)
     applyDefaultHierarchyTemplate {
         common {
             group("jvmAndAndroid") {
@@ -42,7 +46,7 @@ kotlin {
                 api(compose.foundation)
                 api(compose.material3)
                 api(compose.materialIconsExtended)
-                addModules(SupabaseModule.GOTRUE, SupabaseModule.POSTGREST, SupabaseModule.REALTIME, SupabaseModule.COMPOSE_AUTH, SupabaseModule.COMPOSE_AUTH_UI)
+                addModules(SupabaseModule.AUTH, SupabaseModule.POSTGREST, SupabaseModule.REALTIME, SupabaseModule.COMPOSE_AUTH, SupabaseModule.COMPOSE_AUTH_UI)
                 api(libs.koin.core)
             }
         }

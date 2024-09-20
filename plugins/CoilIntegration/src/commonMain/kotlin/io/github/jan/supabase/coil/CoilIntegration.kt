@@ -14,7 +14,7 @@ import io.github.jan.supabase.storage.StorageItem
 import io.github.jan.supabase.storage.storage
 
 /**
- * A plugin that implements [Fetcher.Factory] to support using [StorageItem] as data when creating a [ImageRequest] or using it as a model in Jetpack Compose.
+ * A plugin that implements [Fetcher.Factory] to support using [StorageItem] as data when creating an [ImageRequest] or using it as a model in Jetpack Compose.
  */
 interface CoilIntegration: SupabasePlugin<CoilIntegration.Config>, Fetcher.Factory<StorageItem> {
 

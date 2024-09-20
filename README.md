@@ -6,12 +6,12 @@ For information about supported Kotlin targets, see the corresponding module REA
 
 [Migrating from version 1.4.X to 2.0.0](/MIGRATION.md)
 
-*Note: [WASM](https://github.com/supabase-community/supabase-kt/issues/86) build available: [2.5.4-wasm0](https://github.com/supabase-community/supabase-kt/releases/tag/2.5.4-wasm0)*
+*Note: The `WASM-JS` target for supported modules is only available for version 3.0.0 and above*
 
 [![](https://img.shields.io/github/release/supabase-community/supabase-kt?label=stable)](https://github.com/supabase-community/supabase-kt/releases) 
 [![](https://badgen.net/github/release/supabase-community/supabase-kt?label=prerelease)](https://central.sonatype.com/search?q=io.github.jan.supabase&smo=true) 
-[![Kotlin](https://img.shields.io/badge/kotlin-2.0.10-blue.svg?logo=kotlin)](http://kotlinlang.org) 
-![https://img.shields.io/badge/ktor-2.3.12-blue](https://img.shields.io/badge/ktor-2.3.12-blue)
+[![Kotlin](https://img.shields.io/badge/kotlin-2.0.20-blue.svg?logo=kotlin)](http://kotlinlang.org) 
+[![Ktor](https://img.shields.io/badge/ktor-3.0.0--rc--1-blue)](https://ktor.io/)
 [![slack](https://img.shields.io/badge/slack-%23supabase--kt-purple.svg?logo=slack)](https://kotlinlang.slack.com/archives/C06QXPC7064)
 
 ### Links
@@ -34,13 +34,17 @@ For information about supported Kotlin targets, see the corresponding module REA
 
 ### Add one or more modules to your project
 
-**Available modules**: `gotrue-kt`, `postgrest-kt`, `functions-kt`, `storage-kt`, `realtime-kt`, `apollo-graphql`, `compose-auth`, `compose-auth-ui`, `coil-integration`, `imageloader-integration`
+**Available modules**: `gotrue-kt`*, `postgrest-kt`, `functions-kt`, 
+`storage-kt`, `realtime-kt`, `apollo-graphql`, `compose-auth`, 
+`compose-auth-ui`, `coil-integration`, `coil3-integration`, `imageloader-integration`
 
 ```kotlin
 dependencies {
     implementation("io.github.jan-tennert.supabase:[module]:VERSION")
 }
 ```
+
+\* After version 3.0.0, the module will be called `auth-kt`.
 
 If you use multiple modules, you can use the bom dependency to get the correct versions for all
 modules:
@@ -94,11 +98,15 @@ val iosMain by getting {
 
 **Note:** It is recommended to use the same Ktor version as supabase-kt:
 
-![https://img.shields.io/badge/ktor-2.3.12-blue](https://img.shields.io/badge/ktor-2.3.12-blue)
+__For 3.0.0 and above:__
+[![Ktor](https://img.shields.io/badge/ktor-3.0.0--rc--1-blue)](https://ktor.io/)
+
+__For versions below 3.0.0:__
+[![Ktor](https://img.shields.io/badge/ktor-2.3.12-blue)](https://ktor.io/)
 
 ## Main Modules
 
-- [Authentication](/GoTrue)
+- [Authentication](/GoTrue) <!-- Will be renamed after the version 3.0.0 comes out -->
 - [Database/Postgrest](/Postgrest)
 - [Storage](/Storage)
 - [Realtime](/Realtime)
@@ -109,7 +117,8 @@ val iosMain by getting {
 - [Apollo GraphQL integration](/plugins/ApolloGraphQL) - Creates an [Apollo GraphQL Client](https://github.com/apollographql/apollo-kotlin) for interacting with the Supabase API.
 - [Compose Auth](/plugins/ComposeAuth) - Provides easy Native Google & Apple Auth for Compose Multiplatform targets.
 - [Compose Auth UI](/plugins/ComposeAuthUI) - Provides UI Components for Compose Multiplatform.
-- [Coil Integration](/plugins/CoilIntegration) - Provides a [Coil](https://github.com/coil-kt/coil) Integration for displaying images stored in Supabase Storage.
+- [Coil Integration](/plugins/CoilIntegration) - Provides a [Coil2](https://github.com/coil-kt/coil) Integration for displaying images stored in Supabase Storage. Only supports Android.
+- [Coil3 Integration](/plugins/Coil3Integration) - Provides a [Coil3](https://github.com/coil-kt/coil) Integration for displaying images stored in Supabase Storage. Supports all Compose Multiplatform targets.
 - [Compose-ImageLoader Integration](/plugins/ImageLoaderIntegration) - Provides a [Compose ImageLoader](https://github.com/qdsfdhvh/compose-imageloader) Integration for displaying images stored in Supabase Storage.
 
 ### Miscellaneous

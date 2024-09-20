@@ -21,11 +21,14 @@ import io.ktor.http.HttpMethod
 import io.ktor.http.headersOf
 import kotlinx.coroutines.test.runTest
 import kotlinx.datetime.Clock
+import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.int
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.long
+import kotlinx.serialization.json.put
+import kotlin.io.encoding.ExperimentalEncodingApi
 import kotlin.test.Test
 import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
@@ -74,7 +77,9 @@ class BucketApiTest {
                 )
             },
             request = { client, expectedPath, data ->
-                client.storage[bucketId].upload(expectedPath, data, upsert = true)
+                client.storage[bucketId].upload(expectedPath, data) {
+                    upsert = true
+                }
             }
         )
     }
@@ -98,7 +103,9 @@ class BucketApiTest {
                 )
             },
             request = { client, expectedPath, data ->
-                client.storage[bucketId].uploadToSignedUrl(path = expectedPath, token = expectedToken, data = data, upsert = false)
+                client.storage[bucketId].uploadToSignedUrl(path = expectedPath, token = expectedToken, data = data) {
+                    upsert = false
+                }
             }
         )
     }
@@ -122,7 +129,9 @@ class BucketApiTest {
                 )
             },
             request = { client, expectedPath, data ->
-                client.storage[bucketId].uploadToSignedUrl(path = expectedPath, token = expectedToken, data = data, upsert = true)
+                client.storage[bucketId].uploadToSignedUrl(path = expectedPath, token = expectedToken, data = data) {
+                    upsert = true
+                }
             }
         )
     }
@@ -158,7 +167,9 @@ class BucketApiTest {
                 )
             },
             request = { client, expectedPath, data ->
-                client.storage[bucketId].update(expectedPath, data, upsert = true)
+                client.storage[bucketId].update(expectedPath, data) {
+                    upsert = true
+                }
             }
         )
     }
@@ -458,11 +469,12 @@ class BucketApiTest {
                 quality = expectedQuality
                 resize = expectedResize
             }
-            val data = if(authenticated) client.storage[bucketId].downloadAuthenticated(expectedPath, transform) else client.storage[bucketId].downloadPublic(expectedPath, transform)
+            val data = if(authenticated) client.storage[bucketId].downloadAuthenticated(expectedPath) { transform(transform) } else client.storage[bucketId].downloadPublic(expectedPath)  { transform(transform) }
             assertContentEquals(expectedData, data, "Data should be [1, 2, 3]")
         }
     }
 
+    @OptIn(ExperimentalEncodingApi::class)
     private fun testUploadMethod(
         method: HttpMethod,
         urlPath: String,
@@ -472,6 +484,9 @@ class BucketApiTest {
     ) {
         runTest {
             val expectedData = byteArrayOf(1, 2, 3)
+            val expectedMetadata = buildJsonObject {
+                put("key", "value")
+            }
             val client = createMockedSupabaseClient(configuration = configureClient) {
                 val data = it.body.toByteArray()
                 assertMethodIs(method, it.method)

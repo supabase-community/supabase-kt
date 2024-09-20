@@ -1,13 +1,11 @@
 package io.github.jan.supabase.common.ui.components
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import com.google.accompanist.web.WebView
 import com.google.accompanist.web.WebViewNavigator
 import com.google.accompanist.web.WebViewState
-import io.ktor.client.plugins.UserAgent
 import io.ktor.http.Url
 
 @Composable

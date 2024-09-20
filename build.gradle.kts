@@ -7,7 +7,7 @@ import org.jetbrains.kotlin.gradle.targets.js.yarn.YarnRootExtension
 val excludedModules = listOf("plugins", "serializers", "test-common")
 
 fun libraryModules(withBom: Boolean = true, init: Project.() -> Unit) = configure(
-    allprojects.filter { it.name !in excludedModules && !it.path.contains("sample") && if(withBom) true else it.name != "bom" },
+    allprojects.filter { it.name !in excludedModules && !it.path.contains("sample") && if(withBom) true else it.name != "bom" && it.name != it.rootProject.name },
     init
 )
 
@@ -45,11 +45,13 @@ libraryModules {
     applyPublishing()
 }
 
-libraryModules(false) {
-    apply(plugin = "io.gitlab.arturbosch.detekt")
+val reportMerge by tasks.registering(io.gitlab.arturbosch.detekt.report.ReportMergeTask::class) {
+    output.set(rootProject.layout.buildDirectory.file("reports/detekt/merge.sarif"))
+}
 
+libraryModules(false) {
     applyDokkaWithConfiguration()
-    applyDetektWithConfiguration()
+    applyDetektWithConfiguration(reportMerge)
 }
 
 tasks.register("detektAll") {
