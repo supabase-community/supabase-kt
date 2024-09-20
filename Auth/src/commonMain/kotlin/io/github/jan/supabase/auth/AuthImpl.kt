@@ -387,7 +387,7 @@ internal class AuthImpl(
         val response = api.postJson("token?grant_type=refresh_token", body) {
             headers.remove("Authorization")
         }
-        return response.safeBody("GoTrue#refreshSession")
+        return response.safeBody("Auth#refreshSession")
     }
 
     override suspend fun refreshCurrentSession() {

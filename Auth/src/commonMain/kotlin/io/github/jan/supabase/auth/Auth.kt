@@ -414,7 +414,7 @@ sealed interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
         override val logger: SupabaseLogger = SupabaseClient.createLogger("Supabase-Auth")
 
         /**
-         * The gotrue api version to use
+         * The auth api version to use
          */
         const val API_VERSION = 1
 
