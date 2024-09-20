@@ -2,12 +2,12 @@ package io.github.jan.supabase.compose.auth
 
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.SupabaseSerializer
-import io.github.jan.supabase.auth.SessionStatus
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.auth.providers.Apple
 import io.github.jan.supabase.auth.providers.Google
 import io.github.jan.supabase.auth.providers.IDTokenProvider
 import io.github.jan.supabase.auth.providers.builtin.IDToken
+import io.github.jan.supabase.auth.status.SessionStatus
 import io.github.jan.supabase.compose.auth.composable.NativeSignInState
 import io.github.jan.supabase.logging.SupabaseLogger
 import io.github.jan.supabase.logging.d

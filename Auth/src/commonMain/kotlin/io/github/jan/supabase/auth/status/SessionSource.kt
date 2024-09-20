@@ -1,45 +1,8 @@
-package io.github.jan.supabase.auth
+package io.github.jan.supabase.auth.status
 
+import io.github.jan.supabase.auth.Auth
 import io.github.jan.supabase.auth.providers.AuthProvider
 import io.github.jan.supabase.auth.user.UserSession
-
-/**
- * Represents the status of the current session in [Auth]
- */
-sealed interface SessionStatus {
-
-    /**
-     * This status means that the user is not logged in
-     * @param isSignOut Whether this status was caused by a sign out
-     */
-    data class NotAuthenticated(val isSignOut: Boolean) : SessionStatus
-
-    /**
-     * This status means that [Auth] is currently loading the session from storage
-     */
-    data object LoadingFromStorage : SessionStatus
-
-    /**
-     * This status means that [Auth] had an error while refreshing the session
-     */
-    data object NetworkError : SessionStatus
-
-    /**
-     * This status means that [Auth] holds a valid session
-     * @param session The session
-     * @param source The source of the session
-     */
-    data class Authenticated(val session: UserSession, val source: SessionSource = SessionSource.Unknown) : SessionStatus {
-
-        /**
-         * Whether the session is new, i.e. [source] is [SessionSource.SignIn], [SessionSource.SignUp] or [SessionSource.External].
-         * Use this to determine whether this status is the result of a new sign in or sign up or just a session refresh.
-         */
-        val isNew: Boolean = source is SessionSource.SignIn || source is SessionSource.SignUp || source is SessionSource.External
-
-    }
-
-}
 
 /**
  * Represents the source of a session
@@ -63,13 +26,13 @@ sealed interface SessionSource {
     data class SignIn(val provider: AuthProvider<*, *>) : SessionSource
 
     /**
-     * The session was loaded from a sign up (only if auto-confirm is enabled)
+     * The session was loaded from a sign-up (only if auto-confirm is enabled)
      * @param provider The provider that was used to sign up
      */
     data class SignUp(val provider: AuthProvider<*, *>) : SessionSource
 
     /**
-     * The session comes from an external source, e.g. OAuth via deeplinks.
+     * The session comes from an external source, e.g. OAuth via deep links.
      */
     data object External : SessionSource
 

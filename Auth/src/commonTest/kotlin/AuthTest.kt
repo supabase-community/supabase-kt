@@ -1,10 +1,10 @@
 import io.github.jan.supabase.SupabaseClientBuilder
 import io.github.jan.supabase.auth.Auth
 import io.github.jan.supabase.auth.MemorySessionManager
-import io.github.jan.supabase.auth.SessionStatus
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.auth.minimalSettings
 import io.github.jan.supabase.auth.providers.Github
+import io.github.jan.supabase.auth.status.SessionStatus
 import io.github.jan.supabase.auth.user.Identity
 import io.github.jan.supabase.auth.user.UserInfo
 import io.github.jan.supabase.auth.user.UserSession

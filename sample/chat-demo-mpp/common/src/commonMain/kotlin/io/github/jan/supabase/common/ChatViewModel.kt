@@ -3,7 +3,7 @@ package io.github.jan.supabase.common
 
 import co.touchlab.kermit.Logger
 import io.github.jan.supabase.SupabaseClient
-import io.github.jan.supabase.auth.SessionStatus
+import io.github.jan.supabase.auth.status.SessionStatus
 import io.github.jan.supabase.common.net.AuthApi
 import io.github.jan.supabase.common.net.Message
 import io.github.jan.supabase.common.net.MessageApi

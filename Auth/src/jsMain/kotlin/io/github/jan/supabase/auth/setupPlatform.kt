@@ -1,6 +1,7 @@
 package io.github.jan.supabase.auth
 
 import io.github.jan.supabase.annotations.SupabaseInternal
+import io.github.jan.supabase.auth.status.SessionSource
 import io.ktor.util.PlatformUtils.IS_BROWSER
 import kotlinx.browser.window
 import kotlinx.coroutines.launch
