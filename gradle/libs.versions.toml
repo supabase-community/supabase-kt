@@ -31,7 +31,7 @@ credentials = "1.2.2"
 koin = "3.5.6"
 androidx-core = "1.13.1"
 androidx-compat = "1.7.0"
-androidx-lifecycle = "2.8.5"
+androidx-lifecycle = "2.8.6"
 filekit = "0.8.2"
 
 [plugins]
