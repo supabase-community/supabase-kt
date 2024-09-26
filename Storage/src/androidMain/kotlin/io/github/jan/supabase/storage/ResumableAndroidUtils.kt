@@ -12,9 +12,9 @@ import io.ktor.utils.io.jvm.javaio.toByteReadChannel
  * Creates a new upload or continues an existing one from the given [uri]
  * @param path The path to upload the file to
  * @param uri The uri of the file to upload (make sure you have access to it)
- * @param upsert Whether to overwrite an existing file
+ * @param options The options for the upload
  */
-suspend fun ResumableClient.createOrContinueUpload(path: String, uri: Uri, upsert: Boolean = false) = createOrContinueUpload(uri.createByteReader(), uri.toString(), uri.contentSize, path, upsert)
+suspend fun ResumableClient.createOrContinueUpload(path: String, uri: Uri, options: UploadOptionBuilder.() -> Unit = {}) = createOrContinueUpload(uri.createByteReader(), uri.toString(), uri.contentSize, path, options)
 
 @SuppressLint("Recycle")
 private suspend fun Uri.createByteReader(): suspend (Long) -> ByteReadChannel = { offset: Long ->

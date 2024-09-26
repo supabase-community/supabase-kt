@@ -7,6 +7,7 @@ import io.github.jan.supabase.auth.Auth
 import io.github.jan.supabase.logging.d
 import io.github.jan.supabase.storage.BucketApi
 import io.github.jan.supabase.storage.Storage
+import io.github.jan.supabase.storage.UploadOptionBuilder
 import io.github.jan.supabase.storage.resumable.ResumableClient.Companion.TUS_VERSION
 import io.github.jan.supabase.storage.storage
 import io.ktor.client.request.bearerAuth
@@ -41,18 +42,18 @@ sealed interface ResumableClient {
      * @param channel A function that takes the offset of the upload and returns a [ByteReadChannel] that reads the data to upload from the given offset
      * @param size The size of the data to upload
      * @param path The path to upload the data to
-     * @param upsert Whether to overwrite existing files
+     * @param options The options for the upload
      */
-    suspend fun createOrContinueUpload(channel: suspend (offset: Long) -> ByteReadChannel, source: String, size: Long, path: String, upsert: Boolean = false): ResumableUpload
+    suspend fun createOrContinueUpload(channel: suspend (offset: Long) -> ByteReadChannel, source: String, size: Long, path: String, options: UploadOptionBuilder.() -> Unit = {}): ResumableUpload
 
     /**
      * Creates a new resumable upload or continues an existing one.
      * If there is an url in the cache for the given [Fingerprint], the upload will be continued.
      * @param data The data to upload as a [ByteArray]
      * @param path The path to upload the data to
-     * @param upsert Whether to overwrite existing files
+     * @param options The options for the upload
      */
-    suspend fun createOrContinueUpload(data: ByteArray, source: String, path: String, upsert: Boolean = false) = createOrContinueUpload({ ByteReadChannel(data).apply { discard(it) } }, source, data.size.toLong(), path)
+    suspend fun createOrContinueUpload(data: ByteArray, source: String, path: String, options: UploadOptionBuilder.() -> Unit = {}) = createOrContinueUpload({ ByteReadChannel(data).apply { discard(it) } }, source, data.size.toLong(), path)
 
     /**
      * Reads pending uploads from the cache and creates a new [ResumableUpload] for each of them. This done in parallel, so you can start the downloads independently.
@@ -94,23 +95,24 @@ internal class ResumableClientImpl(private val storageApi: BucketApi, private va
         source: String,
         size: Long,
         path: String,
-        upsert: Boolean
+        options: UploadOptionBuilder.() -> Unit
     ): ResumableUpload {
         val cachedEntry = cache.get(Fingerprint(source, size))
         if(cachedEntry != null) {
             Storage.logger.d { "Found cached upload for $path" }
             return resumeUpload(channel, cachedEntry, source, path, size)
         }
-        return createUpload(channel, source, path, size, upsert)
+        return createUpload(channel, source, path, size, options)
     }
 
-    private suspend fun createUpload(channel: suspend (Long) -> ByteReadChannel, source: String, path: String, size: Long, upsert: Boolean): ResumableUploadImpl {
+    private suspend fun createUpload(channel: suspend (Long) -> ByteReadChannel, source: String, path: String, size: Long, options: UploadOptionBuilder.() -> Unit): ResumableUploadImpl {
+        val uploadOptions = UploadOptionBuilder(storageApi.supabaseClient.storage.serializer).apply(options)
         val response = httpClient.post(url) {
-            header("Upload-Metadata", encodeMetadata(createMetadata(path)))
+            header("Upload-Metadata", encodeMetadata(createMetadata(path, uploadOptions.contentType)))
             bearerAuth(accessTokenOrApiKey())
             header("Upload-Length", size)
             header("Tus-Resumable", TUS_VERSION)
-            header("x-upsert", upsert.toString())
+            header("x-upsert", uploadOptions.upsert)
         }
         when(response.status) {
             HttpStatusCode.Conflict -> error("Specified path already exists. Consider setting upsert to true")
@@ -120,7 +122,7 @@ internal class ResumableClientImpl(private val storageApi: BucketApi, private va
         }
         val uploadUrl = response.headers["Location"] ?: error("No upload url found")
         val fingerprint = Fingerprint(source, size)
-        val cacheEntry = ResumableCacheEntry(uploadUrl, path, storageApi.bucketId, Clock.System.now() + 1.days)
+        val cacheEntry = ResumableCacheEntry(uploadUrl, path, storageApi.bucketId, Clock.System.now() + 1.days, uploadOptions.upsert, uploadOptions.contentType.toString())
         cache.set(fingerprint, cacheEntry)
         return ResumableUploadImpl(fingerprint, path, cacheEntry, channel, 0, chunkSize, uploadUrl, httpClient, storageApi, { retrieveServerOffset(uploadUrl, path) }) {
             cache.remove(fingerprint)
@@ -132,7 +134,10 @@ internal class ResumableClientImpl(private val storageApi: BucketApi, private va
         if(Clock.System.now() > entry.expiresAt) {
             Storage.logger.d { "Upload url for $path expired. Creating new one" }
             cache.remove(fingerprint)
-            return createUpload(channel, source, path, size, false)
+            return createUpload(channel, source, path, size) {
+                upsert = entry.upsert
+                contentType = ContentType.parse(entry.contentType)
+            }
         }
         val offset = retrieveServerOffset(entry.url, path)
         if(offset < size) {
@@ -156,10 +161,10 @@ internal class ResumableClientImpl(private val storageApi: BucketApi, private va
 
     private fun accessTokenOrApiKey() = storageApi.supabaseClient.pluginManager.getPluginOrNull(Auth)?.currentAccessTokenOrNull() ?: storageApi.supabaseClient.supabaseKey
 
-    private fun createMetadata(path: String): Map<String, String> = buildMap {
+    private fun createMetadata(path: String, contentType: ContentType? = null): Map<String, String> = buildMap {
         put("bucketName", storageApi.bucketId)
         put("objectName", path)
-        put("contentType", ContentType.defaultForFilePath(path).toString())
+        put("contentType", contentType?.toString() ?: ContentType.defaultForFilePath(path).toString())
     }
 
     @OptIn(ExperimentalEncodingApi::class)
