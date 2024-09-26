@@ -122,7 +122,7 @@ internal class ResumableClientImpl(private val storageApi: BucketApi, private va
         }
         val uploadUrl = response.headers["Location"] ?: error("No upload url found")
         val fingerprint = Fingerprint(source, size)
-        val cacheEntry = ResumableCacheEntry(uploadUrl, path, storageApi.bucketId, Clock.System.now() + 1.days)
+        val cacheEntry = ResumableCacheEntry(uploadUrl, path, storageApi.bucketId, Clock.System.now() + 1.days, uploadOptions.upsert, uploadOptions.contentType.toString())
         cache.set(fingerprint, cacheEntry)
         return ResumableUploadImpl(fingerprint, path, cacheEntry, channel, 0, chunkSize, uploadUrl, httpClient, storageApi, { retrieveServerOffset(uploadUrl, path) }) {
             cache.remove(fingerprint)
