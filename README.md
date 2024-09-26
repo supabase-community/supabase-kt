@@ -4,7 +4,7 @@ A Kotlin Multiplatform Client for Supabase.
 
 For information about supported Kotlin targets, see the corresponding module README.
 
-[Migrating from version 1.4.X to 2.0.0](/MIGRATION.md)
+[Migrating from version 2.X to 3.0.0](/MIGRATION.md)
 
 *Note: The `WASM-JS` target for supported modules is only available for version 3.0.0 and above*
 
@@ -34,7 +34,7 @@ For information about supported Kotlin targets, see the corresponding module REA
 
 ### Add one or more modules to your project
 
-**Available modules**: `gotrue-kt`*, `postgrest-kt`, `functions-kt`, 
+**Available modules**: `auth-kt`*, `postgrest-kt`, `functions-kt`, 
 `storage-kt`, `realtime-kt`, `apollo-graphql`, `compose-auth`, 
 `compose-auth-ui`, `coil-integration`, `coil3-integration`, `imageloader-integration`
 
@@ -44,7 +44,7 @@ dependencies {
 }
 ```
 
-\* After version 3.0.0, the module will be called `auth-kt`.
+\* Before version 3.0.0, the module was called `gotrue-kt`.
 
 If you use multiple modules, you can use the bom dependency to get the correct versions for all
 modules:
