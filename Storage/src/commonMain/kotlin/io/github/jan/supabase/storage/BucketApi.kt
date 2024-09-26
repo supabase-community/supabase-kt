@@ -163,8 +163,9 @@ sealed interface BucketApi {
      * Creates a signed url to upload without authentication.
      * These urls are valid for 2 hours.
      * @param path The path to create an url for
+     * @param upsert Whether to upsert the file if it already exists
      */
-    suspend fun createSignedUploadUrl(path: String): UploadSignedUrl
+    suspend fun createSignedUploadUrl(path: String, upsert: Boolean = false): UploadSignedUrl
 
     /**
      * Creates a signed url to download without authentication. The url will expire after [expiresIn]

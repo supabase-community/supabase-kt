@@ -11,9 +11,18 @@ import kotlinx.serialization.Serializable
  * @param path The storage path
  * @param bucketId The bucket id
  * @param expiresAt The time the url expires
+ * @param upsert Whether the entry should be updated if it already exists
+ * @param contentType The content type of the file
  */
 @Serializable
-data class ResumableCacheEntry(val url: String, val path: String, val bucketId: String, val expiresAt: Instant)
+data class ResumableCacheEntry(
+    val url: String,
+    val path: String,
+    val bucketId: String,
+    val expiresAt: Instant,
+    val upsert: Boolean = false,  //for compatibility with the old cache
+    val contentType: String = "application/octet-stream"
+)
 
 /**
  * A pair of a [Fingerprint] and a [ResumableCacheEntry]
