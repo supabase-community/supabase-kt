@@ -9,6 +9,11 @@ Ktor `3.0.0-rc-1` or later has to be used.
 
 - **The `gotrue-kt` module is no longer being published starting with version `3.0.0`. Use the new `auth-kt` module.**
 - **Rename `auth-kt` package name from `io.github.jan.supabase.gotrue` to `io.github.jan.supabase.auth`**.
+- Refactor SessionStatus
+  - Move `SessionStatus` to its own `status` package
+  - Rename `SessionStatus#LoadingFromStorage` to `SessionStatus#Initializing`
+  - Rename and refactor `SessionStatus#NetworkError` to `SessionStatus#RefreshFailure(cause)`
+    *Note: The cause can be either `RefreshFailureCause#NetworkError` or `RefreshFailureCause#InternalServerError`. In both cases the refreshing will be retried and the session not cleared from storage. During that time, the session is obviously not usable.*
 
 ### New plugin & Kotlin targets
 
