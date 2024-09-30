@@ -2,7 +2,6 @@
 
 ### 3.0.0 - 27.09.2024
 
-
 # Ktor 3
 
 Starting with `2.7.0`, supabase-kt now uses Ktor 3. This brings WASM support, but projects using Ktor 2 will be incompatible.
@@ -61,6 +60,7 @@ supabase.storage.from("test").downloadAuthenticated("test.jpg") {
     }
 }
 ```
+- Uploading options such as `upsert` or `contentType` for resumable uploads are now getting cached. If an upload is resumed, the options from the initial upload will be used.
 
 ### Postgrest
 
@@ -75,6 +75,7 @@ supabase.from("table").upsert(myValue) {
 - Move the non-parameter variant of `Postgrest#rpc()` to the `Postgrest` interface. It was an extension function before by @jan-tennert in #726
 - Add a non-generic parameter variant of `Postgrest#rpc()` to the `Postgrest` interface. This function will be called from the existing generic variant by @jan-tennert in #726
 - Add a `schema` property to the `Postgrest#rpc` DSL by @jan-tennert in #716
+- Fix `insert` and `upsert` requests failing when providing an empty `JsonObject` by @jan-tennert in #742
 
 ### Realtime
 

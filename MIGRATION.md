@@ -42,6 +42,7 @@ supabase.storage.from("test").downloadAuthenticated("test.jpg") {
     }
 }
 ```
+- Uploading options such as `upsert` or `contentType` for resumable uploads are now getting cached. If an upload is resumed, the options from the initial upload will be used.
 
 ### Postgrest Changes
 
