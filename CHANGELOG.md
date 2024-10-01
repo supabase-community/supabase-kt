@@ -4,7 +4,7 @@
 
 # Ktor 3
 
-Starting with `2.7.0`, supabase-kt now uses Ktor 3. This brings WASM support, but projects using Ktor 2 will be incompatible.
+Starting with `3.0.0`, supabase-kt now uses Ktor 3. This brings WASM support, but projects using Ktor 2 will be incompatible.
 Ktor  `3.0.0-rc-1` is used in this release.
 
 # Changes
