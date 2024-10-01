@@ -19,13 +19,17 @@ import io.ktor.client.request.HttpRequestData
 import io.ktor.client.request.HttpResponseData
 import io.ktor.http.HttpMethod
 import kotlinx.coroutines.test.runTest
+import kotlinx.serialization.json.JsonArray
+import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.buildJsonArray
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.jsonArray
+import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.put
 import kotlin.test.Test
 import kotlin.test.assertContains
 import kotlin.test.assertEquals
+import kotlin.test.assertNull
 
 class PostgrestTest {
 
@@ -126,14 +130,25 @@ class PostgrestTest {
         )
     }
 
+    @Test
+    fun testInsertEmptyObject() {
+        insertTestClient(
+            mockData = buildJsonObject {  },
+            request = {
+            },
+            requestHandler = {
+            }
+        )
+    }
+
     private fun insertTestClient(
+        mockData: JsonObject = buildJsonObject {
+            put("column1", "value1")
+            put("column2", "value2")
+        },
         request: InsertRequestBuilder.() -> Unit,
         requestHandler: suspend MockRequestHandleScope.(HttpRequestData) -> Unit,
     ) {
-        val mockData = buildJsonObject {
-            put("column1", "value1")
-            put("column2", "value2")
-        }
         testClient(
             request = { table ->
                 from("schema", table).insert(mockData) {
@@ -146,6 +161,11 @@ class PostgrestTest {
                 assertEquals(mockData, it.body.toJsonElement().jsonArray.first())
                 requestHandler(it)
                 assertMethodIs(HttpMethod.Post, it.method)
+                if(mockData.isEmpty()) {
+                    assertNull(it.url.parameters["columns"])
+                } else {
+                    assertEquals("column1,column2", it.url.parameters["columns"])
+                }
                 assertEquals("value", it.headers["custom"])
                 assertEquals("value", it.url.parameters["custom"])
                 assertEquals("schema", it.headers["Content-Profile"])
@@ -207,6 +227,17 @@ class PostgrestTest {
     }
 
     @Test
+    fun testUpsertEmptyObject() {
+        upsertTestClient(
+            mockData = buildJsonArray {  },
+            request = {
+            },
+            requestHandler = {
+            }
+        )
+    }
+
+    @Test
     fun testUpsertWithOnConflict() {
         upsertTestClient(
             request = {
@@ -219,10 +250,7 @@ class PostgrestTest {
     }
 
     private fun upsertTestClient(
-        request: UpsertRequestBuilder.() -> Unit,
-        requestHandler: suspend MockRequestHandleScope.(HttpRequestData) -> Unit,
-    ) {
-        val mockData = buildJsonArray {
+        mockData: JsonArray = buildJsonArray {
             add(buildJsonObject {
                 put("column1", "value1")
                 put("column2", "value2")
@@ -231,7 +259,11 @@ class PostgrestTest {
                 put("column1", "value1")
                 put("column3", "value3")
             })
-        }
+        },
+        request: UpsertRequestBuilder.() -> Unit,
+        requestHandler: suspend MockRequestHandleScope.(HttpRequestData) -> Unit,
+    ) {
+
         testClient(
             request = { table ->
                 from("schema", table).upsert(mockData) {
@@ -244,7 +276,11 @@ class PostgrestTest {
                 assertEquals(mockData, it.body.toJsonElement())
                 requestHandler(it)
                 assertMethodIs(HttpMethod.Post, it.method)
-                assertEquals("column1,column2,column3", it.url.parameters["columns"])
+                if(mockData.isEmpty() || mockData.all { it.jsonObject.isEmpty() }) {
+                    assertNull(it.url.parameters["columns"])
+                } else {
+                    assertEquals("column1,column2,column3", it.url.parameters["columns"])
+                }
                 assertEquals("value", it.headers["custom"])
                 assertEquals("schema", it.headers["Content-Profile"])
                 assertEquals("value", it.url.parameters["custom"])
