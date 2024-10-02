@@ -22,16 +22,16 @@ body:
     id: version
     attributes:
       label: Version(s)
-      description: which supabase-kt versions are affected
-      placeholder: 0.9.3
+      description: Which supabase-kt versions are affected
+      placeholder: 3.0.0
     validations:
       required: true
   - type: input
     id: target
     attributes:
       label: Kotlin Target(s) and their respective versions
-      description: which kotlin targets are affected
-      placeholder: JVM 17 and Android 14
+      description: Which Kotlin targets are affected
+      placeholder: JVM 17, ioS 16 and Android 14
     validations:
       required: true
   - type: textarea
