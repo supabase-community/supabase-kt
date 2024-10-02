@@ -31,7 +31,7 @@ body:
     attributes:
       label: Kotlin Target(s) and their respective versions
       description: Which Kotlin targets are affected
-      placeholder: JVM 17, ioS 16 and Android 14
+      placeholder: JVM 17, iOS 16 and Android 14
     validations:
       required: true
   - type: textarea
