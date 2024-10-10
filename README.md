@@ -106,7 +106,7 @@ __For versions below 3.0.0:__
 
 ## Main Modules
 
-- [Authentication](/GoTrue) <!-- Will be renamed after the version 3.0.0 comes out -->
+- [Authentication](/Auth)
 - [Database/Postgrest](/Postgrest)
 - [Storage](/Storage)
 - [Realtime](/Realtime)
