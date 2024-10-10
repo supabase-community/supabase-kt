@@ -20,14 +20,14 @@ kotlin {
                 withJvm()
                 withMacos()
                 withLinux()
-                //withMingw() - not supported
+                withMingw()
             }
             group("nonDesktop") {
                 //withAndroidTarget() android has its own implementation
                 withIos()
                 withTvos()
                 withWatchos()
-                withMingw()
+                //withMingw()
                 withJs()
                 withWasmJs()
             }
