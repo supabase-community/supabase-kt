@@ -1,5 +1,5 @@
 [versions]
-kotlin = "2.0.21-RC"
+kotlin = "2.0.21"
 accompanist-permissions = "0.36.0"
 ktor = "3.0.0"
 dokka = "1.9.20"
