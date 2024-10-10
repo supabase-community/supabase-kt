@@ -99,7 +99,7 @@ val iosMain by getting {
 **Note:** It is recommended to use the same Ktor version as supabase-kt:
 
 __For 3.0.0 and above:__
-[![Ktor](https://img.shields.io/badge/ktor-3.0.0-1-blue)](https://ktor.io/)
+[![Ktor](https://img.shields.io/badge/ktor-3.0.0-blue)](https://ktor.io/)
 
 __For versions below 3.0.0:__
 [![Ktor](https://img.shields.io/badge/ktor-2.3.12-blue)](https://ktor.io/)
