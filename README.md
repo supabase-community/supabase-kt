@@ -132,9 +132,7 @@ __For versions below 3.0.0:__
 
 - [Chat Demo](/sample/chat-demo-mpp) *(Desktop/Android/iOS/Browser)* - A simple chat application using the Auth, Postgrest and Realtime module.
 - [File Upload Demo](/sample/file-upload) *(Desktop/Android)* - A simple bulk file upload application using the Storage module.
-- [Android Native Google login & in-app OAuth](https://github.com/supabase-community/supabase-kt/tree/master/demos/android-login) *(Android)* - A simple Android application showcasing Native Google login and in-app OAuth.
 - [Multi-Factor Authentication](/sample/multi-factor-auth) *(Desktop/Android/Browser)* - A simple application showcasing Multi-Factor Authentication.
-- [Multiplatform Deep Linking](https://github.com/supabase-community/supabase-kt/tree/master/demos/multiplatform-deeplinks) *(Desktop/Android)* - A simple application showcasing deep linking on Desktop and Android.
 
 **Community Samples**
 
