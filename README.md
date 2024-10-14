@@ -167,3 +167,7 @@ Checkout the [contribution guidelines](/CONTRIBUTING.md) for more information.
 
 - Postgres Syntax inspired by https://github.com/supabase-community/postgrest-kt
 - Plugin system inspired by ktor
+
+### Sponsoring
+
+If you like the project and want to support it, consider sponsoring me on [Ko-fi](https://ko-fi.com/jantennert) or directly on [PayPal](https://www.paypal.com/donate/?hosted_button_id=SR3YJS5CZFS9L).
