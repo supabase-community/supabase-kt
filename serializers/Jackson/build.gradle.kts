@@ -21,6 +21,12 @@ kotlin {
                 api(libs.bundles.jackson)
             }
         }
+        val commonTest by getting {
+            dependencies {
+                implementation(libs.bundles.testing)
+                implementation(project(":test-common"))
+            }
+        }
     }
 }
 
