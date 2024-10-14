@@ -19,6 +19,7 @@ plugins {
     alias(libs.plugins.kotlinx.plugin.serialization) apply false
     id(libs.plugins.maven.publish.get().pluginId) apply false
     alias(libs.plugins.kotlinx.atomicfu) apply false
+    id(libs.plugins.power.assert.get().pluginId) apply false
 }
 
 allprojects {
@@ -51,6 +52,7 @@ val reportMerge by tasks.registering(io.gitlab.arturbosch.detekt.report.ReportMe
 
 libraryModules(false) {
     applyDokkaWithConfiguration()
+    applyPowerAssertConfiguration()
     applyDetektWithConfiguration(reportMerge)
 }
 
