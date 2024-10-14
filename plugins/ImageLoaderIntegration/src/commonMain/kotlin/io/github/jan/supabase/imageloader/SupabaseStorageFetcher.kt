@@ -2,12 +2,13 @@ package io.github.jan.supabase.imageloader
 
 import com.seiko.imageloader.component.fetcher.FetchResult
 import com.seiko.imageloader.component.fetcher.Fetcher
+import com.seiko.imageloader.model.ImageSource
+import com.seiko.imageloader.model.ImageSourceFrom
 import com.seiko.imageloader.model.extraData
 import io.github.jan.supabase.storage.Storage
 import io.github.jan.supabase.storage.StorageItem
 import io.ktor.http.ContentType
 import io.ktor.http.defaultForFileExtension
-import okio.Buffer
 import kotlin.collections.set
 
 internal class SupabaseStorageFetcher(
@@ -23,11 +24,12 @@ internal class SupabaseStorageFetcher(
             bucket.downloadPublic(item.path)
         }
         return FetchResult.OfSource(
-            source = Buffer().write(data),
+            imageSource = ImageSource(data),
             extra = extraData {
                 this["KEY_MIME_TYPE"] =
                     ContentType.defaultForFileExtension(item.path.substringAfterLast(".")).toString()
-            }
+            },
+            imageSourceFrom = ImageSourceFrom.Network
         )
     }
 
