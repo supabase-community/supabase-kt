@@ -70,7 +70,22 @@ enum class AuthErrorCode(val value: String) {
     OverRequestRateLimit("over_request_rate_limit"),
     OverEmailSendRateLimit("over_email_send_rate_limit"),
     OverSmsSendRateLimit("over_sms_send_rate_limit"),
-    BadCodeVerifier("bad_code_verifier");
+    BadCodeVerifier("bad_code_verifier"),
+    InvalidCredentials("invalid_credentials"),
+    EmailAddressNotAuthorized("email_address_not_authorized"),
+    AnonymousProviderDisabled("anonymous_provider_disabled"),
+    HookTimeout("hook_timeout"),
+    HookTimeoutAfterRetry("hook_timeout_after_retry"),
+    HookPayloadOverSizeLimit("hook_payload_over_size_limit"),
+    HookPayloadInvalidContentType("hook_payload_invalid_content_type"),
+    RequestTimeout("request_timeout"),
+    MfaPhoneEnrollDisabled("mfa_phone_enroll_not_enabled"),
+    MfaPhoneVerifyDisabled("mfa_phone_verify_not_enabled"),
+    MfaTotpEnrollDisabled("mfa_totp_enroll_not_enabled"),
+    MfaTotpVerifyDisabled("mfa_totp_verify_not_enabled"),
+    MfaWebAuthnEnrollDisabled("mfa_webauthn_enroll_not_enabled"),
+    MfaWebAuthnVerifyDisabled("mfa_webauthn_verify_not_enabled"),
+    MfaVerifiedFactorExists("mfa_verified_factor_exists");
 
     companion object {
         /**
