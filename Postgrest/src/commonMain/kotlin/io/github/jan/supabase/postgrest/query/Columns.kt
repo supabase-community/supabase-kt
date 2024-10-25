@@ -19,7 +19,8 @@ value class Columns @PublishedApi internal constructor(val value: String) {
         val ALL = Columns("*")
 
         /**
-         * TODO
+         * Select all columns given in the [builder] parameter
+         * @param builder The columns to select
          */
         @SupabaseExperimental
         inline operator fun invoke(builder: BasicColumnsBuilder.() -> Unit): Columns {
