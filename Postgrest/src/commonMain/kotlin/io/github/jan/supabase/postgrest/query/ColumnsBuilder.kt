@@ -1,5 +1,13 @@
 package io.github.jan.supabase.postgrest.query
 
+internal object Aggregates {
+    const val AVG = "avg()"
+    const val COUNT = "count()"
+    const val MAX = "max()"
+    const val MIN = "min()"
+    const val SUM = "sum()"
+}
+
 /**
  * Type-safe builder for selecting columns
  */
@@ -92,30 +100,30 @@ open class BasicColumnsBuilder {
     /**
      * Applies the `avg()` function to the column
      */
-    fun avg() = "avg()"
+    fun avg() = Aggregates.AVG
 
     /**
      * Applies the `count()` function to the column
      */
-    fun count() = "count()"
+    fun count() = Aggregates.COUNT
 
     /**
      * Applies the `max()` function to the column
      */
-    fun max() = "max()"
+    fun max() = Aggregates.MAX
 
     /**
      * Applies the `min()` function to the column
      */
-    fun min() = "min()"
+    fun min() = Aggregates.MIN
 
     /**
      * Applies the `sum()` function to the column
      */
-    fun sum() = "sum()"
+    fun sum() = Aggregates.SUM
 
     @PublishedApi
-    internal fun build() = columns.joinToString(",").also(::println)
+    internal fun build() = columns.joinToString(",")
 
 }
 
