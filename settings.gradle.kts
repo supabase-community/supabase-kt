@@ -12,7 +12,7 @@ plugins {
 }
 
 // Main Modules
-include("GoTrue")
+include("Auth")
 include("Postgrest")
 include("Storage")
 include("Realtime")
@@ -45,7 +45,7 @@ if (System.getProperty("LibrariesOnly") != "true") {
 }
 
 // Renames
-project(":GoTrue").name = "gotrue-kt"
+project(":Auth").name = "auth-kt"
 project(":Postgrest").name = "postgrest-kt"
 project(":Storage").name = "storage-kt"
 project(":Realtime").name = "realtime-kt"

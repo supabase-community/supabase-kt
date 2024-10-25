@@ -15,7 +15,7 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
-                addModules(SupabaseModule.GOTRUE, SupabaseModule.SUPABASE)
+                addModules(SupabaseModule.AUTH, SupabaseModule.SUPABASE)
             }
         }
         val commonTest by getting {

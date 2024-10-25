@@ -16,7 +16,7 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
-                addModules(SupabaseModule.GOTRUE)
+                addModules(SupabaseModule.AUTH)
                 api(libs.kotlin.reflect)
             }
         }

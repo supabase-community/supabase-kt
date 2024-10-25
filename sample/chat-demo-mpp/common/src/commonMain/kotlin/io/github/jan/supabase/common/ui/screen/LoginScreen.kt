@@ -31,6 +31,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import io.github.jan.supabase.annotations.SupabaseExperimental
+import io.github.jan.supabase.auth.providers.Google
 import io.github.jan.supabase.common.ChatViewModel
 import io.github.jan.supabase.common.ui.components.OTPDialog
 import io.github.jan.supabase.common.ui.components.OTPDialogState
@@ -38,7 +39,6 @@ import io.github.jan.supabase.common.ui.components.PasswordField
 import io.github.jan.supabase.common.ui.components.PasswordRecoveryDialog
 import io.github.jan.supabase.compose.auth.ui.ProviderButtonContent
 import io.github.jan.supabase.compose.auth.ui.annotations.AuthUiExperimental
-import io.github.jan.supabase.gotrue.providers.Google
 
 @OptIn(ExperimentalMaterial3Api::class, SupabaseExperimental::class, AuthUiExperimental::class)
 @Composable

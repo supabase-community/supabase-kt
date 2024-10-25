@@ -15,4 +15,5 @@ dependencies {
     implementation(libs.dokka.gradle)
     implementation(libs.publishing.gradle)
     implementation(libs.compose.gradle)
+    implementation(libs.power.assert.gradle)
 }

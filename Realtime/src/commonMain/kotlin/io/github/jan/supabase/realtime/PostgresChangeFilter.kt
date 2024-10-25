@@ -7,7 +7,6 @@ import io.github.jan.supabase.postgrest.query.filter.FilterOperator
 /**
  * Used to filter postgres changes
  */
-@Suppress("DEPRECATION")
 class PostgresChangeFilter(private val event: String, private val schema: String) {
 
     /**
@@ -20,7 +19,7 @@ class PostgresChangeFilter(private val event: String, private val schema: String
      * E.g.: "user_id=eq.1"
      */
     var filter: String? = null
-        @Deprecated("Use the new `filter` method instead") set
+        private set
 
     /**
      * Filters the received changes in your table.

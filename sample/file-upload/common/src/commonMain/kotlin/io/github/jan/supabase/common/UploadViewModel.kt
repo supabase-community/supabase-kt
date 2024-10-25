@@ -41,9 +41,10 @@ class UploadViewModel(
                     file.dataProducer,
                     file.path ?: file.name,
                     file.getSize() ?: error("Invalid file"),
-                    path,
-                    true
-                )
+                    path
+                ) {
+                    upsert = true
+                }
                 uploads[upload.fingerprint] = upload
                 uploadItems.value = uploadItems.value.map {
                     if(it.fingerprint == upload.fingerprint) UploadState.Loaded(upload.fingerprint, upload.stateFlow.value) else it

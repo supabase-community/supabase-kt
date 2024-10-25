@@ -1,11 +1,11 @@
 package io.github.jan.supabase.common.net
 
 import io.github.jan.supabase.SupabaseClient
-import io.github.jan.supabase.gotrue.OtpType
-import io.github.jan.supabase.gotrue.SessionStatus
-import io.github.jan.supabase.gotrue.auth
-import io.github.jan.supabase.gotrue.providers.Google
-import io.github.jan.supabase.gotrue.providers.builtin.Email
+import io.github.jan.supabase.auth.OtpType
+import io.github.jan.supabase.auth.auth
+import io.github.jan.supabase.auth.providers.Google
+import io.github.jan.supabase.auth.providers.builtin.Email
+import io.github.jan.supabase.auth.status.SessionStatus
 import kotlinx.coroutines.flow.Flow
 
 sealed interface AuthApi {

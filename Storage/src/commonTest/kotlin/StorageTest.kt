@@ -1,7 +1,7 @@
 import io.github.jan.supabase.SupabaseClientBuilder
-import io.github.jan.supabase.gotrue.Auth
-import io.github.jan.supabase.gotrue.auth
-import io.github.jan.supabase.gotrue.minimalSettings
+import io.github.jan.supabase.auth.Auth
+import io.github.jan.supabase.auth.auth
+import io.github.jan.supabase.auth.minimalSettings
 import io.github.jan.supabase.storage.Storage
 import io.github.jan.supabase.storage.resumable.MemoryResumableCache
 import io.github.jan.supabase.storage.storage

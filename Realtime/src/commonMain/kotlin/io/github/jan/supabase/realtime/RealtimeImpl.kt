@@ -2,12 +2,12 @@ package io.github.jan.supabase.realtime
 
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.annotations.SupabaseInternal
+import io.github.jan.supabase.auth.Auth
+import io.github.jan.supabase.auth.status.SessionStatus
 import io.github.jan.supabase.buildUrl
 import io.github.jan.supabase.collections.AtomicMutableMap
 import io.github.jan.supabase.exceptions.RestException
 import io.github.jan.supabase.exceptions.UnknownRestException
-import io.github.jan.supabase.gotrue.Auth
-import io.github.jan.supabase.gotrue.SessionStatus
 import io.github.jan.supabase.logging.d
 import io.github.jan.supabase.logging.e
 import io.github.jan.supabase.logging.i

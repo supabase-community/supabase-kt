@@ -11,10 +11,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import io.github.jan.supabase.auth.status.SessionStatus
 import io.github.jan.supabase.common.ui.components.AlertDialog
 import io.github.jan.supabase.common.ui.screen.LoginScreen
 import io.github.jan.supabase.common.ui.screen.MfaScreen
-import io.github.jan.supabase.gotrue.SessionStatus
 
 @Composable
 fun App(viewModel: AppViewModel) {

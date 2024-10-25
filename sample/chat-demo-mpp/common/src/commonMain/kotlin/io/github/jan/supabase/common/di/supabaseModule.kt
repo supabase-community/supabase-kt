@@ -1,9 +1,9 @@
 package io.github.jan.supabase.common.di
 
+import io.github.jan.supabase.auth.Auth
+import io.github.jan.supabase.auth.AuthConfig
+import io.github.jan.supabase.auth.FlowType
 import io.github.jan.supabase.createSupabaseClient
-import io.github.jan.supabase.gotrue.Auth
-import io.github.jan.supabase.gotrue.AuthConfig
-import io.github.jan.supabase.gotrue.FlowType
 import io.github.jan.supabase.logging.LogLevel
 import io.github.jan.supabase.postgrest.Postgrest
 import io.github.jan.supabase.realtime.Realtime

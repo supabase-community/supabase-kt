@@ -4,14 +4,14 @@ A Kotlin Multiplatform Client for Supabase.
 
 For information about supported Kotlin targets, see the corresponding module README.
 
-[Migrating from version 1.4.X to 2.0.0](/MIGRATION.md)
+[Migrating from version 2.X to 3.0.0](/MIGRATION.md)
 
 *Note: The `WASM-JS` target for supported modules is only available for version 3.0.0 and above*
 
 [![](https://img.shields.io/github/release/supabase-community/supabase-kt?label=stable)](https://github.com/supabase-community/supabase-kt/releases) 
 [![](https://badgen.net/github/release/supabase-community/supabase-kt?label=prerelease)](https://central.sonatype.com/search?q=io.github.jan.supabase&smo=true) 
-[![Kotlin](https://img.shields.io/badge/kotlin-2.0.20-blue.svg?logo=kotlin)](http://kotlinlang.org) 
-[![Ktor](https://img.shields.io/badge/ktor-3.0.0--rc--1-blue)](https://ktor.io/)
+[![Kotlin](https://img.shields.io/badge/kotlin-2.0.21-blue.svg?logo=kotlin)](http://kotlinlang.org) 
+[![Ktor](https://img.shields.io/badge/ktor-3.0.0-blue)](https://ktor.io/)
 [![slack](https://img.shields.io/badge/slack-%23supabase--kt-purple.svg?logo=slack)](https://kotlinlang.slack.com/archives/C06QXPC7064)
 
 ### Links
@@ -34,7 +34,7 @@ For information about supported Kotlin targets, see the corresponding module REA
 
 ### Add one or more modules to your project
 
-**Available modules**: `gotrue-kt`, `postgrest-kt`, `functions-kt`, 
+**Available modules**: `auth-kt`*, `postgrest-kt`, `functions-kt`, 
 `storage-kt`, `realtime-kt`, `apollo-graphql`, `compose-auth`, 
 `compose-auth-ui`, `coil-integration`, `coil3-integration`, `imageloader-integration`
 
@@ -43,6 +43,8 @@ dependencies {
     implementation("io.github.jan-tennert.supabase:[module]:VERSION")
 }
 ```
+
+\* Before version 3.0.0, the module was called `gotrue-kt`.
 
 If you use multiple modules, you can use the bom dependency to get the correct versions for all
 modules:
@@ -97,14 +99,14 @@ val iosMain by getting {
 **Note:** It is recommended to use the same Ktor version as supabase-kt:
 
 __For 3.0.0 and above:__
-[![Ktor](https://img.shields.io/badge/ktor-3.0.0--rc--1-blue)](https://ktor.io/)
+[![Ktor](https://img.shields.io/badge/ktor-3.0.0-blue)](https://ktor.io/)
 
 __For versions below 3.0.0:__
 [![Ktor](https://img.shields.io/badge/ktor-2.3.12-blue)](https://ktor.io/)
 
 ## Main Modules
 
-- [Authentication](/GoTrue)
+- [Authentication](/Auth)
 - [Database/Postgrest](/Postgrest)
 - [Storage](/Storage)
 - [Realtime](/Realtime)
@@ -130,9 +132,7 @@ __For versions below 3.0.0:__
 
 - [Chat Demo](/sample/chat-demo-mpp) *(Desktop/Android/iOS/Browser)* - A simple chat application using the Auth, Postgrest and Realtime module.
 - [File Upload Demo](/sample/file-upload) *(Desktop/Android)* - A simple bulk file upload application using the Storage module.
-- [Android Native Google login & in-app OAuth](https://github.com/supabase-community/supabase-kt/tree/master/demos/android-login) *(Android)* - A simple Android application showcasing Native Google login and in-app OAuth.
 - [Multi-Factor Authentication](/sample/multi-factor-auth) *(Desktop/Android/Browser)* - A simple application showcasing Multi-Factor Authentication.
-- [Multiplatform Deep Linking](https://github.com/supabase-community/supabase-kt/tree/master/demos/multiplatform-deeplinks) *(Desktop/Android)* - A simple application showcasing deep linking on Desktop and Android.
 
 **Community Samples**
 
@@ -154,6 +154,7 @@ __For versions below 3.0.0:__
 # Videos
 
 - [Getting started with Android and Supabase](https://www.youtube.com/watch?v=_iXUVJ6HTHU) by the official Supabase YouTube channel
+- [Sign in with Google on Android using Credential Manager](https://www.youtube.com/watch?v=P_jZMDmodG4) by the official Supabase YouTube channel
 - [Getting started with Supabase on Android](https://www.youtube.com/watch?v=SGr73sWMX6w) (by [Eric Ampire](https://www.youtube.com/@eric-ampire))
 - [Supabase | Jetpack Compose | Android | 2023](https://www.youtube.com/playlist?list=PL91kV_wdjTlcGQdcZzkuid094as5eUlwU) (by [YoursSohailYT](https://www.youtube.com/@YoursSohailYT))
 
@@ -165,3 +166,7 @@ Checkout the [contribution guidelines](/CONTRIBUTING.md) for more information.
 
 - Postgres Syntax inspired by https://github.com/supabase-community/postgrest-kt
 - Plugin system inspired by ktor
+
+## Sponsoring
+
+If you like the project and want to support it, consider sponsoring me on [Ko-fi](https://ko-fi.com/jantennert) or directly on [PayPal](https://www.paypal.com/donate/?hosted_button_id=SR3YJS5CZFS9L).

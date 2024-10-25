@@ -1,6 +1,12 @@
+# Deprecation notice
+
+**Starting with version 3.0.0, the module is called `auth-kt`. Checkout the updated [README](/Auth)**.
+
+The `gotrue-kt` artifact will no longer be published after version 3.0.0.
+
 # Supabase-kt GoTrue
 
-Extends Supabase-kt with a multiplatform GoTrue client.
+Extends Supabase-kt with a multiplatform Auth client.
 
 Supported targets:
 
@@ -40,6 +46,8 @@ Supported targets:
 
 Newest version: [![](https://img.shields.io/github/release/supabase-community/supabase-kt?label=)](https://github.com/supabase-community/supabase-kt/releases)
 
+Versions above 3.0.0 are available under the `auth-kt` module.
+
 ```kotlin
 dependencies {
     implementation("io.github.jan-tennert.supabase:gotrue-kt:VERSION")
@@ -65,4 +73,4 @@ val supabase = createSupabaseClient(
 
 # Usage
 
-See [GoTrue documentation](https://supabase.com/docs/reference/kotlin/auth-signup) for usage
+See [Auth documentation](https://supabase.com/docs/reference/kotlin/auth-signup) for usage

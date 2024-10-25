@@ -22,6 +22,12 @@ kotlin {
                 implementation(libs.bundles.moshi)
             }
         }
+        val commonTest by getting {
+            dependencies {
+                implementation(libs.bundles.testing)
+                implementation(project(":test-common"))
+            }
+        }
     }
 }
 

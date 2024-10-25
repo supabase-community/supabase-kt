@@ -1,10 +1,10 @@
 @file:Suppress("UndocumentedPublicProperty")
 package io.github.jan.supabase.postgrest.query
 
+import io.github.jan.supabase.auth.PostgrestFilterDSL
 import io.github.jan.supabase.encodeToJsonElement
 import io.github.jan.supabase.exceptions.HttpRequestException
 import io.github.jan.supabase.exceptions.RestException
-import io.github.jan.supabase.gotrue.PostgrestFilterDSL
 import io.github.jan.supabase.postgrest.Postgrest
 import io.github.jan.supabase.postgrest.executor.RestRequestExecutor
 import io.github.jan.supabase.postgrest.mapToFirstValue
@@ -78,7 +78,7 @@ class PostgrestQueryBuilder(
         val requestBuilder = UpsertRequestBuilder(postgrest.config.propertyConversionMethod).apply(request)
         val body = postgrest.serializer.encodeToJsonElement(values).jsonArray
         val columns = body.map { it.jsonObject.keys }.flatten().distinct()
-        requestBuilder.params["columns"] = listOf(columns.joinToString(","))
+        if(columns.isNotEmpty()) requestBuilder.params["columns"] = listOf(columns.joinToString(","))
         requestBuilder.onConflict?.let {
             requestBuilder.params["on_conflict"] = listOf(it)
         }
@@ -132,7 +132,7 @@ class PostgrestQueryBuilder(
         val requestBuilder = InsertRequestBuilder(postgrest.config.propertyConversionMethod).apply(request)
         val body = postgrest.serializer.encodeToJsonElement(values).jsonArray
         val columns = body.map { it.jsonObject.keys }.flatten().distinct()
-        requestBuilder.params["columns"] = listOf(columns.joinToString(","))
+        if(columns.isNotEmpty()) requestBuilder.params["columns"] = listOf(columns.joinToString(","))
         val insertRequest = InsertRequest(
             body = body,
             returning = requestBuilder.returning,

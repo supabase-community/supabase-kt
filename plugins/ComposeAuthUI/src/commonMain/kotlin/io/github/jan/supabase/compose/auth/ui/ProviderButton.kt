@@ -11,8 +11,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
+import io.github.jan.supabase.auth.providers.OAuthProvider
 import io.github.jan.supabase.compose.auth.ui.annotations.AuthUiExperimental
-import io.github.jan.supabase.gotrue.providers.OAuthProvider
 
 internal val DEFAULT_ICON_SIZE = 24.dp //from Material3
 

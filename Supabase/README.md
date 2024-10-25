@@ -57,7 +57,7 @@ val supabase = createSupabaseClient(
     defaultLogLevel = LogLevel.DEBUG
     
     //Install a plugin
-    install(Auth) //from gotrue-kt
+    install(Auth) //from auth-kt
 
 }
 

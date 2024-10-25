@@ -1,5 +1,89 @@
 # Changelog
 
+### 3.0.0 - October 1, 2024
+
+# Ktor 3
+
+Starting with `3.0.0`, supabase-kt now uses Ktor 3. This brings WASM support, but projects using Ktor 2 will be incompatible.
+Ktor  `3.0.0-rc-1` is used in this release.
+
+# Changes
+
+### Rename gotrue-kt to auth-kt and rename the package name
+
+- **The `gotrue-kt` module is no longer being published starting with version `3.0.0`. Use the new `auth-kt` module.**
+- **Rename `auth-kt` package name from `io.github.jan.supabase.gotrue` to `io.github.jan.supabase.auth`**.
+
+### Support for WASM-JS
+
+New `wasm-js` target for **supabase-kt**, **auth-kt**, **storage-kt**, **functions-kt**, **postgrest-kt**, **realtime-kt**, **compose-auth**, **compose-auth-ui**, **apollo-graphql** and the new **coil3-integration** by @jan-tennert in #311
+
+### New plugin: coil3-integration
+
+Support for Coil3 and all Compose Multiplatform targets under a new plugin by @jan-tennert in #428. [Checkout the documentation](https://github.com/supabase-community/supabase-kt/tree/master/plugins/Coil3Integration).
+**The "old" coil 2 integration is still available and hasn't changed.**
+
+### Auth
+
+- Remove `Auth#modifyUser()`
+- Remove `MfaApi#loggedInUsingMfa`, `MfaApi#loggedInUsingMfaFlow`, `MfaApi#isMfaEnabled`, `MfaApi#isMfaEnabledFlow`
+- Refactor SessionStatus by @jan-tennert in https://github.com/supabase-community/supabase-kt/pull/725
+  - Move `SessionStatus` to its own `status` package
+  - Rename `SessionStatus#LoadingFromStorage` to `SessionStatus#Initializing`
+  - Rename and refactor `SessionStatus#NetworkError` to `SessionStatus#RefreshFailure(cause)`
+    *Note: The cause can be either `RefreshFailureCause#NetworkError` or `RefreshFailureCause#InternalServerError`. In both cases the refreshing will be retried and the session not cleared from storage. During that time, the session is obviously not usable.*
+
+### Apollo GraphQL
+
+- Migrate to Apollo GraphQL 4.0.0 by @jan-tennert in #692
+
+### Storage
+
+**Rework the uploading & downloading methods by @jan-tennert in #729**
+- Each uploading method (upload, update, uploadAsFlow ...) now has a `options` DSL. Currently, you can configure three things:
+1. Whether to upsert or not
+2. The content type (will still be inferred like in 2.X if null)
+3. Additional HTTP request configurations
+   Example:
+```kotlin
+supabase.storage.from("test").upload("test.txt", "Hello World!".encodeToByteArray()) {
+    contentType = ContentType.Text.Plain
+    upsert = true
+}
+```
+- Each downloading method (downloadPublic, downloadAuthenticated, downloadPublicAsFlow, ...) now has a `options` DSL. Currently you can only configure the image transformation
+  Example:
+```kotlin
+supabase.storage.from("test").downloadAuthenticated("test.jpg") {
+    transform {
+        size(100, 100)
+    }
+}
+```
+- Uploading options such as `upsert` or `contentType` for resumable uploads are now getting cached. If an upload is resumed, the options from the initial upload will be used.
+
+### Postgrest
+
+- Move all optional function parameters for `PostgrestQueryBuilder#select()`, `insert()`, `upsert()` and `Postgrest#rpc()` to the request DSL by @jan-tennert in #716
+  Example:
+```kotlin
+supabase.from("table").upsert(myValue) {
+    defaultToNull = false
+    ignoreDuplicates = false
+}
+```
+- Move the non-parameter variant of `Postgrest#rpc()` to the `Postgrest` interface. It was an extension function before by @jan-tennert in #726
+- Add a non-generic parameter variant of `Postgrest#rpc()` to the `Postgrest` interface. This function will be called from the existing generic variant by @jan-tennert in #726
+- Add a `schema` property to the `Postgrest#rpc` DSL by @jan-tennert in #716
+- Fix `insert` and `upsert` requests failing when providing an empty `JsonObject` by @jan-tennert in #742
+
+### Realtime
+
+- Refactor internal event system for maintainability and readability by @jan-tennert #696
+- `RealtimeChannel#presenceChangeFlow` is now a member function of `RealtimeChannel`. (It was an extension function before) by @jan-tennert in #697
+- Move the implementation for `RealtimeChannel#broadcastFlow` and `RealtimeChannel#postgresChangeFlow` to a member function of `RealtimeChannel`. (Doesn't change anything in the public API) by @jan-tennert in #697
+- Make the setter of `PostgresChangeFilter` private
+
 ## 2.6.0 - August 16, 2024
 
 ### Core

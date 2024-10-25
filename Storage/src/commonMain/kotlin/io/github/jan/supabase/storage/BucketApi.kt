@@ -1,9 +1,9 @@
 package io.github.jan.supabase.storage
 
 import io.github.jan.supabase.SupabaseClient
+import io.github.jan.supabase.auth.resolveAccessToken
 import io.github.jan.supabase.exceptions.HttpRequestException
 import io.github.jan.supabase.exceptions.RestException
-import io.github.jan.supabase.gotrue.resolveAccessToken
 import io.github.jan.supabase.storage.resumable.ResumableClient
 import io.ktor.client.plugins.HttpRequestTimeoutException
 import io.ktor.utils.io.ByteReadChannel
@@ -163,8 +163,9 @@ sealed interface BucketApi {
      * Creates a signed url to upload without authentication.
      * These urls are valid for 2 hours.
      * @param path The path to create an url for
+     * @param upsert Whether to upsert the file if it already exists
      */
-    suspend fun createSignedUploadUrl(path: String): UploadSignedUrl
+    suspend fun createSignedUploadUrl(path: String, upsert: Boolean = false): UploadSignedUrl
 
     /**
      * Creates a signed url to download without authentication. The url will expire after [expiresIn]

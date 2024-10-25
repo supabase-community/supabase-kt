@@ -1,7 +1,7 @@
 package io.github.jan.supabase.storage.resumable
 
 import io.github.jan.supabase.annotations.SupabaseInternal
-import io.github.jan.supabase.gotrue.Auth
+import io.github.jan.supabase.auth.Auth
 import io.github.jan.supabase.logging.d
 import io.github.jan.supabase.logging.e
 import io.github.jan.supabase.logging.w
@@ -21,7 +21,7 @@ import io.ktor.client.statement.bodyAsText
 import io.ktor.http.HttpStatusCode
 import io.ktor.utils.io.ByteReadChannel
 import io.ktor.utils.io.cancel
-import io.ktor.utils.io.readAvailable
+import io.ktor.utils.io.readFully
 import io.ktor.utils.io.writeFully
 import kotlinx.atomicfu.atomic
 import kotlinx.coroutines.CoroutineScope
@@ -152,7 +152,7 @@ internal class ResumableUploadImpl(
     private suspend fun uploadChunk(): Int {
         val limit = min(chunkSize, size.toInt() - offset)
         val buffer = ByteArray(limit.toInt())
-        dataStream.readAvailable(buffer, 0, limit.toInt())
+        dataStream.readFully(buffer, 0, limit.toInt())
         //dataStream.readFully(buffer, 0, limit.toInt())
         val uploadResponse = httpClient.patch(locationUrl) {
             header("Tus-Resumable", TUS_VERSION)

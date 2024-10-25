@@ -1,3 +1,73 @@
+# Migrating from version 2.X to 3.0.0
+
+### Ktor 3
+
+Starting with `3.0.0`, supabase-kt now uses Ktor 3. This brings WASM support, but projects using Ktor 2 will be incompatible.
+Ktor `3.0.0-rc-1` or later has to be used.
+
+### Rename gotrue-kt to auth-kt and rename the package name
+
+- **The `gotrue-kt` module is no longer being published starting with version `3.0.0`. Use the new `auth-kt` module.**
+- **Rename `auth-kt` package name from `io.github.jan.supabase.gotrue` to `io.github.jan.supabase.auth`**.
+- Refactor SessionStatus
+  - Move `SessionStatus` to its own `status` package
+  - Rename `SessionStatus#LoadingFromStorage` to `SessionStatus#Initializing`
+  - Rename and refactor `SessionStatus#NetworkError` to `SessionStatus#RefreshFailure(cause)`
+    *Note: The cause can be either `RefreshFailureCause#NetworkError` or `RefreshFailureCause#InternalServerError`. In both cases the refreshing will be retried and the session not cleared from storage. During that time, the session is obviously not usable.*
+
+### New plugin & Kotlin targets
+
+- New [coil3-integration](/plugins/Coil3Integration)
+- New wasm-js support for almost all plugins
+
+### File uploading & downloading 
+
+- Each uploading method (upload, update, uploadAsFlow ...) now has a `options` DSL. Currently you can configure three things:
+1. Whether to upsert or not
+2. The content type (will still be inferred like in 2.X if null)
+3. Additional HTTP request configurations
+   Example:
+```kotlin
+supabase.storage.from("test").upload("test.txt", "Hello World!".encodeToByteArray()) {
+    contentType = ContentType.Text.Plain
+    upsert = true
+}
+```
+- Each downloading method (downloadPublic, downloadAuthenticated, downloadPublicAsFlow, ...) now has a `options` DSL. Currently you can only configure the image transformation
+  Example:
+```kotlin
+supabase.storage.from("test").downloadAuthenticated("test.jpg") {
+    transform {
+        size(100, 100)
+    }
+}
+```
+- Uploading options such as `upsert` or `contentType` for resumable uploads are now getting cached. If an upload is resumed, the options from the initial upload will be used.
+
+### Postgrest Changes
+
+- Move all optional function parameters for `PostgrestQueryBuilder#select()`, `insert()`, `upsert()` and `Postgrest#rpc()` to the request DSL
+  Example:
+```kotlin
+supabase.from("table").upsert(myValue) {
+    defaultToNull = false
+    ignoreDuplicates = false
+}
+```
+- Move the non-parameter variant of `Postgrest#rpc()` to the `Postgrest` interface. It was an extension function before
+- Add a non-generic parameter variant of `Postgrest#rpc()` to the `Postgrest` interface. This function will be called from the existing generic variant
+
+### Realtime changes
+
+- `RealtimeChannel#presenceChangeFlow` is now a member function of `RealtimeChannel`. (It was an extension function before)
+
+### Apollo GraphQL plugin
+
+The Apollo GraphQL plugin now uses Apollo GraphQL 4.0.0.
+
+<details>
+<summary>Migrating from version 1.4.X to 2.0.0</summary>
+
 # Migrating from version 1.4.X to 2.0.0
 
 ## GoTrue
@@ -143,3 +213,5 @@ Compose Auth also had some renames:
 - Rename `ComposeAuth#rememberSignOut` to `ComposeAuth#rememberSignOutWithGoogle`
 
 Additionally, Native Google Auth on Android will now use the Credential Manager for Android 14+ devices once again.
+
+</details>

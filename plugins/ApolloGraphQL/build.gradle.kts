@@ -23,7 +23,7 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
-                addModules(SupabaseModule.GOTRUE, SupabaseModule.SUPABASE)
+                addModules(SupabaseModule.AUTH, SupabaseModule.SUPABASE)
                 api(libs.apollo.kotlin)
             }
         }
