@@ -101,6 +101,7 @@ interface Postgrest : MainPlugin<Postgrest.Config>, CustomSerializationPlugin {
     data class Config(
         var defaultSchema: String = "public",
         var propertyConversionMethod: PropertyConversionMethod = PropertyConversionMethod.CAMEL_CASE_TO_SNAKE_CASE,
+        var columnRegistry: ColumnRegistry = ColumnRegistry()
     ): MainConfig(), CustomSerializationConfig {
 
         override var serializer: SupabaseSerializer? = null
