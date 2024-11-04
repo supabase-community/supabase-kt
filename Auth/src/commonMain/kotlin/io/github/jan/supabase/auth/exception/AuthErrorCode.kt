@@ -17,7 +17,7 @@ enum class AuthErrorCode(val value: String) {
     UserNotFound("user_not_found"),
     SessionNotFound("session_not_found"),
     SessionExpired("session_expired"),
-    RefreshTokenNotfound("refresh_token_not_found"),
+    RefreshTokenNotFound("refresh_token_not_found"),
     RefreshTokenAlreadyUsed("refresh_token_already_used"),
     FlowStateNotFound("flow_state_not_found"),
     FlowStateExpired("flow_state_expired"),
