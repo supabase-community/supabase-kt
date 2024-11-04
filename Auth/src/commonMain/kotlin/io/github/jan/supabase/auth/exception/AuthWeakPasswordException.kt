@@ -1,5 +1,7 @@
 package io.github.jan.supabase.auth.exception
 
+import io.ktor.client.statement.HttpResponse
+
 /**
  * Exception thrown on sign-up if the password is too weak
  * @param description The description of the exception.
@@ -7,12 +9,12 @@ package io.github.jan.supabase.auth.exception
  */
 class AuthWeakPasswordException(
     description: String,
-    statusCode: Int,
+    response: HttpResponse,
     val reasons: List<String>
 ) : AuthRestException(
     CODE,
     description,
-    statusCode
+    response
 ) {
 
     internal companion object {
