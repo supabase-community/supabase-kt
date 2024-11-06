@@ -40,8 +40,7 @@ import kotlinx.serialization.json.buildJsonObject
     private val _status = MutableStateFlow(Realtime.Status.DISCONNECTED)
     override val status: StateFlow<Realtime.Status> = _status.asStateFlow()
     private val _subscriptions = AtomicMutableMap<String, RealtimeChannel>()
-    override val subscriptions: Map<String, RealtimeChannel>
-        get() = _subscriptions.toMap()
+    override val subscriptions: Map<String, RealtimeChannel> = _subscriptions
     private val scope = CoroutineScope(Dispatchers.Default + SupervisorJob())
     private val mutex = Mutex()
     var heartbeatJob: Job? = null
