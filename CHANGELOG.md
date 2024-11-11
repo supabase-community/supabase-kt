@@ -4,7 +4,7 @@
 
 ### Core
 
-- Add support for Ktor `3.0.1`
+- Add support for Ktor `3.0.1` by @jan-tennert in #780
 
 ### Auth
 
@@ -21,7 +21,7 @@
 
 ### Coil3 Integration
 
-- Add support for Coil3 version `3.0.2` by @jan-tennert in #778
+- Add support for Coil3 version `3.0.2` by @jan-tennert in #780
 
 ### 3.0.1 - October 10, 2024
 
