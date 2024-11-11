@@ -1,5 +1,43 @@
 # Changelog
 
+### 3.0.2 - November 11, 2024
+
+### Core
+
+- Add support for Ktor `3.0.1`
+
+### Auth
+
+- Add IDToken support for the `Kakao` `OAuthProvider` by @jan-tennert in #776
+- Add missing `AuthErrorCode`s: `SessionExpired`, `RefreshTokenNotFound`, `RefreshTokenAlreadyUsed` by @jan-tennert in #775
+
+### Compose Auth & Compose Auth UI
+
+- Add support for Compose `1.7.0` by @jan-tennert in #759
+
+### Realtime
+
+- Remove additional `toMap()` call for `Realtime#subscriptions` to prevent rare exceptions by @jan-tennert in #779
+
+### Coil3 Integration
+
+- Add support for Coil3 version `3.0.2` by @jan-tennert in #778
+
+### 3.0.1 - October 10, 2024
+
+### Core
+
+- Add support for Kotlin `2.0.21`
+- Add support for Ktor `3.0.0`
+
+### Auth
+
+- Add HTTP Callback Server support for `mingwx64` (untested)
+
+### Coil3 Integration
+
+- Add support for Coil3 version `3.0.0-rc01`
+
 ### 3.0.0 - October 1, 2024
 
 # Ktor 3
