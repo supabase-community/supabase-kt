@@ -8,6 +8,7 @@ import io.github.jan.supabase.auth.status.SessionStatus
 import io.github.jan.supabase.auth.user.Identity
 import io.github.jan.supabase.auth.user.UserInfo
 import io.github.jan.supabase.auth.user.UserSession
+import io.github.jan.supabase.testing.TEST_JWT
 import io.github.jan.supabase.testing.createMockedSupabaseClient
 import io.github.jan.supabase.testing.pathAfterVersion
 import io.github.jan.supabase.testing.respondJson
@@ -106,6 +107,19 @@ class AuthTest {
             client.auth.importSession(session)
             assertIs<SessionStatus.Authenticated>(client.auth.sessionStatus.value)
             assertEquals(newSession.expiresIn, client.auth.currentSessionOrNull()?.expiresIn)
+        }
+    }
+
+    @Test
+    fun testImportingInvalidSession() {
+        runTest {
+            val client = createMockedSupabaseClient(configuration = configuration)
+            client.auth.awaitInitialization()
+            assertIs<SessionStatus.NotAuthenticated>(client.auth.sessionStatus.value)
+            val session = userSession(customToken = "invalidToken")
+            assertFailsWith<IllegalArgumentException> {
+                client.auth.importSession(session)
+            }
         }
     }
 
@@ -216,7 +230,7 @@ class AuthTest {
 
 }
 
-fun userSession(customToken: String = "accessToken", expiresIn: Long = 3600, user: UserInfo? = null) = UserSession(
+fun userSession(customToken: String = TEST_JWT, expiresIn: Long = 3600, user: UserInfo? = null) = UserSession(
     accessToken = customToken,
     refreshToken = "refreshToken",
     expiresIn = expiresIn,

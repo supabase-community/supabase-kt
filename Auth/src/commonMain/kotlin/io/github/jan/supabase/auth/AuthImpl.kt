@@ -26,6 +26,7 @@ import io.github.jan.supabase.exceptions.BadRequestRestException
 import io.github.jan.supabase.exceptions.RestException
 import io.github.jan.supabase.exceptions.UnauthorizedRestException
 import io.github.jan.supabase.exceptions.UnknownRestException
+import io.github.jan.supabase.isJwt
 import io.github.jan.supabase.logging.d
 import io.github.jan.supabase.logging.e
 import io.github.jan.supabase.logging.i
@@ -403,6 +404,9 @@ internal class AuthImpl(
         autoRefresh: Boolean,
         source: SessionSource
     ) {
+        require(isJwt(session.accessToken)) {
+            "The access token is not a valid JWT token"
+        }
         if (!autoRefresh) {
             if (session.refreshToken.isNotBlank() && session.expiresIn != 0L && config.autoSaveToStorage) {
                 sessionManager.saveSession(session)

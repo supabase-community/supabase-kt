@@ -2,6 +2,7 @@ import io.github.jan.supabase.auth.Auth
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.auth.minimalSettings
 import io.github.jan.supabase.auth.resolveAccessToken
+import io.github.jan.supabase.testing.TEST_JWT
 import io.github.jan.supabase.testing.createMockedSupabaseClient
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
@@ -28,8 +29,16 @@ class AccessTokenTest {
     @Test
     fun testAccessTokenWithKeyAsFallback() {
         runTest {
-            val client = createMockedSupabaseClient(supabaseKey = "myKey")
-            assertEquals("myKey", client.resolveAccessToken())
+            val client = createMockedSupabaseClient(supabaseKey = TEST_JWT)
+            assertEquals(TEST_JWT, client.resolveAccessToken())
+        }
+    }
+
+    @Test
+    fun testAccessTokenWithKeyAsFallbackWithInvalidKey() {
+        runTest {
+            val client = createMockedSupabaseClient(supabaseKey = "not_a_jwt")
+            assertNull(client.resolveAccessToken())
         }
     }
 
