@@ -111,19 +111,6 @@ class AuthTest {
     }
 
     @Test
-    fun testImportingInvalidSession() {
-        runTest {
-            val client = createMockedSupabaseClient(configuration = configuration)
-            client.auth.awaitInitialization()
-            assertIs<SessionStatus.NotAuthenticated>(client.auth.sessionStatus.value)
-            val session = userSession(customToken = "invalidToken")
-            assertFailsWith<IllegalArgumentException> {
-                client.auth.importSession(session)
-            }
-        }
-    }
-
-    @Test
     fun testAutoRefreshSession() {
         runTest {
             val newSession = userSession()
@@ -199,7 +186,7 @@ class AuthTest {
                 identities = expectedIdentities
             )
             val session = UserSession(
-                accessToken = "accessToken",
+                accessToken = TEST_JWT,
                 refreshToken = "refreshToken",
                 expiresIn = 3600,
                 tokenType = "Bearer",

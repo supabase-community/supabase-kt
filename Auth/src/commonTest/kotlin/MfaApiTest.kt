@@ -213,7 +213,8 @@ class MfaApiTest {
         val data = buildJsonObject {
             put("aal", currentAAL.name.lowercase())
         }
-        val token = "ignore.${data.toString().encodeBase64()}"
+        val encoded = data.toString().encodeBase64()
+        val token = "$encoded.$encoded.$encoded"
         val client = createMockedSupabaseClient(
             configuration = configuration
         ) {
@@ -231,7 +232,8 @@ class MfaApiTest {
             val data = buildJsonObject {
                 put("aal", current.name.lowercase())
             }
-            val token = "ignore.${data.toString().encodeBase64()}"
+            val encoded = data.toString().encodeBase64()
+            val token = "$encoded.$encoded.$encoded"
             val client = createMockedSupabaseClient(
                 configuration = configuration
             ) {

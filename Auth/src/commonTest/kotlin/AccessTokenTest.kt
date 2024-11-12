@@ -21,7 +21,7 @@ class AccessTokenTest {
                     }
                 }
             )
-            client.auth.importAuthToken("myAuth") //this should be ignored as per plugin tokens override the used access token
+            client.auth.importAuthToken(TEST_JWT) //this should be ignored as per plugin tokens override the used access token
             assertEquals("myJwtToken", client.resolveAccessToken("myJwtToken"))
         }
     }
@@ -74,8 +74,8 @@ class AccessTokenTest {
                     }
                 }
             )
-            client.auth.importAuthToken("myAuth")
-            assertEquals("myAuth", client.resolveAccessToken())
+            client.auth.importAuthToken(TEST_JWT)
+            assertEquals(TEST_JWT, client.resolveAccessToken())
         }
     }
 
