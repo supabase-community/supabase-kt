@@ -109,7 +109,7 @@ data object Spotify : OAuthProvider() {
 
 }
 
-data object Kakao : OAuthProvider() {
+data object Kakao : IDTokenProvider() {
 
     override val name = "kakao"
 
