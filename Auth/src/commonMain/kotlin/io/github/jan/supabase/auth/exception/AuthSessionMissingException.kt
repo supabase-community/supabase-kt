@@ -8,7 +8,7 @@ import io.ktor.client.statement.HttpResponse
 class AuthSessionMissingException(response: HttpResponse): AuthRestException(
     errorCode = CODE,
     response = response,
-    description = "Session not found. This can happen if the user was logged out or deleted."
+    errorDescription = "Session not found. This can happen if the user was logged out or deleted."
 ) {
 
     internal companion object {
