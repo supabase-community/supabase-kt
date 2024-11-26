@@ -54,6 +54,8 @@ implementation(platform("io.github.jan-tennert.supabase:bom:VERSION"))
 implementation("io.github.jan-tennert.supabase:[module]")
 ```
 
+*Note that the minimum Android SDK version is 26. For lower versions, you need to enable [core library desugaring](https://developer.android.com/studio/write/java8-support#library-desugaring).*
+
 ### Add a Ktor Client Engine to each of your Kotlin targets
 
 You can find a list of available engines [here](https://ktor.io/docs/http-client-engines.html).
