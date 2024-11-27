@@ -65,6 +65,11 @@ kotlin {
                 api(libs.androidx.browser)
             }
         }
+        val wasmJsMain by getting {
+            dependencies {
+                api(libs.kotlinx.browser)
+            }
+        }
     }
 }
 
