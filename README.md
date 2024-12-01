@@ -45,7 +45,7 @@ dependencies {
 ```
 
 > [!NOTE]
-> Before version 4.0.0, the Maven Central group id was `io.github.jan-tennert` instead of `io.supabase`
+> Before version 4.0.0, the Maven Central group id was `io.github.jan-tennert` instead of `io.supabase` \
 > \* Before version 3.0.0, the module was called `gotrue-kt`.
 
 If you use multiple modules, you can use the bom dependency to get the correct versions for all
@@ -76,7 +76,9 @@ For targets: `jvm`, `android`, `js`, `ios`
 ```kotlin
 val commonMain by getting {
     dependencies {
-        //supabase modules
+        implementation(platform("io.supabase:bom:VERSION"))
+        implementation("io.supabase:auth-kt")
+        implementation("io.supabase:postgrest-kt")
     }
 }
 val jvmMain by getting {
