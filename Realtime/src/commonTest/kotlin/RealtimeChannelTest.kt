@@ -1,23 +1,23 @@
 import app.cash.turbine.test
-import io.github.jan.supabase.auth.Auth
-import io.github.jan.supabase.auth.auth
-import io.github.jan.supabase.auth.minimalSettings
-import io.github.jan.supabase.postgrest.query.filter.FilterOperation
-import io.github.jan.supabase.postgrest.query.filter.FilterOperator
-import io.github.jan.supabase.realtime.CallbackManagerImpl
-import io.github.jan.supabase.realtime.PostgresAction
-import io.github.jan.supabase.realtime.PostgresJoinConfig
-import io.github.jan.supabase.realtime.Presence
-import io.github.jan.supabase.realtime.Realtime
-import io.github.jan.supabase.realtime.RealtimeChannel
-import io.github.jan.supabase.realtime.RealtimeChannel.Companion.CHANNEL_EVENT_REPLY
-import io.github.jan.supabase.realtime.RealtimeChannel.Companion.CHANNEL_EVENT_SYSTEM
-import io.github.jan.supabase.realtime.RealtimeJoinPayload
-import io.github.jan.supabase.realtime.RealtimeMessage
-import io.github.jan.supabase.realtime.broadcastFlow
-import io.github.jan.supabase.realtime.channel
-import io.github.jan.supabase.realtime.postgresChangeFlow
-import io.github.jan.supabase.realtime.realtime
+import io.supabase.auth.Auth
+import io.supabase.auth.auth
+import io.supabase.auth.minimalSettings
+import io.supabase.postgrest.query.filter.FilterOperation
+import io.supabase.postgrest.query.filter.FilterOperator
+import io.supabase.realtime.CallbackManagerImpl
+import io.supabase.realtime.PostgresAction
+import io.supabase.realtime.PostgresJoinConfig
+import io.supabase.realtime.Presence
+import io.supabase.realtime.Realtime
+import io.supabase.realtime.RealtimeChannel
+import io.supabase.realtime.RealtimeChannel.Companion.CHANNEL_EVENT_REPLY
+import io.supabase.realtime.RealtimeChannel.Companion.CHANNEL_EVENT_SYSTEM
+import io.supabase.realtime.RealtimeJoinPayload
+import io.supabase.realtime.RealtimeMessage
+import io.supabase.realtime.broadcastFlow
+import io.supabase.realtime.channel
+import io.supabase.realtime.postgresChangeFlow
+import io.supabase.realtime.realtime
 import io.github.jan.supabase.testing.assertPathIs
 import io.github.jan.supabase.testing.pathAfterVersion
 import io.github.jan.supabase.testing.toJsonElement
@@ -357,7 +357,7 @@ class RealtimeChannelTest {
                         assertEquals(expectedSchema, postgresChanges.first().schema)
                         assertEquals(expectedFilter, postgresChanges.first().filter)
                         assertEquals(event, postgresChanges.first().event)
-                        o.send(RealtimeMessage("realtime:$channelId", RealtimeChannel.CHANNEL_EVENT_REPLY, buildJsonObject {
+                        o.send(RealtimeMessage("realtime:$channelId", CHANNEL_EVENT_REPLY, buildJsonObject {
                             put("response", buildJsonObject {
                                 put("postgres_changes", Json.encodeToJsonElement(postgresServerChanges))
                             })

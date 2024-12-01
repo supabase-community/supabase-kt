@@ -1,10 +1,10 @@
-import io.github.jan.supabase.SupabaseClientBuilder
-import io.github.jan.supabase.auth.Auth
-import io.github.jan.supabase.auth.auth
-import io.github.jan.supabase.auth.minimalSettings
-import io.github.jan.supabase.storage.Storage
-import io.github.jan.supabase.storage.resumable.MemoryResumableCache
-import io.github.jan.supabase.storage.storage
+import io.supabase.SupabaseClientBuilder
+import io.supabase.auth.Auth
+import io.supabase.auth.auth
+import io.supabase.auth.minimalSettings
+import io.supabase.storage.Storage
+import io.supabase.storage.resumable.MemoryResumableCache
+import io.supabase.storage.storage
 import io.github.jan.supabase.testing.assertMethodIs
 import io.github.jan.supabase.testing.assertPathIs
 import io.github.jan.supabase.testing.createMockedSupabaseClient

@@ -1,8 +1,8 @@
 package io.github.jan.supabase.testing
 
-import io.github.jan.supabase.SupabaseClient
-import io.github.jan.supabase.SupabaseClientBuilder
-import io.github.jan.supabase.createSupabaseClient
+import io.supabase.SupabaseClient
+import io.supabase.SupabaseClientBuilder
+import io.supabase.createSupabaseClient
 import io.ktor.client.engine.mock.MockEngine
 import io.ktor.client.engine.mock.MockRequestHandleScope
 import io.ktor.client.engine.mock.respond

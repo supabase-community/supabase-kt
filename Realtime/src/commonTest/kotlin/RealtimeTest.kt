@@ -1,6 +1,6 @@
-import io.github.jan.supabase.realtime.Realtime
-import io.github.jan.supabase.realtime.RealtimeMessage
-import io.github.jan.supabase.realtime.realtime
+import io.supabase.realtime.Realtime
+import io.supabase.realtime.RealtimeMessage
+import io.supabase.realtime.realtime
 import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put

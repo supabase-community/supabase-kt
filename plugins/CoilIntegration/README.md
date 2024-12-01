@@ -16,7 +16,7 @@ Newest version: [![](https://img.shields.io/github/release/supabase-community/su
 
 ```kotlin
 dependencies {
-    implementation("io.github.jan-tennert.supabase:coil-integration:VERSION")
+    implementation("io.supabase:coil-integration:VERSION")
 }
 ```
 

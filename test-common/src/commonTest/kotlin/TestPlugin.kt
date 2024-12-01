@@ -1,8 +1,8 @@
-import io.github.jan.supabase.SupabaseClient
-import io.github.jan.supabase.SupabaseClientBuilder
-import io.github.jan.supabase.logging.SupabaseLogger
-import io.github.jan.supabase.plugins.SupabasePlugin
-import io.github.jan.supabase.plugins.SupabasePluginProvider
+import io.supabase.SupabaseClient
+import io.supabase.SupabaseClientBuilder
+import io.supabase.logging.SupabaseLogger
+import io.supabase.plugins.SupabasePlugin
+import io.supabase.plugins.SupabasePluginProvider
 
 class TestPlugin(override val config: Config, override val supabaseClient: SupabaseClient) :
     SupabasePlugin<TestPlugin.Config> {

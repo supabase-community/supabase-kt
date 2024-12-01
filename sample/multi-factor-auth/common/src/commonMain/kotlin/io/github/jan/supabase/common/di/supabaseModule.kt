@@ -1,8 +1,8 @@
 package io.github.jan.supabase.common.di
 
-import io.github.jan.supabase.auth.Auth
-import io.github.jan.supabase.auth.AuthConfig
-import io.github.jan.supabase.createSupabaseClient
+import io.supabase.auth.Auth
+import io.supabase.auth.AuthConfig
+import io.supabase.createSupabaseClient
 import org.koin.dsl.module
 
 expect fun AuthConfig.platformGoTrueConfig()

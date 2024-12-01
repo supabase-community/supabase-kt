@@ -1,0 +1,76 @@
+package io.supabase.imageloader
+
+import com.seiko.imageloader.ImageLoader
+import com.seiko.imageloader.component.ComponentRegistryBuilder
+import com.seiko.imageloader.component.fetcher.Fetcher
+import com.seiko.imageloader.component.keyer.Keyer
+import com.seiko.imageloader.model.ImageRequest
+import com.seiko.imageloader.option.Options
+import io.supabase.SupabaseClient
+import io.supabase.annotations.SupabaseExperimental
+import io.supabase.logging.SupabaseLogger
+import io.supabase.logging.d
+import io.supabase.plugins.SupabasePlugin
+import io.supabase.plugins.SupabasePluginProvider
+import io.supabase.storage.StorageItem
+import io.supabase.storage.storage
+
+/**
+ * A plugin that implements [Fetcher.Factory] and [Keyer] for [ImageLoader] to support using [StorageItem] as data when creating a [ImageRequest].
+ * Use [ComponentRegistryBuilder.add] to add this component to your [ImageLoader] instance:
+ * ```kotlin
+ * add(keyer = supabaseClient.imageLoader)
+ * add(fetcherFactory = supabaseClient.imageLoader)
+ * ```
+ */
+interface ImageLoaderIntegration: SupabasePlugin<ImageLoaderIntegration.Config>, Fetcher.Factory, Keyer {
+
+    /**
+     * The configuration for the [ImageLoader] integration.
+     */
+    class Config
+
+    companion object : SupabasePluginProvider<Config, ImageLoaderIntegration> {
+
+        override val key = "imageloader"
+
+        override val logger: SupabaseLogger = SupabaseClient.createLogger("Supabase-ComposeImageLoader")
+
+        override fun create(supabaseClient: SupabaseClient, config: Config): ImageLoaderIntegration {
+            return ImageLoaderIntegrationImpl(supabaseClient, config)
+        }
+
+        override fun createConfig(init: Config.() -> Unit): Config {
+            return Config().apply(init)
+        }
+
+    }
+
+}
+
+internal class ImageLoaderIntegrationImpl(
+    override val supabaseClient: SupabaseClient,
+    override val config: ImageLoaderIntegration.Config
+) : ImageLoaderIntegration {
+
+    override fun create(data: Any, options: Options): Fetcher? {
+        if(data !is StorageItem) return null
+        ImageLoaderIntegration.logger.d { "Creating Storage Fetcher" }
+        return SupabaseStorageFetcher(supabaseClient.storage, data)
+    }
+
+    override fun key(data: Any, options: Options, type: Keyer.Type): String? {
+        if(data !is StorageItem) return null
+        val key = data.bucketId + data.path
+        ImageLoaderIntegration.logger.d { "Key for $data created: $key" }
+        return key
+    }
+
+}
+
+/**
+ * With the [ImageLoaderIntegration] plugin installed, you can use this property to access the [ImageLoader] implementations of [Fetcher.Factory] & [Keyer].
+ */
+@SupabaseExperimental
+val SupabaseClient.imageLoader: ImageLoaderIntegration
+    get() = pluginManager.getPlugin(ImageLoaderIntegration)

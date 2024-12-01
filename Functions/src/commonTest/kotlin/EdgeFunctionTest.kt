@@ -1,5 +1,5 @@
-import io.github.jan.supabase.functions.FunctionRegion
-import io.github.jan.supabase.functions.functions
+import io.supabase.functions.FunctionRegion
+import io.supabase.functions.functions
 import io.github.jan.supabase.testing.createMockedSupabaseClient
 import io.github.jan.supabase.testing.pathAfterVersion
 import io.github.jan.supabase.testing.toJsonElement

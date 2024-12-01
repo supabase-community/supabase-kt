@@ -1,7 +1,7 @@
 package io.github.jan.supabase.common
 
-import io.github.jan.supabase.storage.resumable.ResumableClient
-import io.github.jan.supabase.storage.resumable.ResumableUpload
+import io.supabase.storage.resumable.ResumableClient
+import io.supabase.storage.resumable.ResumableUpload
 import io.github.vinceglb.filekit.core.PlatformFile
 import kotlinx.coroutines.Deferred
 

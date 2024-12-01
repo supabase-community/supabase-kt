@@ -3,7 +3,7 @@ package io.github.jan.supabase.serializer
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.adapter
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
-import io.github.jan.supabase.SupabaseSerializer
+import io.supabase.SupabaseSerializer
 import kotlin.reflect.KType
 
 /**

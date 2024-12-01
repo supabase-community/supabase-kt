@@ -1,8 +1,8 @@
-import io.github.jan.supabase.auth.Auth
-import io.github.jan.supabase.auth.auth
-import io.github.jan.supabase.auth.minimalSettings
-import io.github.jan.supabase.auth.resolveAccessToken
 import io.github.jan.supabase.testing.createMockedSupabaseClient
+import io.supabase.auth.Auth
+import io.supabase.auth.auth
+import io.supabase.auth.minimalSettings
+import io.supabase.auth.resolveAccessToken
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 import kotlin.test.assertEquals

@@ -1,9 +1,9 @@
 package request
 
-import io.github.jan.supabase.postgrest.query.Count
-import io.github.jan.supabase.postgrest.query.Returning
-import io.github.jan.supabase.postgrest.request.DeleteRequest
-import io.github.jan.supabase.postgrest.request.PostgrestRequest
+import io.supabase.postgrest.query.Count
+import io.supabase.postgrest.query.Returning
+import io.supabase.postgrest.request.DeleteRequest
+import io.supabase.postgrest.request.PostgrestRequest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 

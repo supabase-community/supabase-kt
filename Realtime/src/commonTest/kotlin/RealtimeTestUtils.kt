@@ -1,10 +1,10 @@
-import io.github.jan.supabase.auth.Auth
-import io.github.jan.supabase.auth.user.UserSession
-import io.github.jan.supabase.putJsonObject
-import io.github.jan.supabase.realtime.Presence
-import io.github.jan.supabase.realtime.RealtimeChannel.Companion.CHANNEL_EVENT_PRESENCE_DIFF
-import io.github.jan.supabase.realtime.RealtimeChannel.Companion.CHANNEL_EVENT_SYSTEM
-import io.github.jan.supabase.realtime.RealtimeMessage
+import io.supabase.auth.Auth
+import io.supabase.auth.user.UserSession
+import io.supabase.putJsonObject
+import io.supabase.realtime.Presence
+import io.supabase.realtime.RealtimeChannel.Companion.CHANNEL_EVENT_PRESENCE_DIFF
+import io.supabase.realtime.RealtimeChannel.Companion.CHANNEL_EVENT_SYSTEM
+import io.supabase.realtime.RealtimeMessage
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.channels.SendChannel
 import kotlinx.coroutines.flow.Flow

@@ -40,18 +40,20 @@ For information about supported Kotlin targets, see the corresponding module REA
 
 ```kotlin
 dependencies {
-    implementation("io.github.jan-tennert.supabase:[module]:VERSION")
+    implementation("io.supabase:[module]:VERSION")
 }
 ```
 
-\* Before version 3.0.0, the module was called `gotrue-kt`.
+> [!NOTE]
+> Before version 4.0.0, the Maven Central group id was `io.github.jan-tennert` instead of `io.supabase`
+> \* Before version 3.0.0, the module was called `gotrue-kt`.
 
 If you use multiple modules, you can use the bom dependency to get the correct versions for all
 modules:
 
 ```kotlin
-implementation(platform("io.github.jan-tennert.supabase:bom:VERSION"))
-implementation("io.github.jan-tennert.supabase:[module]")
+implementation(platform("io.supabase:bom:VERSION"))
+implementation("io.supabase:[module]")
 ```
 
 *Note that the minimum Android SDK version is 26. For lower versions, you need to enable [core library desugaring](https://developer.android.com/studio/write/java8-support#library-desugaring).*

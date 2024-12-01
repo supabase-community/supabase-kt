@@ -29,9 +29,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import io.github.jan.supabase.CurrentPlatformTarget
-import io.github.jan.supabase.PlatformTarget
-import io.github.jan.supabase.auth.user.UserInfo
+import io.supabase.CurrentPlatformTarget
+import io.supabase.PlatformTarget
+import io.supabase.auth.user.UserInfo
 import io.github.jan.supabase.common.ChatViewModel
 import io.github.jan.supabase.common.ui.components.MessageCard
 import io.github.jan.supabase.common.ui.components.PasswordChangeDialog

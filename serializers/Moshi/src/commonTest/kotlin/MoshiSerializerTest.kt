@@ -1,4 +1,4 @@
-import io.github.jan.supabase.encode
+import io.supabase.encode
 import io.github.jan.supabase.serializer.MoshiSerializer
 import io.github.jan.supabase.testing.createMockedSupabaseClient
 import org.junit.Test

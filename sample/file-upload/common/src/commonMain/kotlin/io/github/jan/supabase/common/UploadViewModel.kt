@@ -1,12 +1,12 @@
 package io.github.jan.supabase.common
 
 import androidx.compose.ui.ExperimentalComposeUiApi
-import io.github.jan.supabase.annotations.SupabaseInternal
-import io.github.jan.supabase.collections.AtomicMutableMap
-import io.github.jan.supabase.storage.UploadStatus
-import io.github.jan.supabase.storage.resumable.Fingerprint
-import io.github.jan.supabase.storage.resumable.ResumableClient
-import io.github.jan.supabase.storage.resumable.ResumableUpload
+import io.supabase.annotations.SupabaseInternal
+import io.supabase.collections.AtomicMutableMap
+import io.supabase.storage.UploadStatus
+import io.supabase.storage.resumable.Fingerprint
+import io.supabase.storage.resumable.ResumableClient
+import io.supabase.storage.resumable.ResumableUpload
 import io.github.vinceglb.filekit.core.PlatformFile
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

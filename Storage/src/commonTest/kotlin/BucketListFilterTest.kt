@@ -1,4 +1,4 @@
-import io.github.jan.supabase.storage.BucketListFilter
+import io.supabase.storage.BucketListFilter
 import kotlinx.serialization.json.int
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
