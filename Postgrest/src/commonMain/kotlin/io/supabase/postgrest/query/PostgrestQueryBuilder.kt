@@ -2,6 +2,7 @@
 
 package io.supabase.postgrest.query
 
+import io.ktor.client.plugins.HttpRequestTimeoutException
 import io.supabase.auth.PostgrestFilterDSL
 import io.supabase.encodeToJsonElement
 import io.supabase.exceptions.HttpRequestException
@@ -17,7 +18,6 @@ import io.supabase.postgrest.request.InsertRequest
 import io.supabase.postgrest.request.SelectRequest
 import io.supabase.postgrest.request.UpdateRequest
 import io.supabase.postgrest.result.PostgrestResult
-import io.ktor.client.plugins.HttpRequestTimeoutException
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
 
@@ -45,7 +45,7 @@ class PostgrestQueryBuilder(
         request: @PostgrestFilterDSL SelectRequestBuilder.() -> Unit = {}
     ): PostgrestResult {
         val requestBuilder = SelectRequestBuilder(postgrest.config.propertyConversionMethod).apply {
-            request(); PostgrestRequestBuilder.params["select"] = listOf(columns.value)
+            request(); params["select"] = listOf(columns.value)
         }
         val selectRequest = SelectRequest(
             head = requestBuilder.head,

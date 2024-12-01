@@ -2,13 +2,6 @@
 
 package io.supabase.network
 
-import io.github.jan.supabase.BuildConfig
-import io.supabase.SupabaseClient
-import io.supabase.annotations.SupabaseInternal
-import io.supabase.exceptions.HttpRequestException
-import io.supabase.logging.d
-import io.supabase.logging.e
-import io.supabase.supabaseJson
 import io.ktor.client.HttpClient
 import io.ktor.client.HttpClientConfig
 import io.ktor.client.engine.HttpClientEngine
@@ -25,6 +18,13 @@ import io.ktor.client.statement.HttpResponse
 import io.ktor.client.statement.HttpStatement
 import io.ktor.http.encodedPath
 import io.ktor.serialization.kotlinx.json.json
+import io.supabase.BuildConfig
+import io.supabase.SupabaseClient
+import io.supabase.annotations.SupabaseInternal
+import io.supabase.exceptions.HttpRequestException
+import io.supabase.logging.d
+import io.supabase.logging.e
+import io.supabase.supabaseJson
 import kotlin.coroutines.cancellation.CancellationException
 import kotlin.time.Duration.Companion.milliseconds
 

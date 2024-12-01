@@ -24,7 +24,7 @@ fun Project.applyDokkaWithConfiguration() {
                     else -> ""
                 }
                 localDirectory.set(projectDir.resolve("src"))
-                remoteUrl.set(URL("https://github.com/supabase-community/supabase-kt/tree/master/$name/src"))
+                remoteUrl.set(URL("https://github.com/supabase/supabase-kt/tree/master/$name/src"))
                 remoteLineSuffix.set("#L")
             }
         }

@@ -1,14 +1,14 @@
 package io.supabase.graphql
 
 import com.apollographql.apollo.ApolloClient
-import io.github.jan.supabase.BuildConfig
+import io.ktor.client.statement.HttpResponse
+import io.supabase.BuildConfig
 import io.supabase.SupabaseClient
 import io.supabase.exceptions.RestException
 import io.supabase.logging.SupabaseLogger
 import io.supabase.plugins.MainConfig
 import io.supabase.plugins.MainPlugin
 import io.supabase.plugins.SupabasePluginProvider
-import io.ktor.client.statement.HttpResponse
 
 /**
  * Adds an Apollo GraphQL client to supabase-kt with all necessary headers automatically managed.

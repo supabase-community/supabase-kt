@@ -1,9 +1,9 @@
 import com.apollographql.apollo.api.http.HttpHeader
-import io.github.jan.supabase.BuildConfig
+import io.github.jan.supabase.testing.createMockedSupabaseClient
+import io.supabase.BuildConfig
 import io.supabase.graphql.ApolloHttpInterceptor
 import io.supabase.graphql.GraphQL
 import io.supabase.graphql.graphql
-import io.github.jan.supabase.testing.createMockedSupabaseClient
 import kotlin.test.Test
 import kotlin.test.assertContains
 import kotlin.test.assertEquals
