@@ -1,4 +1,5 @@
 import app.cash.turbine.test
+import io.ktor.client.engine.mock.respond
 import io.supabase.postgrest.Postgrest
 import io.supabase.postgrest.query.filter.FilterOperation
 import io.supabase.postgrest.query.filter.FilterOperator
@@ -11,8 +12,7 @@ import io.supabase.realtime.postgresListDataFlow
 import io.supabase.realtime.postgresSingleDataFlow
 import io.supabase.realtime.presenceDataFlow
 import io.supabase.serializer.KotlinXSerializer
-import io.github.jan.supabase.testing.pathAfterVersion
-import io.ktor.client.engine.mock.respond
+import io.supabase.testing.pathAfterVersion
 import kotlinx.coroutines.test.runTest
 import kotlinx.datetime.Clock
 import kotlinx.serialization.Serializable

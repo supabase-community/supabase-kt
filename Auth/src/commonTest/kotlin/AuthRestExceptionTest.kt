@@ -1,3 +1,4 @@
+import io.ktor.http.HttpStatusCode
 import io.supabase.SupabaseClientBuilder
 import io.supabase.auth.Auth
 import io.supabase.auth.auth
@@ -6,9 +7,8 @@ import io.supabase.auth.exception.AuthWeakPasswordException
 import io.supabase.auth.minimalSettings
 import io.supabase.auth.providers.builtin.Email
 import io.supabase.exceptions.BadRequestRestException
-import io.github.jan.supabase.testing.createMockedSupabaseClient
-import io.github.jan.supabase.testing.respondJson
-import io.ktor.http.HttpStatusCode
+import io.supabase.testing.createMockedSupabaseClient
+import io.supabase.testing.respondJson
 import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.json.add
 import kotlinx.serialization.json.buildJsonObject

@@ -1,4 +1,4 @@
-package io.github.jan.supabase.testing
+package io.supabase.testing
 
 import io.ktor.http.HttpMethod
 import kotlin.test.assertEquals

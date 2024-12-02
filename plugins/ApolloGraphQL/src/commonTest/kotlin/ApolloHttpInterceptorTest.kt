@@ -4,7 +4,6 @@ import com.apollographql.apollo.api.http.HttpRequest
 import com.apollographql.apollo.api.http.HttpResponse
 import com.apollographql.apollo.api.http.get
 import com.apollographql.apollo.network.http.HttpInterceptorChain
-import io.github.jan.supabase.testing.createMockedSupabaseClient
 import io.supabase.SupabaseClient
 import io.supabase.auth.Auth
 import io.supabase.auth.auth
@@ -12,6 +11,7 @@ import io.supabase.auth.minimalSettings
 import io.supabase.graphql.ApolloHttpInterceptor
 import io.supabase.graphql.GraphQL
 import io.supabase.graphql.graphql
+import io.supabase.testing.createMockedSupabaseClient
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 import kotlin.test.assertEquals

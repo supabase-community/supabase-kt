@@ -10,10 +10,10 @@ import io.supabase.storage.storage
 import io.supabase.storage.updateAsFlow
 import io.supabase.storage.uploadAsFlow
 import io.supabase.storage.uploadToSignedUrlAsFlow
-import io.github.jan.supabase.testing.assertMethodIs
-import io.github.jan.supabase.testing.assertPathIs
-import io.github.jan.supabase.testing.createMockedSupabaseClient
-import io.github.jan.supabase.testing.pathAfterVersion
+import io.supabase.testing.assertMethodIs
+import io.supabase.testing.assertPathIs
+import io.supabase.testing.createMockedSupabaseClient
+import io.supabase.testing.pathAfterVersion
 import io.ktor.client.engine.mock.MockRequestHandleScope
 import io.ktor.client.engine.mock.respond
 import io.ktor.client.engine.mock.toByteArray

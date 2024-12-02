@@ -1,6 +1,6 @@
-import io.supabase.encode
 import io.github.jan.supabase.serializer.JacksonSerializer
-import io.github.jan.supabase.testing.createMockedSupabaseClient
+import io.supabase.encode
+import io.supabase.testing.createMockedSupabaseClient
 import kotlin.reflect.typeOf
 import kotlin.test.Test
 import kotlin.test.assertEquals

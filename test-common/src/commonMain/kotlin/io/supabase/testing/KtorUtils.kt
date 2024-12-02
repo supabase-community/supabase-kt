@@ -1,4 +1,4 @@
-package io.github.jan.supabase.testing
+package io.supabase.testing
 
 import io.ktor.client.engine.mock.MockRequestHandleScope
 import io.ktor.client.engine.mock.respond

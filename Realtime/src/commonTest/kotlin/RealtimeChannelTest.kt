@@ -1,4 +1,5 @@
 import app.cash.turbine.test
+import io.ktor.client.engine.mock.respond
 import io.supabase.auth.Auth
 import io.supabase.auth.auth
 import io.supabase.auth.minimalSettings
@@ -18,10 +19,9 @@ import io.supabase.realtime.broadcastFlow
 import io.supabase.realtime.channel
 import io.supabase.realtime.postgresChangeFlow
 import io.supabase.realtime.realtime
-import io.github.jan.supabase.testing.assertPathIs
-import io.github.jan.supabase.testing.pathAfterVersion
-import io.github.jan.supabase.testing.toJsonElement
-import io.ktor.client.engine.mock.respond
+import io.supabase.testing.assertPathIs
+import io.supabase.testing.pathAfterVersion
+import io.supabase.testing.toJsonElement
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch

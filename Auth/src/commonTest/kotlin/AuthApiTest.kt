@@ -1,9 +1,3 @@
-import io.github.jan.supabase.testing.assertMethodIs
-import io.github.jan.supabase.testing.assertPathIs
-import io.github.jan.supabase.testing.createMockedSupabaseClient
-import io.github.jan.supabase.testing.pathAfterVersion
-import io.github.jan.supabase.testing.respondJson
-import io.github.jan.supabase.testing.toJsonElement
 import io.ktor.client.engine.mock.respond
 import io.ktor.http.HttpMethod
 import io.supabase.SupabaseClientBuilder
@@ -21,6 +15,12 @@ import io.supabase.auth.providers.builtin.IDToken
 import io.supabase.auth.providers.builtin.OTP
 import io.supabase.auth.providers.builtin.Phone
 import io.supabase.auth.status.SessionSource
+import io.supabase.testing.assertMethodIs
+import io.supabase.testing.assertPathIs
+import io.supabase.testing.createMockedSupabaseClient
+import io.supabase.testing.pathAfterVersion
+import io.supabase.testing.respondJson
+import io.supabase.testing.toJsonElement
 import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject

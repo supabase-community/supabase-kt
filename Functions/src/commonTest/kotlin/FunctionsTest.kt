@@ -1,3 +1,7 @@
+import io.ktor.client.engine.mock.respond
+import io.ktor.http.ContentType
+import io.ktor.http.Headers
+import io.ktor.http.HttpHeaders
 import io.supabase.SupabaseClientBuilder
 import io.supabase.auth.Auth
 import io.supabase.auth.auth
@@ -5,13 +9,9 @@ import io.supabase.auth.minimalSettings
 import io.supabase.functions.FunctionRegion
 import io.supabase.functions.Functions
 import io.supabase.functions.functions
-import io.github.jan.supabase.testing.createMockedSupabaseClient
-import io.github.jan.supabase.testing.pathAfterVersion
-import io.github.jan.supabase.testing.toJsonElement
-import io.ktor.client.engine.mock.respond
-import io.ktor.http.ContentType
-import io.ktor.http.Headers
-import io.ktor.http.HttpHeaders
+import io.supabase.testing.createMockedSupabaseClient
+import io.supabase.testing.pathAfterVersion
+import io.supabase.testing.toJsonElement
 import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.jsonObject

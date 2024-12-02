@@ -1,3 +1,4 @@
+import io.ktor.http.Url
 import io.supabase.SupabaseClientBuilder
 import io.supabase.auth.Auth
 import io.supabase.auth.MemorySessionManager
@@ -8,10 +9,9 @@ import io.supabase.auth.status.SessionStatus
 import io.supabase.auth.user.Identity
 import io.supabase.auth.user.UserInfo
 import io.supabase.auth.user.UserSession
-import io.github.jan.supabase.testing.createMockedSupabaseClient
-import io.github.jan.supabase.testing.pathAfterVersion
-import io.github.jan.supabase.testing.respondJson
-import io.ktor.http.Url
+import io.supabase.testing.createMockedSupabaseClient
+import io.supabase.testing.pathAfterVersion
+import io.supabase.testing.respondJson
 import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.json.buildJsonObject
 import kotlin.test.Test
