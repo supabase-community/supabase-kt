@@ -1,8 +1,8 @@
 package request
 
-import io.github.jan.supabase.postgrest.query.Count
-import io.github.jan.supabase.postgrest.request.PostgrestRequest
-import io.github.jan.supabase.postgrest.request.RpcRequest
+import io.supabase.postgrest.query.Count
+import io.supabase.postgrest.request.PostgrestRequest
+import io.supabase.postgrest.request.RpcRequest
 import io.ktor.http.HttpMethod
 import kotlinx.serialization.json.JsonArray
 import kotlin.test.Test

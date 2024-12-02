@@ -6,7 +6,7 @@ plugins {
     alias(libs.plugins.kotlinx.plugin.serialization)
 }
 
-group = "io.github.jan.supabase"
+group = "io.supabase"
 version = "1.0-SNAPSHOT"
 
 dependencies {

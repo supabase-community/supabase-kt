@@ -50,7 +50,7 @@ Versions above 3.0.0 are available under the `auth-kt` module.
 
 ```kotlin
 dependencies {
-    implementation("io.github.jan-tennert.supabase:gotrue-kt:VERSION")
+    implementation("io.supabase:gotrue-kt:VERSION")
 }
 ```
 

@@ -31,12 +31,12 @@ fun Project.configureLibraryAndroidTarget(
 fun BaseAppModuleExtension.configureApplicationAndroidTarget() {
     compileSdk = 35
     defaultConfig {
-        applicationId = "io.github.jan.supabase.android"
+        applicationId = "io.supabase.android"
         minSdk = 26
         versionCode = 1
         versionName = "1.0-SNAPSHOT"
     }
-    namespace = "io.github.jan.supabase.android"
+    namespace = "io.supabase.android"
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8

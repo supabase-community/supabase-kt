@@ -1,8 +1,8 @@
-import io.github.jan.supabase.BuildConfig
-import io.github.jan.supabase.SupabaseClient
-import io.github.jan.supabase.logging.LogLevel
-import io.github.jan.supabase.testing.createMockedSupabaseClient
 import io.ktor.client.engine.mock.respond
+import io.supabase.BuildConfig
+import io.supabase.SupabaseClient
+import io.supabase.logging.LogLevel
+import io.supabase.testing.createMockedSupabaseClient
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 import kotlin.test.assertEquals

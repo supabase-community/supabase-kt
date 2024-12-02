@@ -25,8 +25,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
-import io.github.jan.supabase.auth.mfa.FactorType
-import io.github.jan.supabase.auth.mfa.MfaFactor
+import io.supabase.auth.mfa.FactorType
+import io.supabase.auth.mfa.MfaFactor
 import io.github.jan.supabase.common.AppViewModel
 import io.github.jan.supabase.common.ui.components.QRCode
 

@@ -34,8 +34,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import io.github.jan.supabase.common.ui.utils.fileSize
-import io.github.jan.supabase.storage.UploadStatus
-import io.github.jan.supabase.storage.resumable.ResumableUploadState
+import io.supabase.storage.UploadStatus
+import io.supabase.storage.resumable.ResumableUploadState
 
 fun fileIcon(extension: String): ImageVector {
     return when (extension) {

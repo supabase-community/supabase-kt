@@ -13,9 +13,9 @@ val buildConfigGenerator by tasks.registering(Sync::class) {
     from(
         resources.text.fromString(
             """
-        |package io.github.jan.supabase
+        |package io.supabase
         |
-        |import io.github.jan.supabase.annotations.SupabaseInternal
+        |import io.supabase.annotations.SupabaseInternal
         |
         |@SupabaseInternal
         |object BuildConfig {

@@ -1,6 +1,6 @@
 import com.russhwolf.settings.MapSettings
-import io.github.jan.supabase.auth.SettingsSessionManager
-import io.github.jan.supabase.auth.user.UserSession
+import io.supabase.auth.SettingsSessionManager
+import io.supabase.auth.user.UserSession
 import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json

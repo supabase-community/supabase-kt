@@ -1,10 +1,10 @@
 package io.github.jan.supabase.common.net
 
-import io.github.jan.supabase.SupabaseClient
-import io.github.jan.supabase.annotations.SupabaseExperimental
-import io.github.jan.supabase.auth.auth
-import io.github.jan.supabase.postgrest.postgrest
-import io.github.jan.supabase.realtime.selectAsFlow
+import io.supabase.SupabaseClient
+import io.supabase.annotations.SupabaseExperimental
+import io.supabase.auth.auth
+import io.supabase.postgrest.postgrest
+import io.supabase.realtime.selectAsFlow
 import kotlinx.coroutines.flow.Flow
 import kotlinx.datetime.Instant
 import kotlinx.serialization.SerialName

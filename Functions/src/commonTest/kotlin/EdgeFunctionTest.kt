@@ -1,12 +1,12 @@
-import io.github.jan.supabase.functions.FunctionRegion
-import io.github.jan.supabase.functions.functions
-import io.github.jan.supabase.testing.createMockedSupabaseClient
-import io.github.jan.supabase.testing.pathAfterVersion
-import io.github.jan.supabase.testing.toJsonElement
 import io.ktor.client.engine.mock.respond
 import io.ktor.http.ContentType
 import io.ktor.http.Headers
 import io.ktor.http.HttpHeaders
+import io.supabase.functions.FunctionRegion
+import io.supabase.functions.functions
+import io.supabase.testing.createMockedSupabaseClient
+import io.supabase.testing.pathAfterVersion
+import io.supabase.testing.toJsonElement
 import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.jsonObject

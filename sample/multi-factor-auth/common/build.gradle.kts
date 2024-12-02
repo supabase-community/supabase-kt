@@ -9,7 +9,7 @@ plugins {
     alias(libs.plugins.kotlinx.plugin.serialization)
 }
 
-group = "io.github.jan.supabase"
+group = "io.supabase"
 version = "1.0-SNAPSHOT"
 
 @OptIn(ExperimentalKotlinGradlePluginApi::class)
@@ -69,4 +69,4 @@ kotlin {
     }
 }
 
-configureLibraryAndroidTarget("io.github.jan.supabase.common", 26, JavaVersion.VERSION_1_8)
+configureLibraryAndroidTarget("io.supabase.common", 26, JavaVersion.VERSION_1_8)

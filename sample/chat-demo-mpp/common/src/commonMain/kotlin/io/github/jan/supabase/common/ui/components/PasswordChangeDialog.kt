@@ -14,10 +14,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import io.github.jan.supabase.compose.auth.ui.AuthForm
-import io.github.jan.supabase.compose.auth.ui.LocalAuthState
-import io.github.jan.supabase.compose.auth.ui.annotations.AuthUiExperimental
-import io.github.jan.supabase.compose.auth.ui.password.OutlinedPasswordField
+import io.supabase.compose.auth.ui.AuthForm
+import io.supabase.compose.auth.ui.LocalAuthState
+import io.supabase.compose.auth.ui.annotations.AuthUiExperimental
+import io.supabase.compose.auth.ui.password.OutlinedPasswordField
 
 @OptIn(AuthUiExperimental::class, ExperimentalMaterial3Api::class)
 @Composable

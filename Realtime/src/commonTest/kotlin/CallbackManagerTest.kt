@@ -1,10 +1,10 @@
-import io.github.jan.supabase.SupabaseSerializer
-import io.github.jan.supabase.realtime.CallbackManagerImpl
-import io.github.jan.supabase.realtime.HasRecord
-import io.github.jan.supabase.realtime.PostgresAction
-import io.github.jan.supabase.realtime.PostgresJoinConfig
-import io.github.jan.supabase.realtime.Presence
-import io.github.jan.supabase.serializer.KotlinXSerializer
+import io.supabase.SupabaseSerializer
+import io.supabase.realtime.CallbackManagerImpl
+import io.supabase.realtime.HasRecord
+import io.supabase.realtime.PostgresAction
+import io.supabase.realtime.PostgresJoinConfig
+import io.supabase.realtime.Presence
+import io.supabase.serializer.KotlinXSerializer
 import kotlinx.datetime.Clock
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.buildJsonObject

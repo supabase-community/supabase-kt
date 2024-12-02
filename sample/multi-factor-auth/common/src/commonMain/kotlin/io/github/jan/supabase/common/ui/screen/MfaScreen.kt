@@ -3,7 +3,7 @@ package io.github.jan.supabase.common.ui.screen
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import io.github.jan.supabase.auth.mfa.MfaStatus
+import io.supabase.auth.mfa.MfaStatus
 import io.github.jan.supabase.common.AppViewModel
 
 @Composable

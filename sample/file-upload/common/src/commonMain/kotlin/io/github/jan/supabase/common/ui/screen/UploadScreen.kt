@@ -42,7 +42,7 @@ import io.github.jan.supabase.common.UploadState
 import io.github.jan.supabase.common.UploadViewModel
 import io.github.jan.supabase.common.ui.components.UploadCard
 import io.github.jan.supabase.common.ui.utils.applyDragging
-import io.github.jan.supabase.storage.resumable.Fingerprint
+import io.supabase.storage.resumable.Fingerprint
 import io.github.vinceglb.filekit.compose.rememberFilePickerLauncher
 import io.github.vinceglb.filekit.core.PickerType
 
