@@ -38,7 +38,9 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 addModules(SupabaseModule.SUPABASE)
-                implementation(libs.krypto)
+             //   implementation(libs.krypto)
+                implementation(libs.secure.random)
+                api(libs.okio)
             }
         }
         val desktopMain by getting {
@@ -63,6 +65,11 @@ kotlin {
             dependencies {
                 api(libs.androidx.startup.runtime)
                 api(libs.androidx.browser)
+            }
+        }
+        val wasmJsMain by getting {
+            dependencies {
+                api(libs.kotlinx.browser)
             }
         }
     }

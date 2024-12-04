@@ -1,21 +1,21 @@
 [versions]
-kotlin = "2.0.21"
+kotlin = "2.1.0"
 accompanist-permissions = "0.36.0"
-ktor = "3.0.1"
+ktor = "3.0.2"
 dokka = "1.9.20"
 kotlinx-datetime = "0.6.1"
 kermit = "2.0.5"
-atomicfu = "0.26.0"
+atomicfu = "0.26.1"
 coroutines = "1.9.0"
 android-lifecycle = "2.8.7"
 androidx-startup = "1.2.0"
 androidx-activity-compose = "1.9.3"
-multiplatform-settings = "1.2.0"
+multiplatform-settings = "1.3.0"
 complete-kotlin = "1.1.0"
 agp = "8.5.2"
 maven-publish = "0.30.0"
 apollo-kotlin = "4.1.0"
-korlibs = "4.0.10"
+korlibs = "6.0.0"
 detekt = "1.23.7"
 moshi = "1.15.1"
 jackson = "2.18.1"
@@ -33,6 +33,8 @@ androidx-core = "1.15.0"
 androidx-compat = "1.7.0"
 androidx-lifecycle = "2.8.7"
 filekit = "0.8.7"
+kotlinx-browser = "0.3"
+secure-random = "0.3.2"
 
 [plugins]
 kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
@@ -54,6 +56,7 @@ power-assert = { id = "org.jetbrains.kotlin.plugin.power-assert", version.ref = 
 [libraries]
 kotlinx-atomicfu = { module = "org.jetbrains.kotlinx:atomicfu", version.ref = "atomicfu" }
 kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinx-datetime" }
+kotlinx-browser = { module = "org.jetbrains.kotlinx:kotlinx-browser", version.ref = "kotlinx-browser" }
 kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
 kotlinx-coroutines-play-services = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-play-services", version.ref = "coroutines" }
 kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "coroutines" }
@@ -98,7 +101,8 @@ multiplatform-settings-test = { module = "com.russhwolf:multiplatform-settings-t
 
 apollo-kotlin = { module = "com.apollographql.apollo:apollo-runtime", version.ref = "apollo-kotlin" }
 
-krypto = { module = "com.soywiz.korlibs.krypto:krypto", version.ref = "korlibs" }
+krypto = { module = "com.soywiz:korlibs-crypto", version.ref = "korlibs" }
+secure-random = { module = "org.kotlincrypto:secure-random", version.ref = "secure-random" }
 okio = { module = "com.squareup.okio:okio", version.ref = "okio" }
 
 moshi = { module = "com.squareup.moshi:moshi", version.ref = "moshi" }
