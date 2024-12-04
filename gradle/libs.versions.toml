@@ -34,6 +34,7 @@ androidx-compat = "1.7.0"
 androidx-lifecycle = "2.8.7"
 filekit = "0.8.7"
 kotlinx-browser = "0.3"
+secure-random = "0.3.2"
 
 [plugins]
 kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
@@ -101,6 +102,7 @@ multiplatform-settings-test = { module = "com.russhwolf:multiplatform-settings-t
 apollo-kotlin = { module = "com.apollographql.apollo:apollo-runtime", version.ref = "apollo-kotlin" }
 
 krypto = { module = "com.soywiz:korlibs-crypto", version.ref = "korlibs" }
+secure-random = { module = "org.kotlincrypto:secure-random", version.ref = "secure-random" }
 okio = { module = "com.squareup.okio:okio", version.ref = "okio" }
 
 moshi = { module = "com.squareup.moshi:moshi", version.ref = "moshi" }

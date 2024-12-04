@@ -38,7 +38,9 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 addModules(SupabaseModule.SUPABASE)
-                implementation(libs.krypto)
+             //   implementation(libs.krypto)
+                implementation(libs.secure.random)
+                api(libs.okio)
             }
         }
         val desktopMain by getting {
