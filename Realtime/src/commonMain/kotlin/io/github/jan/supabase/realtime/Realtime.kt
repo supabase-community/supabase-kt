@@ -4,7 +4,9 @@ import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.SupabaseClientBuilder
 import io.github.jan.supabase.SupabaseSerializer
 import io.github.jan.supabase.annotations.SupabaseInternal
+import io.github.jan.supabase.auth.resolveAccessToken
 import io.github.jan.supabase.logging.SupabaseLogger
+import io.github.jan.supabase.logging.w
 import io.github.jan.supabase.plugins.CustomSerializationConfig
 import io.github.jan.supabase.plugins.CustomSerializationPlugin
 import io.github.jan.supabase.plugins.MainConfig
@@ -93,6 +95,15 @@ sealed interface Realtime : MainPlugin<Realtime.Config>, CustomSerializationPlug
     suspend fun send(message: RealtimeMessage)
 
     /**
+     * Sets the JWT access token used for channel subscription authorization and Realtime RLS.
+     *
+     * If [token] is null, the token will be resolved using the [Realtime.Config.accessToken] provider.
+     *
+     * @param token The JWT access token
+     */
+    suspend fun setAuth(token: String? = null)
+
+    /**
      * @property websocketConfig Custom configuration for the Ktor Websocket Client. This only applies if [Realtime.Config.websocketFactory] is null.
      * @property secure Whether to use wss or ws. Defaults to [SupabaseClient.useHTTPS] when null
      * @property disconnectOnSessionLoss Whether to disconnect from the websocket when the session is lost. Defaults to true
@@ -114,6 +125,11 @@ sealed interface Realtime : MainPlugin<Realtime.Config>, CustomSerializationPlug
         var disconnectOnNoSubscriptions: Boolean = true,
     ): MainConfig(), CustomSerializationConfig {
 
+        var accessToken: suspend SupabaseClient.() -> String? = { resolveAccessToken(realtime, keyAsFallback = false) }
+            set(value) {
+                logger.w { "You are setting a custom access token provider. This can lead to unexpected behavior." }
+                field = value
+            }
         override var serializer: SupabaseSerializer? = null
 
     }

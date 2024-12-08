@@ -43,6 +43,7 @@ import kotlinx.serialization.json.buildJsonObject
     override val subscriptions: Map<String, RealtimeChannel> = _subscriptions
     private val scope = CoroutineScope(Dispatchers.Default + SupervisorJob())
     private val mutex = Mutex()
+    internal var accessToken by atomic<String?>(null)
     var heartbeatJob: Job? = null
     var messageJob: Job? = null
     var ref by atomic(0)
@@ -92,7 +93,7 @@ import kotlinx.serialization.json.buildJsonObject
             supabaseClient.pluginManager.getPluginOrNull(Auth)?.sessionStatus?.collect {
                 if(status.value == Realtime.Status.CONNECTED) {
                     when(it) {
-                        is SessionStatus.Authenticated -> updateJwt(it.session.accessToken)
+                        is SessionStatus.Authenticated -> setAuth(it.session.accessToken)
                         is SessionStatus.NotAuthenticated -> {
                             if(config.disconnectOnSessionLoss) {
                                 Realtime.logger.w { "No auth session found, disconnecting from realtime websocket"}
@@ -166,9 +167,11 @@ import kotlinx.serialization.json.buildJsonObject
         }
     }
 
-    private fun updateJwt(jwt: String) {
+    override suspend fun setAuth(token: String?) {
+        val newToken = token ?: config.accessToken(supabaseClient)
+        this.accessToken = newToken
         scope.launch {
-            subscriptions.values.filter { it.status.value == RealtimeChannel.Status.SUBSCRIBED }.forEach { it.updateAuth(jwt) }
+            subscriptions.values.filter { it.status.value == RealtimeChannel.Status.SUBSCRIBED }.forEach { it.updateAuth(accessToken) }
         }
     }
 
