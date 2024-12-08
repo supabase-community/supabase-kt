@@ -1,11 +1,15 @@
 import io.github.jan.supabase.realtime.Realtime
+import io.github.jan.supabase.realtime.RealtimeImpl
 import io.github.jan.supabase.realtime.RealtimeMessage
 import io.github.jan.supabase.realtime.realtime
+import io.ktor.util.encodeBase64
 import kotlinx.coroutines.test.runTest
+import kotlinx.datetime.Clock
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertNull
 
 class RealtimeTest {
 
@@ -49,6 +53,48 @@ class RealtimeTest {
                 }
             )
         }
+    }
+
+    @Test
+    fun testSendingExpiredToken() {
+        runTest {
+            createTestClient(
+                wsHandler = { i, _ ->
+
+                },
+                supabaseHandler = {
+                    it.realtime as RealtimeImpl
+                    val expiredToken = generateToken(Clock.System.now().epochSeconds - 10)
+                    it.realtime.setAuth(expiredToken)
+                    assertNull((it.realtime as RealtimeImpl).accessToken)
+                }
+            )
+        }
+    }
+
+    @Test
+    fun testSendingValidToken() {
+        runTest {
+            createTestClient(
+                wsHandler = { i, _ ->
+
+                },
+                supabaseHandler = {
+                    it.realtime as RealtimeImpl
+                    val token = generateToken(Clock.System.now().epochSeconds + 10)
+                    it.realtime.setAuth(token)
+                    assertEquals(token, (it.realtime as RealtimeImpl).accessToken)
+                }
+            )
+        }
+    }
+
+    private fun generateToken(exp: Long) = buildString {
+        append("test.")
+        append(buildJsonObject {
+            put("exp", exp)
+        }.toString().encodeBase64())
+        append(".test")
     }
 
 }
