@@ -4,8 +4,8 @@ package io.github.jan.supabase.postgrest.query
 import io.github.jan.supabase.auth.PostgrestFilterDSL
 import io.github.jan.supabase.encodeToJsonElement
 import io.github.jan.supabase.exceptions.HttpRequestException
-import io.github.jan.supabase.exceptions.RestException
 import io.github.jan.supabase.postgrest.Postgrest
+import io.github.jan.supabase.postgrest.exception.PostgrestRestException
 import io.github.jan.supabase.postgrest.executor.RestRequestExecutor
 import io.github.jan.supabase.postgrest.mapToFirstValue
 import io.github.jan.supabase.postgrest.query.request.InsertRequestBuilder
@@ -35,7 +35,7 @@ class PostgrestQueryBuilder(
      * @param columns The columns to retrieve, defaults to [Columns.ALL]. You can also use [Columns.list], [Columns.type] or [Columns.raw] to specify the columns
      * @param request Additional configurations for the request including filters
      * @return PostgrestResult which is either an error, an empty JsonArray or the data you requested as an JsonArray
-     * @throws RestException or one of its subclasses if receiving an error response
+     * @throws PostgrestRestException if receiving an error response
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
@@ -67,7 +67,7 @@ class PostgrestQueryBuilder(
      *
      * @param values The values to insert, will automatically get serialized into json.
      * @param request Additional configurations for the request including filters
-     * @throws RestException or one of its subclasses if receiving an error response
+     * @throws PostgrestRestException if receiving an error response
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
@@ -107,7 +107,7 @@ class PostgrestQueryBuilder(
      *
      * @param value The value to insert, will automatically get serialized into json.
      * @param request Additional filtering to apply to the query
-     * @throws RestException or one of its subclasses if receiving an error response
+     * @throws PostgrestRestException if receiving an error response
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
@@ -121,7 +121,7 @@ class PostgrestQueryBuilder(
      *
      * @param values The values to insert, will automatically get serialized into json.
      * @param request Additional filtering to apply to the query
-     * @throws RestException or one of its subclasses if receiving an error response
+     * @throws PostgrestRestException if receiving an error response
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
@@ -150,7 +150,7 @@ class PostgrestQueryBuilder(
      *
      * @param value The value to insert, will automatically get serialized into json.
      * @param request Additional filtering to apply to the query
-     * @throws RestException or one of its subclasses if receiving an error response
+     * @throws PostgrestRestException if receiving an error response
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
@@ -166,7 +166,7 @@ class PostgrestQueryBuilder(
      *
      * @param update Specifies the fields to update via a DSL
      * @param request Additional filtering to apply to the query
-     * @throws RestException or one of its subclasses if receiving an error response
+     * @throws PostgrestRestException if receiving an error response
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
@@ -193,7 +193,7 @@ class PostgrestQueryBuilder(
      *
      * @param value The value to update, will automatically get serialized into json.
      * @param request Additional filtering to apply to the query
-     * @throws RestException or one of its subclasses if receiving an error response
+     * @throws PostgrestRestException if receiving an error response
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
@@ -219,7 +219,7 @@ class PostgrestQueryBuilder(
      * By default, deleted rows are not returned. To return it, call `[PostgrestRequestBuilder.select]`.
      *
      * @param request Additional filtering to apply to the query
-     * @throws RestException or one of its subclasses if receiving an error response
+     * @throws PostgrestRestException if receiving an error response
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
