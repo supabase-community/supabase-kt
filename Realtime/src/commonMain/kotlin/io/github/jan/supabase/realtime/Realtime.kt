@@ -125,6 +125,9 @@ sealed interface Realtime : MainPlugin<Realtime.Config>, CustomSerializationPlug
         var disconnectOnNoSubscriptions: Boolean = true,
     ): MainConfig(), CustomSerializationConfig {
 
+        /**
+         * A custom access token provider. If this is set, the [SupabaseClient] will not be used to resolve the access token.
+         */
         var accessToken: suspend SupabaseClient.() -> String? = { resolveAccessToken(realtime, keyAsFallback = false) }
             set(value) {
                 logger.w { "You are setting a custom access token provider. This can lead to unexpected behavior." }
