@@ -46,9 +46,9 @@ sealed interface RealtimeChannel {
     suspend fun subscribe(blockUntilSubscribed: Boolean = false)
 
     /**
-     * Updates the JWT token for this client
+     * Updates the JWT token for this channel
      */
-    suspend fun updateAuth(jwt: String)
+    suspend fun updateAuth(jwt: String?)
 
     /**
      * Unsubscribes from the channel
