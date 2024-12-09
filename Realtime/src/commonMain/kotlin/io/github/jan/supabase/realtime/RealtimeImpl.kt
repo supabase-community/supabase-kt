@@ -188,7 +188,6 @@ import kotlin.io.encoding.ExperimentalEncodingApi
                 return
             }
         }
-
         this.accessToken = newToken
         scope.launch {
             subscriptions.values.filter { it.status.value == RealtimeChannel.Status.SUBSCRIBED }.forEach { it.updateAuth(accessToken) }
