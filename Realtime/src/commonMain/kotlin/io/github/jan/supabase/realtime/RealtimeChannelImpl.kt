@@ -40,14 +40,13 @@ internal class RealtimeChannelImpl(
     private val _status = MutableStateFlow(RealtimeChannel.Status.UNSUBSCRIBED)
     override val status = _status.asStateFlow()
     override val realtime: Realtime = realtimeImpl
-    private val accessToken = suspend {
-        realtimeImpl.config.accessToken(supabaseClient) ?: realtimeImpl.accessToken
-    }
     override val supabaseClient = realtimeImpl.supabaseClient
 
     private val broadcastUrl = realtimeImpl.broadcastUrl()
     private val subTopic = topic.replaceFirst(Regex("^realtime:", RegexOption.IGNORE_CASE), "")
     private val httpClient = realtimeImpl.supabaseClient.httpClient
+
+    private suspend fun accessToken() = realtimeImpl.config.accessToken(supabaseClient) ?: realtimeImpl.accessToken
 
     @OptIn(SupabaseInternal::class)
     override suspend fun subscribe(blockUntilSubscribed: Boolean) {
