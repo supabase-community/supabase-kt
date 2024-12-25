@@ -142,7 +142,7 @@ class RealtimeChannelTest {
 
     @Test
     fun testSendingPayloadWithAuthJWT() {
-        val expectedAuthToken = "authToken"
+        val expectedAuthToken = "valid.test.token"
         runTest {
             createTestClient(
                 wsHandler = { i, _ ->
