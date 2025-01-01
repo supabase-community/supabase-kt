@@ -22,10 +22,12 @@ import io.github.jan.supabase.testing.assertPathIs
 import io.github.jan.supabase.testing.pathAfterVersion
 import io.github.jan.supabase.testing.toJsonElement
 import io.ktor.client.engine.mock.respond
+import io.ktor.util.encodeBase64
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runTest
+import kotlinx.datetime.Clock
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.boolean
@@ -41,6 +43,12 @@ import kotlin.test.Test
 import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
+
+val EXAMPLE_JWT = buildString {
+    append("test.")
+    append(buildJsonObject { put("exp", Clock.System.now().epochSeconds + 500) }.toString().encodeBase64())
+    append(".test")
+}
 
 class RealtimeChannelTest {
 
@@ -142,7 +150,7 @@ class RealtimeChannelTest {
 
     @Test
     fun testSendingPayloadWithAuthJWT() {
-        val expectedAuthToken = "valid.test.token"
+        val expectedAuthToken = EXAMPLE_JWT
         runTest {
             createTestClient(
                 wsHandler = { i, _ ->
@@ -165,7 +173,7 @@ class RealtimeChannelTest {
 
     @Test
     fun testSendingPayloadWithCustomJWT() {
-        val expectedAuthToken = "authToken"
+        val expectedAuthToken = EXAMPLE_JWT
         runTest {
             createTestClient(
                 wsHandler = { i, _ ->
