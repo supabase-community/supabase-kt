@@ -54,7 +54,7 @@ sealed interface Realtime : MainPlugin<Realtime.Config>, CustomSerializationPlug
     val status: StateFlow<Status>
 
     /**
-     * A list of all active the subscriptions
+     * A map of all active the subscriptions
      */
     val subscriptions: Map<String, RealtimeChannel>
 
