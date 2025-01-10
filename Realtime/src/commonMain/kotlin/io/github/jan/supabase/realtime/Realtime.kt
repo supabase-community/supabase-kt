@@ -104,7 +104,7 @@ sealed interface Realtime : MainPlugin<Realtime.Config>, CustomSerializationPlug
      * Creates a new [RealtimeChannel] and adds it to the [subscriptions]
      *
      * - This method does not subscribe to the channel. You have to call [RealtimeChannel.subscribe] to do so.
-     * - If the channel already exists, it will be returned
+     * - If a channel with the same [channelId] already exists, it will be returned
      *
      * @param channelId The id of the channel
      * @param builder The builder for the channel
@@ -195,10 +195,10 @@ sealed interface Realtime : MainPlugin<Realtime.Config>, CustomSerializationPlug
 }
 
 /**
- * Creates a new [RealtimeChannel] and adds it to the [Realtime.subscriptions]
+ * Creates a new [RealtimeChannel] and adds it to the [subscriptions]
  *
  * - This method does not subscribe to the channel. You have to call [RealtimeChannel.subscribe] to do so.
- * - If the channel already exists, it will be returned
+ * - If a channel with the same [channelId] already exists, it will be returned
  *
  * @param channelId The id of the channel
  * @param builder The builder for the channel
