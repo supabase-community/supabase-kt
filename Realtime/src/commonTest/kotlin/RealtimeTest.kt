@@ -1,6 +1,7 @@
 import io.github.jan.supabase.realtime.Realtime
 import io.github.jan.supabase.realtime.RealtimeImpl
 import io.github.jan.supabase.realtime.RealtimeMessage
+import io.github.jan.supabase.realtime.channel
 import io.github.jan.supabase.realtime.realtime
 import io.ktor.util.encodeBase64
 import kotlinx.coroutines.test.runTest
@@ -26,6 +27,22 @@ class RealtimeTest {
                     assertEquals(Realtime.Status.CONNECTED, it.realtime.status.value)
                     it.realtime.disconnect()
                     assertEquals(Realtime.Status.DISCONNECTED, it.realtime.status.value)
+                }
+            )
+        }
+    }
+
+    @Test
+    fun testExistingChannelShouldBeReturned() {
+        runTest {
+            createTestClient(
+                wsHandler = { _, _ ->
+                    //Does not matter for this test
+                },
+                supabaseHandler = {
+                    val channel = it.realtime.channel("channelId")
+                    val channel2 = it.realtime.channel("channelId")
+                    assertEquals(channel, channel2)
                 }
             )
         }

@@ -162,6 +162,13 @@ import kotlin.io.encoding.ExperimentalEncodingApi
         _status.value = Realtime.Status.DISCONNECTED
     }
 
+    override fun channel(channelId: String, builder: RealtimeChannelBuilder): RealtimeChannel {
+        if(subscriptions.containsKey(channelId)) return subscriptions[channelId]!!
+        val channel = builder.build()
+        _subscriptions[channelId] = channel
+        return channel
+    }
+
     private suspend fun onMessage(message: RealtimeMessage) {
         Realtime.logger.d { "Received message $message" }
         val channel = subscriptions[message.topic] as? RealtimeChannelImpl
