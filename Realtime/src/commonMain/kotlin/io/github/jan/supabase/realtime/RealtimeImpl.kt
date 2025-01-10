@@ -1,7 +1,6 @@
 package io.github.jan.supabase.realtime
 
 import io.github.jan.supabase.SupabaseClient
-import io.github.jan.supabase.annotations.SupabaseInternal
 import io.github.jan.supabase.auth.Auth
 import io.github.jan.supabase.auth.status.SessionStatus
 import io.github.jan.supabase.buildUrl
@@ -239,11 +238,6 @@ import kotlin.io.encoding.ExperimentalEncodingApi
             Realtime.logger.d { "No more subscriptions, disconnecting from realtime websocket" }
             disconnect()
         }
-    }
-
-    @SupabaseInternal
-    override fun Realtime.addChannel(channel: RealtimeChannel) {
-        _subscriptions[channel.topic] = channel
     }
 
     override suspend fun close() {

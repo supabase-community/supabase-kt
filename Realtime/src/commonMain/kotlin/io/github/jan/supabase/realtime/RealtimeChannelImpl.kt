@@ -54,9 +54,6 @@ internal class RealtimeChannelImpl(
             if(!realtimeImpl.config.connectOnSubscribe) error("You can't subscribe to a channel while the realtime client is not connected. Did you forget to call `realtime.connect()`?")
             realtimeImpl.connect()
         }
-        realtimeImpl.run {
-            addChannel(this@RealtimeChannelImpl)
-        }
         _status.value = RealtimeChannel.Status.SUBSCRIBING
         Realtime.logger.d { "Subscribing to channel $topic" }
         val currentJwt = accessToken()
