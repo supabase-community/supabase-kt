@@ -6,6 +6,20 @@ import io.github.jan.supabase.compose.auth.ComposeAuth
 import io.github.jan.supabase.compose.auth.fallbackLogin
 
 /**
+ * Enum class for the type of Google Dialog
+ */
+enum class GoogleDialogType {
+    /**
+     * A bottom sheet dialog
+     */
+    BOTTOM_SHEET,
+    /**
+     * A standard dialog
+     */
+    DIALOG
+}
+
+/**
  * Composable function that implements Native Google Auth.
  *
  * On unsupported platforms it will use the [fallback]
@@ -17,6 +31,7 @@ import io.github.jan.supabase.compose.auth.fallbackLogin
 @Composable
 expect fun ComposeAuth.rememberSignInWithGoogle(
     onResult: (NativeSignInResult) -> Unit = {},
+    type: GoogleDialogType = GoogleDialogType.DIALOG,
     fallback: suspend () -> Unit = {
         fallbackLogin(Google)
     }
