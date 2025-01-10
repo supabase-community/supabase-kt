@@ -17,6 +17,7 @@ import io.github.jan.supabase.realtime.websocket.RealtimeWebsocket
 import io.ktor.client.statement.HttpResponse
 import io.ktor.http.URLProtocol
 import io.ktor.http.path
+import io.ktor.util.decodeBase64String
 import kotlinx.atomicfu.atomic
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -30,7 +31,13 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import kotlinx.datetime.Clock
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.jsonPrimitive
+import kotlinx.serialization.json.longOrNull
+import kotlin.io.encoding.ExperimentalEncodingApi
 
 @PublishedApi internal class RealtimeImpl(override val supabaseClient: SupabaseClient, override val config: Realtime.Config) : Realtime {
 
@@ -43,6 +50,7 @@ import kotlinx.serialization.json.buildJsonObject
     override val subscriptions: Map<String, RealtimeChannel> = _subscriptions
     private val scope = CoroutineScope(Dispatchers.Default + SupervisorJob())
     private val mutex = Mutex()
+    internal var accessToken by atomic<String?>(null)
     var heartbeatJob: Job? = null
     var messageJob: Job? = null
     var ref by atomic(0)
@@ -92,7 +100,7 @@ import kotlinx.serialization.json.buildJsonObject
             supabaseClient.pluginManager.getPluginOrNull(Auth)?.sessionStatus?.collect {
                 if(status.value == Realtime.Status.CONNECTED) {
                     when(it) {
-                        is SessionStatus.Authenticated -> updateJwt(it.session.accessToken)
+                        is SessionStatus.Authenticated -> setAuth(it.session.accessToken)
                         is SessionStatus.NotAuthenticated -> {
                             if(config.disconnectOnSessionLoss) {
                                 Realtime.logger.w { "No auth session found, disconnecting from realtime websocket"}
@@ -166,9 +174,23 @@ import kotlinx.serialization.json.buildJsonObject
         }
     }
 
-    private fun updateJwt(jwt: String) {
+    @OptIn(ExperimentalEncodingApi::class)
+    override suspend fun setAuth(token: String?) {
+        val newToken = token ?: config.accessToken(supabaseClient)
+
+        if(newToken != null) {
+            val parsed = Json.decodeFromString<JsonObject>(newToken.split(".")[1].decodeBase64String())
+            val exp = parsed["exp"]?.jsonPrimitive?.longOrNull ?: error("No exp found in token")
+            val now = Clock.System.now().epochSeconds
+            val diff = exp - now
+            if(diff < 0) {
+                Realtime.logger.w { "Token is expired. Not sending it to realtime." }
+                return
+            }
+        }
+        this.accessToken = newToken
         scope.launch {
-            subscriptions.values.filter { it.status.value == RealtimeChannel.Status.SUBSCRIBED }.forEach { it.updateAuth(jwt) }
+            subscriptions.values.filter { it.status.value == RealtimeChannel.Status.SUBSCRIBED }.forEach { it.updateAuth(accessToken) }
         }
     }
 

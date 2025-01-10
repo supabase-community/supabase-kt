@@ -34,7 +34,7 @@ kotlin {
             dependencies {
                 addModules(SupabaseModule.AUTH)
                 implementation(compose.runtime)
-                implementation(libs.krypto)
+          //      implementation(libs.krypto)
             }
         }
         val androidMain by getting {

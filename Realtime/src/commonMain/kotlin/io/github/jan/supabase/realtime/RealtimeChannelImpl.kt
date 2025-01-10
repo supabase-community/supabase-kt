@@ -1,7 +1,6 @@
 package io.github.jan.supabase.realtime
 
 import io.github.jan.supabase.annotations.SupabaseInternal
-import io.github.jan.supabase.auth.resolveAccessToken
 import io.github.jan.supabase.collections.AtomicMutableList
 import io.github.jan.supabase.logging.d
 import io.github.jan.supabase.logging.e
@@ -41,12 +40,13 @@ internal class RealtimeChannelImpl(
     private val _status = MutableStateFlow(RealtimeChannel.Status.UNSUBSCRIBED)
     override val status = _status.asStateFlow()
     override val realtime: Realtime = realtimeImpl
-
     override val supabaseClient = realtimeImpl.supabaseClient
 
     private val broadcastUrl = realtimeImpl.broadcastUrl()
     private val subTopic = topic.replaceFirst(Regex("^realtime:", RegexOption.IGNORE_CASE), "")
     private val httpClient = realtimeImpl.supabaseClient.httpClient
+
+    private suspend fun accessToken() = realtimeImpl.config.accessToken(supabaseClient) ?: realtimeImpl.accessToken
 
     @OptIn(SupabaseInternal::class)
     override suspend fun subscribe(blockUntilSubscribed: Boolean) {
@@ -59,7 +59,7 @@ internal class RealtimeChannelImpl(
         }
         _status.value = RealtimeChannel.Status.SUBSCRIBING
         Realtime.logger.d { "Subscribing to channel $topic" }
-        val currentJwt = supabaseClient.resolveAccessToken(realtimeImpl, keyAsFallback = false)
+        val currentJwt = accessToken()
         val postgrestChanges = clientChanges.toList()
         val joinConfig = RealtimeJoinPayload(RealtimeJoinConfig(broadcastJoinConfig, presenceJoinConfig, postgrestChanges, isPrivate))
         val joinConfigObject = buildJsonObject {
@@ -93,7 +93,7 @@ internal class RealtimeChannelImpl(
         realtimeImpl.send(RealtimeMessage(topic, RealtimeChannel.CHANNEL_EVENT_LEAVE, buildJsonObject {}, null))
     }
 
-    override suspend fun updateAuth(jwt: String) {
+    override suspend fun updateAuth(jwt: String?) {
         Realtime.logger.d { "Updating auth token for channel $topic" }
         realtimeImpl.send(RealtimeMessage(topic, RealtimeChannel.CHANNEL_EVENT_ACCESS_TOKEN, buildJsonObject {
             put("access_token", jwt)
@@ -102,12 +102,16 @@ internal class RealtimeChannelImpl(
 
     override suspend fun broadcast(event: String, message: JsonObject) {
         if(status.value != RealtimeChannel.Status.SUBSCRIBED) {
+            val token = accessToken()
             val response = httpClient.postJson(
                 url = broadcastUrl,
                 body = BroadcastApiBody(listOf(BroadcastApiMessage(subTopic, event, message, isPrivate)))
             ) {
                 headers {
                     append("apikey", realtimeImpl.supabaseClient.supabaseKey)
+                    token?.let {
+                        set("Authorization", "Bearer $it")
+                    }
                 }
             }
             @Suppress("MagicNumber")
