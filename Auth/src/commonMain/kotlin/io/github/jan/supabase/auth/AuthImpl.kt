@@ -36,7 +36,6 @@ import io.ktor.client.call.body
 import io.ktor.client.request.parameter
 import io.ktor.client.statement.HttpResponse
 import io.ktor.client.statement.bodyAsText
-import io.ktor.client.statement.request
 import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
 import kotlinx.coroutines.CoroutineScope
@@ -52,8 +51,10 @@ import kotlinx.datetime.Clock
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonObjectBuilder
 import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.contentOrNull
 import kotlinx.serialization.json.encodeToJsonElement
 import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.put
 import kotlin.time.Duration.Companion.seconds
 
@@ -152,8 +153,9 @@ internal class AuthImpl(
             val url = getOAuthUrl(provider, redirectTo, "user/identities/authorize", config)
             val response = api.rawRequest(url) {
                 method = HttpMethod.Get
+                parameter("skip_http_redirect", true)
             }
-            response.request.url.toString()
+            response.body<JsonObject>()["url"]?.jsonPrimitive?.contentOrNull ?: error("No URL found in response")
         }
         if(!automaticallyOpen) {
             return fetchUrl(redirectUrl ?: "")
