@@ -17,6 +17,7 @@ import androidx.credentials.exceptions.GetCredentialException
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.google.android.libraries.identity.googleid.GoogleIdTokenParsingException
 import io.github.jan.supabase.compose.auth.ComposeAuth
+import io.github.jan.supabase.compose.auth.GoogleLoginConfig
 import io.github.jan.supabase.compose.auth.applicationContext
 import io.github.jan.supabase.compose.auth.getActivity
 import io.github.jan.supabase.compose.auth.getGoogleBottomSheetOptions
@@ -25,6 +26,13 @@ import io.github.jan.supabase.compose.auth.hash
 import io.github.jan.supabase.compose.auth.signInWithGoogle
 import io.github.jan.supabase.logging.d
 import io.github.jan.supabase.logging.e
+
+private data class GoogleRequestOptions(
+    val config: GoogleLoginConfig?,
+    val nonce: String?,
+    val filterByAuthorizedAccounts: Boolean = false,
+    val type: GoogleDialogType
+)
 
 /**
  * Composable function that implements Native Google Auth.
@@ -61,7 +69,11 @@ internal fun ComposeAuth.signInWithCM(
                 if (activity != null && config.googleLoginConfig != null) {
                     val hashedNonce = status.nonce?.hash()
                     ComposeAuth.logger.d { "Starting Google Sign In Flow${if(hashedNonce != null) " with hashed nonce: $hashedNonce" else ""}" }
-                    val response = makeRequest(context, activity, config, hashedNonce, type)
+                    val response = makeRequest(
+                        context,
+                        activity,
+                        GoogleRequestOptions(config = config.googleLoginConfig, nonce = hashedNonce, type = type)
+                    )
                     if(response == null) {
                         onResult.invoke(NativeSignInResult.ClosedByUser)
                         ComposeAuth.logger.d { "Google Sign In Flow was closed by user" }
@@ -149,14 +161,11 @@ internal actual suspend fun handleGoogleSignOut() {
 private suspend fun tryRequest(
     context: Context,
     activity: Activity,
-    config: ComposeAuth.Config,
-    nonce: String?,
-    type: GoogleDialogType,
-    onlyAuthorizedAccounts: Boolean = true
+    options: GoogleRequestOptions
 ): GetCredentialResponse {
-    val option = when(type) {
-        GoogleDialogType.BOTTOM_SHEET -> getGoogleBottomSheetOptions(config.googleLoginConfig, onlyAuthorizedAccounts, nonce)
-        GoogleDialogType.DIALOG -> getGoogleButtonOptions(config.googleLoginConfig, nonce)
+    val option = when(options.type) {
+        GoogleDialogType.BOTTOM_SHEET -> getGoogleBottomSheetOptions(options.config, options.filterByAuthorizedAccounts, options.nonce)
+        GoogleDialogType.DIALOG -> getGoogleButtonOptions(options.config, options.nonce)
     }
     val request = GetCredentialRequest.Builder()
         .addCredentialOption(option)
@@ -167,19 +176,17 @@ private suspend fun tryRequest(
 private suspend fun makeRequest(
     context: Context,
     activity: Activity,
-    config: ComposeAuth.Config,
-    nonce: String?,
-    type: GoogleDialogType
+    options: GoogleRequestOptions
 ): GetCredentialResponse? {
     return try {
         ComposeAuth.logger.d { "Trying to get Google ID Token Credential" }
-        tryRequest(context, activity, config, nonce, type)
+        tryRequest(context, activity, options)
     } catch(e: GetCredentialCancellationException) {
         return null
     } catch(e: GetCredentialException) {
-        if(type == GoogleDialogType.BOTTOM_SHEET) {
+        if(options.type == GoogleDialogType.BOTTOM_SHEET) {
             ComposeAuth.logger.d { "Error while trying to get Google ID Token Credential. Retrying without only authorized accounts" }
-            tryRequest(context, activity, config, nonce, type, false)
+            tryRequest(context, activity, options)
         } else null
     }
 }
