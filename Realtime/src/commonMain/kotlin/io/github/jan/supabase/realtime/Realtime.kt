@@ -195,7 +195,7 @@ sealed interface Realtime : MainPlugin<Realtime.Config>, CustomSerializationPlug
 }
 
 /**
- * Creates a new [RealtimeChannel] and adds it to the [subscriptions]
+ * Creates a new [RealtimeChannel] and adds it to the [Realtime.subscriptions]
  *
  * - This method does not subscribe to the channel. You have to call [RealtimeChannel.subscribe] to do so.
  * - If a channel with the same [channelId] already exists, it will be returned
@@ -203,7 +203,7 @@ sealed interface Realtime : MainPlugin<Realtime.Config>, CustomSerializationPlug
  * @param channelId The id of the channel
  * @param builder The builder for the channel
  */
-inline fun Realtime.channel(channelId: String, builder: RealtimeChannelBuilder.() -> Unit = {}): RealtimeChannel = channel(channelId, RealtimeChannelBuilder("realtime:$channelId", this as RealtimeImpl).apply(builder))
+inline fun Realtime.channel(channelId: String, builder: RealtimeChannelBuilder.() -> Unit = {}): RealtimeChannel = channel(channelId, RealtimeChannelBuilder(RealtimeTopic.withChannelId(channelId)).apply(builder))
 
 /**
  * Supabase Realtime is a way to listen to changes in the PostgreSQL database via websockets

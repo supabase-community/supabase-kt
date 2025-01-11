@@ -162,9 +162,10 @@ import kotlin.io.encoding.ExperimentalEncodingApi
     }
 
     override fun channel(channelId: String, builder: RealtimeChannelBuilder): RealtimeChannel {
-        if(subscriptions.containsKey(channelId)) return subscriptions[channelId]!!
-        val channel = builder.build()
-        _subscriptions[channelId] = channel
+        val topic = RealtimeTopic.withChannelId(channelId)
+        if(subscriptions.containsKey(topic)) return subscriptions[topic]!!
+        val channel = builder.build(this)
+        _subscriptions[topic] = channel
         return channel
     }
 

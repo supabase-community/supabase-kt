@@ -27,23 +27,23 @@ import kotlin.reflect.KClass
 import kotlin.reflect.KType
 
 internal class RealtimeChannelImpl(
-    private val realtimeImpl: RealtimeImpl,
+    override val realtime: Realtime,
     override val topic: String,
     private val broadcastJoinConfig: BroadcastJoinConfig,
     private val presenceJoinConfig: PresenceJoinConfig,
     private val isPrivate: Boolean,
 ) : RealtimeChannel {
 
+    private val realtimeImpl: RealtimeImpl = realtime as RealtimeImpl
     private val clientChanges = AtomicMutableList<PostgresJoinConfig>()
     @SupabaseInternal
     override val callbackManager = CallbackManagerImpl(realtimeImpl.serializer)
     private val _status = MutableStateFlow(RealtimeChannel.Status.UNSUBSCRIBED)
     override val status = _status.asStateFlow()
-    override val realtime: Realtime = realtimeImpl
     override val supabaseClient = realtimeImpl.supabaseClient
 
     private val broadcastUrl = realtimeImpl.broadcastUrl()
-    private val subTopic = topic.replaceFirst(Regex("^realtime:", RegexOption.IGNORE_CASE), "")
+    private val subTopic = topic.replaceFirst(Regex("^${RealtimeTopic.PREFIX}:", RegexOption.IGNORE_CASE), "")
     private val httpClient = realtimeImpl.supabaseClient.httpClient
 
     private suspend fun accessToken() = realtimeImpl.config.accessToken(supabaseClient) ?: realtimeImpl.accessToken

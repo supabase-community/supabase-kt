@@ -7,7 +7,7 @@ import io.github.jan.supabase.realtime.annotations.ChannelDsl
  * Used to build a realtime channel
  */
 @ChannelDsl
-class RealtimeChannelBuilder @PublishedApi internal constructor(private val topic: String, private val realtimeImpl: RealtimeImpl) {
+class RealtimeChannelBuilder @PublishedApi internal constructor(private val topic: String) {
 
     private var broadcastJoinConfig = BroadcastJoinConfig(acknowledgeBroadcasts = false, receiveOwnBroadcasts = false)
     private var presenceJoinConfig = PresenceJoinConfig("")
@@ -33,9 +33,9 @@ class RealtimeChannelBuilder @PublishedApi internal constructor(private val topi
     }
 
     @SupabaseInternal
-    fun build(): RealtimeChannel {
+    fun build(realtime: Realtime): RealtimeChannel {
         return RealtimeChannelImpl(
-            realtimeImpl,
+            realtime,
             topic,
             broadcastJoinConfig,
             presenceJoinConfig,
