@@ -1,3 +1,4 @@
+@file:Suppress("MatchingDeclarationName")
 package io.github.jan.supabase.compose.auth.composable
 
 import androidx.compose.runtime.Composable
