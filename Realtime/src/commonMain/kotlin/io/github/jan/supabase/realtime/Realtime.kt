@@ -68,9 +68,6 @@ sealed interface Realtime : MainPlugin<Realtime.Config>, CustomSerializationPlug
      */
     fun disconnect()
 
-    @SupabaseInternal
-    fun Realtime.addChannel(channel: RealtimeChannel)
-
     /**
      * Unsubscribes and removes a channel from the [subscriptions]
      * @param channel The channel to remove
@@ -102,6 +99,17 @@ sealed interface Realtime : MainPlugin<Realtime.Config>, CustomSerializationPlug
      * @param token The JWT access token
      */
     suspend fun setAuth(token: String? = null)
+
+    /**
+     * Creates a new [RealtimeChannel] and adds it to the [subscriptions]
+     *
+     * - This method does not subscribe to the channel. You have to call [RealtimeChannel.subscribe] to do so.
+     * - If a channel with the same [channelId] already exists, it will be returned
+     *
+     * @param channelId The id of the channel
+     * @param builder The builder for the channel
+     */
+    fun channel(channelId: String, builder: RealtimeChannelBuilder): RealtimeChannel
 
     /**
      * @property websocketConfig Custom configuration for the Ktor Websocket Client. This only applies if [Realtime.Config.websocketFactory] is null.
@@ -187,11 +195,15 @@ sealed interface Realtime : MainPlugin<Realtime.Config>, CustomSerializationPlug
 }
 
 /**
- * Creates a new [RealtimeChannel]
+ * Creates a new [RealtimeChannel] and adds it to the [Realtime.subscriptions]
+ *
+ * - This method does not subscribe to the channel. You have to call [RealtimeChannel.subscribe] to do so.
+ * - If a channel with the same [channelId] already exists, it will be returned
+ *
+ * @param channelId The id of the channel
+ * @param builder The builder for the channel
  */
-inline fun Realtime.channel(channelId: String, builder: RealtimeChannelBuilder.() -> Unit = {}): RealtimeChannel {
-    return RealtimeChannelBuilder("realtime:$channelId", this as RealtimeImpl).apply(builder).build()
-}
+inline fun Realtime.channel(channelId: String, builder: RealtimeChannelBuilder.() -> Unit = {}): RealtimeChannel = channel(channelId, RealtimeChannelBuilder(RealtimeTopic.withChannelId(channelId)).apply(builder))
 
 /**
  * Supabase Realtime is a way to listen to changes in the PostgreSQL database via websockets

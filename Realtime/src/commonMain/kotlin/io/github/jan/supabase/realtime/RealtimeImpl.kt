@@ -1,7 +1,6 @@
 package io.github.jan.supabase.realtime
 
 import io.github.jan.supabase.SupabaseClient
-import io.github.jan.supabase.annotations.SupabaseInternal
 import io.github.jan.supabase.auth.Auth
 import io.github.jan.supabase.auth.status.SessionStatus
 import io.github.jan.supabase.buildUrl
@@ -162,6 +161,14 @@ import kotlin.io.encoding.ExperimentalEncodingApi
         _status.value = Realtime.Status.DISCONNECTED
     }
 
+    override fun channel(channelId: String, builder: RealtimeChannelBuilder): RealtimeChannel {
+        val topic = RealtimeTopic.withChannelId(channelId)
+        if(subscriptions.containsKey(topic)) return subscriptions[topic]!!
+        val channel = builder.build(this)
+        _subscriptions[topic] = channel
+        return channel
+    }
+
     private suspend fun onMessage(message: RealtimeMessage) {
         Realtime.logger.d { "Received message $message" }
         val channel = subscriptions[message.topic] as? RealtimeChannelImpl
@@ -232,11 +239,6 @@ import kotlin.io.encoding.ExperimentalEncodingApi
             Realtime.logger.d { "No more subscriptions, disconnecting from realtime websocket" }
             disconnect()
         }
-    }
-
-    @SupabaseInternal
-    override fun Realtime.addChannel(channel: RealtimeChannel) {
-        _subscriptions[channel.topic] = channel
     }
 
     override suspend fun close() {
