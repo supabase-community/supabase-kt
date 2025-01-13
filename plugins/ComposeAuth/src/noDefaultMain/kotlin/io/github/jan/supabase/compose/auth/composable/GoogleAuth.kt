@@ -14,6 +14,10 @@ import io.github.jan.supabase.compose.auth.defaultLoginBehavior
  * @return [NativeSignInState]
  */
 @Composable
-actual fun ComposeAuth.rememberSignInWithGoogle(onResult: (NativeSignInResult) -> Unit, fallback: suspend () -> Unit): NativeSignInState = defaultLoginBehavior(fallback)
+actual fun ComposeAuth.rememberSignInWithGoogle(
+    onResult: (NativeSignInResult) -> Unit,
+    type: GoogleDialogType,
+    fallback: suspend () -> Unit
+): NativeSignInState = defaultLoginBehavior(fallback)
 
 internal actual suspend fun handleGoogleSignOut() = Unit
