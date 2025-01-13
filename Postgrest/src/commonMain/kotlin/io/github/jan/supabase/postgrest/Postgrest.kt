@@ -2,18 +2,20 @@ package io.github.jan.supabase.postgrest
 
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.SupabaseSerializer
-import io.github.jan.supabase.exceptions.RestException
+import io.github.jan.supabase.exceptions.HttpRequestException
 import io.github.jan.supabase.logging.SupabaseLogger
 import io.github.jan.supabase.plugins.CustomSerializationConfig
 import io.github.jan.supabase.plugins.CustomSerializationPlugin
 import io.github.jan.supabase.plugins.MainConfig
 import io.github.jan.supabase.plugins.MainPlugin
 import io.github.jan.supabase.plugins.SupabasePluginProvider
+import io.github.jan.supabase.postgrest.exception.PostgrestRestException
 import io.github.jan.supabase.postgrest.query.PostgrestQueryBuilder
 import io.github.jan.supabase.postgrest.query.PostgrestRequestBuilder
 import io.github.jan.supabase.postgrest.query.PostgrestUpdate
 import io.github.jan.supabase.postgrest.query.request.RpcRequestBuilder
 import io.github.jan.supabase.postgrest.result.PostgrestResult
+import io.ktor.client.plugins.HttpRequestTimeoutException
 import kotlinx.serialization.json.JsonObject
 
 /**
@@ -66,7 +68,9 @@ sealed interface Postgrest : MainPlugin<Postgrest.Config>, CustomSerializationPl
      *
      * @param function The name of the function
      * @param request Filter the result
-     * @throws RestException or one of its subclasses if the request failed
+     * @throws PostgrestRestException if receiving an error response
+     * @throws HttpRequestTimeoutException if the request timed out
+     * @throws HttpRequestException on network related issues
      */
     suspend fun rpc(
         function: String,
@@ -79,7 +83,9 @@ sealed interface Postgrest : MainPlugin<Postgrest.Config>, CustomSerializationPl
      * @param function The name of the function
      * @param parameters The parameters for the function
      * @param request Filter the result
-     * @throws RestException or one of its subclasses if the request failed
+     * @throws PostgrestRestException if receiving an error response
+     * @throws HttpRequestTimeoutException if the request timed out
+     * @throws HttpRequestException on network related issues
      */
     suspend fun rpc(
         function: String,

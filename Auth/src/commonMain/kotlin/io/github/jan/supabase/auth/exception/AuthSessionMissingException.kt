@@ -1,12 +1,14 @@
 package io.github.jan.supabase.auth.exception
 
+import io.ktor.client.statement.HttpResponse
+
 /**
  * Exception thrown when a session is not found.
  */
-class AuthSessionMissingException(statusCode: Int): AuthRestException(
+class AuthSessionMissingException(response: HttpResponse): AuthRestException(
     errorCode = CODE,
-    statusCode = statusCode,
-    message = "Session not found. This can happen if the user was logged out or deleted."
+    response = response,
+    errorDescription = "Session not found. This can happen if the user was logged out or deleted."
 ) {
 
     internal companion object {
