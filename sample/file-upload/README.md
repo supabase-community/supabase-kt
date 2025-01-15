@@ -12,7 +12,7 @@ https://user-images.githubusercontent.com/26686035/233403165-26d87217-a0c9-4abd-
 
 To run the app, you need to create a Supabase project and create a public bucket with the permissions for anonymous users to upload files.
 
-Then you need to specify your bucket id, Supabase url and key in [supabaseModule.kt](https://github.com/supabase-community/supabase-kt/blob/master/demos/file-upload/common/src/commonMain/kotlin/io/github/jan/supabase/common/di/supabaseModule.kt)
+Then you need to specify your bucket id, Supabase url and key in [supabaseModule.kt](https://github.com/supabase-community/supabase-kt/blob/master/sample/file-upload/common/src/commonMain/kotlin/io/github/jan/supabase/common/di/supabaseModule.kt)
 
 # Running
 

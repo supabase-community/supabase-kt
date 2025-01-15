@@ -5,6 +5,7 @@ import io.github.jan.supabase.realtime.Presence
 import io.github.jan.supabase.realtime.RealtimeChannel.Companion.CHANNEL_EVENT_PRESENCE_DIFF
 import io.github.jan.supabase.realtime.RealtimeChannel.Companion.CHANNEL_EVENT_SYSTEM
 import io.github.jan.supabase.realtime.RealtimeMessage
+import io.github.jan.supabase.realtime.RealtimeTopic
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.channels.SendChannel
 import kotlinx.coroutines.flow.Flow
@@ -29,18 +30,18 @@ suspend fun Auth.importAuthTokenValid(token: String) {
 
 suspend fun handleSubscribe(incoming: ReceiveChannel<RealtimeMessage>, outgoing: SendChannel<RealtimeMessage>, channelId: String) {
     incoming.receive()
-    outgoing.send(RealtimeMessage("realtime:$channelId", CHANNEL_EVENT_SYSTEM, buildJsonObject { put("status", "ok") }, ""))
+    outgoing.send(RealtimeMessage(RealtimeTopic.withChannelId(channelId), CHANNEL_EVENT_SYSTEM, buildJsonObject { put("status", "ok") }, ""))
 }
 
 suspend fun SendChannel<RealtimeMessage>.sendBroadcast(channelId: String, event: String, message: JsonObject) {
-    send(RealtimeMessage("realtime:$channelId", "broadcast", buildJsonObject {
+    send(RealtimeMessage(RealtimeTopic.withChannelId(channelId), "broadcast", buildJsonObject {
         put("event", event)
         put("payload", message)
     }, ""))
 }
 
 suspend fun SendChannel<RealtimeMessage>.sendPresence(channelId: String, joins: Map<String, Presence>, leaves: Map<String, Presence>) {
-    send(RealtimeMessage("realtime:$channelId", CHANNEL_EVENT_PRESENCE_DIFF, buildJsonObject {
+    send(RealtimeMessage(RealtimeTopic.withChannelId(channelId), CHANNEL_EVENT_PRESENCE_DIFF, buildJsonObject {
         put("joins", transformPresenceMap(joins))
         put("leaves", transformPresenceMap(leaves))
     }, ""))

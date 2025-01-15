@@ -51,7 +51,7 @@ class AuthRestExceptionTest {
                 }
             }
             assertEquals("error_code", exception.error)
-            assertEquals("error_message", exception.message)
+            assertEquals("error_message", exception.errorDescription)
         }
     }
 
@@ -83,7 +83,7 @@ class AuthRestExceptionTest {
                 }
             }
             assertEquals("weak_password", exception.error)
-            assertEquals("error_message", exception.message)
+            assertEquals("error_message", exception.errorDescription)
             assertEquals(listOf("reason1", "reason2"), exception.reasons)
         }
     }

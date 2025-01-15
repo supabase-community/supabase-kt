@@ -1,9 +1,24 @@
+@file:Suppress("MatchingDeclarationName")
 package io.github.jan.supabase.compose.auth.composable
 
 import androidx.compose.runtime.Composable
 import io.github.jan.supabase.auth.providers.Google
 import io.github.jan.supabase.compose.auth.ComposeAuth
 import io.github.jan.supabase.compose.auth.fallbackLogin
+
+/**
+ * Enum class for the type of Google Dialog
+ */
+enum class GoogleDialogType {
+    /**
+     * A bottom sheet dialog
+     */
+    BOTTOM_SHEET,
+    /**
+     * A standard dialog
+     */
+    DIALOG
+}
 
 /**
  * Composable function that implements Native Google Auth.
@@ -17,6 +32,7 @@ import io.github.jan.supabase.compose.auth.fallbackLogin
 @Composable
 expect fun ComposeAuth.rememberSignInWithGoogle(
     onResult: (NativeSignInResult) -> Unit = {},
+    type: GoogleDialogType = GoogleDialogType.DIALOG,
     fallback: suspend () -> Unit = {
         fallbackLogin(Google)
     }

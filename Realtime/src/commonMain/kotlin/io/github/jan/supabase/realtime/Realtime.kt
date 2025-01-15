@@ -4,7 +4,9 @@ import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.SupabaseClientBuilder
 import io.github.jan.supabase.SupabaseSerializer
 import io.github.jan.supabase.annotations.SupabaseInternal
+import io.github.jan.supabase.auth.resolveAccessToken
 import io.github.jan.supabase.logging.SupabaseLogger
+import io.github.jan.supabase.logging.w
 import io.github.jan.supabase.plugins.CustomSerializationConfig
 import io.github.jan.supabase.plugins.CustomSerializationPlugin
 import io.github.jan.supabase.plugins.MainConfig
@@ -66,9 +68,6 @@ sealed interface Realtime : MainPlugin<Realtime.Config>, CustomSerializationPlug
      */
     fun disconnect()
 
-    @SupabaseInternal
-    fun Realtime.addChannel(channel: RealtimeChannel)
-
     /**
      * Unsubscribes and removes a channel from the [subscriptions]
      * @param channel The channel to remove
@@ -93,6 +92,26 @@ sealed interface Realtime : MainPlugin<Realtime.Config>, CustomSerializationPlug
     suspend fun send(message: RealtimeMessage)
 
     /**
+     * Sets the JWT access token used for channel subscription authorization and Realtime RLS.
+     *
+     * If [token] is null, the token will be resolved using the [Realtime.Config.accessToken] provider.
+     *
+     * @param token The JWT access token
+     */
+    suspend fun setAuth(token: String? = null)
+
+    /**
+     * Creates a new [RealtimeChannel] and adds it to the [subscriptions]
+     *
+     * - This method does not subscribe to the channel. You have to call [RealtimeChannel.subscribe] to do so.
+     * - If a channel with the same [channelId] already exists, it will be returned
+     *
+     * @param channelId The id of the channel
+     * @param builder The builder for the channel
+     */
+    fun channel(channelId: String, builder: RealtimeChannelBuilder): RealtimeChannel
+
+    /**
      * @property websocketConfig Custom configuration for the Ktor Websocket Client. This only applies if [Realtime.Config.websocketFactory] is null.
      * @property secure Whether to use wss or ws. Defaults to [SupabaseClient.useHTTPS] when null
      * @property disconnectOnSessionLoss Whether to disconnect from the websocket when the session is lost. Defaults to true
@@ -114,6 +133,14 @@ sealed interface Realtime : MainPlugin<Realtime.Config>, CustomSerializationPlug
         var disconnectOnNoSubscriptions: Boolean = true,
     ): MainConfig(), CustomSerializationConfig {
 
+        /**
+         * A custom access token provider. If this is set, the [SupabaseClient] will not be used to resolve the access token.
+         */
+        var accessToken: suspend SupabaseClient.() -> String? = { resolveAccessToken(realtime, keyAsFallback = false) }
+            set(value) {
+                logger.w { "You are setting a custom access token provider. This can lead to unexpected behavior." }
+                field = value
+            }
         override var serializer: SupabaseSerializer? = null
 
     }
@@ -168,11 +195,15 @@ sealed interface Realtime : MainPlugin<Realtime.Config>, CustomSerializationPlug
 }
 
 /**
- * Creates a new [RealtimeChannel]
+ * Creates a new [RealtimeChannel] and adds it to the [Realtime.subscriptions]
+ *
+ * - This method does not subscribe to the channel. You have to call [RealtimeChannel.subscribe] to do so.
+ * - If a channel with the same [channelId] already exists, it will be returned
+ *
+ * @param channelId The id of the channel
+ * @param builder The builder for the channel
  */
-inline fun Realtime.channel(channelId: String, builder: RealtimeChannelBuilder.() -> Unit = {}): RealtimeChannel {
-    return RealtimeChannelBuilder("realtime:$channelId", this as RealtimeImpl).apply(builder).build()
-}
+inline fun Realtime.channel(channelId: String, builder: RealtimeChannelBuilder.() -> Unit = {}): RealtimeChannel = channel(channelId, RealtimeChannelBuilder(RealtimeTopic.withChannelId(channelId)).apply(builder))
 
 /**
  * Supabase Realtime is a way to listen to changes in the PostgreSQL database via websockets

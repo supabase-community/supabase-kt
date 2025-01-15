@@ -319,6 +319,7 @@ class AuthRequestTest {
             val expectedRedirectUrl = "https://example.com"
             val expectedScopes = listOf("scope1", "scope2")
             val expectedUrlParams = mapOf("key" to "value")
+            val providerUrl = "https://example.com"
             val client = createMockedSupabaseClient(configuration = configuration) {
                 val params = it.url.parameters
                 assertEquals(expectedRedirectUrl, params["redirect_to"])
@@ -330,14 +331,19 @@ class AuthRequestTest {
                 assertEquals(expectedScopes.joinToString(" "), params["scopes"])
                 assertEquals("value", params["key"])
                 respondJson(
-                    sampleUserSession()
+                    """
+                    {
+                        "url": "$providerUrl"
+                    }
+                    """.trimIndent()
                 )
             }
-            client.auth.linkIdentity(expectedProvider, redirectUrl = expectedRedirectUrl) {
+            val url = client.auth.linkIdentity(expectedProvider, redirectUrl = expectedRedirectUrl) {
                 scopes.addAll(expectedScopes)
                 queryParams.putAll(expectedUrlParams)
                 automaticallyOpenUrl = false
             }
+            assertEquals(providerUrl, url)
         }
     }
 
