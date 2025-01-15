@@ -323,6 +323,11 @@ sealed interface BucketApi {
          */
         const val UPSERT_HEADER = "x-upsert"
 
+        /**
+         * The header to use for the user metadata
+         */
+        const val METADATA_HEADER = "x-metadata"
+
     }
 
 }

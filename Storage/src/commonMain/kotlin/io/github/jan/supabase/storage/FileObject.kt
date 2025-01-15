@@ -59,18 +59,18 @@ data class FileObjectV2(
     @SerialName("updated_at")
     val updatedAt: Instant? = null,
     @SerialName("created_at")
-    val createdAt: Instant?,
+    val createdAt: Instant,
     @SerialName("last_accessed_at")
     val lastAccessedAt: Instant? = null,
-    val metadata: JsonObject?,
+    val metadata: JsonObject? = null,
     val size: Long,
     @SerialName("content_type")
     val rawContentType: String,
-    val etag: String?,
+    val etag: String? = null,
     @SerialName("last_modified")
-    val lastModified: Instant?,
+    val lastModified: Instant? = null,
     @SerialName("cache_control")
-    val cacheControl: String?,
+    val cacheControl: String? = null,
     @Transient @PublishedApi internal val serializer: SupabaseSerializer = KotlinXSerializer()
 ) {
 

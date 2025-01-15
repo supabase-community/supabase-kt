@@ -29,6 +29,8 @@ import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.put
 import kotlinx.serialization.json.putJsonArray
 import kotlinx.serialization.json.putJsonObject
+import kotlin.io.encoding.Base64
+import kotlin.io.encoding.ExperimentalEncodingApi
 import kotlin.time.Duration
 
 internal class BucketApiImpl(override val bucketId: String, val storage: StorageImpl, resumableCache: ResumableCache) : BucketApi {
@@ -265,6 +267,7 @@ internal class BucketApiImpl(override val bucketId: String, val storage: Storage
         return FileUploadResponse(id, path, key)
     }
 
+    @OptIn(ExperimentalEncodingApi::class)
     private fun HttpRequestBuilder.defaultUploadRequest(
         path: String,
         data: UploadData,
@@ -277,6 +280,9 @@ internal class BucketApiImpl(override val bucketId: String, val storage: Storage
         })
         header(HttpHeaders.ContentType, optionBuilder.contentType ?: ContentType.defaultForFilePath(path))
         header(UPSERT_HEADER, optionBuilder.upsert.toString())
+        optionBuilder.userMetadata?.let {
+            header(BucketApi.METADATA_HEADER, Base64.encode(it.toString().encodeToByteArray()))
+        }
     }
 
     override suspend fun changePublicStatusTo(public: Boolean) = storage.updateBucket(bucketId) {
