@@ -1,5 +1,6 @@
 package io.github.jan.supabase.storage
 
+import io.github.jan.supabase.exceptions.RestException
 import io.github.jan.supabase.putJsonObject
 import io.github.jan.supabase.safeBody
 import io.github.jan.supabase.storage.BucketApi.Companion.UPSERT_HEADER
@@ -14,6 +15,7 @@ import io.ktor.client.statement.bodyAsChannel
 import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
+import io.ktor.http.HttpStatusCode
 import io.ktor.http.Url
 import io.ktor.http.content.OutgoingContent
 import io.ktor.http.defaultForFilePath
@@ -27,6 +29,8 @@ import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.put
 import kotlinx.serialization.json.putJsonArray
 import kotlinx.serialization.json.putJsonObject
+import kotlin.io.encoding.Base64
+import kotlin.io.encoding.ExperimentalEncodingApi
 import kotlin.time.Duration
 
 internal class BucketApiImpl(override val bucketId: String, val storage: StorageImpl, resumableCache: ResumableCache) : BucketApi {
@@ -222,6 +226,23 @@ internal class BucketApiImpl(override val bucketId: String, val storage: Storage
         }).safeBody()
     }
 
+    override suspend fun info(path: String): FileObjectV2 {
+        val response = storage.api.get("object/info/$bucketId/$path")
+        return response.safeBody<FileObjectV2>().copy(serializer = storage.serializer)
+    }
+
+    override suspend fun exists(path: String): Boolean {
+        try {
+            storage.api.request("object/$bucketId/$path") {
+                method = HttpMethod.Head
+            }
+            return true
+        } catch (e: RestException) {
+            if (e.statusCode in listOf(HttpStatusCode.NotFound.value, HttpStatusCode.BadRequest.value)) return false
+            throw e
+        }
+    }
+
     private fun defaultUploadUrl(path: String) = "object/$bucketId/$path"
 
     private fun uploadToSignedUrlUrl(path: String, token: String) = "object/upload/sign/$bucketId/$path?token=$token"
@@ -246,6 +267,7 @@ internal class BucketApiImpl(override val bucketId: String, val storage: Storage
         return FileUploadResponse(id, path, key)
     }
 
+    @OptIn(ExperimentalEncodingApi::class)
     private fun HttpRequestBuilder.defaultUploadRequest(
         path: String,
         data: UploadData,
@@ -258,6 +280,9 @@ internal class BucketApiImpl(override val bucketId: String, val storage: Storage
         })
         header(HttpHeaders.ContentType, optionBuilder.contentType ?: ContentType.defaultForFilePath(path))
         header(UPSERT_HEADER, optionBuilder.upsert.toString())
+        optionBuilder.userMetadata?.let {
+            header(BucketApi.METADATA_HEADER, Base64.encode(it.toString().encodeToByteArray()))
+        }
     }
 
     override suspend fun changePublicStatusTo(public: Boolean) = storage.updateBucket(bucketId) {

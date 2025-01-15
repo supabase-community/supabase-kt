@@ -258,6 +258,25 @@ sealed interface BucketApi {
     ): List<FileObject>
 
     /**
+     * Returns information about the file under [path]
+     * @param path The path to get information about
+     * @return The file object
+     * @throws RestException or one of its subclasses if receiving an error response
+     * @throws HttpRequestTimeoutException if the request timed out
+     * @throws HttpRequestException on network related issues
+     */
+    suspend fun info(path: String): FileObjectV2
+
+    /**
+     * Checks if a file exists under [path]
+     * @return true if the file exists, false otherwise
+     * @throws RestException or one of its subclasses if receiving an error response
+     * @throws HttpRequestTimeoutException if the request timed out
+     * @throws HttpRequestException on network related issues
+     */
+    suspend fun exists(path: String): Boolean
+
+    /**
      * Changes the bucket's public status to [public]
      * @throws RestException or one of its subclasses if receiving an error response
      * @throws HttpRequestTimeoutException if the request timed out
@@ -303,6 +322,11 @@ sealed interface BucketApi {
          * The header to use for upserting files
          */
         const val UPSERT_HEADER = "x-upsert"
+
+        /**
+         * The header to use for the user metadata
+         */
+        const val METADATA_HEADER = "x-metadata"
 
     }
 
