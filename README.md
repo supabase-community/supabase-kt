@@ -121,7 +121,7 @@ __For versions below 3.0.0:__
 - [Compose Auth UI](/plugins/ComposeAuthUI) - Provides UI Components for Compose Multiplatform.
 - [Coil Integration](/plugins/CoilIntegration) - Provides a [Coil2](https://github.com/coil-kt/coil) Integration for displaying images stored in Supabase Storage. Only supports Android.
 - [Coil3 Integration](/plugins/Coil3Integration) - Provides a [Coil3](https://github.com/coil-kt/coil) Integration for displaying images stored in Supabase Storage. Supports all Compose Multiplatform targets.
-- [Compose-ImageLoader Integration](/plugins/ImageLoaderIntegration) - Provides a [Compose ImageLoader](https://github.com/qdsfdhvh/compose-imageloader) Integration for displaying images stored in Supabase Storage.
+- *[Compose-ImageLoader Integration](/plugins/ImageLoaderIntegration) - Deprecated. Use Coil 3 or create your own integration*
 
 ### Miscellaneous
 - [Supabase Edge Functions Kotlin](https://github.com/manriif/supabase-edge-functions-kt) - Build, serve and deploy Supabase Edge Functions with Kotlin and Gradle.
