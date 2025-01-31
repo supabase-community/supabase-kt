@@ -1,6 +1,6 @@
 # Supabase-kt Compose-ImageLoader Integration
 
-> #[WARNING]
+> #[!WARNING]
 > Deprecated. Use Coil 3 or create your own integration. Last supported Image Loader version: 1.9.0
 
 Extends supabase-kt with a [Compose-ImageLoader](https://github.com/qdsfdhvh/compose-imageloader) integration for image loading.
