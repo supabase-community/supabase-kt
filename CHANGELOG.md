@@ -1,5 +1,49 @@
 # Changelog
 
+### 3.1.0 - January 31, 2025
+
+### Auth
+
+* Fix OAuth linking on JS/Wasm JS by @jan-tennert in https://github.com/supabase-community/supabase-kt/commit/d7dd01ab15995a360be91b28857a055eeb1e989d
+
+### Realtime
+
+* Improve behavior for realtime channel creation and improve docs by @jan-tennert in https://github.com/supabase-community/supabase-kt/pull/831
+  If a channel with the same `channelId` exists, `Realtime#channel()` will return it instead of creating a new one. The channel will now also be saved after calling `Realtime#channel()` instead at subscribing.
+* Add pull token approach to realtime by @jan-tennert in https://github.com/supabase-community/supabase-kt/pull/807
+* Prevent sending expired tokens to realtime by @jan-tennert in https://github.com/supabase-community/supabase-kt/pull/808
+
+### PostgREST
+
+* Add custom exception for PostgREST API errors and include `HttpResponse` in `RestException`s by @jan-tennert in https://github.com/supabase-community/supabase-kt/pull/789
+  - All PostgREST rest exceptions are a `PostgrestRestException`, which contain PostgREST fields like `hint`, `code`.
+  - All `RestException`s now contain the full `HttpResponse` as a property.
+
+### Storage
+
+* Add support for file metadata, `info` and `exists` by @jan-tennert in https://github.com/supabase-community/supabase-kt/pull/694
+
+### Docs
+
+* Update `supabaseModule.kt` references by @emmanuel-ferdman in https://github.com/supabase-community/supabase-kt/pull/823
+
+### Compose Auth
+
+* Make the dialog type for the Native Google Sign In configurable by @jan-tennert in https://github.com/supabase-community/supabase-kt/pull/832
+  New `type` parameter for `rememberSignInWithGoogle()`, only functional on Android.
+
+### 3.0.3 - December 4, 2024
+
+### Core
+
+- Add support for Kotlin `2.1.0`
+- Fix build errors on certain targets like `wasm-js`
+
+### Compose Auth & Auth
+
+- Use `okio` for hashing instead of `krypto`
+  Let me know if there are any issues!
+
 ### 3.0.2 - November 11, 2024
 
 ### Core
