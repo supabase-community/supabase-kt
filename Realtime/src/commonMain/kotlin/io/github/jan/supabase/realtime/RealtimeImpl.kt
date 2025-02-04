@@ -87,10 +87,7 @@ import kotlin.io.encoding.ExperimentalEncodingApi
                 Error while trying to connect to realtime websocket. Trying again in ${config.reconnectDelay}
                 URL: $websocketUrl
                 """.trimIndent() }
-            scope.launch {
-                disconnect()
-                connect(true)
-            }
+            reconnect()
         }
     }
 
@@ -132,10 +129,7 @@ import kotlin.io.encoding.ExperimentalEncodingApi
             } catch(e: Exception) {
                 if(!isActive) return@launch
                 Realtime.logger.e(e) { "Error while listening for messages. Trying again in ${config.reconnectDelay}" }
-                scope.launch {
-                    disconnect()
-                    connect(true)
-                }
+                reconnect()
             }
         }
     }
@@ -206,10 +200,7 @@ import kotlin.io.encoding.ExperimentalEncodingApi
             heartbeatRef = 0
             ref = 0
             Realtime.logger.e { "Heartbeat timeout. Trying to reconnect in ${config.reconnectDelay}" }
-            scope.launch {
-                disconnect()
-                connect(true)
-            }
+            reconnect()
             return
         }
         Realtime.logger.d { "Sending heartbeat" }
@@ -280,11 +271,23 @@ import kotlin.io.encoding.ExperimentalEncodingApi
     }
 
     override suspend fun send(message: RealtimeMessage) {
-        ws?.send(message)
+        try {
+            ws?.send(message)
+        } catch(e: Exception) {
+            Realtime.logger.e(e) { "Error while sending message $message. Reconnecting in ${config.reconnectDelay}" }
+            reconnect()
+        }
     }
 
     fun nextIncrementId(): Int {
         return incrementId++
+    }
+
+    private fun reconnect() {
+        scope.launch {
+            disconnect()
+            connect(true)
+        }
     }
 
 }
