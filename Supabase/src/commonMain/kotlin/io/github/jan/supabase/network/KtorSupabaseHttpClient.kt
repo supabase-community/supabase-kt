@@ -45,6 +45,10 @@ class KtorSupabaseHttpClient @SupabaseInternal constructor(
     engine: HttpClientEngine? = null
 ): SupabaseHttpClient() {
 
+    init {
+        SupabaseClient.LOGGER.d { "Creating KtorSupabaseHttpClient with request timeout $requestTimeout ms, HttpClientEngine: $engine" }
+    }
+
     @SupabaseInternal
     val httpClient =
         if(engine != null) HttpClient(engine) { applyDefaultConfiguration(modifiers) }

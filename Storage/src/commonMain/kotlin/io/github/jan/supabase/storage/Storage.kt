@@ -34,7 +34,7 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
 /**
- * Plugin for interacting with the supabase storage api
+ * Plugin for interacting with the Supabase Storage API
  *
  * To use it you need to install it to the [SupabaseClient]:
  * ```kotlin
@@ -43,7 +43,7 @@ import kotlin.time.Duration.Companion.seconds
  * }
  * ```
  *
- * then you have to interact with the storage api:
+ * then you have to interact with the Storage API like this:
  * ```kotlin
  * val bucket = supabase.storage.from("icons")
  * val bytes = bucket.downloadAuthenticated("icon.png")

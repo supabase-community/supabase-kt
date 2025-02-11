@@ -1,5 +1,6 @@
 package io.github.jan.supabase
 
+import io.github.jan.supabase.SupabaseClient.Companion.DEFAULT_LOG_LEVEL
 import io.github.jan.supabase.annotations.SupabaseInternal
 import io.github.jan.supabase.logging.KermitSupabaseLogger
 import io.github.jan.supabase.logging.LogLevel
@@ -8,8 +9,6 @@ import io.github.jan.supabase.logging.i
 import io.github.jan.supabase.network.KtorSupabaseHttpClient
 import io.github.jan.supabase.plugins.PluginManager
 import io.github.jan.supabase.plugins.SupabasePlugin
-import io.ktor.client.HttpClientConfig
-import io.ktor.client.engine.HttpClientEngine
 
 /**
  * The main class to interact with Supabase.
@@ -85,18 +84,15 @@ sealed interface SupabaseClient {
 
 }
 
-@Suppress("LongParameterList") //TODO: maybe refactor
 internal class SupabaseClientImpl(
-    override val supabaseUrl: String,
-    override val supabaseKey: String,
-    plugins: Map<String, (SupabaseClient) -> SupabasePlugin<*>>,
-    httpConfigOverrides: MutableList<HttpClientConfig<*>.() -> Unit>,
-    override val useHTTPS: Boolean,
-    requestTimeout: Long,
-    httpEngine: HttpClientEngine?,
-    override val defaultSerializer: SupabaseSerializer,
-    override val accessToken: AccessTokenProvider?,
+    config: SupabaseClientConfig,
 ) : SupabaseClient {
+
+    override val accessToken: AccessTokenProvider? = config.accessToken
+    override val defaultSerializer: SupabaseSerializer = config.defaultSerializer
+    override val supabaseUrl: String = config.supabaseUrl
+    override val supabaseKey: String = config.supabaseKey
+    override val useHTTPS: Boolean = config.networkConfig.useHTTPS
 
     init {
         SupabaseClient.LOGGER.i {
@@ -110,12 +106,15 @@ internal class SupabaseClientImpl(
         "http://$supabaseUrl"
     }
 
- //   override val coroutineContext = Dispatchers.Default + SupervisorJob()
-
     @OptIn(SupabaseInternal::class)
-    override val httpClient = KtorSupabaseHttpClient(supabaseKey, httpConfigOverrides, requestTimeout, httpEngine)
+    override val httpClient = KtorSupabaseHttpClient(
+        supabaseKey,
+        config.networkConfig.httpConfigOverrides,
+        config.networkConfig.requestTimeout.inWholeMilliseconds,
+        config.networkConfig.httpEngine
+    )
 
-    override val pluginManager = PluginManager(plugins.toList().associate { (key, value) ->
+    override val pluginManager = PluginManager(config.plugins.toList().associate { (key, value) ->
         key to value(this)
     })
 
@@ -124,6 +123,7 @@ internal class SupabaseClientImpl(
     }
 
     override suspend fun close() {
+        SupabaseClient.LOGGER.i { "Closing SupabaseClient" }
         httpClient.close()
         pluginManager.closeAllPlugins()
     }

@@ -95,11 +95,12 @@ internal class AuthImpl(
     }
 
     override fun init() {
+        Auth.logger.d { "Initializing Auth plugin..." }
         setupPlatform()
         if (config.autoLoadFromStorage) {
             authScope.launch {
                 Auth.logger.i {
-                    "Trying to load latest session from storage."
+                    "Loading session from storage..."
                 }
                 val successful = loadFromStorage()
                 if (successful) {
@@ -108,14 +109,16 @@ internal class AuthImpl(
                     }
                 } else {
                     Auth.logger.i {
-                        "No session found."
+                        "No session found. Setting session status to NotAuthenticated."
                     }
                     _sessionStatus.value = SessionStatus.NotAuthenticated(false)
                 }
             }
         } else {
+            Auth.logger.d { "Skipping loading from storage (autoLoadFromStorage is set to false)" }
             _sessionStatus.value = SessionStatus.NotAuthenticated(false)
         }
+        Auth.logger.d { "Initialized Auth plugin" }
     }
 
     override suspend fun <C, R, Provider : AuthProvider<C, R>> signInWith(
@@ -405,21 +408,29 @@ internal class AuthImpl(
         autoRefresh: Boolean,
         source: SessionSource
     ) {
+        Auth.logger.d { "Importing session $session from $source, auto refresh is set to $autoRefresh." }
         if (!autoRefresh) {
             if (session.refreshToken.isNotBlank() && session.expiresIn != 0L && config.autoSaveToStorage) {
                 sessionManager.saveSession(session)
+                Auth.logger.d { "Session saved to storage (no auto refresh)" }
             }
             _sessionStatus.value = SessionStatus.Authenticated(session, source)
+            Auth.logger.d { "Session imported successfully." }
             return
         }
         if (session.expiresAt <= Clock.System.now()) {
+            Auth.logger.d { "Session is expired. Handling expired session..." }
             tryImportingSession(
                 { handleExpiredSession(session, config.alwaysAutoRefresh) },
                 { importSession(session) }
             )
         } else {
-            if (config.autoSaveToStorage) sessionManager.saveSession(session)
+            if (config.autoSaveToStorage) {
+                sessionManager.saveSession(session)
+                Auth.logger.d { "Session saved to storage (auto refresh enabled)" }
+            }
             _sessionStatus.value = SessionStatus.Authenticated(session, source)
+            Auth.logger.d { "Session imported successfully. Starting auto refresh..." }
             sessionJob?.cancel()
             sessionJob = authScope.launch {
                 delayBeforeExpiry(session)
@@ -430,6 +441,7 @@ internal class AuthImpl(
                     )
                 }
             }
+            Auth.logger.d { "Auto refresh started." }
         }
     }
 
@@ -442,16 +454,16 @@ internal class AuthImpl(
             importRefreshedSession()
         } catch (e: RestException) {
             if (e.statusCode in 500..599) {
-                Auth.logger.e(e) { "Couldn't refresh session due to an internal server error. Retrying in ${config.retryDelay} (Status code ${e.statusCode})" }
+                Auth.logger.e(e) { "Couldn't refresh session due to an internal server error. Retrying in ${config.retryDelay} (Status code ${e.statusCode})..." }
                 _sessionStatus.value = SessionStatus.RefreshFailure(RefreshFailureCause.InternalServerError(e))
                 delay(config.retryDelay)
                 retry()
             } else {
-                Auth.logger.e(e) { "Couldn't refresh session. The refresh token may have been revoked. Clearing session... (Status code ${e.statusCode})" }
+                Auth.logger.e(e) { "Couldn't refresh session. The refresh token may have been revoked. Clearing session (Status code ${e.statusCode})... " }
                 clearSession()
             }
         } catch (e: Exception) {
-            Auth.logger.e(e) { "Couldn't reach Supabase. Either the address doesn't exist or the network might not be on. Retrying in ${config.retryDelay}" }
+            Auth.logger.e(e) { "Couldn't reach Supabase. Either the address doesn't exist or the network might not be on. Retrying in ${config.retryDelay}..." }
             _sessionStatus.value = SessionStatus.RefreshFailure(RefreshFailureCause.NetworkError(e))
             delay(config.retryDelay)
             retry()
@@ -466,6 +478,9 @@ internal class AuthImpl(
 
         val delayDuration = targetRefreshTime - Clock.System.now()
 
+        Auth.logger.d {
+            "Refreshing session in $delayDuration."
+        }
         // if the delayDuration is negative, delay() will not delay
         delay(delayDuration)
     }
@@ -482,6 +497,7 @@ internal class AuthImpl(
         importSession(currentSessionOrNull() ?: error("No session found"), true, (sessionStatus.value as SessionStatus.Authenticated).source)
 
     override fun stopAutoRefreshForCurrentSession() {
+        Auth.logger.d { "Stopping auto refresh for current session" }
         sessionJob?.cancel()
         sessionJob = null
     }
