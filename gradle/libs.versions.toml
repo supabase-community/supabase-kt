@@ -102,7 +102,7 @@ multiplatform-settings-test = { module = "com.russhwolf:multiplatform-settings-t
 apollo-kotlin = { module = "com.apollographql.apollo:apollo-runtime", version.ref = "apollo-kotlin" }
 
 krypto = { module = "com.soywiz:korlibs-crypto", version.ref = "korlibs" }
-secure-random = { module = "org.kotlincrypto:secure-random", version.ref = "secure-random" }
+secure-random = { module = "org.kotlincrypto.random:crypto-rand", version.ref = "secure-random" }
 okio = { module = "com.squareup.okio:okio", version.ref = "okio" }
 
 moshi = { module = "com.squareup.moshi:moshi", version.ref = "moshi" }
