@@ -2,7 +2,7 @@
 package io.github.jan.supabase.auth
 
 import okio.ByteString.Companion.toByteString
-import org.kotlincrypto.SecureRandom
+import org.kotlincrypto.random.CryptoRand
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
 
@@ -14,7 +14,7 @@ internal object PKCEConstants {
 @OptIn(ExperimentalEncodingApi::class)
 internal fun generateCodeVerifier(): String {
     val bytes = ByteArray(PKCEConstants.VERIFIER_LENGTH)
-    SecureRandom().nextBytesCopyTo(bytes)
+    CryptoRand.nextBytes(bytes)
     return Base64.UrlSafe.encode(bytes)
 }
 
