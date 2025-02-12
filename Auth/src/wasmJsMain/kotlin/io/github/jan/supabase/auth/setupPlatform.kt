@@ -1,6 +1,7 @@
 package io.github.jan.supabase.auth
 
 import io.github.jan.supabase.annotations.SupabaseInternal
+import io.github.jan.supabase.logging.d
 import io.ktor.util.PlatformUtils.IS_BROWSER
 import kotlinx.browser.window
 import kotlinx.coroutines.launch
@@ -9,6 +10,7 @@ import org.w3c.dom.url.URL
 @SupabaseInternal
 actual fun Auth.setupPlatform() {
     this as AuthImpl
+    Auth.logger.d { "Registering window listeners" }
 
     fun checkForHash() {
         if(window.location.hash.isBlank()) return

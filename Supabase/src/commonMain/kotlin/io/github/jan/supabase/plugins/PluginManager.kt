@@ -1,12 +1,18 @@
 package io.github.jan.supabase.plugins
 
+import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.SupabaseClientBuilder
+import io.github.jan.supabase.logging.d
 
 /**
  * The plugin manager is used to manage installed plugins
  * @param installedPlugins A map of installed plugins. You can install plugins by using the [SupabaseClientBuilder.install] method
  */
 class PluginManager(val installedPlugins: Map<String, SupabasePlugin<*>>) {
+
+    init {
+        SupabaseClient.LOGGER.d { "PluginManager initialized with plugins: ${installedPlugins.keys}" }
+    }
 
     /**
      * Retrieve an installed plugin using it's [Provider] or null if no such plugin is installed

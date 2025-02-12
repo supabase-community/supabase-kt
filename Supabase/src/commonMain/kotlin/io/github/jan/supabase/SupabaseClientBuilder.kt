@@ -14,6 +14,9 @@ import kotlinx.serialization.json.Json
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
+internal typealias PluginProvider = (SupabaseClient) -> SupabasePlugin<*>
+internal typealias HttpConfigOverride = HttpClientConfig<*>.() -> Unit
+
 /**
  * Creates a new [SupabaseClient] with the given options.
  *
@@ -79,8 +82,8 @@ class SupabaseClientBuilder @PublishedApi internal constructor(private val supab
      */
     var accessToken: AccessTokenProvider? = null
 
-    private val httpConfigOverrides = mutableListOf<HttpClientConfig<*>.() -> Unit>()
-    private val plugins = mutableMapOf<String, ((SupabaseClient) -> SupabasePlugin<*>)>()
+    private val httpConfigOverrides = mutableListOf<HttpConfigOverride>()
+    private val plugins = mutableMapOf<String, PluginProvider>()
 
     init {
         val module = when {
@@ -91,7 +94,7 @@ class SupabaseClientBuilder @PublishedApi internal constructor(private val supab
             else -> null
         }
         if(!ignoreModulesInUrl && module != null) {
-            error("The supabase url should not contain ($module), supabase-kt handles the url endpoints. If you want to use a custom url for a module, specify it within their builder but that's not necessary for normal supabase projects")
+            error("The Supabase URL should not contain ($module), supabase-kt handles the url endpoints. If you want to use a custom url for a module, specify it within their builder but that's not necessary for normal Supabase projects")
         }
         if(supabaseUrl.startsWith("http://")) {
             useHTTPS = false
@@ -100,16 +103,22 @@ class SupabaseClientBuilder @PublishedApi internal constructor(private val supab
 
     @PublishedApi
     internal fun build(): SupabaseClient {
+        val config = SupabaseClientConfig(
+            supabaseUrl = supabaseUrl.split("//").last(),
+            supabaseKey = supabaseKey,
+            defaultLogLevel = defaultLogLevel,
+            networkConfig = SupabaseNetworkConfig(
+                useHTTPS = useHTTPS,
+                httpEngine = httpEngine,
+                httpConfigOverrides = httpConfigOverrides,
+                requestTimeout = requestTimeout
+            ),
+            defaultSerializer = defaultSerializer,
+            accessToken = accessToken,
+            plugins = plugins
+        )
         return SupabaseClientImpl(
-            supabaseUrl.split("//").last(),
-            supabaseKey,
-            plugins,
-            httpConfigOverrides,
-            useHTTPS,
-            requestTimeout.inWholeMilliseconds,
-            httpEngine,
-            defaultSerializer,
-            accessToken
+            config
         )
     }
 
