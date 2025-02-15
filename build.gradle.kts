@@ -6,8 +6,12 @@ import org.jetbrains.kotlin.gradle.targets.js.yarn.YarnRootExtension
 
 val excludedModules = listOf("plugins", "serializers", "test-common")
 
+private val libraryFilter = { withFilter: Boolean ->
+    allprojects.filter { it.name !in excludedModules && !it.path.contains("sample") && if(withFilter) true else it.name != "bom" && it.name != it.rootProject.name }
+}
+
 fun libraryModules(withBom: Boolean = true, init: Project.() -> Unit) = configure(
-    allprojects.filter { it.name !in excludedModules && !it.path.contains("sample") && if(withBom) true else it.name != "bom" && it.name != it.rootProject.name },
+    libraryFilter(withBom),
     init
 )
 
@@ -15,7 +19,7 @@ plugins {
     id(libs.plugins.kotlin.multiplatform.get().pluginId) apply false
     id(libs.plugins.android.library.get().pluginId) apply false
     id(libs.plugins.detekt.get().pluginId) apply false
-    id(libs.plugins.dokka.get().pluginId) apply false
+    id(libs.plugins.dokka.get().pluginId)
     alias(libs.plugins.kotlinx.plugin.serialization) apply false
     id(libs.plugins.maven.publish.get().pluginId) apply false
     alias(libs.plugins.kotlinx.atomicfu) apply false
@@ -26,6 +30,12 @@ allprojects {
     repositories {
         google()
         mavenCentral()
+    }
+}
+
+dependencies {
+    libraryFilter(false).forEach {
+        dokka(project(it.path))
     }
 }
 
