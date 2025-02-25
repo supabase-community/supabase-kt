@@ -1,5 +1,15 @@
 # Changelog
 
+### 3.1.1 - February 5, 2025
+
+### Core
+
+* Make `HttpRequestException` a subclass of `IOException` by @jan-tennert in https://github.com/supabase-community/supabase-kt/pull/847
+
+### Realtime
+
+* Catch any exceptions when sending a message in realtime by @jan-tennert in https://github.com/supabase-community/supabase-kt/pull/848
+
 ### 3.1.0 - January 31, 2025
 
 ### Auth
