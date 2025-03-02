@@ -1,5 +1,20 @@
 # Changelog
 
+### 3.1.2 - March 3, 2025
+
+This version requires Ktor version `3.1.1` or higher.
+
+### Core
+
+- Migrate to new crypto dependency by @jan-tennert in https://github.com/supabase-community/supabase-kt/commit/7440814403c1a07a32740aeec0aa527a1c2a70c5
+- Clean up internal `SupabaseClient` code by @jan-tennert in https://github.com/supabase-community/supabase-kt/pull/855
+- Migrate to dokka v2 by @jan-tennert in https://github.com/supabase-community/supabase-kt/pull/856
+- Update to Ktor version `3.1.1`
+
+### Compose Auth
+
+- Fix Native Apple Sign In on iOS by @yannickpulver in https://github.com/supabase-community/supabase-kt/pull/866
+
 ### 3.1.1 - February 5, 2025
 
 ### Core

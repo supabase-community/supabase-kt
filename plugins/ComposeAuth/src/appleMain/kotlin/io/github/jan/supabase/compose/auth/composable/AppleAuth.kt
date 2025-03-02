@@ -91,7 +91,7 @@ actual fun ComposeAuth.rememberSignInWithApple(
 }
 
 @BetaInteropApi
-internal class AuthorizationDelegate(
+private class AuthorizationDelegate(
     private val composeAuth: ComposeAuth,
     private val scope: CoroutineScope,
     private val status: NativeSignInStatus.Started,
