@@ -2,8 +2,11 @@ package io.github.jan.supabase.compose.auth.composable
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import io.github.jan.supabase.compose.auth.ComposeAuth
 import io.github.jan.supabase.compose.auth.hash
 import io.github.jan.supabase.compose.auth.signInWithApple
@@ -46,6 +49,7 @@ actual fun ComposeAuth.rememberSignInWithApple(
 ): NativeSignInState {
     val state = remember { NativeSignInState(this.serializer) }
     val scope = rememberCoroutineScope()
+    var authorizationDelegate by remember { mutableStateOf<AuthorizationDelegate?>(null) }
 
     LaunchedEffect(key1 = state.status) {
         if (state.status is NativeSignInStatus.Started) {
@@ -61,14 +65,15 @@ actual fun ComposeAuth.rememberSignInWithApple(
                         nonce = hashedNonce
                     }
 
-                    val controller = ASAuthorizationController(listOf(request)).apply {
-                        delegate = authorizationController(scope, status) {
+                    authorizationDelegate =
+                        AuthorizationDelegate(this@rememberSignInWithApple, scope, status) {
                             onResult.invoke(it)
                             state.reset()
                         }
 
+                    val controller = ASAuthorizationController(listOf(request)).apply {
+                        delegate = authorizationDelegate
                         presentationContextProvider = presentationAnchor()
-
                     }
                     controller.performRequests()
                 } else {
@@ -86,40 +91,39 @@ actual fun ComposeAuth.rememberSignInWithApple(
 }
 
 @BetaInteropApi
-internal fun ComposeAuth.authorizationController(
-    scope: CoroutineScope,
-    status: NativeSignInStatus.Started,
-    onResult: (NativeSignInResult) -> Unit
-): ASAuthorizationControllerDelegateProtocol {
-    return object : NSObject(), ASAuthorizationControllerDelegateProtocol {
-        override fun authorizationController(
-            controller: ASAuthorizationController,
-            didCompleteWithAuthorization: ASAuthorization
-        ) {
-            try {
-                val credentials =
-                    didCompleteWithAuthorization.credential as? ASAuthorizationAppleIDCredential
-                credentials?.identityToken
-                    ?.let { NSString.create(it, encoding = NSUTF8StringEncoding)?.toString() }
-                    ?.let { idToken ->
-                        scope.launch {
-                            signInWithApple(idToken, status.nonce, status.extraData)
-                            onResult.invoke(NativeSignInResult.Success)
-                        }
+internal class AuthorizationDelegate(
+    private val composeAuth: ComposeAuth,
+    private val scope: CoroutineScope,
+    private val status: NativeSignInStatus.Started,
+    private val onResult: (NativeSignInResult) -> Unit
+) : NSObject(), ASAuthorizationControllerDelegateProtocol {
+    override fun authorizationController(
+        controller: ASAuthorizationController,
+        didCompleteWithAuthorization: ASAuthorization
+    ) {
+        try {
+            val credentials =
+                didCompleteWithAuthorization.credential as? ASAuthorizationAppleIDCredential
+            credentials?.identityToken
+                ?.let { NSString.create(it, encoding = NSUTF8StringEncoding)?.toString() }
+                ?.let { idToken ->
+                    scope.launch {
+                        composeAuth.signInWithApple(idToken, status.nonce, status.extraData)
+                        onResult.invoke(NativeSignInResult.Success)
                     }
-            } catch (e: Exception) {
-                onResult.invoke(NativeSignInResult.Error(e.message ?: "error"))
-            }
+                }
+        } catch (e: Exception) {
+            onResult.invoke(NativeSignInResult.Error(e.message ?: "error"))
         }
+    }
 
-        override fun authorizationController(
-            controller: ASAuthorizationController,
-            didCompleteWithError: NSError
-        ) {
-            when (didCompleteWithError.code.toUInt()) {
-                1001.toUInt() -> onResult.invoke(NativeSignInResult.ClosedByUser)
-                else -> onResult.invoke(NativeSignInResult.Error(didCompleteWithError.localizedDescription))
-            }
+    override fun authorizationController(
+        controller: ASAuthorizationController,
+        didCompleteWithError: NSError
+    ) {
+        when (didCompleteWithError.code.toUInt()) {
+            1001.toUInt() -> onResult.invoke(NativeSignInResult.ClosedByUser)
+            else -> onResult.invoke(NativeSignInResult.Error(didCompleteWithError.localizedDescription))
         }
     }
 }
