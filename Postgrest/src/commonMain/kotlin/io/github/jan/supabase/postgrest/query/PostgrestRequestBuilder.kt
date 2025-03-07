@@ -5,7 +5,6 @@ import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.annotations.SupabaseExperimental
 import io.github.jan.supabase.auth.AuthUserScope
 import io.github.jan.supabase.auth.PostgrestFilterDSL
-import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.postgrest.Postgrest
 import io.github.jan.supabase.postgrest.query.filter.PostgrestFilterBuilder
 import io.github.jan.supabase.postgrest.result.PostgrestResult
@@ -157,11 +156,6 @@ open class PostgrestRequestBuilder(
         val forMediatype = headers["Accept"] ?: "application/json"
         headers[HttpHeaders.Accept] = "application/vnd.pgrst.plan+${format}; for=\"${forMediatype}\"; options=${options};"
     }
-
-    /**
-     * Returns the current authenticated user from the [Auth] plugin.
-     */
-    fun currentUser() = postgrest.supabaseClient.auth.currentUserOrNull()
 
     /**
      * Adds a filter to the postgrest request.

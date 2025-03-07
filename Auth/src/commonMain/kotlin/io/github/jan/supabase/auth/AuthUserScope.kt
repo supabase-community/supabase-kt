@@ -14,13 +14,16 @@ interface AuthUserScope {
     val supabase: SupabaseClient
 
     /**
-     * The current user or null if no user is signed in
+     * The current user or null if no user is signed in from the [Auth] plugin
+     * @see Auth
+     * @see Auth.currentUserOrNull
      */
     @SupabaseExperimental
     fun user() = supabase.auth.currentUserOrNull()
 
     /**
      * The id of the current user or null if no user is signed in
+     * @see user
      */
     @SupabaseExperimental
     fun userId() = user()?.id
