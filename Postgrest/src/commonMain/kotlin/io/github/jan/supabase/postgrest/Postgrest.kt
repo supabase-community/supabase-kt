@@ -19,7 +19,7 @@ import io.ktor.client.plugins.HttpRequestTimeoutException
 import kotlinx.serialization.json.JsonObject
 
 /**
- * Plugin to interact with the supabase Postgrest API
+ * Plugin to interact with the Supabase Postgrest API
  *
  * To use it you need to install it to the [SupabaseClient]:
  * ```kotlin

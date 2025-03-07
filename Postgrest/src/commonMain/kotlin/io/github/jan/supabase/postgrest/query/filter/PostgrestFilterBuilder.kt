@@ -1,8 +1,10 @@
 @file:Suppress("UndocumentedPublicProperty", "ConstructorParameterNaming")
 package io.github.jan.supabase.postgrest.query.filter
 
+import io.github.jan.supabase.SupabaseClient
+import io.github.jan.supabase.auth.AuthUserScope
 import io.github.jan.supabase.auth.PostgrestFilterDSL
-import io.github.jan.supabase.postgrest.PropertyConversionMethod
+import io.github.jan.supabase.postgrest.Postgrest
 import kotlin.reflect.KProperty1
 
 /**
@@ -10,10 +12,13 @@ import kotlin.reflect.KProperty1
  */
 @PostgrestFilterDSL
 class PostgrestFilterBuilder(
-    @PublishedApi internal val propertyConversionMethod: PropertyConversionMethod,
+    @PublishedApi internal val postgrest: Postgrest,
     @PublishedApi internal val _params: MutableMap<String, List<String>> = mutableMapOf(),
     val isInLogicalExpression: Boolean = false
-) {
+): AuthUserScope {
+
+    override val supabase: SupabaseClient = postgrest.supabaseClient
+    private val propertyConversionMethod = postgrest.config.propertyConversionMethod
 
     val params: Map<String, List<String>>
         get() = _params.toMap()
@@ -376,7 +381,7 @@ class PostgrestFilterBuilder(
 }
 
 @PublishedApi internal inline fun PostgrestFilterBuilder.formatJoiningFilter(filter: PostgrestFilterBuilder.() -> Unit): String {
-    val params = PostgrestFilterBuilder(propertyConversionMethod, isInLogicalExpression = true).apply(filter).params
+    val params = PostgrestFilterBuilder(postgrest, isInLogicalExpression = true).apply(filter).params
     val formattedFilter = params.toList().joinToString(",") {
         it.second.joinToString(",") { filter ->
             val isLogicalOperator = filter.startsWith("(") && filter.endsWith(")")

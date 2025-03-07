@@ -1,6 +1,8 @@
 @file:Suppress("UndocumentedPublicProperty")
 package io.github.jan.supabase.postgrest.query
 
+import io.github.jan.supabase.SupabaseClient
+import io.github.jan.supabase.auth.AuthUserScope
 import io.github.jan.supabase.auth.PostgrestFilterDSL
 import io.github.jan.supabase.encodeToJsonElement
 import io.github.jan.supabase.exceptions.HttpRequestException
@@ -27,7 +29,9 @@ class PostgrestQueryBuilder(
     val postgrest: Postgrest,
     val table: String,
     val schema: String = postgrest.config.defaultSchema,
-) {
+): AuthUserScope {
+
+    override val supabase: SupabaseClient = postgrest.supabaseClient
 
     /**
      * Executes vertical filtering with select on [table]
@@ -174,9 +178,9 @@ class PostgrestQueryBuilder(
         crossinline update: PostgrestUpdate.() -> Unit = {},
         request: PostgrestRequestBuilder.() -> Unit = {}
     ): PostgrestResult {
-        val requestBuilder = PostgrestRequestBuilder(postgrest.config.propertyConversionMethod).apply(request)
+        val requestBuilder = PostgrestRequestBuilder(postgrest).apply(request)
         val updateRequest = UpdateRequest(
-            body = buildPostgrestUpdate(postgrest.config.propertyConversionMethod, postgrest.serializer, update),
+            body = buildPostgrestUpdate(postgrest, postgrest.serializer, update),
             returning = requestBuilder.returning,
             count = requestBuilder.count,
             urlParams = requestBuilder.params.mapToFirstValue(),
@@ -201,7 +205,7 @@ class PostgrestQueryBuilder(
         value: T,
         request: PostgrestRequestBuilder.() -> Unit = {}
     ): PostgrestResult {
-        val requestBuilder = PostgrestRequestBuilder(postgrest.config.propertyConversionMethod).apply(request)
+        val requestBuilder = PostgrestRequestBuilder(postgrest).apply(request)
         val updateRequest = UpdateRequest(
             returning = requestBuilder.returning,
             count = requestBuilder.count,
@@ -226,7 +230,7 @@ class PostgrestQueryBuilder(
     suspend inline fun delete(
         request: PostgrestRequestBuilder.() -> Unit = {}
     ): PostgrestResult {
-        val requestBuilder = PostgrestRequestBuilder(postgrest.config.propertyConversionMethod).apply(request)
+        val requestBuilder = PostgrestRequestBuilder(postgrest).apply(request)
         val deleteRequest = DeleteRequest(
             returning = requestBuilder.returning,
             count = requestBuilder.count,

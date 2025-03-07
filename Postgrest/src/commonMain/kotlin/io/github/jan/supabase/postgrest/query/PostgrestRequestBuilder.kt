@@ -1,9 +1,12 @@
 @file:Suppress("UndocumentedPublicProperty", "ConstructorParameterNaming")
 package io.github.jan.supabase.postgrest.query
 
+import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.annotations.SupabaseExperimental
+import io.github.jan.supabase.auth.AuthUserScope
 import io.github.jan.supabase.auth.PostgrestFilterDSL
-import io.github.jan.supabase.postgrest.PropertyConversionMethod
+import io.github.jan.supabase.auth.auth
+import io.github.jan.supabase.postgrest.Postgrest
 import io.github.jan.supabase.postgrest.query.filter.PostgrestFilterBuilder
 import io.github.jan.supabase.postgrest.result.PostgrestResult
 import io.ktor.http.HeadersBuilder
@@ -14,7 +17,11 @@ import kotlin.js.JsName
  * A builder for Postgrest requests.
  */
 @PostgrestFilterDSL
-open class PostgrestRequestBuilder(@PublishedApi internal val propertyConversionMethod: PropertyConversionMethod) {
+open class PostgrestRequestBuilder(
+    val postgrest: Postgrest
+): AuthUserScope {
+
+    override val supabase: SupabaseClient = postgrest.supabaseClient
 
     /**
      * The [Count] algorithm to use to count rows in the table or view.
@@ -152,11 +159,16 @@ open class PostgrestRequestBuilder(@PublishedApi internal val propertyConversion
     }
 
     /**
+     * Returns the current authenticated user from the [Auth] plugin.
+     */
+    fun currentUser() = postgrest.supabaseClient.auth.currentUserOrNull()
+
+    /**
      * Adds a filter to the postgrest request.
      * @param block The filter block
      */
     inline fun filter(block: @PostgrestFilterDSL PostgrestFilterBuilder.() -> Unit) {
-        val filter = PostgrestFilterBuilder(propertyConversionMethod, params)
+        val filter = PostgrestFilterBuilder(postgrest, params)
         filter.block()
     }
 
