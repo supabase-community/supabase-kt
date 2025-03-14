@@ -37,6 +37,8 @@ actual fun Auth.setupPlatform() {
         window.history.replaceState(null, window.document.title, newURL);
     }
 
+    checkForHash()
+    checkForPCKECode()
     if(IS_BROWSER) {
         window.onhashchange = {
             checkForHash()
