@@ -2,6 +2,7 @@ package io.github.jan.supabase.auth
 
 import io.github.jan.supabase.annotations.SupabaseInternal
 import io.github.jan.supabase.auth.status.SessionSource
+import io.github.jan.supabase.logging.d
 import io.ktor.util.PlatformUtils.IS_BROWSER
 import kotlinx.browser.window
 import kotlinx.coroutines.launch
@@ -20,31 +21,33 @@ actual fun Auth.setupPlatform() {
             // No params after hash, no need to continue
             return
         }
-
+        Auth.logger.d { "Found hash: $afterHash" }
         parseFragmentAndImportSession(afterHash) {
-            val newURL = window.location.href.split("?")[0];
-            window.history.replaceState({}, window.document.title, newURL);
+            val newURL = window.location.href.split("#")[0];
+            window.history.replaceState(null, window.document.title, newURL);
         }
     }
 
     fun checkForPCKECode() {
         val url = URL(window.location.href)
         val code = url.searchParams.get("code") ?: return
+        Auth.logger.d { "Found PCKE code: $code" }
         authScope.launch {
             val session = exchangeCodeForSession(code)
             importSession(session, source = SessionSource.External)
         }
         val newURL = window.location.href.split("?")[0];
-        window.history.replaceState({}, window.document.title, newURL);
+        window.history.replaceState(null, window.document.title, newURL);
     }
 
     if(IS_BROWSER) {
+        Auth.logger.d { "Checking for hash..." }
+        checkForHash()
+        Auth.logger.d { "Checking for PCKE code..." }
+        checkForPCKECode()
+        Auth.logger.d { "Registering hash change listener..." }
         window.onhashchange = {
             checkForHash()
-        }
-        window.onload = {
-            checkForHash()
-            checkForPCKECode()
         }
     }
 }
