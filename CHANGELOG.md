@@ -1,5 +1,12 @@
 # Changelog
 
+### 3.1.3 - March 17, 2025
+
+### Auth
+
+- Fix JS/Wasm hash/code check and removal by @Sparky983 and @jan-tennert in https://github.com/supabase-community/supabase-kt/pull/875
+Hashes & PKCE codes should now be correctly checked for on WASM, and removed from the browser history after usage.
+
 ### 3.1.2 - March 3, 2025
 
 This version requires Ktor version `3.1.1` or higher.
