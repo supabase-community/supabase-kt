@@ -369,6 +369,9 @@ internal class AuthImpl(
 
     override suspend fun exchangeCodeForSession(code: String, saveSession: Boolean): UserSession {
         val codeVerifier = codeVerifierCache.loadCodeVerifier()
+        require(codeVerifier != null) {
+            "No code verifier stored. Make sure to use `getOAuthUrl` for the OAuth Url to prepare the PKCE flow."
+        }
         val session = api.postJson("token?grant_type=pkce", buildJsonObject {
             put("auth_code", code)
             put("code_verifier", codeVerifier)

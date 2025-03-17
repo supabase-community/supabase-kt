@@ -10,7 +10,6 @@ import org.w3c.dom.url.URL
 @SupabaseInternal
 actual fun Auth.setupPlatform() {
     this as AuthImpl
-    Auth.logger.d { "Registering window listeners" }
 
     fun checkForHash() {
         if(window.location.hash.isBlank()) return
@@ -20,8 +19,9 @@ actual fun Auth.setupPlatform() {
             // No params after hash, no need to continue
             return
         }
+        Auth.logger.d { "Found hash: $afterHash" }
         parseFragmentAndImportSession(afterHash) {
-            val newURL = window.location.href.split("?")[0];
+            val newURL = window.location.href.split("#")[0];
             window.history.replaceState(null, window.document.title, newURL);
         }
     }
@@ -29,6 +29,7 @@ actual fun Auth.setupPlatform() {
     fun checkForPCKECode() {
         val url = URL(window.location.href)
         val code = url.searchParams.get("code") ?: return
+        Auth.logger.d { "Found PCKE code: $code" }
         authScope.launch {
             val session = exchangeCodeForSession(code)
             importSession(session)
@@ -38,12 +39,13 @@ actual fun Auth.setupPlatform() {
     }
 
     if(IS_BROWSER) {
+        Auth.logger.d { "Checking for hash..." }
+        checkForHash()
+        Auth.logger.d { "Checking for PCKE code..." }
+        checkForPCKECode()
+        Auth.logger.d { "Registering hash change listener..." }
         window.onhashchange = {
             checkForHash()
-        }
-        window.onload = {
-            checkForHash()
-            checkForPCKECode()
         }
     }
 }
