@@ -10,7 +10,7 @@ import kotlin.reflect.KType
  */
 class KotlinXSerializer(private val json: Json = Json) : SupabaseSerializer {
 
-    override fun <T : Any> encode(type: KType, value: T): String = json.encodeToString(serializer(type), value)
+    override fun <T : Any> encode(type: KType, value: T): String = json.encodeToString(json.serializersModule.serializer(type), value)
 
     @Suppress("UNCHECKED_CAST")
     override fun <T : Any> decode(type: KType, value: String): T =
