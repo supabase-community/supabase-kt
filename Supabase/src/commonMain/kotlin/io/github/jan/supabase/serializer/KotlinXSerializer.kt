@@ -14,6 +14,6 @@ class KotlinXSerializer(private val json: Json = Json) : SupabaseSerializer {
 
     @Suppress("UNCHECKED_CAST")
     override fun <T : Any> decode(type: KType, value: String): T =
-        json.decodeFromString(serializer(type), value) as T
+        json.decodeFromString(json.serializersModule.serializer(type), value) as T
 
 }
