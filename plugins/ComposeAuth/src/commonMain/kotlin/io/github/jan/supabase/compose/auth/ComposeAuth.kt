@@ -59,7 +59,7 @@ import kotlinx.serialization.json.JsonObject
  * }
  *  ```
  */
-sealed interface ComposeAuth : SupabasePlugin<ComposeAuth.Config>, CustomSerializationPlugin {
+interface ComposeAuth : SupabasePlugin<ComposeAuth.Config>, CustomSerializationPlugin {
 
     /**
      * Config for [ComposeAuth]

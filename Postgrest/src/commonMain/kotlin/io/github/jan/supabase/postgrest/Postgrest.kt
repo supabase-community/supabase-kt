@@ -36,7 +36,7 @@ import kotlinx.serialization.json.JsonObject
  * ```
  */
 
-sealed interface Postgrest : MainPlugin<Postgrest.Config>, CustomSerializationPlugin {
+interface Postgrest : MainPlugin<Postgrest.Config>, CustomSerializationPlugin {
 
     /**
      * Creates a new [PostgrestQueryBuilder] for the given table

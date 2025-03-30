@@ -34,7 +34,7 @@ import kotlin.time.Duration.Companion.days
 /**
  * Represents a resumable client. Can be used to create or continue resumable uploads.
  */
-sealed interface ResumableClient {
+interface ResumableClient {
 
     /**
      * Creates a new resumable upload or continues an existing one.

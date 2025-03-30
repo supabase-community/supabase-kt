@@ -16,7 +16,7 @@ import io.ktor.client.statement.HttpResponse
  *
  * This plugin uses the default GraphQL endpoint for supabase projects and adds the `apikey` and `Authorization` headers automatically
  */
-sealed interface GraphQL: MainPlugin<GraphQL.Config> {
+interface GraphQL: MainPlugin<GraphQL.Config> {
 
     /**
      * The Apollo Client. Customizable via [Config.apolloConfiguration]
