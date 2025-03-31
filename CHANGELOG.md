@@ -1,5 +1,15 @@
 # Changelog
 
+### 3.1.4 - March 31, 2025
+
+### All modules
+
+- Remove `sealed` modifier from interfaces where they are not needed (and prevent mocking in KMP) by @jan-tennert #883
+
+### Core
+
+- Fix custom serializer modules not being used in the `KotlinXSerializer` by @jan-tennert in #881
+
 ### 3.1.3 - March 17, 2025
 
 ### Auth
