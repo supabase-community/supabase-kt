@@ -13,7 +13,7 @@ import kotlin.time.Duration
 /**
  * The api for interacting with a bucket
  */
-sealed interface BucketApi {
+interface BucketApi {
 
     /**
      * The id of the bucket

@@ -14,7 +14,7 @@ import kotlin.reflect.typeOf
 /**
  * Represents a realtime channel
  */
-sealed interface RealtimeChannel {
+interface RealtimeChannel {
 
     /**
      * The status of the channel as a [StateFlow]

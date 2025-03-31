@@ -46,7 +46,7 @@ import kotlin.time.Duration.Companion.seconds
  * channel.subscribe()
  * ```
  */
-sealed interface Realtime : MainPlugin<Realtime.Config>, CustomSerializationPlugin {
+interface Realtime : MainPlugin<Realtime.Config>, CustomSerializationPlugin {
 
     /**
      * The current status of the realtime connection

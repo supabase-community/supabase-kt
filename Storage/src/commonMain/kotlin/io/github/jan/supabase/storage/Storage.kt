@@ -49,7 +49,7 @@ import kotlin.time.Duration.Companion.seconds
  * val bytes = bucket.downloadAuthenticated("icon.png")
  * ```
  */
-sealed interface Storage : MainPlugin<Storage.Config>, CustomSerializationPlugin {
+interface Storage : MainPlugin<Storage.Config>, CustomSerializationPlugin {
 
     /**
      * Creates a new bucket in the storage

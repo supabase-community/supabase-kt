@@ -15,7 +15,7 @@ import io.github.jan.supabase.plugins.SupabasePlugin
  *
  * To add functionality, add plugins like **Auth** or **Functions** within the [SupabaseClientBuilder]
  */
-sealed interface SupabaseClient {
+interface SupabaseClient {
 
     /**
      * The supabase url with either a http or https scheme.

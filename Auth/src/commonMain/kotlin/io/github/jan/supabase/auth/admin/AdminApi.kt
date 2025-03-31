@@ -23,7 +23,7 @@ import kotlinx.serialization.json.put
 /**
  * The admin interface for the supabase auth module. Service role access token is required. Import it via [Auth.importAuthToken]. Never share it publicly
  */
-sealed interface AdminApi {
+interface AdminApi {
 
     /**
      * Creates a new user using an email and password

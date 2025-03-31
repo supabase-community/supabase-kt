@@ -46,7 +46,7 @@ import kotlinx.serialization.json.JsonObject
  * }
  * ```
  */
-sealed interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
+interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
 
     /**
      * Returns the current session status

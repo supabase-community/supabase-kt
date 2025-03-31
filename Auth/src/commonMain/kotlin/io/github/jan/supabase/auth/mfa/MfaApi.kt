@@ -21,7 +21,7 @@ import kotlinx.serialization.json.put
 /**
  * An interface for interacting with Multi-Factor Authentication Api in GoTrue.
  */
-sealed interface MfaApi {
+interface MfaApi {
 
     /**
      * The current MFA status of the user
