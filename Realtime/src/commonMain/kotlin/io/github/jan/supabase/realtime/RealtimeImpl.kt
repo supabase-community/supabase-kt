@@ -23,6 +23,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -36,6 +37,7 @@ import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.longOrNull
+import kotlin.coroutines.coroutineContext
 import kotlin.io.encoding.ExperimentalEncodingApi
 
 @PublishedApi internal class RealtimeImpl(override val supabaseClient: SupabaseClient, override val config: Realtime.Config) : Realtime {
@@ -83,6 +85,7 @@ import kotlin.io.encoding.ExperimentalEncodingApi
                 rejoinChannels()
             }
         } catch(e: Exception) {
+            coroutineContext.ensureActive()
             Realtime.logger.e(e) { """
                 Error while trying to connect to realtime websocket. Trying again in ${config.reconnectDelay}
                 URL: $websocketUrl
@@ -127,7 +130,7 @@ import kotlin.io.encoding.ExperimentalEncodingApi
                     }
                 }
             } catch(e: Exception) {
-                if(!isActive) return@launch
+                coroutineContext.ensureActive()
                 Realtime.logger.e(e) { "Error while listening for messages. Trying again in ${config.reconnectDelay}" }
                 reconnect()
             }
@@ -274,6 +277,7 @@ import kotlin.io.encoding.ExperimentalEncodingApi
         try {
             ws?.send(message)
         } catch(e: Exception) {
+            coroutineContext.ensureActive()
             Realtime.logger.e(e) { "Error while sending message $message. Reconnecting in ${config.reconnectDelay}" }
             reconnect()
         }

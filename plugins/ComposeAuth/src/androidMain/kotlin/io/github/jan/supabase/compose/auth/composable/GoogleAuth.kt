@@ -26,6 +26,8 @@ import io.github.jan.supabase.compose.auth.hash
 import io.github.jan.supabase.compose.auth.signInWithGoogle
 import io.github.jan.supabase.logging.d
 import io.github.jan.supabase.logging.e
+import kotlinx.coroutines.ensureActive
+import kotlin.coroutines.coroutineContext
 
 private data class GoogleRequestOptions(
     val config: GoogleLoginConfig?,
@@ -100,6 +102,7 @@ internal fun ComposeAuth.signInWithCM(
                     }
                 }
             } catch (e: Exception) {
+                coroutineContext.ensureActive()
                 onResult.invoke(NativeSignInResult.Error(e.localizedMessage ?: "error", e))
                 ComposeAuth.logger.e(e) { "Error while logging into Supabase with Google ID Token Credential" }
             } finally {
@@ -135,6 +138,7 @@ private suspend fun parseCredential(
                         )
                     )
                 } catch (e: Exception) {
+                    coroutineContext.ensureActive()
                     ComposeAuth.logger.e(e) { "Error while logging into Supabase with Google ID Token Credential" }
                     onResult.invoke(
                         NativeSignInResult.Error(

@@ -61,7 +61,7 @@ suspend inline fun <reified T> HttpResponse.bodyOrNull(): T? {
     return try {
         val text = bodyAsText()
         supabaseJson.decodeFromString<T>(text)
-    } catch(e: Exception) {
+    } catch(_: Exception) {
         null
     }
 }
