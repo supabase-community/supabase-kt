@@ -61,8 +61,10 @@ internal suspend fun createServer(
         }
         suspendCancellableCoroutine {
             server.monitor.subscribe(ApplicationStopPreparing) { _ ->
-                it.resume(Unit)
-                timeoutScope.cancel()
+                if(!it.isCompleted) {
+                    it.resume(Unit)
+                    timeoutScope.cancel()
+                }
             }
             server.start()
             it.invokeOnCancellation { _ ->
