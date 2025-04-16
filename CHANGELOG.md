@@ -1,5 +1,15 @@
 # Changelog
 
+### 3.1.5 - April 16, 2025
+
+### All modules
+
+- Don't swallow `CancellationException` by @sproctor in #895
+
+### Auth
+
+- Fix OAuth server listener resuming coroutine twice by @jan-tennert in #893
+
 ### 3.1.4 - April 1, 2025
 
 ### All modules
