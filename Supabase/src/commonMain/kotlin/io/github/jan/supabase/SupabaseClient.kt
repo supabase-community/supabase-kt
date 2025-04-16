@@ -71,7 +71,7 @@ interface SupabaseClient {
         var DEFAULT_LOG_LEVEL = LogLevel.INFO
             internal set
 
-        internal val LOGGER = createLogger("Supabase-Core")
+        val LOGGER = createLogger("Supabase-Core")
 
         /**
          * Creates a new [SupabaseLogger] using the [KermitSupabaseLogger] implementation.
