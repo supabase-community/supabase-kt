@@ -6,6 +6,7 @@ import io.github.jan.supabase.annotations.SupabaseInternal
 import io.github.jan.supabase.auth.authenticatedSupabaseApi
 import io.github.jan.supabase.bodyOrNull
 import io.github.jan.supabase.collections.AtomicMutableMap
+import io.github.jan.supabase.defaultDispatcher
 import io.github.jan.supabase.exceptions.BadRequestRestException
 import io.github.jan.supabase.exceptions.HttpRequestException
 import io.github.jan.supabase.exceptions.NotFoundRestException
@@ -26,6 +27,7 @@ import io.ktor.client.plugins.HttpRequestTimeoutException
 import io.ktor.client.plugins.timeout
 import io.ktor.client.statement.HttpResponse
 import io.ktor.http.HttpStatusCode
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.buildJsonObject
@@ -120,7 +122,8 @@ interface Storage : MainPlugin<Storage.Config>, CustomSerializationPlugin {
     data class Config(
         var transferTimeout: Duration = 120.seconds,
         @PublishedApi internal var resumable: Resumable = Resumable(),
-        override var serializer: SupabaseSerializer? = null
+        override var serializer: SupabaseSerializer? = null,
+        var coroutineDispatcher: CoroutineDispatcher = defaultDispatcher
     ) : MainConfig(), CustomSerializationConfig {
 
         /**
