@@ -123,6 +123,7 @@ interface Realtime : MainPlugin<Realtime.Config>, CustomSerializationPlugin {
      * @property disconnectOnNoSubscriptions Whether to disconnect from the websocket when there are no more subscriptions. Defaults to true
      * @property serializer A serializer used for serializing/deserializing objects e.g. in [PresenceAction.decodeJoinsAs] or [RealtimeChannel.broadcast]. Defaults to [KotlinXSerializer]
      * @property websocketFactory A custom websocket factory. If this is set, the [websocketConfig] will be ignored
+     * @property coroutineDispatcher The coroutine dispatcher used for running long-lived tasks. Defaults to [defaultDispatcher]
      */
     data class Config(
         var websocketConfig: WebSockets.Config.() -> Unit = {},
