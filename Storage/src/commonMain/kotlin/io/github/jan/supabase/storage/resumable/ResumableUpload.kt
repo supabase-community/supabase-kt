@@ -24,8 +24,8 @@ import io.ktor.utils.io.cancel
 import io.ktor.utils.io.readFully
 import io.ktor.utils.io.writeFully
 import kotlinx.atomicfu.atomic
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.ensureActive
@@ -84,7 +84,8 @@ internal class ResumableUploadImpl(
     private val httpClient: HttpClient,
     private val storageApi: BucketApi,
     private val retrieveServerOffset: suspend () -> Long,
-    private val removeFromCache: suspend () -> Unit
+    private val removeFromCache: suspend () -> Unit,
+    coroutineDispatcher: CoroutineDispatcher,
 ): ResumableUpload {
 
     private val size = fingerprint.size
@@ -93,7 +94,7 @@ internal class ResumableUploadImpl(
     private var serverOffset = 0L
     private val _stateFlow = MutableStateFlow<ResumableUploadState>(ResumableUploadState(fingerprint, cacheEntry, UploadStatus.Progress(offset, size), paused))
     override val stateFlow: StateFlow<ResumableUploadState> = _stateFlow.asStateFlow()
-    private val scope = CoroutineScope(Dispatchers.Default)
+    private val scope = CoroutineScope(coroutineDispatcher)
     private val config = storageApi.supabaseClient.storage.config.resumable
     private lateinit var dataStream: ByteReadChannel
 
