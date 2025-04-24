@@ -88,7 +88,10 @@ enum class AuthErrorCode(val value: String) {
     MfaTotpVerifyDisabled("mfa_totp_verify_not_enabled"),
     MfaWebAuthnEnrollDisabled("mfa_webauthn_enroll_not_enabled"),
     MfaWebAuthnVerifyDisabled("mfa_webauthn_verify_not_enabled"),
-    MfaVerifiedFactorExists("mfa_verified_factor_exists");
+    MfaVerifiedFactorExists("mfa_verified_factor_exists"),
+    EmailAddressInvalid("email_address_invalid"),
+    Web3ProviderDisabled("web3_provider_disabled"),
+    Web3UnsupportedChain("web3_unsupported_chain");
 
     companion object {
         /**
