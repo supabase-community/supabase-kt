@@ -12,6 +12,7 @@ import io.github.jan.supabase.auth.providers.OAuthProvider
 import io.github.jan.supabase.auth.providers.builtin.Email
 import io.github.jan.supabase.auth.providers.builtin.Phone
 import io.github.jan.supabase.auth.providers.builtin.SSO
+import io.github.jan.supabase.auth.status.NotAuthenticatedReason
 import io.github.jan.supabase.auth.status.SessionSource
 import io.github.jan.supabase.auth.status.SessionStatus
 import io.github.jan.supabase.auth.user.UserInfo
@@ -345,7 +346,13 @@ interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
     /**
      * Deletes the current session from storage and sets [sessionStatus] to [SessionStatus.NotAuthenticated]
      */
-    suspend fun clearSession()
+    suspend fun clearSession() = clearSession(NotAuthenticatedReason.SignOut)
+
+    /**
+     * Deletes the current session from storage and sets [sessionStatus] to [SessionStatus.NotAuthenticated] with the specified [reason]
+     * @param reason The reason why the session was cleared
+     */
+    suspend fun clearSession(reason: NotAuthenticatedReason)
 
     /**
      * Exchanges a code for a session. Used when using the [FlowType.PKCE] flow

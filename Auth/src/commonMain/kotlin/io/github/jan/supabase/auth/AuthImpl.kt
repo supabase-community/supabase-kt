@@ -15,6 +15,7 @@ import io.github.jan.supabase.auth.providers.ExternalAuthConfigDefaults
 import io.github.jan.supabase.auth.providers.OAuthProvider
 import io.github.jan.supabase.auth.providers.builtin.OTP
 import io.github.jan.supabase.auth.providers.builtin.SSO
+import io.github.jan.supabase.auth.status.NotAuthenticatedReason
 import io.github.jan.supabase.auth.status.RefreshFailureCause
 import io.github.jan.supabase.auth.status.SessionSource
 import io.github.jan.supabase.auth.status.SessionStatus
@@ -113,12 +114,12 @@ internal class AuthImpl(
                     Auth.logger.i {
                         "No session found. Setting session status to NotAuthenticated."
                     }
-                    _sessionStatus.value = SessionStatus.NotAuthenticated(false)
+                    _sessionStatus.value = SessionStatus.NotAuthenticated(false, NotAuthenticatedReason.SessionNotFound)
                 }
             }
         } else {
             Auth.logger.d { "Skipping loading from storage (autoLoadFromStorage is set to false)" }
-            _sessionStatus.value = SessionStatus.NotAuthenticated(false)
+            _sessionStatus.value = SessionStatus.NotAuthenticated(false, NotAuthenticatedReason.SessionNotFound)
         }
         Auth.logger.d { "Initialized Auth plugin" }
     }
@@ -584,11 +585,11 @@ internal class AuthImpl(
         })
     }
 
-    override suspend fun clearSession() {
+    override suspend fun clearSession(reason: NotAuthenticatedReason) {
         codeVerifierCache.deleteCodeVerifier()
         sessionManager.deleteSession()
         sessionJob?.cancel()
-        _sessionStatus.value = SessionStatus.NotAuthenticated(true)
+        _sessionStatus.value = SessionStatus.NotAuthenticated(true, reason)
         sessionJob = null
     }
 

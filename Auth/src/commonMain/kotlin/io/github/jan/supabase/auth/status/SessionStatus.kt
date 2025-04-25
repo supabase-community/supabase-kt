@@ -1,5 +1,6 @@
 package io.github.jan.supabase.auth.status
 
+import io.github.jan.supabase.annotations.SupabaseExperimental
 import io.github.jan.supabase.auth.Auth
 import io.github.jan.supabase.auth.user.UserSession
 
@@ -12,7 +13,10 @@ sealed interface SessionStatus {
      * This status means that the user is not logged in
      * @param isSignOut Whether this status was caused by a sign-out
      */
-    data class NotAuthenticated(val isSignOut: Boolean) : SessionStatus
+    data class NotAuthenticated(
+        @property:Deprecated("This property is getting replaced by 'NotAuthenticated#reason', check if the reason is 'NotAuthenticatedReason.SignOut'") val isSignOut: Boolean,
+        @property:SupabaseExperimental val reason: NotAuthenticatedReason = NotAuthenticatedReason.Unknown
+    ) : SessionStatus
 
     /**
      * This status means that [Auth] is currently initializing the session
