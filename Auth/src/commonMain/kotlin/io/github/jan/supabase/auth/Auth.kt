@@ -411,6 +411,17 @@ interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
 
     companion object : SupabasePluginProvider<AuthConfig, Auth> {
 
+        internal val HASH_PARAMETERS = listOf(
+            "access_token",
+            "refresh_token",
+            "expires_in",
+            "expires_at",
+            "token_type",
+            "type",
+            "provider_refresh_token",
+            "provider_token"
+        )
+
         override val key = "auth"
 
         override val logger: SupabaseLogger = SupabaseClient.createLogger("Supabase-Auth")
