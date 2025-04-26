@@ -1,6 +1,7 @@
 package io.github.jan.supabase.auth
 
 import io.github.jan.supabase.SupabaseClient
+import io.github.jan.supabase.annotations.SupabaseInternal
 import io.github.jan.supabase.auth.admin.AdminApi
 import io.github.jan.supabase.auth.exception.AuthRestException
 import io.github.jan.supabase.auth.exception.AuthWeakPasswordException
@@ -353,6 +354,12 @@ interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
      * @param reason The reason why the session was cleared
      */
     suspend fun clearSession(reason: NotAuthenticatedReason)
+
+    /**
+     * Sets the session status to the specified [status]
+     */
+    @SupabaseInternal
+    fun setSessionStatus(status: SessionStatus)
 
     /**
      * Exchanges a code for a session. Used when using the [FlowType.PKCE] flow

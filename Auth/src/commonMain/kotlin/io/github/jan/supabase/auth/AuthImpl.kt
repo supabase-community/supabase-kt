@@ -112,14 +112,14 @@ internal class AuthImpl(
                     }
                 } else {
                     Auth.logger.i {
-                        "No session found. Setting session status to NotAuthenticated."
+                        "No session found in storage."
                     }
-                    _sessionStatus.value = SessionStatus.NotAuthenticated(false, NotAuthenticatedReason.SessionNotFound)
+                    setSessionStatus(SessionStatus.NotAuthenticated(false, NotAuthenticatedReason.SessionNotFound))
                 }
             }
         } else {
             Auth.logger.d { "Skipping loading from storage (autoLoadFromStorage is set to false)" }
-            _sessionStatus.value = SessionStatus.NotAuthenticated(false, NotAuthenticatedReason.SessionNotFound)
+            setSessionStatus(SessionStatus.NotAuthenticated(false, NotAuthenticatedReason.SessionNotFound))
         }
         Auth.logger.d { "Initialized Auth plugin" }
     }
@@ -184,7 +184,7 @@ internal class AuthImpl(
             val session = currentSessionOrNull() ?: return
             val newUser = session.user?.copy(identities = session.user.identities?.filter { it.identityId != identityId })
             val newSession = session.copy(user = newUser)
-            _sessionStatus.value = SessionStatus.Authenticated(newSession, SessionSource.UserIdentitiesChanged(session))
+            setSessionStatus(SessionStatus.Authenticated(newSession, SessionSource.UserIdentitiesChanged(session)))
         }
     }
 
@@ -237,7 +237,7 @@ internal class AuthImpl(
             if (this.config.autoSaveToStorage) {
                 sessionManager.saveSession(newSession)
             }
-            _sessionStatus.value = SessionStatus.Authenticated(newSession, SessionSource.UserChanged(newSession))
+            setSessionStatus(SessionStatus.Authenticated(newSession, SessionSource.UserChanged(newSession)))
         }
         return userInfo
     }
@@ -364,7 +364,7 @@ internal class AuthImpl(
         if (updateSession) {
             val session = currentSessionOrNull() ?: error("No session found")
             val newStatus = SessionStatus.Authenticated(session.copy(user = user), SessionSource.UserChanged(currentSessionOrNull() ?: error("Session shouldn't be null")))
-            _sessionStatus.value = newStatus
+            setSessionStatus(newStatus)
             if (config.autoSaveToStorage) sessionManager.saveSession(newStatus.session)
         }
         return user
@@ -420,7 +420,7 @@ internal class AuthImpl(
                 sessionManager.saveSession(session)
                 Auth.logger.d { "Session saved to storage (no auto refresh)" }
             }
-            _sessionStatus.value = SessionStatus.Authenticated(session, source)
+            setSessionStatus(SessionStatus.Authenticated(session, source))
             Auth.logger.d { "Session imported successfully." }
             return
         }
@@ -435,7 +435,7 @@ internal class AuthImpl(
                 sessionManager.saveSession(session)
                 Auth.logger.d { "Session saved to storage (auto refresh enabled)" }
             }
-            _sessionStatus.value = SessionStatus.Authenticated(session, source)
+            setSessionStatus(SessionStatus.Authenticated(session, source))
             Auth.logger.d { "Session imported successfully. Starting auto refresh..." }
             sessionJob?.cancel()
             sessionJob = authScope.launch {
@@ -461,7 +461,7 @@ internal class AuthImpl(
         } catch (e: RestException) {
             if (e.statusCode in 500..599) {
                 Auth.logger.e(e) { "Couldn't refresh session due to an internal server error. Retrying in ${config.retryDelay} (Status code ${e.statusCode})..." }
-                _sessionStatus.value = SessionStatus.RefreshFailure(RefreshFailureCause.InternalServerError(e))
+                setSessionStatus(SessionStatus.RefreshFailure(RefreshFailureCause.InternalServerError(e)))
                 delay(config.retryDelay)
                 retry()
             } else {
@@ -471,7 +471,7 @@ internal class AuthImpl(
         } catch (e: Exception) {
             coroutineContext.ensureActive()
             Auth.logger.e(e) { "Couldn't reach Supabase. Either the address doesn't exist or the network might not be on. Retrying in ${config.retryDelay}..." }
-            _sessionStatus.value = SessionStatus.RefreshFailure(RefreshFailureCause.NetworkError(e))
+            setSessionStatus(SessionStatus.RefreshFailure(RefreshFailureCause.NetworkError(e)))
             delay(config.retryDelay)
             retry()
         }
@@ -589,7 +589,7 @@ internal class AuthImpl(
         codeVerifierCache.deleteCodeVerifier()
         sessionManager.deleteSession()
         sessionJob?.cancel()
-        _sessionStatus.value = SessionStatus.NotAuthenticated(true, reason)
+        setSessionStatus(SessionStatus.NotAuthenticated(true, reason))
         sessionJob = null
     }
 
@@ -597,8 +597,15 @@ internal class AuthImpl(
         sessionStatus.first { it !is SessionStatus.Initializing }
     }
 
-    fun resetLoadingState() {
-        _sessionStatus.value = SessionStatus.Initializing
+    override fun setSessionStatus(status: SessionStatus) {
+        // Error reasons have a higher priority than other reasons, so they don't get overridden
+        if (status is SessionStatus.NotAuthenticated && sessionStatus.value is SessionStatus.NotAuthenticated) {
+            val currentReason = (sessionStatus.value as SessionStatus.NotAuthenticated).reason
+            if (status.reason !is NotAuthenticatedReason.Error && currentReason is NotAuthenticatedReason.Error) {
+                return
+            }
+        }
+        _sessionStatus.value = status
     }
 
     /**
