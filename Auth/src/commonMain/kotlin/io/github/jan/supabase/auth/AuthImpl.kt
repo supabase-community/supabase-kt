@@ -598,10 +598,10 @@ internal class AuthImpl(
     }
 
     override fun setSessionStatus(status: SessionStatus) {
-        // Error reasons have a higher priority than other reasons, so they don't get overridden
+        // Error reasons have a higher priority than session not found
         if (status is SessionStatus.NotAuthenticated && sessionStatus.value is SessionStatus.NotAuthenticated) {
             val currentReason = (sessionStatus.value as SessionStatus.NotAuthenticated).reason
-            if (status.reason !is NotAuthenticatedReason.Error && currentReason is NotAuthenticatedReason.Error) {
+            if (status.reason is NotAuthenticatedReason.SessionNotFound && currentReason is NotAuthenticatedReason.Error) {
                 return
             }
         }

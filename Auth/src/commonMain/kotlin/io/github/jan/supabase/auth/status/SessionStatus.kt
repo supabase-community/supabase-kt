@@ -14,7 +14,7 @@ sealed interface SessionStatus {
      * @param isSignOut Whether this status was caused by a sign-out
      */
     data class NotAuthenticated(
-        @property:Deprecated("This property is getting replaced by 'NotAuthenticated#reason', check if the reason is 'NotAuthenticatedReason.SignOut'") val isSignOut: Boolean,
+        @property:Deprecated("This property is getting replaced by 'NotAuthenticated#reason'. Check if the reason is 'NotAuthenticatedReason.SignOut'") val isSignOut: Boolean,
         @property:SupabaseExperimental val reason: NotAuthenticatedReason = NotAuthenticatedReason.Unknown
     ) : SessionStatus
 
