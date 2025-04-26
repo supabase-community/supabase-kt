@@ -423,8 +423,9 @@ internal class AuthImpl(
             Auth.logger.d { "Session imported successfully." }
             return
         }
-        if (session.expiresAt <= Clock.System.now()) {
-            Auth.logger.d { "Session is expired. Handling expired session..." }
+        val thresholdDate = session.expiresAt - session.expiresIn.seconds * (1 - SESSION_REFRESH_THRESHOLD)
+        if (thresholdDate <= Clock.System.now()) {
+            Auth.logger.d { "Session is under the threshold date. Refreshing session..." }
             tryImportingSession(
                 { handleExpiredSession(session, config.alwaysAutoRefresh) },
                 { importSession(session) }
