@@ -433,7 +433,17 @@ interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
             "token_type",
             "type",
             "provider_refresh_token",
-            "provider_token"
+            "provider_token",
+            "error",
+            "error_code",
+            "error_description",
+        )
+
+        internal val QUERY_PARAMETERS = listOf(
+            "code",
+            "error_code",
+            "error",
+            "error_description",
         )
 
         override val key = "auth"
