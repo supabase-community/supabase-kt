@@ -72,7 +72,7 @@ internal class AuthImpl(
 
     private val _sessionStatus = MutableStateFlow<SessionStatus>(SessionStatus.Initializing)
     override val sessionStatus: StateFlow<SessionStatus> = _sessionStatus.asStateFlow()
-    internal val authScope = CoroutineScope(config.coroutineDispatcher)
+    internal val authScope = CoroutineScope(config.coroutineDispatcher ?: supabaseClient.coroutineDispatcher)
     override val sessionManager = config.sessionManager ?: createDefaultSessionManager()
     override val codeVerifierCache = config.codeVerifierCache ?: createDefaultCodeVerifierCache()
 

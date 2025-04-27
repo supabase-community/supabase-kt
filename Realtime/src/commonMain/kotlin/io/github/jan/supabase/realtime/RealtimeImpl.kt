@@ -48,7 +48,7 @@ import kotlin.io.encoding.ExperimentalEncodingApi
     override val status: StateFlow<Realtime.Status> = _status.asStateFlow()
     private val _subscriptions = AtomicMutableMap<String, RealtimeChannel>()
     override val subscriptions: Map<String, RealtimeChannel> = _subscriptions
-    private val scope = CoroutineScope(config.coroutineDispatcher + SupervisorJob())
+    private val scope = CoroutineScope(supabaseClient.coroutineDispatcher + SupervisorJob())
     private val mutex = Mutex()
     internal var accessToken by atomic<String?>(null)
     var heartbeatJob: Job? = null

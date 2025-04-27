@@ -10,6 +10,7 @@ import io.github.jan.supabase.serializer.KotlinXSerializer
 import io.ktor.client.HttpClientConfig
 import io.ktor.client.engine.HttpClientEngine
 import io.ktor.client.plugins.HttpRequestTimeoutException
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.serialization.json.Json
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
@@ -70,6 +71,13 @@ class SupabaseClientBuilder @PublishedApi internal constructor(private val supab
     var defaultSerializer: SupabaseSerializer = KotlinXSerializer(Json { ignoreUnknownKeys = true })
 
     /**
+     * The CoroutineDispatcher used for launching long running jobs.
+     *
+     * Default: [KotlinXSerializer]
+     */
+    var coroutineDispatcher: CoroutineDispatcher = defaultDispatcher
+
+    /**
      * Optional function for using a third-party authentication system with
      * Supabase. The function should return an access token or ID token (JWT) by
      * obtaining it from the third-party auth client library. Note that this
@@ -114,6 +122,7 @@ class SupabaseClientBuilder @PublishedApi internal constructor(private val supab
                 requestTimeout = requestTimeout
             ),
             defaultSerializer = defaultSerializer,
+            coroutineDispatcher = coroutineDispatcher,
             accessToken = accessToken,
             plugins = plugins
         )

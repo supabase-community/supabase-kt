@@ -136,7 +136,7 @@ internal class ResumableClientImpl(private val storageApi: BucketApi, private va
             storageApi = storageApi,
             retrieveServerOffset = { retrieveServerOffset(uploadUrl, path) },
             removeFromCache = { cache.remove(fingerprint) },
-            coroutineDispatcher = storageApi.supabaseClient.storage.config.coroutineDispatcher
+            coroutineDispatcher = storageApi.supabaseClient.coroutineDispatcher
         )
     }
 
@@ -164,7 +164,7 @@ internal class ResumableClientImpl(private val storageApi: BucketApi, private va
                 storageApi = storageApi,
                 retrieveServerOffset = { retrieveServerOffset(entry.url, path)},
                 removeFromCache = { cache.remove(fingerprint) },
-                coroutineDispatcher = storageApi.supabaseClient.storage.config.coroutineDispatcher
+                coroutineDispatcher = storageApi.supabaseClient.coroutineDispatcher
             )
         } else error("File already uploaded")
     }

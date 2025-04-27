@@ -6,7 +6,6 @@ import io.github.jan.supabase.annotations.SupabaseInternal
 import io.github.jan.supabase.auth.authenticatedSupabaseApi
 import io.github.jan.supabase.bodyOrNull
 import io.github.jan.supabase.collections.AtomicMutableMap
-import io.github.jan.supabase.defaultDispatcher
 import io.github.jan.supabase.exceptions.BadRequestRestException
 import io.github.jan.supabase.exceptions.HttpRequestException
 import io.github.jan.supabase.exceptions.NotFoundRestException
@@ -27,7 +26,6 @@ import io.ktor.client.plugins.HttpRequestTimeoutException
 import io.ktor.client.plugins.timeout
 import io.ktor.client.statement.HttpResponse
 import io.ktor.http.HttpStatusCode
-import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.buildJsonObject
@@ -118,13 +116,11 @@ interface Storage : MainPlugin<Storage.Config>, CustomSerializationPlugin {
      * @param customUrl the custom url to use for the storage api
      * @param jwtToken the jwt token to use for the storage api
      * @param transferTimeout the timeout for uploading and downloading files (default: 120 seconds)
-     * @param coroutineDispatcher The coroutine dispatcher used for running long-lived tasks. Defaults to [defaultDispatcher]
      */
     data class Config(
         var transferTimeout: Duration = 120.seconds,
         @PublishedApi internal var resumable: Resumable = Resumable(),
         override var serializer: SupabaseSerializer? = null,
-        var coroutineDispatcher: CoroutineDispatcher = defaultDispatcher
     ) : MainConfig(), CustomSerializationConfig {
 
         /**

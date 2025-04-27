@@ -5,7 +5,6 @@ import io.github.jan.supabase.SupabaseClientBuilder
 import io.github.jan.supabase.SupabaseSerializer
 import io.github.jan.supabase.annotations.SupabaseInternal
 import io.github.jan.supabase.auth.resolveAccessToken
-import io.github.jan.supabase.defaultDispatcher
 import io.github.jan.supabase.logging.SupabaseLogger
 import io.github.jan.supabase.logging.w
 import io.github.jan.supabase.plugins.CustomSerializationConfig
@@ -18,7 +17,6 @@ import io.github.jan.supabase.serializer.KotlinXSerializer
 import io.github.jan.supabase.supabaseJson
 import io.ktor.client.plugins.websocket.WebSockets
 import io.ktor.serialization.kotlinx.KotlinxWebsocketSerializationConverter
-import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.StateFlow
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
@@ -123,7 +121,6 @@ interface Realtime : MainPlugin<Realtime.Config>, CustomSerializationPlugin {
      * @property disconnectOnNoSubscriptions Whether to disconnect from the websocket when there are no more subscriptions. Defaults to true
      * @property serializer A serializer used for serializing/deserializing objects e.g. in [PresenceAction.decodeJoinsAs] or [RealtimeChannel.broadcast]. Defaults to [KotlinXSerializer]
      * @property websocketFactory A custom websocket factory. If this is set, the [websocketConfig] will be ignored
-     * @property coroutineDispatcher The coroutine dispatcher used for running long-lived tasks. Defaults to [defaultDispatcher]
      */
     data class Config(
         var websocketConfig: WebSockets.Config.() -> Unit = {},
@@ -134,7 +131,6 @@ interface Realtime : MainPlugin<Realtime.Config>, CustomSerializationPlugin {
         var connectOnSubscribe: Boolean = true,
         @property:SupabaseInternal var websocketFactory: RealtimeWebsocketFactory? = null,
         var disconnectOnNoSubscriptions: Boolean = true,
-        var coroutineDispatcher: CoroutineDispatcher = defaultDispatcher,
     ): MainConfig(), CustomSerializationConfig {
 
         /**
