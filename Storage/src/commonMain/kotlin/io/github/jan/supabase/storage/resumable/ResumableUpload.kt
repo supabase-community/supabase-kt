@@ -24,10 +24,11 @@ import io.ktor.utils.io.cancel
 import io.ktor.utils.io.readFully
 import io.ktor.utils.io.writeFully
 import kotlinx.atomicfu.atomic
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -83,7 +84,8 @@ internal class ResumableUploadImpl(
     private val httpClient: HttpClient,
     private val storageApi: BucketApi,
     private val retrieveServerOffset: suspend () -> Long,
-    private val removeFromCache: suspend () -> Unit
+    private val removeFromCache: suspend () -> Unit,
+    coroutineDispatcher: CoroutineDispatcher
 ): ResumableUpload {
 
     private val size = fingerprint.size
@@ -92,7 +94,7 @@ internal class ResumableUploadImpl(
     private var serverOffset = 0L
     private val _stateFlow = MutableStateFlow<ResumableUploadState>(ResumableUploadState(fingerprint, cacheEntry, UploadStatus.Progress(offset, size), paused))
     override val stateFlow: StateFlow<ResumableUploadState> = _stateFlow.asStateFlow()
-    private val scope = CoroutineScope(Dispatchers.Default)
+    private val scope = CoroutineScope(coroutineDispatcher)
     private val config = storageApi.supabaseClient.storage.config.resumable
     private lateinit var dataStream: ByteReadChannel
 
@@ -122,6 +124,7 @@ internal class ResumableUploadImpl(
                         dataStream.cancel() //cancel old data stream as we are start reading from a new offset
                         dataStream = createDataStream(offset) //create new data stream
                     } catch(e: Exception) {
+                        coroutineContext.ensureActive()
                         Storage.logger.e(e) { "Error while updating server offset for $path. Retrying in ${config.retryTimeout}" }
                         delay(config.retryTimeout)
                         continue
@@ -132,6 +135,7 @@ internal class ResumableUploadImpl(
                     val uploaded = uploadChunk()
                     offset += uploaded
                 } catch(e: Exception) {
+                    coroutineContext.ensureActive()
                     if(e !is IllegalStateException) {
                         Storage.logger.e(e) {"Error while uploading chunk. Retrying in ${config.retryTimeout}" }
                         delay(config.retryTimeout)

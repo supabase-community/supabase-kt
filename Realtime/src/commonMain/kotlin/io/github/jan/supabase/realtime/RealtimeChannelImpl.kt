@@ -11,6 +11,7 @@ import io.github.jan.supabase.realtime.event.RealtimeEvent
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.headers
 import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -199,6 +200,7 @@ internal class RealtimeChannelImpl(
             val decodedValue = try {
                 supabaseClient.realtime.serializer.decode<T>(type, it.toString())
             } catch(e: Exception) {
+                coroutineContext.ensureActive()
                 Realtime.logger.e(e) { "Couldn't decode $it as $type. The corresponding handler wasn't called" }
                 null
             }

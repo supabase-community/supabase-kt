@@ -25,8 +25,10 @@ import io.github.jan.supabase.plugins.CustomSerializationPlugin
 import io.github.jan.supabase.plugins.MainPlugin
 import io.github.jan.supabase.plugins.SupabasePluginProvider
 import io.ktor.client.plugins.HttpRequestTimeoutException
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.serialization.json.JsonObject
+import kotlin.coroutines.coroutineContext
 
 /**
  * Plugin to interact with the Supabase Auth API
@@ -409,6 +411,17 @@ interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
 
     companion object : SupabasePluginProvider<AuthConfig, Auth> {
 
+        internal val HASH_PARAMETERS = listOf(
+            "access_token",
+            "refresh_token",
+            "expires_in",
+            "expires_at",
+            "token_type",
+            "type",
+            "provider_refresh_token",
+            "provider_token"
+        )
+
         override val key = "auth"
 
         override val logger: SupabaseLogger = SupabaseClient.createLogger("Supabase-Auth")
@@ -434,6 +447,7 @@ val SupabaseClient.auth: Auth
 private suspend fun Auth.tryToGetUser(jwt: String) = try {
     retrieveUser(jwt)
 } catch (e: Exception) {
+    coroutineContext.ensureActive()
     Auth.logger.e(e) { "Couldn't retrieve user using your custom jwt token. If you use the project secret ignore this message" }
     null
 }

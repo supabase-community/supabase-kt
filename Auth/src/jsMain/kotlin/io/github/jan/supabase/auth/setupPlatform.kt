@@ -23,7 +23,7 @@ actual fun Auth.setupPlatform() {
         }
         Auth.logger.d { "Found hash: $afterHash" }
         parseFragmentAndImportSession(afterHash) {
-            val newURL = window.location.href.split("#")[0];
+            val newURL = consumeHashParameters(Auth.HASH_PARAMETERS, window.location.href)
             window.history.replaceState(null, window.document.title, newURL);
         }
     }
@@ -36,7 +36,7 @@ actual fun Auth.setupPlatform() {
             val session = exchangeCodeForSession(code)
             importSession(session, source = SessionSource.External)
         }
-        val newURL = window.location.href.split("?")[0];
+        val newURL = consumeUrlParameter(listOf("code"), window.location.href)
         window.history.replaceState(null, window.document.title, newURL);
     }
 

@@ -12,6 +12,7 @@ import io.github.jan.supabase.compose.auth.hash
 import io.github.jan.supabase.compose.auth.signInWithApple
 import kotlinx.cinterop.BetaInteropApi
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.launch
 import platform.AuthenticationServices.ASAuthorization
 import platform.AuthenticationServices.ASAuthorizationAppleIDCredential
@@ -80,6 +81,7 @@ actual fun ComposeAuth.rememberSignInWithApple(
                     fallback.invoke()
                 }
             } catch (e: Exception) {
+                coroutineContext.ensureActive()
                 onResult.invoke(NativeSignInResult.Error(e.message ?: "error"))
             } finally {
                 state.reset()

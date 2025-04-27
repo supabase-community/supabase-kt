@@ -2,11 +2,13 @@ package io.github.jan.supabase
 
 import io.github.jan.supabase.annotations.SupabaseInternal
 import io.github.jan.supabase.exceptions.SupabaseEncodingException
+import io.github.jan.supabase.logging.i
 import io.ktor.client.statement.HttpResponse
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.URLBuilder
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.MissingFieldException
+import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonObjectBuilder
@@ -58,10 +60,11 @@ inline fun <reified T> JsonObject.decodeIfNotEmptyOrDefault(default: T): T {
 
 @SupabaseInternal
 suspend inline fun <reified T> HttpResponse.bodyOrNull(): T? {
+    val text = bodyAsText()
     return try {
-        val text = bodyAsText()
         supabaseJson.decodeFromString<T>(text)
-    } catch(e: Exception) {
+    } catch(e: SerializationException) {
+        SupabaseClient.LOGGER.i(e) { "Could not decode $text as ${T::class}." }
         null
     }
 }

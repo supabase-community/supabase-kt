@@ -59,19 +59,18 @@ internal suspend fun createServer(
                 }
             }
         }
-        launch {
-            suspendCancellableCoroutine {
-                server.monitor.subscribe(ApplicationStopPreparing) { _ ->
+        suspendCancellableCoroutine {
+            server.monitor.subscribe(ApplicationStopPreparing) { _ ->
+                if(!it.isCompleted) {
                     it.resume(Unit)
                     timeoutScope.cancel()
                 }
-                server.start()
-                it.invokeOnCancellation {
-                    server.stop()
-                    timeoutScope.cancel()
-                }
             }
-        }.join()
+            server.start()
+            it.invokeOnCancellation { _ ->
+                server.stop()
+            }
+        }
     }
 }
 
