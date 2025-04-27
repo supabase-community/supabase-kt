@@ -602,9 +602,11 @@ internal class AuthImpl(
         if (status is SessionStatus.NotAuthenticated && sessionStatus.value is SessionStatus.NotAuthenticated) {
             val currentReason = (sessionStatus.value as SessionStatus.NotAuthenticated).reason
             if (status.reason is NotAuthenticatedReason.SessionNotFound && currentReason is NotAuthenticatedReason.Error) {
+                Auth.logger.d { "Not setting session status to $status as the current reason is an error: $currentReason" }
                 return
             }
         }
+        Auth.logger.d { "Setting session status to $status" }
         _sessionStatus.value = status
     }
 
