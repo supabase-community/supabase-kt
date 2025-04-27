@@ -2,6 +2,7 @@ package io.github.jan.supabase
 
 import io.github.jan.supabase.logging.LogLevel
 import io.ktor.client.engine.HttpClientEngine
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlin.time.Duration
 
 internal data class SupabaseClientConfig(
@@ -10,6 +11,7 @@ internal data class SupabaseClientConfig(
     val defaultLogLevel: LogLevel,
     val networkConfig: SupabaseNetworkConfig,
     val defaultSerializer: SupabaseSerializer,
+    val coroutineDispatcher: CoroutineDispatcher,
     val accessToken: AccessTokenProvider?,
     val plugins: Map<String, PluginProvider>
 )

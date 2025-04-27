@@ -5,7 +5,6 @@ import io.github.jan.supabase.SupabaseSerializer
 import io.github.jan.supabase.plugins.CustomSerializationConfig
 import io.github.jan.supabase.plugins.MainConfig
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.Dispatchers
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
@@ -52,7 +51,8 @@ open class AuthConfigDefaults : MainConfig() {
     /**
      * The dispatcher used for all auth related network requests
      */
-    var coroutineDispatcher: CoroutineDispatcher = Dispatchers.Default
+    @Deprecated("SupabaseClientBuilder.coroutineDispatcher should be used instead")
+    var coroutineDispatcher: CoroutineDispatcher? = null
 
     /**
      * The type of login flow to use. Defaults to [FlowType.IMPLICIT]

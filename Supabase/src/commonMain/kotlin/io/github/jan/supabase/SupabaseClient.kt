@@ -9,6 +9,7 @@ import io.github.jan.supabase.logging.i
 import io.github.jan.supabase.network.KtorSupabaseHttpClient
 import io.github.jan.supabase.plugins.PluginManager
 import io.github.jan.supabase.plugins.SupabasePlugin
+import kotlinx.coroutines.CoroutineDispatcher
 
 /**
  * The main class to interact with Supabase.
@@ -59,6 +60,12 @@ interface SupabaseClient {
     val accessToken: AccessTokenProvider?
 
     /**
+     * The default dispatcher used for launching long running jobs
+     */
+    @SupabaseInternal
+    val coroutineDispatcher: CoroutineDispatcher
+
+    /**
      * Releases all resources held by the [httpClient] and all plugins the [pluginManager]
      */
     suspend fun close()
@@ -93,6 +100,7 @@ internal class SupabaseClientImpl(
     override val supabaseUrl: String = config.supabaseUrl
     override val supabaseKey: String = config.supabaseKey
     override val useHTTPS: Boolean = config.networkConfig.useHTTPS
+    override val coroutineDispatcher: CoroutineDispatcher = config.coroutineDispatcher
 
     init {
         SupabaseClient.LOGGER.i {
