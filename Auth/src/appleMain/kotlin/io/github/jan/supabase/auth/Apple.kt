@@ -1,7 +1,6 @@
 package io.github.jan.supabase.auth
 
 import io.github.jan.supabase.SupabaseClient
-import io.github.jan.supabase.auth.status.SessionStatus
 import io.github.jan.supabase.auth.user.UserSession
 import io.github.jan.supabase.logging.d
 import kotlinx.coroutines.launch
@@ -33,12 +32,7 @@ fun SupabaseClient.handleDeeplinks(url: NSURL, onSessionSuccess: (UserSession) -
         }
         FlowType.PKCE -> {
             val components = NSURLComponents(url, false)
-            val error = checkForUrlParameterError { key ->
-                getQueryItem(components, key)
-            }
-            if (error != null) {
-                Auth.logger.d { "Error in deeplink: $error" }
-                auth.setSessionStatus(SessionStatus.NotAuthenticated(false, error))
+            if (auth.handledUrlParameterError{ key -> getQueryItem(components, key) }) {
                 return
             }
             val code = getQueryItem(components, "code") ?: return

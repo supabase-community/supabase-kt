@@ -2,7 +2,6 @@ package io.github.jan.supabase.auth
 
 import io.github.jan.supabase.annotations.SupabaseInternal
 import io.github.jan.supabase.auth.status.SessionSource
-import io.github.jan.supabase.auth.status.SessionStatus
 import io.github.jan.supabase.logging.d
 import io.ktor.util.PlatformUtils.IS_BROWSER
 import kotlinx.browser.window
@@ -31,11 +30,8 @@ actual fun Auth.setupPlatform() {
 
     fun checkForPCKECode() {
         val url = URL(window.location.href)
-        val error = checkForUrlParameterError { url.searchParams.get(it) }
-        var clean = false
-        if(error != null) {
-            Auth.logger.d { "Error in the URL Parameters: $error" }
-            setSessionStatus(SessionStatus.NotAuthenticated(false, error))
+        var clean: Boolean
+        if(handledUrlParameterError { url.searchParams.get(it) }) {
             clean = true
         } else {
             val code = url.searchParams.get("code") ?: return

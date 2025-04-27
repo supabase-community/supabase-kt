@@ -12,7 +12,7 @@ import kotlinx.coroutines.launch
 
 @SupabaseInternal
 fun Auth.parseFragmentAndImportSession(fragment: String, onFinish: (UserSession?) -> Unit = {}) {
-    Auth.logger.d { "Parsing deeplink fragment $fragment" }
+    Auth.logger.d { "Parsing fragment $fragment" }
     val error = checkForErrorHash(fragment)
     if(error != null) {
         Auth.logger.d { "Error found in fragment: $error" }
@@ -64,6 +64,15 @@ internal fun checkForUrlParameterError(parameters: (String) -> String?): NotAuth
             errorDescription = "$errorDescription ($error)",
         )
     } else null
+}
+
+internal fun Auth.handledUrlParameterError(parameters: (String) -> String?): Boolean {
+    val error = checkForUrlParameterError(parameters)
+    return if(error != null) {
+        Auth.logger.d { "Found error code in the URL Parameters: $error. Updating session status..." }
+        setSessionStatus(SessionStatus.NotAuthenticated(false, error))
+        true
+    } else false
 }
 
 @SupabaseInternal

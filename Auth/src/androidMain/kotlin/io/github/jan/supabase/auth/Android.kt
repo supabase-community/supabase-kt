@@ -5,9 +5,7 @@ import android.net.Uri
 import androidx.browser.customtabs.CustomTabsIntent
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.annotations.SupabaseInternal
-import io.github.jan.supabase.auth.status.SessionStatus
 import io.github.jan.supabase.auth.user.UserSession
-import io.github.jan.supabase.logging.d
 import kotlinx.coroutines.launch
 
 internal fun openUrl(uri: Uri, action: ExternalAuthAction) {
@@ -46,10 +44,7 @@ fun SupabaseClient.handleDeeplinks(intent: Intent, onSessionSuccess: (UserSessio
             }
         }
         FlowType.PKCE -> {
-            val error = checkForUrlParameterError { data.getQueryParameter(it) }
-            if(error != null) {
-                Auth.logger.d { "Error in deeplink: $error" }
-                auth.setSessionStatus(SessionStatus.NotAuthenticated(false, error))
+            if(auth.handledUrlParameterError { data.getQueryParameter(it) }) {
                 return
             }
             val code = data.getQueryParameter("code") ?: return
