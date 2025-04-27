@@ -85,7 +85,7 @@ internal class ResumableUploadImpl(
     private val storageApi: BucketApi,
     private val retrieveServerOffset: suspend () -> Long,
     private val removeFromCache: suspend () -> Unit,
-    coroutineDispatcher: CoroutineDispatcher,
+    coroutineDispatcher: CoroutineDispatcher
 ): ResumableUpload {
 
     private val size = fingerprint.size

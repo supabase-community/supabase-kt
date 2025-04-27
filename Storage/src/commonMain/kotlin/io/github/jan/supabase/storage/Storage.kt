@@ -120,7 +120,7 @@ interface Storage : MainPlugin<Storage.Config>, CustomSerializationPlugin {
     data class Config(
         var transferTimeout: Duration = 120.seconds,
         @PublishedApi internal var resumable: Resumable = Resumable(),
-        override var serializer: SupabaseSerializer? = null,
+        override var serializer: SupabaseSerializer? = null
     ) : MainConfig(), CustomSerializationConfig {
 
         /**
