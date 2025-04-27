@@ -4,6 +4,7 @@ import io.github.jan.supabase.auth.MemorySessionManager
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.auth.minimalSettings
 import io.github.jan.supabase.auth.providers.Github
+import io.github.jan.supabase.auth.status.NotAuthenticatedReason
 import io.github.jan.supabase.auth.status.SessionStatus
 import io.github.jan.supabase.auth.user.Identity
 import io.github.jan.supabase.auth.user.UserInfo
@@ -79,6 +80,7 @@ class AuthTest {
             )
             client.auth.awaitInitialization()
             assertIs<SessionStatus.NotAuthenticated>(client.auth.sessionStatus.value)
+            assertIs<NotAuthenticatedReason.SessionNotFound>((client.auth.sessionStatus.value as SessionStatus.NotAuthenticated).reason)
             assertNull(sessionManager.loadSession())
             val session = userSession()
             client.auth.importSession(session)
@@ -102,6 +104,7 @@ class AuthTest {
             }
             client.auth.awaitInitialization()
             assertIs<SessionStatus.NotAuthenticated>(client.auth.sessionStatus.value)
+            assertIs<NotAuthenticatedReason.SessionNotFound>((client.auth.sessionStatus.value as SessionStatus.NotAuthenticated).reason)
             val session = userSession(expiresIn = 0)
             client.auth.importSession(session)
             assertIs<SessionStatus.Authenticated>(client.auth.sessionStatus.value)
@@ -126,6 +129,7 @@ class AuthTest {
             }
             client.auth.awaitInitialization()
             assertIs<SessionStatus.NotAuthenticated>(client.auth.sessionStatus.value)
+            assertIs<NotAuthenticatedReason.SessionNotFound>((client.auth.sessionStatus.value as SessionStatus.NotAuthenticated).reason)
             val session = userSession(expiresIn = 0)
             client.auth.importSession(session)
             assertIs<SessionStatus.Authenticated>(client.auth.sessionStatus.value)
@@ -211,6 +215,7 @@ class AuthTest {
             assertIs<SessionStatus.Authenticated>(client.auth.sessionStatus.value)
             client.auth.clearSession()
             assertIs<SessionStatus.NotAuthenticated>(client.auth.sessionStatus.value)
+            assertIs<NotAuthenticatedReason.SignOut>((client.auth.sessionStatus.value as SessionStatus.NotAuthenticated).reason)
         }
     }
 
