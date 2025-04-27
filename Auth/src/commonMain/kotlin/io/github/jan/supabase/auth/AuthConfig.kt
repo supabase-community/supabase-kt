@@ -51,6 +51,7 @@ open class AuthConfigDefaults : MainConfig() {
     /**
      * The dispatcher used for all auth related network requests
      */
+    @Deprecated("SupabaseClientBuilder.coroutineDispatcher should be used instead")
     var coroutineDispatcher: CoroutineDispatcher? = null
 
     /**
