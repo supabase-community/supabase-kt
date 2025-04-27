@@ -41,6 +41,7 @@ import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.ensureActive
@@ -73,7 +74,7 @@ internal class AuthImpl(
 
     private val _sessionStatus = MutableStateFlow<SessionStatus>(SessionStatus.Initializing)
     override val sessionStatus: StateFlow<SessionStatus> = _sessionStatus.asStateFlow()
-    internal val authScope = CoroutineScope(config.coroutineDispatcher)
+    internal val authScope = CoroutineScope((config.coroutineDispatcher ?: supabaseClient.coroutineDispatcher) + SupervisorJob())
     override val sessionManager = config.sessionManager ?: createDefaultSessionManager()
     override val codeVerifierCache = config.codeVerifierCache ?: createDefaultCodeVerifierCache()
 
@@ -424,8 +425,9 @@ internal class AuthImpl(
             Auth.logger.d { "Session imported successfully." }
             return
         }
-        if (session.expiresAt <= Clock.System.now()) {
-            Auth.logger.d { "Session is expired. Handling expired session..." }
+        val thresholdDate = session.expiresAt - session.expiresIn.seconds * (1 - SESSION_REFRESH_THRESHOLD)
+        if (thresholdDate <= Clock.System.now()) {
+            Auth.logger.d { "Session is under the threshold date. Refreshing session..." }
             tryImportingSession(
                 { handleExpiredSession(session, config.alwaysAutoRefresh) },
                 { importSession(session) }

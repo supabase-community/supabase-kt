@@ -53,6 +53,7 @@ interface ResumableClient {
      * @param path The path to upload the data to
      * @param options The options for the upload
      */
+    @Suppress("unused")
     suspend fun createOrContinueUpload(data: ByteArray, source: String, path: String, options: UploadOptionBuilder.() -> Unit = {}) = createOrContinueUpload({ ByteReadChannel(data).apply { discard(it) } }, source, data.size.toLong(), path)
 
     /**
@@ -124,9 +125,20 @@ internal class ResumableClientImpl(private val storageApi: BucketApi, private va
         val fingerprint = Fingerprint(source, size)
         val cacheEntry = ResumableCacheEntry(uploadUrl, path, storageApi.bucketId, Clock.System.now() + 1.days, uploadOptions.upsert, uploadOptions.contentType.toString())
         cache.set(fingerprint, cacheEntry)
-        return ResumableUploadImpl(fingerprint, path, cacheEntry, channel, 0, chunkSize, uploadUrl, httpClient, storageApi, { retrieveServerOffset(uploadUrl, path) }) {
-            cache.remove(fingerprint)
-        }
+        return ResumableUploadImpl(
+            fingerprint = fingerprint,
+            path = path,
+            cacheEntry = cacheEntry,
+            createDataStream = channel,
+            offset = 0,
+            chunkSize = chunkSize,
+            locationUrl = uploadUrl,
+            httpClient = httpClient,
+            storageApi = storageApi,
+            retrieveServerOffset = { retrieveServerOffset(uploadUrl, path) },
+            removeFromCache = { cache.remove(fingerprint) },
+            coroutineDispatcher = storageApi.supabaseClient.coroutineDispatcher
+        )
     }
 
     private suspend fun resumeUpload(channel: suspend (Long) -> ByteReadChannel, entry: ResumableCacheEntry, source: String, path: String, size: Long): ResumableUploadImpl {
@@ -141,9 +153,20 @@ internal class ResumableClientImpl(private val storageApi: BucketApi, private va
         }
         val offset = retrieveServerOffset(entry.url, path)
         if(offset < size) {
-            return ResumableUploadImpl(fingerprint, path, entry, channel, offset, chunkSize, entry.url, httpClient, storageApi, { retrieveServerOffset(entry.url, path)}) {
-                cache.remove(fingerprint)
-            }
+            return ResumableUploadImpl(
+                fingerprint = fingerprint,
+                path = path,
+                cacheEntry = entry,
+                createDataStream = channel,
+                offset = offset,
+                chunkSize = chunkSize,
+                locationUrl = entry.url,
+                httpClient = httpClient,
+                storageApi = storageApi,
+                retrieveServerOffset = { retrieveServerOffset(entry.url, path)},
+                removeFromCache = { cache.remove(fingerprint) },
+                coroutineDispatcher = storageApi.supabaseClient.coroutineDispatcher
+            )
         } else error("File already uploaded")
     }
 

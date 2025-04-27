@@ -5,7 +5,6 @@ import io.github.jan.supabase.SupabaseSerializer
 import io.github.jan.supabase.plugins.CustomSerializationConfig
 import io.github.jan.supabase.plugins.MainConfig
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.Dispatchers
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
@@ -40,19 +39,20 @@ open class AuthConfigDefaults : MainConfig() {
     var autoSaveToStorage: Boolean = true
 
     /**
-     * The session manager used to store/load the session. When null, the default [SettingsSessionManager] will be used
+     * The session manager used to store/load the session. When null, the default [io.github.jan.supabase.auth.SettingsSessionManager] will be used
      */
     var sessionManager: SessionManager? = null
 
     /**
-     * The cache used to store/load the code verifier for the [FlowType.PKCE] flow. When null, the default [SettingsCodeVerifierCache] will be used
+     * The cache used to store/load the code verifier for the [FlowType.PKCE] flow. When null, the default [io.github.jan.supabase.auth.SettingsCodeVerifierCache] will be used
      */
     var codeVerifierCache: CodeVerifierCache? = null
 
     /**
      * The dispatcher used for all auth related network requests
      */
-    var coroutineDispatcher: CoroutineDispatcher = Dispatchers.Default
+    @Deprecated("SupabaseClientBuilder.coroutineDispatcher should be used instead")
+    var coroutineDispatcher: CoroutineDispatcher? = null
 
     /**
      * The type of login flow to use. Defaults to [FlowType.IMPLICIT]
@@ -120,6 +120,7 @@ enum class FlowType {
 /**
  * The deeplink used for the implicit and PKCE flow. Throws an [IllegalArgumentException], if either the scheme or host is not set
  */
+@Suppress("unused")
 val AuthConfig.deepLink: String
     get() {
         val scheme = scheme ?: noDeeplinkError("scheme")
@@ -147,7 +148,7 @@ val AuthConfig.deepLinkOrNull: String?
  * @param enableLifecycleCallbacks Whether to stop auto-refresh on focus loss, and resume it on focus again. Currently only supported on Android.
  * @see AuthConfigDefaults
  */
-@Suppress("LongParameterList")
+@Suppress("LongParameterList", "unused")
 fun AuthConfigDefaults.minimalSettings(
     alwaysAutoRefresh: Boolean = false,
     autoLoadFromStorage: Boolean = false,
