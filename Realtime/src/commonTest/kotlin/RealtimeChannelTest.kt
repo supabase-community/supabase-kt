@@ -1,7 +1,7 @@
 import app.cash.turbine.test
 import io.github.jan.supabase.auth.Auth
 import io.github.jan.supabase.auth.auth
-import io.github.jan.supabase.auth.minimalSettings
+import io.github.jan.supabase.auth.minimalConfig
 import io.github.jan.supabase.postgrest.query.filter.FilterOperation
 import io.github.jan.supabase.postgrest.query.filter.FilterOperator
 import io.github.jan.supabase.realtime.CallbackManagerImpl
@@ -164,7 +164,7 @@ class RealtimeChannelTest {
                 },
                 supabaseConfig = {
                     install(Auth) {
-                        minimalSettings()
+                        minimalConfig()
                     }
                 }
             )

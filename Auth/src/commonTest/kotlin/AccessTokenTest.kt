@@ -1,6 +1,6 @@
 import io.github.jan.supabase.auth.Auth
 import io.github.jan.supabase.auth.auth
-import io.github.jan.supabase.auth.minimalSettings
+import io.github.jan.supabase.auth.minimalConfig
 import io.github.jan.supabase.auth.resolveAccessToken
 import io.github.jan.supabase.testing.createMockedSupabaseClient
 import kotlinx.coroutines.test.runTest
@@ -16,7 +16,7 @@ class AccessTokenTest {
             val client = createMockedSupabaseClient(
                 configuration = {
                     install(Auth) {
-                        minimalSettings()
+                        minimalConfig()
                     }
                 }
             )
@@ -61,7 +61,7 @@ class AccessTokenTest {
             val client = createMockedSupabaseClient(
                 configuration = {
                     install(Auth) {
-                        minimalSettings()
+                        minimalConfig()
                     }
                 }
             )

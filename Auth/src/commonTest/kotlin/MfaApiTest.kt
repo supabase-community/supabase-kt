@@ -5,7 +5,7 @@ import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.auth.mfa.AuthenticatorAssuranceLevel
 import io.github.jan.supabase.auth.mfa.FactorType
 import io.github.jan.supabase.auth.mfa.MfaStatus
-import io.github.jan.supabase.auth.minimalSettings
+import io.github.jan.supabase.auth.minimalConfig
 import io.github.jan.supabase.auth.providers.builtin.Phone
 import io.github.jan.supabase.auth.user.UserInfo
 import io.github.jan.supabase.auth.user.UserMfaFactor
@@ -33,7 +33,7 @@ class MfaApiTest {
 
     private val configuration: SupabaseClientBuilder.() -> Unit = {
         install(Auth) {
-            minimalSettings()
+            minimalConfig()
         }
     }
 
