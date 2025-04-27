@@ -21,7 +21,6 @@ include("Supabase")
 include("bom")
 
 // Test module
-include("test")
 include("test-common")
 
 // Serializers
