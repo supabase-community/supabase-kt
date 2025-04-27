@@ -73,7 +73,7 @@ class SupabaseClientBuilder @PublishedApi internal constructor(private val supab
     /**
      * The CoroutineDispatcher used for launching long running jobs.
      *
-     * Default: [KotlinXSerializer]
+     * Default: [defaultDispatcher], the IO Dispatcher on supported targets.
      */
     var coroutineDispatcher: CoroutineDispatcher = defaultDispatcher
 
