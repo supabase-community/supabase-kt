@@ -113,9 +113,9 @@ interface Storage : MainPlugin<Storage.Config>, CustomSerializationPlugin {
 
     /**
      * Config for the storage plugin
-     * @param customUrl the custom url to use for the storage api
-     * @param jwtToken the jwt token to use for the storage api
      * @param transferTimeout the timeout for uploading and downloading files (default: 120 seconds)
+     * @param resumable the resume settings to use for the storage api
+     * @param serializer the serializer to use for the storage api, use null to use the default serializer
      */
     data class Config(
         var transferTimeout: Duration = 120.seconds,
@@ -140,7 +140,7 @@ interface Storage : MainPlugin<Storage.Config>, CustomSerializationPlugin {
             var defaultChunkSize: Long = DEFAULT_CHUNK_SIZE
                 set(value) {
                     if(value != DEFAULT_CHUNK_SIZE) {
-                        Storage.logger.w { "Supabase currently only supports a chunk size of 6MB" }
+                        logger.w { "Supabase currently only supports a chunk size of 6MB" }
                     }
                     field = value
                 }

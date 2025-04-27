@@ -53,6 +53,7 @@ interface ResumableClient {
      * @param path The path to upload the data to
      * @param options The options for the upload
      */
+    @Suppress("unused")
     suspend fun createOrContinueUpload(data: ByteArray, source: String, path: String, options: UploadOptionBuilder.() -> Unit = {}) = createOrContinueUpload({ ByteReadChannel(data).apply { discard(it) } }, source, data.size.toLong(), path)
 
     /**
