@@ -3,7 +3,7 @@ package io.github.jan.supabase.auth.status
 import io.github.jan.supabase.auth.exception.AuthErrorCode
 
 /**
- * Represents the reason why a user is not authenticated.
+ * Represents the reason for an [SessionStatus.NotAuthenticated] status.
  */
 sealed interface NotAuthenticatedReason {
 
@@ -23,18 +23,13 @@ sealed interface NotAuthenticatedReason {
     }
 
     /**
-     * This status means that the user is not logged in because the session was deleted by the user
+     * This status means that the user was just signed out.
      */
     data object SignOut: NotAuthenticatedReason
 
     /**
-     * This status means that the user is not logged in because there was no session found
+     * This status means that there was no session found in the local storage.
      */
     data object SessionNotFound: NotAuthenticatedReason
-
-    /**
-     * This status means that the reason for the user not being logged in is unknown
-     */
-    data object Unknown: NotAuthenticatedReason
 
 }
