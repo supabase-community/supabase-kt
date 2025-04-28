@@ -1,6 +1,5 @@
 import io.github.jan.supabase.auth.Auth
 import io.github.jan.supabase.auth.auth
-import io.github.jan.supabase.auth.checkForErrorHash
 import io.github.jan.supabase.auth.checkForUrlParameterError
 import io.github.jan.supabase.auth.consumeHashParameters
 import io.github.jan.supabase.auth.consumeUrlParameter
@@ -49,15 +48,6 @@ class UrlUtilsTest {
         }.url.toString()
         val expectedUrl = "https://example.com/?redirect_to=https%3A%2F%2Fredirect.com"
         assertEquals(expectedUrl, newUrl)
-    }
-
-    @Test
-    fun testErrorHash() {
-        val url = "error=invalid_request&error_code=otp_expired&error_description=Invalid+request"
-        val error = checkForErrorHash(url)
-        assertEquals("otp_expired", error?.error)
-        assertEquals("Invalid+request (invalid_request)", error?.errorDescription)
-        assertEquals(AuthErrorCode.OtpExpired, error?.errorCode)
     }
 
     @Test
