@@ -1,24 +1,27 @@
+import app.cash.turbine.test
 import io.github.jan.supabase.auth.Auth
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.auth.checkForUrlParameterError
 import io.github.jan.supabase.auth.consumeHashParameters
 import io.github.jan.supabase.auth.consumeUrlParameter
+import io.github.jan.supabase.auth.event.AuthEvent
 import io.github.jan.supabase.auth.exception.AuthErrorCode
 import io.github.jan.supabase.auth.getFragmentParts
 import io.github.jan.supabase.auth.handledUrlParameterError
 import io.github.jan.supabase.auth.minimalSettings
 import io.github.jan.supabase.auth.redirectTo
-import io.github.jan.supabase.auth.status.NotAuthenticatedReason
 import io.github.jan.supabase.auth.status.SessionStatus
 import io.github.jan.supabase.testing.createMockedSupabaseClient
 import io.ktor.client.request.HttpRequestBuilder
 import io.ktor.client.request.url
 import io.ktor.http.Url
+import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertIs
 import kotlin.test.assertTrue
+import kotlin.time.Duration.Companion.seconds
 
 class UrlUtilsTest {
 
@@ -78,15 +81,19 @@ class UrlUtilsTest {
                 }
             }
         )
-        val handled = supabase.auth.handledUrlParameterError {
-            url.parameters[it]
+        runTest {
+            val handled = supabase.auth.handledUrlParameterError {
+                url.parameters[it]
+            }
+            assertTrue { handled }
+            assertIs<SessionStatus.NotAuthenticated>(supabase.auth.sessionStatus.value)
+            supabase.auth.events.test {
+                val event = expectMostRecentItem()
+                assertIs<AuthEvent.OtpError>(event)
+                assertEquals(AuthErrorCode.OtpExpired, event.errorCode)
+                assertEquals("Invalid request (invalid_request)", event.errorDescription)
+            }
         }
-        assertTrue { handled }
-        assertIs<SessionStatus.NotAuthenticated>(supabase.auth.sessionStatus.value)
-        val reason = (supabase.auth.sessionStatus.value as SessionStatus.NotAuthenticated).reason
-        assertIs<NotAuthenticatedReason.Error>(reason)
-        assertEquals(AuthErrorCode.OtpExpired, reason.errorCode)
-        assertEquals("Invalid request (invalid_request)", reason.errorDescription)
     }
 
     @Test
@@ -99,13 +106,16 @@ class UrlUtilsTest {
                 }
             }
         )
-        val handled = supabase.auth.handledUrlParameterError {
-            url.parameters[it]
+        runTest {
+            val handled = supabase.auth.handledUrlParameterError {
+                url.parameters[it]
+            }
+            assertFalse { handled }
+            assertIs<SessionStatus.NotAuthenticated>(supabase.auth.sessionStatus.value)
+            supabase.auth.events.test(timeout = 1.seconds) {
+                expectNoEvents()
+            }
         }
-        assertFalse { handled }
-        assertIs<SessionStatus.NotAuthenticated>(supabase.auth.sessionStatus.value)
-        val reason = (supabase.auth.sessionStatus.value as SessionStatus.NotAuthenticated).reason
-        assertIs<NotAuthenticatedReason.SessionNotFound>(reason)
     }
 
 }

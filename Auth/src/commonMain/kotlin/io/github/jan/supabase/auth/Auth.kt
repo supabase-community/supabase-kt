@@ -1,8 +1,10 @@
 package io.github.jan.supabase.auth
 
 import io.github.jan.supabase.SupabaseClient
+import io.github.jan.supabase.annotations.SupabaseExperimental
 import io.github.jan.supabase.annotations.SupabaseInternal
 import io.github.jan.supabase.auth.admin.AdminApi
+import io.github.jan.supabase.auth.event.AuthEvent
 import io.github.jan.supabase.auth.exception.AuthRestException
 import io.github.jan.supabase.auth.exception.AuthWeakPasswordException
 import io.github.jan.supabase.auth.mfa.MfaApi
@@ -13,7 +15,6 @@ import io.github.jan.supabase.auth.providers.OAuthProvider
 import io.github.jan.supabase.auth.providers.builtin.Email
 import io.github.jan.supabase.auth.providers.builtin.Phone
 import io.github.jan.supabase.auth.providers.builtin.SSO
-import io.github.jan.supabase.auth.status.NotAuthenticatedReason
 import io.github.jan.supabase.auth.status.SessionSource
 import io.github.jan.supabase.auth.status.SessionStatus
 import io.github.jan.supabase.auth.user.UserInfo
@@ -28,6 +29,7 @@ import io.github.jan.supabase.plugins.MainPlugin
 import io.github.jan.supabase.plugins.SupabasePluginProvider
 import io.ktor.client.plugins.HttpRequestTimeoutException
 import kotlinx.coroutines.ensureActive
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.serialization.json.JsonObject
 import kotlin.coroutines.coroutineContext
@@ -56,6 +58,12 @@ interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
      * Returns the current session status
      */
     val sessionStatus: StateFlow<SessionStatus>
+
+    /**
+     * Events emitted by the auth plugin
+     */
+    @SupabaseExperimental
+    val events: SharedFlow<AuthEvent>
 
     /**
      * Whether the [sessionStatus] session is getting refreshed automatically
@@ -347,19 +355,19 @@ interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
     /**
      * Deletes the current session from storage and sets [sessionStatus] to [SessionStatus.NotAuthenticated]
      */
-    suspend fun clearSession() = clearSession(NotAuthenticatedReason.SignOut)
-
-    /**
-     * Deletes the current session from storage and sets [sessionStatus] to [SessionStatus.NotAuthenticated] with the specified [reason]
-     * @param reason The reason why the session was cleared
-     */
-    suspend fun clearSession(reason: NotAuthenticatedReason)
+    suspend fun clearSession()
 
     /**
      * Sets the session status to the specified [status]
      */
     @SupabaseInternal
     fun setSessionStatus(status: SessionStatus)
+
+    /**
+     * Emits an event to the [events] flow
+     */
+    @SupabaseInternal
+    fun emitEvent(event: AuthEvent)
 
     /**
      * Exchanges a code for a session. Used when using the [FlowType.PKCE] flow

@@ -1,9 +1,7 @@
 package io.github.jan.supabase.auth.server
 
 import io.github.jan.supabase.auth.Auth
-import io.github.jan.supabase.auth.checkForUrlParameterError
-import io.github.jan.supabase.auth.status.NotAuthenticatedReason
-import io.github.jan.supabase.auth.status.SessionStatus
+import io.github.jan.supabase.auth.handledUrlParameterError
 import io.github.jan.supabase.auth.user.UserSession
 import io.github.jan.supabase.logging.d
 import io.ktor.http.ContentType
@@ -19,18 +17,15 @@ internal fun Routing.configureRoutes(
 ) {
     get("/") {
         val code = call.parameters["code"]
-        val error = checkForUrlParameterError {
-            call.parameters[it]
-        }
-        if(code != null) {
+        if (auth.handledUrlParameterError { call.parameters[it] }) {
+            errorResponse()
+        } else if(code != null) {
             val session = auth.exchangeCodeForSession(code, false)
             onSuccess(session)
             Auth.logger.d {
                 "Successfully authenticated user with OAuth using the PKCE flow"
             }
             shutdown(call, auth.config.httpCallbackConfig.redirectHtml)
-        } else if (error != null) {
-            errorResponse(auth, error)
         } else {
             Auth.logger.d {
                 "No code or error in OAuth callback"
@@ -46,11 +41,8 @@ internal fun Routing.configureRoutes(
         Auth.logger.d {
             "Received request on OAuth callback route"
         }
-        val error = checkForUrlParameterError {
-            call.parameters[it]
-        }
-        if (error != null) {
-            errorResponse(auth, error)
+        if (auth.handledUrlParameterError { call.parameters[it] }) {
+            errorResponse()
             return@get
         }
         val accessToken = call.parameters["access_token"] ?: return@get
@@ -69,13 +61,12 @@ internal fun Routing.configureRoutes(
     }
 }
 
-private suspend fun RoutingContext.errorResponse(auth: Auth, error: NotAuthenticatedReason.Error) {
+private suspend fun RoutingContext.errorResponse() {
     Auth.logger.d {
-        "Error in OAuth callback: $error"
+        "Error in OAuth callback"
     }
-    auth.setSessionStatus(SessionStatus.NotAuthenticated(false, error))
     call.respondText(
-        text = "Error: ${error.errorDescription}",
+        text = "Error",
         contentType = ContentType.Text.Html,
         status = HttpStatusCode.BadRequest
     )

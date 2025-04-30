@@ -5,6 +5,7 @@ import io.github.jan.supabase.annotations.SupabaseExperimental
 import io.github.jan.supabase.annotations.SupabaseInternal
 import io.github.jan.supabase.auth.admin.AdminApi
 import io.github.jan.supabase.auth.admin.AdminApiImpl
+import io.github.jan.supabase.auth.event.AuthEvent
 import io.github.jan.supabase.auth.exception.AuthRestException
 import io.github.jan.supabase.auth.exception.AuthSessionMissingException
 import io.github.jan.supabase.auth.exception.AuthWeakPasswordException
@@ -15,7 +16,6 @@ import io.github.jan.supabase.auth.providers.ExternalAuthConfigDefaults
 import io.github.jan.supabase.auth.providers.OAuthProvider
 import io.github.jan.supabase.auth.providers.builtin.OTP
 import io.github.jan.supabase.auth.providers.builtin.SSO
-import io.github.jan.supabase.auth.status.NotAuthenticatedReason
 import io.github.jan.supabase.auth.status.RefreshFailureCause
 import io.github.jan.supabase.auth.status.SessionSource
 import io.github.jan.supabase.auth.status.SessionStatus
@@ -45,8 +45,11 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.ensureActive
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -74,6 +77,9 @@ internal class AuthImpl(
 
     private val _sessionStatus = MutableStateFlow<SessionStatus>(SessionStatus.Initializing)
     override val sessionStatus: StateFlow<SessionStatus> = _sessionStatus.asStateFlow()
+    private val _events = MutableSharedFlow<AuthEvent>(replay = 1)
+    override val events: SharedFlow<AuthEvent> = _events.asSharedFlow()
+    @Suppress("DEPRECATION")
     internal val authScope = CoroutineScope((config.coroutineDispatcher ?: supabaseClient.coroutineDispatcher) + SupervisorJob())
     override val sessionManager = config.sessionManager ?: createDefaultSessionManager()
     override val codeVerifierCache = config.codeVerifierCache ?: createDefaultCodeVerifierCache()
@@ -100,7 +106,6 @@ internal class AuthImpl(
 
     override fun init() {
         Auth.logger.d { "Initializing Auth plugin..." }
-        setupPlatform()
         if (config.autoLoadFromStorage) {
             authScope.launch {
                 Auth.logger.i {
@@ -115,13 +120,14 @@ internal class AuthImpl(
                     Auth.logger.i {
                         "No session found in storage."
                     }
-                    setSessionStatus(SessionStatus.NotAuthenticated(false, NotAuthenticatedReason.SessionNotFound))
+                    setSessionStatus(SessionStatus.NotAuthenticated())
                 }
             }
         } else {
             Auth.logger.d { "Skipping loading from storage (autoLoadFromStorage is set to false)" }
-            setSessionStatus(SessionStatus.NotAuthenticated(false, NotAuthenticatedReason.SessionNotFound))
+            setSessionStatus(SessionStatus.NotAuthenticated())
         }
+        setupPlatform()
         Auth.logger.d { "Initialized Auth plugin" }
     }
 
@@ -463,7 +469,7 @@ internal class AuthImpl(
         } catch (e: RestException) {
             if (e.statusCode in 500..599) {
                 Auth.logger.e(e) { "Couldn't refresh session due to an internal server error. Retrying in ${config.retryDelay} (Status code ${e.statusCode})..." }
-                setSessionStatus(SessionStatus.RefreshFailure(RefreshFailureCause.InternalServerError(e)))
+                updateStatusIfExpired(RefreshFailureCause.InternalServerError(e))
                 delay(config.retryDelay)
                 retry()
             } else {
@@ -473,10 +479,19 @@ internal class AuthImpl(
         } catch (e: Exception) {
             coroutineContext.ensureActive()
             Auth.logger.e(e) { "Couldn't reach Supabase. Either the address doesn't exist or the network might not be on. Retrying in ${config.retryDelay}..." }
-            setSessionStatus(SessionStatus.RefreshFailure(RefreshFailureCause.NetworkError(e)))
+            updateStatusIfExpired(RefreshFailureCause.NetworkError(e))
             delay(config.retryDelay)
             retry()
         }
+    }
+
+    private fun updateStatusIfExpired(reason: RefreshFailureCause) {
+        val currentSession = currentSessionOrNull() ?: error("No session found")
+        if (currentSession.expiresAt <= Clock.System.now()) {
+            Auth.logger.d { "Session expired while trying to refresh the session. Updating status..." }
+            setSessionStatus(SessionStatus.RefreshFailure(reason))
+        }
+        emitEvent(AuthEvent.RefreshFailure(reason))
     }
 
     private suspend fun delayBeforeExpiry(session: UserSession) {
@@ -587,11 +602,11 @@ internal class AuthImpl(
         })
     }
 
-    override suspend fun clearSession(reason: NotAuthenticatedReason) {
+    override suspend fun clearSession() {
         codeVerifierCache.deleteCodeVerifier()
         sessionManager.deleteSession()
         sessionJob?.cancel()
-        setSessionStatus(SessionStatus.NotAuthenticated(true, reason))
+        setSessionStatus(SessionStatus.NotAuthenticated(true))
         sessionJob = null
     }
 
@@ -600,16 +615,13 @@ internal class AuthImpl(
     }
 
     override fun setSessionStatus(status: SessionStatus) {
-        // Error reasons have a higher priority than session not found
-        if (status is SessionStatus.NotAuthenticated && sessionStatus.value is SessionStatus.NotAuthenticated) {
-            val currentReason = (sessionStatus.value as SessionStatus.NotAuthenticated).reason
-            if (status.reason is NotAuthenticatedReason.SessionNotFound && currentReason is NotAuthenticatedReason.Error) {
-                Auth.logger.d { "Not setting session status to $status as the current reason is an error: $currentReason" }
-                return
-            }
-        }
         Auth.logger.d { "Setting session status to $status" }
         _sessionStatus.value = status
+    }
+
+    override fun emitEvent(event: AuthEvent) {
+        Auth.logger.d { "Emitting event $event" }
+        _events.tryEmit(event)
     }
 
     /**

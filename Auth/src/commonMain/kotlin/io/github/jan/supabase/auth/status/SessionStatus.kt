@@ -1,6 +1,5 @@
 package io.github.jan.supabase.auth.status
 
-import io.github.jan.supabase.annotations.SupabaseExperimental
 import io.github.jan.supabase.auth.Auth
 import io.github.jan.supabase.auth.user.UserSession
 
@@ -14,8 +13,7 @@ sealed interface SessionStatus {
      * @param isSignOut Whether this status was caused by a sign-out
      */
     data class NotAuthenticated(
-        @property:Deprecated("This property is getting replaced by 'NotAuthenticated#reason'. Check if the reason is 'NotAuthenticatedReason.SignOut'") val isSignOut: Boolean,
-        @property:SupabaseExperimental val reason: NotAuthenticatedReason = NotAuthenticatedReason.SessionNotFound
+        val isSignOut: Boolean = false,
     ) : SessionStatus
 
     /**
@@ -24,17 +22,22 @@ sealed interface SessionStatus {
     data object Initializing : SessionStatus
 
     /**
-     * This status means that [Auth] had an error while refreshing the session
-     * @param cause The cause of the error
+     * This status means the session expired and [Auth] is trying to refresh it
      */
-    data class RefreshFailure(val cause: RefreshFailureCause) : SessionStatus
+    data class RefreshFailure(
+        @Deprecated("This property will be removed in a future version. Use the new AuthEvent.RefreshFailure(cause) event to diagnose failures.")
+        val cause: RefreshFailureCause
+    ) : SessionStatus
 
     /**
      * This status means that [Auth] holds a valid session
      * @param session The session
      * @param source The source of the session
      */
-    data class Authenticated(val session: UserSession, val source: SessionSource = SessionSource.Unknown) : SessionStatus {
+    data class Authenticated(
+        val session: UserSession,
+        val source: SessionSource = SessionSource.Unknown
+    ) : SessionStatus {
 
         /**
          * Whether the session is new, i.e. [source] is [SessionSource.SignIn], [SessionSource.SignUp] or [SessionSource.External].

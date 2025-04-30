@@ -1,7 +1,7 @@
 package io.github.jan.supabase.auth
 
 import io.github.jan.supabase.annotations.SupabaseInternal
-import io.github.jan.supabase.auth.status.NotAuthenticatedReason
+import io.github.jan.supabase.auth.event.AuthEvent
 import io.github.jan.supabase.auth.status.SessionSource
 import io.github.jan.supabase.auth.status.SessionStatus
 import io.github.jan.supabase.auth.user.UserSession
@@ -39,12 +39,12 @@ internal fun getFragmentParts(fragment: String) = fragment.split("&").associate 
     }
 }
 
-internal fun checkForUrlParameterError(parameters: (String) -> String?): NotAuthenticatedReason.Error? {
+internal fun checkForUrlParameterError(parameters: (String) -> String?): AuthEvent.OtpError? {
     val error = parameters("error")
     val errorCode = parameters("error_code")
     val errorDescription = parameters("error_description")
     return if(errorCode != null) {
-        NotAuthenticatedReason.Error(
+        AuthEvent.OtpError(
             error = errorCode,
             errorDescription = "$errorDescription ($error)",
         )
@@ -54,8 +54,10 @@ internal fun checkForUrlParameterError(parameters: (String) -> String?): NotAuth
 internal fun Auth.handledUrlParameterError(parameters: (String) -> String?): Boolean {
     val error = checkForUrlParameterError(parameters)
     return if(error != null) {
-        Auth.logger.d { "Found error code in the URL Parameters: $error. Updating session status..." }
-        setSessionStatus(SessionStatus.NotAuthenticated(false, error))
+        if(sessionStatus.value !is SessionStatus.Authenticated) {
+            Auth.logger.d { "Found error code in the URL Parameters: $error. Emitting event..." }
+            emitEvent(error)
+        }
         true
     } else false
 }

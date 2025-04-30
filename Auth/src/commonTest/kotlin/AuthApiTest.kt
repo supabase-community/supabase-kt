@@ -12,7 +12,6 @@ import io.github.jan.supabase.auth.providers.builtin.Email
 import io.github.jan.supabase.auth.providers.builtin.IDToken
 import io.github.jan.supabase.auth.providers.builtin.OTP
 import io.github.jan.supabase.auth.providers.builtin.Phone
-import io.github.jan.supabase.auth.status.NotAuthenticatedReason
 import io.github.jan.supabase.auth.status.SessionSource
 import io.github.jan.supabase.auth.status.SessionStatus
 import io.github.jan.supabase.testing.assertMethodIs
@@ -654,7 +653,6 @@ class AuthRequestTest {
             client.auth.signOut(expectedScope)
             assertNull(client.auth.currentSessionOrNull(), "Session should be null")
             assertIs<SessionStatus.NotAuthenticated>(client.auth.sessionStatus.value)
-            assertIs<NotAuthenticatedReason.SignOut>((client.auth.sessionStatus.value as SessionStatus.NotAuthenticated).reason)
         }
     }
 
