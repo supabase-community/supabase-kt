@@ -436,7 +436,8 @@ internal class AuthImpl(
             Auth.logger.d { "Session is under the threshold date. Refreshing session..." }
             tryImportingSession(
                 { handleExpiredSession(session, config.alwaysAutoRefresh) },
-                { importSession(session) }
+                { importSession(session) },
+                { updateStatusIfExpired(session, it) }
             )
         } else {
             if (config.autoSaveToStorage) {
@@ -451,7 +452,8 @@ internal class AuthImpl(
                 launch {
                     tryImportingSession(
                         { handleExpiredSession(session) },
-                        { importSession(session, source = source) }
+                        { importSession(session, source = source) },
+                        { updateStatusIfExpired(session, it) }
                     )
                 }
             }
@@ -462,14 +464,15 @@ internal class AuthImpl(
     @Suppress("MagicNumber")
     private suspend fun tryImportingSession(
         importRefreshedSession: suspend () -> Unit,
-        retry: suspend () -> Unit
+        retry: suspend () -> Unit,
+        updateStatus: suspend (RefreshFailureCause) -> Unit
     ) {
         try {
             importRefreshedSession()
         } catch (e: RestException) {
             if (e.statusCode in 500..599) {
                 Auth.logger.e(e) { "Couldn't refresh session due to an internal server error. Retrying in ${config.retryDelay} (Status code ${e.statusCode})..." }
-                updateStatusIfExpired(RefreshFailureCause.InternalServerError(e))
+                updateStatus(RefreshFailureCause.InternalServerError(e))
                 delay(config.retryDelay)
                 retry()
             } else {
@@ -479,15 +482,14 @@ internal class AuthImpl(
         } catch (e: Exception) {
             coroutineContext.ensureActive()
             Auth.logger.e(e) { "Couldn't reach Supabase. Either the address doesn't exist or the network might not be on. Retrying in ${config.retryDelay}..." }
-            updateStatusIfExpired(RefreshFailureCause.NetworkError(e))
+            updateStatus(RefreshFailureCause.NetworkError(e))
             delay(config.retryDelay)
             retry()
         }
     }
 
-    private fun updateStatusIfExpired(reason: RefreshFailureCause) {
-        val currentSession = currentSessionOrNull() ?: error("No session found")
-        if (currentSession.expiresAt <= Clock.System.now()) {
+    private fun updateStatusIfExpired(session: UserSession, reason: RefreshFailureCause) {
+        if (session.expiresAt <= Clock.System.now()) {
             Auth.logger.d { "Session expired while trying to refresh the session. Updating status..." }
             setSessionStatus(SessionStatus.RefreshFailure(reason))
         }

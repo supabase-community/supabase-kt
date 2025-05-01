@@ -23,6 +23,7 @@ sealed interface SessionStatus {
 
     /**
      * This status means the session expired and [Auth] is trying to refresh it
+     * @param cause The cause of the error. This property will be removed in a future version. Use the new AuthEvent.RefreshFailure(cause) event to diagnose failures.
      */
     data class RefreshFailure(
         @Deprecated("This property will be removed in a future version. Use the new AuthEvent.RefreshFailure(cause) event to diagnose failures.")
