@@ -19,6 +19,7 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.decodeFromJsonElement
+import kotlinx.serialization.json.jsonObject
 
 /**
  * A default authentication provider
@@ -96,7 +97,8 @@ sealed interface DefaultAuthProvider<C, R> : AuthProvider<C, R> {
         if (json.containsKey("access_token")) {
             val userSession = supabaseJson.decodeFromJsonElement<UserSession>(json)
             onSuccess(userSession)
-            return decodeResult(json)
+            val userJson = json["user"]?.jsonObject ?: buildJsonObject { }
+            return decodeResult(userJson)
         }
         return decodeResult(json)
     }
