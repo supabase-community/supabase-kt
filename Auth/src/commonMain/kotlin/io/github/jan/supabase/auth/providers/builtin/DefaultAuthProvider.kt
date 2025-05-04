@@ -1,7 +1,6 @@
 package io.github.jan.supabase.auth.providers.builtin
 
 import io.github.jan.supabase.SupabaseClient
-import io.github.jan.supabase.annotations.SupabaseExperimental
 import io.github.jan.supabase.annotations.SupabaseInternal
 import io.github.jan.supabase.auth.AuthImpl
 import io.github.jan.supabase.auth.FlowType
@@ -65,7 +64,6 @@ sealed interface DefaultAuthProvider<C, R> : AuthProvider<C, R> {
         }
     }
 
-    @OptIn(SupabaseExperimental::class)
     override suspend fun signUp(
         supabaseClient: SupabaseClient,
         onSuccess: suspend (UserSession) -> Unit,
@@ -95,10 +93,10 @@ sealed interface DefaultAuthProvider<C, R> : AuthProvider<C, R> {
             redirectUrl?.let { redirectTo(it) }
         }
         val json = response.body<JsonObject>()
-        if(json.containsKey("access_token")) {
+        if (json.containsKey("access_token")) {
             val userSession = supabaseJson.decodeFromJsonElement<UserSession>(json)
             onSuccess(userSession)
-            return null
+            return decodeResult(json)
         }
         return decodeResult(json)
     }
