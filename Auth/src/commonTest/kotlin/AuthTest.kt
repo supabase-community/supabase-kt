@@ -2,6 +2,7 @@ import io.github.jan.supabase.SupabaseClientBuilder
 import io.github.jan.supabase.auth.Auth
 import io.github.jan.supabase.auth.MemorySessionManager
 import io.github.jan.supabase.auth.auth
+import io.github.jan.supabase.auth.minimalConfig
 import io.github.jan.supabase.auth.minimalSettings
 import io.github.jan.supabase.auth.providers.Github
 import io.github.jan.supabase.auth.status.SessionStatus
@@ -24,7 +25,7 @@ class AuthTest {
 
     private val configuration: SupabaseClientBuilder.() -> Unit = {
         install(Auth) {
-            minimalSettings()
+            minimalConfig()
         }
     }
 

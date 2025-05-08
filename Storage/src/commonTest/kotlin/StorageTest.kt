@@ -1,7 +1,7 @@
 import io.github.jan.supabase.SupabaseClientBuilder
 import io.github.jan.supabase.auth.Auth
 import io.github.jan.supabase.auth.auth
-import io.github.jan.supabase.auth.minimalSettings
+import io.github.jan.supabase.auth.minimalConfig
 import io.github.jan.supabase.storage.Storage
 import io.github.jan.supabase.storage.resumable.MemoryResumableCache
 import io.github.jan.supabase.storage.storage
@@ -202,7 +202,7 @@ class StorageTest {
                         }
                     }
                     install(Auth) {
-                        minimalSettings()
+                        minimalConfig()
                         enableLifecycleCallbacks = false
                     }
                 }
