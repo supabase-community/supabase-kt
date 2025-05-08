@@ -11,12 +11,8 @@ internal object HttpCallbackHtml {
 
                   <body>
                         <script>
-                            const pairs = location.hash.substring(1).split("&").map(pair => pair.split("="))
-                            const accessToken = pairs.find(pair => pair[0] === "access_token")[1]
-                            const refreshToken = pairs.find(pair => pair[0] === "refresh_token")[1]
-                            const expiresIn = pairs.find(pair => pair[0] === "expires_in")[1]
-                            const tokenType = pairs.find(pair => pair[0] === "token_type")[1]
-                            location.href = "/callback?access_token=" + accessToken + "&refresh_token=" + refreshToken + "&expires_in=" + expiresIn + "&token_type=" + tokenType
+                            const hash = location.hash.substring(1);
+                            location.href = "/callback?" + hash;
                        </script>
                  </body>
             </html>

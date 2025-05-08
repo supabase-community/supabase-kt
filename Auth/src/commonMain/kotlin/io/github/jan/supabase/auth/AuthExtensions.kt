@@ -21,11 +21,7 @@ internal fun noDeeplinkError(arg: String): Nothing = error("""
  * @return The parsed session. Note that the user will be null, but you can retrieve it using [Auth.retrieveUser]
  */
 fun Auth.parseSessionFromFragment(fragment: String): UserSession {
-    val sessionParts = fragment.split("&").associate {
-        it.split("=").let { pair ->
-            pair[0] to pair[1]
-        }
-    }
+    val sessionParts = getFragmentParts(fragment)
 
     Auth.logger.d { "Fragment parts: $sessionParts" }
 

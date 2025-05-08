@@ -1,7 +1,10 @@
 package io.github.jan.supabase.auth
 
 import io.github.jan.supabase.SupabaseClient
+import io.github.jan.supabase.annotations.SupabaseExperimental
+import io.github.jan.supabase.annotations.SupabaseInternal
 import io.github.jan.supabase.auth.admin.AdminApi
+import io.github.jan.supabase.auth.event.AuthEvent
 import io.github.jan.supabase.auth.exception.AuthRestException
 import io.github.jan.supabase.auth.exception.AuthWeakPasswordException
 import io.github.jan.supabase.auth.mfa.MfaApi
@@ -26,6 +29,7 @@ import io.github.jan.supabase.plugins.MainPlugin
 import io.github.jan.supabase.plugins.SupabasePluginProvider
 import io.ktor.client.plugins.HttpRequestTimeoutException
 import kotlinx.coroutines.ensureActive
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.serialization.json.JsonObject
 import kotlin.coroutines.coroutineContext
@@ -54,6 +58,12 @@ interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
      * Returns the current session status
      */
     val sessionStatus: StateFlow<SessionStatus>
+
+    /**
+     * Events emitted by the auth plugin
+     */
+    @SupabaseExperimental
+    val events: SharedFlow<AuthEvent>
 
     /**
      * Whether the [sessionStatus] session is getting refreshed automatically
@@ -348,6 +358,18 @@ interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
     suspend fun clearSession()
 
     /**
+     * Sets the session status to the specified [status]
+     */
+    @SupabaseInternal
+    fun setSessionStatus(status: SessionStatus)
+
+    /**
+     * Emits an event to the [events] flow
+     */
+    @SupabaseInternal
+    fun emitEvent(event: AuthEvent)
+
+    /**
      * Exchanges a code for a session. Used when using the [FlowType.PKCE] flow
      * @param code The code to exchange
      * @param saveSession Whether to save the session in storage
@@ -419,7 +441,17 @@ interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
             "token_type",
             "type",
             "provider_refresh_token",
-            "provider_token"
+            "provider_token",
+            "error",
+            "error_code",
+            "error_description",
+        )
+
+        internal val QUERY_PARAMETERS = listOf(
+            "code",
+            "error_code",
+            "error",
+            "error_description",
         )
 
         override val key = "auth"

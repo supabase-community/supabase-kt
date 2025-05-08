@@ -26,11 +26,16 @@ fun SupabaseClient.handleDeeplinks(url: NSURL, onSessionSuccess: (UserSession) -
                 Auth.logger.d { "No fragment for deeplink" }
                 return
             }
-            auth.parseFragmentAndImportSession(fragment, onSessionSuccess)
+            auth.parseFragmentAndImportSession(fragment) {
+                it?.let(onSessionSuccess)
+            }
         }
         FlowType.PKCE -> {
             val components = NSURLComponents(url, false)
-            val code = (components.queryItems?.firstOrNull { it is NSURLQueryItem && it.name == "code" } as? NSURLQueryItem)?.value ?: return
+            if (auth.handledUrlParameterError{ key -> getQueryItem(components, key) }) {
+                return
+            }
+            val code = getQueryItem(components, "code") ?: return
             val scope = (auth as AuthImpl).authScope
             scope.launch {
                 auth.exchangeCodeForSession(code)
@@ -38,4 +43,8 @@ fun SupabaseClient.handleDeeplinks(url: NSURL, onSessionSuccess: (UserSession) -
             }
         }
     }
+}
+
+private fun getQueryItem(components: NSURLComponents, key: String): String? {
+    return (components.queryItems?.firstOrNull { it is NSURLQueryItem && it.name == key } as? NSURLQueryItem)?.value
 }
