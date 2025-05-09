@@ -1,7 +1,6 @@
 package io.github.jan.supabase.auth.providers.builtin
 
 import io.github.jan.supabase.SupabaseClient
-import io.github.jan.supabase.annotations.SupabaseExperimental
 import io.github.jan.supabase.annotations.SupabaseInternal
 import io.github.jan.supabase.auth.AuthImpl
 import io.github.jan.supabase.auth.FlowType
@@ -20,6 +19,7 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.decodeFromJsonElement
+import kotlinx.serialization.json.jsonObject
 
 /**
  * A default authentication provider
@@ -65,7 +65,6 @@ sealed interface DefaultAuthProvider<C, R> : AuthProvider<C, R> {
         }
     }
 
-    @OptIn(SupabaseExperimental::class)
     override suspend fun signUp(
         supabaseClient: SupabaseClient,
         onSuccess: suspend (UserSession) -> Unit,
@@ -95,10 +94,11 @@ sealed interface DefaultAuthProvider<C, R> : AuthProvider<C, R> {
             redirectUrl?.let { redirectTo(it) }
         }
         val json = response.body<JsonObject>()
-        if(json.containsKey("access_token")) {
+        if (json.containsKey("access_token")) {
             val userSession = supabaseJson.decodeFromJsonElement<UserSession>(json)
             onSuccess(userSession)
-            return null
+            val userJson = json["user"]?.jsonObject ?: buildJsonObject { }
+            return decodeResult(userJson)
         }
         return decodeResult(json)
     }
