@@ -1,7 +1,7 @@
 import io.github.jan.supabase.SupabaseClientBuilder
 import io.github.jan.supabase.auth.Auth
 import io.github.jan.supabase.auth.auth
-import io.github.jan.supabase.auth.minimalSettings
+import io.github.jan.supabase.auth.minimalConfig
 import io.github.jan.supabase.functions.FunctionRegion
 import io.github.jan.supabase.functions.Functions
 import io.github.jan.supabase.functions.functions
@@ -32,7 +32,7 @@ class FunctionsTest {
             val supabase = createMockedSupabaseClient(
                 configuration ={
                     install(Auth) {
-                        minimalSettings()
+                        minimalConfig()
                     }
                     configuration()
                 },
