@@ -1,11 +1,10 @@
 package io.github.jan.supabase
 
 actual val OSInformation: OSInformation = OSInformation(
-    name = "Linux",
+    name = "Windows",
     version = getOSVersion()
 )
 
 private fun getOSVersion(): String {
-    //Get OS Version, this is from Native Linux code:
     TODO("Not yet implemented")
 }
