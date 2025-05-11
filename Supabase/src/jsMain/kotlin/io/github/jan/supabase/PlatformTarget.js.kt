@@ -1,4 +1,3 @@
 package io.github.jan.supabase
 
-internal actual val OSInformation: OSInformation
-    get() = TODO("Not yet implemented")
+internal actual fun getOSInformation(): OSInformation = TODO("")

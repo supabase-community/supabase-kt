@@ -1,6 +1,6 @@
 package io.github.jan.supabase
 
-actual val OSInformation: OSInformation = OSInformation(
+internal actual fun getOSInformation(): OSInformation = OSInformation(
     name = "Linux",
     version = getOSVersion()
 )

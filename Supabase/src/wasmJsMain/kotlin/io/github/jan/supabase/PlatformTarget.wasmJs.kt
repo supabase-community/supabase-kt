@@ -5,4 +5,4 @@ package io.github.jan.supabase
  */
 actual val CurrentPlatformTarget: PlatformTarget = PlatformTarget.WASM_JS
 
-internal actual val OSInformation: OSInformation get() = TODO("Not yet implemented")
+internal actual fun getOSInformation(): OSInformation = TODO("")

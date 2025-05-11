@@ -1,6 +1,6 @@
 package io.github.jan.supabase
 
-internal actual val OSInformation: OSInformation = OSInformation(
+internal actual fun getOSInformation(): OSInformation = OSInformation(
     name = "Android",
-    version = android.os.Build.VERSION.SDK_INT.toString()
+    version = android.os.Build.VERSION.RELEASE
 )
