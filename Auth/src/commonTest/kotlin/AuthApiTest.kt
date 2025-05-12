@@ -6,7 +6,7 @@ import io.github.jan.supabase.auth.OtpType
 import io.github.jan.supabase.auth.PKCEConstants
 import io.github.jan.supabase.auth.SignOutScope
 import io.github.jan.supabase.auth.auth
-import io.github.jan.supabase.auth.minimalSettings
+import io.github.jan.supabase.auth.minimalConfig
 import io.github.jan.supabase.auth.providers.Google
 import io.github.jan.supabase.auth.providers.builtin.Email
 import io.github.jan.supabase.auth.providers.builtin.IDToken
@@ -37,7 +37,7 @@ class AuthRequestTest {
 
     private val configuration: SupabaseClientBuilder.() -> Unit = {
         install(Auth) {
-            minimalSettings()
+            minimalConfig()
             flowType = FlowType.PKCE
         }
     }
