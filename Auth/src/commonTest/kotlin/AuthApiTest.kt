@@ -98,7 +98,7 @@ class AuthRequestTest {
                 assertEquals(userData, body["data"]!!.jsonObject)
                 containsCodeChallenge(body)
                 respondJson(
-                    sampleUserSession()
+                    sampleSessionWithUserData(email = "example@email.com", phone = "+1234567890")
                 )
             }
             val user = client.auth.signUpWith(Email) {
@@ -107,7 +107,8 @@ class AuthRequestTest {
                 this.captchaToken = captchaToken
                 data = userData
             }
-            assertNull(user)
+            assertNotNull(user)
+            assertEquals(expectedEmail, user?.email, "Email should be equal")
             assertNotNull(client.auth.currentSessionOrNull(), "Session should not be null")
             assertEquals(client.auth.sessionSource(), SessionSource.SignUp(Email))
         }
@@ -133,7 +134,7 @@ class AuthRequestTest {
                 assertEquals(userData, body["data"]!!.jsonObject)
                 containsCodeChallenge(body)
                 respondJson(
-                    sampleUserSession()
+                    sampleSessionWithUserData()
                 )
             }
             val user = client.auth.signUpWith(Phone) {
@@ -142,7 +143,7 @@ class AuthRequestTest {
                 this.captchaToken = captchaToken
                 data = userData
             }
-            assertNull(user)
+            assertNotNull(user)
             assertNotNull(client.auth.currentSessionOrNull(), "Session should not be null")
             assertEquals(client.auth.sessionSource(), SessionSource.SignUp(Phone))
         }
@@ -687,6 +688,25 @@ class AuthRequestTest {
         "refresh_token": "refresh",
         "token_type": "bearer",
         "expires_in": 3600
+        }
+    """.trimIndent()
+
+    private fun sampleSessionWithUserData(email: String? = null, phone: String? = null) = """
+        {   
+            "id": "id",
+            "aud": "aud",
+            "email": "$email",
+            "phone": "$phone",
+            "access_token": "token",
+            "refresh_token": "refresh",
+            "token_type": "bearer",
+            "expires_in": 3600,
+            "user": {
+                "id": "id",
+                "aud": "aud",
+                "email": "$email",
+                "phone": "$phone"
+            }
         }
     """.trimIndent()
 
