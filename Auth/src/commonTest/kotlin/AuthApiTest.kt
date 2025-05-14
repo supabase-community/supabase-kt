@@ -43,7 +43,7 @@ class AuthRequestTest {
     }
 
     @Test
-    fun testSignUpWithEmailNoAutoconfirm() {
+    fun testSignUpWithEmailNoAutoConfirm() {
         runTest {
             val expectedEmail = "example@email.com"
             val expectedPassword = "password"
@@ -79,7 +79,7 @@ class AuthRequestTest {
     }
 
     @Test
-    fun testSignUpWithEmailAutoconfirm() {
+    fun testSignUpWithEmailAutoConfirm() {
         runTest {
             val expectedEmail = "example@email.com"
             val expectedPassword = "password"
@@ -115,7 +115,42 @@ class AuthRequestTest {
     }
 
     @Test
-    fun testSignUpWithPhoneAutoconfirm() {
+    fun testSignUpWithEmailAutoConfirmWithoutUserData() {
+        runTest {
+            val expectedEmail = "example@email.com"
+            val expectedPassword = "password"
+            val captchaToken = "captchaToken"
+            val userData = buildJsonObject {
+                put("key", "value")
+            }
+            val client = createMockedSupabaseClient(configuration = configuration) {
+                val body = it.body.toJsonElement().jsonObject
+                val metaSecurity = body["gotrue_meta_security"]!!.jsonObject
+                assertMethodIs(HttpMethod.Post, it.method)
+                assertPathIs("/signup", it.url.pathAfterVersion())
+                assertEquals(expectedEmail, body["email"]?.jsonPrimitive?.content)
+                assertEquals(expectedPassword, body["password"]?.jsonPrimitive?.content)
+                assertEquals(captchaToken, metaSecurity["captcha_token"]?.jsonPrimitive?.content)
+                assertEquals(userData, body["data"]!!.jsonObject)
+                containsCodeChallenge(body)
+                respondJson(
+                    sampleUserSession()
+                )
+            }
+            val user = client.auth.signUpWith(Email) {
+                email = expectedEmail
+                password = expectedPassword
+                this.captchaToken = captchaToken
+                data = userData
+            }
+            assertNull(user)
+            assertNotNull(client.auth.currentSessionOrNull(), "Session should not be null")
+            assertEquals(client.auth.sessionSource(), SessionSource.SignUp(Email))
+        }
+    }
+
+    @Test
+    fun testSignUpWithPhoneAutoConfirm() {
         runTest {
             val expectedPhone = "+1234567890"
             val expectedPassword = "password"
@@ -150,7 +185,7 @@ class AuthRequestTest {
     }
 
     @Test
-    fun testSignUpWithPhoneNoAutoconfirm() {
+    fun testSignUpWithPhoneNoAutoConfirm() {
         runTest {
             val expectedPhone = "+1234567890"
             val expectedPassword = "password"

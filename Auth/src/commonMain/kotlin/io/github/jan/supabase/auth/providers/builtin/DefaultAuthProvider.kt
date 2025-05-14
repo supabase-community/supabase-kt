@@ -95,10 +95,14 @@ sealed interface DefaultAuthProvider<C, R> : AuthProvider<C, R> {
         }
         val json = response.body<JsonObject>()
         if (json.containsKey("access_token")) {
-            val userSession = supabaseJson.decodeFromJsonElement<UserSession>(json)
-            onSuccess(userSession)
-            val userJson = json["user"]?.jsonObject ?: buildJsonObject { }
-            return decodeResult(userJson)
+            runCatching {
+                val userSession = supabaseJson.decodeFromJsonElement<UserSession>(json)
+                onSuccess(userSession)
+                val userJson = json["user"]?.jsonObject ?: buildJsonObject { }
+                return decodeResult(userJson)
+            }.onFailure {
+                return null
+            }
         }
         return decodeResult(json)
     }
