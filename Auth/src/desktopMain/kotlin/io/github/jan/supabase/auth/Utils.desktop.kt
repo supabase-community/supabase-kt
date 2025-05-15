@@ -13,7 +13,7 @@ internal actual suspend fun Auth.startExternalAuth(
 ) {
     withContext(Dispatchers.IO) {
         if(redirectUrl != null) {
-            supabaseClient.openExternalUrl(getUrl(redirectUrl))
+            config.urlLauncher.openUrl(supabaseClient, getUrl(redirectUrl))
             return@withContext
         }
         createServer({

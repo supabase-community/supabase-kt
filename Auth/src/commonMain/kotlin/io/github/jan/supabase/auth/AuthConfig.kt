@@ -2,6 +2,7 @@ package io.github.jan.supabase.auth
 
 import io.github.jan.supabase.SupabaseClientBuilder
 import io.github.jan.supabase.SupabaseSerializer
+import io.github.jan.supabase.annotations.SupabaseExperimental
 import io.github.jan.supabase.plugins.CustomSerializationConfig
 import io.github.jan.supabase.plugins.MainConfig
 import kotlinx.coroutines.CoroutineDispatcher
@@ -95,6 +96,12 @@ open class AuthConfigDefaults : MainConfig() {
      * Currently only supported on Android.
      */
     var enableLifecycleCallbacks: Boolean = true
+
+    /**
+     * The URL launcher used to open OAuth links in the system browser.
+     */
+    @SupabaseExperimental
+    var urlLauncher: UrlLauncher = UrlLauncher.DEFAULT
 
 }
 
