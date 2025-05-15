@@ -28,7 +28,9 @@ fun Project.configureLibraryAndroidTarget(
     }
 }
 
-fun BaseAppModuleExtension.configureApplicationAndroidTarget() {
+fun BaseAppModuleExtension.configureApplicationAndroidTarget(
+    javaVersion: JavaVersion = JavaVersion.VERSION_1_8
+) {
     compileSdk = 35
     defaultConfig {
         applicationId = "io.github.jan.supabase.android"
@@ -38,8 +40,8 @@ fun BaseAppModuleExtension.configureApplicationAndroidTarget() {
     }
     namespace = "io.github.jan.supabase.android"
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = javaVersion
+        targetCompatibility = javaVersion
     }
     buildTypes {
         getByName("release") {

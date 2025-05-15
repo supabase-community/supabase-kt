@@ -2,6 +2,7 @@
 
 import org.jetbrains.compose.ExperimentalComposeLibrary
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 
 plugins {
@@ -16,9 +17,13 @@ group = "io.github.jan.supabase"
 version = "1.0-SNAPSHOT"
 
 kotlin {
-    jvmToolchain(8)
+    jvmToolchain(11)
     androidTarget()
-    jvm("desktop")
+    jvm("desktop") {
+        compilerOptions {
+            jvmTarget = JvmTarget.JVM_11
+        }
+    }
     applyDefaultHierarchyTemplate {
         common {
             group("nonJs") {
@@ -62,4 +67,4 @@ kotlin {
     }
 }
 
-configureLibraryAndroidTarget("io.github.jan.supabase.common", 26, JavaVersion.VERSION_1_8)
+configureLibraryAndroidTarget("io.github.jan.supabase.common", 26, JavaVersion.VERSION_11)
