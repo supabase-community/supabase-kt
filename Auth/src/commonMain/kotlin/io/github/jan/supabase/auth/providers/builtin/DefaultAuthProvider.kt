@@ -2,6 +2,7 @@ package io.github.jan.supabase.auth.providers.builtin
 
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.annotations.SupabaseInternal
+import io.github.jan.supabase.auth.Auth
 import io.github.jan.supabase.auth.AuthImpl
 import io.github.jan.supabase.auth.FlowType
 import io.github.jan.supabase.auth.auth
@@ -11,6 +12,7 @@ import io.github.jan.supabase.auth.providers.AuthProvider
 import io.github.jan.supabase.auth.putCodeChallenge
 import io.github.jan.supabase.auth.redirectTo
 import io.github.jan.supabase.auth.user.UserSession
+import io.github.jan.supabase.logging.w
 import io.github.jan.supabase.putJsonObject
 import io.github.jan.supabase.supabaseJson
 import io.ktor.client.call.body
@@ -100,7 +102,8 @@ sealed interface DefaultAuthProvider<C, R> : AuthProvider<C, R> {
                 onSuccess(userSession)
                 val userJson = json["user"]?.jsonObject ?: buildJsonObject { }
                 return decodeResult(userJson)
-            }.onFailure {
+            }.onFailure { exception ->
+                Auth.logger.w(exception) { "Failed to decode user info" }
                 return null
             }
         }
