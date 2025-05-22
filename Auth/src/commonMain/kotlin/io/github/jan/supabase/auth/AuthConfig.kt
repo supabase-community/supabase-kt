@@ -2,6 +2,7 @@ package io.github.jan.supabase.auth
 
 import io.github.jan.supabase.SupabaseClientBuilder
 import io.github.jan.supabase.SupabaseSerializer
+import io.github.jan.supabase.annotations.SupabaseExperimental
 import io.github.jan.supabase.plugins.CustomSerializationConfig
 import io.github.jan.supabase.plugins.MainConfig
 import kotlinx.coroutines.CoroutineDispatcher
@@ -96,6 +97,12 @@ open class AuthConfigDefaults : MainConfig() {
      */
     var enableLifecycleCallbacks: Boolean = true
 
+    /**
+     * The URL launcher used to open OAuth links in the system browser.
+     */
+    @SupabaseExperimental
+    var urlLauncher: UrlLauncher = UrlLauncher.DEFAULT
+
 }
 
 /**
@@ -148,6 +155,7 @@ val AuthConfig.deepLinkOrNull: String?
  * @param enableLifecycleCallbacks Whether to stop auto-refresh on focus loss, and resume it on focus again. Currently only supported on Android.
  * @see AuthConfigDefaults
  */
+@Deprecated("Use the new minimalConfig function instead", ReplaceWith("minimalConfig()"))
 @Suppress("LongParameterList", "unused")
 fun AuthConfigDefaults.minimalSettings(
     alwaysAutoRefresh: Boolean = false,

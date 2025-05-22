@@ -4,7 +4,7 @@ import io.github.jan.supabase.auth.SignOutScope
 import io.github.jan.supabase.auth.admin.LinkType
 import io.github.jan.supabase.auth.admin.generateLinkFor
 import io.github.jan.supabase.auth.auth
-import io.github.jan.supabase.auth.minimalSettings
+import io.github.jan.supabase.auth.minimalConfig
 import io.github.jan.supabase.auth.user.UserInfo
 import io.github.jan.supabase.auth.user.UserMfaFactor
 import io.github.jan.supabase.testing.assertMethodIs
@@ -17,7 +17,6 @@ import io.ktor.client.engine.mock.respond
 import io.ktor.http.HttpMethod
 import kotlinx.coroutines.test.runTest
 import kotlinx.datetime.Clock
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.boolean
 import kotlinx.serialization.json.buildJsonObject
@@ -32,7 +31,7 @@ class AdminApiTest {
 
     private val configuration: SupabaseClientBuilder.() -> Unit = {
         install(Auth) {
-            minimalSettings()
+            minimalConfig()
         }
     }
 
