@@ -13,6 +13,7 @@ import io.github.jan.supabase.auth.providers.builtin.IDToken
 import io.github.jan.supabase.auth.providers.builtin.OTP
 import io.github.jan.supabase.auth.providers.builtin.Phone
 import io.github.jan.supabase.auth.status.SessionSource
+import io.github.jan.supabase.auth.status.SessionStatus
 import io.github.jan.supabase.testing.assertMethodIs
 import io.github.jan.supabase.testing.assertPathIs
 import io.github.jan.supabase.testing.createMockedSupabaseClient
@@ -30,6 +31,7 @@ import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.put
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertIs
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 
@@ -686,6 +688,7 @@ class AuthRequestTest {
             assertNotNull(client.auth.currentSessionOrNull(), "Session should not be null")
             client.auth.signOut(expectedScope)
             assertNull(client.auth.currentSessionOrNull(), "Session should be null")
+            assertIs<SessionStatus.NotAuthenticated>(client.auth.sessionStatus.value)
         }
     }
 

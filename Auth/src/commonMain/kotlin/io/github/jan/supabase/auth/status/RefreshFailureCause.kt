@@ -5,6 +5,7 @@ import io.github.jan.supabase.exceptions.RestException
 /**
  * Represents the cause of a refresh error
  */
+//Note: Move this interface when removing the deprecated property from [SessionStatus.RefreshFailure]
 sealed interface RefreshFailureCause {
 
     /**

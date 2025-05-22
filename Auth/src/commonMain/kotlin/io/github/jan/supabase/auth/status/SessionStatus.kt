@@ -12,7 +12,9 @@ sealed interface SessionStatus {
      * This status means that the user is not logged in
      * @param isSignOut Whether this status was caused by a sign-out
      */
-    data class NotAuthenticated(val isSignOut: Boolean) : SessionStatus
+    data class NotAuthenticated(
+        val isSignOut: Boolean = false,
+    ) : SessionStatus
 
     /**
      * This status means that [Auth] is currently initializing the session
@@ -20,17 +22,23 @@ sealed interface SessionStatus {
     data object Initializing : SessionStatus
 
     /**
-     * This status means that [Auth] had an error while refreshing the session
-     * @param cause The cause of the error
+     * This status means the session expired and [Auth] is trying to refresh it
+     * @param cause The cause of the error. This property will be removed in a future version. Use the new AuthEvent.RefreshFailure(cause) event to diagnose failures.
      */
-    data class RefreshFailure(val cause: RefreshFailureCause) : SessionStatus
+    data class RefreshFailure(
+        @Deprecated("This property will be removed in a future version. Use the new AuthEvent.RefreshFailure(cause) event to diagnose failures.")
+        val cause: RefreshFailureCause
+    ) : SessionStatus
 
     /**
      * This status means that [Auth] holds a valid session
      * @param session The session
      * @param source The source of the session
      */
-    data class Authenticated(val session: UserSession, val source: SessionSource = SessionSource.Unknown) : SessionStatus {
+    data class Authenticated(
+        val session: UserSession,
+        val source: SessionSource = SessionSource.Unknown
+    ) : SessionStatus {
 
         /**
          * Whether the session is new, i.e. [source] is [SessionSource.SignIn], [SessionSource.SignUp] or [SessionSource.External].

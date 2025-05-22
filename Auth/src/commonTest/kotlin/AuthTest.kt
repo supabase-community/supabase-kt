@@ -1,18 +1,26 @@
+import app.cash.turbine.test
 import io.github.jan.supabase.SupabaseClientBuilder
 import io.github.jan.supabase.auth.Auth
 import io.github.jan.supabase.auth.MemorySessionManager
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.auth.minimalConfig
+import io.github.jan.supabase.auth.event.AuthEvent
 import io.github.jan.supabase.auth.minimalSettings
 import io.github.jan.supabase.auth.providers.Github
+import io.github.jan.supabase.auth.status.RefreshFailureCause
+import io.github.jan.supabase.auth.status.SessionSource
 import io.github.jan.supabase.auth.status.SessionStatus
 import io.github.jan.supabase.auth.user.Identity
 import io.github.jan.supabase.auth.user.UserInfo
 import io.github.jan.supabase.auth.user.UserSession
+import io.github.jan.supabase.logging.LogLevel
 import io.github.jan.supabase.testing.createMockedSupabaseClient
 import io.github.jan.supabase.testing.pathAfterVersion
 import io.github.jan.supabase.testing.respondJson
+import io.ktor.client.engine.mock.respondError
+import io.ktor.http.HttpStatusCode
 import io.ktor.http.Url
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.json.buildJsonObject
 import kotlin.test.Test
@@ -20,6 +28,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertIs
 import kotlin.test.assertNull
+import kotlin.time.Duration.Companion.seconds
 
 class AuthTest {
 
@@ -106,6 +115,7 @@ class AuthTest {
             val session = userSession(expiresIn = 0)
             client.auth.importSession(session)
             assertIs<SessionStatus.Authenticated>(client.auth.sessionStatus.value)
+            assertIs<SessionSource.Refresh>((client.auth.sessionStatus.value as SessionStatus.Authenticated).source)
             assertEquals(newSession.expiresIn, client.auth.currentSessionOrNull()?.expiresIn)
         }
     }
@@ -132,7 +142,93 @@ class AuthTest {
             assertIs<SessionStatus.Authenticated>(client.auth.sessionStatus.value)
             assertEquals(session.expiresIn, client.auth.currentSessionOrNull()?.expiresIn) //The session shouldn't be refreshed automatically as alwaysAutoRefresh is false
             client.auth.startAutoRefreshForCurrentSession()
+            assertIs<SessionSource.Refresh>((client.auth.sessionStatus.value as SessionStatus.Authenticated).source)
             assertEquals(newSession.expiresIn, client.auth.currentSessionOrNull()?.expiresIn)
+        }
+    }
+
+    @Test
+    fun testAutoRefreshFailureNetworkValidSession() {
+        runTest {
+            val newSession = userSession()
+            val client = createMockedSupabaseClient(configuration = {
+                install(Auth) {
+                    minimalSettings(
+                        alwaysAutoRefresh = true
+                    )
+                }
+                defaultLogLevel = LogLevel.DEBUG
+            }) {
+                throw IllegalStateException("Some random error") //everything except RestException are handled as network errors
+            }
+            client.auth.awaitInitialization()
+            assertIs<SessionStatus.NotAuthenticated>(client.auth.sessionStatus.value)
+            val session = userSession(expiresIn = 1)
+            client.auth.importSession(session)
+            assertIs<SessionStatus.Authenticated>(client.auth.sessionStatus.value) // since the session is still valid, the status should be authenticated
+            client.auth.events.test(timeout = 2.seconds) { //event should be emitted regardless of the session status
+                val event = awaitItem()
+                assertIs<AuthEvent.RefreshFailure>(event)
+                assertIs<RefreshFailureCause.NetworkError>(event.cause)
+            }
+        }
+    }
+
+    @Test
+    fun testAutoRefreshFailureServerErrorValidSession() {
+        runTest {
+            val newSession = userSession()
+            val client = createMockedSupabaseClient(configuration = {
+                install(Auth) {
+                    minimalSettings(
+                        alwaysAutoRefresh = true
+                    )
+                }
+                defaultLogLevel = LogLevel.DEBUG
+            }) {
+                respondError(HttpStatusCode.InternalServerError, "{}")
+            }
+            assertIs<SessionStatus.NotAuthenticated>(client.auth.sessionStatus.value)
+            val session = userSession(expiresIn = 1)
+            client.auth.importSession(session)
+            assertIs<SessionStatus.Authenticated>(client.auth.sessionStatus.value) // since the session is still valid, the status should be authenticated
+            client.auth.events.test(timeout = 2.seconds) { //event should be emitted regardless of the session status
+                val event = awaitItem()
+                assertIs<AuthEvent.RefreshFailure>(event)
+                assertIs<RefreshFailureCause.InternalServerError>(event.cause)
+            }
+        }
+    }
+
+    @Test
+    fun testAutoRefreshFailureInvalidSession() {
+        runTest {
+            var first = true
+            val newSession = userSession()
+            val client = createMockedSupabaseClient(configuration = {
+                install(Auth) {
+                    minimalSettings(
+                        alwaysAutoRefresh = false
+                    )
+                }
+                defaultLogLevel = LogLevel.DEBUG
+            }) {
+                if(first) {
+                    first = false
+                    respondError(HttpStatusCode.InternalServerError, "{}")
+                } else respondJson(newSession)
+            }
+            client.auth.awaitInitialization()
+            assertIs<SessionStatus.NotAuthenticated>(client.auth.sessionStatus.value)
+            val session = userSession(expiresIn = 0)
+            launch {
+                client.auth.events.test(timeout = 1.seconds) { //event should be emitted regardless of the session status
+                    val event = awaitItem()
+                    assertIs<SessionStatus.RefreshFailure>(client.auth.sessionStatus.value) // session expired and should be in refresh failure state
+                    assertIs<AuthEvent.RefreshFailure>(event)
+                }
+            }
+            client.auth.importSession(session, autoRefresh = true)
         }
     }
 
