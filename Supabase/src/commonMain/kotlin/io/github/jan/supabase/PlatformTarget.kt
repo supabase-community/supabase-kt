@@ -10,7 +10,7 @@ enum class PlatformTarget {
     JVM, ANDROID, JS, WASM_JS, IOS, WINDOWS, MACOS, TVOS, WATCHOS, LINUX;
 }
 
-internal data class OSInformation(
+data class OSInformation(
     val name: String,
     val version: String
 ) {
@@ -38,4 +38,4 @@ expect val CurrentPlatformTarget: PlatformTarget
 /**
  * The current operating system information
  */
-internal expect fun getOSInformation(): OSInformation
+internal expect fun getOSInformation(): OSInformation?

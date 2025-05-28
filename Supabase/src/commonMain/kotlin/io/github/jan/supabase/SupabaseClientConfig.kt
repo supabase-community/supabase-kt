@@ -13,7 +13,8 @@ internal data class SupabaseClientConfig(
     val defaultSerializer: SupabaseSerializer,
     val coroutineDispatcher: CoroutineDispatcher,
     val accessToken: AccessTokenProvider?,
-    val plugins: Map<String, PluginProvider>
+    val plugins: Map<String, PluginProvider>,
+    val osInformation: OSInformation?
 )
 
 internal data class SupabaseNetworkConfig(

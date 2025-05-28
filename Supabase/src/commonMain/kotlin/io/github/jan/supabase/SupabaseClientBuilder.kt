@@ -90,6 +90,11 @@ class SupabaseClientBuilder @PublishedApi internal constructor(private val supab
      */
     var accessToken: AccessTokenProvider? = null
 
+    /**
+     * The current operating system information.
+     */
+    var osInformation: OSInformation? = OSInformation.CURRENT
+
     private val httpConfigOverrides = mutableListOf<HttpConfigOverride>()
     private val plugins = mutableMapOf<String, PluginProvider>()
 
@@ -124,7 +129,8 @@ class SupabaseClientBuilder @PublishedApi internal constructor(private val supab
             defaultSerializer = defaultSerializer,
             coroutineDispatcher = coroutineDispatcher,
             accessToken = accessToken,
-            plugins = plugins
+            plugins = plugins,
+            osInformation = osInformation
         )
         return SupabaseClientImpl(
             config

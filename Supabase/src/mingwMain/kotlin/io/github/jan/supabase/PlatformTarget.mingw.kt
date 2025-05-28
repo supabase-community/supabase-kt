@@ -3,7 +3,7 @@ package io.github.jan.supabase
 import platform.windows.DWORD
 import platform.windows.GetVersion
 
-internal actual fun getOSInformation(): OSInformation = OSInformation(
+internal actual fun getOSInformation(): OSInformation? = OSInformation(
     name = "Windows",
     version = getOSVersion()
 )
