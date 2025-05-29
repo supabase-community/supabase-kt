@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
 plugins {
     id(libs.plugins.compose.plugin.get().pluginId)
     alias(libs.plugins.compose.compiler)
@@ -10,8 +12,12 @@ version = "1.0-SNAPSHOT"
 
 
 kotlin {
-    jvmToolchain(8)
-    jvm()
+    jvmToolchain(11)
+    jvm {
+        compilerOptions {
+            jvmTarget = JvmTarget.JVM_11
+        }
+    }
     sourceSets {
         val jvmMain by getting {
             dependencies {

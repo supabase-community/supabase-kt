@@ -1,6 +1,7 @@
 import com.android.build.gradle.internal.lint.AndroidLintAnalysisTask
 import com.android.build.gradle.internal.lint.LintModelWriterTask
 import com.android.build.gradle.internal.tasks.LintModelMetadataTask
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     id(libs.plugins.kotlin.multiplatform.get().pluginId)
@@ -27,7 +28,8 @@ kotlin {
             }
         }
     }
-    composeTargets()
+    composeTargets(JvmTarget.JVM_11)
+    jvmToolchain(11)
     sourceSets {
         val commonMain by getting {
             dependencies {
@@ -44,7 +46,7 @@ kotlin {
     }
 }
 
-configureLibraryAndroidTarget()
+configureLibraryAndroidTarget(javaVersion = JavaVersion.VERSION_11)
 
 //see https://github.com/JetBrains/compose-multiplatform/issues/4739
 tasks.withType<LintModelWriterTask> {

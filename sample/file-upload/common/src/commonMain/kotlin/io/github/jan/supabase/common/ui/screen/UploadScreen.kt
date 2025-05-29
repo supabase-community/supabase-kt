@@ -73,7 +73,7 @@ fun UploadScreen(viewModel: UploadViewModel) {
                 }
         ) {
             items(states, { it.fingerprint.source + it.fingerprint.size }) {
-                Box(Modifier.animateItemPlacement()) {
+                Box(Modifier.animateItem()) {
                     if(it is UploadState.Loaded) {
                         UploadCard(
                             it.state,
