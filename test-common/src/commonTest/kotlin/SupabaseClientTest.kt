@@ -1,4 +1,5 @@
 import io.github.jan.supabase.BuildConfig
+import io.github.jan.supabase.OSInformation
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.logging.LogLevel
 import io.github.jan.supabase.testing.createMockedSupabaseClient
@@ -24,6 +25,36 @@ class SupabaseClientTest {
                         "X-Client-Info header should be set to 'supabase-kt/${BuildConfig.PROJECT_VERSION}'"
                     )
                     respond("")
+                }
+            )
+            client.httpClient.get("")
+        }
+    }
+
+    @Test
+    fun testOSVersionHeader() {
+        runTest {
+            val client = createMockedSupabaseClient(
+                supabaseUrl = "https://example.supabase.co",
+                supabaseKey = "somekey",
+                requestHandler = {
+                    assertEquals(
+                        "TestOS",
+                        it.headers["X-Supabase-Client-Platform"],
+                        "X-Supabase-Client-Platform header should be set to 'TestOS'"
+                    )
+                    assertEquals(
+                        "1.0.0",
+                        it.headers["X-Supabase-Client-Platform-Version"],
+                        "X-Supabase-Client-Platform-Version header should be set to '1.0.0'"
+                    )
+                    respond("")
+                },
+                configuration = {
+                    osInformation = OSInformation(
+                        name = "TestOS",
+                        version = "1.0.0",
+                    )
                 }
             )
             client.httpClient.get("")

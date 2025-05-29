@@ -119,7 +119,8 @@ internal class SupabaseClientImpl(
         supabaseKey,
         config.networkConfig.httpConfigOverrides,
         config.networkConfig.requestTimeout.inWholeMilliseconds,
-        config.networkConfig.httpEngine
+        config.networkConfig.httpEngine,
+        config.osInformation
     )
 
     override val pluginManager = PluginManager(config.plugins.toList().associate { (key, value) ->
