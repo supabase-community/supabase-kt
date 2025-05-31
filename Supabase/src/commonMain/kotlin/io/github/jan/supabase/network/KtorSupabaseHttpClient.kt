@@ -2,6 +2,7 @@
 package io.github.jan.supabase.network
 
 import io.github.jan.supabase.BuildConfig
+import io.github.jan.supabase.OSInformation
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.annotations.SupabaseInternal
 import io.github.jan.supabase.exceptions.HttpRequestException
@@ -42,7 +43,8 @@ class KtorSupabaseHttpClient @SupabaseInternal constructor(
     private val supabaseKey: String,
     modifiers: List<HttpClientConfig<*>.() -> Unit> = listOf(),
     private val requestTimeout: Long,
-    engine: HttpClientEngine? = null
+    engine: HttpClientEngine? = null,
+    private val osInformation: OSInformation?
 ): SupabaseHttpClient() {
 
     init {
@@ -111,6 +113,10 @@ class KtorSupabaseHttpClient @SupabaseInternal constructor(
                     append("apikey", supabaseKey)
                 }
                 append("X-Client-Info", "supabase-kt/${BuildConfig.PROJECT_VERSION}")
+                osInformation?.let {
+                    append("X-Supabase-Client-Platform", it.name)
+                    append("X-Supabase-Client-Platform-Version", it.version)
+                }
             }
             port = HTTPS_PORT
         }
