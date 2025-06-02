@@ -1,5 +1,6 @@
 @file:OptIn(org.jetbrains.compose.ExperimentalComposeLibrary::class)
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     id(libs.plugins.android.library.get().pluginId)
@@ -14,9 +15,13 @@ version = "1.0-SNAPSHOT"
 
 @OptIn(ExperimentalKotlinGradlePluginApi::class)
 kotlin {
-    jvmToolchain(8)
+    jvmToolchain(11)
     androidTarget()
-    jvm("desktop")
+    jvm("desktop") {
+        compilerOptions {
+            jvmTarget = JvmTarget.JVM_11
+        }
+    }
     js(IR) {
         browser()
     }
@@ -69,4 +74,4 @@ kotlin {
     }
 }
 
-configureLibraryAndroidTarget("io.github.jan.supabase.common", 26, JavaVersion.VERSION_1_8)
+configureLibraryAndroidTarget("io.github.jan.supabase.common", 26, JavaVersion.VERSION_11)

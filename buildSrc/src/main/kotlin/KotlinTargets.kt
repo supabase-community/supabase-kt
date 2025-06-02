@@ -33,23 +33,23 @@ fun KotlinMultiplatformExtension.desktopTargets() {
     linuxX64()
 }
 
-fun KotlinMultiplatformExtension.configuredJvmTarget() {
+fun KotlinMultiplatformExtension.configuredJvmTarget(jvmTarget: JvmTarget = JvmTarget.JVM_1_8) {
     jvm {
-        compilerOptions.jvmTarget = JvmTarget.JVM_1_8
+        compilerOptions.jvmTarget = jvmTarget
     }
 }
 
-fun KotlinMultiplatformExtension.configuredAndroidTarget() {
+fun KotlinMultiplatformExtension.configuredAndroidTarget(jvmTarget: JvmTarget = JvmTarget.JVM_1_8) {
     androidTarget {
         publishLibraryVariants("release", "debug")
-        compilerOptions.jvmTarget = JvmTarget.JVM_1_8
+        compilerOptions.jvmTarget = jvmTarget
     }
 }
 
 @OptIn(ExperimentalKotlinGradlePluginApi::class)
-fun KotlinMultiplatformExtension.jvmTargets() {
-    configuredAndroidTarget()
-    configuredJvmTarget()
+fun KotlinMultiplatformExtension.jvmTargets(jvmTarget: JvmTarget = JvmTarget.JVM_1_8) {
+    configuredAndroidTarget(jvmTarget)
+    configuredJvmTarget(jvmTarget)
 }
 
 fun KotlinMultiplatformExtension.jsTarget() {
@@ -94,8 +94,10 @@ fun KotlinMultiplatformExtension.allTargets() {
     wasmJsTarget()
 }
 
-fun KotlinMultiplatformExtension.composeTargets() {
-    jvmTargets()
+fun KotlinMultiplatformExtension.composeTargets(
+    jvmTarget: JvmTarget = JvmTarget.JVM_1_8,
+) {
+    jvmTargets(jvmTarget)
     jsTarget()
     iosTargets()
     wasmJsTarget()
