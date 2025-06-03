@@ -35,6 +35,7 @@ androidx-lifecycle = "2.9.0"
 filekit = "0.8.8"
 kotlinx-browser = "0.3"
 secure-random = "0.5.1"
+sketch = "4.1.0"
 
 [plugins]
 kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
@@ -118,6 +119,7 @@ coil3 = { module = "io.coil-kt.coil3:coil", version.ref = "coil3" }
 coil3-network-core = { module = "io.coil-kt.coil3:coil-network-core", version.ref = "coil3" }
 coil2 = { module = "io.coil-kt:coil", version.ref = "coil2" }
 imageloader = { module = "io.github.qdsfdhvh:image-loader", version.ref = "imageloader" }
+sketch-http = { module = "io.github.panpf.sketch4:sketch-http", version.ref = "sketch" }
 
 # Sample dependencies
 koin-core = { module = "io.insert-koin:koin-core", version.ref = "koin" }

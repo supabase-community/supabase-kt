@@ -22,6 +22,7 @@ include("bom")
 
 // Test module
 include("test-common")
+include("test")
 
 // Serializers
 include(":serializers:Moshi")
@@ -36,6 +37,7 @@ include(":plugins:ComposeAuthUI")
 include(":plugins:Coil3Integration")
 include(":plugins:CoilIntegration")
 include(":plugins:ImageLoaderIntegration")
+include(":plugins:SketchIntegration")
 
 // Samples
 if (System.getProperty("LibrariesOnly") != "true") {
@@ -57,6 +59,7 @@ project(":plugins:ComposeAuthUI").name = "compose-auth-ui"
 project(":plugins:Coil3Integration").name = "coil3-integration"
 project(":plugins:CoilIntegration").name = "coil-integration"
 project(":plugins:ImageLoaderIntegration").name = "imageloader-integration"
+project(":plugins:SketchIntegration").name = "sketch-integration"
 rootProject.name = "supabase-kt"
 
 fun includeSample(name: String, vararg targets: String) {

@@ -1,9 +1,9 @@
 # Supabase-kt Coil 3 Integration
 
-Extends supabase-kt with a Coil3 integration for image loading.
-**Requires supabase-kt `3.0.0` or higher.**
+Extends supabase-kt with a [Sketch](https://github.com/panpf/sketch) integration for image loading.
+**Requires supabase-kt `3.2.0` or higher.**
 
-Current supported Coil3 version: `3.2.0` and higher.
+Current supported Sketch version: `4.1.0` and higher.
 
 Supported targets:
 
@@ -29,7 +29,7 @@ Newest version: [![](https://img.shields.io/github/release/supabase-community/su
 
 ```kotlin
 dependencies {
-    implementation("io.github.jan-tennert.supabase:coil3-integration:VERSION")
+    implementation("io.github.jan-tennert.supabase:sketch-integration:VERSION")
 }
 ```
 
@@ -43,30 +43,27 @@ val client = createSupabaseClient(
     install(Storage) {
         //your config
     }
-    install(Coil3Integration)
+    install(SketchIntegration)
 }
 ```
 
-If you don't have a coil-network artifact in your dependencies, you will need to add it. See the [Coil documentation](https://coil-kt.github.io/coil/upgrading_to_coil3/#network-images) for more information.
+If you don't have a sketch-http artifact in your dependencies, you will need to add it. See the [Sketch documentation](https://github.com/panpf/sketch#install) for more information.
 
 # Usage
 
-### Add Supabase Fetcher to Coil
+### Add Supabase Fetcher to Sketch
 
-Create a new ImageLoader with the Supabase Fetcher and a [network fetcher](https://coil-kt.github.io/coil/upgrading_to_coil3/#network-images).
+Create Sketch with the Supabase Fetcher.
 
 ```kotlin
-ImageLoader.Builder(context)
-    .components {
-        add(supabaseClient.coil3)
-        //You also need the add the network fetcher factory if you don't have it already
-        //Depending on the network artifact you added, this will be different
-        add(KtorNetworkFetcherFactory())
+Sketch.Builder(it).apply {
+    components {
+        supportSupabaseStorage(supabase)
     }
-    .build()
+}.build()
 ```
 
-You can also replace the default Coil Image Loader in your application. 
+You can also replace the default Sketch object
 For Compose Multiplatform Applications using the `coil-compose` dependency, you can use the `setSingletonImageLoaderFactory` composable function:
 ```kotlin
 setSingletonImageLoaderFactory { platformContext ->
