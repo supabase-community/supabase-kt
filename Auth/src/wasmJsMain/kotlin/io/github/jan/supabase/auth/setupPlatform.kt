@@ -1,6 +1,7 @@
 package io.github.jan.supabase.auth
 
 import io.github.jan.supabase.annotations.SupabaseInternal
+import io.github.jan.supabase.auth.status.SessionSource
 import io.github.jan.supabase.logging.d
 import io.ktor.util.PlatformUtils.IS_BROWSER
 import kotlinx.browser.window
@@ -28,14 +29,22 @@ actual fun Auth.setupPlatform() {
 
     fun checkForPCKECode() {
         val url = URL(window.location.href)
-        val code = url.searchParams.get("code") ?: return
-        Auth.logger.d { "Found PCKE code: $code" }
-        authScope.launch {
-            val session = exchangeCodeForSession(code)
-            importSession(session)
+        var clean: Boolean
+        if(handledUrlParameterError { url.searchParams.get(it) }) {
+            clean = true
+        } else {
+            val code = url.searchParams.get("code") ?: return
+            Auth.logger.d { "Found PCKE code: $code" }
+            authScope.launch {
+                val session = exchangeCodeForSession(code)
+                importSession(session, source = SessionSource.External)
+            }
+            clean = true
         }
-        val newURL = consumeUrlParameter(listOf("code"), window.location.href)
-        window.history.replaceState(null, window.document.title, newURL);
+        if(clean) {
+            val newURL = consumeUrlParameter(Auth.QUERY_PARAMETERS, window.location.href)
+            window.history.replaceState(null, window.document.title, newURL);
+        }
     }
 
     if(IS_BROWSER) {
