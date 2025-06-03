@@ -73,19 +73,19 @@ interface SupabaseClient {
     companion object {
 
         /**
-         * The default logging level used for plugins. Can be changed within the [SupabaseClientBuilder]
+         * The default minimum logging level used for plugins. Can be changed within the [SupabaseClientBuilder]
          */
         var DEFAULT_LOG_LEVEL = LogLevel.INFO
             internal set
 
-        val LOGGER = createLogger("Supabase-Core")
+        val LOGGER: SupabaseLogger = createLogger("Supabase-Core")
 
         /**
          * Creates a new [SupabaseLogger] using the [KermitSupabaseLogger] implementation.
          * @param tag The tag for the logger
          * @param level The logging level. If set to null, the [DEFAULT_LOG_LEVEL] property will be used instead
          */
-        fun createLogger(tag: String, level: LogLevel? = null) = KermitSupabaseLogger(level, tag)
+        fun createLogger(tag: String, level: LogLevel? = null): SupabaseLogger = KermitSupabaseLogger(level, tag)
 
     }
 

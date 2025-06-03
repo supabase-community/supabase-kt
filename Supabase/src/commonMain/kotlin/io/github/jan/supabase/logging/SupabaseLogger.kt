@@ -3,7 +3,6 @@ package io.github.jan.supabase.logging
 import co.touchlab.kermit.Logger
 import co.touchlab.kermit.Severity
 import io.github.jan.supabase.SupabaseClient
-import io.github.jan.supabase.annotations.SupabaseInternal
 
 /**
  * An interface for logging in Supabase plugins.
@@ -11,7 +10,7 @@ import io.github.jan.supabase.annotations.SupabaseInternal
 abstract class SupabaseLogger {
 
     /**
-     * The log level for this logger. If null, the [SupabaseClient.DEFAULT_LOG_LEVEL] will be used.
+     * The minimum log level to handle for this logger. If null, the [SupabaseClient.DEFAULT_LOG_LEVEL] will be used.
      */
     abstract val level: LogLevel?
 
@@ -35,37 +34,29 @@ abstract class SupabaseLogger {
         }
     }
 
-    /**
-     * Set the log level for this logger
-     * @param level The log level
-     */
-    @SupabaseInternal
-    abstract fun setLevel(level: LogLevel)
-
 }
 
 /**
  * A logger implementation using the Kermit logger.
- * @param level The log level for this logger. If null, the [SupabaseClient.DEFAULT_LOG_LEVEL] will be used.
+ * @param level The minimum log level for this logger.
  * @param tag The tag for this logger
  * @param logger The Kermit logger
  */
-class KermitSupabaseLogger(level: LogLevel?, tag: String, private val logger: Logger = Logger.withTag(tag)):
-    SupabaseLogger() {
+class KermitSupabaseLogger(
+    override val level: LogLevel?,
+    tag: String,
+    private val logger: Logger = Logger.withTag(tag)
+) : SupabaseLogger() {
 
-    override var level: LogLevel? = level
-        private set
-
-    @SupabaseInternal
-    override fun setLevel(level: LogLevel) {
-        this.level = level
+    init {
+        logger.mutableConfig.minSeverity = (level ?: SupabaseClient.DEFAULT_LOG_LEVEL).toSeverity()
     }
 
-    override fun log(level: LogLevel, throwable: Throwable?, message:  String) {
+    override fun log(level: LogLevel, throwable: Throwable?, message: String) {
         logger.log(level.toSeverity(), logger.tag, throwable, message)
     }
 
-    private fun LogLevel.toSeverity() = when(this) {
+    private fun LogLevel.toSeverity() = when (this) {
         LogLevel.DEBUG -> Severity.Debug
         LogLevel.INFO -> Severity.Info
         LogLevel.WARNING -> Severity.Warn
