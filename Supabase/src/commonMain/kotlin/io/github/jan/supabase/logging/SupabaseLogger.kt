@@ -42,7 +42,7 @@ abstract class SupabaseLogger {
  * @param tag The tag for this logger
  * @param logger The Kermit logger
  */
-class KermitSupabaseLogger(
+internal class KermitSupabaseLogger(
     override val level: LogLevel,
     tag: String,
     private val logger: Logger = Logger.withTag(tag)
