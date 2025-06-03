@@ -85,7 +85,8 @@ interface SupabaseClient {
          * @param tag The tag for the logger
          * @param level The logging level. If set to null, the [DEFAULT_LOG_LEVEL] property will be used instead
          */
-        fun createLogger(tag: String, level: LogLevel? = null): SupabaseLogger = KermitSupabaseLogger(level, tag)
+        fun createLogger(tag: String, level: LogLevel? = null): SupabaseLogger =
+            KermitSupabaseLogger(level ?: DEFAULT_LOG_LEVEL, tag)
 
     }
 

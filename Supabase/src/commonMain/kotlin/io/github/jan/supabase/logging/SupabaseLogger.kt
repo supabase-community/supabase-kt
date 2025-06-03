@@ -43,13 +43,13 @@ abstract class SupabaseLogger {
  * @param logger The Kermit logger
  */
 class KermitSupabaseLogger(
-    override val level: LogLevel?,
+    override val level: LogLevel,
     tag: String,
     private val logger: Logger = Logger.withTag(tag)
 ) : SupabaseLogger() {
 
     init {
-        logger.mutableConfig.minSeverity = (level ?: SupabaseClient.DEFAULT_LOG_LEVEL).toSeverity()
+        logger.mutableConfig.minSeverity = level.toSeverity()
     }
 
     override fun log(level: LogLevel, throwable: Throwable?, message: String) {
