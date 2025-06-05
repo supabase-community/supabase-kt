@@ -14,6 +14,7 @@ import io.github.jan.supabase.storage.storage
 /**
  * A plugin that implements [Fetcher.Factory] to support using [StorageItem] as data when creating an [ImageRequest] or using it as a model in Compose Multiplatform.
  */
+@SupabaseExperimental
 interface SketchIntegration: SupabasePlugin<SketchIntegration.Config>, Fetcher.Factory {
 
     /**
