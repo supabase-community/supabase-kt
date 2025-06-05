@@ -68,7 +68,7 @@ You can also replace the default Sketch object
 SingletonSketch.setSafe {
     Sketch.Builder(it).apply {
         components {
-            supportSupabaseStorage
+            supportSupabaseStorage(supabase)
         }
     }.build()
 }
