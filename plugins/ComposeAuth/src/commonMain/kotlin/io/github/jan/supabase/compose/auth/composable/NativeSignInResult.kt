@@ -19,7 +19,7 @@ sealed interface NativeSignInResult {
      * Network error occurred
      * @property message The error message
      */
-    @Deprecated
+    @Deprecated("Use Error instead. This will be removed in a future version.")
     data class NetworkError(val message: String) : NativeSignInResult
 
     /**
