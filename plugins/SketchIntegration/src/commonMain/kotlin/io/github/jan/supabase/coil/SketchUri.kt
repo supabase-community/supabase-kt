@@ -19,6 +19,6 @@ internal fun Uri.toStorageItem(): StorageItem {
 }
 
 internal fun isSupabaseUri(uri: Uri): Boolean =
-    SupabaseStorageFetcher.SCHEME.equals(uri.scheme, ignoreCase = true).also(::println)
+    SupabaseStorageFetcher.SCHEME.equals(uri.scheme, ignoreCase = true)
             && uri.authority?.takeIf { it.isNotEmpty() } == null
             && uri.pathSegments.size > 1

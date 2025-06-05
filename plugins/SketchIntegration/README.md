@@ -64,39 +64,33 @@ Sketch.Builder(it).apply {
 ```
 
 You can also replace the default Sketch object
-For Compose Multiplatform Applications using the `coil-compose` dependency, you can use the `setSingletonImageLoaderFactory` composable function:
 ```kotlin
-setSingletonImageLoaderFactory { platformContext ->
-    ImageLoader.Builder(platformContext)
-        .components {
-            add(supabaseClient.coil3)
-            //Your network fetcher factory
-            add(KtorNetworkFetcherFactory())
+SingletonSketch.setSafe {
+    Sketch.Builder(it).apply {
+        components {
+            supportSupabaseStorage
         }
-        .build()
+    }.build()
 }
 ```
-You call this composable before any `Image` composable is used. Presumably in your `Root` composable.
 
-See the [Coil documentation](https://coil-kt.github.io/coil/getting_started/#image-loaders) for more information.
+See the [Sketch documentation](https://github.com/panpf/sketch/blob/main/docs/getting_started.md#singleton-mode) for more information.
 
 ### Display images from Supabase Storage
 
 You can easily create an image request like this:
 
 ```kotlin
-val request = ImageRequest.Builder(context)
-    .data(authenticatedStorageItem("icons", "profile.png")) //for non-public buckets
-    .build()
+val request = ImageRequest(context, authenticatedStorageItem("icons", "profile.png").asSketchUri())
 ```
 
-Or if you are using [Compose Multiplatform](https://coil-kt.github.io/coil/compose/):
+Or if you are using [Sketch Compose](https://github.com/panpf/sketch/blob/main/docs/compose.md):
 
 ```kotlin
 AsyncImage(
-    model = publicStorageItem("icons", "profile.png"), //for public buckets
-    contentDescription = null,
+    uri = authenticatedStorageItem("icons", "profile.png").asSketchUri(),
+    contentDescription = "profile image"
 )
 ```
 
-The Coil integration will automatically add the Authorization header to the request if the bucket is not public.
+The Sketch integration will automatically add the Authorization header to the request if the bucket is not public.
