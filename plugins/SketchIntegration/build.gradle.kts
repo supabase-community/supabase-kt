@@ -13,12 +13,18 @@ repositories {
 @OptIn(org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi::class)
 kotlin {
     defaultConfig()
-    jvm()
+    composeTargets()
     sourceSets {
         val commonMain by getting {
             dependencies {
                 api(project(":storage-kt"))
                 api(libs.sketch.http)
+            }
+        }
+        val commonTest by getting {
+            dependencies {
+                implementation(project(":test-common"))
+                implementation(libs.bundles.testing)
             }
         }
     }

@@ -16,6 +16,8 @@ import io.github.jan.supabase.storage.authenticatedRequest
 
 /**
  * Adds support for fetching [StorageItem]s from Supabase Storage in Sketch.
+ * This allows you to use Supabase Storage items as image sources in Sketch.
+ * @param supabase The [SupabaseClient] instance to use for authentication. Note that fetching is not done through the Supabase client directly, but rather through an installed HTTP [Fetcher] in Sketch.
  */
 fun ComponentRegistry.Builder.supportSupabaseStorage(supabase: SupabaseClient): ComponentRegistry.Builder = apply {
     addFetcher(supabase.sketch)
