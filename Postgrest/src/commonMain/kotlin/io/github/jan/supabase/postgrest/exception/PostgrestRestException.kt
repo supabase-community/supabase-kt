@@ -2,6 +2,7 @@ package io.github.jan.supabase.postgrest.exception
 
 import io.github.jan.supabase.exceptions.RestException
 import io.ktor.client.statement.HttpResponse
+import kotlinx.serialization.json.JsonElement
 
 /**
  * Exception thrown when a Postgrest request fails
@@ -14,7 +15,10 @@ import io.ktor.client.statement.HttpResponse
 class PostgrestRestException(
     message: String,
     val hint: String?,
-    val details: String?,
+    val details: JsonElement?,
     val code: String?,
     response: HttpResponse
-): RestException(message, hint ?: details, response)
+): RestException(message, """
+    |Hint: $hint
+    |Details: $details
+""".trimIndent(), response)
