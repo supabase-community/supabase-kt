@@ -22,6 +22,10 @@ kotlin {
                 withLinux()
                 withMingw()
             }
+            group("web") {
+                withJs()
+                withWasmJs()
+            }
             group("nonDesktop") {
                 //withAndroidTarget() android has its own implementation
                 withIos()
