@@ -14,5 +14,5 @@ internal actual suspend fun Auth.startExternalAuth(
     getUrl: suspend (redirectTo: String?) -> String,
     onSessionSuccess: suspend (UserSession) -> Unit
 ) {
-    supabaseClient.openExternalUrl(getUrl(redirectUrl))
+    config.urlLauncher.openUrl(supabaseClient, getUrl(redirectUrl))
 }

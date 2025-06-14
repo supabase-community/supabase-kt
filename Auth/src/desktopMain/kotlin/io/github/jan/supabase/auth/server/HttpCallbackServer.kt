@@ -2,7 +2,6 @@ package io.github.jan.supabase.auth.server
 
 import io.github.jan.supabase.auth.Auth
 import io.github.jan.supabase.auth.AuthImpl
-import io.github.jan.supabase.auth.openExternalUrl
 import io.github.jan.supabase.auth.user.UserSession
 import io.github.jan.supabase.logging.d
 import io.ktor.http.ContentType
@@ -42,7 +41,8 @@ internal suspend fun createServer(
             Auth.logger.d {
                 "Started OAuth callback server on port $port. Opening url in browser..."
             }
-            auth.supabaseClient.openExternalUrl(
+            auth.config.urlLauncher.openUrl(
+                auth.supabaseClient,
                 url(
                     "http://localhost:$port"
                 )

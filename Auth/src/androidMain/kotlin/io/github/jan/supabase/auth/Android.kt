@@ -39,9 +39,14 @@ fun SupabaseClient.handleDeeplinks(intent: Intent, onSessionSuccess: (UserSessio
     when(this.auth.config.flowType) {
         FlowType.IMPLICIT -> {
             val fragment = data.fragment ?: return
-            auth.parseFragmentAndImportSession(fragment, onSessionSuccess)
+            auth.parseFragmentAndImportSession(fragment) {
+                it?.let(onSessionSuccess)
+            }
         }
         FlowType.PKCE -> {
+            if(auth.handledUrlParameterError { data.getQueryParameter(it) }) {
+                return
+            }
             val code = data.getQueryParameter("code") ?: return
             (auth as AuthImpl).authScope.launch {
                 this@handleDeeplinks.auth.exchangeCodeForSession(code)
