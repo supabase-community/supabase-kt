@@ -14,6 +14,8 @@ For information about supported Kotlin targets, see the corresponding module REA
 [![Ktor](https://img.shields.io/badge/ktor-3.1.1-blue)](https://ktor.io/)
 [![slack](https://img.shields.io/badge/slack-%23supabase--kt-purple.svg?logo=slack)](https://kotlinlang.slack.com/archives/C06QXPC7064)
 
+[![ko-fi](https://www.ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/jantennert)
+
 ### Links
 
 [Documentation](https://supabase.com/docs/reference/kotlin/introduction)
