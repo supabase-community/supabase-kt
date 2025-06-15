@@ -49,7 +49,7 @@ class SelectableSymbolProcessor(
                 logger.error("Primary constructor is null or has no parameter", symbol)
                 return emptyList()
             }
-            val columns = parameters.map { processParameters(it, resolver) }.joinToString(",")
+            val columns = parameters.joinToString(",") { processParameters(it, resolver) }
             types[qualifiedName] = columns
         }
         writePostgrestExtensionFunction(types, symbols.mapNotNull { it.containingFile }.toList())
@@ -98,7 +98,7 @@ class SelectableSymbolProcessor(
                     logger.error("Primary constructor of ${parameterClass.qualifiedName} is null or has no parameter", parameter)
                     return ""
                 }
-                columns.map { processParameters(it, resolver) }.joinToString(",")
+                columns.joinToString(",") { processParameters(it, resolver) }
             }
         } else ""
         val alias = parameter.nameAsString

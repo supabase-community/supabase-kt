@@ -6,7 +6,7 @@ To install it, add the KSP Gradle plugin to your project:
 
 ```kotlin
 plugins {
-    id("com.google.devtools.ksp") version "2.0.21-1.0.25" //kotlinVersion-kspVersion
+    id("com.google.devtools.ksp") version "2.1.21-2.0.2" //kotlinVersion-kspVersion
 }
 ```
 
