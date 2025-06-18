@@ -1,7 +1,7 @@
 # Supabase-kt Compose-ImageLoader Integration
 
 > [!WARNING]
-> Deprecated. Use Coil 3 or create your own integration. Last supported Image Loader version: 1.9.0
+> Deprecated and will not be updated anymore. Use Coil 3, Sketch or create your own integration. Last supported Image Loader version: 1.9.0
 
 Extends supabase-kt with a [Compose-ImageLoader](https://github.com/qdsfdhvh/compose-imageloader) integration for image loading.
 
@@ -25,7 +25,7 @@ Supported targets:
 
 # Installation
 
-Newest version: [![](https://img.shields.io/github/release/supabase-community/supabase-kt?label=)](https://github.com/supabase-community/supabase-kt/releases)
+Latest version: `3.1.0`
 
 ```kotlin
 dependencies {

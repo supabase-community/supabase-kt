@@ -51,7 +51,8 @@ kotlin {
                 api(compose.foundation)
                 api(compose.material3)
                 api(compose.materialIconsExtended)
-                addModules(SupabaseModule.AUTH, SupabaseModule.POSTGREST, SupabaseModule.REALTIME, SupabaseModule.COMPOSE_AUTH, SupabaseModule.COMPOSE_AUTH_UI)
+                addModules(SupabaseModule.AUTH, SupabaseModule.POSTGREST, SupabaseModule.REALTIME)
+                //TODO: Add compose-auth and compose-auth-ui when available on Maven Central
                 api(libs.koin.core)
             }
         }
