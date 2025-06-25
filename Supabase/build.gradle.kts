@@ -37,7 +37,7 @@ kotlin {
     defaultConfig()
     allTargets()
     sourceSets {
-        val commonMain by getting {
+        commonMain {
             kotlin.srcDir(
                 // convert the task to a file-provider
                 buildConfigGenerator.map { it.destinationDir }
@@ -50,12 +50,12 @@ kotlin {
                 api(libs.kotlinx.atomicfu)
             }
         }
-        val commonTest by getting {
+        commonTest {
             dependencies {
                 implementation(libs.bundles.testing)
             }
         }
-        val androidMain by getting {
+        androidMain {
             dependencies {
                 api(libs.android.lifecycle.process)
             }
