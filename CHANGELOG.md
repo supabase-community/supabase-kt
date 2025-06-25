@@ -4,6 +4,8 @@
 
 ### All modules
 
+- Update to Kotlin `2.2.0`
+- Update to Ktor `2.2.0`
 - Don't swallow `CancellationException` by @sproctor in #895
 - Only catch serialization exceptions in `bodyOrNull` by @jan-tennert in https://github.com/supabase-community/supabase-kt/pull/904
 - Fix simple warnings by @sproctor in https://github.com/supabase-community/supabase-kt/pull/915
@@ -40,15 +42,12 @@
 
   Additional changes:
   - Error related parameters will now be removed from the history when used
-* Deprecate NativeSignInResult.NetworkError as it isn't used by @jan-tennert in https://github.com/supabase-community/supabase-kt/pull/952
 * (JS, WASM JS) Add an option to disable automatic url checking by @jan-tennert in https://github.com/supabase-community/supabase-kt/pull/96
   ```kotlin
   install(Auth) {
       disableUrlChecking = true //Default: false
   }
   ```
-* Deprecate minimalSettings in favor of minimalConfig by @jan-tennert in https://github.com/supabase-community/supabase-kt/pull/916
-* Fix null result when sign up with Email provider by @hieuwu in https://github.com/supabase-community/supabase-kt/pull/922
 * Add support for providing a custom url launcher by @jan-tennert in https://github.com/supabase-community/supabase-kt/pull/933
   You can now provide a custom `UrlLauncher` for opening URLs in the OAuth flow:
   ```kotlin
@@ -58,6 +57,9 @@
       }
   }
   ```
+* Deprecate NativeSignInResult.NetworkError as it isn't used by @jan-tennert in https://github.com/supabase-community/supabase-kt/pull/952
+* Deprecate minimalSettings in favor of minimalConfig by @jan-tennert in https://github.com/supabase-community/supabase-kt/pull/916
+* Fix null result when sign up with Email provider by @hieuwu in https://github.com/supabase-community/supabase-kt/pull/922
 - Fix OAuth server listener resuming coroutine twice by @jan-tennert in #893
   A Desktop app using OAuth should no longer produce an exception when exiting the app after using `signInWith(OAuthProvider)`
 - Add missing error codes by @jan-tennert in https://github.com/supabase-community/supabase-kt/pull/909:
