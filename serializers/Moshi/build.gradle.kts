@@ -15,14 +15,14 @@ kotlin {
     configuredAndroidTarget()
     configuredJvmTarget()
     sourceSets {
-        val commonMain by getting {
+        commonMain {
             dependencies {
                 addModules(SupabaseModule.SUPABASE)
                 implementation(libs.kotlin.reflect)
                 implementation(libs.bundles.moshi)
             }
         }
-        val commonTest by getting {
+        commonTest {
             dependencies {
                 implementation(libs.bundles.testing)
                 implementation(project(":test-common"))
