@@ -53,7 +53,6 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-import kotlinx.datetime.Clock
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonObjectBuilder
 import kotlinx.serialization.json.buildJsonObject
@@ -63,12 +62,15 @@ import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.put
 import kotlin.coroutines.coroutineContext
+import kotlin.time.Clock
 import kotlin.time.Duration.Companion.seconds
+import kotlin.time.ExperimentalTime
 
 private const val SESSION_REFRESH_THRESHOLD = 0.8
 @Suppress("MagicNumber") // see #631
 private val SIGNOUT_IGNORE_CODES = listOf(401, 403, 404)
 
+@OptIn(ExperimentalTime::class)
 @PublishedApi
 internal class AuthImpl(
     override val supabaseClient: SupabaseClient,

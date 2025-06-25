@@ -1,8 +1,9 @@
 package io.github.jan.supabase.auth.mfa
 
-import kotlinx.datetime.Instant
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
 
 /**
  * A challenge to verify the user's identity.
@@ -17,6 +18,7 @@ data class MfaChallenge(val id: String, @SerialName("type") val factorType: Stri
     /**
      * Timestamp in UNIX seconds when this challenge will no longer be usable.
      */
+    @OptIn(ExperimentalTime::class)
     val expiresAt: Instant
         get() = Instant.fromEpochSeconds(expiresAtSeconds)
 
