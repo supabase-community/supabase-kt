@@ -5,7 +5,7 @@
 ### All modules
 
 - Update to Kotlin `2.2.0`
-- Update to Ktor `2.2.0`
+- Update to Ktor `3.2.0`
 - Don't swallow `CancellationException` by @sproctor in #895
 - Only catch serialization exceptions in `bodyOrNull` by @jan-tennert in https://github.com/supabase-community/supabase-kt/pull/904
 - Fix simple warnings by @sproctor in https://github.com/supabase-community/supabase-kt/pull/915
