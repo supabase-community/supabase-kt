@@ -112,7 +112,7 @@ jackson = { module = "com.fasterxml.jackson.core:jackson-core", version.ref = "j
 jackson-kotlin = { module = "com.fasterxml.jackson.module:jackson-module-kotlin", version.ref = "jackson" }
 
 androidsvg = { module = "com.caverock:androidsvg-aar", version.ref = "androidsvg" }
-turbine = { module = "app.cash.turbine:turbine", version = "1.2.0" }
+turbine = { module = "app.cash.turbine:turbine", version = "1.2.1" }
 
 coil3 = { module = "io.coil-kt.coil3:coil", version.ref = "coil3" }
 coil3-network-core = { module = "io.coil-kt.coil3:coil-network-core", version.ref = "coil3" }
