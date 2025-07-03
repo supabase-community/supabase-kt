@@ -14,6 +14,7 @@ plugins {
 
 group = "io.github.jan.supabase"
 version = "1.0-SNAPSHOT"
+val pluginVersion = "3.2.0"
 
 kotlin {
     @OptIn(ExperimentalKotlinGradlePluginApi::class)
@@ -52,7 +53,8 @@ kotlin {
                 api(compose.material3)
                 api(compose.materialIconsExtended)
                 addModules(SupabaseModule.AUTH, SupabaseModule.POSTGREST, SupabaseModule.REALTIME)
-                //TODO: Add compose-auth and compose-auth-ui when available on Maven Central
+                api("io.github.jan-tennert.supabase:compose-auth:$pluginVersion")
+                api("io.github.jan-tennert.supabase:compose-auth-ui:$pluginVersion")
                 api(libs.koin.core)
             }
         }
