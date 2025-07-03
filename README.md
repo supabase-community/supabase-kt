@@ -120,12 +120,16 @@ __For versions below 3.0.0:__
 
 ### Plugins
 
-- [Apollo GraphQL integration](/plugins/ApolloGraphQL) - Creates an [Apollo GraphQL Client](https://github.com/apollographql/apollo-kotlin) for interacting with the Supabase API.
-- [Compose Auth](/plugins/ComposeAuth) - Provides easy Native Google & Apple Auth for Compose Multiplatform targets.
-- [Compose Auth UI](/plugins/ComposeAuthUI) - Provides UI Components for Compose Multiplatform.
-- [Coil Integration](/plugins/CoilIntegration) - Provides a [Coil2](https://github.com/coil-kt/coil) Integration for displaying images stored in Supabase Storage. Only supports Android.
-- [Coil3 Integration](/plugins/Coil3Integration) - Provides a [Coil3](https://github.com/coil-kt/coil) Integration for displaying images stored in Supabase Storage. Supports all Compose Multiplatform targets.
-- *[Compose-ImageLoader Integration](/plugins/ImageLoaderIntegration) - Deprecated. Use Coil 3 or create your own integration*
+There are several plugins available to extend the functionality of supabase-kt. They can be installed in the `createSupabaseClient` function.
+
+Some highlights include:
+
+- [Apollo GraphQL integration](https://github.com/supabase-community/supabase-kt-plugins/tree/main/ApolloGraphQL) - Creates an [Apollo GraphQL Client](https://github.com/apollographql/apollo-kotlin) for interacting with the Supabase API.
+- [Compose Auth](https://github.com/supabase-community/supabase-kt-plugins/tree/main/ComposeAuth) - Provides easy Native Google & Apple Auth for Compose Multiplatform targets.
+- [Compose Auth UI](https://github.com/supabase-community/supabase-kt-plugins/tree/main/ComposeAuthUI) - Provides UI Components for Compose Multiplatform.
+- [Coil3 Integration](https://github.com/supabase-community/supabase-kt-plugins/tree/main/Coil3Integration) - Provides a [Coil3](https://github.com/coil-kt/coil) Integration for displaying images stored in Supabase Storage. Supports all Compose Multiplatform targets.
+
+For more information, checkout [supabase-kt-plugins](https://github.com/supabase-community/supabase-kt-plugins).
 
 ### Miscellaneous
 - [Supabase Edge Functions Kotlin](https://github.com/manriif/supabase-edge-functions-kt) - Build, serve and deploy Supabase Edge Functions with Kotlin and Gradle.
