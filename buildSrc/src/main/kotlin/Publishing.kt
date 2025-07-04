@@ -7,7 +7,7 @@ val Project.supabaseVersion get() = System.getProperty("SupabaseVersion") ?: ext
 
 fun Project.applyPublishing() {
     extensions.configure(MavenPublishBaseExtension::class) {
-        publishToMavenCentral(com.vanniktech.maven.publish.SonatypeHost.S01)
+        publishToMavenCentral()
 
         if (System.getProperty("DisableSigning") != "true") {
             signAllPublications()

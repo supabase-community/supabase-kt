@@ -1,5 +1,78 @@
 # Changelog
 
+### 3.2.0 - June 25, 2025
+
+### All modules
+
+- Update to Kotlin `2.2.0`
+- Update to Ktor `3.2.0`
+- Don't swallow `CancellationException` by @sproctor in #895
+- Only catch serialization exceptions in `bodyOrNull` by @jan-tennert in https://github.com/supabase-community/supabase-kt/pull/904
+- Fix simple warnings by @sproctor in https://github.com/supabase-community/supabase-kt/pull/915
+- Use Dispatchers.IO by default on multi-threaded platforms by @sproctor in https://github.com/supabase-community/supabase-kt/pull/905
+  - Configurable default dispatcher `SupabaseClientBuilder#coroutineDispatcher`, defaulting to `Dispatchers.IO` on supported targets.
+  - Deprecated `AuthConfig#coroutineDispatcher`, replaced by the new client wide dispatcher.
+
+### Core
+
+* Add new standard headers by @jan-tennert in https://github.com/supabase-community/supabase-kt/pull/927
+
+### Auth
+
+* Add new event system, add support for error code in OTP links by @jan-tennert in https://github.com/supabase-community/supabase-kt/pull/912
+  ```kotlin
+  supabase.auth.events.collect { 
+      when(it) {
+          is AuthEvent.OtpError -> {
+              println(it.errorCode)
+          }
+          is AuthEvent.RefreshFailure -> TODO()
+      }
+  }
+  ```
+  New event system which exists next to the `sessionStatus`, but works independently. Currently there are two events:
+  - `AuthEvent.OtpError(...)` - will be emitted if an error code was found in a OTP link (deeplink on Android/iOS, URL on JS and Desktop)
+  - `AuthEvent.RefreshFailure(cause)` - will be emitted if a session refresh failed (regardless if the session is still valid)
+
+  This PR also changes the `SessionStatus.RefreshFailure(cause)`:
+  - The `cause` parameter/property is deprecated (use the event for the cause)
+  - This status will only get set, if the session expired.
+
+  --> If a refresh failed, an event will always be emitted, but the session status will only get updated if the session also expired. Planning to rename the status in the future to something like `SessionStatus.NeedsRefresh`
+
+  Additional changes:
+  - Error related parameters will now be removed from the history when used
+* (JS, WASM JS) Add an option to disable automatic url checking by @jan-tennert in https://github.com/supabase-community/supabase-kt/pull/96
+  ```kotlin
+  install(Auth) {
+      disableUrlChecking = true //Default: false
+  }
+  ```
+* Add support for providing a custom url launcher by @jan-tennert in https://github.com/supabase-community/supabase-kt/pull/933
+  You can now provide a custom `UrlLauncher` for opening URLs in the OAuth flow:
+  ```kotlin
+  install(Auth)  {
+      urlLauncher = UrlLauncher { supabase, url ->
+          println("Opening URL: $url")
+      }
+  }
+  ```
+* Deprecate NativeSignInResult.NetworkError as it isn't used by @jan-tennert in https://github.com/supabase-community/supabase-kt/pull/952
+* Deprecate minimalSettings in favor of minimalConfig by @jan-tennert in https://github.com/supabase-community/supabase-kt/pull/916
+* Fix null result when sign up with Email provider by @hieuwu in https://github.com/supabase-community/supabase-kt/pull/922
+- Fix OAuth server listener resuming coroutine twice by @jan-tennert in #893
+  A Desktop app using OAuth should no longer produce an exception when exiting the app after using `signInWith(OAuthProvider)`
+- Add missing error codes by @jan-tennert in https://github.com/supabase-community/supabase-kt/pull/909:
+  `EmailAddressInvalid`, `Web3ProviderDisabled`, `Web3UnsupportedChain`
+- (JS/Wasm JS) Fix exception on non-session hash parameters and only consume used parameters by @jan-tennert in https://github.com/supabase-community/supabase-kt/pull/911
+  Previously, all URL parameters / hash parameter were removed after successfully authenticating, this is no longer the case.
+- Fix session expiration check by @jan-tennert in https://github.com/supabase-community/supabase-kt/pull/913
+  The session will now also be refreshed when the current date time is under a certain threshold (20% before the actual expiration), instead of only after session expiration
+
+### Postgrest
+
+* Fix serialization exception occurring when `PostgrestRestException#details` is not a String by @jan-tennert in https://github.com/supabase-community/supabase-kt/pull/956
+
 ### 3.1.4 - April 1, 2025
 
 ### All modules
