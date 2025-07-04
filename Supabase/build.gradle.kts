@@ -48,6 +48,7 @@ kotlin {
                 api(libs.kermit)
                 api(libs.bundles.ktor.client)
                 api(libs.kotlinx.atomicfu)
+                api(libs.kotlinx.serialization.json)
             }
         }
         commonTest {

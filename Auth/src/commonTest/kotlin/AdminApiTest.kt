@@ -16,7 +16,6 @@ import io.github.jan.supabase.testing.toJsonElement
 import io.ktor.client.engine.mock.respond
 import io.ktor.http.HttpMethod
 import kotlinx.coroutines.test.runTest
-import kotlinx.datetime.Clock
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.boolean
 import kotlinx.serialization.json.buildJsonObject
@@ -26,6 +25,7 @@ import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.put
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.time.Clock
 
 class AdminApiTest {
 
