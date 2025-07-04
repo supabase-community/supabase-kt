@@ -1,7 +1,7 @@
 [versions]
 kotlin = "2.2.0"
 accompanist-permissions = "0.37.3"
-ktor = "3.2.0"
+ktor = "3.2.1"
 dokka = "2.0.0"
 kotlinx-datetime = "0.7.0"
 kermit = "2.0.6"
@@ -15,6 +15,7 @@ complete-kotlin = "1.1.0"
 agp = "8.9.2"
 maven-publish = "0.33.0"
 apollo-kotlin = "4.3.1"
+serialization = "1.9.0"
 #korlibs = "6.0.0"
 detekt = "1.23.8"
 moshi = "1.15.2"
@@ -48,6 +49,7 @@ kotlinx-atomicfu = { id = "org.jetbrains.kotlinx.atomicfu", version.ref = "atomi
 power-assert = { id = "org.jetbrains.kotlin.plugin.power-assert", version.ref = "kotlin" }
 
 [libraries]
+kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "serialization" }
 kotlinx-atomicfu = { module = "org.jetbrains.kotlinx:atomicfu", version.ref = "atomicfu" }
 kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinx-datetime" }
 kotlinx-browser = { module = "org.jetbrains.kotlinx:kotlinx-browser", version.ref = "kotlinx-browser" }

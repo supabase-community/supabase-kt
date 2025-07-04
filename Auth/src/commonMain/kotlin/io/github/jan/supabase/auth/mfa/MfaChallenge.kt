@@ -2,7 +2,6 @@ package io.github.jan.supabase.auth.mfa
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
 
 /**
@@ -18,7 +17,6 @@ data class MfaChallenge(val id: String, @SerialName("type") val factorType: Stri
     /**
      * Timestamp in UNIX seconds when this challenge will no longer be usable.
      */
-    @OptIn(ExperimentalTime::class)
     val expiresAt: Instant
         get() = Instant.fromEpochSeconds(expiresAtSeconds)
 

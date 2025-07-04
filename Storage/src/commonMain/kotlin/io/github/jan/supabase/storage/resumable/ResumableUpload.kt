@@ -35,7 +35,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlin.math.min
-import kotlin.time.ExperimentalTime
 
 /**
  * Represents a resumable upload. Can be paused, resumed or cancelled.
@@ -108,7 +107,6 @@ internal class ResumableUploadImpl(
         removeFromCache()
     }
 
-    @OptIn(ExperimentalTime::class)
     override suspend fun startOrResumeUploading() {
         if(paused) paused = false
         if(!::dataStream.isInitialized) dataStream = createDataStream(offset)
