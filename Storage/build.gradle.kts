@@ -20,12 +20,12 @@ kotlin {
     }
     allTargets()
     sourceSets {
-        val commonMain by getting {
+        commonMain {
             dependencies {
                 addModules(SupabaseModule.AUTH)
             }
         }
-        val commonTest by getting {
+        commonTest {
             dependencies {
                 implementation(project(":test-common"))
                 implementation(libs.bundles.testing)

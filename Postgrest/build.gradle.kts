@@ -14,13 +14,13 @@ kotlin {
     defaultConfig()
     allTargets()
     sourceSets {
-        val commonMain by getting {
+        commonMain {
             dependencies {
                 addModules(SupabaseModule.AUTH)
                 api(libs.kotlin.reflect)
             }
         }
-        val commonTest by getting {
+        commonTest {
             dependencies {
                 implementation(libs.bundles.testing)
                 implementation(project(":test-common"))

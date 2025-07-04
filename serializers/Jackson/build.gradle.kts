@@ -15,13 +15,13 @@ kotlin {
     configuredAndroidTarget()
     configuredJvmTarget()
     sourceSets {
-        val commonMain by getting {
+        commonMain {
             dependencies {
                 addModules(SupabaseModule.SUPABASE)
                 api(libs.bundles.jackson)
             }
         }
-        val commonTest by getting {
+        commonTest {
             dependencies {
                 implementation(libs.bundles.testing)
                 implementation(project(":test-common"))

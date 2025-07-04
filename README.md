@@ -10,8 +10,8 @@ For information about supported Kotlin targets, see the corresponding module REA
 
 [![](https://img.shields.io/github/release/supabase-community/supabase-kt?label=stable)](https://github.com/supabase-community/supabase-kt/releases) 
 [![](https://badgen.net/github/release/supabase-community/supabase-kt?label=prerelease)](https://central.sonatype.com/search?q=io.github.jan.supabase&smo=true) 
-[![Kotlin](https://img.shields.io/badge/kotlin-2.1.10-blue.svg?logo=kotlin)](http://kotlinlang.org) 
-[![Ktor](https://img.shields.io/badge/ktor-3.1.1-blue)](https://ktor.io/)
+[![Kotlin](https://img.shields.io/badge/kotlin-2.2.0-blue.svg?logo=kotlin)](http://kotlinlang.org) 
+[![Ktor](https://img.shields.io/badge/ktor-3.2.0-blue)](https://ktor.io/)
 [![slack](https://img.shields.io/badge/slack-%23supabase--kt-purple.svg?logo=slack)](https://kotlinlang.slack.com/archives/C06QXPC7064)
 
 [![ko-fi](https://www.ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/jantennert)
@@ -74,27 +74,29 @@ implementation("io.ktor:ktor-client-[engine]:VERSION")
 For targets: `jvm`, `android`, `js`, `ios`
 
 ```kotlin
-val commonMain by getting {
-    dependencies {
-        //supabase modules
+sourceSets {
+    commonMain {
+        dependencies {
+            //Supabase modules
+        }
     }
-}
-val jvmMain by getting {
-    dependencies {
-        implementation("io.ktor:ktor-client-cio:KTOR_VERSION")
+    jvmMain {
+        dependencies {
+            implementation("io.ktor:ktor-client-cio:KTOR_VERSION")
+        }
     }
-}
-val androidMain by getting {
-    dependsOn(jvmMain)
-}
-val jsMain by getting {
-    dependencies {
-        implementation("io.ktor:ktor-client-js:KTOR_VERSION")
+    androidMain {
+        dependsOn(jvmMain.get())
     }
-}
-val iosMain by getting {
-    dependencies {
-        implementation("io.ktor:ktor-client-darwin:KTOR_VERSION")
+    jsMain {
+        dependencies {
+            implementation("io.ktor:ktor-client-js:KTOR_VERSION")
+        }
+    }
+    iosMain {
+        dependencies {
+            implementation("io.ktor:ktor-client-darwin:KTOR_VERSION")
+        }
     }
 }
 ```
@@ -103,7 +105,7 @@ val iosMain by getting {
 **Note:** It is recommended to use the same Ktor version as supabase-kt:
 
 __For 3.0.0 and above:__
-[![Ktor](https://img.shields.io/badge/ktor-3.1.1-blue)](https://ktor.io/)
+[![Ktor](https://img.shields.io/badge/ktor-3.2.0-blue)](https://ktor.io/)
 
 __For versions below 3.0.0:__
 [![Ktor](https://img.shields.io/badge/ktor-2.3.12-blue)](https://ktor.io/)
@@ -118,12 +120,16 @@ __For versions below 3.0.0:__
 
 ### Plugins
 
-- [Apollo GraphQL integration](/plugins/ApolloGraphQL) - Creates an [Apollo GraphQL Client](https://github.com/apollographql/apollo-kotlin) for interacting with the Supabase API.
-- [Compose Auth](/plugins/ComposeAuth) - Provides easy Native Google & Apple Auth for Compose Multiplatform targets.
-- [Compose Auth UI](/plugins/ComposeAuthUI) - Provides UI Components for Compose Multiplatform.
-- [Coil Integration](/plugins/CoilIntegration) - Provides a [Coil2](https://github.com/coil-kt/coil) Integration for displaying images stored in Supabase Storage. Only supports Android.
-- [Coil3 Integration](/plugins/Coil3Integration) - Provides a [Coil3](https://github.com/coil-kt/coil) Integration for displaying images stored in Supabase Storage. Supports all Compose Multiplatform targets.
-- *[Compose-ImageLoader Integration](/plugins/ImageLoaderIntegration) - Deprecated. Use Coil 3 or create your own integration*
+There are several plugins available to extend the functionality of supabase-kt. They can be installed in the `createSupabaseClient` function.
+
+Some highlights include:
+
+- [Apollo GraphQL integration](https://github.com/supabase-community/supabase-kt-plugins/tree/main/ApolloGraphQL) - Creates an [Apollo GraphQL Client](https://github.com/apollographql/apollo-kotlin) for interacting with the Supabase API.
+- [Compose Auth](https://github.com/supabase-community/supabase-kt-plugins/tree/main/ComposeAuth) - Provides easy Native Google & Apple Auth for Compose Multiplatform targets.
+- [Compose Auth UI](https://github.com/supabase-community/supabase-kt-plugins/tree/main/ComposeAuthUI) - Provides UI Components for Compose Multiplatform.
+- [Coil3 Integration](https://github.com/supabase-community/supabase-kt-plugins/tree/main/Coil3Integration) - Provides a [Coil3](https://github.com/coil-kt/coil) Integration for displaying images stored in Supabase Storage. Supports all Compose Multiplatform targets.
+
+For more information, checkout [supabase-kt-plugins](https://github.com/supabase-community/supabase-kt-plugins).
 
 ### Miscellaneous
 - [Supabase Edge Functions Kotlin](https://github.com/manriif/supabase-edge-functions-kt) - Build, serve and deploy Supabase Edge Functions with Kotlin and Gradle.

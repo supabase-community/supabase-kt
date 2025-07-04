@@ -14,22 +14,17 @@ kotlin {
     defaultConfig()
     allTargets()
     sourceSets {
-        val commonMain by getting {
+        commonMain {
             dependencies {
                 addModules(SupabaseModule.SUPABASE)
                 implementation(libs.bundles.testing)
             }
         }
-        val commonTest by getting {
+        commonTest {
             dependencies {
                 implementation(libs.bundles.testing)
             }
         }
-        val jvmMain by getting
-        val androidMain by getting
-        val jsMain by getting
-        val iosMain by getting
-        val iosSimulatorArm64Main by getting
     }
 }
 
