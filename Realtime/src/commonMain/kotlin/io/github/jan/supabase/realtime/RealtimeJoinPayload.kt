@@ -30,9 +30,10 @@ data class BroadcastJoinConfig(@SerialName("ack") var acknowledgeBroadcasts: Boo
 
 /**
  * @param key Used to track presence payloads. Can be e.g. a user id
+ * @param enabled Whether presence is enabled for this channel
  */
 @Serializable
-data class PresenceJoinConfig(var key: String, var enabled: Boolean)
+data class PresenceJoinConfig(var key: String, internal var enabled: Boolean)
 
 @SupabaseInternal
 @Serializable

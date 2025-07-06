@@ -25,6 +25,7 @@ import io.ktor.client.engine.mock.respond
 import io.ktor.util.encodeBase64
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runTest
 import kotlinx.datetime.Clock
@@ -304,7 +305,7 @@ class RealtimeChannelTest {
         runTest {
             createTestClient(
                 wsHandler = { i, o ->
-                    handleSubscribe(i, o, channelId)
+                    handleSubscribe(i, o, channelId, true)
                     for(i in 0..amount) {
                         o.sendPresence(
                             channelId,
@@ -380,6 +381,38 @@ class RealtimeChannelTest {
                     }
                 )
             }
+        }
+    }
+
+    @Test
+    fun testResubscribeOnPresenceChange() {
+        val channelId = "channelId"
+        runTest {
+            createTestClient(
+                wsHandler = { i, o ->
+                    handleSubscribe(i, o, channelId, false)
+                    handleUnsubscribe(i, o, channelId)
+                    handleSubscribe(i, o, channelId, true)
+                },
+                realtimeConfig = {
+                    disconnectOnNoSubscriptions = false
+                },
+                supabaseHandler = {
+                    val channel = it.channel(channelId)
+                    channel.status.test {
+                        assertEquals(RealtimeChannel.Status.UNSUBSCRIBED, awaitItem())
+                        channel.subscribe(false)
+                        assertEquals(RealtimeChannel.Status.SUBSCRIBING, awaitItem())
+                        assertEquals(RealtimeChannel.Status.SUBSCRIBED, awaitItem())
+                        val job = channel.presenceChangeFlow().launchIn(this@runTest)
+                        assertEquals(RealtimeChannel.Status.UNSUBSCRIBING, awaitItem())
+                        assertEquals(RealtimeChannel.Status.UNSUBSCRIBED, awaitItem())
+                        assertEquals(RealtimeChannel.Status.SUBSCRIBING, awaitItem())
+                        assertEquals(RealtimeChannel.Status.SUBSCRIBED, awaitItem())
+                        job.cancel()
+                    }
+                }
+            )
         }
     }
 
