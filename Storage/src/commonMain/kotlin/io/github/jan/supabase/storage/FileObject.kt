@@ -1,14 +1,17 @@
+@file:OptIn(ExperimentalTime::class)
+
 package io.github.jan.supabase.storage
 
 import io.github.jan.supabase.SupabaseSerializer
 import io.github.jan.supabase.decode
 import io.github.jan.supabase.serializer.KotlinXSerializer
 import io.ktor.http.ContentType
-import kotlinx.datetime.Instant
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 import kotlinx.serialization.json.JsonObject
+import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
 
 /**
  * Represents a file or a folder in a bucket. If the item is a folder, everything except [name] is null.
