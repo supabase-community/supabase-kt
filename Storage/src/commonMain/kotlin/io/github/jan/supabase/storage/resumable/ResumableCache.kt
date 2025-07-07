@@ -2,8 +2,8 @@
 package io.github.jan.supabase.storage.resumable
 
 import io.github.jan.supabase.annotations.SupabaseInternal
-import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
+import kotlin.time.Instant
 
 /**
  * Represents a cache entry for a resumable upload

@@ -60,7 +60,7 @@ class Functions(override val config: Config, override val supabaseClient: Supaba
 
     /**
      * Invokes a remote edge function. The authorization token is automatically added to the request.
-     * @param function The function to invoke
+     * @param function The function to invoke. If name of the function is renamed, use the slug after URL
      * @param builder The request builder to configure the request
      * @param region The region where the function is invoked
      * @throws RestException or one of its subclasses if receiving an error response
@@ -77,7 +77,7 @@ class Functions(override val config: Config, override val supabaseClient: Supaba
     /**
      * Invokes a remote edge function. The authorization token is automatically added to the request.
      * Note, if you want to serialize [body] to json, you need to add the [HttpHeaders.ContentType] header yourself.
-     * @param function The function to invoke
+     * @param function The function to invoke. If name of the function is renamed, use the slug after URL
      * @param body The body of the request
      * @param headers Headers to add to the request
      * @param region The region where the function is invoked
@@ -93,7 +93,7 @@ class Functions(override val config: Config, override val supabaseClient: Supaba
 
     /**
      * Invokes a remote edge function. The authorization token is automatically added to the request.
-     * @param function The function to invoke
+     * @param function The function to invoke. If name of the function is renamed, use the slug after URL
      * @param headers Headers to add to the request
      * @param region The region where the function is invoked
      * @throws RestException or one of its subclasses if receiving an error response
@@ -107,7 +107,7 @@ class Functions(override val config: Config, override val supabaseClient: Supaba
 
     /**
      * Builds an [EdgeFunction] which can be invoked multiple times
-     * @param function The function name
+     * @param function The function name. If name of the function is renamed, use the slug after URL
      * @param headers Headers to add to the requests when invoking the function
      * @param region The region where the function is invoked
      */

@@ -14,7 +14,6 @@ import io.github.jan.supabase.serializer.KotlinXSerializer
 import io.github.jan.supabase.testing.pathAfterVersion
 import io.ktor.client.engine.mock.respond
 import kotlinx.coroutines.test.runTest
-import kotlinx.datetime.Clock
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.encodeToJsonElement
@@ -22,6 +21,7 @@ import kotlinx.serialization.json.jsonObject
 import kotlin.test.Test
 import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
+import kotlin.time.Clock
 
 @Serializable
 data class DummyData(val key: Int, val content: String = "")
