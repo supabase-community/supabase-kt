@@ -4,6 +4,7 @@ import io.github.jan.supabase.realtime.HasRecord
 import io.github.jan.supabase.realtime.PostgresAction
 import io.github.jan.supabase.realtime.PostgresJoinConfig
 import io.github.jan.supabase.realtime.Presence
+import io.github.jan.supabase.realtime.RealtimeCallback
 import io.github.jan.supabase.serializer.KotlinXSerializer
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.buildJsonObject
@@ -34,6 +35,18 @@ class CallbackManagerTest {
         called = false
         cm.triggerBroadcast(expectedEvent, expectedPayload)
         assertFalse { called }
+    }
+
+    @Test
+    fun testGetCallbacks() {
+        val cm = CallbackManagerImpl()
+        val expectedEvent = "event"
+        cm.addBroadcastCallback(expectedEvent) {
+            //...
+        }
+        val callbacks = cm.getCallbacks()
+        assertTrue { callbacks.isNotEmpty() }
+        assertTrue { callbacks.any { it is RealtimeCallback.BroadcastCallback && it.event == expectedEvent } }
     }
 
     @Test

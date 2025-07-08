@@ -7,10 +7,12 @@ import io.github.jan.supabase.realtime.annotations.ChannelDsl
  * Used to build a realtime channel
  */
 @ChannelDsl
-class RealtimeChannelBuilder @PublishedApi internal constructor(private val topic: String) {
+class RealtimeChannelBuilder @PublishedApi internal constructor(
+    private val topic: String,
+) {
 
     private var broadcastJoinConfig = BroadcastJoinConfig(acknowledgeBroadcasts = false, receiveOwnBroadcasts = false)
-    private var presenceJoinConfig = PresenceJoinConfig("")
+    private var presenceJoinConfig = PresenceJoinConfig("", false)
 
     /**
      * Whether this channel should be private.
@@ -29,7 +31,7 @@ class RealtimeChannelBuilder @PublishedApi internal constructor(private val topi
      * @param block The presence join config
      */
     fun presence(block: PresenceJoinConfig.() -> Unit) {
-        presenceJoinConfig = PresenceJoinConfig("").apply(block)
+        presenceJoinConfig = PresenceJoinConfig("", false).apply(block)
     }
 
     @SupabaseInternal

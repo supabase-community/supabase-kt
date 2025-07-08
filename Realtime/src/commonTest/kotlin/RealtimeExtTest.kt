@@ -44,7 +44,7 @@ class RealtimeExtTest {
             )
             createTestClient(
                 wsHandler = { i, o ->
-                    handleSubscribe(i, o, "channelId")
+                    handleSubscribe(i, o, "channelId", true)
                 },
                 supabaseHandler = {
                     val channel = it.channel("channelId")

@@ -75,6 +75,12 @@ interface Realtime : MainPlugin<Realtime.Config>, CustomSerializationPlugin {
     suspend fun removeChannel(channel: RealtimeChannel)
 
     /**
+     * Adds a channel to the [subscriptions] without subscribing to it.
+     */
+    @SupabaseInternal
+    fun addChannel(channel: RealtimeChannel)
+
+    /**
      * Unsubscribes and removes all channels from the [subscriptions]
      */
     suspend fun removeAllChannels()

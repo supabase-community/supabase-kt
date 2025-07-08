@@ -17,6 +17,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.buildJsonObject
@@ -55,10 +56,15 @@ internal class RealtimeChannelImpl(
             if(!realtimeImpl.config.connectOnSubscribe) error("You can't subscribe to a channel while the realtime client is not connected. Did you forget to call `realtime.connect()`?")
             realtimeImpl.connect()
         }
+        if(!realtimeImpl.subscriptions.containsKey(topic)) {
+            realtime.addChannel(this)
+        }
         _status.value = RealtimeChannel.Status.SUBSCRIBING
         Realtime.logger.d { "Subscribing to channel $topic" }
         val currentJwt = accessToken()
         val postgrestChanges = clientChanges.toList()
+        val hasPresenceCallback = callbackManager.getCallbacks().filterIsInstance<RealtimeCallback.PresenceCallback>().isNotEmpty()
+        presenceJoinConfig.enabled = hasPresenceCallback
         val joinConfig = RealtimeJoinPayload(RealtimeJoinConfig(broadcastJoinConfig, presenceJoinConfig, postgrestChanges, isPrivate))
         val joinConfigObject = buildJsonObject {
             putJsonObject(Json.encodeToJsonElement(joinConfig).jsonObject)
@@ -214,11 +220,24 @@ internal class RealtimeChannelImpl(
             trySend(action)
         }
         val id = callbackManager.addPresenceCallback(callback)
+        if(status.value == RealtimeChannel.Status.SUBSCRIBED && !presenceJoinConfig.enabled) {
+            // If the channel is already subscribed, we need to resubscribe to enable presence
+            Realtime.logger.d { "Resubscribing to channel $topic to enable presence..." }
+            launch {
+                resubscribe()
+            }
+        }
         awaitClose { callbackManager.removeCallbackById(id) }
     }
 
     override fun updateStatus(status: RealtimeChannel.Status) {
         _status.value = status
+    }
+
+    private suspend fun resubscribe() {
+        unsubscribe()
+        _status.first { it == RealtimeChannel.Status.UNSUBSCRIBED }
+        subscribe()
     }
 
 }

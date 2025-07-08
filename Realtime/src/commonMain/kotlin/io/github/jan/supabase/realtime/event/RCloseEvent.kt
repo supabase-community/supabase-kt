@@ -13,6 +13,7 @@ data object RCloseEvent : RealtimeEvent {
     override suspend fun handle(channel: RealtimeChannel, message: RealtimeMessage) {
         channel.realtime.removeChannel(channel)
         Realtime.logger.d { "Unsubscribed from channel ${message.topic}" }
+        channel.updateStatus(RealtimeChannel.Status.UNSUBSCRIBED)
     }
 
     override fun appliesTo(message: RealtimeMessage): Boolean {

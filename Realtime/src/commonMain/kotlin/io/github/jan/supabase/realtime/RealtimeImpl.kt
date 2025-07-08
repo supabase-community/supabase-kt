@@ -93,6 +93,10 @@ import kotlin.time.Clock
         }
     }
 
+    override fun addChannel(channel: RealtimeChannel) {
+        _subscriptions[channel.topic] = channel
+    }
+
     override fun init() {
         scope.launch {
             supabaseClient.pluginManager.getPluginOrNull(Auth)?.sessionStatus?.collect {
