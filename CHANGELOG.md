@@ -1,5 +1,23 @@
 # Changelog
 
+### 3.2.1 - July 11, 2025
+
+### Core
+
+- Update KotlinX Datetime to version `0.7.1` by @jan-tennert in https://github.com/supabase-community/supabase-kt/pull/995
+- Update Ktor to version `3.2.1`
+- Move plugins to its [own](https://github.com/supabase-community/supabase-kt-plugins) repository by @jan-tennert in https://github.com/supabase-community/supabase-kt/pull/955
+  - Added a Sketch integration
+  - In the future the versioning for the plugins will be separate from the main modules
+
+### Functions
+
+-Improve docs to put more context of the parameter when a function is renamed by @hieuwu in https://github.com/supabase-community/supabase-kt/pull/993
+
+### Realtime
+
+-Add presence enabled flag by @jan-tennert in https://github.com/supabase-community/supabase-kt/pull/996
+
 ### 3.2.0 - June 25, 2025
 
 ### All modules
