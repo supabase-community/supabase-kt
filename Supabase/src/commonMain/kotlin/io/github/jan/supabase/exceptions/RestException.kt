@@ -16,7 +16,7 @@ import io.ktor.client.statement.request
  * @see UnknownRestException
  */
 open class RestException(val error: String, val description: String?, val response: HttpResponse): Exception("""
-        $error${description?.let { " ($it)" } ?: ""}
+        $error${description?.let { "\n$it" } ?: ""}
         URL: ${response.request.url}
         Headers: ${response.request.headers.entries()}
         Http Method: ${response.request.method.value}
