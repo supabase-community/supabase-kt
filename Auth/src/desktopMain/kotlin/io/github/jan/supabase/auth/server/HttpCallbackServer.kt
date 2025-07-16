@@ -12,6 +12,7 @@ import io.ktor.server.cio.CIO
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.response.respondText
 import io.ktor.server.routing.routing
+import io.ktor.utils.io.InternalAPI
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
@@ -74,6 +75,7 @@ internal suspend fun createServer(
     }
 }
 
+@OptIn(InternalAPI::class)
 internal suspend fun shutdown(call: ApplicationCall, message: String) {
     val application = call.application
     val environment = application.environment
@@ -82,7 +84,7 @@ internal suspend fun shutdown(call: ApplicationCall, message: String) {
     call.application.launch {
         application.monitor.raise(ApplicationStopPreparing, environment)
         latch.join()
-        application.dispose()
+        application.disposeAndJoin()
     }
 
     try {
