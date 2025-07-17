@@ -13,6 +13,7 @@ import io.github.jan.supabase.realtime.presenceDataFlow
 import io.github.jan.supabase.serializer.KotlinXSerializer
 import io.github.jan.supabase.testing.pathAfterVersion
 import io.ktor.client.engine.mock.respond
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
@@ -79,19 +80,21 @@ class RealtimeExtTest {
                         filter = filter,
                         primaryKey = DummyData::key
                     )
-                    dataFlow.test(FLOW_TIMEOUT) {
-                        assertContentEquals(listOf(DummyData(0, "first")), awaitItem()) //1. Initial data
-                        channel.subscribe(true)
-                        channel.callbackManager.setServerChanges(listOf(PostgresJoinConfig("public", "table", "id=eq.0", "*", 0)))
-                        channel.callbackManager.triggerPostgresChange<PostgresAction.Update>(DummyData(0, "second"), DummyData(0, "first")) //2.
-                        assertContentEquals(listOf(DummyData(0, "second")), awaitItem()) //2.
-                        channel.callbackManager.triggerPostgresChange<PostgresAction.Insert>(DummyData(1, "third"), null) //3.
-                        assertContentEquals(listOf(DummyData(0, "second"), DummyData(1, "third")), awaitItem())//3.
-                        channel.callbackManager.triggerPostgresChange<PostgresAction.Update>(DummyData(0, "fourth"), DummyData(0, "second")) //4.
-                        assertContentEquals(listOf(DummyData(0, "fourth"), DummyData(1, "third")), awaitItem())//4.
-                        channel.callbackManager.triggerPostgresChange<PostgresAction.Delete>(null, DummyData(1)) //5.
-                        assertContentEquals(listOf(DummyData(0, "fourth")), awaitItem()) //5.
+                    launch {
+                        dataFlow.test(FLOW_TIMEOUT) {
+                            assertContentEquals(listOf(DummyData(0, "first")), awaitItem()) //1. Initial data
+                            assertContentEquals(listOf(DummyData(0, "second")), awaitItem()) //2.
+                            assertContentEquals(listOf(DummyData(0, "second"), DummyData(1, "third")), awaitItem())//3.
+                            assertContentEquals(listOf(DummyData(0, "fourth"), DummyData(1, "third")), awaitItem())//4.
+                            assertContentEquals(listOf(DummyData(0, "fourth")), awaitItem()) //5.
+                        }
                     }
+                    channel.subscribe(true)
+                    channel.callbackManager.setServerChanges(listOf(PostgresJoinConfig("public", "table", "id=eq.0", "*", 0)))
+                    channel.callbackManager.triggerPostgresChange<PostgresAction.Update>(DummyData(0, "second"), DummyData(0, "first")) //2.
+                    channel.callbackManager.triggerPostgresChange<PostgresAction.Insert>(DummyData(1, "third"), null) //3.
+                    channel.callbackManager.triggerPostgresChange<PostgresAction.Update>(DummyData(0, "fourth"), DummyData(0, "second")) //4.
+                    channel.callbackManager.triggerPostgresChange<PostgresAction.Delete>(null, DummyData(1)) //5.
                 },
                 mockEngineHandler = {
                     assertEquals("/table", it.url.pathAfterVersion())

@@ -1,5 +1,20 @@
 # Changelog
 
+### 3.3.2 - July 18, 2025
+
+### Core
+
+- Update to Ktor `3.2.2`
+- Fix [Sketch integration](https://github.com/supabase-community/supabase-kt-plugins/tree/main/SketchIntegration) not correctly publishing
+
+### Postgrest
+
+- improve postgrest error messages by @sproctor in https://github.com/supabase-community/supabase-kt/pull/1006
+
+### Auth
+
+- Fix IMPLICIT OAuth flow on Desktop targets by @jan-tennert in https://github.com/supabase-community/supabase-kt/pull/1005
+
 ### 3.2.1 - July 14, 2025
 
 ### Core
