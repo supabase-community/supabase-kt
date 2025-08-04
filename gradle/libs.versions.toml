@@ -29,7 +29,7 @@ androidx-core = "1.16.0"
 androidx-compat = "1.7.1"
 androidx-lifecycle = "2.9.2"
 filekit = "0.8.8"
-kotlinx-browser = "0.3"
+kotlinx-browser = "0.4"
 secure-random = "0.5.1"
 
 [plugins]
