@@ -161,12 +161,11 @@ For more information, checkout [supabase-kt-plugins](https://github.com/supabase
 - [Create a discussion](https://github.com/supabase-community/supabase-kt/discussions/new/choose)
 - [Create an issue](https://github.com/supabase-community/supabase-kt/issues/new/choose)
 
-# Videos
+# Guides
 
+- [Building Secure User Sign Up With Email Confirmation with Supabase on Android](https://hieuwu.medium.com/supadroid-building-secure-user-sign-up-with-email-confirmation-with-supabase-on-android-72f3172d6049)
 - [Getting started with Android and Supabase](https://www.youtube.com/watch?v=_iXUVJ6HTHU) by the official Supabase YouTube channel
 - [Sign in with Google on Android using Credential Manager](https://www.youtube.com/watch?v=P_jZMDmodG4) by the official Supabase YouTube channel
-- [Getting started with Supabase on Android](https://www.youtube.com/watch?v=SGr73sWMX6w) (by [Eric Ampire](https://www.youtube.com/@eric-ampire))
-- [Supabase | Jetpack Compose | Android | 2023](https://www.youtube.com/playlist?list=PL91kV_wdjTlcGQdcZzkuid094as5eUlwU) (by [YoursSohailYT](https://www.youtube.com/@YoursSohailYT))
 
 # Contribution
 
