@@ -12,7 +12,7 @@ fun Project.configureLibraryAndroidTarget(
     javaVersion: JavaVersion = JavaVersion.VERSION_1_8
 ) {
     extensions.configure(LibraryExtension::class) {
-        compileSdk = 35
+        compileSdk = 36
         sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
         this.namespace = namespace ?: "${extra["base-group"].toString().replace("-", ".")}.${this@configureLibraryAndroidTarget.name.replace("-", "")}.library"
         defaultConfig {
@@ -31,7 +31,7 @@ fun Project.configureLibraryAndroidTarget(
 fun BaseAppModuleExtension.configureApplicationAndroidTarget(
     javaVersion: JavaVersion = JavaVersion.VERSION_1_8
 ) {
-    compileSdk = 35
+    compileSdk = 36
     defaultConfig {
         applicationId = "io.github.jan.supabase.android"
         minSdk = 26
