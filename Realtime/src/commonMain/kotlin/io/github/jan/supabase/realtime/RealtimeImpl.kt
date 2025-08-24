@@ -17,10 +17,10 @@ import io.ktor.client.statement.HttpResponse
 import io.ktor.http.URLProtocol
 import io.ktor.http.path
 import io.ktor.util.decodeBase64String
-import kotlinx.atomicfu.atomic
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -35,7 +35,10 @@ import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.longOrNull
-import kotlin.coroutines.coroutineContext
+import kotlin.concurrent.atomics.AtomicInt
+import kotlin.concurrent.atomics.AtomicReference
+import kotlin.concurrent.atomics.fetchAndIncrement
+import kotlin.concurrent.atomics.incrementAndFetch
 import kotlin.io.encoding.ExperimentalEncodingApi
 import kotlin.time.Clock
 
@@ -50,11 +53,12 @@ import kotlin.time.Clock
     override val subscriptions: Map<String, RealtimeChannel> = _subscriptions
     private val scope = CoroutineScope(supabaseClient.coroutineDispatcher + SupervisorJob())
     private val mutex = Mutex()
-    internal var accessToken by atomic<String?>(null)
-    var heartbeatJob: Job? = null
-    var messageJob: Job? = null
-    var ref by atomic(0)
-    var heartbeatRef by atomic(0)
+    private val _accessToken = AtomicReference<String?>(null)
+    val accessToken get() = _accessToken.load()
+    private var heartbeatJob: Job? = null
+    private var messageJob: Job? = null
+    internal val ref = AtomicInt(0)
+    private val heartbeatRef = AtomicInt(0)
     override val apiVersion: Int
         get() = Realtime.API_VERSION
 
@@ -63,7 +67,7 @@ import kotlin.time.Clock
 
     override var serializer = config.serializer ?: supabaseClient.defaultSerializer
     private val websocketUrl = realtimeWebsocketUrl()
-    private var incrementId by atomic(0)
+    private val incrementId = AtomicInt(0)
 
     override suspend fun connect() = connect(false)
 
@@ -84,7 +88,7 @@ import kotlin.time.Clock
                 rejoinChannels()
             }
         } catch(e: Exception) {
-            coroutineContext.ensureActive()
+            currentCoroutineContext().ensureActive()
             Realtime.logger.e(e) { """
                 Error while trying to connect to realtime websocket. Trying again in ${config.reconnectDelay}
                 URL: $websocketUrl
@@ -133,7 +137,7 @@ import kotlin.time.Clock
                     }
                 }
             } catch(e: Exception) {
-                coroutineContext.ensureActive()
+                currentCoroutineContext().ensureActive()
                 Realtime.logger.e(e) { "Error while listening for messages. Trying again in ${config.reconnectDelay}" }
                 reconnect()
             }
@@ -172,9 +176,9 @@ import kotlin.time.Clock
     private suspend fun onMessage(message: RealtimeMessage) {
         Realtime.logger.d { "Received message $message" }
         val channel = subscriptions[message.topic] as? RealtimeChannelImpl
-        if(message.ref?.toIntOrNull() == heartbeatRef) {
+        val ref = message.ref?.toIntOrNull()
+        if(ref != null && heartbeatRef.compareAndSet(ref, 0)) {
             Realtime.logger.i { "Heartbeat received" }
-            heartbeatRef = 0
         } else {
             Realtime.logger.d { "Received event ${message.event} for channel ${channel?.topic}" }
             channel?.onMessage(message)
@@ -195,22 +199,22 @@ import kotlin.time.Clock
                 return
             }
         }
-        this.accessToken = newToken
+        this._accessToken.store(newToken)
         scope.launch {
             subscriptions.values.filter { it.status.value == RealtimeChannel.Status.SUBSCRIBED }.forEach { it.updateAuth(accessToken) }
         }
     }
 
     private suspend fun sendHeartbeat() {
-        if (heartbeatRef != 0) {
-            heartbeatRef = 0
-            ref = 0
+        if (heartbeatRef.load() != 0) {
+            heartbeatRef.store(0)
+            ref.store(0)
             Realtime.logger.e { "Heartbeat timeout. Trying to reconnect in ${config.reconnectDelay}" }
             reconnect()
             return
         }
         Realtime.logger.d { "Sending heartbeat" }
-        heartbeatRef = ++ref
+        heartbeatRef.store(ref.incrementAndFetch())
         send(RealtimeMessage("phoenix", "heartbeat", buildJsonObject { }, heartbeatRef.toString()))
     }
 
@@ -280,14 +284,14 @@ import kotlin.time.Clock
         try {
             ws?.send(message)
         } catch(e: Exception) {
-            coroutineContext.ensureActive()
+            currentCoroutineContext().ensureActive()
             Realtime.logger.e(e) { "Error while sending message $message. Reconnecting in ${config.reconnectDelay}" }
             reconnect()
         }
     }
 
     fun nextIncrementId(): Int {
-        return incrementId++
+        return incrementId.fetchAndIncrement()
     }
 
     private fun reconnect() {

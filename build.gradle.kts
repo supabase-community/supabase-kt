@@ -22,7 +22,6 @@ plugins {
     id(libs.plugins.dokka.get().pluginId)
     alias(libs.plugins.kotlinx.plugin.serialization) apply false
     id(libs.plugins.maven.publish.get().pluginId) apply false
-    alias(libs.plugins.kotlinx.atomicfu) apply false
     id(libs.plugins.power.assert.get().pluginId) apply false
 }
 
@@ -42,7 +41,6 @@ dependencies {
 libraryModules {
     apply(plugin = "org.jetbrains.dokka")
     apply(plugin = "org.jetbrains.kotlin.plugin.serialization")
-    apply(plugin = "org.jetbrains.kotlinx.atomicfu")
     apply(plugin = "com.vanniktech.maven.publish")
 
     group = extra["base-group"].toString()

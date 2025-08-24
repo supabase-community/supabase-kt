@@ -7,10 +7,10 @@ import io.github.jan.supabase.realtime.data.PostgresActionData
 import io.github.jan.supabase.realtime.realtime
 import io.github.jan.supabase.supabaseJson
 import kotlinx.serialization.json.decodeFromJsonElement
+import kotlinx.serialization.json.intOrNull
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
-import kotlinx.serialization.json.longOrNull
 
 /**
  * Handles postgres changes events
@@ -19,7 +19,7 @@ data object RPostgresChangesEvent : RealtimeEvent {
 
     override suspend fun handle(channel: RealtimeChannel, message: RealtimeMessage) {
         val data = message.payload["data"]?.jsonObject ?: return
-        val ids = message.payload["ids"]?.jsonArray?.mapNotNull { it.jsonPrimitive.longOrNull } ?: emptyList() //the ids of the matching postgres changes
+        val ids = message.payload["ids"]?.jsonArray?.mapNotNull { it.jsonPrimitive.intOrNull } ?: emptyList() //the ids of the matching postgres changes
         val postgresAction = supabaseJson.decodeFromJsonElement<PostgresActionData>(data)
         val action = when(data["type"]?.jsonPrimitive?.content ?: "") {
             "UPDATE" -> PostgresAction.Update(
