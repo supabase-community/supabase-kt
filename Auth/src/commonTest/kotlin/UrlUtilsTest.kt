@@ -8,7 +8,7 @@ import io.github.jan.supabase.auth.event.AuthEvent
 import io.github.jan.supabase.auth.exception.AuthErrorCode
 import io.github.jan.supabase.auth.getFragmentParts
 import io.github.jan.supabase.auth.handledUrlParameterError
-import io.github.jan.supabase.auth.minimalSettings
+import io.github.jan.supabase.auth.minimalConfig
 import io.github.jan.supabase.auth.redirectTo
 import io.github.jan.supabase.auth.status.SessionStatus
 import io.github.jan.supabase.testing.createMockedSupabaseClient
@@ -77,7 +77,7 @@ class UrlUtilsTest {
         val supabase = createMockedSupabaseClient(
             configuration = {
                 install(Auth) {
-                    minimalSettings()
+                    minimalConfig()
                 }
             }
         )
@@ -102,7 +102,7 @@ class UrlUtilsTest {
         val supabase = createMockedSupabaseClient(
             configuration = {
                 install(Auth) {
-                    minimalSettings()
+                    minimalConfig()
                 }
             }
         )

@@ -5,11 +5,10 @@ import com.russhwolf.settings.Settings
 import com.russhwolf.settings.coroutines.toSuspendSettings
 import io.github.jan.supabase.auth.user.UserSession
 import io.github.jan.supabase.logging.e
+import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonBuilder
-import kotlin.coroutines.coroutineContext
 
 private val settingsJson = Json {
     encodeDefaults = true
@@ -56,7 +55,7 @@ class SettingsSessionManager(
         return try {
             json.decodeFromString(session)
         } catch(e: Exception) {
-            coroutineContext.ensureActive()
+            currentCoroutineContext().ensureActive()
             Auth.logger.e(e) { "Failed to load session" }
             null
         }

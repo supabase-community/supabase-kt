@@ -1,8 +1,7 @@
 package io.github.jan.supabase.auth
 
 import io.github.jan.supabase.auth.user.UserSession
-import kotlinx.atomicfu.AtomicRef
-import kotlinx.atomicfu.atomic
+import kotlin.concurrent.atomics.AtomicReference
 
 /**
  * Represents the session manager. Used for saving and restoring the session from storage
@@ -27,22 +26,22 @@ interface SessionManager {
 }
 
 /**
- * A [SessionManager] that uses the [AtomicRef] API.
+ * A [SessionManager] that uses the [AtomicReference] API.
  */
 class MemorySessionManager(session: UserSession? = null): SessionManager {
 
-    private var session by atomic(session)
+    private val session = AtomicReference(session)
 
     override suspend fun saveSession(session: UserSession) {
-        this.session = session
+        this.session.store(session)
     }
 
     override suspend fun loadSession(): UserSession? {
-        return session
+        return session.load()
     }
 
     override suspend fun deleteSession() {
-        session = null
+        session.store(null)
     }
 
 }

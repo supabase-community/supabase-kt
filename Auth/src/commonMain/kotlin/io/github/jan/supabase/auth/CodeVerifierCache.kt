@@ -1,7 +1,6 @@
 package io.github.jan.supabase.auth
 
-import kotlinx.atomicfu.AtomicRef
-import kotlinx.atomicfu.atomic
+import kotlin.concurrent.atomics.AtomicReference
 
 /**
  * A cache for the code verifier used in the PKCE flow.
@@ -26,22 +25,22 @@ interface CodeVerifierCache {
 }
 
 /**
- * A [CodeVerifierCache] that uses the [AtomicRef] API.
+ * A [CodeVerifierCache] that uses the [AtomicReference] API.
  */
 class MemoryCodeVerifierCache(codeVerifier: String? = null): CodeVerifierCache {
 
-    private var codeVerifier by atomic(codeVerifier)
+    private val codeVerifier = AtomicReference(codeVerifier)
 
     override suspend fun saveCodeVerifier(codeVerifier: String) {
-        this.codeVerifier = codeVerifier
+        this.codeVerifier.store(codeVerifier)
     }
 
     override suspend fun loadCodeVerifier(): String? {
-        return codeVerifier
+        return codeVerifier.load()
     }
 
     override suspend fun deleteCodeVerifier() {
-        codeVerifier = null
+        codeVerifier.store(null)
     }
 
 }

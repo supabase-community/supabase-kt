@@ -37,7 +37,7 @@ data class PresenceJoinConfig(var key: String, internal var enabled: Boolean)
 
 @SupabaseInternal
 @Serializable
-data class PostgresJoinConfig(val schema: String, val table: String? = null, val filter: String? = null, val event: String, val id: Long = 0L) {
+data class PostgresJoinConfig(val schema: String, val table: String? = null, val filter: String? = null, val event: String, val id: Int = 0) {
 
     override fun equals(other: Any?): Boolean {
         if(other !is PostgresJoinConfig) return false

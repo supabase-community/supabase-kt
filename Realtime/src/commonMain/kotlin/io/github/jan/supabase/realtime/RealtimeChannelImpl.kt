@@ -25,6 +25,7 @@ import kotlinx.serialization.json.encodeToJsonElement
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.put
 import kotlinx.serialization.json.putJsonObject
+import kotlin.concurrent.atomics.incrementAndFetch
 import kotlin.reflect.KClass
 import kotlin.reflect.KType
 
@@ -101,7 +102,7 @@ internal class RealtimeChannelImpl(
         Realtime.logger.d { "Updating auth token for channel $topic" }
         realtimeImpl.send(RealtimeMessage(topic, RealtimeChannel.CHANNEL_EVENT_ACCESS_TOKEN, buildJsonObject {
             put("access_token", jwt)
-        }, (++realtimeImpl.ref).toString()))
+        }, (realtimeImpl.ref.incrementAndFetch()).toString()))
     }
 
     override suspend fun broadcast(event: String, message: JsonObject) {
@@ -128,7 +129,7 @@ internal class RealtimeChannelImpl(
                     put("type", "broadcast")
                     put("event", event)
                     put("payload", message)
-                }, (++realtimeImpl.ref).toString())
+                }, (realtimeImpl.ref.incrementAndFetch()).toString())
             )
         }
     }
@@ -155,7 +156,7 @@ internal class RealtimeChannelImpl(
             }
         }
         realtimeImpl.send(
-            RealtimeMessage(topic, RealtimeChannel.CHANNEL_EVENT_PRESENCE, payload, (++realtimeImpl.ref).toString())
+            RealtimeMessage(topic, RealtimeChannel.CHANNEL_EVENT_PRESENCE, payload, realtimeImpl.ref.incrementAndFetch().toString())
         )
     }
 
@@ -164,7 +165,7 @@ internal class RealtimeChannelImpl(
             RealtimeMessage(topic, RealtimeChannel.CHANNEL_EVENT_PRESENCE, buildJsonObject {
                 put("type", "presence")
                 put("event", "untrack")
-            }, (++realtimeImpl.ref).toString())
+            }, (realtimeImpl.ref.incrementAndFetch()).toString())
         )
     }
 

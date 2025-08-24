@@ -43,6 +43,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -61,7 +62,6 @@ import kotlinx.serialization.json.encodeToJsonElement
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.put
-import kotlin.coroutines.coroutineContext
 import kotlin.time.Clock
 import kotlin.time.Duration.Companion.seconds
 
@@ -480,7 +480,7 @@ internal class AuthImpl(
                 clearSession()
             }
         } catch (e: Exception) {
-            coroutineContext.ensureActive()
+            currentCoroutineContext().ensureActive()
             Auth.logger.e(e) { "Couldn't reach Supabase. Either the address doesn't exist or the network might not be on. Retrying in ${config.retryDelay}..." }
             updateStatus(RefreshFailureCause.NetworkError(e))
             delay(config.retryDelay)
