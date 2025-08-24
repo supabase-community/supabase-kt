@@ -1,5 +1,5 @@
 [versions]
-kotlin = "2.2.10"
+kotlin = "2.2.20-RC"
 accompanist-permissions = "0.37.3"
 ktor = "3.2.3"
 dokka = "2.0.0"
@@ -29,7 +29,7 @@ androidx-core = "1.17.0"
 androidx-compat = "1.7.1"
 androidx-lifecycle = "2.9.2"
 filekit = "0.8.8"
-kotlinx-browser = "0.3"
+kotlinx-browser = "0.5.0"
 secure-random = "0.5.1"
 
 [plugins]
