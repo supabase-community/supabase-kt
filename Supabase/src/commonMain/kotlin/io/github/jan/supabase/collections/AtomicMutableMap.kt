@@ -5,7 +5,7 @@ import kotlinx.collections.immutable.persistentHashMapOf
 import kotlin.concurrent.atomics.AtomicReference
 
 /**
- * A multiplatform, thread-safe [MutableMap], implemented using AtomicFU. Thanks to the author of [klogging](https://github.com/klogging/klogging)!
+ * A multiplatform, thread-safe [MutableMap], implemented using AtomicReference and PersistentMap.
  */
 @SupabaseInternal
 class AtomicMutableMap<K, V>(
