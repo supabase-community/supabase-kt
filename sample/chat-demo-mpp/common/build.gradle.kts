@@ -26,6 +26,7 @@ kotlin {
             }
         }
     }
+    compilerOptions.freeCompilerArgs.add("-Xexpect-actual-classes")
     androidTarget()
     jvmToolchain(11)
     jvm("desktop") {

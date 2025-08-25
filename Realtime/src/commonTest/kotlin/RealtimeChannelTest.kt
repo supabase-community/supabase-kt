@@ -352,7 +352,7 @@ class RealtimeChannelTest {
         val expectedFilter = "id=eq.1"
         val events = listOf("INSERT", "UPDATE", "DELETE", "*")
         for(event in events) { //Test if all events are correctly handled using the type parameter
-            val postgresServerChanges = listOf(PostgresJoinConfig(expectedSchema, expectedTable, expectedFilter, event, 0L))
+            val postgresServerChanges = listOf(PostgresJoinConfig(expectedSchema, expectedTable, expectedFilter, event, 0))
             runTest {
                 createTestClient(
                     wsHandler = { i, o ->
