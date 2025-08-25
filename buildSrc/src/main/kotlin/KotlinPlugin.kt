@@ -8,6 +8,7 @@ fun KotlinMultiplatformExtension.defaultConfig() {
         languageSettings.optIn("io.github.jan.supabase.annotations.SupabaseInternal")
         languageSettings.optIn("io.github.jan.supabase.annotations.SupabaseExperimental")
         languageSettings.optIn("kotlin.time.ExperimentalTime")
+        languageSettings.optIn("kotlin.concurrent.atomics.ExperimentalAtomicApi")
     }
     compilerOptions.freeCompilerArgs.add("-Xexpect-actual-classes")
     applyDefaultHierarchyTemplate()

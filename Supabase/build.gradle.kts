@@ -6,7 +6,6 @@ plugins {
     id(libs.plugins.dokka.get().pluginId)
     alias(libs.plugins.kotlinx.plugin.serialization)
     id(libs.plugins.maven.publish.get().pluginId)
-    alias(libs.plugins.kotlinx.atomicfu)
 }
 
 val buildConfigGenerator by tasks.registering(Sync::class) {
@@ -48,8 +47,8 @@ kotlin {
                 api(libs.kotlinx.coroutines.core)
                 api(libs.kermit)
                 api(libs.bundles.ktor.client)
-                api(libs.kotlinx.atomicfu)
                 api(libs.kotlinx.serialization.json)
+                api(libs.kotlinx.immutable.collections)
             }
         }
         commonTest {

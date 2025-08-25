@@ -1,66 +1,66 @@
 package io.github.jan.supabase.collections
 
 import io.github.jan.supabase.annotations.SupabaseInternal
-import kotlinx.atomicfu.atomic
-import kotlinx.atomicfu.update
+import kotlinx.collections.immutable.persistentHashMapOf
+import kotlin.concurrent.atomics.AtomicReference
 
 /**
- * A multiplatform, thread-safe [MutableMap], implemented using AtomicFU. Thanks to the author of [klogging](https://github.com/klogging/klogging)!
+ * A multiplatform, thread-safe [MutableMap], implemented using AtomicReference and PersistentMap.
  */
 @SupabaseInternal
 class AtomicMutableMap<K, V>(
     vararg pairs: Pair<K, V>
 ) : MutableMap<K, V> {
 
-    private val map = atomic(mapOf(*pairs))
+    private val ref = AtomicReference(persistentHashMapOf(*pairs))
 
     override val entries: MutableSet<MutableMap.MutableEntry<K, V>>
-        get() = map.value.toMutableMap().entries
+        get() = ref.load().toMutableMap().entries
     override val keys: MutableSet<K>
-        get() = map.value.toMutableMap().keys
-    override val size: Int
-        get() = map.value.size
+        get() = ref.load().toMutableMap().keys
     override val values: MutableCollection<V>
-        get() = map.value.toMutableMap().values
+        get() = ref.load().toMutableMap().values
+
+    override val size: Int get() = ref.load().size
+    override fun isEmpty(): Boolean = ref.load().isEmpty()
+
+    override fun get(key: K): V? = ref.load()[key]
+    override fun containsKey(key: K): Boolean = ref.load().containsKey(key)
+    override fun containsValue(value: V): Boolean = ref.load().containsValue(value)
 
     override fun clear() {
-        map.update { emptyMap() }
+        ref.updateIfChanged { if (it.isEmpty()) it else persistentHashMapOf() }
     }
 
-    override fun isEmpty(): Boolean = map.value.isEmpty()
-
-    override fun remove(key: K): V? {
-        var removedValue: V? = null
-        map.update { current ->
-            buildMap {
-                putAll(current)
-                removedValue = remove(key)
-            }
-        }
-        return removedValue
-    }
-
-    override fun putAll(from: Map<out K, V>) = map.update { current ->
-        buildMap {
-            putAll(current)
-            putAll(from)
-        }
+    override fun putAll(from: Map<out K, V>) {
+        if (from.isEmpty()) return
+        ref.updateIfChanged { it.putAll(from) }
     }
 
     override fun put(key: K, value: V): V? {
-        var previousValue: V? = null
-        map.update { current ->
-            buildMap {
-                putAll(current)
-                previousValue = put(key, value)
-            }
+        while (true) {
+            val cur = ref.load()
+            val prev = cur[key]
+            val next = cur.put(key, value)
+            if (next === cur) return prev // same mapping/value, nothing changed
+            if (ref.compareAndSet(cur, next)) return prev
         }
-        return previousValue
     }
 
-    override fun get(key: K): V? = map.value[key]
+    override fun remove(key: K): V? {
+        while (true) {
+            val cur = ref.load()
+            val prev = cur[key] ?: run {
+                // still try a no-op remove to confirm no change, but can return fast
+                val next = cur.remove(key)
+                if (next === cur) return null
+                // If structure changed (rare), still CAS to be correct.
+                if (ref.compareAndSet(cur, next)) return null
+                continue
+            }
+            val next = cur.remove(key)
+            if (ref.compareAndSet(cur, next)) return prev
+        }
+    }
 
-    override fun containsValue(value: V): Boolean = map.value.containsValue(value)
-
-    override fun containsKey(key: K): Boolean = map.value.containsKey(key)
 }
