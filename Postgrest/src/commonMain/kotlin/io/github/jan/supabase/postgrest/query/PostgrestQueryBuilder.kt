@@ -18,6 +18,7 @@ import io.github.jan.supabase.postgrest.request.UpdateRequest
 import io.github.jan.supabase.postgrest.result.PostgrestResult
 import io.ktor.client.plugins.HttpRequestTimeoutException
 import kotlinx.serialization.json.JsonArray
+import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
 
@@ -230,6 +231,33 @@ class PostgrestQueryBuilder(
      *
      * By default, updated rows are not returned. To return it, call `[PostgrestRequestBuilder.select]`.
      *
+     * @param body The request body representing the value to update.
+     * @param request Additional filtering to apply to the query
+     * @throws PostgrestRestException if receiving an error response
+     * @throws HttpRequestTimeoutException if the request timed out
+     * @throws HttpRequestException on network related issues
+     */
+    suspend inline fun update(
+        body: JsonElement,
+        request: PostgrestRequestBuilder.() -> Unit = {}
+    ): PostgrestResult {
+        val requestBuilder = PostgrestRequestBuilder(postgrest.config.propertyConversionMethod).apply(request)
+        val updateRequest = UpdateRequest(
+            body = body,
+            returning = requestBuilder.returning,
+            count = requestBuilder.count,
+            urlParams = requestBuilder.params.mapToFirstValue(),
+            schema = schema,
+            headers = requestBuilder.headers.build()
+        )
+        return RestRequestExecutor.execute(postgrest = postgrest, path = table, request = updateRequest)
+    }
+
+    /**
+     * Executes an update operation on the [table].
+     *
+     * By default, updated rows are not returned. To return it, call `[PostgrestRequestBuilder.select]`.
+     *
      * @param value The value to update, will automatically get serialized into json.
      * @param request Additional filtering to apply to the query
      * @throws PostgrestRestException if receiving an error response
@@ -239,18 +267,10 @@ class PostgrestQueryBuilder(
     suspend inline fun <reified T : Any> update(
         value: T,
         request: PostgrestRequestBuilder.() -> Unit = {}
-    ): PostgrestResult {
-        val requestBuilder = PostgrestRequestBuilder(postgrest.config.propertyConversionMethod).apply(request)
-        val updateRequest = UpdateRequest(
-            returning = requestBuilder.returning,
-            count = requestBuilder.count,
-            urlParams = requestBuilder.params.mapToFirstValue(),
-            body = postgrest.serializer.encodeToJsonElement(value),
-            schema = schema,
-            headers = requestBuilder.headers.build()
-        )
-        return RestRequestExecutor.execute(postgrest = postgrest, path = table, request = updateRequest)
-    }
+    ): PostgrestResult = update(
+        body = postgrest.serializer.encodeToJsonElement(value),
+        request = request
+    )
 
     /**
      * Executes a delete operation on the [table].
