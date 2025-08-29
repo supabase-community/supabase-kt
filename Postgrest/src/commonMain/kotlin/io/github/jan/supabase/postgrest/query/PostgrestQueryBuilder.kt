@@ -17,6 +17,8 @@ import io.github.jan.supabase.postgrest.request.SelectRequest
 import io.github.jan.supabase.postgrest.request.UpdateRequest
 import io.github.jan.supabase.postgrest.result.PostgrestResult
 import io.ktor.client.plugins.HttpRequestTimeoutException
+import kotlinx.serialization.json.JsonArray
+import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
 
@@ -65,18 +67,17 @@ class PostgrestQueryBuilder(
      *
      * By default, upserted rows are not returned. To return it, call `[PostgrestRequestBuilder.select]`.
      *
-     * @param values The values to insert, will automatically get serialized into json.
+     * @param body The request body as an array of json object.
      * @param request Additional configurations for the request including filters
      * @throws PostgrestRestException if receiving an error response
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
-    suspend inline fun <reified T : Any> upsert(
-        values: List<T>,
+    suspend inline fun upsert(
+        body: JsonArray,
         request: UpsertRequestBuilder.() -> Unit = {}
     ): PostgrestResult {
         val requestBuilder = UpsertRequestBuilder(postgrest.config.propertyConversionMethod).apply(request)
-        val body = postgrest.serializer.encodeToJsonElement(values).jsonArray
         val columns = body.map { it.jsonObject.keys }.flatten().distinct()
         if(columns.isNotEmpty()) requestBuilder.params["columns"] = listOf(columns.joinToString(","))
         requestBuilder.onConflict?.let {
@@ -105,6 +106,29 @@ class PostgrestQueryBuilder(
      *
      * By default, upserted rows are not returned. To return it, call `[PostgrestRequestBuilder.select]`.
      *
+     * @param values The values to insert, will automatically get serialized into json.
+     * @param request Additional configurations for the request including filters
+     * @throws PostgrestRestException if receiving an error response
+     * @throws HttpRequestTimeoutException if the request timed out
+     * @throws HttpRequestException on network related issues
+     */
+    suspend inline fun <reified T : Any> upsert(
+        values: List<T>,
+        request: UpsertRequestBuilder.() -> Unit = {}
+    ): PostgrestResult = upsert(
+        body = postgrest.serializer.encodeToJsonElement(values).jsonArray,
+        request = request
+    )
+
+    /**
+     * Perform an UPSERT on the table or view. Depending on the column(s) passed
+     * to [UpsertRequestBuilder.onConflict], [upsert] allows you to perform the equivalent of
+     * `[insert] if a row with the corresponding onConflict columns doesn't
+     * exist, or if it does exist, perform an alternative action depending on
+     * [UpsertRequestBuilder.ignoreDuplicates].
+     *
+     * By default, upserted rows are not returned. To return it, call `[PostgrestRequestBuilder.select]`.
+     *
      * @param value The value to insert, will automatically get serialized into json.
      * @param request Additional filtering to apply to the query
      * @throws PostgrestRestException if receiving an error response
@@ -119,18 +143,17 @@ class PostgrestQueryBuilder(
     /**
      * Executes an insert operation on the [table]
      *
-     * @param values The values to insert, will automatically get serialized into json.
+     * @param body The request body as an array of json object.
      * @param request Additional filtering to apply to the query
      * @throws PostgrestRestException if receiving an error response
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
-    suspend inline fun <reified T : Any> insert(
-        values: List<T>,
+    suspend inline fun insert(
+        body: JsonArray,
         request: InsertRequestBuilder.() -> Unit = {}
     ): PostgrestResult {
         val requestBuilder = InsertRequestBuilder(postgrest.config.propertyConversionMethod).apply(request)
-        val body = postgrest.serializer.encodeToJsonElement(values).jsonArray
         val columns = body.map { it.jsonObject.keys }.flatten().distinct()
         if(columns.isNotEmpty()) requestBuilder.params["columns"] = listOf(columns.joinToString(","))
         val insertRequest = InsertRequest(
@@ -144,6 +167,23 @@ class PostgrestQueryBuilder(
         )
         return RestRequestExecutor.execute(postgrest = postgrest, path = table, request = insertRequest)
     }
+
+    /**
+     * Executes an insert operation on the [table]
+     *
+     * @param values The values to insert, will automatically get serialized into json.
+     * @param request Additional filtering to apply to the query
+     * @throws PostgrestRestException if receiving an error response
+     * @throws HttpRequestTimeoutException if the request timed out
+     * @throws HttpRequestException on network related issues
+     */
+    suspend inline fun <reified T : Any> insert(
+        values: List<T>,
+        request: InsertRequestBuilder.() -> Unit = {}
+    ): PostgrestResult = insert(
+        body = postgrest.serializer.encodeToJsonElement(values).jsonArray,
+        request = request
+    )
 
     /**
      * Executes an insert operation on the [table]
@@ -191,6 +231,33 @@ class PostgrestQueryBuilder(
      *
      * By default, updated rows are not returned. To return it, call `[PostgrestRequestBuilder.select]`.
      *
+     * @param body The request body representing the value to update.
+     * @param request Additional filtering to apply to the query
+     * @throws PostgrestRestException if receiving an error response
+     * @throws HttpRequestTimeoutException if the request timed out
+     * @throws HttpRequestException on network related issues
+     */
+    suspend inline fun update(
+        body: JsonElement,
+        request: PostgrestRequestBuilder.() -> Unit = {}
+    ): PostgrestResult {
+        val requestBuilder = PostgrestRequestBuilder(postgrest.config.propertyConversionMethod).apply(request)
+        val updateRequest = UpdateRequest(
+            body = body,
+            returning = requestBuilder.returning,
+            count = requestBuilder.count,
+            urlParams = requestBuilder.params.mapToFirstValue(),
+            schema = schema,
+            headers = requestBuilder.headers.build()
+        )
+        return RestRequestExecutor.execute(postgrest = postgrest, path = table, request = updateRequest)
+    }
+
+    /**
+     * Executes an update operation on the [table].
+     *
+     * By default, updated rows are not returned. To return it, call `[PostgrestRequestBuilder.select]`.
+     *
      * @param value The value to update, will automatically get serialized into json.
      * @param request Additional filtering to apply to the query
      * @throws PostgrestRestException if receiving an error response
@@ -200,18 +267,10 @@ class PostgrestQueryBuilder(
     suspend inline fun <reified T : Any> update(
         value: T,
         request: PostgrestRequestBuilder.() -> Unit = {}
-    ): PostgrestResult {
-        val requestBuilder = PostgrestRequestBuilder(postgrest.config.propertyConversionMethod).apply(request)
-        val updateRequest = UpdateRequest(
-            returning = requestBuilder.returning,
-            count = requestBuilder.count,
-            urlParams = requestBuilder.params.mapToFirstValue(),
-            body = postgrest.serializer.encodeToJsonElement(value),
-            schema = schema,
-            headers = requestBuilder.headers.build()
-        )
-        return RestRequestExecutor.execute(postgrest = postgrest, path = table, request = updateRequest)
-    }
+    ): PostgrestResult = update(
+        body = postgrest.serializer.encodeToJsonElement(value),
+        request = request
+    )
 
     /**
      * Executes a delete operation on the [table].
