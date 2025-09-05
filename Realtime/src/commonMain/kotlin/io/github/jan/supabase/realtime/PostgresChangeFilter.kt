@@ -27,12 +27,18 @@ class PostgresChangeFilter(private val event: String, private val schema: String
      */
     fun filter(filter: FilterOperation) {
         val filterValue = when(filter.operator) {
-            FilterOperator.EQ, FilterOperator.NEQ, FilterOperator.GT, FilterOperator.GTE, FilterOperator.LT, FilterOperator.LTE -> filter.value.toString()
+            FilterOperator.EQ,
+            FilterOperator.NEQ,
+            FilterOperator.GT,
+            FilterOperator.GTE,
+            FilterOperator.LT,
+            FilterOperator.LTE ->
+                escapeValue(filter.value)
             FilterOperator.IN -> {
                 if(filter.value is List<*>) {
-                    (filter.value as List<*>).joinToString(",", prefix = "(", postfix = ")") { it.toString() }
+                    (filter.value as List<*>).joinToString(",", prefix = "(", postfix = ")") { escapeValue(it) }
                 } else {
-                    filter.value.toString()
+                    escapeValue(filter.value)
                 }
             }
             else -> throw UnsupportedOperationException("Unsupported filter operator: ${filter.operator}")
@@ -53,4 +59,17 @@ class PostgresChangeFilter(private val event: String, private val schema: String
     @SupabaseInternal
     fun buildConfig() = PostgresJoinConfig(schema, table, filter, event)
 
+}
+
+private val quotedCharacters = listOf(",", ".", ":", "(", ")")
+
+private fun escapeValue(value: Any?): String {
+    val asString = value.toString()
+        .replace("\\", "\\\\")
+        .replace("\"", "\\\"")
+    return if (quotedCharacters.any { asString.contains(it) }) {
+        "\"$asString\""
+    } else {
+        asString
+    }
 }
