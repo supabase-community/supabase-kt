@@ -96,7 +96,8 @@ sealed interface PresenceAction {
 
 }
 
-@PublishedApi internal class PresenceActionImpl(
+//@PublishedApi
+class PresenceActionImpl(
     @PublishedApi internal val serializer: SupabaseSerializer,
     override val joins: Map<String, Presence>,
     override val leaves: Map<String, Presence>

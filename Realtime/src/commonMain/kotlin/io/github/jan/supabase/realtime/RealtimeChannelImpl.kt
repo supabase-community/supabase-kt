@@ -64,7 +64,7 @@ internal class RealtimeChannelImpl(
         Realtime.logger.d { "Subscribing to channel $topic" }
         val currentJwt = accessToken()
         val postgrestChanges = clientChanges.toList()
-        val hasPresenceCallback = callbackManager.getCallbacks().filterIsInstance<RealtimeCallback.PresenceCallback>().isNotEmpty()
+        val hasPresenceCallback = callbackManager.hasPresenceCallback()
         presenceJoinConfig.enabled = hasPresenceCallback
         val joinConfig = RealtimeJoinPayload(RealtimeJoinConfig(broadcastJoinConfig, presenceJoinConfig, postgrestChanges, isPrivate))
         val joinConfigObject = buildJsonObject {

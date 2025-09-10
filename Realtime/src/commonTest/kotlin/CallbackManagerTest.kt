@@ -4,7 +4,6 @@ import io.github.jan.supabase.realtime.HasRecord
 import io.github.jan.supabase.realtime.PostgresAction
 import io.github.jan.supabase.realtime.PostgresJoinConfig
 import io.github.jan.supabase.realtime.Presence
-import io.github.jan.supabase.realtime.RealtimeCallback
 import io.github.jan.supabase.serializer.KotlinXSerializer
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.buildJsonObject
@@ -38,18 +37,6 @@ class CallbackManagerTest {
     }
 
     @Test
-    fun testGetCallbacks() {
-        val cm = CallbackManagerImpl()
-        val expectedEvent = "event"
-        cm.addBroadcastCallback(expectedEvent) {
-            //...
-        }
-        val callbacks = cm.getCallbacks()
-        assertTrue { callbacks.isNotEmpty() }
-        assertTrue { callbacks.any { it is RealtimeCallback.BroadcastCallback && it.event == expectedEvent } }
-    }
-
-    @Test
     fun testPresenceCallbacks() {
         val cm = CallbackManagerImpl()
         val expectedJoins = mapOf("join" to Presence("join", buildJsonObject {
@@ -64,10 +51,12 @@ class CallbackManagerTest {
             assertEquals(expectedLeaves, it.leaves)
             called = true
         }
+        assertTrue { cm.hasPresenceCallback() }
         cm.triggerPresenceDiff(expectedJoins, expectedLeaves)
         assertTrue { called }
         cm.removeCallbackById(id)
         called = false
+        assertFalse { cm.hasPresenceCallback() }
         cm.triggerPresenceDiff(expectedJoins, expectedLeaves)
         assertFalse { called }
     }
@@ -96,7 +85,7 @@ class CallbackManagerTest {
                 called = true
             }
             cm.setServerChanges(listOf(joinConfig))
-            cm.triggerPostgresChange(listOf(id), actionFromEvent(event, expectedRecord, expectedOldRecord))
+            cm.triggerPostgresChange(listOf(id.id), actionFromEvent(event, expectedRecord, expectedOldRecord))
             assertTrue { called }
             called = false
             if(event != "*") {
@@ -104,7 +93,7 @@ class CallbackManagerTest {
                 assertFalse { called }
             }
             cm.removeCallbackById(id)
-            cm.triggerPostgresChange(listOf(id), actionFromEvent(event, expectedRecord, expectedOldRecord))
+            cm.triggerPostgresChange(listOf(id.id), actionFromEvent(event, expectedRecord, expectedOldRecord))
             assertFalse { called }
         }
     }
