@@ -48,8 +48,9 @@ interface CallbackManager {
 
 }
 
-typealias BroadcastMap = PersistentMap<String, PersistentList<RealtimeCallback.BroadcastCallback>>
-
+private typealias BroadcastMap = PersistentMap<String, PersistentList<RealtimeCallback.BroadcastCallback>>
+private typealias PresenceMap = PersistentMap<Int, RealtimeCallback.PresenceCallback>
+private typealias PostgresMap = PersistentMap<Int, RealtimeCallback.PostgresCallback>
 
 class CallbackManagerImpl(
     private val serializer: SupabaseSerializer = KotlinXSerializer()
@@ -59,12 +60,13 @@ class CallbackManagerImpl(
     private val _serverChanges = AtomicReference(listOf<PostgresJoinConfig>())
     val serverChanges: List<PostgresJoinConfig> get() = _serverChanges.load()
 
-    private val presenceCallbacks = AtomicReference<PersistentMap<Int, RealtimeCallback.PresenceCallback>>(persistentHashMapOf())
+    private val presenceCallbacks = AtomicReference<PresenceMap>(persistentHashMapOf())
 
     private val broadcastCallbacks = AtomicReference<BroadcastMap>(persistentHashMapOf())
+    // Additional map to know from which list a callback may be removed in broadcastCallbacks without searching through the whole map
     private val broadcastEventId = AtomicReference<PersistentMap<Int, String>>(persistentHashMapOf())
 
-    private val postgresCallbacks = AtomicReference<PersistentMap<Int, RealtimeCallback.PostgresCallback>>(persistentHashMapOf())
+    private val postgresCallbacks = AtomicReference<PostgresMap>(persistentHashMapOf())
 
     override fun addBroadcastCallback(event: String, callback: (JsonObject) -> Unit): RealtimeCallbackId.Broadcast {
         val id = nextId.fetchAndIncrement()
