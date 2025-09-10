@@ -15,13 +15,13 @@ import kotlin.concurrent.atomics.fetchAndIncrement
 import kotlin.concurrent.atomics.update
 
 @SupabaseInternal
-sealed class RealtimeCallbackId(val id: Int) {
+sealed class RealtimeCallbackId(val value: Int) {
 
-    class Postgres(id: Int) : RealtimeCallbackId(id)
+    class Postgres(value: Int) : RealtimeCallbackId(value)
 
-    class Presence(id: Int) : RealtimeCallbackId(id)
+    class Presence(value: Int) : RealtimeCallbackId(value)
 
-    class Broadcast(id: Int) : RealtimeCallbackId(id)
+    class Broadcast(value: Int) : RealtimeCallbackId(value)
 
 }
 
@@ -139,9 +139,9 @@ class CallbackManagerImpl(
 
     override fun removeCallbackById(id: RealtimeCallbackId) {
         when (id) {
-            is RealtimeCallbackId.Broadcast -> removeBroadcastCallbackById(id.id)
-            is RealtimeCallbackId.Presence -> removePresenceCallbackById(id.id)
-            is RealtimeCallbackId.Postgres -> removePostgresCallbackById(id.id)
+            is RealtimeCallbackId.Broadcast -> removeBroadcastCallbackById(id.value)
+            is RealtimeCallbackId.Presence -> removePresenceCallbackById(id.value)
+            is RealtimeCallbackId.Postgres -> removePostgresCallbackById(id.value)
         }
     }
 

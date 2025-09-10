@@ -85,7 +85,7 @@ class CallbackManagerTest {
                 called = true
             }
             cm.setServerChanges(listOf(joinConfig))
-            cm.triggerPostgresChange(listOf(id.id), actionFromEvent(event, expectedRecord, expectedOldRecord))
+            cm.triggerPostgresChange(listOf(id.value), actionFromEvent(event, expectedRecord, expectedOldRecord))
             assertTrue { called }
             called = false
             if(event != "*") {
@@ -93,7 +93,7 @@ class CallbackManagerTest {
                 assertFalse { called }
             }
             cm.removeCallbackById(id)
-            cm.triggerPostgresChange(listOf(id.id), actionFromEvent(event, expectedRecord, expectedOldRecord))
+            cm.triggerPostgresChange(listOf(id.value), actionFromEvent(event, expectedRecord, expectedOldRecord))
             assertFalse { called }
         }
     }
