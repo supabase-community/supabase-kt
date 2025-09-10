@@ -52,7 +52,7 @@ private typealias BroadcastMap = PersistentMap<String, PersistentList<RealtimeCa
 private typealias PresenceMap = PersistentMap<Int, RealtimeCallback.PresenceCallback>
 private typealias PostgresMap = PersistentMap<Int, RealtimeCallback.PostgresCallback>
 
-class CallbackManagerImpl(
+internal class CallbackManagerImpl(
     private val serializer: SupabaseSerializer = KotlinXSerializer()
 ) : CallbackManager {
 
