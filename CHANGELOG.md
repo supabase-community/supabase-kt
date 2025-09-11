@@ -1,6 +1,32 @@
 # Changelog
 
-### 3.3.2 - July 19, 2025
+### 3.2.3 - September 11, 2025
+
+### Core
+
+- Update Kotlin to version `2.2.20` (**due to `kotlinx.browser` changes, using this or a higher version might be required**)
+- Remove atomicfu, migrate Atomic lists/maps, coroutine improvements by @jan-tennert in https://github.com/supabase-community/supabase-kt/pull/1029
+  Removed atomicfu dependency completely, improvements to atomic references / lists
+- Fix min loglevel by @sproctor in https://github.com/supabase-community/supabase-kt/pull/951
+- Re-add serializers into the bom dependency by @jan-tennert in https://github.com/supabase-community/supabase-kt-plugins/commit/5e34081ac1855b22ea3cd52a07fe9820a6c7a6cd
+
+### Postgrest
+
+- make filter values comply with postrest rules by @sproctor in https://github.com/supabase-community/supabase-kt/pull/1036
+  You can now use reserved characters in requests
+- Add overloads for Postgrest insert, upsert and update requests by @manriif in https://github.com/supabase-community/supabase-kt/pull/1034
+  You can now provide an already-serialized `JsonObject`/`JsonElement` to the `insert`/`upsert`/`update` methods
+
+### Auth
+
+- Unify Wasm JS and JS implementations by @jan-tennert in https://github.com/supabase-community/supabase-kt/pull/1043
+
+### Realtime
+
+- Split callbacks in the CallbackManager by @jan-tennert in https://github.com/supabase-community/supabase-kt/pull/1042
+  This **might** increase performance drastically for applications using a lot of (different) callbacks
+
+### 3.2.2 - July 19, 2025
 
 ### Core
 
