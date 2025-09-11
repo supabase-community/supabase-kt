@@ -64,6 +64,7 @@ kotlin {
         val androidMain by getting {
             dependencies {
                 api(libs.androidx.startup.runtime)
+                api(libs.androidx.browser)
             }
         }
         val webMain by getting {
