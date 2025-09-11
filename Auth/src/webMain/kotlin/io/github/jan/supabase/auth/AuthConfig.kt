@@ -1,9 +1,11 @@
 package io.github.jan.supabase.auth
 
+import io.github.jan.supabase.plugins.CustomSerializationConfig
+
 /**
- * The configuration for [Auth] in web applications.
+ * The configuration for [Auth]
  */
-open class WebAuthConfig: AuthConfigDefaults() {
+actual class AuthConfig: CustomSerializationConfig, AuthConfigDefaults() {
 
     /**
      * Whether to disable automatic URL checking for PKCE codes, error codes, and session tokens.

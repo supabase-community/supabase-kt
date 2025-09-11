@@ -22,10 +22,6 @@ kotlin {
                 withLinux()
                 withMingw()
             }
-            group("web") {
-                withJs()
-                withWasmJs()
-            }
             group("nonDesktop") {
                 //withAndroidTarget() android has its own implementation
                 withIos()
@@ -71,7 +67,7 @@ kotlin {
                 api(libs.androidx.browser)
             }
         }
-        val wasmJsMain by getting {
+        val webMain by getting {
             dependencies {
                 api(libs.kotlinx.browser)
             }
