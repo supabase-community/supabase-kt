@@ -2,7 +2,10 @@ package io.github.jan.supabase.logging
 
 import co.touchlab.kermit.Logger
 import co.touchlab.kermit.Severity
+import co.touchlab.kermit.loggerConfigInit
+import co.touchlab.kermit.platformLogWriter
 import io.github.jan.supabase.SupabaseClient
+import io.github.jan.supabase.annotations.SupabaseInternal
 
 /**
  * An interface for logging in Supabase plugins.
@@ -34,23 +37,32 @@ abstract class SupabaseLogger {
         }
     }
 
+    /**
+     * Set the log level for this logger
+     * @param level The log level
+     */
+    @SupabaseInternal
+    abstract fun setLevel(level: LogLevel)
+
 }
 
 /**
  * A logger implementation using the Kermit logger.
  * @param level The minimum log level for this logger.
  * @param tag The tag for this logger
- * @param logger The Kermit logger
  */
 internal class KermitSupabaseLogger(
-    override val level: LogLevel,
+    initialLevel: LogLevel,
     tag: String,
-    private val logger: Logger = Logger.withTag(tag)
 ) : SupabaseLogger() {
 
-    init {
-        logger.mutableConfig.minSeverity = level.toSeverity()
-    }
+    override var level: LogLevel = initialLevel
+        private set
+
+    private val logger: Logger = Logger(
+        config = loggerConfigInit(platformLogWriter(), minSeverity = level.toSeverity()),
+        tag = tag,
+    )
 
     override fun log(level: LogLevel, throwable: Throwable?, message: String) {
         logger.log(level.toSeverity(), logger.tag, throwable, message)
@@ -62,6 +74,12 @@ internal class KermitSupabaseLogger(
         LogLevel.WARNING -> Severity.Warn
         LogLevel.ERROR -> Severity.Error
         LogLevel.NONE -> Severity.Assert
+    }
+
+    @SupabaseInternal
+    override fun setLevel(level: LogLevel) {
+        this.level = level
+        logger.mutableConfig.minSeverity = level.toSeverity()
     }
 
 }
