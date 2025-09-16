@@ -5,12 +5,12 @@ import io.github.jan.supabase.postgrest.query.filter.PostgrestFilterBuilder
 import io.ktor.http.decodeURLQueryComponent
 import io.ktor.http.formUrlEncode
 import io.ktor.http.parametersOf
-import kotlinx.datetime.Instant
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFails
+import kotlin.time.Instant
 
 @Serializable
 data class TestData(@SerialName("created_at") val createdAt: Instant)

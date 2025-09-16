@@ -10,8 +10,8 @@ For information about supported Kotlin targets, see the corresponding module REA
 
 [![](https://img.shields.io/github/release/supabase-community/supabase-kt?label=stable)](https://github.com/supabase-community/supabase-kt/releases) 
 [![](https://badgen.net/github/release/supabase-community/supabase-kt?label=prerelease)](https://central.sonatype.com/search?q=io.github.jan.supabase&smo=true) 
-[![Kotlin](https://img.shields.io/badge/kotlin-2.2.0-blue.svg?logo=kotlin)](http://kotlinlang.org) 
-[![Ktor](https://img.shields.io/badge/ktor-3.2.0-blue)](https://ktor.io/)
+[![Kotlin](https://img.shields.io/badge/kotlin-2.2.20-blue.svg?logo=kotlin)](http://kotlinlang.org) 
+[![Ktor](https://img.shields.io/badge/ktor-3.2.3-blue)](https://ktor.io/)
 [![slack](https://img.shields.io/badge/slack-%23supabase--kt-purple.svg?logo=slack)](https://kotlinlang.slack.com/archives/C06QXPC7064)
 
 [![ko-fi](https://www.ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/jantennert)
@@ -105,7 +105,7 @@ sourceSets {
 **Note:** It is recommended to use the same Ktor version as supabase-kt:
 
 __For 3.0.0 and above:__
-[![Ktor](https://img.shields.io/badge/ktor-3.2.0-blue)](https://ktor.io/)
+[![Ktor](https://img.shields.io/badge/ktor-3.2.2-blue)](https://ktor.io/)
 
 __For versions below 3.0.0:__
 [![Ktor](https://img.shields.io/badge/ktor-2.3.12-blue)](https://ktor.io/)
@@ -161,12 +161,11 @@ For more information, checkout [supabase-kt-plugins](https://github.com/supabase
 - [Create a discussion](https://github.com/supabase-community/supabase-kt/discussions/new/choose)
 - [Create an issue](https://github.com/supabase-community/supabase-kt/issues/new/choose)
 
-# Videos
+# Guides
 
+- [Building Secure User Sign Up With Email Confirmation with Supabase on Android](https://hieuwu.medium.com/supadroid-building-secure-user-sign-up-with-email-confirmation-with-supabase-on-android-72f3172d6049)
 - [Getting started with Android and Supabase](https://www.youtube.com/watch?v=_iXUVJ6HTHU) by the official Supabase YouTube channel
 - [Sign in with Google on Android using Credential Manager](https://www.youtube.com/watch?v=P_jZMDmodG4) by the official Supabase YouTube channel
-- [Getting started with Supabase on Android](https://www.youtube.com/watch?v=SGr73sWMX6w) (by [Eric Ampire](https://www.youtube.com/@eric-ampire))
-- [Supabase | Jetpack Compose | Android | 2023](https://www.youtube.com/playlist?list=PL91kV_wdjTlcGQdcZzkuid094as5eUlwU) (by [YoursSohailYT](https://www.youtube.com/@YoursSohailYT))
 
 # Contribution
 

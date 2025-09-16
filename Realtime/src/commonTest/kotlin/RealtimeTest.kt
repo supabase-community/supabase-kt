@@ -5,12 +5,12 @@ import io.github.jan.supabase.realtime.channel
 import io.github.jan.supabase.realtime.realtime
 import io.ktor.util.encodeBase64
 import kotlinx.coroutines.test.runTest
-import kotlinx.datetime.Clock
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
+import kotlin.time.Clock
 
 class RealtimeTest {
 

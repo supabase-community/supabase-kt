@@ -3,9 +3,8 @@ import io.github.jan.supabase.SupabaseClientBuilder
 import io.github.jan.supabase.auth.Auth
 import io.github.jan.supabase.auth.MemorySessionManager
 import io.github.jan.supabase.auth.auth
-import io.github.jan.supabase.auth.minimalConfig
 import io.github.jan.supabase.auth.event.AuthEvent
-import io.github.jan.supabase.auth.minimalSettings
+import io.github.jan.supabase.auth.minimalConfig
 import io.github.jan.supabase.auth.providers.Github
 import io.github.jan.supabase.auth.status.RefreshFailureCause
 import io.github.jan.supabase.auth.status.SessionSource
@@ -45,10 +44,9 @@ class AuthTest {
             val client = createMockedSupabaseClient(
                 configuration = {
                     install(Auth) {
-                        minimalSettings(
-                            sessionManager = sessionManager,
-                            autoLoadFromStorage = true
-                        )
+                        minimalConfig()
+                        this.sessionManager = sessionManager
+                        autoLoadFromStorage = true
                     }
                 }
             )
@@ -80,10 +78,9 @@ class AuthTest {
             val client = createMockedSupabaseClient(
                 configuration = {
                     install(Auth) {
-                        minimalSettings(
-                            sessionManager = sessionManager,
-                            autoSaveToStorage = true
-                        )
+                        minimalConfig()
+                        this.sessionManager = sessionManager
+                        autoSaveToStorage = true
                     }
                 }
             )
@@ -103,9 +100,8 @@ class AuthTest {
             val newSession = userSession()
             val client = createMockedSupabaseClient(configuration = {
                 install(Auth) {
-                    minimalSettings(
-                        alwaysAutoRefresh = true
-                    )
+                    minimalConfig()
+                    alwaysAutoRefresh = true
                 }
             }) {
                 respondJson(newSession)
@@ -126,11 +122,10 @@ class AuthTest {
             val newSession = userSession()
             val client = createMockedSupabaseClient(configuration = {
                 install(Auth) {
-                    minimalSettings(
-                        autoLoadFromStorage = false,
-                        alwaysAutoRefresh = false,
-                        autoSaveToStorage = false
-                    )
+                    minimalConfig()
+                    autoLoadFromStorage = false
+                    alwaysAutoRefresh = false
+                    autoSaveToStorage = false
                 }
             }) {
                 respondJson(newSession)
@@ -153,9 +148,8 @@ class AuthTest {
             val newSession = userSession()
             val client = createMockedSupabaseClient(configuration = {
                 install(Auth) {
-                    minimalSettings(
-                        alwaysAutoRefresh = true
-                    )
+                    minimalConfig()
+                    alwaysAutoRefresh = true
                 }
                 defaultLogLevel = LogLevel.DEBUG
             }) {
@@ -180,9 +174,8 @@ class AuthTest {
             val newSession = userSession()
             val client = createMockedSupabaseClient(configuration = {
                 install(Auth) {
-                    minimalSettings(
-                        alwaysAutoRefresh = true
-                    )
+                    minimalConfig()
+                    alwaysAutoRefresh = true
                 }
                 defaultLogLevel = LogLevel.DEBUG
             }) {
@@ -207,9 +200,8 @@ class AuthTest {
             val newSession = userSession()
             val client = createMockedSupabaseClient(configuration = {
                 install(Auth) {
-                    minimalSettings(
-                        alwaysAutoRefresh = false
-                    )
+                    minimalConfig()
+                    alwaysAutoRefresh = false
                 }
                 defaultLogLevel = LogLevel.DEBUG
             }) {

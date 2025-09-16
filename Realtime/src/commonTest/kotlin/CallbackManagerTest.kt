@@ -5,7 +5,6 @@ import io.github.jan.supabase.realtime.PostgresAction
 import io.github.jan.supabase.realtime.PostgresJoinConfig
 import io.github.jan.supabase.realtime.Presence
 import io.github.jan.supabase.serializer.KotlinXSerializer
-import kotlinx.datetime.Clock
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
@@ -13,6 +12,7 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
+import kotlin.time.Clock
 
 class CallbackManagerTest {
 
@@ -51,10 +51,12 @@ class CallbackManagerTest {
             assertEquals(expectedLeaves, it.leaves)
             called = true
         }
+        assertTrue { cm.hasPresenceCallback() }
         cm.triggerPresenceDiff(expectedJoins, expectedLeaves)
         assertTrue { called }
         cm.removeCallbackById(id)
         called = false
+        assertFalse { cm.hasPresenceCallback() }
         cm.triggerPresenceDiff(expectedJoins, expectedLeaves)
         assertFalse { called }
     }
@@ -83,7 +85,7 @@ class CallbackManagerTest {
                 called = true
             }
             cm.setServerChanges(listOf(joinConfig))
-            cm.triggerPostgresChange(listOf(id), actionFromEvent(event, expectedRecord, expectedOldRecord))
+            cm.triggerPostgresChange(listOf(id.value), actionFromEvent(event, expectedRecord, expectedOldRecord))
             assertTrue { called }
             called = false
             if(event != "*") {
@@ -91,7 +93,7 @@ class CallbackManagerTest {
                 assertFalse { called }
             }
             cm.removeCallbackById(id)
-            cm.triggerPostgresChange(listOf(id), actionFromEvent(event, expectedRecord, expectedOldRecord))
+            cm.triggerPostgresChange(listOf(id.value), actionFromEvent(event, expectedRecord, expectedOldRecord))
             assertFalse { called }
         }
     }

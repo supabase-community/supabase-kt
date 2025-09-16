@@ -23,10 +23,10 @@ import io.ktor.utils.io.ByteReadChannel
 import io.ktor.utils.io.cancel
 import io.ktor.utils.io.readFully
 import io.ktor.utils.io.writeFully
-import kotlinx.atomicfu.atomic
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -34,8 +34,8 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import kotlin.concurrent.atomics.AtomicBoolean
 import kotlin.math.min
-import kotlin.time.ExperimentalTime
 
 /**
  * Represents a resumable upload. Can be paused, resumed or cancelled.
@@ -90,16 +90,16 @@ internal class ResumableUploadImpl(
 
     private val size = fingerprint.size
 
-    private var paused by atomic(true)
+    private val paused = AtomicBoolean(false)
     private var serverOffset = 0L
-    private val _stateFlow = MutableStateFlow<ResumableUploadState>(ResumableUploadState(fingerprint, cacheEntry, UploadStatus.Progress(offset, size), paused))
+    private val _stateFlow = MutableStateFlow<ResumableUploadState>(ResumableUploadState(fingerprint, cacheEntry, UploadStatus.Progress(offset, size), paused.load()))
     override val stateFlow: StateFlow<ResumableUploadState> = _stateFlow.asStateFlow()
     private val scope = CoroutineScope(coroutineDispatcher)
     private val config = storageApi.supabaseClient.storage.config.resumable
     private lateinit var dataStream: ByteReadChannel
 
     override suspend fun pause() {
-        paused = true
+        paused.store(true)
     }
 
     override suspend fun cancel() {
@@ -108,14 +108,13 @@ internal class ResumableUploadImpl(
         removeFromCache()
     }
 
-    @OptIn(ExperimentalTime::class)
     override suspend fun startOrResumeUploading() {
-        if(paused) paused = false
+        paused.compareAndSet(expectedValue = true, newValue = false)
         if(!::dataStream.isInitialized) dataStream = createDataStream(offset)
         scope.launch {
             var updateOffset = false
             while (offset < size) {
-                if(paused || !isActive) return@launch //check if paused or the scope is still active
+                if(paused.load() || !isActive) return@launch //check if paused or the scope is still active
                 if(updateOffset) { //after an upload error we retrieve the server offset and update the data stream to avoid conflicts
                     Storage.logger.d { "Trying to update server offset for $path" }
                     try {
@@ -124,7 +123,7 @@ internal class ResumableUploadImpl(
                         dataStream.cancel() //cancel old data stream as we are start reading from a new offset
                         dataStream = createDataStream(offset) //create new data stream
                     } catch(e: Exception) {
-                        coroutineContext.ensureActive()
+                        currentCoroutineContext().ensureActive()
                         Storage.logger.e(e) { "Error while updating server offset for $path. Retrying in ${config.retryTimeout}" }
                         delay(config.retryTimeout)
                         continue
@@ -135,7 +134,7 @@ internal class ResumableUploadImpl(
                     val uploaded = uploadChunk()
                     offset += uploaded
                 } catch(e: Exception) {
-                    coroutineContext.ensureActive()
+                    currentCoroutineContext().ensureActive()
                     if(e !is IllegalStateException) {
                         Storage.logger.e(e) {"Error while uploading chunk. Retrying in ${config.retryTimeout}" }
                         delay(config.retryTimeout)
@@ -143,7 +142,7 @@ internal class ResumableUploadImpl(
                         continue
                     }
                 }
-                _stateFlow.value = ResumableUploadState(fingerprint, cacheEntry, UploadStatus.Progress(offset, size), paused)
+                _stateFlow.value = ResumableUploadState(fingerprint, cacheEntry, UploadStatus.Progress(offset, size), paused.load())
             }
             if(offset != serverOffset) error("Upload offset does not match server offset")
             _stateFlow.value = ResumableUploadState(fingerprint, cacheEntry, UploadStatus.Success(FileUploadResponse(path = path)), false)
@@ -168,7 +167,7 @@ internal class ResumableUploadImpl(
             })
             onUpload { bytesSentTotal, _ ->
                 if(!config.onlyUpdateStateAfterChunk) {
-                    _stateFlow.value = ResumableUploadState(fingerprint, cacheEntry, UploadStatus.Progress(offset + bytesSentTotal, size), paused)
+                    _stateFlow.value = ResumableUploadState(fingerprint, cacheEntry, UploadStatus.Progress(offset + bytesSentTotal, size), paused.load())
                 }
             }
         }

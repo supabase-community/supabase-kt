@@ -27,14 +27,7 @@ internal fun Routing.configureRoutes(
             }
             shutdown(call, auth.config.httpCallbackConfig.redirectHtml)
         } else {
-            Auth.logger.d {
-                "No code or error in OAuth callback"
-            }
-            call.respondText(
-                text = "No code or error in OAuth callback",
-                contentType = ContentType.Text.Html,
-                status = HttpStatusCode.BadRequest
-            )
+            call.respondText(ContentType.Text.Html, HttpStatusCode.OK) { HttpCallbackHtml.landingPage(auth.config.httpCallbackConfig.htmlTitle) }
         }
     }
     get("/callback") {

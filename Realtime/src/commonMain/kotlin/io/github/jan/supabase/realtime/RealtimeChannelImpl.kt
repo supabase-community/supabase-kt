@@ -17,6 +17,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.buildJsonObject
@@ -24,6 +25,7 @@ import kotlinx.serialization.json.encodeToJsonElement
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.put
 import kotlinx.serialization.json.putJsonObject
+import kotlin.concurrent.atomics.incrementAndFetch
 import kotlin.reflect.KClass
 import kotlin.reflect.KType
 
@@ -55,10 +57,15 @@ internal class RealtimeChannelImpl(
             if(!realtimeImpl.config.connectOnSubscribe) error("You can't subscribe to a channel while the realtime client is not connected. Did you forget to call `realtime.connect()`?")
             realtimeImpl.connect()
         }
+        if(!realtimeImpl.subscriptions.containsKey(topic)) {
+            realtime.addChannel(this)
+        }
         _status.value = RealtimeChannel.Status.SUBSCRIBING
         Realtime.logger.d { "Subscribing to channel $topic" }
         val currentJwt = accessToken()
         val postgrestChanges = clientChanges.toList()
+        val hasPresenceCallback = callbackManager.hasPresenceCallback()
+        presenceJoinConfig.enabled = hasPresenceCallback
         val joinConfig = RealtimeJoinPayload(RealtimeJoinConfig(broadcastJoinConfig, presenceJoinConfig, postgrestChanges, isPrivate))
         val joinConfigObject = buildJsonObject {
             putJsonObject(Json.encodeToJsonElement(joinConfig).jsonObject)
@@ -95,7 +102,7 @@ internal class RealtimeChannelImpl(
         Realtime.logger.d { "Updating auth token for channel $topic" }
         realtimeImpl.send(RealtimeMessage(topic, RealtimeChannel.CHANNEL_EVENT_ACCESS_TOKEN, buildJsonObject {
             put("access_token", jwt)
-        }, (++realtimeImpl.ref).toString()))
+        }, (realtimeImpl.ref.incrementAndFetch()).toString()))
     }
 
     override suspend fun broadcast(event: String, message: JsonObject) {
@@ -122,7 +129,7 @@ internal class RealtimeChannelImpl(
                     put("type", "broadcast")
                     put("event", event)
                     put("payload", message)
-                }, (++realtimeImpl.ref).toString())
+                }, (realtimeImpl.ref.incrementAndFetch()).toString())
             )
         }
     }
@@ -149,7 +156,7 @@ internal class RealtimeChannelImpl(
             }
         }
         realtimeImpl.send(
-            RealtimeMessage(topic, RealtimeChannel.CHANNEL_EVENT_PRESENCE, payload, (++realtimeImpl.ref).toString())
+            RealtimeMessage(topic, RealtimeChannel.CHANNEL_EVENT_PRESENCE, payload, realtimeImpl.ref.incrementAndFetch().toString())
         )
     }
 
@@ -158,7 +165,7 @@ internal class RealtimeChannelImpl(
             RealtimeMessage(topic, RealtimeChannel.CHANNEL_EVENT_PRESENCE, buildJsonObject {
                 put("type", "presence")
                 put("event", "untrack")
-            }, (++realtimeImpl.ref).toString())
+            }, (realtimeImpl.ref.incrementAndFetch()).toString())
         )
     }
 
@@ -214,11 +221,24 @@ internal class RealtimeChannelImpl(
             trySend(action)
         }
         val id = callbackManager.addPresenceCallback(callback)
+        if(status.value == RealtimeChannel.Status.SUBSCRIBED && !presenceJoinConfig.enabled) {
+            // If the channel is already subscribed, we need to resubscribe to enable presence
+            Realtime.logger.d { "Resubscribing to channel $topic to enable presence..." }
+            launch {
+                resubscribe()
+            }
+        }
         awaitClose { callbackManager.removeCallbackById(id) }
     }
 
     override fun updateStatus(status: RealtimeChannel.Status) {
         _status.value = status
+    }
+
+    private suspend fun resubscribe() {
+        unsubscribe()
+        _status.first { it == RealtimeChannel.Status.UNSUBSCRIBED }
+        subscribe()
     }
 
 }

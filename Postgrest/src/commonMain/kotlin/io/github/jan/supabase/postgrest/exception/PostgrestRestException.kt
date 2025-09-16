@@ -19,6 +19,7 @@ class PostgrestRestException(
     val code: String?,
     response: HttpResponse
 ): RestException(message, """
-    |Hint: $hint
-    |Details: $details
+    Code: $code
+    Hint: $hint
+    Details: $details
 """.trimIndent(), response)

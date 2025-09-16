@@ -1,146 +1,109 @@
 package io.github.jan.supabase.collections
 
 import io.github.jan.supabase.annotations.SupabaseInternal
-import kotlinx.atomicfu.atomic
-import kotlinx.atomicfu.update
+import kotlinx.collections.immutable.persistentListOf
+import kotlin.concurrent.atomics.AtomicReference
 
 /**
- * A multiplatform, thread-safe [MutableList], implemented using AtomicFU. Thanks to the author of [klogging](https://github.com/klogging/klogging)!
+ * A multiplatform, thread-safe [MutableList], implemented using AtomicReference and PersistentList.
  */
 @SupabaseInternal
 class AtomicMutableList<E>(
     vararg elements: E
 ) : MutableList<E> {
 
-    private val list = atomic(listOf(*elements))
+    private val list = AtomicReference(persistentListOf(*elements))
 
     override val size: Int
-        get() = list.value.size
+        get() = list.load().size
 
-    override fun clear(): Unit = list.update { buildList { emptyList<E>() } }
+    override fun clear() {
+        list.updateIfChanged { if (it.isEmpty()) it else persistentListOf() }
+    }
 
     override fun addAll(elements: Collection<E>): Boolean {
-        var changed = false
-        list.update { current ->
-            buildList {
-                addAll(current)
-                changed = addAll(elements)
-            }
+        if(elements.isEmpty()) return false
+        return list.updateIfChanged { current ->
+            current.addAll(elements)
         }
-        return changed
     }
 
     override fun addAll(index: Int, elements: Collection<E>): Boolean {
-        var changed = false
-        list.update { current ->
-            buildList {
-                addAll(current)
-                changed = addAll(index, elements)
-            }
+        if(elements.isEmpty()) return false
+        return list.updateIfChanged { current ->
+            current.addAll(index, elements)
         }
-        return changed
     }
 
     override fun add(index: Int, element: E) = list.update { current ->
-        buildList {
-            addAll(current)
-            add(index, element)
-        }
+        current.add(index, element)
     }
 
-    override fun add(element: E): Boolean {
-        list.update { current ->
-            buildList {
-                addAll(current)
-                add(element)
-            }
-        }
-        return true
+    override fun add(element: E): Boolean = list.updateIfChanged { current ->
+        current.add(element)
     }
 
-    override fun get(index: Int): E = list.value[index]
+    override fun get(index: Int): E = list.load()[index]
 
-    override fun isEmpty(): Boolean = list.value.isEmpty()
+    override fun isEmpty(): Boolean = list.load().isEmpty()
 
-    override fun iterator(): MutableIterator<E> = list.value.toMutableList().iterator()
+    override fun iterator(): MutableIterator<E> = list.load().toMutableList().iterator()
 
-    override fun listIterator(): MutableListIterator<E> = list.value.toMutableList().listIterator()
+    override fun listIterator(): MutableListIterator<E> = list.load().toMutableList().listIterator()
 
-    override fun listIterator(index: Int): MutableListIterator<E> = list.value.toMutableList().listIterator(index)
-
-    override fun removeAt(index: Int): E {
-        checkElementIndex(index, size)
-        val removed: E = get(index)
-        list.update { current ->
-            buildList {
-                addAll(current)
-                removeAt(index)
-            }
-        }
-        return removed
-    }
+    override fun listIterator(index: Int): MutableListIterator<E> = list.load().toMutableList().listIterator(index)
 
     override fun subList(fromIndex: Int, toIndex: Int): MutableList<E> =
-        list.value.toMutableList().subList(fromIndex, toIndex)
+        list.load().subList(fromIndex, toIndex).toMutableList()
 
     override fun set(index: Int, element: E): E {
-        checkElementIndex(index, size)
-        val replaced: E = get(index)
-        list.update { current ->
-            buildList {
-                addAll(current)
-                set(index, element)
-            }
+        while (true) {
+            val cur = list.load()
+            checkElementIndex(index, cur.size)
+            val old = cur[index]
+            val next = cur.set(index, element)
+            if (list.compareAndSet(cur, next)) return old
         }
-        return replaced
     }
 
-    override fun retainAll(elements: Collection<E>): Boolean {
-        var modified = false
-        list.update { current ->
-            buildList {
-                addAll(current)
-                modified = retainAll(elements)
-            }
+    override fun removeAt(index: Int): E {
+        while (true) {
+            val cur = list.load()
+            checkElementIndex(index, cur.size)
+            val old = cur[index]
+            val next = cur.removeAt(index)
+            if (list.compareAndSet(cur, next)) return old
         }
-        return modified
+    }
+
+    override fun retainAll(elements: Collection<E>): Boolean = list.updateIfChanged { current ->
+        current.retainAll(elements)
     }
 
     override fun removeAll(elements: Collection<E>): Boolean {
-        var modified = false
-        list.update { current ->
-            buildList {
-                addAll(current)
-                modified = removeAll(elements)
-            }
+        if(elements.isEmpty()) return false
+        return list.updateIfChanged { current ->
+            current.removeAll(elements)
         }
-        return modified
     }
 
-    override fun remove(element: E): Boolean {
-        var modified = false
-        list.update { current ->
-            buildList {
-                addAll(current)
-                modified = remove(element)
-            }
-        }
-        return modified
+    override fun remove(element: E): Boolean = list.updateIfChanged { current ->
+        current.remove(element)
     }
 
-    override fun lastIndexOf(element: E): Int = list.value.lastIndexOf(element)
+    override fun lastIndexOf(element: E): Int = list.load().lastIndexOf(element)
 
-    override fun indexOf(element: E): Int = list.value.indexOf(element)
+    override fun indexOf(element: E): Int = list.load().indexOf(element)
 
-    override fun containsAll(elements: Collection<E>): Boolean = list.value.containsAll(elements)
+    override fun containsAll(elements: Collection<E>): Boolean = list.load().containsAll(elements)
 
-    override fun contains(element: E): Boolean = list.value.contains(element)
+    override fun contains(element: E): Boolean = list.load().contains(element)
 
     /**
      * Copied from Kotlin [AbstractList] internal code.
      */
     private fun checkElementIndex(index: Int, size: Int) {
-        if (index < 0 || index >= size) {
+        if (index !in 0..<size) {
             throw IndexOutOfBoundsException("index: $index, size: $size")
         }
     }

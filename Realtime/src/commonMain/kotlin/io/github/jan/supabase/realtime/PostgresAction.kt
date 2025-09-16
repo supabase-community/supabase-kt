@@ -3,9 +3,9 @@ package io.github.jan.supabase.realtime
 import io.github.jan.supabase.SupabaseSerializer
 import io.github.jan.supabase.decode
 import io.github.jan.supabase.plugins.SerializableData
-import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonObject
+import kotlin.time.Instant
 
 /**
  * Contains information about a column

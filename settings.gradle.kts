@@ -18,7 +18,7 @@ include("Storage")
 include("Realtime")
 include("Functions")
 include("Supabase")
-include("bom")
+//include("bom")
 
 // Test module
 include("test-common")
