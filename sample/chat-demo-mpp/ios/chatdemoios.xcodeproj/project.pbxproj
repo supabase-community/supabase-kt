@@ -20,6 +20,7 @@
 		6581F1552B36C0D000BA34A9 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		6581F1572B36C0D000BA34A9 /* chatdemoios.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = chatdemoios.entitlements; sourceTree = "<group>"; };
 		6581F1592B36C0D000BA34A9 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		65E1CD792E79AA2500DACC1A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -52,6 +53,7 @@
 		6581F1502B36C0CF00BA34A9 /* chatdemoios */ = {
 			isa = PBXGroup;
 			children = (
+				65E1CD792E79AA2500DACC1A /* Info.plist */,
 				6581F1512B36C0CF00BA34A9 /* chatdemoiosApp.swift */,
 				6581F1532B36C0CF00BA34A9 /* ContentView.swift */,
 				6581F1552B36C0D000BA34A9 /* Assets.xcassets */,
@@ -300,6 +302,8 @@
 				FRAMEWORK_SEARCH_PATHS = "$(SRCROOT)/../common/build/xcode-frameworks/$(CONFIGURATION)/$(SDK_NAME)";
 				GENERATE_INFOPLIST_FILE = YES;
 				HEADER_SEARCH_PATHS = "";
+				INFOPLIST_FILE = chatdemoios/Info.plist;
+				INFOPLIST_KEY_LSApplicationCategoryType = "";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -341,6 +345,8 @@
 				FRAMEWORK_SEARCH_PATHS = "$(SRCROOT)/../common/build/xcode-frameworks/$(CONFIGURATION)/$(SDK_NAME)";
 				GENERATE_INFOPLIST_FILE = YES;
 				HEADER_SEARCH_PATHS = "";
+				INFOPLIST_FILE = chatdemoios/Info.plist;
+				INFOPLIST_KEY_LSApplicationCategoryType = "";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
