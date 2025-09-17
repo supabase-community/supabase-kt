@@ -13,7 +13,9 @@ import io.github.jan.supabase.auth.mfa.MfaApi
 import io.github.jan.supabase.auth.mfa.MfaApiImpl
 import io.github.jan.supabase.auth.providers.AuthProvider
 import io.github.jan.supabase.auth.providers.ExternalAuthConfigDefaults
+import io.github.jan.supabase.auth.providers.IDTokenProvider
 import io.github.jan.supabase.auth.providers.OAuthProvider
+import io.github.jan.supabase.auth.providers.builtin.IDToken
 import io.github.jan.supabase.auth.providers.builtin.OTP
 import io.github.jan.supabase.auth.providers.builtin.SSO
 import io.github.jan.supabase.auth.status.RefreshFailureCause
@@ -183,6 +185,16 @@ internal class AuthImpl(
             }
         )
         return null
+    }
+
+    override suspend fun linkIdentityWithIdToken(
+        provider: IDTokenProvider,
+        idToken: String,
+        config: (IDToken.Config) -> Unit
+    ) {
+        val body = IDToken.Config(idToken = idToken, provider = provider, linkIdentity = true).apply(config)
+        val result = api.postJson("token?grant_type=id_token", body)
+        importSession(result.safeBody(), source = SessionSource.UserIdentitiesChanged(result.safeBody()))
     }
 
     override suspend fun unlinkIdentity(identityId: String, updateLocalUser: Boolean) {

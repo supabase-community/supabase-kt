@@ -386,6 +386,37 @@ class AuthRequestTest {
     }
 
     @Test
+    fun testLinkIdentityWithIdToken() {
+        runTest {
+            val expectedProvider = Google
+            val expectedIdToken = "idToken"
+            val expectedAccessToken = "accessToken"
+            val expectedNonce = "nonce"
+            val client = createMockedSupabaseClient(configuration = configuration) {
+                val body = it.body.toJsonElement().jsonObject
+                val params = it.url.parameters
+                assertMethodIs(HttpMethod.Post, it.method)
+                assertPathIs("/token", it.url.pathAfterVersion())
+                assertEquals("id_token", params["grant_type"])
+                assertEquals(expectedIdToken, body["id_token"]?.jsonPrimitive?.content)
+                assertEquals(expectedProvider.name, body["provider"]?.jsonPrimitive?.content)
+                assertEquals(expectedAccessToken, body["access_token"]?.jsonPrimitive?.content)
+                assertEquals(expectedNonce, body["nonce"]?.jsonPrimitive?.content)
+                // ensure we signal linking
+                assertEquals("true", body["linkIdentity"]?.jsonPrimitive?.content)
+                respondJson(
+                    sampleUserSession()
+                )
+            }
+            client.auth.linkIdentityWithIdToken(expectedProvider, expectedIdToken) {
+                accessToken = expectedAccessToken
+                nonce = expectedNonce
+            }
+            assertNotNull(client.auth.currentSessionOrNull(), "Session should not be null")
+        }
+    }
+
+    @Test
     fun testUnlinkIdentity() {
         runTest {
             val expectedIdentityId = "identityId"
