@@ -1,5 +1,6 @@
 package io.github.jan.supabase.auth.providers.builtin
 
+import io.github.jan.supabase.annotations.SupabaseInternal
 import io.github.jan.supabase.auth.providers.Apple
 import io.github.jan.supabase.auth.providers.Azure
 import io.github.jan.supabase.auth.providers.Facebook
@@ -39,7 +40,8 @@ data object IDToken : DefaultAuthProvider<IDToken.Config, UserInfo> {
         @SerialName("id_token") var idToken: String = "",
         var provider: IDTokenProvider? = null,
         @SerialName("access_token") var accessToken: String? = null,
-        var nonce: String? = null
+        var nonce: String? = null,
+        @property:SupabaseInternal var linkIdentity: Boolean = false
     ) : DefaultAuthProvider.Config()
 
     @OptIn(ExperimentalSerializationApi::class)

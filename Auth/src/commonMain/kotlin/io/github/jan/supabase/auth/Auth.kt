@@ -11,8 +11,10 @@ import io.github.jan.supabase.auth.mfa.MfaApi
 import io.github.jan.supabase.auth.providers.AuthProvider
 import io.github.jan.supabase.auth.providers.ExternalAuthConfigDefaults
 import io.github.jan.supabase.auth.providers.Google
+import io.github.jan.supabase.auth.providers.IDTokenProvider
 import io.github.jan.supabase.auth.providers.OAuthProvider
 import io.github.jan.supabase.auth.providers.builtin.Email
+import io.github.jan.supabase.auth.providers.builtin.IDToken
 import io.github.jan.supabase.auth.providers.builtin.Phone
 import io.github.jan.supabase.auth.providers.builtin.SSO
 import io.github.jan.supabase.auth.status.SessionSource
@@ -164,7 +166,13 @@ interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
     /**
      * Links an OAuth Identity to an existing user.
      *
-     * This methods works similar to signing in with OAuth providers. Refer to the [documentation](https://supabase.com/docs/reference/kotlin/initializing) to learn how to handle OAuth and OTP links.
+     * Example:
+     * ```kotlin
+     * val url = supabase.auth.linkIdentity(Google)
+     * // Open the url in the browser, but this will happen automatically if [ExternalAuthConfigDefaults.automaticallyOpenUrl] is true (which it is by default)
+     * ```
+     *
+     * This method works similar to signing in with OAuth providers. Refer to the [documentation](https://supabase.com/docs/reference/kotlin/initializing) to learn how to handle OAuth and OTP links.
      * @param provider The OAuth provider
      * @param redirectUrl The redirect url to use. If you don't specify this, the platform specific will be used, like deeplinks on android.
      * @param config Extra configuration
@@ -178,6 +186,30 @@ interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
         redirectUrl: String? = defaultRedirectUrl(),
         config: ExternalAuthConfigDefaults.() -> Unit = {}
     ): String?
+
+    /**
+     * Links an identity to the current user using an ID token.
+     *
+     * Example:
+     * ```kotlin
+     * supabase.auth.linkIdentityWithIdToken(provider = Google, idToken = "idToken") {
+     *     // Optional nonce
+     *     nonce = "nonce"
+     * }
+     * ```
+     *
+     * @param provider One of the [IDTokenProvider] providers.
+     * @param idToken The ID token to use
+     * @param config Extra configuration
+     * @throws RestException or one of its subclasses if receiving an error response. If the error response contains a error code, an [AuthRestException] will be thrown which can be used to easier identify the problem.
+     * @throws HttpRequestTimeoutException if the request timed out
+     * @throws HttpRequestException on network related issues
+     */
+    suspend fun linkIdentityWithIdToken(
+        provider: IDTokenProvider,
+        idToken: String,
+        config: (IDToken.Config).() -> Unit = {}
+    )
 
     /**
      * Unlinks an OAuth Identity from an existing user.
