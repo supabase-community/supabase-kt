@@ -198,11 +198,9 @@ interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
      * }
      * ```
      *
-     * This method works similar to signing in with OAuth providers. Refer to the [documentation](https://supabase.com/docs/reference/kotlin/initializing) to learn how to handle OAuth and OTP links.
      * @param provider One of the [IDTokenProvider] providers.
      * @param idToken The ID token to use
      * @param config Extra configuration
-     * @return The OAuth url to open in the browser if [ExternalAuthConfigDefaults.automaticallyOpenUrl] is false, otherwise null.
      * @throws RestException or one of its subclasses if receiving an error response. If the error response contains a error code, an [AuthRestException] will be thrown which can be used to easier identify the problem.
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
