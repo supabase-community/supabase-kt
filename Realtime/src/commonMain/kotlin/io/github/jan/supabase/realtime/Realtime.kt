@@ -127,12 +127,16 @@ interface Realtime : MainPlugin<Realtime.Config>, CustomSerializationPlugin {
      * @property disconnectOnNoSubscriptions Whether to disconnect from the websocket when there are no more subscriptions. Defaults to true
      * @property serializer A serializer used for serializing/deserializing objects e.g. in [PresenceAction.decodeJoinsAs] or [RealtimeChannel.broadcast]. Defaults to [KotlinXSerializer]
      * @property websocketFactory A custom websocket factory. If this is set, the [websocketConfig] will be ignored
+     * @property rejoinDelay The interval between channel rejoin attempts
+     * @property maxAttempts The maximum amount of connection attempts before giving up. Defaults to 5
      */
     data class Config(
         var websocketConfig: WebSockets.Config.() -> Unit = {},
         var secure: Boolean? = null,
         var heartbeatInterval: Duration = 15.seconds,
         var reconnectDelay: Duration = 7.seconds,
+        var rejoinDelay: Duration = 2.seconds,
+        var maxAttempts: Int = 5,
         var disconnectOnSessionLoss: Boolean = true,
         var connectOnSubscribe: Boolean = true,
         @property:SupabaseInternal var websocketFactory: RealtimeWebsocketFactory? = null,
