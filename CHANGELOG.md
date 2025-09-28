@@ -1,5 +1,32 @@
 # Changelog
 
+### 3.2.4 - September 26, 2025
+
+### Core
+
+- Update Ktor to version `3.3.0`
+- make kermit logger non-global by @sproctor in https://github.com/supabase-community/supabase-kt/pull/1044
+
+### Auth & Compose Auth
+
+* Add support for linkIdentity with OIDC by @jan-tennert in https://github.com/supabase-community/supabase-kt/pull/1051
+  You can now link a Google / Apple account to an existing Supabase account via `linkIdentityWithIdToken`:
+  ```kotlin
+  supabase.auth.linkIdentityWithIdToken(provider = Google, idToken = "idToken received from native auth") {
+      // optional stuff
+  }
+  ```
+  To accomplish this with Compose Auth, set the `onIdToken` parameter in the `rememberSignInWith(...)` method:
+  ```kotlin
+  //default parameter is ComposeAuth.SIGN_IN_CALLBACK
+  val state = composeAuth.rememberSignInWithGoogle(onIdToken = ComposeAuth.LINK_IDENTITY_CALLBACK)
+  ```
+  This also means, you can upgrade anonymous users via native auth and/or handle the id token received from native auth yourself (e.g. via your viewmodel)
+
+### Samples
+
+* Fix Chat sample launch fails on iOS by @hieuwu in https://github.com/supabase-community/supabase-kt/pull/1050
+
 ### 3.2.3 - September 11, 2025
 
 ### Core
