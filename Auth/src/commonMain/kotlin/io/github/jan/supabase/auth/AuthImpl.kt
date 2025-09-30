@@ -446,11 +446,14 @@ internal class AuthImpl(
         val thresholdDate = session.expiresAt - session.expiresIn.seconds * (1 - SESSION_REFRESH_THRESHOLD)
         if (thresholdDate <= Clock.System.now()) {
             Auth.logger.d { "Session is under the threshold date. Refreshing session..." }
-            tryImportingSession(
-                { handleExpiredSession(session, config.alwaysAutoRefresh) },
-                { importSession(session) },
-                { updateStatusIfExpired(session, it) }
-            )
+            sessionJob?.cancel()
+            sessionJob = authScope.launch {
+                tryImportingSession(
+                    { handleExpiredSession(session, config.alwaysAutoRefresh) },
+                    { importSession(session) },
+                    { updateStatusIfExpired(session, it) }
+                )
+            }
         } else {
             if (config.autoSaveToStorage) {
                 sessionManager.saveSession(session)
