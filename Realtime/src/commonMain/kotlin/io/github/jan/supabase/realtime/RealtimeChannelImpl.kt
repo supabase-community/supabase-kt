@@ -52,24 +52,16 @@ internal class RealtimeChannelImpl(
     private val subTopic = topic.replaceFirst(Regex("^realtime:", RegexOption.IGNORE_CASE), "")
     private val httpClient = realtimeImpl.supabaseClient.httpClient
     private val userPresenceEnabled = presenceJoinConfig.enabled
-    private var presenceEnabled = presenceJoinConfig.enabled
     private var joinedOnce = false
 
-    private fun hasPresenceBindings(): Boolean {
-        return callbackManager.hasPresenceCallbacks()
-    }
-
-    private fun updatePresenceEnabled() {
-        val shouldEnable = userPresenceEnabled || hasPresenceBindings() || presenceEnabled
-        presenceEnabled = shouldEnable
-        presenceJoinConfig.enabled = presenceEnabled
-    }
+    private fun shouldEnablePresence(): Boolean =
+        userPresenceEnabled || callbackManager.hasPresenceCallbacks()
 
     private fun maybeEnablePresenceAndRejoin() {
         if(!joinedOnce || status.value != RealtimeChannel.Status.SUBSCRIBED) return
-        if(presenceEnabled) return
-        if(!(userPresenceEnabled || hasPresenceBindings())) return
-        presenceEnabled = true
+        if(presenceJoinConfig.enabled) return
+        if(!shouldEnablePresence()) return
+
         presenceJoinConfig.enabled = true
         coroutineScope.launch {
             runCatching {
@@ -90,11 +82,11 @@ internal class RealtimeChannelImpl(
     }
 
     @SupabaseInternal
-    internal fun isPresenceEnabledForJoin(): Boolean = presenceEnabled
+    internal fun isPresenceEnabledForJoin(): Boolean = presenceJoinConfig.enabled
 
     @SupabaseInternal
     internal fun createJoinPayload(): JsonObject {
-        updatePresenceEnabled()
+        presenceJoinConfig.enabled = shouldEnablePresence()
         val postgrestChanges = clientChanges.toList()
         val joinConfig = RealtimeJoinPayload(RealtimeJoinConfig(broadcastJoinConfig, presenceJoinConfig, postgrestChanges))
         val joinConfigJson = Json.encodeToJsonElement(joinConfig).jsonObject
