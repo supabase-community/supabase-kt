@@ -446,11 +446,7 @@ internal class AuthImpl(
         val thresholdDate = session.expiresAt - session.expiresIn.seconds * (1 - SESSION_REFRESH_THRESHOLD)
         if (thresholdDate <= Clock.System.now()) {
             Auth.logger.d { "Session is under the threshold date. Refreshing session..." }
-            tryImportingSession(
-                { handleExpiredSession(session, config.alwaysAutoRefresh) },
-                { importSession(session) },
-                { updateStatusIfExpired(session, it) }
-            )
+            recreateSessionJob(session, source, false)
         } else {
             if (config.autoSaveToStorage) {
                 sessionManager.saveSession(session)
@@ -458,18 +454,24 @@ internal class AuthImpl(
             }
             setSessionStatus(SessionStatus.Authenticated(session, source))
             Auth.logger.d { "Session imported successfully. Starting auto refresh..." }
-            sessionJob?.cancel()
-            sessionJob = authScope.launch {
-                delayBeforeExpiry(session)
-                launch {
-                    tryImportingSession(
-                        { handleExpiredSession(session) },
-                        { importSession(session, source = source) },
-                        { updateStatusIfExpired(session, it) }
-                    )
-                }
-            }
+            recreateSessionJob(session, source, true)
             Auth.logger.d { "Auto refresh started." }
+        }
+    }
+
+    private fun recreateSessionJob(
+        session: UserSession,
+        source: SessionSource,
+        delay: Boolean
+    ) {
+        sessionJob?.cancel()
+        sessionJob = authScope.launch {
+            if(delay) delayBeforeExpiry(session)
+            tryImportingSession(
+                { handleExpiredSession(session, config.alwaysAutoRefresh) },
+                { importSession(session, source = source) },
+                { updateStatusIfExpired(session, it) }
+            )
         }
     }
 
@@ -619,9 +621,8 @@ internal class AuthImpl(
     override suspend fun clearSession() {
         codeVerifierCache.deleteCodeVerifier()
         sessionManager.deleteSession()
-        sessionJob?.cancel()
         setSessionStatus(SessionStatus.NotAuthenticated(true))
-        sessionJob = null
+        stopAutoRefreshForCurrentSession()
     }
 
     override suspend fun awaitInitialization() {
