@@ -24,6 +24,8 @@ sealed interface CallbackManager {
 
     fun setServerChanges(changes: List<PostgresJoinConfig>)
 
+    fun hasPresenceCallbacks(): Boolean
+
 }
 
 internal class CallbackManagerImpl(
@@ -69,6 +71,10 @@ internal class CallbackManagerImpl(
         val id = nextId++
         callbacks += RealtimeCallback.PresenceCallback(callback, id)
         return id
+    }
+
+    override fun hasPresenceCallbacks(): Boolean {
+        return callbacks.any { it is RealtimeCallback.PresenceCallback }
     }
 
     override fun removeCallbackById(id: Long) {

@@ -49,6 +49,8 @@ import kotlin.time.Duration.Companion.milliseconds
     override val subscriptions: Map<String, RealtimeChannel>
         get() = _subscriptions.toMap()
     private val scope = CoroutineScope(Dispatchers.Default + SupervisorJob())
+    internal val coroutineScope: CoroutineScope
+        get() = scope
     private val mutex = Mutex()
     var heartbeatJob: Job? = null
     var messageJob: Job? = null

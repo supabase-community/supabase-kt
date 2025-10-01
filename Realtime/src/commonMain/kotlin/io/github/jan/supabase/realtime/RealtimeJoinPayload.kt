@@ -1,6 +1,10 @@
+@file:OptIn(kotlinx.serialization.ExperimentalSerializationApi::class)
+
 package io.github.jan.supabase.realtime
 
 import io.github.jan.supabase.annotations.SupabaseInternal
+import kotlinx.serialization.EncodeDefault
+import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -30,7 +34,11 @@ data class BroadcastJoinConfig(@SerialName("ack") var acknowledgeBroadcasts: Boo
  * @param key Used to track presence payloads. Can be e.g. a user id
  */
 @Serializable
-data class PresenceJoinConfig(var key: String)
+data class PresenceJoinConfig(
+    var key: String,
+    @EncodeDefault
+    var enabled: Boolean = false,
+)
 
 @SupabaseInternal
 @Serializable

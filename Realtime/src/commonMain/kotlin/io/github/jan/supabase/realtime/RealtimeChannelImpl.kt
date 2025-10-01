@@ -14,9 +14,11 @@ import io.github.jan.supabase.realtime.data.PostgresActionData
 import io.github.jan.supabase.supabaseJson
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.headers
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
@@ -35,6 +37,7 @@ internal class RealtimeChannelImpl(
     override val topic: String,
     private val broadcastJoinConfig: BroadcastJoinConfig,
     private val presenceJoinConfig: PresenceJoinConfig,
+    private val coroutineScope: CoroutineScope = realtimeImpl.coroutineScope,
 ) : RealtimeChannel {
 
     private val clientChanges = AtomicMutableList<PostgresJoinConfig>()
@@ -48,6 +51,63 @@ internal class RealtimeChannelImpl(
     private val broadcastUrl = realtimeImpl.broadcastUrl()
     private val subTopic = topic.replaceFirst(Regex("^realtime:", RegexOption.IGNORE_CASE), "")
     private val httpClient = realtimeImpl.supabaseClient.httpClient
+    private val userPresenceEnabled = presenceJoinConfig.enabled
+    private var presenceEnabled = presenceJoinConfig.enabled
+    private var joinedOnce = false
+
+    private fun hasPresenceBindings(): Boolean {
+        return callbackManager.hasPresenceCallbacks()
+    }
+
+    private fun updatePresenceEnabled() {
+        val shouldEnable = userPresenceEnabled || hasPresenceBindings() || presenceEnabled
+        presenceEnabled = shouldEnable
+        presenceJoinConfig.enabled = presenceEnabled
+    }
+
+    private fun maybeEnablePresenceAndRejoin() {
+        if(!joinedOnce || status.value != RealtimeChannel.Status.SUBSCRIBED) return
+        if(presenceEnabled) return
+        if(!(userPresenceEnabled || hasPresenceBindings())) return
+        presenceEnabled = true
+        presenceJoinConfig.enabled = true
+        coroutineScope.launch {
+            runCatching {
+                val joinPayload = createJoinPayload()
+                Realtime.logger.d { "Rejoining channel $topic with updated presence config $joinPayload" }
+                realtimeImpl.send(
+                    RealtimeMessage(topic, RealtimeChannel.CHANNEL_EVENT_JOIN, joinPayload, null)
+                )
+            }.onFailure {
+                Realtime.logger.e(it) { "Failed to rejoin channel $topic after enabling presence" }
+            }
+        }
+    }
+
+    @SupabaseInternal
+    internal fun onPresenceCallbackAdded() {
+        maybeEnablePresenceAndRejoin()
+    }
+
+    @SupabaseInternal
+    internal fun isPresenceEnabledForJoin(): Boolean = presenceEnabled
+
+    @SupabaseInternal
+    internal fun createJoinPayload(): JsonObject {
+        updatePresenceEnabled()
+        val postgrestChanges = clientChanges.toList()
+        val joinConfig = RealtimeJoinPayload(RealtimeJoinConfig(broadcastJoinConfig, presenceJoinConfig, postgrestChanges))
+        val joinConfigJson = Json.encodeToJsonElement(joinConfig).jsonObject
+        val currentJwt = realtimeImpl.config.jwtToken ?: supabaseClient.pluginManager.getPluginOrNull(Auth)?.currentSessionOrNull()?.let {
+            if(it.expiresAt > Clock.System.now()) it.accessToken else null
+        }
+        return buildJsonObject {
+            putJsonObject(joinConfigJson)
+            currentJwt?.let { token ->
+                put("access_token", token)
+            }
+        }
+    }
 
     @OptIn(SupabaseInternal::class)
     override suspend fun subscribe(blockUntilSubscribed: Boolean) {
@@ -60,17 +120,7 @@ internal class RealtimeChannelImpl(
         }
         _status.value = RealtimeChannel.Status.SUBSCRIBING
         Realtime.logger.d { "Subscribing to channel $topic" }
-        val currentJwt = realtimeImpl.config.jwtToken ?: supabaseClient.pluginManager.getPluginOrNull(Auth)?.currentSessionOrNull()?.let {
-            if(it.expiresAt > Clock.System.now()) it.accessToken else null
-        }
-        val postgrestChanges = clientChanges.toList()
-        val joinConfig = RealtimeJoinPayload(RealtimeJoinConfig(broadcastJoinConfig, presenceJoinConfig, postgrestChanges))
-        val joinConfigObject = buildJsonObject {
-            putJsonObject(Json.encodeToJsonElement(joinConfig).jsonObject)
-            currentJwt?.let {
-                put("access_token", currentJwt)
-            }
-        }
+        val joinConfigObject = createJoinPayload()
         Realtime.logger.d { "Subscribing to channel with body $joinConfigObject" }
         realtimeImpl.send(
             RealtimeMessage(topic, RealtimeChannel.CHANNEL_EVENT_JOIN, joinConfigObject, null)
@@ -93,6 +143,8 @@ internal class RealtimeChannelImpl(
             RealtimeMessage.EventType.SYSTEM -> {
                 Realtime.logger.d { "Subscribed to channel ${message.topic}" }
                 _status.value = RealtimeChannel.Status.SUBSCRIBED
+                joinedOnce = true
+                maybeEnablePresenceAndRejoin()
             }
             RealtimeMessage.EventType.SYSTEM_REPLY -> {
                 Realtime.logger.d { "Received system reply: ${message.payload}." }
@@ -107,6 +159,8 @@ internal class RealtimeChannelImpl(
                 if(status.value != RealtimeChannel.Status.SUBSCRIBED) {
                     Realtime.logger.d { "Joined channel ${message.topic}" }
                     _status.value = RealtimeChannel.Status.SUBSCRIBED
+                    joinedOnce = true
+                    maybeEnablePresenceAndRejoin()
                 }
             }
             RealtimeMessage.EventType.POSTGRES_CHANGES -> {
@@ -221,4 +275,3 @@ internal class RealtimeChannelImpl(
     }
 
 }
-

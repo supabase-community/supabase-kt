@@ -125,6 +125,7 @@ fun RealtimeChannel.presenceChangeFlow(): Flow<PresenceAction> {
         }
 
         val id = callbackManager.addPresenceCallback(callback)
+        (this as? RealtimeChannelImpl)?.onPresenceCallbackAdded()
         awaitClose { callbackManager.removeCallbackById(id) }
     }
 }
