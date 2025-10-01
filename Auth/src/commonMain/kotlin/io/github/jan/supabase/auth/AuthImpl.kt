@@ -1,6 +1,6 @@
 package io.github.jan.supabase.auth
 
-import io.github.jan.supabase.SupabaseClient
+import io.github.jan.supabase.*
 import io.github.jan.supabase.annotations.SupabaseExperimental
 import io.github.jan.supabase.annotations.SupabaseInternal
 import io.github.jan.supabase.auth.admin.AdminApi
@@ -24,7 +24,6 @@ import io.github.jan.supabase.auth.status.SessionStatus
 import io.github.jan.supabase.auth.user.UserInfo
 import io.github.jan.supabase.auth.user.UserSession
 import io.github.jan.supabase.auth.user.UserUpdateBuilder
-import io.github.jan.supabase.bodyOrNull
 import io.github.jan.supabase.exceptions.BadRequestRestException
 import io.github.jan.supabase.exceptions.RestException
 import io.github.jan.supabase.exceptions.UnauthorizedRestException
@@ -32,38 +31,13 @@ import io.github.jan.supabase.exceptions.UnknownRestException
 import io.github.jan.supabase.logging.d
 import io.github.jan.supabase.logging.e
 import io.github.jan.supabase.logging.i
-import io.github.jan.supabase.putJsonObject
-import io.github.jan.supabase.safeBody
-import io.github.jan.supabase.supabaseJson
-import io.ktor.client.call.body
-import io.ktor.client.request.parameter
-import io.ktor.client.statement.HttpResponse
-import io.ktor.client.statement.bodyAsText
-import io.ktor.http.HttpMethod
-import io.ktor.http.HttpStatusCode
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.cancel
-import kotlinx.coroutines.currentCoroutineContext
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.ensureActive
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharedFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.launch
-import kotlinx.serialization.json.JsonObject
-import kotlinx.serialization.json.JsonObjectBuilder
-import kotlinx.serialization.json.buildJsonObject
-import kotlinx.serialization.json.contentOrNull
-import kotlinx.serialization.json.encodeToJsonElement
-import kotlinx.serialization.json.jsonObject
-import kotlinx.serialization.json.jsonPrimitive
-import kotlinx.serialization.json.put
+import io.ktor.client.call.*
+import io.ktor.client.request.*
+import io.ktor.client.statement.*
+import io.ktor.http.*
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.*
+import kotlinx.serialization.json.*
 import kotlin.time.Clock
 import kotlin.time.Duration.Companion.seconds
 
@@ -446,14 +420,7 @@ internal class AuthImpl(
         val thresholdDate = session.expiresAt - session.expiresIn.seconds * (1 - SESSION_REFRESH_THRESHOLD)
         if (thresholdDate <= Clock.System.now()) {
             Auth.logger.d { "Session is under the threshold date. Refreshing session..." }
-            sessionJob?.cancel()
-            sessionJob = authScope.launch {
-                tryImportingSession(
-                    { handleExpiredSession(session, config.alwaysAutoRefresh) },
-                    { importSession(session) },
-                    { updateStatusIfExpired(session, it) }
-                )
-            }
+            recreateSessionJob(session, source, false)
         } else {
             if (config.autoSaveToStorage) {
                 sessionManager.saveSession(session)
@@ -461,18 +428,24 @@ internal class AuthImpl(
             }
             setSessionStatus(SessionStatus.Authenticated(session, source))
             Auth.logger.d { "Session imported successfully. Starting auto refresh..." }
-            sessionJob?.cancel()
-            sessionJob = authScope.launch {
-                delayBeforeExpiry(session)
-                launch {
-                    tryImportingSession(
-                        { handleExpiredSession(session) },
-                        { importSession(session, source = source) },
-                        { updateStatusIfExpired(session, it) }
-                    )
-                }
-            }
+            recreateSessionJob(session, source, true)
             Auth.logger.d { "Auto refresh started." }
+        }
+    }
+
+    private fun recreateSessionJob(
+        session: UserSession,
+        source: SessionSource,
+        delay: Boolean
+    ) {
+        sessionJob?.cancel()
+        sessionJob = authScope.launch {
+            if(delay) delayBeforeExpiry(session)
+            tryImportingSession(
+                { handleExpiredSession(session, config.alwaysAutoRefresh) },
+                { importSession(session, source = source) },
+                { updateStatusIfExpired(session, it) }
+            )
         }
     }
 
@@ -622,9 +595,8 @@ internal class AuthImpl(
     override suspend fun clearSession() {
         codeVerifierCache.deleteCodeVerifier()
         sessionManager.deleteSession()
-        sessionJob?.cancel()
         setSessionStatus(SessionStatus.NotAuthenticated(true))
-        sessionJob = null
+        stopAutoRefreshForCurrentSession()
     }
 
     override suspend fun awaitInitialization() {
