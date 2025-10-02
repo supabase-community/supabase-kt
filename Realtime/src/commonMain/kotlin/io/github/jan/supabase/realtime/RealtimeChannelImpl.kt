@@ -50,10 +50,14 @@ internal class RealtimeChannelImpl(
     private val broadcastUrl = realtimeImpl.broadcastUrl()
     private val subTopic = topic.replaceFirst(Regex("^${RealtimeTopic.PREFIX}:", RegexOption.IGNORE_CASE), "")
     private val httpClient = realtimeImpl.supabaseClient.httpClient
+    private val userPresenceEnabled = presenceJoinConfig.enabled
 
     internal val joinAttempt = AtomicInt(0)
 
     private suspend fun accessToken() = realtimeImpl.config.accessToken(supabaseClient) ?: realtimeImpl.accessToken
+
+    private fun shouldEnablePresence(): Boolean =
+        userPresenceEnabled || callbackManager.hasPresenceCallback()
 
     @OptIn(SupabaseInternal::class)
     override suspend fun subscribe(blockUntilSubscribed: Boolean) {
@@ -68,8 +72,7 @@ internal class RealtimeChannelImpl(
         Realtime.logger.d { "Subscribing to channel $topic" }
         val currentJwt = accessToken()
         val postgrestChanges = clientChanges.toList()
-        val hasPresenceCallback = callbackManager.hasPresenceCallback()
-        presenceJoinConfig.enabled = hasPresenceCallback
+        presenceJoinConfig.enabled = shouldEnablePresence()
         val joinConfig = RealtimeJoinPayload(RealtimeJoinConfig(broadcastJoinConfig, presenceJoinConfig, postgrestChanges, isPrivate))
         val joinConfigObject = buildJsonObject {
             putJsonObject(Json.encodeToJsonElement(joinConfig).jsonObject)
@@ -232,17 +235,14 @@ internal class RealtimeChannelImpl(
         }
         val id = callbackManager.addPresenceCallback(callback)
         if(status.value == RealtimeChannel.Status.SUBSCRIBED && !presenceJoinConfig.enabled) {
-            // If the channel is already subscribed, we need to resubscribe to enable presence
             Realtime.logger.d { "Resubscribing to channel $topic to enable presence..." }
-            launch {
-                resubscribe()
-            }
+            resubscribe()
         }
         awaitClose { callbackManager.removeCallbackById(id) }
     }
 
     override fun updateStatus(status: RealtimeChannel.Status) {
-        if(this.status.value == RealtimeChannel.Status.SUBSCRIBED) {
+        if(status == RealtimeChannel.Status.SUBSCRIBED) {
             joinAttempt.store(0)
         }
         _status.value = status
