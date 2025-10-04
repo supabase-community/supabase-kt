@@ -35,14 +35,16 @@ class PostgrestFilterBuilder(
      * Adds a filter to the query
      */
     fun filter(column: String, operator: FilterOperator, value: Any?) {
-        val columnValue = params[column] ?: emptyList()
-        _params[column] = columnValue + listOf("${operator.identifier}.$value")
+        filter(FilterOperation(column, operator, value))
     }
 
     /**
      * Adds a filter to the query
      */
-    fun filter(operation: FilterOperation) = filter(operation.column, operation.operator, operation.value)
+    fun filter(operation: FilterOperation) {
+        val columnValue = params[operation.column] ?: emptyList()
+        _params[operation.column] = columnValue + listOf("${operation.operator.identifier}.${operation.escapedValue()}")
+    }
 
     /**
      * Finds all rows where the value of the [column] is equal to [value]
@@ -84,7 +86,7 @@ class PostgrestFilterBuilder(
      */
     fun likeAll(column: String, patterns: List<String>) {
         val columnValue = params[column] ?: emptyList()
-        _params[column] = columnValue + listOf("like(all).{${patterns.joinToString(",")}}")
+        _params[column] = columnValue + listOf("like(all).{${patterns.joinToString(",") { escapeValue(it) }}}")
     }
 
     /**
@@ -92,7 +94,7 @@ class PostgrestFilterBuilder(
      */
     fun likeAny(column: String, patterns: List<String>) {
         val columnValue = params[column] ?: emptyList()
-        _params[column] = columnValue + listOf("like(any).{${patterns.joinToString(",")}}")
+        _params[column] = columnValue + listOf("like(any).{${patterns.joinToString(",") { escapeValue(it) }}}")
     }
 
     /**
@@ -100,7 +102,7 @@ class PostgrestFilterBuilder(
      */
     fun ilikeAll(column: String, patterns: List<String>) {
         val columnValue = params[column] ?: emptyList()
-        _params[column] = columnValue + listOf("ilike(all).{${patterns.joinToString(",")}}")
+        _params[column] = columnValue + listOf("ilike(all).{${patterns.joinToString(",") { escapeValue(it) }}}")
     }
 
     /**
@@ -108,7 +110,7 @@ class PostgrestFilterBuilder(
      */
     fun ilikeAny(column: String, patterns: List<String>) {
         val columnValue = params[column] ?: emptyList()
-        _params[column] = columnValue + listOf("ilike(any).{${patterns.joinToString(",")}}")
+        _params[column] = columnValue + listOf("ilike(any).{${patterns.joinToString(",") { escapeValue(it) }}}")
     }
 
     /**
@@ -134,27 +136,27 @@ class PostgrestFilterBuilder(
     /**
      * Finds all rows where the value of the [column] is a member of [values]
      */
-    fun isIn(column: String, values: List<Any>) = filter(column, FilterOperator.IN, "(${values.joinToString(",")})")
+    fun isIn(column: String, values: List<Any>) = filter(column, FilterOperator.IN, values)
 
     /**
      * Finds all rows where the value of the [column] is strictly left of [range]
      */
-    fun sl(column: String, range: Pair<Any, Any>) = filter(column, FilterOperator.SL, "(${range.first},${range.second})")
+    fun sl(column: String, range: Pair<Any, Any>) = filter(column, FilterOperator.SL, range)
 
     /**
      * Finds all rows where the value of the [column] is strictly right of [range]
      */
-    fun sr(column: String, range: Pair<Any, Any>) = filter(column, FilterOperator.SR, "(${range.first},${range.second})")
+    fun sr(column: String, range: Pair<Any, Any>) = filter(column, FilterOperator.SR, range)
 
     /**
      * Finds all rows where the value of the [column] does not extend to the left of [range]
      */
-    fun nxl(column: String, range: Pair<Any, Any>) = filter(column, FilterOperator.NXL, "(${range.first},${range.second})")
+    fun nxl(column: String, range: Pair<Any, Any>) = filter(column, FilterOperator.NXL, range)
 
     /**
      * Finds all rows where the value of the [column] does not extend to the right of [range]
      */
-    fun nxr(column: String, range: Pair<Any, Any>) = filter(column, FilterOperator.NXR, "(${range.first},${range.second})")
+    fun nxr(column: String, range: Pair<Any, Any>) = filter(column, FilterOperator.NXR, range)
 
     /**
      * Finds all rows where the value of the [column] is strictly left of [range]
@@ -179,7 +181,7 @@ class PostgrestFilterBuilder(
     /**
      * Finds all rows where the value of the [column] is adjacent to [range]
      */
-    fun adjacent(column: String, range: Pair<Any, Any>) = filter(column, FilterOperator.ADJ, "(${range.first},${range.second})")
+    fun adjacent(column: String, range: Pair<Any, Any>) = filter(column, FilterOperator.ADJ, range)
 
     /**
      * Adds an `or` condition to the query
@@ -228,7 +230,7 @@ class PostgrestFilterBuilder(
      * @param column The column name to filter on
      * @param values The values to filter on
      */
-    fun contains(column: String, values: List<Any>) = filter(column, FilterOperator.CS, "{${values.joinToString(",")}}")
+    fun contains(column: String, values: List<Any>) = filter(column, FilterOperator.CS, values)
 
     /**
      * Finds all rows where the value of the [column] is contained in [values]
@@ -236,7 +238,7 @@ class PostgrestFilterBuilder(
      * @param column The column name to filter on
      * @param values The values to filter on
      */
-    fun contained(column: String, values: List<Any>) = filter(column, FilterOperator.CD, "{${values.joinToString(",")}}")
+    fun contained(column: String, values: List<Any>) = filter(column, FilterOperator.CD, values)
 
     /**
      * Finds all rows where the value of the [column] contains [values]
@@ -268,37 +270,37 @@ class PostgrestFilterBuilder(
      * @param column The column name to filter on
      * @param values The values to filter on
      */
-    fun overlaps(column: String, values: List<Any>) = filter(column, FilterOperator.OV, "{${values.joinToString(",")}}")
+    fun overlaps(column: String, values: List<Any>) = filter(column, FilterOperator.OV, values)
 
     /**
      * Finds all rows where the value of the column with the name of the [KProperty1] converted using [propertyConversionMethod] is equal to [value]
      */
-    infix fun <T, V> KProperty1<T, V>.eq(value: V) = filter(FilterOperation(propertyConversionMethod(this), FilterOperator.EQ, value.toString()))
+    infix fun <T, V> KProperty1<T, V>.eq(value: V) = filter(FilterOperation(propertyConversionMethod(this), FilterOperator.EQ, value))
 
     /**
      * Finds all rows where the value of the column with the name of the [KProperty1] converted using [propertyConversionMethod] is not equal to [value]
      */
-    infix fun <T, V> KProperty1<T, V>.neq(value: V) = filter(FilterOperation(propertyConversionMethod(this), FilterOperator.NEQ, value.toString()))
+    infix fun <T, V> KProperty1<T, V>.neq(value: V) = filter(FilterOperation(propertyConversionMethod(this), FilterOperator.NEQ, value))
 
     /**
      * Finds all rows where the value of the column with the name of the [KProperty1] converted using [propertyConversionMethod] is greater than [value]
      */
-    infix fun <T, V> KProperty1<T, V>.gt(value: V) = filter(FilterOperation(propertyConversionMethod(this), FilterOperator.GT, value.toString()))
+    infix fun <T, V> KProperty1<T, V>.gt(value: V) = filter(FilterOperation(propertyConversionMethod(this), FilterOperator.GT, value))
 
     /**
      * Finds all rows where the value of the column with the name of the [KProperty1] converted using [propertyConversionMethod] is greater than or equal to [value]
      */
-    infix fun <T, V> KProperty1<T, V>.gte(value: V) = filter(FilterOperation(propertyConversionMethod(this), FilterOperator.GTE, value.toString()))
+    infix fun <T, V> KProperty1<T, V>.gte(value: V) = filter(FilterOperation(propertyConversionMethod(this), FilterOperator.GTE, value))
 
     /**
      * Finds all rows where the value of the column with the name of the [KProperty1] converted using [propertyConversionMethod] is less than [value]
      */
-    infix fun <T, V> KProperty1<T, V>.lt(value: V) = filter(FilterOperation(propertyConversionMethod(this), FilterOperator.LT, value.toString()))
+    infix fun <T, V> KProperty1<T, V>.lt(value: V) = filter(FilterOperation(propertyConversionMethod(this), FilterOperator.LT, value))
 
     /**
      * Finds all rows where the value of the column with the name of the [KProperty1] converted using [propertyConversionMethod] is less than or equal to [value]
      */
-    infix fun <T, V> KProperty1<T, V>.lte(value: V) = filter(FilterOperation(propertyConversionMethod(this), FilterOperator.LTE, value.toString()))
+    infix fun <T, V> KProperty1<T, V>.lte(value: V) = filter(FilterOperation(propertyConversionMethod(this), FilterOperator.LTE, value))
 
     /**
      * Finds all rows where the value of the column with the name of the [KProperty1] converted using [propertyConversionMethod] matches the specified [pattern]
@@ -325,12 +327,12 @@ class PostgrestFilterBuilder(
     /**
      * Finds all rows where the value of the column with the name of the [KProperty1] converted using [propertyConversionMethod] equals to one of these values: null,true,false,unknown
      */
-    infix fun <T, V> KProperty1<T, V>.isExact(value: Boolean?) = filter(FilterOperation(propertyConversionMethod(this), FilterOperator.IS, value.toString()))
+    infix fun <T, V> KProperty1<T, V>.isExact(value: Boolean?) = filter(FilterOperation(propertyConversionMethod(this), FilterOperator.IS, value))
 
     /**
      * Finds all rows where the value of the column with the name of the [KProperty1] converted using [propertyConversionMethod] is in the specified [list]
      */
-    infix fun <T, V> KProperty1<T, V>.isIn(list: List<V>) = filter(FilterOperation(propertyConversionMethod(this), FilterOperator.IN, "(${list.joinToString(",")})"))
+    infix fun <T, V> KProperty1<T, V>.isIn(list: List<V>) = filter(FilterOperation(propertyConversionMethod(this), FilterOperator.IN, list))
 
     /**
      * Finds all rows where the value of the column with the name of the [KProperty1] converted using [propertyConversionMethod] is strictly left of [range]
