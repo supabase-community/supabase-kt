@@ -28,22 +28,16 @@ fun FilterOperation.escapedValue(): String =
 
         FilterOperator.IN ->
             if (value is List<*>) {
-                value.joinToString(",", prefix = "(", postfix = ")") { escapeValue(it) }
+                encodeAsList(value)
             } else {
                 escapeValue(value)
             }
         FilterOperator.CS,
-        FilterOperator.CD->
-            if (value is List<*>) {
-                value.joinToString(",", prefix = "{", postfix = "}") { escapeValue(it) }
-            } else {
-                escapeValue(value)
-            }
-
+        FilterOperator.CD,
         FilterOperator.OV ->
             when (value) {
-                is List<*> -> value.joinToString(",", prefix = "{", postfix = "}") { escapeValue(it) }
-                is Pair<*, *> -> "[${escapeValue(value.first)},${escapeValue(value.second)}]"
+                is List<*> -> encodeOverlapAsArray(value)
+                is Pair<*, *> -> encodeOverlapAsRange(value)
                 else -> escapeValue(value)
             }
 
@@ -53,13 +47,28 @@ fun FilterOperation.escapedValue(): String =
         FilterOperator.NXR,
         FilterOperator.ADJ ->
             when (value) {
-                is Pair<*, *> -> "(${escapeValue(value.first)},${escapeValue(value.second)})"
-                is List<*> -> "(${escapeValue(value[0])},${escapeValue(value[1])})"
+                is Pair<*, *> -> encodeAsRange(value)
+                is List<*> -> encodeAsRange(value)
                 else -> escapeValue(value)
             }
 
         else -> escapeValue(value) // Do these need special handling?
     }
+
+private fun encodeAsList(values: List<*>): String =
+    values.joinToString(",", prefix = "(", postfix = ")") { escapeValue(it) }
+
+private fun encodeAsRange(range: Pair<*, *>): String =
+    "(${escapeValue(range.first)},${escapeValue(range.second)})"
+
+private fun encodeAsRange(range: List<*>): String =
+    "(${escapeValue(range[0])},${escapeValue(range[1])})"
+
+private fun encodeOverlapAsRange(range: Pair<*, *>): String =
+    "[${escapeValue(range.first)},${escapeValue(range.second)}]"
+
+private fun encodeOverlapAsArray(values: List<*>): String =
+    values.joinToString(",", prefix = "{", postfix = "}") { escapeValue(it) }
 
 private val quotedCharacters = listOf(",", ".", ":", "(", ")")
 
