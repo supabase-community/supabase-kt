@@ -146,7 +146,8 @@ For more information, checkout [supabase-kt-plugins](https://github.com/supabase
 
 **Community Samples**
 
-- [Groceries Store App](https://github.com/hieuwu/android-groceries-store) *(Android)*
+- [Groceries Store App](https://github.com/hieuwu/android-groceries-store) *(Android)* - An e-commerce app using Auth, Postgrest and Storage
+- [Supa Sketcher](https://github.com/hieuwu/supa-sketcher) *(Android)* - An real-time white board app using anonymous sign-ins Auth, Postgrest and Realtime
  
 ### Server-side Applications
 
