@@ -26,6 +26,22 @@ class PostgrestFilterBuilderTest {
     }
 
     @Test
+    fun eq_reserved() {
+        val filter = filterToString {
+            eq("id", "2004-09-16T23:59:58.75")
+        }
+        assertEquals("id=eq.\"2004-09-16T23:59:58.75\"", filter)
+    }
+
+    @Test
+    fun eq_quoted() {
+        val filter = filterToString {
+            eq("id", "Hello, \"World\"")
+        }
+        assertEquals("id=eq.\"Hello,+\\\"World\\\"\"", filter)
+    }
+
+    @Test
     fun neq() {
         val filter = filterToString {
             neq("id", 1)
@@ -209,6 +225,17 @@ class PostgrestFilterBuilderTest {
             or { }
         }
         assertEquals("", filter)
+    }
+
+    @Test
+    fun and_escaped() {
+        val filter = filterToString {
+            and {
+                eq("id1", "foo.bar")
+                eq("id2", "bar.baz")
+            }
+        }
+        assertEquals("and=(id1.eq.\"foo.bar\",id2.eq.\"bar.baz\")", filter)
     }
 
     @Test
