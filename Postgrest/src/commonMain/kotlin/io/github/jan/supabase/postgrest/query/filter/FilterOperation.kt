@@ -25,7 +25,6 @@ fun FilterOperation.escapedValue(): String =
         FilterOperator.IMATCH,
         FilterOperator.IS ->
             escapeValue(value)
-
         FilterOperator.IN ->
             if (value is List<*>) {
                 encodeAsList(value)
@@ -40,7 +39,6 @@ fun FilterOperation.escapedValue(): String =
                 is Pair<*, *> -> encodeOverlapAsRange(value)
                 else -> escapeValue(value)
             }
-
         FilterOperator.SL,
         FilterOperator.SR,
         FilterOperator.NXL,
@@ -51,8 +49,11 @@ fun FilterOperation.escapedValue(): String =
                 is List<*> -> encodeAsRange(value)
                 else -> escapeValue(value)
             }
-
-        else -> escapeValue(value) // Do these need special handling?
+        FilterOperator.FTS,
+        FilterOperator.WFTS,
+        FilterOperator.PHFTS,
+        FilterOperator.PLFTS ->
+            escapeValue(value) // Do these need special handling?
     }
 
 private fun encodeAsList(values: List<*>): String =
