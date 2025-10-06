@@ -4,6 +4,7 @@ package io.github.jan.supabase.network
 import io.github.jan.supabase.BuildConfig
 import io.github.jan.supabase.OSInformation
 import io.github.jan.supabase.SupabaseClient
+import io.github.jan.supabase.SupabaseNetworkConfig
 import io.github.jan.supabase.annotations.SupabaseInternal
 import io.github.jan.supabase.exceptions.HttpRequestException
 import io.github.jan.supabase.logging.d
@@ -11,7 +12,6 @@ import io.github.jan.supabase.logging.e
 import io.github.jan.supabase.supabaseJson
 import io.ktor.client.HttpClient
 import io.ktor.client.HttpClientConfig
-import io.ktor.client.engine.HttpClientEngine
 import io.ktor.client.plugins.DefaultRequest
 import io.ktor.client.plugins.HttpRequestTimeoutException
 import io.ktor.client.plugins.HttpTimeout
@@ -39,16 +39,21 @@ typealias HttpRequestOverride = HttpRequestBuilder.() -> Unit
  * A [SupabaseHttpClient] that uses ktor to send requests
  */
 @OptIn(SupabaseInternal::class)
-class KtorSupabaseHttpClient @SupabaseInternal constructor(
+internal class KtorSupabaseHttpClient @SupabaseInternal constructor(
     private val supabaseKey: String,
-    modifiers: List<HttpClientConfig<*>.() -> Unit> = listOf(),
-    private val requestTimeout: Long,
-    engine: HttpClientEngine? = null,
+    private val networkConfig: SupabaseNetworkConfig,
     private val osInformation: OSInformation?
 ): SupabaseHttpClient() {
 
+    val requestTimeout = networkConfig.requestTimeout
+    val engine = networkConfig.httpEngine
+    val modifiers = networkConfig.httpConfigOverrides
+
+    val beforeInterceptors = networkConfig.interceptors.filter { it is NetworkInterceptor.Before }.toTypedArray()
+    val afterInterceptors = networkConfig.interceptors.filter { it is NetworkInterceptor.After }.toTypedArray()
+
     init {
-        SupabaseClient.LOGGER.d { "Creating KtorSupabaseHttpClient with request timeout $requestTimeout ms, HttpClientEngine: $engine" }
+        SupabaseClient.LOGGER.d { "Creating KtorSupabaseHttpClient with request timeout $requestTimeout, HttpClientEngine: $engine" }
     }
 
     @SupabaseInternal
@@ -63,11 +68,11 @@ class KtorSupabaseHttpClient @SupabaseInternal constructor(
         }
         val endPoint = request.url.encodedPath
         SupabaseClient.LOGGER.d { "Starting ${request.method.value} request to endpoint $endPoint" }
-
+        callBeforeInterceptors(request)
         val response = try {
             httpClient.request(url, builder)
         } catch(e: HttpRequestTimeoutException) {
-            SupabaseClient.LOGGER.e { "${request.method.value} request to endpoint $endPoint timed out after $requestTimeout ms" }
+            SupabaseClient.LOGGER.e { "${request.method.value} request to endpoint $endPoint timed out after $requestTimeout" }
             throw e
         } catch(e: CancellationException) {
             SupabaseClient.LOGGER.e { "${request.method.value} request to endpoint $endPoint was cancelled"}
@@ -76,6 +81,7 @@ class KtorSupabaseHttpClient @SupabaseInternal constructor(
             SupabaseClient.LOGGER.e(e) { "${request.method.value} request to endpoint $endPoint failed with exception ${e.message}" }
             throw HttpRequestException(e.message ?: "", request)
         }
+        callAfterInterceptors(response)
         val responseTime = (response.responseTime.timestamp - response.requestTime.timestamp).milliseconds
         SupabaseClient.LOGGER.d { "${request.method.value} request to endpoint $endPoint successfully finished in $responseTime" }
         return response
@@ -92,7 +98,7 @@ class KtorSupabaseHttpClient @SupabaseInternal constructor(
         val response = try {
             httpClient.prepareRequest(url, builder)
         } catch(e: HttpRequestTimeoutException) {
-            SupabaseClient.LOGGER.e { "Request timed out after $requestTimeout ms on url $url" }
+            SupabaseClient.LOGGER.e { "Request timed out after $requestTimeout on url $url" }
             throw e
         } catch(e: CancellationException) {
             SupabaseClient.LOGGER.e { "Request was cancelled on url $url" }
@@ -105,6 +111,18 @@ class KtorSupabaseHttpClient @SupabaseInternal constructor(
     }
 
     fun close() = httpClient.close()
+
+    private fun callBeforeInterceptors(requestBuilder: HttpRequestBuilder) {
+        beforeInterceptors.forEach {
+            it.call(requestBuilder, supabase)
+        }
+    }
+
+    private fun callAfterInterceptors(response: HttpResponse) {
+        interceptors.forEach {
+            it.afterRequest(response)
+        }
+    }
 
     private fun HttpClientConfig<*>.applyDefaultConfiguration(modifiers: List<HttpClientConfig<*>.() -> Unit>) {
         install(DefaultRequest) {
@@ -124,7 +142,7 @@ class KtorSupabaseHttpClient @SupabaseInternal constructor(
             json(supabaseJson)
         }
         install(HttpTimeout) {
-            requestTimeoutMillis = requestTimeout
+            requestTimeoutMillis = requestTimeout.inWholeMilliseconds
         }
         modifiers.forEach { it.invoke(this) }
     }
