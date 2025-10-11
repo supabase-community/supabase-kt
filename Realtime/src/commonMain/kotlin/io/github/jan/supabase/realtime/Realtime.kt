@@ -4,6 +4,7 @@ import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.SupabaseClientBuilder
 import io.github.jan.supabase.SupabaseSerializer
 import io.github.jan.supabase.annotations.SupabaseInternal
+import io.github.jan.supabase.auth.AuthDependentPluginConfig
 import io.github.jan.supabase.auth.resolveAccessToken
 import io.github.jan.supabase.logging.SupabaseLogger
 import io.github.jan.supabase.logging.w
@@ -141,7 +142,8 @@ interface Realtime : MainPlugin<Realtime.Config>, CustomSerializationPlugin {
         var connectOnSubscribe: Boolean = true,
         @property:SupabaseInternal var websocketFactory: RealtimeWebsocketFactory? = null,
         var disconnectOnNoSubscriptions: Boolean = true,
-    ): MainConfig(), CustomSerializationConfig {
+        override var requireValidSession: Boolean = false,
+    ): MainConfig(), CustomSerializationConfig, AuthDependentPluginConfig {
 
         /**
          * A custom access token provider. If this is set, the [SupabaseClient] will not be used to resolve the access token.
