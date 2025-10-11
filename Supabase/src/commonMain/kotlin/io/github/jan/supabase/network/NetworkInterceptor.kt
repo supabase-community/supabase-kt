@@ -10,13 +10,13 @@ sealed interface NetworkInterceptor {
 
     fun interface Before: NetworkInterceptor {
 
-        fun call(builder: HttpRequestBuilder, supabase: SupabaseClient)
+        suspend fun call(builder: HttpRequestBuilder, supabase: SupabaseClient)
 
     }
 
     fun interface After: NetworkInterceptor {
 
-        fun call(response: HttpResponse, supabase: SupabaseClient)
+        suspend fun call(response: HttpResponse, supabase: SupabaseClient)
 
     }
 

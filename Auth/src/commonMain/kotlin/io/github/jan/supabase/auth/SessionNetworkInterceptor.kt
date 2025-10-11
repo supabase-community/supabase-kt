@@ -2,6 +2,7 @@ package io.github.jan.supabase.auth
 
 import io.github.jan.supabase.OSInformation
 import io.github.jan.supabase.SupabaseClient
+import io.github.jan.supabase.exceptions.RestException
 import io.github.jan.supabase.logging.e
 import io.github.jan.supabase.network.NetworkInterceptor
 import io.ktor.client.request.HttpRequestBuilder
@@ -10,7 +11,7 @@ import kotlin.time.Clock
 
 object SessionNetworkInterceptor: NetworkInterceptor.Before {
 
-    override fun call(builder: HttpRequestBuilder, supabase: SupabaseClient) {
+    override suspend fun call(builder: HttpRequestBuilder, supabase: SupabaseClient) {
         val authHeader = builder.headers[HttpHeaders.Authorization]?.replace("Bearer ", "")
         val currentSession = supabase.auth.currentSessionOrNull()
         val sessionExistsAndExpired = authHeader == currentSession?.accessToken && currentSession != null && currentSession.expiresAt < Clock.System.now()
@@ -23,6 +24,13 @@ object SessionNetworkInterceptor: NetworkInterceptor.Before {
                 OS: ${OSInformation.CURRENT}
                 Session: $currentSession
             """.trimIndent() }
+
+            //TODO: Exception logic
+            try {
+                supabase.auth.refreshCurrentSession()
+            } catch(e: RestException) {
+                Auth.logger.e(e) { "Failed to refresh session" }
+            }
         }
     }
 

@@ -2,9 +2,7 @@
 package io.github.jan.supabase.network
 
 import io.github.jan.supabase.BuildConfig
-import io.github.jan.supabase.OSInformation
 import io.github.jan.supabase.SupabaseClient
-import io.github.jan.supabase.SupabaseNetworkConfig
 import io.github.jan.supabase.annotations.SupabaseInternal
 import io.github.jan.supabase.exceptions.HttpRequestException
 import io.github.jan.supabase.logging.d
@@ -39,18 +37,20 @@ typealias HttpRequestOverride = HttpRequestBuilder.() -> Unit
  * A [SupabaseHttpClient] that uses ktor to send requests
  */
 @OptIn(SupabaseInternal::class)
-internal class KtorSupabaseHttpClient @SupabaseInternal constructor(
-    private val supabaseKey: String,
-    private val networkConfig: SupabaseNetworkConfig,
-    private val osInformation: OSInformation?
+class KtorSupabaseHttpClient @SupabaseInternal constructor(
+    private val supabase: SupabaseClient
 ): SupabaseHttpClient() {
 
-    val requestTimeout = networkConfig.requestTimeout
-    val engine = networkConfig.httpEngine
-    val modifiers = networkConfig.httpConfigOverrides
+    private val supabaseKey = supabase.supabaseKey
+    private val osInformation = supabase.config.osInformation
 
-    val beforeInterceptors = networkConfig.interceptors.filter { it is NetworkInterceptor.Before }.toTypedArray()
-    val afterInterceptors = networkConfig.interceptors.filter { it is NetworkInterceptor.After }.toTypedArray()
+    private val networkConfig = supabase.config.networkConfig
+    private val requestTimeout = networkConfig.requestTimeout
+    private val engine = networkConfig.httpEngine
+    private val modifiers = networkConfig.httpConfigOverrides
+
+    private val beforeInterceptors = networkConfig.interceptors.filterIsInstance<NetworkInterceptor.Before>().toTypedArray()
+    private val afterInterceptors = networkConfig.interceptors.filterIsInstance<NetworkInterceptor.After>().toTypedArray()
 
     init {
         SupabaseClient.LOGGER.d { "Creating KtorSupabaseHttpClient with request timeout $requestTimeout, HttpClientEngine: $engine" }
@@ -119,8 +119,8 @@ internal class KtorSupabaseHttpClient @SupabaseInternal constructor(
     }
 
     private fun callAfterInterceptors(response: HttpResponse) {
-        interceptors.forEach {
-            it.afterRequest(response)
+        afterInterceptors.forEach {
+            it.call(response, supabase)
         }
     }
 
