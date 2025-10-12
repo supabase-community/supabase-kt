@@ -5,9 +5,11 @@ import io.github.jan.supabase.OSInformation
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.annotations.SupabaseInternal
 import io.github.jan.supabase.auth.exception.SessionRequiredException
+import io.github.jan.supabase.auth.exception.TokenExpiredException
 import io.github.jan.supabase.exceptions.RestException
 import io.github.jan.supabase.logging.e
 import io.github.jan.supabase.network.SupabaseApi
+import io.github.jan.supabase.plugins.MainConfig
 import io.github.jan.supabase.plugins.MainPlugin
 import io.ktor.client.request.HttpRequestBuilder
 import io.ktor.client.request.bearerAuth
@@ -15,6 +17,7 @@ import io.ktor.client.statement.HttpResponse
 import io.ktor.client.statement.HttpStatement
 import kotlin.time.Clock
 
+@SupabaseInternal
 data class AuthenticatedApiConfig(
     val jwtToken: String? = null,
     val defaultRequest: (HttpRequestBuilder.() -> Unit)? = null,
@@ -34,13 +37,14 @@ class AuthenticatedSupabaseApi @SupabaseInternal constructor(
     private val requireSession = config.requireSession
 
     override suspend fun rawRequest(url: String, builder: HttpRequestBuilder.() -> Unit): HttpResponse {
+        val builder = HttpRequestBuilder().apply(builder)
         val accessToken = supabaseClient.resolveAccessToken(jwtToken, keyAsFallback = !requireSession)
             ?: throw SessionRequiredException()
         checkAccessToken(accessToken)
         return super.rawRequest(url) {
             bearerAuth(accessToken)
-            builder()
             defaultRequest?.invoke(this)
+            this
         }
     }
 
@@ -63,29 +67,30 @@ class AuthenticatedSupabaseApi @SupabaseInternal constructor(
     private suspend fun checkAccessToken(token: String?) {
         val currentSession = supabaseClient.auth.currentSessionOrNull()
         val now = Clock.System.now()
-        val sessionExistsAndExpired = token == currentSession?.accessToken && currentSession != null && currentSession.expiresAt < now
+        val sessionExistsAndExpired =
+            token == currentSession?.accessToken && currentSession != null && currentSession.expiresAt < now
         val autoRefreshEnabled = supabaseClient.auth.config.alwaysAutoRefresh
-        if(sessionExistsAndExpired  && autoRefreshEnabled) {
+        if (sessionExistsAndExpired && autoRefreshEnabled) {
             val autoRefreshRunning = supabaseClient.auth.isAutoRefreshRunning
-            Auth.logger.e { """
+            Auth.logger.e {
+                """
                 Authenticated request attempted with expired access token. This should not happen. Please report this issue. Trying to refresh session before...
                 Auto refresh running: $autoRefreshRunning
                 OS: ${OSInformation.CURRENT}
                 Session: $currentSession
-            """.trimIndent() }
+            """.trimIndent()
+            }
 
-            //TODO: Exception logic
             try {
                 supabaseClient.auth.refreshCurrentSession()
-            } catch(e: RestException) {
+            } catch (e: Exception) {
                 Auth.logger.e(e) { "Failed to refresh session" }
+                throw TokenExpiredException()
             }
         }
     }
 
 }
-
-//TODO: Fix
 
 /**
  * Creates a [AuthenticatedSupabaseApi] with the given [baseUrl]. Requires [Auth] to authenticate requests
@@ -94,20 +99,22 @@ class AuthenticatedSupabaseApi @SupabaseInternal constructor(
 @SupabaseInternal
 fun SupabaseClient.authenticatedSupabaseApi(
     baseUrl: String,
-    parseErrorResponse: (suspend (response: HttpResponse) -> RestException)? = null
+    parseErrorResponse: (suspend (response: HttpResponse) -> RestException)? = null,
+    config: AuthenticatedApiConfig
 ) =
-    authenticatedSupabaseApi({ baseUrl + it }, parseErrorResponse)
+    authenticatedSupabaseApi({ baseUrl + it }, parseErrorResponse, config)
 
 /**
  * Creates a [AuthenticatedSupabaseApi] for the given [plugin]. Requires [Auth] to authenticate requests
  * All requests will be resolved using the [MainPlugin.resolveUrl] function
  */
 @SupabaseInternal
-fun SupabaseClient.authenticatedSupabaseApi(
-    plugin: MainPlugin<*>,
-    defaultRequest: (HttpRequestBuilder.() -> Unit)? = null
-) =
-    authenticatedSupabaseApi(plugin::resolveUrl, plugin::parseErrorResponse, defaultRequest, plugin.config.jwtToken)
+fun <C> SupabaseClient.authenticatedSupabaseApi(
+    plugin: MainPlugin<C>,
+    defaultRequest: (HttpRequestBuilder.() -> Unit)? = null,
+    requireSession: Boolean = plugin.config.requireValidSession
+): AuthenticatedSupabaseApi where C : MainConfig, C : AuthDependentPluginConfig =
+    authenticatedSupabaseApi(plugin::resolveUrl, plugin::parseErrorResponse, AuthenticatedApiConfig(defaultRequest = defaultRequest, requireSession = requireSession))
 
 /**
  * Creates a [AuthenticatedSupabaseApi] with the given [resolveUrl] function. Requires [Auth] to authenticate requests

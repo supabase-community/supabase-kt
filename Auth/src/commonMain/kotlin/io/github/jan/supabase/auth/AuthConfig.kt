@@ -12,7 +12,7 @@ import kotlin.time.Duration.Companion.seconds
 /**
  * The configuration for [Auth]
  */
-expect class AuthConfig() : CustomSerializationConfig, AuthConfigDefaults
+expect class AuthConfig() : CustomSerializationConfig, AuthConfigDefaults, AuthDependentPluginConfig
 
 /**
  * The default values for the [AuthConfig]
@@ -110,6 +110,8 @@ open class AuthConfigDefaults : MainConfig() {
      */
     @SupabaseExperimental
     var checkSessionOnRequest: Boolean = true
+
+    var requireValidSession: Boolean = false
 
 }
 
