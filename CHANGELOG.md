@@ -1,5 +1,21 @@
 # Changelog
 
+### 3.2.5 - October 15, 2025
+
+### Auth
+
+* Fix a bug causing auto-refresh to continue in the background (Android) #1060 by @jozefv-git in https://github.com/supabase-community/supabase-kt/pull/1062
+* Fix `Auth#linkIdentityWithIdToken()` not working correctly by @jan-tennert in https://github.com/supabase-community/supabase-kt/commit/31be2bd310ddc334aab14733fae0bfa76e24f2a4 
+
+### Postgrest
+
+* fix: add presence flag to join payload by @filipecabaco in https://github.com/supabase-community/supabase-kt/pull/1064
+* quote and/or escape special characters in all postrest filters by @sproctor in https://github.com/supabase-community/supabase-kt/pull/1066
+
+### Docs / README
+
+* Introduce new sample - Supa Sketcher - A realtime-white board application by @hieuwu in https://github.com/supabase-community/supabase-kt/pull/1067
+
 ### 3.2.4 - September 26, 2025
 
 ### Core
