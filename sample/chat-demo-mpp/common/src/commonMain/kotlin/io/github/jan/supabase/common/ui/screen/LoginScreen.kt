@@ -37,10 +37,15 @@ import io.github.jan.supabase.common.ui.components.OTPDialog
 import io.github.jan.supabase.common.ui.components.OTPDialogState
 import io.github.jan.supabase.common.ui.components.PasswordField
 import io.github.jan.supabase.common.ui.components.PasswordRecoveryDialog
+import io.github.jan.supabase.compose.auth.ComposeAuth
+import io.github.jan.supabase.compose.auth.composable.NativeSignInResult
+import io.github.jan.supabase.compose.auth.composable.rememberSignInWithGoogle
 import io.github.jan.supabase.compose.auth.ui.ProviderButtonContent
 import io.github.jan.supabase.compose.auth.ui.annotations.AuthUiExperimental
+import io.github.jan.supabase.compose.auth.composeAuth
+import io.github.jan.supabase.compose.auth.ui.ProviderIcon
 
-@OptIn(ExperimentalMaterial3Api::class, SupabaseExperimental::class, AuthUiExperimental::class)
+@OptIn(AuthUiExperimental::class)
 @Composable
 fun LoginScreen(viewModel: ChatViewModel) {
     var signUp by remember { mutableStateOf(false) }
@@ -48,6 +53,21 @@ fun LoginScreen(viewModel: ChatViewModel) {
     var email by remember { mutableStateOf("") }
     var otpDialogState by remember { mutableStateOf<OTPDialogState>(OTPDialogState.Invisible) }
     var showPasswordRecoveryDialog by remember { mutableStateOf(false) }
+
+    val action = viewModel.supabaseClient.composeAuth.rememberSignInWithGoogle(
+        onResult =  { result -> //optional error handling
+            when (result) {
+                is NativeSignInResult.Success -> {}
+                is NativeSignInResult.ClosedByUser -> {}
+                is NativeSignInResult.Error -> {}
+                is NativeSignInResult.NetworkError -> {}
+            }
+        },
+        onIdToken = ComposeAuth.LINK_IDENTITY_CALLBACK, // optional: if you want to link an identity to an existing account rather than signing in
+        fallback = { // optional: override custom fallback handling, not required by default
+
+        }
+    )
 
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -93,6 +113,14 @@ fun LoginScreen(viewModel: ChatViewModel) {
             }
         ) {
             ProviderButtonContent(Google, text = if (signUp) "Sign Up with Google" else "Login with Google")
+        }
+        Button(
+            onClick = {
+                action.startFlow()
+            },
+        ) {
+            ProviderIcon(Google, contentDescription = null)
+            Text("Native Sign In with Google")
         }
 
         TextButton(
