@@ -12,7 +12,7 @@ import kotlin.time.Duration.Companion.seconds
 /**
  * The configuration for [Auth]
  */
-expect class AuthConfig() : CustomSerializationConfig, AuthConfigDefaults
+expect class AuthConfig() : CustomSerializationConfig, AuthConfigDefaults, AuthDependentPluginConfig
 
 /**
  * The default values for the [AuthConfig]
@@ -102,6 +102,16 @@ open class AuthConfigDefaults : MainConfig() {
      */
     @SupabaseExperimental
     var urlLauncher: UrlLauncher = UrlLauncher.DEFAULT
+
+    /**
+     * Whether to check if the current session is expired on an authenticated request and possibly try to refresh it.
+     *
+     * **Note: This option is experimental and is a fail-safe for when the auto refresh fails. This option may be removed without notice.**
+     */
+    @SupabaseExperimental
+    var checkSessionOnRequest: Boolean = true
+
+    var requireValidSession: Boolean = false
 
 }
 
