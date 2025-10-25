@@ -3,6 +3,9 @@ package io.github.jan.supabase.common.di
 import io.github.jan.supabase.auth.Auth
 import io.github.jan.supabase.auth.AuthConfig
 import io.github.jan.supabase.auth.FlowType
+import io.github.jan.supabase.compose.auth.ComposeAuth
+import io.github.jan.supabase.compose.auth.appleNativeLogin
+import io.github.jan.supabase.compose.auth.googleNativeLogin
 import io.github.jan.supabase.createSupabaseClient
 import io.github.jan.supabase.logging.LogLevel
 import io.github.jan.supabase.postgrest.Postgrest
@@ -24,6 +27,10 @@ val supabaseModule = module {
                 flowType = FlowType.PKCE
             }
             install(Realtime)
+            install(ComposeAuth) {
+                googleNativeLogin(serverClientId = "262801370652-drhuntgvaes4upcqcd29m380g1mjnbuu.apps.googleusercontent.com")
+                appleNativeLogin()
+            }
         }
     }
 }
