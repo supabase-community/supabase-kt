@@ -11,7 +11,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Mail
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
@@ -30,14 +29,13 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import io.github.jan.supabase.annotations.SupabaseExperimental
+import co.touchlab.kermit.Logger
 import io.github.jan.supabase.auth.providers.Google
 import io.github.jan.supabase.common.ChatViewModel
 import io.github.jan.supabase.common.ui.components.OTPDialog
 import io.github.jan.supabase.common.ui.components.OTPDialogState
 import io.github.jan.supabase.common.ui.components.PasswordField
 import io.github.jan.supabase.common.ui.components.PasswordRecoveryDialog
-import io.github.jan.supabase.compose.auth.ComposeAuth
 import io.github.jan.supabase.compose.auth.composable.NativeSignInResult
 import io.github.jan.supabase.compose.auth.composable.rememberSignInWithGoogle
 import io.github.jan.supabase.compose.auth.ui.ProviderButtonContent
@@ -55,18 +53,26 @@ fun LoginScreen(viewModel: ChatViewModel) {
     var showPasswordRecoveryDialog by remember { mutableStateOf(false) }
 
     val action = viewModel.supabaseClient.composeAuth.rememberSignInWithGoogle(
-        onResult =  { result -> //optional error handling
+        onResult = { result ->
             when (result) {
-                is NativeSignInResult.Success -> {}
-                is NativeSignInResult.ClosedByUser -> {}
-                is NativeSignInResult.Error -> {}
-                is NativeSignInResult.NetworkError -> {}
+                is NativeSignInResult.Success -> {
+                    viewModel.handleSignInWithGoogleResult()
+                    Logger.d("LoginScreen - Success")
+                }
+
+                is NativeSignInResult.ClosedByUser -> {
+                    Logger.d("LoginScreen - ClosedByUser")
+                }
+
+                is NativeSignInResult.Error -> {
+                    Logger.d("LoginScreen - Error")
+                }
+
+                is NativeSignInResult.NetworkError -> {
+                    Logger.d("LoginScreen - Network Error")
+                }
             }
         },
-        onIdToken = ComposeAuth.LINK_IDENTITY_CALLBACK, // optional: if you want to link an identity to an existing account rather than signing in
-        fallback = { // optional: override custom fallback handling, not required by default
-
-        }
     )
 
     Column(
