@@ -21,15 +21,15 @@ class PostgrestFilterBuilder(
     /**
      * Adds a negated filter to the query
      */
-    fun filterNot(column: String, operator: FilterOperator, value: Any?) {
-        val columnValue = params[column] ?: emptyList()
-        _params[column] = columnValue + listOf("not.${operator.identifier}.$value")
-    }
+    fun filterNot(column: String, operator: FilterOperator, value: Any?) = filterNot(FilterOperation(column, operator, value))
 
     /**
      * Adds a negated filter to the query
      */
-    fun filterNot(operation: FilterOperation) = filterNot(operation.column, operation.operator, operation.value)
+    fun filterNot(operation: FilterOperation) {
+        val columnValue = params[operation.column] ?: emptyList()
+        _params[operation.column] = columnValue + listOf("not.${operation.operator.identifier}.${operation.escapedValue()}")
+    }
 
     /**
      * Adds a filter to the query

@@ -18,6 +18,14 @@ data class TestData(@SerialName("created_at") val createdAt: Instant)
 class PostgrestFilterBuilderTest {
 
     @Test
+    fun filterFloat() {
+        val filter = filterToString {
+            eq("id", 1.0)
+        }
+        assertEquals("id=eq.1.0", filter)
+    }
+
+    @Test
     fun eq() {
         val filter = filterToString {
             eq("id", 1)
