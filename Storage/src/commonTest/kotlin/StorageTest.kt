@@ -137,7 +137,7 @@ class StorageTest {
                     """
                 )
             }
-            val buckets = client.storage.retrieveBuckets()
+            val buckets = client.storage.listBuckets()
             assertEquals(1, buckets.size, "Buckets should contain 1 item")
             assertEquals(expectedId, buckets[0].id, "Bucket id should be 'test-bucket'")
             assertEquals(expectedId, buckets[0].name, "Bucket name should be 'test-bucket'")
@@ -178,7 +178,7 @@ class StorageTest {
                     """
                 )
             }
-            val bucket = client.storage.retrieveBucketById(expectedId)
+            val bucket = client.storage.getBucket(expectedId)
             assertEquals(expectedId, bucket?.id, "Bucket id should be 'test-bucket'")
             assertEquals(expectedId, bucket?.name, "Bucket name should be 'test-bucket'")
             assertEquals(expectedPublic, bucket?.public, "Bucket public should be true")
@@ -211,7 +211,7 @@ class StorageTest {
                 respond("[]")
             }
             client.auth.importAuthToken(key)
-            client.storage.retrieveBuckets()
+            client.storage.listBuckets()
         }
     }
 
