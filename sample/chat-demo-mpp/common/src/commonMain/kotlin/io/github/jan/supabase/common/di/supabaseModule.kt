@@ -28,7 +28,7 @@ val supabaseModule = module {
             }
             install(Realtime)
             install(ComposeAuth) {
-                googleNativeLogin(serverClientId = "262801370652-drhuntgvaes4upcqcd29m380g1mjnbuu.apps.googleusercontent.com")
+                googleNativeLogin(serverClientId = "YOUR_WEB_CLIENT_ID")
                 appleNativeLogin()
             }
         }
