@@ -77,7 +77,7 @@ internal fun escapeValue(value: Any?): String {
     val asString = value.toString()
         .replace("\\", "\\\\")
         .replace("\"", "\\\"")
-    return if (quotedCharacters.any { asString.contains(it) }) {
+    return if (value !is Number && quotedCharacters.any { asString.contains(it) }) {
         "\"$asString\""
     } else {
         asString
