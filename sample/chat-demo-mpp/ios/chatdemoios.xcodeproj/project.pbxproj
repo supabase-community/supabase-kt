@@ -3,10 +3,12 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 56;
+	objectVersion = 60;
 	objects = {
 
 /* Begin PBXBuildFile section */
+		65406C5C2EB1FBDB006F89ED /* exportedNativeBridge in Frameworks */ = {isa = PBXBuildFile; productRef = 65406C5B2EB1FBDB006F89ED /* exportedNativeBridge */; };
+		65406C5F2EB2001D006F89ED /* exportedNativeBridge in Frameworks */ = {isa = PBXBuildFile; productRef = 65406C5E2EB2001D006F89ED /* exportedNativeBridge */; };
 		6581F1522B36C0CF00BA34A9 /* chatdemoiosApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6581F1512B36C0CF00BA34A9 /* chatdemoiosApp.swift */; };
 		6581F1542B36C0CF00BA34A9 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6581F1532B36C0CF00BA34A9 /* ContentView.swift */; };
 		6581F1562B36C0D000BA34A9 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6581F1552B36C0D000BA34A9 /* Assets.xcassets */; };
@@ -28,16 +30,26 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				65406C5C2EB1FBDB006F89ED /* exportedNativeBridge in Frameworks */,
+				65406C5F2EB2001D006F89ED /* exportedNativeBridge in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		657152FA2EAFC4B20046C115 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		6581F1452B36C0CF00BA34A9 = {
 			isa = PBXGroup;
 			children = (
 				6581F1502B36C0CF00BA34A9 /* chatdemoios */,
+				657152FA2EAFC4B20046C115 /* Frameworks */,
 				6581F14F2B36C0CF00BA34A9 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -116,6 +128,9 @@
 				Base,
 			);
 			mainGroup = 6581F1452B36C0CF00BA34A9;
+			packageReferences = (
+				65406C5D2EB2001D006F89ED /* XCLocalSwiftPackageReference "../../../../supabase-kt-plugins/ComposeAuth/exportedNativeBridge" */,
+			);
 			productRefGroup = 6581F14F2B36C0CF00BA34A9 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -320,7 +335,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 14.1;
 				MARKETING_VERSION = 1.0;
 				OTHER_LDFLAGS = "\"$(inherited) -framework common\"";
-				"OTHER_LDFLAGS[arch=*]" = "";
+				"OTHER_LDFLAGS[arch=*]" = "\"-ObjC -fObjC\"";
 				PRODUCT_BUNDLE_IDENTIFIER = com.chatdemo.chatdemoios;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = auto;
@@ -395,6 +410,24 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		65406C5D2EB2001D006F89ED /* XCLocalSwiftPackageReference "../../../../supabase-kt-plugins/ComposeAuth/exportedNativeBridge" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = "../../../../supabase-kt-plugins/ComposeAuth/exportedNativeBridge";
+		};
+/* End XCLocalSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		65406C5B2EB1FBDB006F89ED /* exportedNativeBridge */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = exportedNativeBridge;
+		};
+		65406C5E2EB2001D006F89ED /* exportedNativeBridge */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = exportedNativeBridge;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 6581F1462B36C0CF00BA34A9 /* Project object */;
 }

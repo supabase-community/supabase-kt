@@ -14,7 +14,7 @@ plugins {
 
 group = "io.github.jan.supabase"
 version = "1.0-SNAPSHOT"
-val pluginVersion = "3.2.5"
+val pluginVersion = "3.2.47-local"
 
 kotlin {
     @OptIn(ExperimentalKotlinGradlePluginApi::class)
