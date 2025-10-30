@@ -78,7 +78,6 @@
 			buildPhases = (
 				656500D42B3962F0005F97B4 /* ShellScript */,
 				6581F14A2B36C0CF00BA34A9 /* Sources */,
-				6581F14B2B36C0CF00BA34A9 /* Frameworks */,
 				6581F14C2B36C0CF00BA34A9 /* Resources */,
 			);
 			buildRules = (
@@ -114,9 +113,6 @@
 				Base,
 			);
 			mainGroup = 6581F1452B36C0CF00BA34A9;
-			packageReferences = (
-				652938622EB3C4BB0055EDD2 /* XCLocalSwiftPackageReference "../../../../hieuwu-supabase-kt-plugins/ComposeAuth/exportedNativeBridge" */,
-			);
 			productRefGroup = 6581F14F2B36C0CF00BA34A9 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
