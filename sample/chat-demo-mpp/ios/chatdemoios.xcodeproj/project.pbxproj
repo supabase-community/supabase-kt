@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 56;
+	objectVersion = 60;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -23,21 +23,19 @@
 		65E1CD792E79AA2500DACC1A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
-/* Begin PBXFrameworksBuildPhase section */
-		6581F14B2B36C0CF00BA34A9 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-/* End PBXFrameworksBuildPhase section */
-
 /* Begin PBXGroup section */
+		657152FA2EAFC4B20046C115 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		6581F1452B36C0CF00BA34A9 = {
 			isa = PBXGroup;
 			children = (
 				6581F1502B36C0CF00BA34A9 /* chatdemoios */,
+				657152FA2EAFC4B20046C115 /* Frameworks */,
 				6581F14F2B36C0CF00BA34A9 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -80,7 +78,6 @@
 			buildPhases = (
 				656500D42B3962F0005F97B4 /* ShellScript */,
 				6581F14A2B36C0CF00BA34A9 /* Sources */,
-				6581F14B2B36C0CF00BA34A9 /* Frameworks */,
 				6581F14C2B36C0CF00BA34A9 /* Resources */,
 			);
 			buildRules = (
@@ -320,7 +317,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 14.1;
 				MARKETING_VERSION = 1.0;
 				OTHER_LDFLAGS = "\"$(inherited) -framework common\"";
-				"OTHER_LDFLAGS[arch=*]" = "";
+				"OTHER_LDFLAGS[arch=*]" = "\"-ObjC -fObjC\"";
 				PRODUCT_BUNDLE_IDENTIFIER = com.chatdemo.chatdemoios;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = auto;

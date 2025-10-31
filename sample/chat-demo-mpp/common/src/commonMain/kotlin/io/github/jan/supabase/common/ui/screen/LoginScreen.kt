@@ -11,7 +11,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Mail
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
@@ -30,17 +29,21 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import io.github.jan.supabase.annotations.SupabaseExperimental
+import co.touchlab.kermit.Logger
 import io.github.jan.supabase.auth.providers.Google
 import io.github.jan.supabase.common.ChatViewModel
 import io.github.jan.supabase.common.ui.components.OTPDialog
 import io.github.jan.supabase.common.ui.components.OTPDialogState
 import io.github.jan.supabase.common.ui.components.PasswordField
 import io.github.jan.supabase.common.ui.components.PasswordRecoveryDialog
+import io.github.jan.supabase.compose.auth.composable.NativeSignInResult
+import io.github.jan.supabase.compose.auth.composable.rememberSignInWithGoogle
 import io.github.jan.supabase.compose.auth.ui.ProviderButtonContent
 import io.github.jan.supabase.compose.auth.ui.annotations.AuthUiExperimental
+import io.github.jan.supabase.compose.auth.composeAuth
+import io.github.jan.supabase.compose.auth.ui.ProviderIcon
 
-@OptIn(ExperimentalMaterial3Api::class, SupabaseExperimental::class, AuthUiExperimental::class)
+@OptIn(AuthUiExperimental::class)
 @Composable
 fun LoginScreen(viewModel: ChatViewModel) {
     var signUp by remember { mutableStateOf(false) }
@@ -48,6 +51,29 @@ fun LoginScreen(viewModel: ChatViewModel) {
     var email by remember { mutableStateOf("") }
     var otpDialogState by remember { mutableStateOf<OTPDialogState>(OTPDialogState.Invisible) }
     var showPasswordRecoveryDialog by remember { mutableStateOf(false) }
+
+    val action = viewModel.supabaseClient.composeAuth.rememberSignInWithGoogle(
+        onResult = { result ->
+            when (result) {
+                is NativeSignInResult.Success -> {
+                    viewModel.handleSignInWithGoogleResult()
+                    Logger.d("LoginScreen - Success")
+                }
+
+                is NativeSignInResult.ClosedByUser -> {
+                    Logger.d("LoginScreen - ClosedByUser")
+                }
+
+                is NativeSignInResult.Error -> {
+                    Logger.d("LoginScreen - Error")
+                }
+
+                is NativeSignInResult.NetworkError -> {
+                    Logger.d("LoginScreen - Network Error")
+                }
+            }
+        },
+    )
 
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -93,6 +119,14 @@ fun LoginScreen(viewModel: ChatViewModel) {
             }
         ) {
             ProviderButtonContent(Google, text = if (signUp) "Sign Up with Google" else "Login with Google")
+        }
+        Button(
+            onClick = {
+                action.startFlow()
+            },
+        ) {
+            ProviderIcon(Google, contentDescription = null)
+            Text("Native Sign In with Google")
         }
 
         TextButton(

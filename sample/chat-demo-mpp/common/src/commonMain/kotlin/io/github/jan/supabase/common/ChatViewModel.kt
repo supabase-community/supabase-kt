@@ -77,6 +77,10 @@ class ChatViewModel(
         }
     }
 
+    fun handleSignInWithGoogleResult() {
+        alert.value = "Successfully signed in with Google!"
+    }
+
     fun resetPassword(email: String) {
         coroutineScope.launch {
             kotlin.runCatching {
