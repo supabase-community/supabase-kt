@@ -11,7 +11,7 @@ package io.github.jan.supabase.postgrest.query.filter
  */
 data class FilterOperation(val column: String, val operator: FilterOperator, val value: Any?)
 
-fun FilterOperation.escapedValue(): String =
+fun FilterOperation.escapedValue(isInLogicalExpression: Boolean): String =
     when (operator) {
         FilterOperator.EQ,
         FilterOperator.NEQ,
@@ -23,8 +23,15 @@ fun FilterOperation.escapedValue(): String =
         FilterOperator.ILIKE,
         FilterOperator.MATCH,
         FilterOperator.IMATCH,
-        FilterOperator.IS ->
-            escapeValue(value)
+        FilterOperator.IS,
+        FilterOperator.FTS,
+        FilterOperator.WFTS,
+        FilterOperator.PHFTS,
+        FilterOperator.PLFTS ->
+            if (isInLogicalExpression)
+                escapeValue(value)
+            else
+                value.toString()
         FilterOperator.IN ->
             if (value is List<*>) {
                 encodeAsList(value)
@@ -35,9 +42,15 @@ fun FilterOperation.escapedValue(): String =
         FilterOperator.CD,
         FilterOperator.OV ->
             when (value) {
-                is List<*> -> encodeOverlapAsArray(value)
-                is Pair<*, *> -> encodeOverlapAsRange(value)
-                else -> escapeValue(value)
+                is List<*> ->
+                    encodeOverlapAsArray(value)
+                is Pair<*, *> ->
+                    encodeOverlapAsRange(value)
+                else ->
+                    if (isInLogicalExpression)
+                        escapeValue(value)
+                    else
+                        value.toString()
             }
         FilterOperator.SL,
         FilterOperator.SR,
@@ -49,27 +62,22 @@ fun FilterOperation.escapedValue(): String =
                 is List<*> -> encodeAsRange(value)
                 else -> escapeValue(value)
             }
-        FilterOperator.FTS,
-        FilterOperator.WFTS,
-        FilterOperator.PHFTS,
-        FilterOperator.PLFTS ->
-            escapeValue(value) // Do these need special handling?
     }
 
 private fun encodeAsList(values: List<*>): String =
     values.joinToString(",", prefix = "(", postfix = ")") { escapeValue(it) }
 
 private fun encodeAsRange(range: Pair<*, *>): String =
-    "(${escapeValue(range.first)},${escapeValue(range.second)})"
+    "(${range.first},${range.second})"
 
 private fun encodeAsRange(range: List<*>): String =
-    "(${escapeValue(range[0])},${escapeValue(range[1])})"
+    "(${range[0]},${range[1]})"
 
 private fun encodeOverlapAsRange(range: Pair<*, *>): String =
-    "[${escapeValue(range.first)},${escapeValue(range.second)}]"
+    "[${range.first},${range.second}]"
 
 private fun encodeOverlapAsArray(values: List<*>): String =
-    values.joinToString(",", prefix = "{", postfix = "}") { escapeValue(it) }
+    values.joinToString(",", prefix = "{", postfix = "}")
 
 private val quotedCharacters = listOf(",", ".", ":", "(", ")")
 
@@ -77,7 +85,7 @@ internal fun escapeValue(value: Any?): String {
     val asString = value.toString()
         .replace("\\", "\\\\")
         .replace("\"", "\\\"")
-    return if (value !is Number && quotedCharacters.any { asString.contains(it) }) {
+    return if (quotedCharacters.any { asString.contains(it) }) {
         "\"$asString\""
     } else {
         asString

@@ -28,7 +28,7 @@ class PostgrestFilterBuilder(
      */
     fun filterNot(operation: FilterOperation) {
         val columnValue = params[operation.column] ?: emptyList()
-        _params[operation.column] = columnValue + listOf("not.${operation.operator.identifier}.${operation.escapedValue()}")
+        _params[operation.column] = columnValue + listOf("not.${operation.operator.identifier}.${operation.escapedValue(isInLogicalExpression)}")
     }
 
     /**
@@ -43,7 +43,7 @@ class PostgrestFilterBuilder(
      */
     fun filter(operation: FilterOperation) {
         val columnValue = params[operation.column] ?: emptyList()
-        _params[operation.column] = columnValue + listOf("${operation.operator.identifier}.${operation.escapedValue()}")
+        _params[operation.column] = columnValue + listOf("${operation.operator.identifier}.${operation.escapedValue(isInLogicalExpression)}")
     }
 
     /**
