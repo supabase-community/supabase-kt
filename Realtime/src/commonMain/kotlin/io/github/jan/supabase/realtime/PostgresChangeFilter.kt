@@ -35,7 +35,7 @@ class PostgresChangeFilter(private val event: String, private val schema: String
             FilterOperator.LT,
             FilterOperator.LTE,
             FilterOperator.IN ->
-                filter.escapedValue()
+                filter.escapedValue(false)
             else -> throw UnsupportedOperationException("Unsupported filter operator: ${filter.operator}")
         }
         this.filter = "${filter.column}=${filter.operator.name.lowercase()}.$filterValue"

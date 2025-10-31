@@ -38,15 +38,15 @@ class PostgrestFilterBuilderTest {
         val filter = filterToString {
             eq("id", "2004-09-16T23:59:58.75")
         }
-        assertEquals("id=eq.\"2004-09-16T23:59:58.75\"", filter)
+        assertEquals("id=eq.2004-09-16T23:59:58.75", filter)
     }
 
     @Test
     fun eq_quoted() {
         val filter = filterToString {
-            eq("id", "Hello, \"World\"")
+            isIn("id", listOf("Hello, \"World\"", "."))
         }
-        assertEquals("id=eq.\"Hello,+\\\"World\\\"\"", filter)
+        assertEquals("id=in.(\"Hello,+\\\"World\\\"\",\".\")", filter)
     }
 
     @Test
