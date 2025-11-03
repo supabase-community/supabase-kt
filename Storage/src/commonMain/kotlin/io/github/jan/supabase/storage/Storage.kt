@@ -75,7 +75,16 @@ interface Storage : MainPlugin<Storage.Config>, CustomSerializationPlugin {
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
-    suspend fun retrieveBuckets(): List<Bucket>
+    suspend fun listBuckets(filter: BucketFilter.() -> Unit = {}): List<Bucket>
+
+    /**
+     * Returns all buckets in the storage
+     * @throws RestException or one of its subclasses if receiving an error response
+     * @throws HttpRequestTimeoutException if the request timed out
+     * @throws HttpRequestException on network related issues
+     */
+    @Deprecated("Use listBuckets instead", ReplaceWith("listBuckets()"))
+    suspend fun retrieveBuckets(): List<Bucket> = listBuckets()
 
     /**
      * Retrieves a bucket by its [bucketId]
@@ -83,7 +92,16 @@ interface Storage : MainPlugin<Storage.Config>, CustomSerializationPlugin {
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
-    suspend fun retrieveBucketById(bucketId: String): Bucket?
+    suspend fun getBucket(bucketId: String): Bucket?
+
+    /**
+     * Retrieves a bucket by its [bucketId]
+     * @throws RestException or one of its subclasses if receiving an error response
+     * @throws HttpRequestTimeoutException if the request timed out
+     * @throws HttpRequestException on network related issues
+     */
+    @Deprecated("Use getBucket instead", ReplaceWith("getBucket(bucketId)"))
+    suspend fun retrieveBucketById(bucketId: String): Bucket? = getBucket(bucketId)
 
     /**
      * Empties a bucket by its [bucketId]
@@ -200,9 +218,14 @@ internal class StorageImpl(override val supabaseClient: SupabaseClient, override
 
     private val resumableClients = AtomicMutableMap<String, BucketApi>()
 
-    override suspend fun retrieveBuckets(): List<Bucket> = api.get("bucket").safeBody()
+    override suspend fun listBuckets(filter: BucketFilter.() -> Unit): List<Bucket> {
+        val response = api.get("bucket") {
+            url.parameters.appendAll(BucketFilter().apply(filter).build())
+        }
+        return response.safeBody()
+    }
 
-    override suspend fun retrieveBucketById(bucketId: String): Bucket? = api.get("bucket/$bucketId").safeBody()
+    override suspend fun getBucket(bucketId: String): Bucket? = api.get("bucket/$bucketId").safeBody()
 
     override suspend fun deleteBucket(bucketId: String) {
         api.delete("bucket/$bucketId")
