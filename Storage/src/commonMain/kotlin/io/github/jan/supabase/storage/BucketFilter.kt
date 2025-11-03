@@ -43,7 +43,7 @@ class BucketFilter {
         sortOrder = order
     }
 
-    fun build() = parameters {
+    internal fun build() = parameters {
         limit?.let { set("limit", it.toString()) }
         offset?.let { set("offset", it.toString()) }
         search?.let { set("search", it) }
