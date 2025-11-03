@@ -34,19 +34,27 @@ class PostgrestFilterBuilderTest {
     }
 
     @Test
-    fun eq_reserved() {
+    fun eq_with_reserved() {
         val filter = filterToString {
-            eq("id", "2004-09-16T23:59:58.75")
+            eq("time", "2004-09-16T23:59:58.75")
         }
-        assertEquals("id=eq.\"2004-09-16T23:59:58.75\"", filter)
+        assertEquals("time=eq.2004-09-16T23:59:58.75", filter)
     }
 
     @Test
-    fun eq_quoted() {
+    fun eq_with_quotes() {
         val filter = filterToString {
-            eq("id", "Hello, \"World\"")
+            eq("message", "Hello, \"World\"")
         }
-        assertEquals("id=eq.\"Hello,+\\\"World\\\"\"", filter)
+        assertEquals("message=eq.Hello,+\"World\"", filter)
+    }
+
+    @Test
+    fun in_quoted() {
+        val filter = filterToString {
+            isIn("message", listOf("\"Hello, World\"", "Goodbye.", "Greetings"))
+        }
+        assertEquals("message=in.(\"\\\"Hello,+World\\\"\",\"Goodbye.\",Greetings)", filter)
     }
 
     @Test
@@ -148,7 +156,7 @@ class PostgrestFilterBuilderTest {
     @Test
     fun contained() {
         val filter = filterToString {
-            contained("id", listOf(1,2,3))
+            contained("id", listOf(1, 2, 3))
         }
         assertEquals("id=cd.{1,2,3}", filter)
     }
@@ -156,7 +164,7 @@ class PostgrestFilterBuilderTest {
     @Test
     fun overlaps() {
         val filter = filterToString {
-            overlaps("id", listOf(1,2,3))
+            overlaps("id", listOf(1, 2, 3))
         }
         assertEquals("id=ov.{1,2,3}", filter)
     }
@@ -293,7 +301,7 @@ class PostgrestFilterBuilderTest {
 
     @Test
     fun propertyConversionWithSerialName() {
-        if(CurrentPlatformTarget in listOf(PlatformTarget.JVM, PlatformTarget.ANDROID)) {
+        if (CurrentPlatformTarget in listOf(PlatformTarget.JVM, PlatformTarget.ANDROID)) {
             assertEquals("created_at", PropertyConversionMethod.SERIAL_NAME(TestData::createdAt))
         } else {
             assertFails { PropertyConversionMethod.SERIAL_NAME(TestData::createdAt) }
@@ -301,7 +309,11 @@ class PostgrestFilterBuilderTest {
     }
 
     private fun filterToString(builder: PostgrestFilterBuilder.() -> Unit): String {
-        return PostgrestFilterBuilder(PropertyConversionMethod.NONE).apply(block = builder).params.mapValues { (_, value) -> listOf(value.first()) }.let {
+        return PostgrestFilterBuilder(PropertyConversionMethod.NONE).apply(block = builder).params.mapValues { (_, value) ->
+            listOf(
+                value.first()
+            )
+        }.let {
             parametersOf(it).formUrlEncode()
         }.decodeURLQueryComponent()
     }
