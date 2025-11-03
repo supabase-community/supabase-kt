@@ -34,223 +34,111 @@ class BucketFilterTest {
     }
 
     @Test
-    fun testBucketFilterWithLimitOnly() {
-        val filter = BucketFilter().apply {
-            limit = 20
-        }
-        val params = filter.build()
+    fun testBucketFilterIndividualParameters() {
+        // Test limit only
+        var filter = BucketFilter().apply { limit = 20 }
+        var params = filter.build()
         assertEquals("20", params["limit"])
         assertNull(params["offset"])
-        assertNull(params["search"])
-        assertNull(params["sortOrder"])
-        assertNull(params["sortColumn"])
-    }
 
-    @Test
-    fun testBucketFilterWithOffsetOnly() {
-        val filter = BucketFilter().apply {
-            offset = 15
-        }
-        val params = filter.build()
-        assertNull(params["limit"])
+        // Test offset only
+        filter = BucketFilter().apply { offset = 15 }
+        params = filter.build()
         assertEquals("15", params["offset"])
-        assertNull(params["search"])
-        assertNull(params["sortOrder"])
-        assertNull(params["sortColumn"])
-    }
-
-    @Test
-    fun testBucketFilterWithSearchOnly() {
-        val filter = BucketFilter().apply {
-            search = "my-bucket"
-        }
-        val params = filter.build()
         assertNull(params["limit"])
-        assertNull(params["offset"])
+
+        // Test search only
+        filter = BucketFilter().apply { search = "my-bucket" }
+        params = filter.build()
         assertEquals("my-bucket", params["search"])
-        assertNull(params["sortOrder"])
-        assertNull(params["sortColumn"])
+        assertNull(params["limit"])
     }
 
     @Test
-    fun testBucketFilterWithLimitAndOffset() {
-        val filter = BucketFilter().apply {
-            limit = 25
-            offset = 50
+    fun testBucketFilterSortColumns() {
+        // Test all sort columns with both orders
+        val columns = listOf(
+            BucketFilter.SortColumn.ID to "id",
+            BucketFilter.SortColumn.NAME to "name",
+            BucketFilter.SortColumn.CREATED_AT to "created_at",
+            BucketFilter.SortColumn.UPDATED_AT to "updated_at"
+        )
+
+        for ((column, expectedName) in columns) {
+            // Test ascending
+            var filter = BucketFilter().apply { sortBy(column, SortOrder.ASC) }
+            var params = filter.build()
+            assertEquals(expectedName, params["sortColumn"])
+            assertEquals("asc", params["sortOrder"])
+
+            // Test descending
+            filter = BucketFilter().apply { sortBy(column, SortOrder.DESC) }
+            params = filter.build()
+            assertEquals(expectedName, params["sortColumn"])
+            assertEquals("desc", params["sortOrder"])
         }
-        val params = filter.build()
-        assertEquals("25", params["limit"])
-        assertEquals("50", params["offset"])
-        assertNull(params["search"])
-        assertNull(params["sortOrder"])
-        assertNull(params["sortColumn"])
     }
 
     @Test
-    fun testBucketFilterSortByIdAscending() {
-        val filter = BucketFilter().apply {
-            sortBy(BucketFilter.SortColumn.ID, SortOrder.ASC)
-        }
-        val params = filter.build()
-        assertEquals("id", params["sortColumn"])
-        assertEquals("asc", params["sortOrder"])
-    }
-
-    @Test
-    fun testBucketFilterSortByIdDescending() {
-        val filter = BucketFilter().apply {
-            sortBy(BucketFilter.SortColumn.ID, SortOrder.DESC)
-        }
-        val params = filter.build()
-        assertEquals("id", params["sortColumn"])
-        assertEquals("desc", params["sortOrder"])
-    }
-
-    @Test
-    fun testBucketFilterSortByNameAscending() {
-        val filter = BucketFilter().apply {
-            sortBy(BucketFilter.SortColumn.NAME, SortOrder.ASC)
-        }
-        val params = filter.build()
-        assertEquals("name", params["sortColumn"])
-        assertEquals("asc", params["sortOrder"])
-    }
-
-    @Test
-    fun testBucketFilterSortByNameDescending() {
-        val filter = BucketFilter().apply {
-            sortBy(BucketFilter.SortColumn.NAME, SortOrder.DESC)
-        }
-        val params = filter.build()
-        assertEquals("name", params["sortColumn"])
-        assertEquals("desc", params["sortOrder"])
-    }
-
-    @Test
-    fun testBucketFilterSortByCreatedAtAscending() {
-        val filter = BucketFilter().apply {
-            sortBy(BucketFilter.SortColumn.CREATED_AT, SortOrder.ASC)
-        }
-        val params = filter.build()
-        assertEquals("created_at", params["sortColumn"])
-        assertEquals("asc", params["sortOrder"])
-    }
-
-    @Test
-    fun testBucketFilterSortByCreatedAtDescending() {
-        val filter = BucketFilter().apply {
-            sortBy(BucketFilter.SortColumn.CREATED_AT, SortOrder.DESC)
-        }
-        val params = filter.build()
-        assertEquals("created_at", params["sortColumn"])
-        assertEquals("desc", params["sortOrder"])
-    }
-
-    @Test
-    fun testBucketFilterSortByUpdatedAtAscending() {
-        val filter = BucketFilter().apply {
-            sortBy(BucketFilter.SortColumn.UPDATED_AT, SortOrder.ASC)
-        }
-        val params = filter.build()
-        assertEquals("updated_at", params["sortColumn"])
-        assertEquals("asc", params["sortOrder"])
-    }
-
-    @Test
-    fun testBucketFilterSortByUpdatedAtDescending() {
-        val filter = BucketFilter().apply {
-            sortBy(BucketFilter.SortColumn.UPDATED_AT, SortOrder.DESC)
-        }
-        val params = filter.build()
-        assertEquals("updated_at", params["sortColumn"])
-        assertEquals("desc", params["sortOrder"])
-    }
-
-    @Test
-    fun testBucketFilterSearchWithSpecialCharacters() {
-        val filter = BucketFilter().apply {
-            search = "test-bucket_123"
-        }
-        val params = filter.build()
-        assertEquals("test-bucket_123", params["search"])
-    }
-
-    @Test
-    fun testBucketFilterWithZeroLimit() {
-        val filter = BucketFilter().apply {
+    fun testBucketFilterEdgeCases() {
+        // Zero values
+        var filter = BucketFilter().apply {
             limit = 0
-        }
-        val params = filter.build()
-        assertEquals("0", params["limit"])
-    }
-
-    @Test
-    fun testBucketFilterWithZeroOffset() {
-        val filter = BucketFilter().apply {
             offset = 0
         }
-        val params = filter.build()
+        var params = filter.build()
+        assertEquals("0", params["limit"])
         assertEquals("0", params["offset"])
-    }
 
-    @Test
-    fun testBucketFilterComplexScenario() {
-        val filter = BucketFilter().apply {
-            limit = 50
-            offset = 100
-            search = "production"
-            sortBy(BucketFilter.SortColumn.CREATED_AT, SortOrder.DESC)
-        }
-        val params = filter.build()
-        assertEquals("50", params["limit"])
-        assertEquals("100", params["offset"])
-        assertEquals("production", params["search"])
-        assertEquals("created_at", params["sortColumn"])
-        assertEquals("desc", params["sortOrder"])
-    }
+        // Empty search string
+        filter = BucketFilter().apply { search = "" }
+        params = filter.build()
+        assertEquals("", params["search"])
 
-    @Test
-    fun testBucketFilterWithLargeNumbers() {
-        val filter = BucketFilter().apply {
+        // Special characters in search
+        filter = BucketFilter().apply { search = "test-bucket_123" }
+        params = filter.build()
+        assertEquals("test-bucket_123", params["search"])
+
+        // Large numbers
+        filter = BucketFilter().apply {
             limit = 1000
             offset = 5000
         }
-        val params = filter.build()
+        params = filter.build()
         assertEquals("1000", params["limit"])
         assertEquals("5000", params["offset"])
     }
 
     @Test
-    fun testBucketFilterSearchWithEmptyString() {
-        val filter = BucketFilter().apply {
-            search = ""
+    fun testBucketFilterCombinations() {
+        // Limit and offset
+        var filter = BucketFilter().apply {
+            limit = 25
+            offset = 50
         }
-        val params = filter.build()
-        assertEquals("", params["search"])
-    }
+        var params = filter.build()
+        assertEquals("25", params["limit"])
+        assertEquals("50", params["offset"])
+        assertNull(params["search"])
 
-    @Test
-    fun testBucketFilterWithSearchAndSort() {
-        val filter = BucketFilter().apply {
+        // Search and sort
+        filter = BucketFilter().apply {
             search = "images"
             sortBy(BucketFilter.SortColumn.UPDATED_AT, SortOrder.ASC)
         }
-        val params = filter.build()
+        params = filter.build()
         assertEquals("images", params["search"])
         assertEquals("updated_at", params["sortColumn"])
         assertEquals("asc", params["sortOrder"])
-        assertNull(params["limit"])
-        assertNull(params["offset"])
-    }
 
-    @Test
-    fun testBucketFilterPaginationScenario() {
-        val filter = BucketFilter().apply {
+        // Pagination with sort
+        filter = BucketFilter().apply {
             limit = 10
             offset = 30
             sortBy(BucketFilter.SortColumn.NAME, SortOrder.ASC)
         }
-        val params = filter.build()
+        params = filter.build()
         assertEquals("10", params["limit"])
         assertEquals("30", params["offset"])
         assertEquals("name", params["sortColumn"])
