@@ -4,6 +4,7 @@ import io.github.jan.supabase.storage.BucketApi
 import io.github.jan.supabase.storage.FileObjectV2
 import io.github.jan.supabase.storage.FileUploadResponse
 import io.github.jan.supabase.storage.ImageTransformation
+import io.github.jan.supabase.storage.SortOrder
 import io.github.jan.supabase.storage.Storage
 import io.github.jan.supabase.storage.resumable.MemoryResumableCache
 import io.github.jan.supabase.storage.storage
@@ -451,7 +452,7 @@ class BucketApiTest {
                 limit = expectedLimit
                 offset = expectedOffset
                 search = expectedSearch
-                sortBy(expectedColumn, expectedOrder)
+                sortBy(expectedColumn, SortOrder.ASC)
             }
          //   assertContentEquals(expectedData, data, "Data should be $expectedData")
         }

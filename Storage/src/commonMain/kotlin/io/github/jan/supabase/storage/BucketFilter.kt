@@ -26,14 +26,24 @@ class BucketFilter {
      * The sort order for the results. Can be [SortOrder.ASC] (ascending) or [SortOrder.DESC] (descending).
      * If null, the default sort order from the API is used.
      */
-    var sortOrder: SortOrder? = null
+    private var sortOrder: SortOrder? = null
 
     /**
      * The column to sort the results by. If null, the default sort column from the API is used.
      */
-    var sortColumn: SortColumn? = null
+    private var sortColumn: SortColumn? = null
 
-    internal fun build() = parameters {
+    /**
+     * Sets the sorting criteria for the bucket list results
+     * @param column The column to sort by
+     * @param order The sort order (ascending or descending)
+     */
+    fun sortBy(column: SortColumn, order: SortOrder) {
+        sortColumn = column
+        sortOrder = order
+    }
+
+    fun build() = parameters {
         limit?.let { set("limit", it.toString()) }
         offset?.let { set("offset", it.toString()) }
         search?.let { set("search", it) }
