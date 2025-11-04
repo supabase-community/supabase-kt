@@ -1,5 +1,13 @@
 # Changelog
 
+### 3.2.6 - October 29, 2025
+
+- Update Kotlin to version `2.2.21`
+
+### Postgrest
+
+- Do not escape numbers in Postgrest & escape `filterNot` by @jan-tennert in https://github.com/supabase-community/supabase-kt/pull/1084
+
 ### 3.2.5 - October 15, 2025
 
 ### Auth
