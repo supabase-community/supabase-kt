@@ -29,10 +29,12 @@ class BucketListFilter {
 
     /**
      * Sorts the result by the given [column] in the given [order]
+     * @param column The column to sort by
+     * @param order The sort order (ascending or descending)
      */
-    fun sortBy(column: String, order: String) {
+    fun sortBy(column: String, order: SortOrder) {
         this.column = column
-        this.order = order
+        this.order = order.name.lowercase()
     }
 
     @SupabaseInternal

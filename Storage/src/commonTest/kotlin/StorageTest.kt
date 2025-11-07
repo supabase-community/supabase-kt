@@ -2,6 +2,8 @@ import io.github.jan.supabase.SupabaseClientBuilder
 import io.github.jan.supabase.auth.Auth
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.auth.minimalConfig
+import io.github.jan.supabase.storage.BucketFilter
+import io.github.jan.supabase.storage.SortOrder
 import io.github.jan.supabase.storage.Storage
 import io.github.jan.supabase.storage.resumable.MemoryResumableCache
 import io.github.jan.supabase.storage.storage
@@ -137,7 +139,7 @@ class StorageTest {
                     """
                 )
             }
-            val buckets = client.storage.retrieveBuckets()
+            val buckets = client.storage.listBuckets()
             assertEquals(1, buckets.size, "Buckets should contain 1 item")
             assertEquals(expectedId, buckets[0].id, "Bucket id should be 'test-bucket'")
             assertEquals(expectedId, buckets[0].name, "Bucket name should be 'test-bucket'")
@@ -147,6 +149,54 @@ class StorageTest {
             assertEquals(expectedUpdatedAt, buckets[0].updatedAt, "Bucket updated at should be $expectedUpdatedAt")
             assertEquals(owner, buckets[0].owner, "Bucket owner should be $owner")
             assertEquals(expectedAllowedMimeTypes, buckets[0].allowedMimeTypes, "Bucket allowed mime types should be ['image/jpeg', 'image/png']")
+        }
+    }
+
+    @Test
+    fun testListBucketsWithFilter() {
+        runTest {
+            val expectedId = "test-bucket"
+            val expectedPublic = true
+            val expectedFileSizeLimit = 10000L
+            val expectedAllowedMimeTypes = listOf("image/jpeg", "image/png")
+            val expectedCreatedAt = Clock.System.now()
+            val expectedUpdatedAt = Clock.System.now()
+            val owner = "uuid"
+            val client = createMockedSupabaseClient(configuration = configureClient) {
+                assertPathIs("/bucket", it.url.pathAfterVersion())
+                assertMethodIs(HttpMethod.Get, it.method)
+                assertEquals("10", it.url.parameters["limit"], "Limit should be 10")
+                assertEquals("5", it.url.parameters["offset"], "Offset should be 5")
+                assertEquals("test", it.url.parameters["search"], "Search should be 'test'")
+                assertEquals("asc", it.url.parameters["sortOrder"], "Sort order should be 'asc'")
+                assertEquals("name", it.url.parameters["sortColumn"], "Sort column should be 'name'")
+                respond(
+                    """
+                    [
+                        ${
+                        createSampleBucket(
+                            id = expectedId,
+                            name = expectedId,
+                            public = expectedPublic,
+                            fileSizeLimit = expectedFileSizeLimit,
+                            allowedMimeTypes = expectedAllowedMimeTypes,
+                            createdAt = expectedCreatedAt.toString(),
+                            updatedAt = expectedUpdatedAt.toString(),
+                            owner = owner
+                        )
+                    }
+                    ]
+                    """
+                )
+            }
+            val buckets = client.storage.listBuckets {
+                limit = 10
+                offset = 5
+                search = "test"
+                sortBy(BucketFilter.SortColumn.NAME, SortOrder.ASC)
+            }
+            assertEquals(1, buckets.size, "Buckets should contain 1 item")
+            assertEquals(expectedId, buckets[0].id, "Bucket id should be 'test-bucket'")
         }
     }
 
@@ -178,7 +228,7 @@ class StorageTest {
                     """
                 )
             }
-            val bucket = client.storage.retrieveBucketById(expectedId)
+            val bucket = client.storage.getBucket(expectedId)
             assertEquals(expectedId, bucket?.id, "Bucket id should be 'test-bucket'")
             assertEquals(expectedId, bucket?.name, "Bucket name should be 'test-bucket'")
             assertEquals(expectedPublic, bucket?.public, "Bucket public should be true")
@@ -211,7 +261,7 @@ class StorageTest {
                 respond("[]")
             }
             client.auth.importAuthToken(key)
-            client.storage.retrieveBuckets()
+            client.storage.listBuckets()
         }
     }
 
