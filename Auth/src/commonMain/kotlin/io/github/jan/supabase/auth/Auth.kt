@@ -87,6 +87,8 @@ interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
      */
     val mfa: MfaApi
 
+    val oauth: OAuthServerApi
+
     /**
      * The cache for the code verifier. This is used for PKCE authentication. Can be customized via [AuthConfig.codeVerifierCache]
      */

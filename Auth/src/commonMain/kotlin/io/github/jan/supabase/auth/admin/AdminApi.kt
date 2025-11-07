@@ -25,6 +25,8 @@ import kotlinx.serialization.json.put
  */
 interface AdminApi {
 
+    val oauth: OAuthAdminApi
+
     /**
      * Creates a new user using an email and password
      * @return the newly created user
