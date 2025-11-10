@@ -97,6 +97,10 @@ class ChatViewModel(
         }
     }
 
+    fun handleSignInWithGoogleResult() {
+        alert.value = "Successfully signed in with Google!"
+    }
+
     fun logout() {
         coroutineScope.launch {
             kotlin.runCatching {
