@@ -1,6 +1,7 @@
 package io.github.jan.supabase.auth
 
 import io.github.jan.supabase.SupabaseClient
+import io.github.jan.supabase.auth.status.SessionStatus
 import io.github.jan.supabase.auth.user.UserSession
 
 internal fun invalidArg(message: String): Nothing = throw IllegalArgumentException(message)
@@ -12,3 +13,9 @@ internal expect suspend fun Auth.startExternalAuth(
     getUrl: suspend (redirectTo: String?) -> String,
     onSessionSuccess: suspend (UserSession) -> Unit
 )
+
+internal fun Auth.initDone() {
+    if(sessionStatus.value is SessionStatus.Initializing) {
+        setSessionStatus(SessionStatus.NotAuthenticated())
+    }
+}

@@ -122,12 +122,10 @@ internal class AuthImpl(
                     Auth.logger.i {
                         "No session found in storage."
                     }
-                    setSessionStatus(SessionStatus.NotAuthenticated())
                 }
             }
         } else {
             Auth.logger.d { "Skipping loading from storage (autoLoadFromStorage is set to false)" }
-            setSessionStatus(SessionStatus.NotAuthenticated())
         }
         setupPlatform()
         Auth.logger.d { "Initialized Auth plugin" }

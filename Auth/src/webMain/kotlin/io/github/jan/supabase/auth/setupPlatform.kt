@@ -25,6 +25,7 @@ actual fun Auth.setupPlatform() {
         parseFragmentAndImportSession(afterHash) {
             val newURL = consumeHashParameters(Auth.HASH_PARAMETERS, window.location.href)
             window.history.replaceState(null, window.document.title, newURL);
+            initDone()
         }
     }
 
@@ -33,6 +34,7 @@ actual fun Auth.setupPlatform() {
         var clean: Boolean
         if(handledUrlParameterError { url.searchParams.get(it) }) {
             clean = true
+            initDone()
         } else {
             val code = url.searchParams.get("code") ?: return
             Auth.logger.d { "Found PCKE code: $code" }
@@ -43,6 +45,7 @@ actual fun Auth.setupPlatform() {
                 } catch(e: Exception) {
                     Auth.logger.w(e) { "Failed to exchange PCKE code for session" }
                 }
+                initDone()
             }
             clean = true
         }

@@ -28,7 +28,7 @@ actual fun Auth.setupPlatform() {
 }
 
 private fun addLifecycleCallbacks(gotrue: Auth) {
-    if(!gotrue.config.enableLifecycleCallbacks) return
+    if(!gotrue.config.enableLifecycleCallbacks) return gotrue.initDone()
     val lifecycle = ProcessLifecycleOwner.get().lifecycle
     gotrue as AuthImpl
     val scope = gotrue.authScope
@@ -52,6 +52,7 @@ private fun addLifecycleCallbacks(gotrue: Auth) {
                                     "Session found, auto refresh started"
                                 }
                             }
+                            gotrue.initDone()
                         }
                     }
                 }
