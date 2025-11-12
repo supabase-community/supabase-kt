@@ -87,8 +87,9 @@ internal class AuthImpl(
     override val codeVerifierCache = config.codeVerifierCache ?: createDefaultCodeVerifierCache()
 
     @OptIn(SupabaseInternal::class)
-    internal val api = supabaseClient.authenticatedSupabaseApi(this)
-    override val admin: AdminApi = AdminApiImpl(this)
+    internal val userApi = supabaseClient.authenticatedSupabaseApi(this)
+    internal val publicApi = supabaseClient.authenticatedSupabaseApi(this, requireSession = false)
+    override val admin: AdminApi = AdminApiImpl(publicApi)
     override val mfa: MfaApi = MfaApiImpl(this)
     var sessionJob: Job? = null
     override val isAutoRefreshRunning: Boolean
@@ -142,7 +143,7 @@ internal class AuthImpl(
     }, redirectUrl, config)
 
     override suspend fun signInAnonymously(data: JsonObject?, captchaToken: String?) {
-        val response = api.postJson("signup", buildJsonObject {
+        val response = publicApi.postJson("signup", buildJsonObject {
             data?.let { put("data", it) }
             captchaToken?.let(::putCaptchaToken)
         })
@@ -166,7 +167,7 @@ internal class AuthImpl(
         val automaticallyOpen = ExternalAuthConfigDefaults().apply(config).automaticallyOpenUrl
         val fetchUrl: suspend (String?) -> String = { redirectTo: String? ->
             val url = getOAuthUrl(provider, redirectTo, "user/identities/authorize", config)
-            val response = api.rawRequest(url) {
+            val response = userApi.rawRequest(url) {
                 method = HttpMethod.Get
                 parameter("skip_http_redirect", true)
             }
@@ -193,12 +194,12 @@ internal class AuthImpl(
         config: (IDToken.Config) -> Unit
     ) {
         val body = IDToken.Config(idToken = idToken, provider = provider, linkIdentity = true).apply(config)
-        val result = api.postJson("token?grant_type=id_token", body)
+        val result = userApi.postJson("token?grant_type=id_token", body)
         importSession(result.safeBody(), source = SessionSource.UserIdentitiesChanged(result.safeBody()))
     }
 
     override suspend fun unlinkIdentity(identityId: String, updateLocalUser: Boolean) {
-        api.delete("user/identities/$identityId")
+        userApi.delete("user/identities/$identityId")
         if (updateLocalUser) {
             val session = currentSessionOrNull() ?: return
             val newUser = session.user?.copy(identities = session.user.identities?.filter { it.identityId != identityId })
@@ -222,7 +223,7 @@ internal class AuthImpl(
         }
 
         val codeChallenge: String? = preparePKCEIfEnabled()
-        return api.postJson("sso", buildJsonObject {
+        return publicApi.postJson("sso", buildJsonObject {
             redirectUrl?.let { put("redirect_to", it) }
             createdConfig.captchaToken?.let(::putCaptchaToken)
             codeChallenge?.let(::putCodeChallenge)
@@ -232,7 +233,8 @@ internal class AuthImpl(
             createdConfig.providerId?.let {
                 put("provider_id", it)
             }
-        }).body()
+        })
+            .body()
     }
 
     override suspend fun updateUser(
@@ -246,7 +248,7 @@ internal class AuthImpl(
             putJsonObject(supabaseJson.encodeToJsonElement(updateBuilder).jsonObject)
             codeChallenge?.let(::putCodeChallenge)
         }.toString()
-        val response = api.putJson("user", body) {
+        val response = userApi.putJson("user", body) {
             redirectUrl?.let { url.parameters.append("redirect_to", it) }
         }
         val userInfo = response.safeBody<UserInfo>()
@@ -262,7 +264,7 @@ internal class AuthImpl(
     }
 
     private suspend fun resend(type: String, body: JsonObjectBuilder.() -> Unit) {
-        api.postJson("resend", buildJsonObject {
+        userApi.postJson("resend", buildJsonObject {
             put("type", type)
             putJsonObject(buildJsonObject(body))
         })
@@ -297,19 +299,19 @@ internal class AuthImpl(
             captchaToken?.let(::putCaptchaToken)
             codeChallenge?.let(::putCodeChallenge)
         }.toString()
-        api.postJson("recover", body) {
+        publicApi.postJson("recover", body) {
             redirectUrl?.let { url.encodedParameters.append("redirect_to", it) }
         }
     }
 
     override suspend fun reauthenticate() {
-        api.get("reauthenticate")
+        userApi.get("reauthenticate")
     }
 
     override suspend fun signOut(scope: SignOutScope) {
         if (currentSessionOrNull() != null) {
             try {
-                api.post("logout") {
+                userApi.post("logout") {
                     parameter("scope", scope.name.lowercase())
                 }
             } catch(e: RestException) {
@@ -339,7 +341,7 @@ internal class AuthImpl(
             captchaToken?.let(::putCaptchaToken)
             additionalData()
         }
-        val response = api.postJson("verify", body)
+        val response = publicApi.postJson("verify", body)
         val session = response.body<UserSession>()
         importSession(session, source = SessionSource.SignIn(OTP))
     }
@@ -371,7 +373,7 @@ internal class AuthImpl(
     }
 
     override suspend fun retrieveUser(jwt: String): UserInfo {
-        val response = api.get("user") {
+        val response = userApi.get("user") {
             headers["Authorization"] = "Bearer $jwt"
         }
         val body = response.bodyAsText()
@@ -394,7 +396,7 @@ internal class AuthImpl(
         require(codeVerifier != null) {
             "No code verifier stored. Make sure to use `getOAuthUrl` for the OAuth Url to prepare the PKCE flow."
         }
-        val session = api.postJson("token?grant_type=pkce", buildJsonObject {
+        val session = publicApi.postJson("token?grant_type=pkce", buildJsonObject {
             put("auth_code", code)
             put("code_verifier", codeVerifier)
         }) {
@@ -414,7 +416,7 @@ internal class AuthImpl(
         val body = buildJsonObject {
             put("refresh_token", refreshToken)
         }
-        val response = api.postJson("token?grant_type=refresh_token", body) {
+        val response = publicApi.postJson("token?grant_type=refresh_token", body) {
             headers.remove("Authorization")
         }
         return response.safeBody("Auth#refreshSession")
