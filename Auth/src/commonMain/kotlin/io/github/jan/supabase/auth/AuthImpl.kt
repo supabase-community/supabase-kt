@@ -123,11 +123,17 @@ internal class AuthImpl(
                         "No session found in storage."
                     }
                 }
+                if(config.autoSetupPlatform) {
+                    setupPlatform()
+                }
             }
         } else {
             Auth.logger.d { "Skipping loading from storage (autoLoadFromStorage is set to false)" }
+            if(config.autoSetupPlatform) {
+                setupPlatform()
+            }
         }
-        setupPlatform()
+
         Auth.logger.d { "Initialized Auth plugin" }
     }
 

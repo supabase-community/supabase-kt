@@ -5,7 +5,6 @@ import io.github.jan.supabase.auth.status.SessionSource
 import io.github.jan.supabase.logging.d
 import io.github.jan.supabase.logging.w
 import io.ktor.util.PlatformUtils.IS_BROWSER
-import kotlinx.browser.window
 import kotlinx.coroutines.launch
 import org.w3c.dom.url.URL
 
@@ -13,9 +12,9 @@ import org.w3c.dom.url.URL
 actual fun Auth.setupPlatform() {
     this as AuthImpl
 
-    fun checkForHash() {
-        if(window.location.hash.isBlank()) return
-        val afterHash = window.location.hash.substring(1)
+    fun checkForHash(bridge: BrowserBridge) {
+        if(bridge.currentHash.isBlank()) return
+        val afterHash = bridge.currentHash.substring(1)
 
         if(!afterHash.contains('=')) {
             // No params after hash, no need to continue
@@ -23,14 +22,14 @@ actual fun Auth.setupPlatform() {
         }
         Auth.logger.d { "Found hash: $afterHash" }
         parseFragmentAndImportSession(afterHash) {
-            val newURL = consumeHashParameters(Auth.HASH_PARAMETERS, window.location.href)
-            window.history.replaceState(null, window.document.title, newURL);
+            val newURL = consumeHashParameters(Auth.HASH_PARAMETERS, bridge.href)
+            bridge.replaceCurrentUrl(newURL);
             initDone()
         }
     }
 
-    fun checkForPCKECode() {
-        val url = URL(window.location.href)
+    fun checkForPCKECode(bridge: BrowserBridge) {
+        val url = URL(bridge.href)
         var clean: Boolean
         if(handledUrlParameterError { url.searchParams.get(it) }) {
             clean = true
@@ -50,8 +49,8 @@ actual fun Auth.setupPlatform() {
             clean = true
         }
         if(clean) {
-            val newURL = consumeUrlParameter(Auth.QUERY_PARAMETERS, window.location.href)
-            window.history.replaceState(null, window.document.title, newURL);
+            val newURL = consumeUrlParameter(Auth.QUERY_PARAMETERS, bridge.href)
+            bridge.replaceCurrentUrl(newURL);
         }
     }
 
@@ -59,14 +58,16 @@ actual fun Auth.setupPlatform() {
         when(config.flowType) {
             FlowType.PKCE -> {
                 Auth.logger.d { "Using PCKE flow type, checking for PCKE code..." }
-                checkForPCKECode()
+                config.browserBridge?.let(::checkForPCKECode)
             }
             FlowType.IMPLICIT -> {
                 Auth.logger.d { "Using IMPLICIT flow type, checking for hash..." }
-                checkForHash()
+                config.browserBridge?.let(::checkForHash)
                 Auth.logger.d { "Registering hash change listener..." }
-                window.onhashchange = {
-                    checkForHash()
+                config.browserBridge?.let {
+                    it.onHashChange {
+                        checkForHash(it)
+                    }
                 }
             }
         }
