@@ -1,6 +1,7 @@
 package io.github.jan.supabase.auth
 
 import io.github.jan.supabase.SupabaseClient
+import io.github.jan.supabase.SupabaseClientBuilder
 import io.github.jan.supabase.annotations.SupabaseExperimental
 import io.github.jan.supabase.annotations.SupabaseInternal
 import io.github.jan.supabase.auth.admin.AdminApi
@@ -496,7 +497,14 @@ interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
         const val API_VERSION = 1
 
         override fun createConfig(init: AuthConfig.() -> Unit) = AuthConfig().apply(init)
+
         override fun create(supabaseClient: SupabaseClient, config: AuthConfig): Auth = AuthImpl(supabaseClient, config)
+
+        override fun setup(builder: SupabaseClientBuilder, config: AuthConfig) {
+            if(config.checkSessionOnRequest) {
+                builder.networkInterceptors.add(SessionNetworkInterceptor)
+            }
+        }
 
     }
 

@@ -2,7 +2,7 @@ package io.github.jan.supabase.auth.admin
 
 import io.github.jan.supabase.annotations.SupabaseInternal
 import io.github.jan.supabase.auth.Auth
-import io.github.jan.supabase.auth.AuthImpl
+import io.github.jan.supabase.auth.AuthenticatedSupabaseApi
 import io.github.jan.supabase.auth.SignOutScope
 import io.github.jan.supabase.auth.user.UserInfo
 import io.github.jan.supabase.auth.user.UserMfaFactor
@@ -99,9 +99,7 @@ interface AdminApi {
 }
 
 @PublishedApi
-internal class AdminApiImpl(val gotrue: Auth) : AdminApi {
-
-    val api = (gotrue as AuthImpl).api
+internal class AdminApiImpl(val api: AuthenticatedSupabaseApi) : AdminApi {
 
     override suspend fun signOut(jwt: String, scope: SignOutScope) {
         api.post("logout") {

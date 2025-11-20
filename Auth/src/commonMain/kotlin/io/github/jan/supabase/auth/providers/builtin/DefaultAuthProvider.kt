@@ -59,7 +59,7 @@ sealed interface DefaultAuthProvider<C, R> : AuthProvider<C, R> {
         val encodedCredentials = encodeCredentials(config)
         val gotrue = supabaseClient.auth as AuthImpl
         val url = "token?grant_type=$grantType"
-        val response = gotrue.api.postJson(url, encodedCredentials) {
+        val response = gotrue.publicApi.postJson(url, encodedCredentials) {
             redirectUrl?.let { redirectTo(it) }
         }
         response.body<UserSession>().also {
@@ -87,7 +87,7 @@ sealed interface DefaultAuthProvider<C, R> : AuthProvider<C, R> {
             Phone -> "signup"
             IDToken -> "token?grant_type=id_token"
         }
-        val response = gotrue.api.postJson(url, buildJsonObject {
+        val response = gotrue.publicApi.postJson(url, buildJsonObject {
             putJsonObject(body)
             if (codeChallenge != null) {
                 putCodeChallenge(codeChallenge)
