@@ -23,7 +23,7 @@ internal class SupabaseInitializer : Initializer<Context> {
 internal fun applicationContext(): Context = appContext ?: error("Application context not initialized")
 
 @SupabaseInternal
-actual fun Auth.setupPlatform() {
+actual suspend fun Auth.setupPlatform() {
     addLifecycleCallbacks(this)
 }
 

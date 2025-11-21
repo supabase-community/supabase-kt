@@ -1,6 +1,11 @@
+import app.cash.turbine.test
 import io.github.jan.supabase.auth.Auth
+import io.github.jan.supabase.auth.AuthImpl
 import io.github.jan.supabase.auth.BrowserBridge
+import io.github.jan.supabase.auth.FlowType
+import io.github.jan.supabase.auth.MemoryCodeVerifierCache
 import io.github.jan.supabase.auth.auth
+import io.github.jan.supabase.auth.event.AuthEvent
 import io.github.jan.supabase.auth.setupPlatform
 import io.github.jan.supabase.auth.status.SessionStatus
 import io.github.jan.supabase.auth.user.UserInfo
@@ -10,76 +15,166 @@ import io.ktor.client.engine.mock.MockRequestHandleScope
 import io.ktor.client.engine.mock.respond
 import io.ktor.client.request.HttpRequestData
 import io.ktor.client.request.HttpResponseData
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.test.StandardTestDispatcher
-import kotlinx.coroutines.test.TestDispatcher
-import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
-import kotlin.test.BeforeTest
+import kotlinx.serialization.json.Json
+import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 import kotlin.test.assertIs
+import kotlin.test.assertTrue
+import kotlin.time.Clock
+import kotlin.time.Duration.Companion.hours
+
+private const val EXAMPLE_URL = "https://example.com/"
 
 class PlatformSetupTest {
 
-    lateinit var dispatcher: TestDispatcher
-
-    @BeforeTest
-    fun setupDispatcher() {
-        dispatcher = StandardTestDispatcher()
-    }
-
-    @kotlin.test.Test
-    fun testPlatformSetupTestNoCodeOrHash() = runTest(dispatcher) {
-        val auth = createAuthClient(autoSetup = false, dispatcher)
+    @Test
+    fun testPlatformSetupTestNoHash() = runTest {
+        val auth = createAuthClient(autoSetup = false)
         assertEquals(SessionStatus.Initializing, auth.sessionStatus.value)
         auth.setupPlatform()
-        advanceUntilIdle()
         assertIs<SessionStatus.NotAuthenticated>(auth.sessionStatus.value)
     }
 
-    @kotlin.test.Test
-    fun testPlatformSetupWithInvalidHash() = runTest(dispatcher) {
+    @Test
+    fun testPlatformSetupTestNoCode() = runTest {
+        val auth = createAuthClient(autoSetup = false, flowType = FlowType.PKCE)
+        assertEquals(SessionStatus.Initializing, auth.sessionStatus.value)
+        auth.setupPlatform()
+        assertIs<SessionStatus.NotAuthenticated>(auth.sessionStatus.value)
+    }
+
+    @Test
+    fun testPlatformSetupWithInvalidHash() = runTest {
+        var changeUrlCalled = false
         val bridge = BrowserBridgeMock(
-            hash = "abc$#as"
+            hash = "abc$#as",
+            changeUrl = {
+                changeUrlCalled = true
+            }
         )
-        val auth = createAuthClient(autoSetup = false, dispatcher, bridge)
+        val auth = createAuthClient(autoSetup = false, bridge)
         assertEquals(SessionStatus.Initializing, auth.sessionStatus.value);
         auth.setupPlatform()
-        advanceUntilIdle() //TODO: Also check that the hash is unchanged
         assertIs<SessionStatus.NotAuthenticated>(auth.sessionStatus.value)
+        assertFalse { changeUrlCalled }
     }
 
-    @kotlin.test.Test
-    fun testPlatformSetupWithValidSessionHash() = runTest(dispatcher) {
+    @Test
+    fun testPlatformSetupWithValidSessionHash() = runTest {
+        val expiresAt = Clock.System.now() + 100.hours //because this gets lost in the hash and doesn't matter for this test
+        val session = userSession(user = UserInfo(
+            id = "id",
+            aud = "aud")
+        ).copy(expiresAt = expiresAt)
+        var changedUrl = false
+        val bridge = BrowserBridgeMock(
+            hash = "#access_token=${session.accessToken}&refresh_token=${session.refreshToken}&expires_in=${session.expiresIn}&token_type=${session.tokenType}&other=hash&and=another",
+            changeUrl = {
+                assertEquals("$EXAMPLE_URL#other=hash&and=another", it) //The other hash values are not getting removed
+                changedUrl = true
+            }
+        )
+        val auth = createAuthClient(autoSetup = false, bridge, requestHandler = {
+            respondJson(session.user, Json { encodeDefaults = true })
+        }) as AuthImpl
+        assertEquals(SessionStatus.Initializing, auth.sessionStatus.value)
+        auth.setupPlatform()
+        assertIs<SessionStatus.Authenticated>(auth.sessionStatus.value)
+        assertEquals(session, (auth.sessionStatus.value as SessionStatus.Authenticated).session.copy(expiresAt = expiresAt))
+        assertTrue { changedUrl }
+    }
+
+    @Test
+    fun testPlatformSetupWithErrorHash() = runTest {
+        var changedUrl = false
+        val bridge = BrowserBridgeMock(
+            hash = "#error_code=myCode&error_description=Description&error=Error&other=hash&and=another",
+            changeUrl = {
+                assertEquals("$EXAMPLE_URL#other=hash&and=another", it) //The other hash values are not getting removed
+                changedUrl = true
+            }
+        )
+        val auth = createAuthClient(autoSetup = false, bridge)
+        assertEquals(SessionStatus.Initializing, auth.sessionStatus.value)
+        auth.setupPlatform()
+        auth.events.test {
+            val errorEvent = awaitItem()
+            assertIs<AuthEvent.OtpError>(errorEvent)
+            assertEquals("myCode", errorEvent.error)
+            assertEquals("Description (Error)", errorEvent.errorDescription)
+        }
+        assertIs<SessionStatus.NotAuthenticated>(auth.sessionStatus.value)
+        assertTrue { changedUrl }
+    }
+
+    @Test
+    fun testPlatformSetupWithValidPKCECode() = runTest {
         val session = userSession(user = UserInfo(
             id = "id",
             aud = "aud")
         )
+        var changedUrl = false
         val bridge = BrowserBridgeMock(
-            hash = "#access_token=${session.accessToken}&refresh_token=${session.refreshToken}&expires_in=${session.expiresIn}&token_type=${session.tokenType}"
+            href = "$EXAMPLE_URL?code=1234&another=parameter",
+            changeUrl = {
+                assertEquals("$EXAMPLE_URL?another=parameter", it) //The other hash values are not getting removed
+                changedUrl = true
+            }
         )
-        val auth = createAuthClient(autoSetup = false, dispatcher, bridge, requestHandler = {
-            respondJson(session.user)
-        })
+        val auth = createAuthClient(
+            autoSetup = false,
+            bridge = bridge,
+            flowType = FlowType.PKCE,
+            requestHandler = {
+                respondJson(session, Json { encodeDefaults = true })
+            }
+        )
         assertEquals(SessionStatus.Initializing, auth.sessionStatus.value)
         auth.setupPlatform()
-        advanceUntilIdle() //TODO: also check that the hash params were removed
         assertIs<SessionStatus.Authenticated>(auth.sessionStatus.value)
         assertEquals(session, (auth.sessionStatus.value as SessionStatus.Authenticated).session)
+        assertTrue { changedUrl }
+    }
+
+    @Test
+    fun testPlatformSetupWithErrorCode() = runTest {
+        var changedUrl = false
+        val bridge = BrowserBridgeMock(
+            href = "$EXAMPLE_URL?error_code=myCode&error_description=Description&error=Error&other=hash&and=another",
+            changeUrl = {
+                assertEquals("$EXAMPLE_URL?other=hash&and=another", it) //The other hash values are not getting removed
+                changedUrl = true
+            }
+        )
+        val auth = createAuthClient(autoSetup = false, bridge, FlowType.PKCE)
+        assertEquals(SessionStatus.Initializing, auth.sessionStatus.value)
+        auth.setupPlatform()
+        auth.events.test {
+            val errorEvent = awaitItem()
+            assertIs<AuthEvent.OtpError>(errorEvent)
+            assertEquals("myCode", errorEvent.error)
+            assertEquals("Description (Error)", errorEvent.errorDescription)
+        }
+        assertIs<SessionStatus.NotAuthenticated>(auth.sessionStatus.value)
+        assertTrue { changedUrl }
     }
 
     internal fun createAuthClient(
         autoSetup: Boolean,
-        dispatcher: CoroutineDispatcher,
         bridge: BrowserBridge = BrowserBridgeMock(),
+        flowType: FlowType = FlowType.IMPLICIT,
         requestHandler: suspend MockRequestHandleScope.(HttpRequestData) -> HttpResponseData = { respond("") }
     ) = createMockedSupabaseClient(
         configuration = {
-            coroutineDispatcher = dispatcher
             install(Auth) {
                 autoSetupPlatform = autoSetup
                 autoLoadFromStorage = false
+                alwaysAutoRefresh = false
                 browserBridge = bridge
+                this.flowType = flowType
+                codeVerifierCache = MemoryCodeVerifierCache("verifier") //not important
             }
         },
         requestHandler = requestHandler
@@ -90,15 +185,12 @@ class PlatformSetupTest {
 
 internal class BrowserBridgeMock(
     override val hash: String = "",
-    override val href: String = "",
-    private val replaceCurrentUrl: (String) -> Unit = {},
+    override val href: String = "$EXAMPLE_URL$hash",
+    private val changeUrl: (newUrl: String) -> Unit = {},
+    private val hashChangeCallback: () -> Unit = {}
 ): BrowserBridge {
     override fun replaceCurrentUrl(newUrl: String) {
-        replaceCurrentUrl(newUrl)
-    }
-
-    override fun onHashChange(callback: () -> Unit) {
-        TODO("Not yet implemented")
+        this.changeUrl(newUrl)
     }
 
 }

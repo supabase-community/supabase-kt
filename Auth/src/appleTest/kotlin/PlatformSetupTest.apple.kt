@@ -5,23 +5,21 @@ import kotlinx.coroutines.test.runTest
 import kotlin.test.assertEquals
 import kotlin.test.assertIs
 
-actual class PlatformSetupTest {
+class PlatformSetupTest {
 
     @kotlin.test.Test
-    actual fun testPlatformSetupTestNoAutoLoad() {
-        val auth = createAuthClientOld(autoSetup = false, sessionFound = false)
+    fun testPlatformSetupTestNoAutoLoad() = runTest {
+        val auth = createMinimalAuthClient(autoSetup = false)
         auth.setupPlatform()
         assertIs<SessionStatus.NotAuthenticated>(auth.sessionStatus.value)
     }
 
     @kotlin.test.Test
-    actual fun testPlatformSetupTestAutoLoad() {
-        runTest {
-            val auth = createAuthClientOld(autoSetup = true, sessionFound = false) as AuthImpl
-            assertEquals(SessionStatus.Initializing, auth.sessionStatus.value)
-            auth.setupPlatform()
-            assertIs<SessionStatus.NotAuthenticated>(auth.sessionStatus.value)
-        }
+    fun testPlatformSetupTestAutoLoad() = runTest {
+        val auth = createMinimalAuthClient(autoSetup = true) as AuthImpl
+        assertEquals(SessionStatus.Initializing, auth.sessionStatus.value)
+        auth.setupPlatform()
+        assertIs<SessionStatus.NotAuthenticated>(auth.sessionStatus.value)
     }
 
 }

@@ -1,7 +1,7 @@
 package io.github.jan.supabase.auth.server
 
 import io.github.jan.supabase.auth.Auth
-import io.github.jan.supabase.auth.handledUrlParameterError
+import io.github.jan.supabase.auth.url.handledUrlParameterError
 import io.github.jan.supabase.auth.user.UserSession
 import io.github.jan.supabase.logging.d
 import io.ktor.http.ContentType

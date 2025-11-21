@@ -12,8 +12,6 @@ interface BrowserBridge {
 
     fun replaceCurrentUrl(newUrl: String)
 
-    fun onHashChange(callback: () -> Unit)
-
 }
 
 internal class BrowserBridgeImpl(
@@ -29,12 +27,6 @@ internal class BrowserBridgeImpl(
     @OptIn(ExperimentalWasmJsInterop::class)
     override fun replaceCurrentUrl(newUrl: String) {
         window.history.replaceState(null, window.document.title, newUrl)
-    }
-
-    override fun onHashChange(callback: () -> Unit) {
-        window.onhashchange = {
-            callback()
-        }
     }
 
 }

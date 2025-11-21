@@ -1,37 +1,9 @@
 package io.github.jan.supabase.auth
 
 import io.github.jan.supabase.annotations.SupabaseInternal
-import io.github.jan.supabase.auth.event.AuthEvent
-import io.github.jan.supabase.auth.status.SessionStatus
+import io.github.jan.supabase.auth.url.validateHash
 import io.github.jan.supabase.auth.user.UserSession
-import io.github.jan.supabase.buildUrl
-import io.github.jan.supabase.logging.d
 import io.ktor.client.request.HttpRequestBuilder
-
-internal sealed interface UrlValidationResult {
-
-    data object ErrorFound: UrlValidationResult
-
-    data class SessionFound(val session: UserSession): UrlValidationResult
-
-    data object Skipped: UrlValidationResult
-
-}
-
-internal fun Auth.validateHash(hash: String): UrlValidationResult {
-    Auth.logger.d { "Parsing fragment/hash $hash" }
-    val parameters = getFragmentParts(hash)
-    if(handledUrlParameterError { parameters[it] }) {
-        return UrlValidationResult.ErrorFound
-    }
-    val session = try {
-        parseSessionFromFragment(hash)
-    } catch(e: IllegalArgumentException) {
-        Auth.logger.d(e) { "Received invalid session fragment. Ignoring." }
-        return UrlValidationResult.Skipped
-    }
-    return UrlValidationResult.SessionFound(session)
-}
 
 @SupabaseInternal
 fun Auth.parseFragmentAndImportSession(fragment: String, onFinish: (UserSession?) -> Unit = {}) {
@@ -49,52 +21,7 @@ fun Auth.parseFragmentAndImportSession(fragment: String, onFinish: (UserSession?
     }*/
 }
 
-internal fun getFragmentParts(fragment: String) = fragment.split("&").associate {
-    it.split("=").let { pair ->
-        pair[0] to pair[1]
-    }
-}
-
-internal fun checkForUrlParameterError(parameters: (String) -> String?): AuthEvent.OtpError? {
-    val error = parameters("error")
-    val errorCode = parameters("error_code")
-    val errorDescription = parameters("error_description")
-    return if(errorCode != null) {
-        AuthEvent.OtpError(
-            error = errorCode,
-            errorDescription = "$errorDescription ($error)",
-        )
-    } else null
-}
-
-internal fun Auth.handledUrlParameterError(parameters: (String) -> String?): Boolean {
-    val error = checkForUrlParameterError(parameters)
-    return if(error != null) {
-        if(sessionStatus.value !is SessionStatus.Authenticated) {
-            Auth.logger.d { "Found error code in the URL Parameters: $error. Emitting event..." }
-            emitEvent(error)
-        }
-        true
-    } else false
-}
-
 @SupabaseInternal
 fun HttpRequestBuilder.redirectTo(url: String) {
     this.url.parameters["redirect_to"] = url
-}
-
-internal fun consumeHashParameters(parameters: List<String>, url: String): String {
-    return buildUrl(url) {
-        fragment = fragment.split("&").filter {
-            it.split("=").first() !in parameters
-        }.joinToString("&")
-    }
-}
-
-internal fun consumeUrlParameter(parameters: List<String>, url: String): String {
-    return buildUrl(url) {
-        parameters.forEach { parameter ->
-            this.parameters.remove(parameter)
-        }
-    }
 }

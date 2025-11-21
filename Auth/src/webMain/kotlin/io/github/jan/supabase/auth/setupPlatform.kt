@@ -2,12 +2,15 @@ package io.github.jan.supabase.auth
 
 import io.github.jan.supabase.annotations.SupabaseInternal
 import io.github.jan.supabase.auth.status.SessionSource
+import io.github.jan.supabase.auth.url.UrlValidationResult
+import io.github.jan.supabase.auth.url.consumeHashParameters
+import io.github.jan.supabase.auth.url.consumeUrlParameter
+import io.github.jan.supabase.auth.url.handledUrlParameterError
+import io.github.jan.supabase.auth.url.validateHash
 import io.github.jan.supabase.auth.user.UserSession
 import io.github.jan.supabase.logging.d
-import io.github.jan.supabase.logging.e
 import io.github.jan.supabase.logging.w
 import io.ktor.util.PlatformUtils.IS_BROWSER
-import kotlinx.coroutines.launch
 import org.w3c.dom.url.URL
 
 private fun cleanQueryParams(bridge: BrowserBridge) {
@@ -17,8 +20,7 @@ private fun cleanQueryParams(bridge: BrowserBridge) {
 
 private fun cleanHash(bridge: BrowserBridge) {
     val newURL = consumeHashParameters(Auth.HASH_PARAMETERS, bridge.href)
-    //bridge.replaceCurrentUrl(newURL)
-    Auth.logger.e { "hallo" }
+    bridge.replaceCurrentUrl(newURL)
 }
 
 private fun Auth.checkForHash(bridge: BrowserBridge): UserSession? {
@@ -46,49 +48,25 @@ private fun Auth.checkForPKCECode(bridge: BrowserBridge): String? {
     return code
 }
 
-private fun Auth.handleHash(bridge: BrowserBridge) {
-    if(bridge.hash.isBlank()) return initDone()
-    val afterHash = bridge.hash.substring(1)
-
-    if(!afterHash.contains('=')) {
-        // No params after hash, no need to continue
-        return initDone()
-    }
-    Auth.logger.d { "Found hash: $afterHash" }
-    parseFragmentAndImportSession(afterHash) {
-        val newURL = consumeHashParameters(Auth.HASH_PARAMETERS, bridge.href)
-        bridge.replaceCurrentUrl(newURL);
-        initDone()
-    }
-    return
-}
-
-private fun Auth.handlePKCECode(code: String) {
-    this as AuthImpl
+private suspend fun Auth.handlePKCECode(code: String) {
     Auth.logger.d { "Found PCKE code: $code" }
-    authScope.launch {
-        try {
-            val session = exchangeCodeForSession(code)
-            importSession(session, source = SessionSource.External)
-        } catch(e: Exception) {
-            Auth.logger.w(e) { "Failed to exchange PCKE code for session" }
-        }
-        initDone()
+    try {
+        val session = exchangeCodeForSession(code)
+        importSession(session, source = SessionSource.External)
+    } catch(e: Exception) {
+        Auth.logger.w(e) { "Failed to exchange PCKE code for session" }
     }
+    initDone()
 }
 
-private fun Auth.handleHashSession(session: UserSession) {
-    Auth.logger.w { session.toString() }
-    this as AuthImpl
-    authScope.launch {
-        val user = retrieveUser(session.accessToken) //TODO: Potentially catch any errors and still import the session then return false
-        val newSession = session.copy(user = user)
-        importSession(newSession, source = SessionSource.External)
-    }
+private suspend fun Auth.handleHashSession(session: UserSession) {
+    val user = retrieveUser(session.accessToken) //TODO: Potentially catch any errors and still import the session then return false
+    val newSession = session.copy(user = user)
+    importSession(newSession, source = SessionSource.External)
 }
 
 @SupabaseInternal
-actual fun Auth.setupPlatform() {
+actual suspend fun Auth.setupPlatform() {
     if(IS_BROWSER && !config.disableUrlChecking) {
         config.browserBridge?.let { bridge ->
             when(config.flowType) {
@@ -101,10 +79,6 @@ actual fun Auth.setupPlatform() {
                     Auth.logger.d { "Using IMPLICIT flow type, checking for hash..." }
                     val sessionInHash = checkForHash(bridge) ?: return initDone()
                     handleHashSession(sessionInHash)
-                    //Auth.logger.d { "Registering hash change listener..." }
-                    /*bridge.onHashChange {
-                        handleHash()
-                    }*/
                 }
             }
         }
