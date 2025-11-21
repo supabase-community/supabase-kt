@@ -1,5 +1,6 @@
 import io.github.jan.supabase.auth.Auth
 import io.github.jan.supabase.auth.auth
+import io.github.jan.supabase.auth.minimalConfig
 import io.github.jan.supabase.testing.createMockedSupabaseClient
 
 internal fun createMinimalAuthClient(
@@ -8,7 +9,7 @@ internal fun createMinimalAuthClient(
     configuration = {
         install(Auth) {
             autoSetupPlatform = autoSetup
-            autoLoadFromStorage = false
+            minimalConfig()
         }
     }
 ).auth
