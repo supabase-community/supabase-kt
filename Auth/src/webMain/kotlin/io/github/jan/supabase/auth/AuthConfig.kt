@@ -15,7 +15,7 @@ actual class AuthConfig: CustomSerializationConfig, AuthConfigDefaults() {
     var disableUrlChecking: Boolean = false
 
     /**
-     * Interface to access browser properties like the current hash. Can be changed for testing.
+     * Interface to access browser properties like the current hash. By default, null on NodeJS. Can be changed for testing.
      */
     @SupabaseInternal
     var browserBridge: BrowserBridge? = if(IS_BROWSER) BrowserBridgeImpl() else null

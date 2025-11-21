@@ -1,24 +1,27 @@
 package io.github.jan.supabase.auth
 
 import io.github.jan.supabase.annotations.SupabaseInternal
+import io.github.jan.supabase.auth.status.SessionSource
+import io.github.jan.supabase.auth.url.UrlValidationResult
 import io.github.jan.supabase.auth.url.validateHash
 import io.github.jan.supabase.auth.user.UserSession
 import io.ktor.client.request.HttpRequestBuilder
+import kotlinx.coroutines.launch
 
 @SupabaseInternal
 fun Auth.parseFragmentAndImportSession(fragment: String, onFinish: (UserSession?) -> Unit = {}) {
-    val session = validateHash(fragment)
-    if(session == null) {
+    val res = validateHash(fragment)
+    if(res !is UrlValidationResult.SessionFound) {
         onFinish(null)
         return
     }
-    this as AuthImpl
-    /*authScope.launch {
+    val session = res.session
+    authScope.launch {
         val user = retrieveUser(session.accessToken)
         val newSession = session.copy(user = user)
         onFinish(newSession)
         importSession(newSession, source = SessionSource.External)
-    }*/
+    }
 }
 
 @SupabaseInternal
