@@ -20,10 +20,17 @@ internal fun Auth.validateHash(hash: String): UrlValidationResult {
     return UrlValidationResult.SessionFound(session)
 }
 
-internal fun getFragmentParts(fragment: String) = fragment.split("&").associate {
-    it.split("=").let { pair ->
-        pair[0] to pair[1]
-    }
+internal fun getFragmentParts(fragment: String): Map<String, String> {
+    val pairs = fragment.split("&")
+    if(pairs.isEmpty()) return emptyMap()
+    return pairs.mapNotNull {
+        val keyAndValue = it.split("=")
+        keyAndValue.getOrNull(0)?.let { key ->
+            keyAndValue.getOrNull(1)?.let { value ->
+                key to value
+            }
+        }
+    }.toMap()
 }
 
 internal fun consumeHashParameters(parameters: List<String>, url: String): String {
