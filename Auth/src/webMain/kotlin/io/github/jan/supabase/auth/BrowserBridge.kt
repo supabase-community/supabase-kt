@@ -7,7 +7,7 @@ import kotlin.js.ExperimentalWasmJsInterop
 @SupabaseInternal
 interface BrowserBridge {
 
-    val currentHash: String
+    val hash: String
     val href: String
 
     fun replaceCurrentUrl(newUrl: String)
@@ -20,7 +20,7 @@ internal class BrowserBridgeImpl(
     private val window: Window = kotlinx.browser.window
 ): BrowserBridge {
 
-    override val currentHash: String
+    override val hash: String
         get() = window.location.hash
 
     override val href: String
@@ -28,8 +28,13 @@ internal class BrowserBridgeImpl(
 
     @OptIn(ExperimentalWasmJsInterop::class)
     override fun replaceCurrentUrl(newUrl: String) {
-        kotlinx.browser.window.history.replaceState(null, kotlinx.browser.window.document.title, newUrl)
+        window.history.replaceState(null, window.document.title, newUrl)
     }
 
+    override fun onHashChange(callback: () -> Unit) {
+        window.onhashchange = {
+            callback()
+        }
+    }
 
 }

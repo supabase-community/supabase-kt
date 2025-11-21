@@ -3,6 +3,7 @@ package io.github.jan.supabase.testing
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.SupabaseClientBuilder
 import io.github.jan.supabase.createSupabaseClient
+import io.github.jan.supabase.logging.LogLevel
 import io.ktor.client.engine.mock.MockEngine
 import io.ktor.client.engine.mock.MockRequestHandleScope
 import io.ktor.client.engine.mock.respond
@@ -19,6 +20,7 @@ fun createMockedSupabaseClient(
         supabaseUrl = supabaseUrl,
         supabaseKey = supabaseKey,
     ) {
+        defaultLogLevel = LogLevel.DEBUG
         httpEngine = MockEngine {
             requestHandler(this, it)
         }

@@ -9,7 +9,7 @@ class PlatformSetupTest {
 
     @kotlin.test.Test
     fun testPlatformSetupTestNoAutoLoad() {
-        val auth = createAuthClient(autoLoad = false, sessionFound = false)
+        val auth = createAuthClientOld(autoSetup = false, sessionFound = false)
         auth.setupPlatform()
         assertIs<SessionStatus.NotAuthenticated>(auth.sessionStatus.value)
     }
@@ -17,7 +17,7 @@ class PlatformSetupTest {
     @kotlin.test.Test
     fun testPlatformSetupTestAutoLoad() {
         runTest {
-            val auth = createAuthClient(autoLoad = true, sessionFound = false) as AuthImpl
+            val auth = createAuthClientOld(autoSetup = true, sessionFound = false) as AuthImpl
             assertEquals(SessionStatus.Initializing, auth.sessionStatus.value)
             auth.setupPlatform()
             assertIs<SessionStatus.NotAuthenticated>(auth.sessionStatus.value)

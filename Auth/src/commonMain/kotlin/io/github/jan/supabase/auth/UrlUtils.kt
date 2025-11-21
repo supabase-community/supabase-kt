@@ -2,35 +2,51 @@ package io.github.jan.supabase.auth
 
 import io.github.jan.supabase.annotations.SupabaseInternal
 import io.github.jan.supabase.auth.event.AuthEvent
-import io.github.jan.supabase.auth.status.SessionSource
 import io.github.jan.supabase.auth.status.SessionStatus
 import io.github.jan.supabase.auth.user.UserSession
 import io.github.jan.supabase.buildUrl
 import io.github.jan.supabase.logging.d
 import io.ktor.client.request.HttpRequestBuilder
-import kotlinx.coroutines.launch
+
+internal sealed interface UrlValidationResult {
+
+    data object ErrorFound: UrlValidationResult
+
+    data class SessionFound(val session: UserSession): UrlValidationResult
+
+    data object Skipped: UrlValidationResult
+
+}
+
+internal fun Auth.validateHash(hash: String): UrlValidationResult {
+    Auth.logger.d { "Parsing fragment/hash $hash" }
+    val parameters = getFragmentParts(hash)
+    if(handledUrlParameterError { parameters[it] }) {
+        return UrlValidationResult.ErrorFound
+    }
+    val session = try {
+        parseSessionFromFragment(hash)
+    } catch(e: IllegalArgumentException) {
+        Auth.logger.d(e) { "Received invalid session fragment. Ignoring." }
+        return UrlValidationResult.Skipped
+    }
+    return UrlValidationResult.SessionFound(session)
+}
 
 @SupabaseInternal
 fun Auth.parseFragmentAndImportSession(fragment: String, onFinish: (UserSession?) -> Unit = {}) {
-    Auth.logger.d { "Parsing fragment $fragment" }
-    val parameters = getFragmentParts(fragment)
-    if(handledUrlParameterError { parameters[it] }) {
+    val session = validateHash(fragment)
+    if(session == null) {
         onFinish(null)
         return
     }
-    val session = try {
-        parseSessionFromFragment(fragment)
-    } catch(e: IllegalArgumentException) {
-        Auth.logger.d(e) { "Received invalid session fragment. Ignoring." }
-        return
-    }
     this as AuthImpl
-    authScope.launch {
+    /*authScope.launch {
         val user = retrieveUser(session.accessToken)
         val newSession = session.copy(user = user)
         onFinish(newSession)
         importSession(newSession, source = SessionSource.External)
-    }
+    }*/
 }
 
 internal fun getFragmentParts(fragment: String) = fragment.split("&").associate {

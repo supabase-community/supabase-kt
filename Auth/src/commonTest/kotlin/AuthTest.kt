@@ -39,36 +39,32 @@ class AuthTest {
     }
 
     @Test
-    fun testLoadingSessionFromStorage() {
-        runTest {
-            val sessionManager = MemorySessionManager(userSession())
-            val client = createMockedSupabaseClient(
-                configuration = {
-                    install(Auth) {
-                        minimalConfig()
-                        this.sessionManager = sessionManager
-                        autoLoadFromStorage = true
-                    }
+    fun testLoadingSessionFromStorage() = runTest {
+        val sessionManager = MemorySessionManager(userSession())
+        val client = createMockedSupabaseClient(
+            configuration = {
+                install(Auth) {
+                    minimalConfig()
+                    this.sessionManager = sessionManager
+                    autoLoadFromStorage = true
                 }
-            )
-            client.auth.awaitInitialization()
-            assertIs<SessionStatus.Authenticated>(client.auth.sessionStatus.value)
-        }
+            }
+        )
+        client.auth.awaitInitialization()
+        assertIs<SessionStatus.Authenticated>(client.auth.sessionStatus.value)
     }
 
     @Test
-    fun testErrorWhenUsingAccessToken() {
-        runTest {
-            assertFailsWith<IllegalStateException> {
-                createMockedSupabaseClient(
-                    configuration = {
-                        accessToken = {
-                            "myToken"
-                        }
-                        install(Auth)
+    fun testErrorWhenUsingAccessToken() = runTest {
+        assertFailsWith<IllegalStateException> {
+            createMockedSupabaseClient(
+                configuration = {
+                    accessToken = {
+                        "myToken"
                     }
-                )
-            }
+                    install(Auth)
+                }
+            )
         }
     }
 

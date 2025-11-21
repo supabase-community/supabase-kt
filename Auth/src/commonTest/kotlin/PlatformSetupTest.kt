@@ -1,18 +1,17 @@
 import io.github.jan.supabase.auth.Auth
-import io.github.jan.supabase.auth.MemorySessionManager
 import io.github.jan.supabase.auth.auth
-import io.github.jan.supabase.auth.user.UserSession
 import io.github.jan.supabase.testing.createMockedSupabaseClient
+import kotlinx.coroutines.CoroutineDispatcher
 
-internal fun createAuthClient(
-    autoLoad: Boolean,
-    sessionFound: Boolean
+internal fun createAuthClientOld(
+    autoSetup: Boolean,
+    dispatcher: CoroutineDispatcher
 ) = createMockedSupabaseClient(
     configuration = {
+        coroutineDispatcher = dispatcher
         install(Auth) {
-            autoSetupPlatform
-            autoLoadFromStorage = autoLoad
-            sessionManager = if(sessionFound) MemorySessionManager(UserSession("token", "token", expiresIn = 1000, tokenType = "Bearer")) else MemorySessionManager()
+            autoSetupPlatform = autoSetup
+            autoLoadFromStorage = false
         }
     }
 ).auth
