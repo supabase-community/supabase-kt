@@ -84,7 +84,7 @@ class ErrorHandlingTest {
                 }
             }
         )
-
+        supabase.auth.awaitInitialization()
         val handled = supabase.auth.handledUrlParameterError {
             url.parameters[it]
         }
@@ -110,6 +110,7 @@ class ErrorHandlingTest {
             }
         )
 
+        supabase.auth.awaitInitialization()
         val handled = supabase.auth.handledUrlParameterError {
             url.parameters[it]
         }
