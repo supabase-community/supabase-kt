@@ -1,6 +1,7 @@
 package io.github.jan.supabase.auth
 
 import io.github.jan.supabase.SupabaseClient
+import io.github.jan.supabase.auth.url.handledUrlParameterError
 import io.github.jan.supabase.auth.user.UserSession
 import io.github.jan.supabase.logging.d
 import kotlinx.coroutines.launch

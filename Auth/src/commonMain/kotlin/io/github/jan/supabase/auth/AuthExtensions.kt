@@ -1,5 +1,6 @@
 package io.github.jan.supabase.auth
 
+import io.github.jan.supabase.auth.url.getFragmentParts
 import io.github.jan.supabase.auth.user.UserSession
 import io.github.jan.supabase.encodeToJsonElement
 import io.github.jan.supabase.logging.d

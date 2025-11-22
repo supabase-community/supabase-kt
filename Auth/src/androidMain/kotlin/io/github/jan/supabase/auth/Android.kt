@@ -5,6 +5,7 @@ import android.net.Uri
 import androidx.browser.customtabs.CustomTabsIntent
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.annotations.SupabaseInternal
+import io.github.jan.supabase.auth.url.handledUrlParameterError
 import io.github.jan.supabase.auth.user.UserSession
 import kotlinx.coroutines.launch
 

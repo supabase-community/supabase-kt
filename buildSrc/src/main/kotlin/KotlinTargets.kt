@@ -56,12 +56,15 @@ fun KotlinMultiplatformExtension.jsTarget() {
     js {
         browser {
             testTask {
-                enabled = false
+                enabled = true
+                useKarma {
+                    useFirefox()
+                }
             }
         }
         nodejs {
             testTask {
-                enabled = false
+                enabled = true
             }
         }
     }

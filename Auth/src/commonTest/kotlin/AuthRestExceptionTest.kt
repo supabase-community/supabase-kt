@@ -37,7 +37,7 @@ class AuthRestExceptionTest {
                 requestHandler = {
                     respondJson(
                         code = HttpStatusCode.BadRequest,
-                        json = buildJsonObject {
+                        data = buildJsonObject {
                             put("error_code", "error_code")
                             put("message", "error_message")
                         }
@@ -63,7 +63,7 @@ class AuthRestExceptionTest {
                 requestHandler = {
                     respondJson(
                         code = HttpStatusCode.BadRequest,
-                        json = buildJsonObject {
+                        data = buildJsonObject {
                             put("error_code", "weak_password")
                             put("message", "error_message")
                             put("weak_password", buildJsonObject {
@@ -96,7 +96,7 @@ class AuthRestExceptionTest {
                 requestHandler = {
                     respondJson(
                         code = HttpStatusCode.BadRequest,
-                        json = buildJsonObject {
+                        data = buildJsonObject {
                             put("message", "error_message")
                         }
                     )
