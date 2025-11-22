@@ -176,7 +176,6 @@ class AuthTest {
     @Test
     fun testAutoRefreshFailureServerErrorValidSession() {
         runTest {
-            val newSession = userSession()
             val client = createMockedSupabaseClient(configuration = {
                 install(Auth) {
                     minimalConfig()
@@ -186,6 +185,7 @@ class AuthTest {
             }) {
                 respondError(HttpStatusCode.InternalServerError, "{}")
             }
+            client.auth.awaitInitialization()
             assertIs<SessionStatus.NotAuthenticated>(client.auth.sessionStatus.value)
             val session = userSession(expiresIn = 1)
             client.auth.importSession(session)
