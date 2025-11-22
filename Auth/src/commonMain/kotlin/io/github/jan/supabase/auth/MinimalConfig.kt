@@ -11,5 +11,6 @@ fun AuthConfigDefaults.minimalConfig() {
     this.sessionManager = MemorySessionManager()
     this.codeVerifierCache = MemoryCodeVerifierCache()
     this.enableLifecycleCallbacks = false
+    this.autoSetupPlatform = false
 }
 

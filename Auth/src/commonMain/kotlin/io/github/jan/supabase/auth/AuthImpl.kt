@@ -133,6 +133,8 @@ internal class AuthImpl(
                 authScope.launch {
                     setupPlatform()
                 }
+            } else {
+                initDone()
             }
         }
 
