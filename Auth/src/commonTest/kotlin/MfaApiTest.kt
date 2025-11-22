@@ -236,6 +236,7 @@ class MfaApiTest {
             ) {
                 respond("")
             }
+            client.auth.awaitInitialization()
             val factors = if(next == AuthenticatorAssuranceLevel.AAL1) emptyList() else listOf(verifiedFactor())
             client.auth.importSession(userSession(customToken = token, user = UserInfo(id = "id", aud = "aud", factors = factors)))
             val (c, n) = client.auth.mfa.getAuthenticatorAssuranceLevel()
