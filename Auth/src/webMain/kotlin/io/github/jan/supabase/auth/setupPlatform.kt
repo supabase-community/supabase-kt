@@ -67,20 +67,20 @@ private suspend fun Auth.handleHashSession(session: UserSession) {
 
 @SupabaseInternal
 actual suspend fun Auth.setupPlatform() {
-    if(IS_BROWSER && !config.disableUrlChecking) {
-        config.browserBridge?.let { bridge ->
-            when(config.flowType) {
-                FlowType.PKCE -> {
-                    Auth.logger.d { "Using PCKE flow type, checking for PCKE code..." }
-                    val code = checkForPKCECode(bridge) ?: return initDone()
-                    handlePKCECode(code)
-                }
-                FlowType.IMPLICIT -> {
-                    Auth.logger.d { "Using IMPLICIT flow type, checking for hash..." }
-                    val sessionInHash = checkForHash(bridge) ?: return initDone()
-                    handleHashSession(sessionInHash)
-                }
+    if(IS_BROWSER && !config.disableUrlChecking && config.browserBridge != null) {
+        when(config.flowType) {
+            FlowType.PKCE -> {
+                Auth.logger.d { "Using PCKE flow type, checking for PCKE code..." }
+                val code = checkForPKCECode(config.browserBridge!!) ?: return initDone()
+                handlePKCECode(code)
+            }
+            FlowType.IMPLICIT -> {
+                Auth.logger.d { "Using IMPLICIT flow type, checking for hash..." }
+                val sessionInHash = checkForHash(config.browserBridge!!) ?: return initDone()
+                handleHashSession(sessionInHash)
             }
         }
+    } else {
+        initDone()
     }
 }

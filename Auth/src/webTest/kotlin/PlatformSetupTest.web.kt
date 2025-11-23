@@ -15,6 +15,8 @@ import io.ktor.client.engine.mock.MockRequestHandleScope
 import io.ktor.client.engine.mock.respond
 import io.ktor.client.request.HttpRequestData
 import io.ktor.client.request.HttpResponseData
+import io.ktor.util.PlatformUtils.IS_BROWSER
+import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.json.Json
 import kotlin.test.Test
@@ -30,7 +32,7 @@ private const val EXAMPLE_URL = "https://example.com/"
 class PlatformSetupTest {
 
     @Test
-    fun testPlatformSetupTestNoHash() = runTest {
+    fun testPlatformSetupTestNoHash() = runTestOnBrowser {
         val auth = createAuthClient(autoSetup = false)
         assertEquals(SessionStatus.Initializing, auth.sessionStatus.value)
         auth.setupPlatform()
@@ -38,7 +40,7 @@ class PlatformSetupTest {
     }
 
     @Test
-    fun testPlatformSetupTestNoCode() = runTest {
+    fun testPlatformSetupTestNoCode() = runTestOnBrowser {
         val auth = createAuthClient(autoSetup = false, flowType = FlowType.PKCE)
         assertEquals(SessionStatus.Initializing, auth.sessionStatus.value)
         auth.setupPlatform()
@@ -46,7 +48,7 @@ class PlatformSetupTest {
     }
 
     @Test
-    fun testPlatformSetupWithInvalidHash() = runTest {
+    fun testPlatformSetupWithInvalidHash() = runTestOnBrowser {
         var changeUrlCalled = false
         val bridge = BrowserBridgeMock(
             hash = "abc$#as",
@@ -62,7 +64,7 @@ class PlatformSetupTest {
     }
 
     @Test
-    fun testPlatformSetupWithValidSessionHash() = runTest {
+    fun testPlatformSetupWithValidSessionHash() = runTestOnBrowser {
         val expiresAt = Clock.System.now() + 100.hours //because this gets lost in the hash and doesn't matter for this test
         val session = userSession(user = UserInfo(
             id = "id",
@@ -87,7 +89,7 @@ class PlatformSetupTest {
     }
 
     @Test
-    fun testPlatformSetupWithErrorHash() = runTest {
+    fun testPlatformSetupWithErrorHash() = runTestOnBrowser {
         var changedUrl = false
         val bridge = BrowserBridgeMock(
             hash = "#error_code=myCode&error_description=Description&error=Error&other=hash&and=another",
@@ -110,7 +112,7 @@ class PlatformSetupTest {
     }
 
     @Test
-    fun testPlatformSetupWithValidPKCECode() = runTest {
+    fun testPlatformSetupWithValidPKCECode() = runTestOnBrowser {
         val session = userSession(user = UserInfo(
             id = "id",
             aud = "aud")
@@ -139,7 +141,7 @@ class PlatformSetupTest {
     }
 
     @Test
-    fun testPlatformSetupWithErrorCode() = runTest {
+    fun testPlatformSetupWithErrorCode() = runTestOnBrowser {
         var changedUrl = false
         val bridge = BrowserBridgeMock(
             href = "$EXAMPLE_URL?error_code=myCode&error_description=Description&error=Error&other=hash&and=another",
@@ -161,6 +163,13 @@ class PlatformSetupTest {
         assertTrue { changedUrl }
     }
 
+    fun testPlatformSetupOnNode() = runTestOnNode {
+        val auth = createAuthClient(autoSetup = false)
+        assertEquals(SessionStatus.Initializing, auth.sessionStatus.value)
+        auth.setupPlatform()
+        assertIs<SessionStatus.NotAuthenticated>(auth.sessionStatus.value)
+    }
+
     internal fun createAuthClient(
         autoSetup: Boolean,
         bridge: BrowserBridge = BrowserBridgeMock(),
@@ -180,6 +189,9 @@ class PlatformSetupTest {
         requestHandler = requestHandler
     ).auth
 
+    private fun runTestOnBrowser(body: suspend TestScope.() -> Unit) = if(IS_BROWSER) runTest(testBody = body) else runTest {}
+
+    private fun runTestOnNode(body: suspend TestScope.() -> Unit) = if(!IS_BROWSER) runTest(testBody = body) else runTest {}
 
 }
 
