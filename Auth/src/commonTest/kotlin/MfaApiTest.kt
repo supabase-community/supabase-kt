@@ -184,6 +184,7 @@ class MfaApiTest {
         ) {
             respond("")
         }
+        client.auth.awaitInitialization()
         client.auth.mfa.statusFlow.test {
             assertEquals(MfaStatus(enabled = false, active = false), awaitItem())
             client.auth.importSession(createSession(AuthenticatorAssuranceLevel.AAL1, AuthenticatorAssuranceLevel.AAL2))
