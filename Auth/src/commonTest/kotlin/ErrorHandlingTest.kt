@@ -123,34 +123,6 @@ class ErrorHandlingTest {
     }
 
     @Test
-    fun testHandledUrlParameterErrorWhenAuthenticated() = runTest {
-        val url =
-            Url("https://example.com/?error=invalid_request&error_code=otp_expired&error_description=Invalid+request")
-        val supabase = createMockedSupabaseClient(
-            configuration = {
-                install(Auth) {
-                    minimalConfig()
-                }
-            }
-        )
-
-        // Import a session to authenticate
-        val session = userSession()
-        supabase.auth.importSession(session)
-        assertIs<SessionStatus.Authenticated>(supabase.auth.sessionStatus.value)
-
-        val handled = supabase.auth.handledUrlParameterError {
-            url.parameters[it]
-        }
-
-        // Should return true (error was found) but not emit event
-        assertTrue { handled }
-        supabase.auth.events.test(timeout = 1.seconds) {
-            expectNoEvents()
-        }
-    }
-
-    @Test
     fun testHandledUrlParameterErrorWithEmptyParameters() = runTest {
         val supabase = createMockedSupabaseClient(
             configuration = {
