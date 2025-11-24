@@ -158,6 +158,7 @@ class MfaApiTest {
         ) {
             respondJson(UserInfo(id = "id", aud = "aud", factors = listOf(expectedFactor)))
         }
+        client.auth.awaitInitialization()
         client.auth.importAuthToken("token")
         val factors = client.auth.mfa.retrieveFactorsForCurrentUser()
         assertEquals(1, factors.size)
