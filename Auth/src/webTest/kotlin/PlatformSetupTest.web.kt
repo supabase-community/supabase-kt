@@ -163,6 +163,7 @@ class PlatformSetupTest {
         assertTrue { changedUrl }
     }
 
+    @Test
     fun testPlatformSetupOnNode() = runTestOnNode {
         val auth = createAuthClient(autoSetup = false)
         assertEquals(SessionStatus.Initializing, auth.sessionStatus.value)
