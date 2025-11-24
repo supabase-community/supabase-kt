@@ -114,6 +114,7 @@ class AuthTest {
                     assertIs<SessionSource.Refresh>(item.source)
                     assertEquals(newSession.expiresIn, client.auth.currentSessionOrNull()?.expiresIn)
                 }
+            client.auth.stopAutoRefreshForCurrentSession()
         }
     }
 
@@ -170,6 +171,7 @@ class AuthTest {
                 assertIs<AuthEvent.RefreshFailure>(event)
                 assertIs<RefreshFailureCause.NetworkError>(event.cause)
             }
+            client.auth.stopAutoRefreshForCurrentSession()
         }
     }
 
@@ -195,6 +197,7 @@ class AuthTest {
                 assertIs<AuthEvent.RefreshFailure>(event)
                 assertIs<RefreshFailureCause.InternalServerError>(event.cause)
             }
+            client.auth.stopAutoRefreshForCurrentSession()
         }
     }
 
