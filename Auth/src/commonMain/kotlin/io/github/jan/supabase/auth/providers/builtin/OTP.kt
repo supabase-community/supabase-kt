@@ -82,7 +82,7 @@ data object OTP: AuthProvider<OTP.Config, Unit> {
             supabaseClient.auth.codeVerifierCache.saveCodeVerifier(codeVerifier)
             codeChallenge = generateCodeChallenge(codeVerifier)
         }
-        (supabaseClient.auth as AuthImpl).api.postJson("otp", buildJsonObject {
+        (supabaseClient.auth as AuthImpl).publicApi.postJson("otp", buildJsonObject {
             putJsonObject(body)
             codeChallenge?.let {
                 put("code_challenge", it)
