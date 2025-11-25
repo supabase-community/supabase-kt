@@ -60,7 +60,7 @@ private suspend fun Auth.handlePKCECode(code: String) {
 }
 
 private suspend fun Auth.handleHashSession(session: UserSession) {
-    val user = retrieveUser(session.accessToken) //TODO: Potentially catch any errors and still import the session then return false
+    val user = tryToGetUser(session.accessToken)
     val newSession = session.copy(user = user)
     importSession(newSession, source = SessionSource.External)
 }

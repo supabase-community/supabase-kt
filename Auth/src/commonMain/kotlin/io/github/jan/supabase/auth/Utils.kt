@@ -3,6 +3,9 @@ package io.github.jan.supabase.auth
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.auth.status.SessionStatus
 import io.github.jan.supabase.auth.user.UserSession
+import io.github.jan.supabase.logging.e
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
 
 internal fun invalidArg(message: String): Nothing = throw IllegalArgumentException(message)
 
@@ -18,4 +21,12 @@ internal fun Auth.initDone() {
     if(sessionStatus.value is SessionStatus.Initializing) {
         setSessionStatus(SessionStatus.NotAuthenticated())
     }
+}
+
+internal suspend fun Auth.tryToGetUser(accessToken: String) = try {
+    retrieveUser(accessToken)
+} catch (e: Exception) {
+    currentCoroutineContext().ensureActive()
+    Auth.logger.e(e) { "Couldn't retrieve user using access token $accessToken.\nIf you use the project secret, ignore this message." }
+    null
 }
