@@ -73,6 +73,17 @@ class RealtimeExtTest {
                 },
                 supabaseHandler = {
                     val channel = it.channel("channelId")
+                    channel.callbackManager.setServerChanges(
+                        listOf(
+                            PostgresJoinConfig(
+                                "public",
+                                "table",
+                                "id=eq.0",
+                                "*",
+                                0
+                            )
+                        )
+                    )
                     val dataFlow = channel.postgresListDataFlow(
                         "public",
                         "table",
@@ -82,7 +93,6 @@ class RealtimeExtTest {
                     dataFlow.test(FLOW_TIMEOUT) {
                         assertContentEquals(listOf(DummyData(0, "first")), awaitItem()) //1. Initial data
                         channel.subscribe(true)
-                        channel.callbackManager.setServerChanges(listOf(PostgresJoinConfig("public", "table", "id=eq.0", "*", 0)))
                         channel.callbackManager.triggerPostgresChange<PostgresAction.Update>(DummyData(0, "second"), DummyData(0, "first")) //2.
                         assertContentEquals(listOf(DummyData(0, "second")), awaitItem()) //2.
                         channel.callbackManager.triggerPostgresChange<PostgresAction.Insert>(DummyData(1, "third"), null) //3.
@@ -115,13 +125,24 @@ class RealtimeExtTest {
                 },
                 supabaseHandler = {
                     val channel = it.channel("channelId")
+                    // Set server changes before creating the data flow to avoid race conditions
+                    channel.callbackManager.setServerChanges(
+                        listOf(
+                            PostgresJoinConfig(
+                                "public",
+                                "table",
+                                "key=eq.0",
+                                "*",
+                                0
+                            )
+                        )
+                    )
                     val dataFlow = channel.postgresSingleDataFlow("public", "table", primaryKey = DummyData::key) {
                         eq("id", 0)
                     }
                     dataFlow.test(FLOW_TIMEOUT) {
                         assertEquals(DummyData(0, "content"), awaitItem()) //1.
                         channel.subscribe(true)
-                        channel.callbackManager.setServerChanges(listOf(PostgresJoinConfig("public", "table", "key=eq.0", "*", 0))) //The method will add a filter for the primary key. In this case 0.
                         channel.callbackManager.triggerPostgresChange<PostgresAction.Update>(DummyData(0, "content4"), DummyData(0, "content")) //2.
                         assertEquals(DummyData(0, "content4"), awaitItem()) //2.
                         channel.callbackManager.triggerPostgresChange<PostgresAction.Delete>(null, DummyData(0)) //3.

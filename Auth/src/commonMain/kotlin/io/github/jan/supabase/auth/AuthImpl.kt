@@ -82,7 +82,7 @@ internal class AuthImpl(
     private val _events = MutableSharedFlow<AuthEvent>(replay = 1)
     override val events: SharedFlow<AuthEvent> = _events.asSharedFlow()
     @Suppress("DEPRECATION")
-    internal val authScope = CoroutineScope((config.coroutineDispatcher ?: supabaseClient.coroutineDispatcher) + SupervisorJob())
+    override val authScope = CoroutineScope((config.coroutineDispatcher ?: supabaseClient.coroutineDispatcher) + SupervisorJob())
     override val sessionManager = config.sessionManager ?: createDefaultSessionManager()
     override val codeVerifierCache = config.codeVerifierCache ?: createDefaultCodeVerifierCache()
 
@@ -122,14 +122,20 @@ internal class AuthImpl(
                     Auth.logger.i {
                         "No session found in storage."
                     }
-                    setSessionStatus(SessionStatus.NotAuthenticated())
+                }
+                if(config.autoSetupPlatform) {
+                    setupPlatform()
                 }
             }
         } else {
             Auth.logger.d { "Skipping loading from storage (autoLoadFromStorage is set to false)" }
-            setSessionStatus(SessionStatus.NotAuthenticated())
+            if(config.autoSetupPlatform) {
+                authScope.launch {
+                    setupPlatform()
+                }
+            }
         }
-        setupPlatform()
+
         Auth.logger.d { "Initialized Auth plugin" }
     }
 
@@ -654,7 +660,7 @@ internal class AuthImpl(
 }
 
 @SupabaseInternal
-expect fun Auth.setupPlatform()
+expect suspend fun Auth.setupPlatform()
 
 @SupabaseInternal
 expect fun Auth.createDefaultSessionManager(): SessionManager

@@ -25,13 +25,11 @@ import io.github.jan.supabase.auth.user.UserUpdateBuilder
 import io.github.jan.supabase.exceptions.HttpRequestException
 import io.github.jan.supabase.exceptions.RestException
 import io.github.jan.supabase.logging.SupabaseLogger
-import io.github.jan.supabase.logging.e
 import io.github.jan.supabase.plugins.CustomSerializationPlugin
 import io.github.jan.supabase.plugins.MainPlugin
 import io.github.jan.supabase.plugins.SupabasePluginProvider
 import io.ktor.client.plugins.HttpRequestTimeoutException
-import kotlinx.coroutines.currentCoroutineContext
-import kotlinx.coroutines.ensureActive
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.serialization.json.JsonObject
@@ -91,6 +89,12 @@ interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
      * The cache for the code verifier. This is used for PKCE authentication. Can be customized via [AuthConfig.codeVerifierCache]
      */
     val codeVerifierCache: CodeVerifierCache
+
+    /**
+     * The coroutine scope used for background auth requests (e.g. session refreshes)
+     */
+    @SupabaseInternal
+    val authScope: CoroutineScope
 
     /**
      * Signs up a new user with the specified [provider]
@@ -507,11 +511,3 @@ interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
  */
 val SupabaseClient.auth: Auth
     get() = pluginManager.getPlugin(Auth)
-
-private suspend fun Auth.tryToGetUser(jwt: String) = try {
-    retrieveUser(jwt)
-} catch (e: Exception) {
-    currentCoroutineContext().ensureActive()
-    Auth.logger.e(e) { "Couldn't retrieve user using your custom jwt token. If you use the project secret ignore this message" }
-    null
-}

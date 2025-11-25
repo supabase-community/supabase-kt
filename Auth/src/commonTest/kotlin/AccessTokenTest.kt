@@ -11,63 +11,55 @@ import kotlin.test.assertNull
 class AccessTokenTest {
 
     @Test
-    fun testAccessTokenWithJwtToken() {
-        runTest {
-            val client = createMockedSupabaseClient(
-                configuration = {
-                    install(Auth) {
-                        minimalConfig()
-                    }
+    fun testAccessTokenWithJwtToken() = runTest {
+        val client = createMockedSupabaseClient(
+            configuration = {
+                install(Auth) {
+                    minimalConfig()
                 }
-            )
-            client.auth.importAuthToken("myAuth") //this should be ignored as per plugin tokens override the used access token
-            assertEquals("myJwtToken", client.resolveAccessToken("myJwtToken"))
-        }
+            }
+        )
+        client.auth.awaitInitialization()
+        client.auth.importAuthToken("myAuth") //this should be ignored as per plugin tokens override the used access token
+        assertEquals("myJwtToken", client.resolveAccessToken("myJwtToken"))
     }
 
     @Test
-    fun testAccessTokenWithKeyAsFallback() {
-        runTest {
-            val client = createMockedSupabaseClient(supabaseKey = "myKey")
-            assertEquals("myKey", client.resolveAccessToken())
-        }
+    fun testAccessTokenWithKeyAsFallback() = runTest {
+        val client = createMockedSupabaseClient(supabaseKey = "myKey")
+        assertEquals("myKey", client.resolveAccessToken())
     }
 
     @Test
-    fun testAccessTokenWithoutKey() {
-        runTest {
-            val client = createMockedSupabaseClient()
-            assertNull(client.resolveAccessToken(keyAsFallback = false))
-        }
+    fun testAccessTokenWithoutKey() = runTest {
+        val client = createMockedSupabaseClient()
+        assertNull(client.resolveAccessToken(keyAsFallback = false))
     }
 
     @Test
-    fun testAccessTokenWithCustomAccessToken() {
-        runTest {
-            val client = createMockedSupabaseClient(
-                configuration = {
-                    accessToken = {
-                        "myCustomToken"
-                    }
+    fun testAccessTokenWithCustomAccessToken() = runTest {
+        val client = createMockedSupabaseClient(
+            configuration = {
+                accessToken = {
+                    "myCustomToken"
                 }
-            )
-            assertEquals("myCustomToken", client.resolveAccessToken())
-        }
+            }
+        )
+        assertEquals("myCustomToken", client.resolveAccessToken())
     }
 
     @Test
-    fun testAccessTokenWithAuth() {
-        runTest {
-            val client = createMockedSupabaseClient(
-                configuration = {
-                    install(Auth) {
-                        minimalConfig()
-                    }
+    fun testAccessTokenWithAuth() = runTest {
+        val client = createMockedSupabaseClient(
+            configuration = {
+                install(Auth) {
+                    minimalConfig()
                 }
-            )
-            client.auth.importAuthToken("myAuth")
-            assertEquals("myAuth", client.resolveAccessToken())
-        }
+            }
+        )
+        client.auth.awaitInitialization()
+        client.auth.importAuthToken("myAuth")
+        assertEquals("myAuth", client.resolveAccessToken())
     }
 
 }

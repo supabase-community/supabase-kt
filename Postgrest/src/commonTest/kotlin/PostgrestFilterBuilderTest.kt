@@ -20,9 +20,9 @@ class PostgrestFilterBuilderTest {
     @Test
     fun filterFloat() {
         val filter = filterToString {
-            eq("id", 1.0)
+            eq("id", 1.1)
         }
-        assertEquals("id=eq.1.0", filter)
+        assertEquals("id=eq.1.1", filter)
     }
 
     @Test

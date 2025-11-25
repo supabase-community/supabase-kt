@@ -260,6 +260,7 @@ class StorageTest {
                 assertEquals("Bearer $key", it.headers["Authorization"], "Authorization header should be 'Bearer test-key'")
                 respond("[]")
             }
+            client.auth.awaitInitialization()
             client.auth.importAuthToken(key)
             client.storage.listBuckets()
         }
