@@ -8,7 +8,7 @@ import org.gradle.kotlin.dsl.get
 
 fun Project.configureLibraryAndroidTarget(
     namespace: String? = null,
-    minSdk: Int = 21,
+    minSdk: Int = 23,
     javaVersion: JavaVersion = JavaVersion.VERSION_1_8
 ) {
     extensions.configure(LibraryExtension::class) {
