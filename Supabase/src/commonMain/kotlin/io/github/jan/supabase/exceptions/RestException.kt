@@ -1,7 +1,11 @@
 package io.github.jan.supabase.exceptions
 
+import io.github.jan.supabase.maskString
+import io.github.jan.supabase.maskUrl
 import io.ktor.client.statement.HttpResponse
 import io.ktor.client.statement.request
+import io.ktor.http.Headers
+import io.ktor.util.toMap
 
 /**
  * Base class for all response-related exceptions
@@ -17,8 +21,8 @@ import io.ktor.client.statement.request
  */
 open class RestException(val error: String, val description: String?, val response: HttpResponse): Exception("""
         $error${description?.let { "\n$it" } ?: ""}
-        URL: ${response.request.url}
-        Headers: ${response.request.headers.entries()}
+        URL: ${maskUrl(response.request.url)}
+        Headers: ${maskHeaders(response.request.headers)}
         Http Method: ${response.request.method.value}
 """.trimIndent()) {
 
@@ -28,6 +32,16 @@ open class RestException(val error: String, val description: String?, val respon
     val statusCode = response.status.value
 
 }
+
+private val SENSITIVE_HEADERS = listOf("apikey", "Authorization")
+
+private fun maskHeaders(headers: Headers): String = headers.toMap().mapValues { (key, value) ->
+    if(key in SENSITIVE_HEADERS) {
+        value.firstOrNull()?.let {
+            listOf(if(key == "Authorization") "Bearer ${maskString(it.drop(7), showLength = true)}" else maskString(it, showLength = true))
+        }
+    } else value
+}.toString()
 
 /**
  * Thrown when supabase-kt receives a response indicating an authentication error
