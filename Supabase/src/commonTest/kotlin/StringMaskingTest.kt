@@ -1,6 +1,8 @@
+import io.github.jan.supabase.maskHeaders
 import io.github.jan.supabase.maskString
 import io.github.jan.supabase.maskUrl
 import io.ktor.http.Url
+import io.ktor.http.headers
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -24,6 +26,21 @@ class StringMaskingTest {
     @Test
     fun testUrl() {
         assertEquals("https://ab.../test?parameter=true", maskUrl(Url("https://abcdefg.supabase.co/test?parameter=true")))
+    }
+
+    @Test
+    fun testHeaderMasking() {
+        val headers = headers {
+            set("aa", "bb")
+            set("another", "one")
+            set("apikey", "areallylongkey")
+            set("Authorization", "Bearer thisisasecretkey")
+        }
+        val maskedString = maskHeaders(headers)
+        assertEquals(
+            "{aa=[bb], another=[one], apikey=[ar... (len=14)], Authorization=[Bearer th... (len=16)]}",
+            maskedString
+        )
     }
 
 }
