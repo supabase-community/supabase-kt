@@ -1,5 +1,5 @@
 name: Documentation enhancement
-description: Template for feature request
+description: Template for documentation enhancement requests
 title: '[Docs]: '
 labels: ["enhancement", "documentation"]
 body:
