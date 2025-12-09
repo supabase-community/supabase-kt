@@ -5,7 +5,6 @@ import io.github.jan.supabase.exceptions.SupabaseEncodingException
 import io.github.jan.supabase.logging.i
 import io.ktor.client.statement.HttpResponse
 import io.ktor.client.statement.bodyAsText
-import io.ktor.http.URLBuilder
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.MissingFieldException
 import kotlinx.serialization.SerializationException
@@ -30,13 +29,6 @@ suspend inline fun <reified T> HttpResponse.safeBody(context: String? = null): T
     } catch(e: MissingFieldException) {
         throw SupabaseEncodingException("Couldn't decode payload$contextMessage as ${T::class.simpleName}. Input: ${text.replace("\n", "")}")
     }
-}
-
-@SupabaseInternal
-inline fun buildUrl(baseUrl: String, init: URLBuilder.() -> Unit): String {
-    val builder = URLBuilder(baseUrl)
-    builder.init()
-    return builder.buildString()
 }
 
 @SupabaseInternal
