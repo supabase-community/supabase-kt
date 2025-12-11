@@ -3,7 +3,6 @@ package io.github.jan.supabase
 import io.github.jan.supabase.annotations.SupabaseDsl
 import io.github.jan.supabase.annotations.SupabaseInternal
 import io.github.jan.supabase.logging.LogLevel
-import io.github.jan.supabase.network.NetworkInterceptor
 import io.github.jan.supabase.plugins.PluginManager
 import io.github.jan.supabase.plugins.SupabasePlugin
 import io.github.jan.supabase.plugins.SupabasePluginProvider
@@ -95,13 +94,6 @@ class SupabaseClientBuilder @PublishedApi internal constructor(private val supab
      * The current operating system information.
      */
     var osInformation: OSInformation? = OSInformation.CURRENT
-
-    /**
-     * A list of [NetworkInterceptor]s. Used for modifying requests or handling responses.
-     */
-    @SupabaseInternal
-    var networkInterceptors = mutableListOf<NetworkInterceptor>()
-
     private val httpConfigOverrides = mutableListOf<HttpConfigOverride>()
     private val plugins = mutableMapOf<String, PluginProvider>()
 
@@ -131,8 +123,7 @@ class SupabaseClientBuilder @PublishedApi internal constructor(private val supab
                 useHTTPS = useHTTPS,
                 httpEngine = httpEngine,
                 httpConfigOverrides = httpConfigOverrides,
-                requestTimeout = requestTimeout,
-                interceptors = networkInterceptors
+                requestTimeout = requestTimeout
             ),
             defaultSerializer = defaultSerializer,
             coroutineDispatcher = coroutineDispatcher,

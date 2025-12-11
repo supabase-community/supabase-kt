@@ -49,9 +49,6 @@ class KtorSupabaseHttpClient @SupabaseInternal constructor(
     private val engine = networkConfig.httpEngine
     private val modifiers = networkConfig.httpConfigOverrides
 
-    private val beforeInterceptors = networkConfig.interceptors.filterIsInstance<NetworkInterceptor.Before>().toTypedArray()
-    private val afterInterceptors = networkConfig.interceptors.filterIsInstance<NetworkInterceptor.After>().toTypedArray()
-
     init {
         SupabaseClient.LOGGER.d { "Creating KtorSupabaseHttpClient with request timeout $requestTimeout, HttpClientEngine: $engine" }
     }
@@ -68,7 +65,6 @@ class KtorSupabaseHttpClient @SupabaseInternal constructor(
         }
         val endPoint = request.url.encodedPath
         SupabaseClient.LOGGER.d { "Starting ${request.method.value} request to endpoint $endPoint" }
-        callBeforeInterceptors(request)
         val response = try {
             httpClient.request(url, builder)
         } catch(e: HttpRequestTimeoutException) {
@@ -81,7 +77,6 @@ class KtorSupabaseHttpClient @SupabaseInternal constructor(
             SupabaseClient.LOGGER.e(e) { "${request.method.value} request to endpoint $endPoint failed with exception ${e.message}" }
             throw HttpRequestException(e.message ?: "", request)
         }
-        callAfterInterceptors(response)
         val responseTime = (response.responseTime.timestamp - response.requestTime.timestamp).milliseconds
         SupabaseClient.LOGGER.d { "${request.method.value} request to endpoint $endPoint successfully finished in $responseTime" }
         return response
@@ -111,18 +106,6 @@ class KtorSupabaseHttpClient @SupabaseInternal constructor(
     }
 
     fun close() = httpClient.close()
-
-    private fun callBeforeInterceptors(requestBuilder: HttpRequestBuilder) {
-        beforeInterceptors.forEach {
-            it.call(requestBuilder, supabase)
-        }
-    }
-
-    private fun callAfterInterceptors(response: HttpResponse) {
-        afterInterceptors.forEach {
-            it.call(response, supabase)
-        }
-    }
 
     private fun HttpClientConfig<*>.applyDefaultConfiguration(modifiers: List<HttpClientConfig<*>.() -> Unit>) {
         install(DefaultRequest) {

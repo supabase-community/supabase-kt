@@ -505,9 +505,7 @@ interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
         override fun create(supabaseClient: SupabaseClient, config: AuthConfig): Auth = AuthImpl(supabaseClient, config)
 
         override fun setup(builder: SupabaseClientBuilder, config: AuthConfig) {
-            if(config.checkSessionOnRequest) {
-                builder.networkInterceptors.add(SessionNetworkInterceptor)
-            }
+
         }
 
     }

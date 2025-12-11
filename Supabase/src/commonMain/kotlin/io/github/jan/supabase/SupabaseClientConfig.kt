@@ -1,7 +1,6 @@
 package io.github.jan.supabase
 
 import io.github.jan.supabase.logging.LogLevel
-import io.github.jan.supabase.network.NetworkInterceptor
 import io.ktor.client.engine.HttpClientEngine
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlin.time.Duration
@@ -22,6 +21,5 @@ data class SupabaseNetworkConfig(
     val useHTTPS: Boolean,
     val httpEngine: HttpClientEngine?,
     val httpConfigOverrides: List<HttpConfigOverride>,
-    val interceptors: List<NetworkInterceptor>,
     val requestTimeout: Duration
 )
