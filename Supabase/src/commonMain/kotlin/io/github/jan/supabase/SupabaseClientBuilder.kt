@@ -94,7 +94,6 @@ class SupabaseClientBuilder @PublishedApi internal constructor(private val supab
      * The current operating system information.
      */
     var osInformation: OSInformation? = OSInformation.CURRENT
-
     private val httpConfigOverrides = mutableListOf<HttpConfigOverride>()
     private val plugins = mutableMapOf<String, PluginProvider>()
 

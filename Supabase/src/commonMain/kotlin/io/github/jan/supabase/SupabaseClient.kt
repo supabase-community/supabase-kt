@@ -19,6 +19,11 @@ import kotlinx.coroutines.CoroutineDispatcher
 interface SupabaseClient {
 
     /**
+     * The configuration for the Supabase Client.
+     */
+    val config: SupabaseClientConfig
+
+    /**
      * The supabase url with either a http or https scheme.
      */
     val supabaseHttpUrl: String
@@ -93,7 +98,7 @@ interface SupabaseClient {
 }
 
 internal class SupabaseClientImpl(
-    config: SupabaseClientConfig,
+    override val config: SupabaseClientConfig,
 ) : SupabaseClient {
 
     override val accessToken: AccessTokenProvider? = config.accessToken
@@ -117,11 +122,7 @@ internal class SupabaseClientImpl(
 
     @OptIn(SupabaseInternal::class)
     override val httpClient = KtorSupabaseHttpClient(
-        supabaseKey,
-        config.networkConfig.httpConfigOverrides,
-        config.networkConfig.requestTimeout.inWholeMilliseconds,
-        config.networkConfig.httpEngine,
-        config.osInformation
+        this
     )
 
     override val pluginManager = PluginManager(config.plugins.toList().associate { (key, value) ->
