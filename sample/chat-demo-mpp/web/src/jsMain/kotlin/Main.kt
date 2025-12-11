@@ -1,6 +1,6 @@
 // Copyright 2000-2021 JetBrains s.r.o. and contributors. Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE file.
 import androidx.compose.ui.ExperimentalComposeUiApi
-import androidx.compose.ui.window.CanvasBasedWindow
+import androidx.compose.ui.window.ComposeViewport
 import io.github.jan.supabase.common.App
 import io.github.jan.supabase.common.ChatViewModel
 import io.github.jan.supabase.common.di.initKoin
@@ -19,7 +19,7 @@ fun main() {
     initKoin()
     val root = RootComponent()
     onWasmReady {
-        CanvasBasedWindow(title = "Demo Chat App") {
+        ComposeViewport("ComposeTarget") {
             App(root.viewModel)
         }
     }
