@@ -41,6 +41,7 @@ class FunctionsTest {
                     respond("")
                 }
             )
+            supabase.auth.awaitInitialization()
             supabase.auth.importAuthToken(expectedJWT)
             supabase.functions.invoke(
                 function = ""

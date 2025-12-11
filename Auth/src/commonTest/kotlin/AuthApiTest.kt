@@ -403,7 +403,7 @@ class AuthRequestTest {
                 assertEquals(expectedAccessToken, body["access_token"]?.jsonPrimitive?.content)
                 assertEquals(expectedNonce, body["nonce"]?.jsonPrimitive?.content)
                 // ensure we signal linking
-                assertEquals("true", body["linkIdentity"]?.jsonPrimitive?.content)
+                assertEquals("true", body["link_identity"]?.jsonPrimitive?.content)
                 respondJson(
                     sampleUserSession()
                 )

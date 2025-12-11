@@ -8,7 +8,7 @@ body:
     attributes:
       label: General Info
       options:
-        - label: I installed the latest version of Supabase Kt
+        - label: I installed the latest version of supabase-kt
           required: true
         - label: I checked for similar feature requests
           required: true

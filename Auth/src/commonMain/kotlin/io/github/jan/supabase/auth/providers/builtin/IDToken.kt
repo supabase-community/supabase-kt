@@ -41,7 +41,7 @@ data object IDToken : DefaultAuthProvider<IDToken.Config, UserInfo> {
         var provider: IDTokenProvider? = null,
         @SerialName("access_token") var accessToken: String? = null,
         var nonce: String? = null,
-        @property:SupabaseInternal var linkIdentity: Boolean = false
+        @property:SupabaseInternal @SerialName("link_identity") var linkIdentity: Boolean = false
     ) : DefaultAuthProvider.Config()
 
     @OptIn(ExperimentalSerializationApi::class)

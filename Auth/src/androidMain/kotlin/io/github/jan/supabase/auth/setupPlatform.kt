@@ -23,26 +23,25 @@ internal class SupabaseInitializer : Initializer<Context> {
 internal fun applicationContext(): Context = appContext ?: error("Application context not initialized")
 
 @SupabaseInternal
-actual fun Auth.setupPlatform() {
+actual suspend fun Auth.setupPlatform() {
     addLifecycleCallbacks(this)
 }
 
-private fun addLifecycleCallbacks(gotrue: Auth) {
-    if(!gotrue.config.enableLifecycleCallbacks) return
+private fun addLifecycleCallbacks(auth: Auth) {
+    if(!auth.config.enableLifecycleCallbacks) return auth.initDone()
     val lifecycle = ProcessLifecycleOwner.get().lifecycle
-    gotrue as AuthImpl
-    val scope = gotrue.authScope
+    val scope = auth.authScope
     scope.launch(Dispatchers.Main) {
         lifecycle.addObserver(
             object : DefaultLifecycleObserver {
 
                 override fun onStart(owner: LifecycleOwner) {
-                    if(!gotrue.isAutoRefreshRunning && gotrue.config.alwaysAutoRefresh) {
+                    if(!auth.isAutoRefreshRunning && auth.config.alwaysAutoRefresh) {
                         Auth.logger.d {
                             "Trying to re-load session from storage..."
                         }
                         scope.launch {
-                            val sessionFound = gotrue.loadFromStorage()
+                            val sessionFound = auth.loadFromStorage()
                             if(!sessionFound) {
                                 Auth.logger.d {
                                     "No session found, not starting auto refresh"
@@ -52,15 +51,16 @@ private fun addLifecycleCallbacks(gotrue: Auth) {
                                     "Session found, auto refresh started"
                                 }
                             }
+                            auth.initDone()
                         }
                     }
                 }
                 override fun onStop(owner: LifecycleOwner) {
-                    if(gotrue.isAutoRefreshRunning) {
+                    if(auth.isAutoRefreshRunning) {
                         Auth.logger.d { "Cancelling auto refresh because app is switching to the background" }
                         scope.launch {
-                            gotrue.stopAutoRefreshForCurrentSession()
-                            gotrue.setSessionStatus(SessionStatus.Initializing)
+                            auth.stopAutoRefreshForCurrentSession()
+                            auth.setSessionStatus(SessionStatus.Initializing)
                         }
                     }
                 }

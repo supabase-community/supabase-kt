@@ -39,36 +39,32 @@ class AuthTest {
     }
 
     @Test
-    fun testLoadingSessionFromStorage() {
-        runTest {
-            val sessionManager = MemorySessionManager(userSession())
-            val client = createMockedSupabaseClient(
-                configuration = {
-                    install(Auth) {
-                        minimalConfig()
-                        this.sessionManager = sessionManager
-                        autoLoadFromStorage = true
-                    }
+    fun testLoadingSessionFromStorage() = runTest {
+        val sessionManager = MemorySessionManager(userSession())
+        val client = createMockedSupabaseClient(
+            configuration = {
+                install(Auth) {
+                    minimalConfig()
+                    this.sessionManager = sessionManager
+                    autoLoadFromStorage = true
                 }
-            )
-            client.auth.awaitInitialization()
-            assertIs<SessionStatus.Authenticated>(client.auth.sessionStatus.value)
-        }
+            }
+        )
+        client.auth.awaitInitialization()
+        assertIs<SessionStatus.Authenticated>(client.auth.sessionStatus.value)
     }
 
     @Test
-    fun testErrorWhenUsingAccessToken() {
-        runTest {
-            assertFailsWith<IllegalStateException> {
-                createMockedSupabaseClient(
-                    configuration = {
-                        accessToken = {
-                            "myToken"
-                        }
-                        install(Auth)
+    fun testErrorWhenUsingAccessToken() = runTest {
+        assertFailsWith<IllegalStateException> {
+            createMockedSupabaseClient(
+                configuration = {
+                    accessToken = {
+                        "myToken"
                     }
-                )
-            }
+                    install(Auth)
+                }
+            )
         }
     }
 
@@ -118,6 +114,7 @@ class AuthTest {
                     assertIs<SessionSource.Refresh>(item.source)
                     assertEquals(newSession.expiresIn, client.auth.currentSessionOrNull()?.expiresIn)
                 }
+            client.auth.stopAutoRefreshForCurrentSession()
         }
     }
 
@@ -174,13 +171,13 @@ class AuthTest {
                 assertIs<AuthEvent.RefreshFailure>(event)
                 assertIs<RefreshFailureCause.NetworkError>(event.cause)
             }
+            client.auth.stopAutoRefreshForCurrentSession()
         }
     }
 
     @Test
     fun testAutoRefreshFailureServerErrorValidSession() {
         runTest {
-            val newSession = userSession()
             val client = createMockedSupabaseClient(configuration = {
                 install(Auth) {
                     minimalConfig()
@@ -190,6 +187,7 @@ class AuthTest {
             }) {
                 respondError(HttpStatusCode.InternalServerError, "{}")
             }
+            client.auth.awaitInitialization()
             assertIs<SessionStatus.NotAuthenticated>(client.auth.sessionStatus.value)
             val session = userSession(expiresIn = 1)
             client.auth.importSession(session)
@@ -199,6 +197,7 @@ class AuthTest {
                 assertIs<AuthEvent.RefreshFailure>(event)
                 assertIs<RefreshFailureCause.InternalServerError>(event.cause)
             }
+            client.auth.stopAutoRefreshForCurrentSession()
         }
     }
 
