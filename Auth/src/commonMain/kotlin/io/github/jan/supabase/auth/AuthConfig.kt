@@ -1,9 +1,11 @@
 package io.github.jan.supabase.auth
 
+import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.SupabaseClientBuilder
 import io.github.jan.supabase.SupabaseSerializer
 import io.github.jan.supabase.annotations.SupabaseExperimental
 import io.github.jan.supabase.annotations.SupabaseInternal
+import io.github.jan.supabase.auth.user.UserSession
 import io.github.jan.supabase.plugins.CustomSerializationConfig
 import io.github.jan.supabase.plugins.MainConfig
 import kotlinx.coroutines.CoroutineDispatcher
@@ -118,6 +120,9 @@ open class AuthConfigDefaults : MainConfig() {
     @SupabaseExperimental
     var checkSessionOnRequest: Boolean = true
 
+    /**
+     * Whether to require a valid [UserSession] in the [Auth] plugin to make any request with this plugin. The [SupabaseClient.supabaseKey] cannot be used as fallback.
+     */
     var requireValidSession: Boolean = false
 
 }

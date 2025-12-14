@@ -2,6 +2,7 @@
 package io.github.jan.supabase.auth
 
 import io.github.jan.supabase.OSInformation
+import io.github.jan.supabase.StringMasking
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.annotations.SupabaseInternal
 import io.github.jan.supabase.auth.exception.SessionRequiredException
@@ -77,7 +78,7 @@ class AuthenticatedSupabaseApi @SupabaseInternal constructor(
                 Authenticated request attempted with expired access token. This should not happen. Please report this issue. Trying to refresh session before...
                 Auto refresh running: $autoRefreshRunning
                 OS: ${OSInformation.CURRENT}
-                Session: ${currentSession}
+                Session: ${StringMasking.maskSession(currentSession)}
             """.trimIndent()
             }
 

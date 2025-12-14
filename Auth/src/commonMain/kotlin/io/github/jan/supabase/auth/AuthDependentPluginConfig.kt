@@ -4,7 +4,7 @@ import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.auth.user.UserSession
 
 /**
- * TODO
+ * Configuration for plugins depending on the Auth plugin
  */
 interface AuthDependentPluginConfig {
 
