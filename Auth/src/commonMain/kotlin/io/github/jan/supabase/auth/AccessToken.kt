@@ -8,7 +8,7 @@ import io.github.jan.supabase.plugins.MainPlugin
 /**
  * Returns the access token used for requests. The token is resolved in the following order:
  * 1. [jwtToken] if not null
- * 2. [SupabaseClient.resolveAccessToken] if not null
+ * 2. [SupabaseClient.accessToken] if not null
  * 3. [Auth.currentAccessTokenOrNull] if the Auth plugin is installed
  * 4. [SupabaseClient.supabaseKey] if [keyAsFallback] is true
  */

@@ -38,14 +38,13 @@ class AuthenticatedSupabaseApi @SupabaseInternal constructor(
     private val requireSession = config.requireSession
 
     override suspend fun rawRequest(url: String, builder: HttpRequestBuilder.() -> Unit): HttpResponse {
-        val builder = HttpRequestBuilder().apply(builder)
         val accessToken = supabaseClient.resolveAccessToken(jwtToken, keyAsFallback = !requireSession)
             ?: throw SessionRequiredException()
         checkAccessToken(accessToken)
         return super.rawRequest(url) {
             bearerAuth(accessToken)
             defaultRequest?.invoke(this)
-            this
+            builder()
         }
     }
 
@@ -66,13 +65,14 @@ class AuthenticatedSupabaseApi @SupabaseInternal constructor(
     }
 
     private suspend fun checkAccessToken(token: String?) {
-        val currentSession = supabaseClient.auth.currentSessionOrNull()
+        val auth = supabaseClient.pluginManager.getPluginOrNull(Auth) ?: return
+        val currentSession = auth.currentSessionOrNull()
         val now = Clock.System.now()
         val sessionExistsAndExpired =
             token == currentSession?.accessToken && currentSession != null && currentSession.expiresAt < now
-        val autoRefreshEnabled = supabaseClient.auth.config.alwaysAutoRefresh
+        val autoRefreshEnabled = auth.config.alwaysAutoRefresh
         if (sessionExistsAndExpired && autoRefreshEnabled) {
-            val autoRefreshRunning = supabaseClient.auth.isAutoRefreshRunning
+            val autoRefreshRunning = auth.isAutoRefreshRunning
             Auth.logger.e {
                 """
                 Authenticated request attempted with expired access token. This should not happen. Please report this issue. Trying to refresh session before...
@@ -115,7 +115,7 @@ fun <C> SupabaseClient.authenticatedSupabaseApi(
     defaultRequest: (HttpRequestBuilder.() -> Unit)? = null,
     requireSession: Boolean = plugin.config.requireValidSession
 ): AuthenticatedSupabaseApi where C : MainConfig, C : AuthDependentPluginConfig =
-    authenticatedSupabaseApi(plugin::resolveUrl, plugin::parseErrorResponse, AuthenticatedApiConfig(defaultRequest = defaultRequest, requireSession = requireSession))
+    authenticatedSupabaseApi(plugin::resolveUrl, plugin::parseErrorResponse, AuthenticatedApiConfig(defaultRequest = defaultRequest, requireSession = requireSession, jwtToken = plugin.config.jwtToken))
 
 /**
  * Creates a [AuthenticatedSupabaseApi] with the given [resolveUrl] function. Requires [Auth] to authenticate requests

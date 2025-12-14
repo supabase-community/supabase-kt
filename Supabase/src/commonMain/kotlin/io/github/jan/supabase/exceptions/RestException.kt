@@ -1,7 +1,7 @@
 package io.github.jan.supabase.exceptions
 
-import io.github.jan.supabase.maskHeaders
-import io.github.jan.supabase.maskUrl
+import io.github.jan.supabase.StringMasking.maskHeaders
+import io.github.jan.supabase.StringMasking.maskUrl
 import io.ktor.client.statement.HttpResponse
 import io.ktor.client.statement.request
 

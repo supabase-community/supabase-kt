@@ -86,9 +86,9 @@ internal class AuthImpl(
     override val sessionManager = config.sessionManager ?: createDefaultSessionManager()
     override val codeVerifierCache = config.codeVerifierCache ?: createDefaultCodeVerifierCache()
 
-    @OptIn(SupabaseInternal::class)
-    internal val userApi = supabaseClient.authenticatedSupabaseApi(this)
     internal val publicApi = supabaseClient.authenticatedSupabaseApi(this, requireSession = false)
+    @OptIn(SupabaseInternal::class)
+    internal val userApi = if(config.requireValidSession) supabaseClient.authenticatedSupabaseApi(this) else publicApi
     override val admin: AdminApi = AdminApiImpl(publicApi)
     override val mfa: MfaApi = MfaApiImpl(this)
     var sessionJob: Job? = null

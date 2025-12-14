@@ -121,7 +121,7 @@ internal class MfaApiImpl(
                 active = current == AuthenticatorAssuranceLevel.AAL2
             )
         } else {
-            MfaStatus(false, false)
+            MfaStatus(enabled = false, active = false)
         }
     }
 

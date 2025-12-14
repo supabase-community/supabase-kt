@@ -212,11 +212,11 @@ internal class StorageImpl(override val supabaseClient: SupabaseClient, override
     override val serializer: SupabaseSerializer = config.serializer ?: supabaseClient.defaultSerializer
 
     @OptIn(SupabaseInternal::class)
-    internal val api = supabaseClient.authenticatedSupabaseApi(this) {
+    internal val api = supabaseClient.authenticatedSupabaseApi(this, defaultRequest = {
         timeout {
             requestTimeoutMillis = config.transferTimeout.inWholeMilliseconds
         }
-    }
+    })
 
     private val resumableClients = AtomicMutableMap<String, BucketApi>()
 
