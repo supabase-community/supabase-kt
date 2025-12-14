@@ -77,14 +77,14 @@ class AuthenticatedSupabaseApi @SupabaseInternal constructor(
                 Authenticated request attempted with expired access token. This should not happen. Please report this issue. Trying to refresh session before...
                 Auto refresh running: $autoRefreshRunning
                 OS: ${OSInformation.CURRENT}
-                Session: $currentSession
+                Session: ${currentSession}
             """.trimIndent()
             }
 
             try {
                 supabaseClient.auth.refreshCurrentSession()
             } catch (e: Exception) {
-                Auth.logger.e(e) { "Failed to refresh session" }
+                Auth.logger.e(e) { "Failed to force-refresh session before making a request with an expired access token" }
                 throw TokenExpiredException()
             }
         }

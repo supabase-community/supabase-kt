@@ -1,4 +1,6 @@
 package io.github.jan.supabase.auth.exception
 
-//TODO: Add actual message and docs
-class TokenExpiredException: Exception("The token has expired")
+/**
+ * Exception thrown when trying to make a request with an expired access token and the force-refresh failed.
+ */
+class TokenExpiredException: Exception("The token has expired and a force-refresh was unsuccessful")
