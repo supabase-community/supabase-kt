@@ -39,7 +39,7 @@ class AuthenticatedSupabaseApi @SupabaseInternal constructor(
 
     override suspend fun rawRequest(url: String, builder: HttpRequestBuilder.() -> Unit): HttpResponse {
         val accessToken = supabaseClient.resolveAccessToken(jwtToken, keyAsFallback = !requireSession)
-            ?: throw SessionRequiredException()
+            ?: throw SessionRequiredException(url)
         checkAccessToken(accessToken)
         return super.rawRequest(url) {
             bearerAuth(accessToken)
@@ -55,7 +55,7 @@ class AuthenticatedSupabaseApi @SupabaseInternal constructor(
         builder: HttpRequestBuilder.() -> Unit
     ): HttpStatement {
         val accessToken = supabaseClient.resolveAccessToken(jwtToken, keyAsFallback = !requireSession)
-            ?: throw SessionRequiredException()
+            ?: throw SessionRequiredException(url)
         checkAccessToken(accessToken)
         return super.prepareRequest(url) {
             bearerAuth(accessToken)
