@@ -1,14 +1,10 @@
 @file:Suppress("UndocumentedPublicClass", "UndocumentedPublicFunction")
 package io.github.jan.supabase.auth
 
-import io.github.jan.supabase.OSInformation
-import io.github.jan.supabase.StringMasking
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.annotations.SupabaseInternal
 import io.github.jan.supabase.auth.exception.SessionRequiredException
-import io.github.jan.supabase.auth.exception.TokenExpiredException
 import io.github.jan.supabase.exceptions.RestException
-import io.github.jan.supabase.logging.e
 import io.github.jan.supabase.network.SupabaseApi
 import io.github.jan.supabase.plugins.MainConfig
 import io.github.jan.supabase.plugins.MainPlugin
@@ -16,7 +12,6 @@ import io.ktor.client.request.HttpRequestBuilder
 import io.ktor.client.request.bearerAuth
 import io.ktor.client.statement.HttpResponse
 import io.ktor.client.statement.HttpStatement
-import kotlin.time.Clock
 
 @SupabaseInternal
 data class AuthenticatedApiConfig(
@@ -40,7 +35,6 @@ class AuthenticatedSupabaseApi @SupabaseInternal constructor(
     override suspend fun rawRequest(url: String, builder: HttpRequestBuilder.() -> Unit): HttpResponse {
         val accessToken = supabaseClient.resolveAccessToken(jwtToken, keyAsFallback = !requireSession)
             ?: throw SessionRequiredException(url)
-        checkAccessToken(accessToken)
         return super.rawRequest(url) {
             bearerAuth(accessToken)
             defaultRequest?.invoke(this)
@@ -56,38 +50,10 @@ class AuthenticatedSupabaseApi @SupabaseInternal constructor(
     ): HttpStatement {
         val accessToken = supabaseClient.resolveAccessToken(jwtToken, keyAsFallback = !requireSession)
             ?: throw SessionRequiredException(url)
-        checkAccessToken(accessToken)
         return super.prepareRequest(url) {
             bearerAuth(accessToken)
             builder()
             defaultRequest?.invoke(this)
-        }
-    }
-
-    private suspend fun checkAccessToken(token: String?) {
-        val auth = supabaseClient.pluginManager.getPluginOrNull(Auth) ?: return
-        val currentSession = auth.currentSessionOrNull()
-        val now = Clock.System.now()
-        val sessionExistsAndExpired =
-            token == currentSession?.accessToken && currentSession != null && currentSession.expiresAt < now
-        val autoRefreshEnabled = auth.config.alwaysAutoRefresh
-        if (sessionExistsAndExpired && autoRefreshEnabled) {
-            val autoRefreshRunning = auth.isAutoRefreshRunning
-            Auth.logger.e {
-                """
-                Authenticated request attempted with expired access token. This should not happen. Please report this issue. Trying to refresh session before...
-                Auto refresh running: $autoRefreshRunning
-                OS: ${OSInformation.CURRENT}
-                Session: ${StringMasking.maskSession(currentSession)}
-            """.trimIndent()
-            }
-
-            try {
-                supabaseClient.auth.refreshCurrentSession()
-            } catch (e: Exception) {
-                Auth.logger.e(e) { "Failed to force-refresh session before making a request with an expired access token" }
-                throw TokenExpiredException()
-            }
         }
     }
 
