@@ -2,12 +2,11 @@ package io.github.jan.supabase.auth
 
 import androidx.browser.customtabs.CustomTabsIntent
 import io.github.jan.supabase.auth.providers.ExternalAuthConfig
-import io.github.jan.supabase.plugins.CustomSerializationConfig
 
 /**
  * The configuration for [Auth]
  */
-actual class AuthConfig : CustomSerializationConfig, AuthConfigDefaults() {
+actual class AuthConfig : AuthConfigDefaults() {
 
     /**
      * The action to use for the OAuth flow. Can be overriden per-request in the [ExternalAuthConfig]

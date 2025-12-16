@@ -500,6 +500,7 @@ interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
         const val API_VERSION = 1
 
         override fun createConfig(init: AuthConfig.() -> Unit) = AuthConfig().apply(init)
+
         override fun create(supabaseClient: SupabaseClient, config: AuthConfig): Auth = AuthImpl(supabaseClient, config)
 
     }

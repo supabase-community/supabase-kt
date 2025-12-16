@@ -2,6 +2,7 @@ package io.github.jan.supabase.postgrest
 
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.SupabaseSerializer
+import io.github.jan.supabase.auth.AuthDependentPluginConfig
 import io.github.jan.supabase.exceptions.HttpRequestException
 import io.github.jan.supabase.logging.SupabaseLogger
 import io.github.jan.supabase.plugins.CustomSerializationConfig
@@ -101,7 +102,8 @@ interface Postgrest : MainPlugin<Postgrest.Config>, CustomSerializationPlugin {
     data class Config(
         var defaultSchema: String = "public",
         var propertyConversionMethod: PropertyConversionMethod = PropertyConversionMethod.CAMEL_CASE_TO_SNAKE_CASE,
-    ): MainConfig(), CustomSerializationConfig {
+        override var requireValidSession: Boolean = false,
+    ): MainConfig(), CustomSerializationConfig, AuthDependentPluginConfig {
 
         override var serializer: SupabaseSerializer? = null
 

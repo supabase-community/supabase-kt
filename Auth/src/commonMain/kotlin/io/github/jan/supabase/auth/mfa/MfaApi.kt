@@ -121,14 +121,14 @@ internal class MfaApiImpl(
                 active = current == AuthenticatorAssuranceLevel.AAL2
             )
         } else {
-            MfaStatus(false, false)
+            MfaStatus(enabled = false, active = false)
         }
     }
 
     override val verifiedFactors: List<UserMfaFactor>
         get() = auth.currentUserOrNull()?.factors?.filter(UserMfaFactor::isVerified) ?: emptyList()
 
-    val api = auth.api
+    val api = auth.userApi
 
     override suspend fun <Config, Response> enroll(factorType: FactorType<Config, Response>, friendlyName: String?, config: Config.() -> Unit): MfaFactor<Response> {
         val result = api.postJson("factors", buildJsonObject {

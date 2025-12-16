@@ -1,13 +1,12 @@
 package io.github.jan.supabase.auth
 
 import io.github.jan.supabase.annotations.SupabaseInternal
-import io.github.jan.supabase.plugins.CustomSerializationConfig
 import io.ktor.util.PlatformUtils.IS_BROWSER
 
 /**
  * The configuration for [Auth]
  */
-actual class AuthConfig: CustomSerializationConfig, AuthConfigDefaults() {
+actual class AuthConfig: AuthConfigDefaults() {
 
     /**
      * Whether to disable automatic URL checking for PKCE codes, error codes, and session tokens.
