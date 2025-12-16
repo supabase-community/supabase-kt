@@ -159,6 +159,7 @@ class RealtimeChannelTest {
                     assertEquals(expectedAuthToken, message.payload["access_token"]?.jsonPrimitive?.content)
                 },
                 supabaseHandler = {
+                    it.auth.awaitInitialization()
                     it.auth.importAuthTokenValid(expectedAuthToken)
                     val channel = it.channel("channelId")
                     channel.subscribe()

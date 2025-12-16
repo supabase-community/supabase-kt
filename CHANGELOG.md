@@ -1,6 +1,83 @@
 # Changelog
 
-### 3.3.2 - July 19, 2025
+### 3.2.6 - October 29, 2025
+
+- Update Kotlin to version `2.2.21`
+
+### Postgrest
+
+- Do not escape numbers in Postgrest & escape `filterNot` by @jan-tennert in https://github.com/supabase-community/supabase-kt/pull/1084
+
+### 3.2.5 - October 15, 2025
+
+### Auth
+
+* Fix a bug causing auto-refresh to continue in the background (Android) #1060 by @jozefv-git in https://github.com/supabase-community/supabase-kt/pull/1062
+* Fix `Auth#linkIdentityWithIdToken()` not working correctly by @jan-tennert in https://github.com/supabase-community/supabase-kt/commit/31be2bd310ddc334aab14733fae0bfa76e24f2a4 
+
+### Postgrest
+
+* fix: add presence flag to join payload by @filipecabaco in https://github.com/supabase-community/supabase-kt/pull/1064
+* quote and/or escape special characters in all postrest filters by @sproctor in https://github.com/supabase-community/supabase-kt/pull/1066
+
+### Docs / README
+
+* Introduce new sample - Supa Sketcher - A realtime-white board application by @hieuwu in https://github.com/supabase-community/supabase-kt/pull/1067
+
+### 3.2.4 - September 26, 2025
+
+### Core
+
+- Update Ktor to version `3.3.0`
+- make kermit logger non-global by @sproctor in https://github.com/supabase-community/supabase-kt/pull/1044
+
+### Auth & Compose Auth
+
+* Add support for linkIdentity with OIDC by @jan-tennert in https://github.com/supabase-community/supabase-kt/pull/1051
+  You can now link a Google / Apple account to an existing Supabase account via `linkIdentityWithIdToken`:
+  ```kotlin
+  supabase.auth.linkIdentityWithIdToken(provider = Google, idToken = "idToken received from native auth") {
+      // optional stuff
+  }
+  ```
+  To accomplish this with Compose Auth, set the `onIdToken` parameter in the `rememberSignInWith(...)` method:
+  ```kotlin
+  //default parameter is ComposeAuth.SIGN_IN_CALLBACK
+  val state = composeAuth.rememberSignInWithGoogle(onIdToken = ComposeAuth.LINK_IDENTITY_CALLBACK)
+  ```
+  This also means, you can upgrade anonymous users via native auth and/or handle the id token received from native auth yourself (e.g. via your viewmodel)
+
+### Samples
+
+* Fix Chat sample launch fails on iOS by @hieuwu in https://github.com/supabase-community/supabase-kt/pull/1050
+
+### 3.2.3 - September 11, 2025
+
+### Core
+
+- Update Kotlin to version `2.2.20` (**due to `kotlinx.browser` changes, using this or a higher version might be required**)
+- Remove atomicfu, migrate Atomic lists/maps, coroutine improvements by @jan-tennert in https://github.com/supabase-community/supabase-kt/pull/1029
+  Removed atomicfu dependency completely, improvements to atomic references / lists
+- Fix min loglevel by @sproctor in https://github.com/supabase-community/supabase-kt/pull/951
+- Re-add serializers into the bom dependency by @jan-tennert in https://github.com/supabase-community/supabase-kt-plugins/commit/5e34081ac1855b22ea3cd52a07fe9820a6c7a6cd
+
+### Postgrest
+
+- make filter values comply with postrest rules by @sproctor in https://github.com/supabase-community/supabase-kt/pull/1036
+  You can now use reserved characters in requests
+- Add overloads for Postgrest insert, upsert and update requests by @manriif in https://github.com/supabase-community/supabase-kt/pull/1034
+  You can now provide an already-serialized `JsonObject`/`JsonElement` to the `insert`/`upsert`/`update` methods
+
+### Auth
+
+- Unify Wasm JS and JS implementations by @jan-tennert in https://github.com/supabase-community/supabase-kt/pull/1043
+
+### Realtime
+
+- Split callbacks in the CallbackManager by @jan-tennert in https://github.com/supabase-community/supabase-kt/pull/1042
+  This **might** increase performance drastically for applications using a lot of (different) callbacks
+
+### 3.2.2 - July 19, 2025
 
 ### Core
 

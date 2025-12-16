@@ -1,6 +1,9 @@
+@file:OptIn(kotlinx.serialization.ExperimentalSerializationApi::class)
+
 package io.github.jan.supabase.realtime
 
 import io.github.jan.supabase.annotations.SupabaseInternal
+import kotlinx.serialization.EncodeDefault
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -33,7 +36,11 @@ data class BroadcastJoinConfig(@SerialName("ack") var acknowledgeBroadcasts: Boo
  * @param enabled Whether presence is enabled for this channel
  */
 @Serializable
-data class PresenceJoinConfig(var key: String, internal var enabled: Boolean)
+data class PresenceJoinConfig(
+    var key: String,
+    @EncodeDefault
+    internal var enabled: Boolean = false
+)
 
 @SupabaseInternal
 @Serializable

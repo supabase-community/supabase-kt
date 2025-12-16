@@ -13,7 +13,9 @@ import io.github.jan.supabase.auth.mfa.MfaApi
 import io.github.jan.supabase.auth.mfa.MfaApiImpl
 import io.github.jan.supabase.auth.providers.AuthProvider
 import io.github.jan.supabase.auth.providers.ExternalAuthConfigDefaults
+import io.github.jan.supabase.auth.providers.IDTokenProvider
 import io.github.jan.supabase.auth.providers.OAuthProvider
+import io.github.jan.supabase.auth.providers.builtin.IDToken
 import io.github.jan.supabase.auth.providers.builtin.OTP
 import io.github.jan.supabase.auth.providers.builtin.SSO
 import io.github.jan.supabase.auth.status.RefreshFailureCause
@@ -80,7 +82,7 @@ internal class AuthImpl(
     private val _events = MutableSharedFlow<AuthEvent>(replay = 1)
     override val events: SharedFlow<AuthEvent> = _events.asSharedFlow()
     @Suppress("DEPRECATION")
-    internal val authScope = CoroutineScope((config.coroutineDispatcher ?: supabaseClient.coroutineDispatcher) + SupervisorJob())
+    override val authScope = CoroutineScope((config.coroutineDispatcher ?: supabaseClient.coroutineDispatcher) + SupervisorJob())
     override val sessionManager = config.sessionManager ?: createDefaultSessionManager()
     override val codeVerifierCache = config.codeVerifierCache ?: createDefaultCodeVerifierCache()
 
@@ -120,14 +122,20 @@ internal class AuthImpl(
                     Auth.logger.i {
                         "No session found in storage."
                     }
-                    setSessionStatus(SessionStatus.NotAuthenticated())
+                }
+                if(config.autoSetupPlatform) {
+                    setupPlatform()
                 }
             }
         } else {
             Auth.logger.d { "Skipping loading from storage (autoLoadFromStorage is set to false)" }
-            setSessionStatus(SessionStatus.NotAuthenticated())
+            if(config.autoSetupPlatform) {
+                authScope.launch {
+                    setupPlatform()
+                }
+            }
         }
-        setupPlatform()
+
         Auth.logger.d { "Initialized Auth plugin" }
     }
 
@@ -183,6 +191,16 @@ internal class AuthImpl(
             }
         )
         return null
+    }
+
+    override suspend fun linkIdentityWithIdToken(
+        provider: IDTokenProvider,
+        idToken: String,
+        config: (IDToken.Config) -> Unit
+    ) {
+        val body = IDToken.Config(idToken = idToken, provider = provider, linkIdentity = true).apply(config)
+        val result = api.postJson("token?grant_type=id_token", body)
+        importSession(result.safeBody(), source = SessionSource.UserIdentitiesChanged(result.safeBody()))
     }
 
     override suspend fun unlinkIdentity(identityId: String, updateLocalUser: Boolean) {
@@ -434,11 +452,7 @@ internal class AuthImpl(
         val thresholdDate = session.expiresAt - session.expiresIn.seconds * (1 - SESSION_REFRESH_THRESHOLD)
         if (thresholdDate <= Clock.System.now()) {
             Auth.logger.d { "Session is under the threshold date. Refreshing session..." }
-            tryImportingSession(
-                { handleExpiredSession(session, config.alwaysAutoRefresh) },
-                { importSession(session) },
-                { updateStatusIfExpired(session, it) }
-            )
+            recreateSessionJob(session, source, false)
         } else {
             if (config.autoSaveToStorage) {
                 sessionManager.saveSession(session)
@@ -446,18 +460,24 @@ internal class AuthImpl(
             }
             setSessionStatus(SessionStatus.Authenticated(session, source))
             Auth.logger.d { "Session imported successfully. Starting auto refresh..." }
-            sessionJob?.cancel()
-            sessionJob = authScope.launch {
-                delayBeforeExpiry(session)
-                launch {
-                    tryImportingSession(
-                        { handleExpiredSession(session) },
-                        { importSession(session, source = source) },
-                        { updateStatusIfExpired(session, it) }
-                    )
-                }
-            }
+            recreateSessionJob(session, source, true)
             Auth.logger.d { "Auto refresh started." }
+        }
+    }
+
+    private fun recreateSessionJob(
+        session: UserSession,
+        source: SessionSource,
+        delay: Boolean
+    ) {
+        sessionJob?.cancel()
+        sessionJob = authScope.launch {
+            if(delay) delayBeforeExpiry(session)
+            tryImportingSession(
+                { handleExpiredSession(session, config.alwaysAutoRefresh) },
+                { importSession(session, source = source) },
+                { updateStatusIfExpired(session, it) }
+            )
         }
     }
 
@@ -607,9 +627,8 @@ internal class AuthImpl(
     override suspend fun clearSession() {
         codeVerifierCache.deleteCodeVerifier()
         sessionManager.deleteSession()
-        sessionJob?.cancel()
         setSessionStatus(SessionStatus.NotAuthenticated(true))
-        sessionJob = null
+        stopAutoRefreshForCurrentSession()
     }
 
     override suspend fun awaitInitialization() {
@@ -641,7 +660,7 @@ internal class AuthImpl(
 }
 
 @SupabaseInternal
-expect fun Auth.setupPlatform()
+expect suspend fun Auth.setupPlatform()
 
 @SupabaseInternal
 expect fun Auth.createDefaultSessionManager(): SessionManager

@@ -11,13 +11,13 @@ import io.github.jan.supabase.realtime.event.RealtimeEvent
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.headers
 import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.buildJsonObject
@@ -25,6 +25,7 @@ import kotlinx.serialization.json.encodeToJsonElement
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.put
 import kotlinx.serialization.json.putJsonObject
+import kotlin.concurrent.atomics.AtomicInt
 import kotlin.concurrent.atomics.incrementAndFetch
 import kotlin.reflect.KClass
 import kotlin.reflect.KType
@@ -48,8 +49,14 @@ internal class RealtimeChannelImpl(
     private val broadcastUrl = realtimeImpl.broadcastUrl()
     private val subTopic = topic.replaceFirst(Regex("^${RealtimeTopic.PREFIX}:", RegexOption.IGNORE_CASE), "")
     private val httpClient = realtimeImpl.supabaseClient.httpClient
+    private val userPresenceEnabled = presenceJoinConfig.enabled
+
+    internal val joinAttempt = AtomicInt(0)
 
     private suspend fun accessToken() = realtimeImpl.config.accessToken(supabaseClient) ?: realtimeImpl.accessToken
+
+    private fun shouldEnablePresence(): Boolean =
+        userPresenceEnabled || callbackManager.hasPresenceCallback()
 
     @OptIn(SupabaseInternal::class)
     override suspend fun subscribe(blockUntilSubscribed: Boolean) {
@@ -64,8 +71,7 @@ internal class RealtimeChannelImpl(
         Realtime.logger.d { "Subscribing to channel $topic" }
         val currentJwt = accessToken()
         val postgrestChanges = clientChanges.toList()
-        val hasPresenceCallback = callbackManager.getCallbacks().filterIsInstance<RealtimeCallback.PresenceCallback>().isNotEmpty()
-        presenceJoinConfig.enabled = hasPresenceCallback
+        presenceJoinConfig.enabled = shouldEnablePresence()
         val joinConfig = RealtimeJoinPayload(RealtimeJoinConfig(broadcastJoinConfig, presenceJoinConfig, postgrestChanges, isPrivate))
         val joinConfigObject = buildJsonObject {
             putJsonObject(Json.encodeToJsonElement(joinConfig).jsonObject)
@@ -90,6 +96,12 @@ internal class RealtimeChannelImpl(
             return
         }
         event.handle(this, message)
+    }
+
+    override suspend fun scheduleRejoin() {
+        Realtime.logger.d { "Rejoining channel $topic in" }
+        delay(realtime.config.rejoinDelay)
+        resubscribe()
     }
 
     override suspend fun unsubscribe() {
@@ -222,16 +234,16 @@ internal class RealtimeChannelImpl(
         }
         val id = callbackManager.addPresenceCallback(callback)
         if(status.value == RealtimeChannel.Status.SUBSCRIBED && !presenceJoinConfig.enabled) {
-            // If the channel is already subscribed, we need to resubscribe to enable presence
             Realtime.logger.d { "Resubscribing to channel $topic to enable presence..." }
-            launch {
-                resubscribe()
-            }
+            resubscribe()
         }
         awaitClose { callbackManager.removeCallbackById(id) }
     }
 
     override fun updateStatus(status: RealtimeChannel.Status) {
+        if(status == RealtimeChannel.Status.SUBSCRIBED) {
+            joinAttempt.store(0)
+        }
         _status.value = status
     }
 

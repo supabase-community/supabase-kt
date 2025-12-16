@@ -115,7 +115,10 @@ class KtorSupabaseHttpClient @SupabaseInternal constructor(
                 append("X-Client-Info", "supabase-kt/${BuildConfig.PROJECT_VERSION}")
                 osInformation?.let {
                     append("X-Supabase-Client-Platform", it.name)
-                    append("X-Supabase-Client-Platform-Version", it.version)
+
+                    it.version?.let { version ->
+                        append("X-Supabase-Client-Platform-Version", version)
+                    }
                 }
             }
             port = HTTPS_PORT

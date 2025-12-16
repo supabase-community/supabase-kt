@@ -38,24 +38,23 @@ class MfaApiTest {
     }
 
     @Test
-    fun testEnrollTOTP() {
-        runTest {
-            val friendlyName = "My Factor"
-            val issuer = "My App"
-            val expectedId = "123"
-            val expectedSecret = "secret"
-            val expectedQrCode = "qrCode"
-            val expectedUri = "uri"
-            val client = createMockedSupabaseClient(
-                configuration = configuration
-            ) {
-                assertPathIs("/factors", it.url.pathAfterVersion())
-                assertMethodIs(HttpMethod.Post, it.method)
-                val body = it.body.toJsonElement().jsonObject
-                assertEquals(friendlyName, body["friendly_name"]?.jsonPrimitive?.content)
-                assertEquals(FactorType.TOTP.value, body["factor_type"]?.jsonPrimitive?.content)
-                assertEquals(issuer, body["issuer"]?.jsonPrimitive?.content)
-                respondJson("""
+    fun testEnrollTOTP() = runTest {
+        val friendlyName = "My Factor"
+        val issuer = "My App"
+        val expectedId = "123"
+        val expectedSecret = "secret"
+        val expectedQrCode = "qrCode"
+        val expectedUri = "uri"
+        val client = createMockedSupabaseClient(
+            configuration = configuration
+        ) {
+            assertPathIs("/factors", it.url.pathAfterVersion())
+            assertMethodIs(HttpMethod.Post, it.method)
+            val body = it.body.toJsonElement().jsonObject
+            assertEquals(friendlyName, body["friendly_name"]?.jsonPrimitive?.content)
+            assertEquals(FactorType.TOTP.value, body["factor_type"]?.jsonPrimitive?.content)
+            assertEquals(issuer, body["issuer"]?.jsonPrimitive?.content)
+            respondJson("""
                     {
                     "id": "$expectedId",
                     "totp": {
@@ -65,45 +64,42 @@ class MfaApiTest {
                         }
                     }
                 """.trimIndent())
-            }
-            val factor = client.auth.mfa.enroll(FactorType.TOTP, friendlyName) {
-                this.issuer = issuer
-            }
-            assertEquals(expectedId, factor.id)
-            assertEquals(expectedSecret, factor.data.secret)
-            assertEquals(expectedQrCode, factor.data.qrCode)
-            assertEquals(expectedUri, factor.data.uri)
         }
+        val factor = client.auth.mfa.enroll(FactorType.TOTP, friendlyName) {
+            this.issuer = issuer
+        }
+        assertEquals(expectedId, factor.id)
+        assertEquals(expectedSecret, factor.data.secret)
+        assertEquals(expectedQrCode, factor.data.qrCode)
+        assertEquals(expectedUri, factor.data.uri)
     }
 
     @Test
-    fun testEnrollPhone() {
-        runTest {
-            val friendlyName = "My Factor"
-            val expectedId = "123"
-            val expectedPhone = "+491638976913"
-            val client = createMockedSupabaseClient(
-                configuration = configuration
-            ) {
-                assertPathIs("/factors", it.url.pathAfterVersion())
-                assertMethodIs(HttpMethod.Post, it.method)
-                val body = it.body.toJsonElement().jsonObject
-                assertEquals(friendlyName, body["friendly_name"]?.jsonPrimitive?.content)
-                assertEquals(FactorType.Phone.value, body["factor_type"]?.jsonPrimitive?.content)
-                assertEquals(expectedPhone, body["phone"]?.jsonPrimitive?.content)
-                respondJson("""
+    fun testEnrollPhone() = runTest {
+        val friendlyName = "My Factor"
+        val expectedId = "123"
+        val expectedPhone = "+491638976913"
+        val client = createMockedSupabaseClient(
+            configuration = configuration
+        ) {
+            assertPathIs("/factors", it.url.pathAfterVersion())
+            assertMethodIs(HttpMethod.Post, it.method)
+            val body = it.body.toJsonElement().jsonObject
+            assertEquals(friendlyName, body["friendly_name"]?.jsonPrimitive?.content)
+            assertEquals(FactorType.Phone.value, body["factor_type"]?.jsonPrimitive?.content)
+            assertEquals(expectedPhone, body["phone"]?.jsonPrimitive?.content)
+            respondJson("""
                     {
                     "id": "$expectedId",
                     "phone": "$expectedPhone"
                     }
                 """.trimIndent())
-            }
-            val factor = client.auth.mfa.enroll(FactorType.Phone, friendlyName) {
-                phone = expectedPhone
-            }
-            assertEquals(expectedId, factor.id)
-            assertEquals(expectedPhone, factor.data.phone)
         }
+        val factor = client.auth.mfa.enroll(FactorType.Phone, friendlyName) {
+            phone = expectedPhone
+        }
+        assertEquals(expectedId, factor.id)
+        assertEquals(expectedPhone, factor.data.phone)
     }
 
     @Test
@@ -127,18 +123,16 @@ class MfaApiTest {
     }
 
     @Test
-    fun testUnenrollFactor() {
-        runTest {
-            val expectedFactorId = "123"
-            val client = createMockedSupabaseClient(
-                configuration = configuration
-            ) {
-                assertPathIs("/factors/$expectedFactorId", it.url.pathAfterVersion())
-                assertMethodIs(HttpMethod.Delete, it.method)
-                respondJson("")
-            }
-            client.auth.mfa.unenroll(expectedFactorId)
+    fun testUnenrollFactor() = runTest {
+        val expectedFactorId = "123"
+        val client = createMockedSupabaseClient(
+            configuration = configuration
+        ) {
+            assertPathIs("/factors/$expectedFactorId", it.url.pathAfterVersion())
+            assertMethodIs(HttpMethod.Delete, it.method)
+            respondJson("")
         }
+        client.auth.mfa.unenroll(expectedFactorId)
     }
 
     @Test
@@ -157,51 +151,47 @@ class MfaApiTest {
     }
 
     @Test
-    fun testRetrieveVerifiedFactors() {
-        runTest {
-            val expectedFactor = verifiedFactor()
-            val client = createMockedSupabaseClient(
-                configuration = configuration
-            ) {
-                respondJson(UserInfo(id = "id", aud = "aud", factors = listOf(expectedFactor)))
-            }
-            client.auth.importAuthToken("token")
-            val factors = client.auth.mfa.retrieveFactorsForCurrentUser()
-            assertEquals(1, factors.size)
-            assertEquals(expectedFactor, factors.first())
+    fun testRetrieveVerifiedFactors() = runTest {
+        val expectedFactor = verifiedFactor()
+        val client = createMockedSupabaseClient(
+            configuration = configuration
+        ) {
+            respondJson(UserInfo(id = "id", aud = "aud", factors = listOf(expectedFactor)))
         }
+        client.auth.awaitInitialization()
+        client.auth.importAuthToken("token")
+        val factors = client.auth.mfa.retrieveFactorsForCurrentUser()
+        assertEquals(1, factors.size)
+        assertEquals(expectedFactor, factors.first())
     }
 
     @Test
-    fun testMfaProperties() {
-        runTest {
-            val client = createMockedSupabaseClient(
-                configuration = configuration
-            ) {
-                respond("")
-            }
+    fun testMfaProperties() = runTest {
+        val client = createMockedSupabaseClient(
+            configuration = configuration
+        ) {
+            respond("")
+        }
+        client.auth.importSession(createSession(AuthenticatorAssuranceLevel.AAL1, AuthenticatorAssuranceLevel.AAL2))
+        assertEquals(MfaStatus(enabled = true, active = false), client.auth.mfa.status)
+        client.auth.importSession(createSession(AuthenticatorAssuranceLevel.AAL2, AuthenticatorAssuranceLevel.AAL1))
+        assertEquals(MfaStatus(enabled = false, active = true), client.auth.mfa.status)
+    }
+
+    @Test
+    fun testMfaStatus() = runTest {
+        val client = createMockedSupabaseClient(
+            configuration = configuration
+        ) {
+            respond("")
+        }
+        client.auth.awaitInitialization()
+        client.auth.mfa.statusFlow.test {
+            assertEquals(MfaStatus(enabled = false, active = false), awaitItem())
             client.auth.importSession(createSession(AuthenticatorAssuranceLevel.AAL1, AuthenticatorAssuranceLevel.AAL2))
-            assertEquals(MfaStatus(enabled = true, active = false), client.auth.mfa.status)
+            assertEquals(MfaStatus(enabled = true, active = false), awaitItem())
             client.auth.importSession(createSession(AuthenticatorAssuranceLevel.AAL2, AuthenticatorAssuranceLevel.AAL1))
-            assertEquals(MfaStatus(enabled = false, active = true), client.auth.mfa.status)
-        }
-    }
-
-    @Test
-    fun testMfaStatus() {
-        runTest {
-            val client = createMockedSupabaseClient(
-                configuration = configuration
-            ) {
-                respond("")
-            }
-           client.auth.mfa.statusFlow.test {
-                assertEquals(MfaStatus(enabled = false, active = false), awaitItem())
-                client.auth.importSession(createSession(AuthenticatorAssuranceLevel.AAL1, AuthenticatorAssuranceLevel.AAL2))
-                assertEquals(MfaStatus(enabled = true, active = false), awaitItem())
-                client.auth.importSession(createSession(AuthenticatorAssuranceLevel.AAL2, AuthenticatorAssuranceLevel.AAL1))
-                assertEquals(MfaStatus(enabled = false, active = true), awaitItem())
-           }
+            assertEquals(MfaStatus(enabled = false, active = true), awaitItem())
         }
     }
 
@@ -236,6 +226,7 @@ class MfaApiTest {
             ) {
                 respond("")
             }
+            client.auth.awaitInitialization()
             val factors = if(next == AuthenticatorAssuranceLevel.AAL1) emptyList() else listOf(verifiedFactor())
             client.auth.importSession(userSession(customToken = token, user = UserInfo(id = "id", aud = "aud", factors = factors)))
             val (c, n) = client.auth.mfa.getAuthenticatorAssuranceLevel()
@@ -260,6 +251,7 @@ class MfaApiTest {
                 assertEquals(expectedChallengeId, body["challenge_id"]?.jsonPrimitive?.content)
                 respondJson(expectedSession)
             }
+            client.auth.awaitInitialization()
             val session = client.auth.mfa.verifyChallenge(expectedFactorId, expectedChallengeId, expectedCode, saveSession)
             assertEquals(expectedSession, session)
             if(saveSession) {
@@ -295,6 +287,7 @@ class MfaApiTest {
                     }
                 """.trimIndent())
             }
+            client.auth.awaitInitialization()
             val challenge = client.auth.mfa.createChallenge(expectedFactorId, if(withChannel) Phone.Channel.SMS else null)
             assertEquals(expectedChallengeId, challenge.id)
             assertEquals("phone", challenge.factorType)

@@ -19,6 +19,7 @@ import io.github.jan.supabase.testing.respondJson
 import io.ktor.client.engine.mock.respondError
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.Url
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.json.buildJsonObject
@@ -38,36 +39,32 @@ class AuthTest {
     }
 
     @Test
-    fun testLoadingSessionFromStorage() {
-        runTest {
-            val sessionManager = MemorySessionManager(userSession())
-            val client = createMockedSupabaseClient(
-                configuration = {
-                    install(Auth) {
-                        minimalConfig()
-                        this.sessionManager = sessionManager
-                        autoLoadFromStorage = true
-                    }
+    fun testLoadingSessionFromStorage() = runTest {
+        val sessionManager = MemorySessionManager(userSession())
+        val client = createMockedSupabaseClient(
+            configuration = {
+                install(Auth) {
+                    minimalConfig()
+                    this.sessionManager = sessionManager
+                    autoLoadFromStorage = true
                 }
-            )
-            client.auth.awaitInitialization()
-            assertIs<SessionStatus.Authenticated>(client.auth.sessionStatus.value)
-        }
+            }
+        )
+        client.auth.awaitInitialization()
+        assertIs<SessionStatus.Authenticated>(client.auth.sessionStatus.value)
     }
 
     @Test
-    fun testErrorWhenUsingAccessToken() {
-        runTest {
-            assertFailsWith<IllegalStateException> {
-                createMockedSupabaseClient(
-                    configuration = {
-                        accessToken = {
-                            "myToken"
-                        }
-                        install(Auth)
+    fun testErrorWhenUsingAccessToken() = runTest {
+        assertFailsWith<IllegalStateException> {
+            createMockedSupabaseClient(
+                configuration = {
+                    accessToken = {
+                        "myToken"
                     }
-                )
-            }
+                    install(Auth)
+                }
+            )
         }
     }
 
@@ -110,9 +107,14 @@ class AuthTest {
             assertIs<SessionStatus.NotAuthenticated>(client.auth.sessionStatus.value)
             val session = userSession(expiresIn = 0)
             client.auth.importSession(session)
-            assertIs<SessionStatus.Authenticated>(client.auth.sessionStatus.value)
-            assertIs<SessionSource.Refresh>((client.auth.sessionStatus.value as SessionStatus.Authenticated).source)
-            assertEquals(newSession.expiresIn, client.auth.currentSessionOrNull()?.expiresIn)
+            client.auth.sessionStatus
+                .filter { it is SessionStatus.Authenticated }
+                .test {
+                    val item = awaitItem() as SessionStatus.Authenticated
+                    assertIs<SessionSource.Refresh>(item.source)
+                    assertEquals(newSession.expiresIn, client.auth.currentSessionOrNull()?.expiresIn)
+                }
+            client.auth.stopAutoRefreshForCurrentSession()
         }
     }
 
@@ -137,8 +139,12 @@ class AuthTest {
             assertIs<SessionStatus.Authenticated>(client.auth.sessionStatus.value)
             assertEquals(session.expiresIn, client.auth.currentSessionOrNull()?.expiresIn) //The session shouldn't be refreshed automatically as alwaysAutoRefresh is false
             client.auth.startAutoRefreshForCurrentSession()
-            assertIs<SessionSource.Refresh>((client.auth.sessionStatus.value as SessionStatus.Authenticated).source)
-            assertEquals(newSession.expiresIn, client.auth.currentSessionOrNull()?.expiresIn)
+            client.auth.sessionStatus
+                .filter { it is SessionStatus.Authenticated && it.source is SessionSource.Refresh }
+                .test {
+                    val item = awaitItem() as SessionStatus.Authenticated
+                    assertEquals(newSession.expiresIn, item.session.expiresIn)
+                }
         }
     }
 
@@ -165,13 +171,13 @@ class AuthTest {
                 assertIs<AuthEvent.RefreshFailure>(event)
                 assertIs<RefreshFailureCause.NetworkError>(event.cause)
             }
+            client.auth.stopAutoRefreshForCurrentSession()
         }
     }
 
     @Test
     fun testAutoRefreshFailureServerErrorValidSession() {
         runTest {
-            val newSession = userSession()
             val client = createMockedSupabaseClient(configuration = {
                 install(Auth) {
                     minimalConfig()
@@ -181,6 +187,7 @@ class AuthTest {
             }) {
                 respondError(HttpStatusCode.InternalServerError, "{}")
             }
+            client.auth.awaitInitialization()
             assertIs<SessionStatus.NotAuthenticated>(client.auth.sessionStatus.value)
             val session = userSession(expiresIn = 1)
             client.auth.importSession(session)
@@ -190,6 +197,7 @@ class AuthTest {
                 assertIs<AuthEvent.RefreshFailure>(event)
                 assertIs<RefreshFailureCause.InternalServerError>(event.cause)
             }
+            client.auth.stopAutoRefreshForCurrentSession()
         }
     }
 
