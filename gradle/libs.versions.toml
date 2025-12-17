@@ -110,7 +110,7 @@ coil2 = { module = "io.coil-kt:coil", version.ref = "coil2" }
 koin-core = { module = "io.insert-koin:koin-core", version.ref = "koin" }
 koin-android = { module = "io.insert-koin:koin-android", version.ref = "koin" }
 filekit-core = { module = "io.github.vinceglb:filekit-core", version.ref = "filekit" }
-filekit-compose = { module = "io.github.vinceglb:filekit-compose", version.ref = "filekit" }
+filekit-compose = { module = "io.github.vinceglb:filekit-dialogs-compose", version.ref = "filekit" }
 accompanist-permissions = { module = "com.google.accompanist:accompanist-permissions", version.ref = "accompanist-permissions" }
 coil2-svg = { module = "io.coil-kt:coil-svg", version.ref = "coil2" }
 coil2-compose = { module = "io.coil-kt:coil-compose", version.ref = "coil2" }

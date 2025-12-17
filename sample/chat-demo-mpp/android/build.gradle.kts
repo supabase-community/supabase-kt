@@ -16,7 +16,4 @@ dependencies {
 
 android {
     configureApplicationAndroidTarget(JavaVersion.VERSION_11)
-    kotlinOptions {
-        jvmTarget = "11"
-    }
 }
