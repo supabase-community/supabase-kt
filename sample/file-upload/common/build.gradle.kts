@@ -16,6 +16,10 @@ plugins {
 group = "io.github.jan.supabase"
 version = "1.0-SNAPSHOT"
 
+repositories {
+    mavenCentral()
+}
+
 kotlin {
     jvmToolchain(11)
     androidTarget()
