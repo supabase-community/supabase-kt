@@ -715,6 +715,7 @@ class AuthRequestTest {
                 assertEquals(expectedScope.name.lowercase(), parameters["scope"])
                 respond("")
             }
+            client.auth.awaitInitialization()
             client.auth.importSession(Json.decodeFromString(sampleUserSession()))
             assertNotNull(client.auth.currentSessionOrNull(), "Session should not be null")
             client.auth.signOut(expectedScope)
