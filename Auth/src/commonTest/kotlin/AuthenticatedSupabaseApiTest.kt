@@ -34,6 +34,7 @@ class AuthenticatedSupabaseApiTest {
             respond("")
         }
 
+        client.auth.awaitInitialization()
         client.auth.importSession(createSession(expectedToken))
 
         val api = client.authenticatedSupabaseApi(
@@ -60,6 +61,7 @@ class AuthenticatedSupabaseApiTest {
             respond("")
         }
 
+        client.auth.awaitInitialization()
         client.auth.importSession(createSession(expectedToken))
 
         val api = client.authenticatedSupabaseApi(
@@ -85,6 +87,7 @@ class AuthenticatedSupabaseApiTest {
             respond("")
         }
 
+        client.auth.awaitInitialization()
         client.auth.importSession(createSession("different-token"))
 
         val api = client.authenticatedSupabaseApi(
@@ -158,6 +161,7 @@ class AuthenticatedSupabaseApiTest {
             respond("")
         }
 
+        client.auth.awaitInitialization()
         client.auth.importSession(createSession("test-token"))
 
         val api = client.authenticatedSupabaseApi(
@@ -184,7 +188,7 @@ class AuthenticatedSupabaseApiTest {
             requestUrl = it.url.toString()
             respond("")
         }
-
+        client.auth.awaitInitialization()
         client.auth.importSession(createSession("test-token"))
 
         val api = client.authenticatedSupabaseApi(
@@ -211,6 +215,7 @@ class AuthenticatedSupabaseApiTest {
             respond("")
         }
 
+        client.auth.awaitInitialization()
         client.auth.importSession(createSession(expectedToken))
 
         val api = client.authenticatedSupabaseApi(
