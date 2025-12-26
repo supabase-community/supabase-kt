@@ -589,6 +589,7 @@ class AuthRequestTest {
                 )
                 assertEquals(expectedEmail, body["email"]?.jsonPrimitive?.content)
                 assertContains(it.url.toString(), encodedRedirectUrl)
+                assertEquals(expectedRedirectUrl, params["redirect_to"])
                 containsCodeChallenge(body)
                 respondJson(
                     sampleUserObject(email = expectedEmail)
