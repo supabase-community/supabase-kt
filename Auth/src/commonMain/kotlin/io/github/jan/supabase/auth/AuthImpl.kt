@@ -41,6 +41,7 @@ import io.ktor.client.statement.HttpResponse
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
+import io.ktor.http.encodeURLParameter
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
@@ -306,7 +307,7 @@ internal class AuthImpl(
             codeChallenge?.let(::putCodeChallenge)
         }.toString()
         publicApi.postJson("recover", body) {
-            redirectUrl?.let { url.encodedParameters.append("redirect_to", it) }
+            redirectUrl?.let { url.parameters.append("redirect_to", it) }
         }
     }
 
@@ -616,11 +617,11 @@ internal class AuthImpl(
             config.queryParams["code_challenge_method"] = PKCEConstants.CHALLENGE_METHOD
         }
         return resolveUrl(buildString {
-            append("$url?provider=${provider.name}&redirect_to=$redirectUrl")
+            append("$url?provider=${provider.name}&redirect_to=${redirectUrl?.encodeURLParameter()}")
             if (config.scopes.isNotEmpty()) append("&scopes=${config.scopes.joinToString("+")}")
             if (config.queryParams.isNotEmpty()) {
                 for ((key, value) in config.queryParams) {
-                    append("&$key=$value")
+                    append("&$key=${value.encodeURLParameter()}")
                 }
             }
         })

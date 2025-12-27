@@ -30,6 +30,7 @@ import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.put
 import kotlin.test.Test
+import kotlin.test.assertContains
 import kotlin.test.assertEquals
 import kotlin.test.assertIs
 import kotlin.test.assertNotNull
@@ -110,7 +111,7 @@ class AuthRequestTest {
                 data = userData
             }
             assertNotNull(user)
-            assertEquals(expectedEmail, user?.email, "Email should be equal")
+            assertEquals(expectedEmail, user.email, "Email should be equal")
             assertNotNull(client.auth.currentSessionOrNull(), "Session should not be null")
             assertEquals(client.auth.sessionSource(), SessionSource.SignUp(Email))
         }
@@ -574,7 +575,8 @@ class AuthRequestTest {
         runTest {
             val expectedEmail = "example@email.com"
             val expectedCaptchaToken = "captchaToken"
-            val expectedRedirectUrl = "https://example.com"
+            val expectedRedirectUrl = "https://example.com?someParama=true&another=one" // Test that url params aren't stripped away
+            val encodedRedirectUrl = "https%3A%2F%2Fexample.com%3FsomeParama%3Dtrue%26another%3Done"
             val client = createMockedSupabaseClient(configuration = configuration) {
                 assertMethodIs(HttpMethod.Post, it.method)
                 assertPathIs("/recover", it.url.pathAfterVersion())
@@ -586,6 +588,7 @@ class AuthRequestTest {
                     metaSecurity["captcha_token"]?.jsonPrimitive?.content
                 )
                 assertEquals(expectedEmail, body["email"]?.jsonPrimitive?.content)
+                assertContains(it.url.toString(), encodedRedirectUrl)
                 assertEquals(expectedRedirectUrl, params["redirect_to"])
                 containsCodeChallenge(body)
                 respondJson(
