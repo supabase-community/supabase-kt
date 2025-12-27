@@ -5,12 +5,12 @@ import io.github.jan.supabase.auth.event.AuthEvent
 import io.github.jan.supabase.auth.status.SessionStatus
 import io.github.jan.supabase.logging.d
 
-internal fun checkForUrlParameterError(parameters: (String) -> String?): AuthEvent.OtpError? {
+internal fun checkForUrlParameterError(parameters: (String) -> String?): AuthEvent.ErrorCodeReceived? {
     val error = parameters("error")
     val errorCode = parameters("error_code")
     val errorDescription = parameters("error_description")
     return if(errorCode != null) {
-        AuthEvent.OtpError(
+        AuthEvent.ErrorCodeReceived(
             error = errorCode,
             errorDescription = "$errorDescription ($error)",
         )

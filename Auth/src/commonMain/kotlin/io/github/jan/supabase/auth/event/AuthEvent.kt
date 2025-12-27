@@ -3,6 +3,7 @@ package io.github.jan.supabase.auth.event
 import io.github.jan.supabase.annotations.SupabaseExperimental
 import io.github.jan.supabase.auth.Auth
 import io.github.jan.supabase.auth.exception.AuthErrorCode
+import io.github.jan.supabase.auth.exception.AuthRestException
 import io.github.jan.supabase.auth.status.RefreshFailureCause
 
 /**
@@ -14,12 +15,20 @@ import io.github.jan.supabase.auth.status.RefreshFailureCause
 sealed interface AuthEvent {
 
     /**
-     * This event means that there was an error while trying to authenticate the user, e.g. from external authentication providers like OAuth.
+     * This event indicates that an authentication error code was received, for example from
+     * external authentication providers like OAuth.
+     *
+     * The error code may appear in a deeplink on mobile targets (when handled via `handleDeeplinks`), an HTTP callback on desktop
+     * targets, or in the current URL on web targets. This is not to be confused with
+     * [AuthRestException], which is only thrown when an authentication request returns
+     * an error response.
+     *
      * You can use [errorCode] to further handle the error.
+     *
      * @param error The raw error code from the server.
      * @param errorDescription The description of the error.
      */
-    data class OtpError(val error: String, val errorDescription: String) : AuthEvent {
+    data class ErrorCodeReceived(val error: String, val errorDescription: String) : AuthEvent {
 
         /**
          * The error code of the rest exception. If [error] is not a known [AuthErrorCode], this will be null. Then, use [error] instead to get the raw unknown error code.

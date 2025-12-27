@@ -93,7 +93,7 @@ class ErrorHandlingTest {
         assertIs<SessionStatus.NotAuthenticated>(supabase.auth.sessionStatus.value)
         supabase.auth.events.test {
             val event = expectMostRecentItem()
-            assertIs<AuthEvent.OtpError>(event)
+            assertIs<AuthEvent.ErrorCodeReceived>(event)
             assertEquals(AuthErrorCode.OtpExpired, event.errorCode)
             assertEquals("Invalid request (invalid_request)", event.errorDescription)
         }

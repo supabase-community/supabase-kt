@@ -103,7 +103,7 @@ class PlatformSetupTest {
         auth.setupPlatform()
         auth.events.test {
             val errorEvent = awaitItem()
-            assertIs<AuthEvent.OtpError>(errorEvent)
+            assertIs<AuthEvent.ErrorCodeReceived>(errorEvent)
             assertEquals("myCode", errorEvent.error)
             assertEquals("Description (Error)", errorEvent.errorDescription)
         }
@@ -155,7 +155,7 @@ class PlatformSetupTest {
         auth.setupPlatform()
         auth.events.test {
             val errorEvent = awaitItem()
-            assertIs<AuthEvent.OtpError>(errorEvent)
+            assertIs<AuthEvent.ErrorCodeReceived>(errorEvent)
             assertEquals("myCode", errorEvent.error)
             assertEquals("Description (Error)", errorEvent.errorDescription)
         }
