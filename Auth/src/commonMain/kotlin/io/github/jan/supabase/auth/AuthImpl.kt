@@ -105,7 +105,7 @@ internal class AuthImpl(
         get() = Auth.key
 
     init {
-        if(supabaseClient.accessToken != null) error("The Auth plugin is not available when using a custom access token provider. Please uninstall the Auth plugin.")
+        if (supabaseClient.accessToken != null) error("The Auth plugin is not available when using a custom access token provider. Please uninstall the Auth plugin.")
     }
 
     override fun init() {
@@ -115,7 +115,7 @@ internal class AuthImpl(
                 Auth.logger.i {
                     "Loading session from storage..."
                 }
-                val successful = loadFromStorage()
+                val successful = loadFromStorage(initializing = true)
                 if (successful) {
                     Auth.logger.i {
                         "Successfully loaded session from storage!"
@@ -441,6 +441,13 @@ internal class AuthImpl(
         session: UserSession,
         autoRefresh: Boolean,
         source: SessionSource
+    ) = importSession(session, autoRefresh, source, false)
+
+    suspend fun importSession(
+        session: UserSession,
+        autoRefresh: Boolean,
+        source: SessionSource,
+        initializing: Boolean
     ) {
         Auth.logger.d { "Importing session $session from $source, auto refresh is set to $autoRefresh." }
         if (!autoRefresh) {
@@ -455,7 +462,7 @@ internal class AuthImpl(
         val thresholdDate = session.expiresAt - session.expiresIn.seconds * (1 - SESSION_REFRESH_THRESHOLD)
         if (thresholdDate <= Clock.System.now()) {
             Auth.logger.d { "Session is under the threshold date. Refreshing session..." }
-            recreateSessionJob(session, source, false)
+            recreateSessionJob(session, source, false, initializing)
         } else {
             if (config.autoSaveToStorage) {
                 sessionManager.saveSession(session)
@@ -463,15 +470,16 @@ internal class AuthImpl(
             }
             setSessionStatus(SessionStatus.Authenticated(session, source))
             Auth.logger.d { "Session imported successfully. Starting auto refresh..." }
-            recreateSessionJob(session, source, true)
+            recreateSessionJob(session, source, true, initializing)
             Auth.logger.d { "Auto refresh started." }
         }
     }
 
-    private fun recreateSessionJob(
+    private suspend fun recreateSessionJob(
         session: UserSession,
         source: SessionSource,
-        delay: Boolean
+        delay: Boolean,
+        initializing: Boolean
     ) {
         sessionJob?.cancel()
         sessionJob = authScope.launch {
@@ -482,6 +490,7 @@ internal class AuthImpl(
                 { updateStatusIfExpired(session, it) }
             )
         }
+        if (initializing) sessionJob?.join()
     }
 
     @Suppress("MagicNumber")
@@ -543,7 +552,11 @@ internal class AuthImpl(
     }
 
     override suspend fun startAutoRefreshForCurrentSession() =
-        importSession(currentSessionOrNull() ?: error("No session found"), true, (sessionStatus.value as SessionStatus.Authenticated).source)
+        importSession(
+            currentSessionOrNull() ?: error("No session found"),
+            true,
+            (sessionStatus.value as SessionStatus.Authenticated).source
+        )
 
     override fun stopAutoRefreshForCurrentSession() {
         Auth.logger.d { "Stopping auto refresh for current session" }
@@ -551,10 +564,12 @@ internal class AuthImpl(
         sessionJob = null
     }
 
-    override suspend fun loadFromStorage(autoRefresh: Boolean): Boolean {
+    override suspend fun loadFromStorage(autoRefresh: Boolean): Boolean = loadFromStorage(autoRefresh, false)
+
+    suspend fun loadFromStorage(autoRefresh: Boolean = config.alwaysAutoRefresh, initializing: Boolean): Boolean {
         val session = sessionManager.loadSession()
         session?.let {
-            importSession(it, autoRefresh, SessionSource.Storage)
+            importSession(it, autoRefresh, SessionSource.Storage, initializing)
         }
         return session != null
     }
