@@ -341,7 +341,7 @@ internal class AuthImpl(
         token: String?,
         captchaToken: String?,
         additionalData: JsonObjectBuilder.() -> Unit
-    ) {
+    ): OtpVerifyResult {
         val body = buildJsonObject {
             put("type", type)
             token?.let { put("token", it) }
@@ -352,9 +352,10 @@ internal class AuthImpl(
         val session = response.bodyOrNull<UserSession>()
         if(session == null) {
             Auth.logger.d { "Received `verifyOtp` response without session: ${response.bodyAsText()}. This may occur if changing the email with 'Secure email change' enabled" }
-            return
+            return OtpVerifyResult.VerifiedNoSession
         }
         importSession(session, source = SessionSource.SignIn(OTP))
+        return OtpVerifyResult.Authenticated(session)
     }
 
     override suspend fun verifyEmailOtp(
