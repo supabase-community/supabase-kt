@@ -349,7 +349,11 @@ internal class AuthImpl(
             additionalData()
         }
         val response = publicApi.postJson("verify", body)
-        val session = response.body<UserSession>()
+        val session = response.bodyOrNull<UserSession>()
+        if(session == null) {
+            Auth.logger.d { "Received `verifyOtp` response without session: ${response.bodyAsText()}. This may occur if changing the email with 'Secure email change' enabled" }
+            return
+        }
         importSession(session, source = SessionSource.SignIn(OTP))
     }
 
