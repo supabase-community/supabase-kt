@@ -6,7 +6,6 @@ import io.github.jan.supabase.safeBody
 import io.github.jan.supabase.storage.BucketApi.Companion.UPSERT_HEADER
 import io.github.jan.supabase.storage.resumable.ResumableCache
 import io.github.jan.supabase.storage.resumable.ResumableClientImpl
-import io.ktor.client.call.body
 import io.ktor.client.request.HttpRequestBuilder
 import io.ktor.client.request.header
 import io.ktor.client.request.setBody
@@ -63,7 +62,7 @@ internal class BucketApiImpl(override val bucketId: String, val storage: Storage
         val result = storage.api.post("object/upload/sign/$bucketId/$path") {
             header(UPSERT_HEADER, upsert.toString())
         }
-        val urlPath = result.body<JsonObject>()["url"]?.jsonPrimitive?.content?.substring(1)
+        val urlPath = result.safeBody<JsonObject>()["url"]?.jsonPrimitive?.content?.substring(1)
             ?: error("Expected a url in create upload signed url response")
         val url = Url(storage.resolveUrl(urlPath))
         return UploadSignedUrl(
@@ -120,7 +119,7 @@ internal class BucketApiImpl(override val bucketId: String, val storage: Storage
             putJsonObject("transform") {
                 putImageTransformation(transformation)
             }
-        }).body<JsonObject>()
+        }).safeBody<JsonObject>()
         return storage.resolveUrl(body["signedURL"]?.jsonPrimitive?.content?.substring(1)
             ?: error("Expected signed url in response"))
     }
@@ -134,7 +133,7 @@ internal class BucketApiImpl(override val bucketId: String, val storage: Storage
                 paths.forEach(this::add)
             }
             put("expiresIn", expiresIn.inWholeSeconds)
-        }).body<List<SignedUrl>>().map {
+        }).safeBody<List<SignedUrl>>().map {
             it.copy(signedURL = storage.resolveUrl(it.signedURL.substring(1)))
         }
         return body
@@ -160,7 +159,7 @@ internal class BucketApiImpl(override val bucketId: String, val storage: Storage
         return storage.api.rawRequest {
             prepareDownloadRequest(path, public, downloadOptions)
             downloadOptions.httpRequestOverrides.forEach { it() }
-        }.body()
+        }.safeBody()
     }
 
     override suspend fun downloadAuthenticated(
@@ -259,7 +258,7 @@ internal class BucketApiImpl(override val bucketId: String, val storage: Storage
             this.method = method
             defaultUploadRequest(path, data, optionBuilder)
             optionBuilder.httpRequestOverrides.forEach { it() }
-        }.body<JsonObject>()
+        }.safeBody<JsonObject>()
         val key = response["Key"]?.jsonPrimitive?.content
             ?: error("Expected a key in a upload response")
         val id = response["Id"]?.jsonPrimitive?.content
