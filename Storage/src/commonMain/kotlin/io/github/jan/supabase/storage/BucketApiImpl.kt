@@ -6,6 +6,7 @@ import io.github.jan.supabase.safeBody
 import io.github.jan.supabase.storage.BucketApi.Companion.UPSERT_HEADER
 import io.github.jan.supabase.storage.resumable.ResumableCache
 import io.github.jan.supabase.storage.resumable.ResumableClientImpl
+import io.ktor.client.call.body
 import io.ktor.client.request.HttpRequestBuilder
 import io.ktor.client.request.header
 import io.ktor.client.request.setBody
@@ -159,7 +160,7 @@ internal class BucketApiImpl(override val bucketId: String, val storage: Storage
         return storage.api.rawRequest {
             prepareDownloadRequest(path, public, downloadOptions)
             downloadOptions.httpRequestOverrides.forEach { it() }
-        }.safeBody()
+        }.body()
     }
 
     override suspend fun downloadAuthenticated(
