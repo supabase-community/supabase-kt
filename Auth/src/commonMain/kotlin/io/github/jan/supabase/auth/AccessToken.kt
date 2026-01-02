@@ -45,7 +45,7 @@ private suspend fun SupabaseClient.checkAccessToken(token: String) {
     val currentSession = auth.currentSessionOrNull()
     val now = Clock.System.now()
     val sessionExistsAndExpired =
-        token == currentSession?.accessToken && currentSession != null && currentSession.expiresAt < now
+        token == currentSession?.accessToken && currentSession.expiresAt < now
     val autoRefreshEnabled = auth.config.alwaysAutoRefresh
     if (sessionExistsAndExpired && autoRefreshEnabled) {
         val autoRefreshRunning = auth.isAutoRefreshRunning
