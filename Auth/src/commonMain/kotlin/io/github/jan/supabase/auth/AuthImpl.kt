@@ -178,7 +178,7 @@ internal class AuthImpl(
                 method = HttpMethod.Get
                 parameter("skip_http_redirect", true)
             }
-            response.body<JsonObject>()["url"]?.jsonPrimitive?.contentOrNull ?: error("No URL found in response")
+            response.safeBody<JsonObject>()["url"]?.jsonPrimitive?.contentOrNull ?: error("No URL found in response")
         }
         if(!automaticallyOpen) {
             return fetchUrl(redirectUrl ?: "")
@@ -241,7 +241,7 @@ internal class AuthImpl(
                 put("provider_id", it)
             }
         })
-            .body()
+            .safeBody()
     }
 
     override suspend fun updateUser(

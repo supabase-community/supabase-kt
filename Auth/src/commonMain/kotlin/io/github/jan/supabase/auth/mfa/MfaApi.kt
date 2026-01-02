@@ -8,7 +8,6 @@ import io.github.jan.supabase.auth.user.UserMfaFactor
 import io.github.jan.supabase.auth.user.UserSession
 import io.github.jan.supabase.putJsonObject
 import io.github.jan.supabase.safeBody
-import io.ktor.client.call.body
 import io.ktor.util.decodeBase64String
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -136,7 +135,7 @@ internal class MfaApiImpl(
             putJsonObject(factorType.encodeConfig(config))
             friendlyName?.let { put("friendly_name", it) }
         })
-        val json = result.body<JsonObject>()
+        val json = result.safeBody<JsonObject>()
         val factorData = factorType.decodeResponse(json)
         return MfaFactor(
             json["id"]!!.jsonPrimitive.content,
@@ -164,7 +163,7 @@ internal class MfaApiImpl(
             put("code", code)
             put("challenge_id", challengeId)
         })
-        val session = result.body<UserSession>()
+        val session = result.safeBody<UserSession>()
         if(saveSession) {
             auth.importSession(session)
         }
