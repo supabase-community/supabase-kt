@@ -32,6 +32,7 @@ import io.github.jan.supabase.exceptions.UnknownRestException
 import io.github.jan.supabase.logging.d
 import io.github.jan.supabase.logging.e
 import io.github.jan.supabase.logging.i
+import io.github.jan.supabase.network.supabaseApi
 import io.github.jan.supabase.putJsonObject
 import io.github.jan.supabase.safeBody
 import io.github.jan.supabase.supabaseJson
@@ -88,6 +89,8 @@ internal class AuthImpl(
     override val codeVerifierCache = config.codeVerifierCache ?: createDefaultCodeVerifierCache()
 
     internal val publicApi = supabaseClient.authenticatedSupabaseApi(this, requireSession = false)
+    @OptIn(SupabaseInternal::class)
+    internal val unauthenticatedApi = supabaseClient.supabaseApi(this)
     @OptIn(SupabaseInternal::class)
     internal val userApi = if(config.requireValidSession) supabaseClient.authenticatedSupabaseApi(this) else publicApi
     override val admin: AdminApi = AdminApiImpl(publicApi)
@@ -403,12 +406,10 @@ internal class AuthImpl(
         require(codeVerifier != null) {
             "No code verifier stored. Make sure to use `getOAuthUrl` for the OAuth Url to prepare the PKCE flow."
         }
-        val session = publicApi.postJson("token?grant_type=pkce", buildJsonObject {
+        val session = unauthenticatedApi.postJson("token?grant_type=pkce", buildJsonObject {
             put("auth_code", code)
             put("code_verifier", codeVerifier)
-        }) {
-            headers.remove("Authorization")
-        }.safeBody<UserSession>()
+        }).safeBody<UserSession>()
         codeVerifierCache.deleteCodeVerifier()
         if (saveSession) {
             importSession(session, source = SessionSource.External)
@@ -423,9 +424,7 @@ internal class AuthImpl(
         val body = buildJsonObject {
             put("refresh_token", refreshToken)
         }
-        val response = publicApi.postJson("token?grant_type=refresh_token", body) {
-            headers.remove("Authorization")
-        }
+        val response = unauthenticatedApi.postJson("token?grant_type=refresh_token", body)
         return response.safeBody("Auth#refreshSession")
     }
 
