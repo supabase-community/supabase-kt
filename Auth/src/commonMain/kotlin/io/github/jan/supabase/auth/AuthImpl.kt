@@ -380,8 +380,10 @@ internal class AuthImpl(
         phone: String,
         token: String,
         captchaToken: String?
-    ) = verify(type.type, token, captchaToken) {
-        put("phone", phone)
+    )  {
+        verify(type.type, token, captchaToken) {
+            put("phone", phone)
+        }
     }
 
     override suspend fun retrieveUser(jwt: String): UserInfo {

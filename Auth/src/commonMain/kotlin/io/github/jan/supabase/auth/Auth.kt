@@ -304,12 +304,17 @@ interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
     suspend fun verifyEmailOtp(type: OtpType.Email, email: String, token: String, captchaToken: String? = null): OtpVerifyResult
 
     /**
-     * Verifies a email otp token hash received via email
+     * Verifies an email otp token hash received via email
      * @param type The type of the verification
      * @param tokenHash The token hash used to verify
      * @throws RestException or one of its subclasses if receiving an error response. If the error response contains a error code, an [AuthRestException] will be thrown which can be used to easier identify the problem.
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
+     * @return [OtpVerifyResult.Authenticated] if the OTP was verified and a session was returned.
+     *
+     * [OtpVerifyResult.VerifiedNoSession] if the session was verified but no session was returned (for example when changing the E-Mail with the "Secure email change enabled" option enabled)
+     * @see OtpVerifyResult.VerifiedNoSession
+     * @see OtpVerifyResult.Authenticated
      */
     suspend fun verifyEmailOtp(type: OtpType.Email, tokenHash: String, captchaToken: String? = null): OtpVerifyResult
 
@@ -322,7 +327,7 @@ interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
-    suspend fun verifyPhoneOtp(type: OtpType.Phone, phone: String, token: String, captchaToken: String? = null): OtpVerifyResult
+    suspend fun verifyPhoneOtp(type: OtpType.Phone, phone: String, token: String, captchaToken: String? = null)
 
     /**
      * Retrieves the user attached to the specified [jwt]

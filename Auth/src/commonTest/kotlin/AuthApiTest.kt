@@ -3,6 +3,7 @@ import io.github.jan.supabase.auth.Auth
 import io.github.jan.supabase.auth.AuthConfig
 import io.github.jan.supabase.auth.FlowType
 import io.github.jan.supabase.auth.OtpType
+import io.github.jan.supabase.auth.OtpVerifyResult
 import io.github.jan.supabase.auth.PKCEConstants
 import io.github.jan.supabase.auth.SignOutScope
 import io.github.jan.supabase.auth.auth
@@ -634,7 +635,36 @@ class AuthRequestTest {
                     sampleUserSession()
                 )
             }
-            client.auth.verifyEmailOtp(expectedType, expectedEmail, expectedToken, expectedCaptchaToken)
+            assertIs<OtpVerifyResult.Authenticated>(client.auth.verifyEmailOtp(expectedType, expectedEmail, expectedToken, expectedCaptchaToken))
+        }
+    }
+
+    @Test
+    fun testVerifyEmailOtpNoSession() {
+        runTest {
+            val expectedType = OtpType.Email.EMAIL
+            val expectedToken = "token"
+            val expectedEmail = "example@email.com"
+            val expectedCaptchaToken = "captchaToken"
+            val client = createMockedSupabaseClient(configuration = configuration) {
+                assertMethodIs(HttpMethod.Post, it.method)
+                assertPathIs("/verify", it.url.pathAfterVersion())
+                val body = it.body.toJsonElement().jsonObject
+                val metaSecurity = body["gotrue_meta_security"]!!.jsonObject
+                assertEquals(
+                    expectedCaptchaToken,
+                    metaSecurity["captcha_token"]?.jsonPrimitive?.content
+                )
+                assertEquals(expectedToken, body["token"]?.jsonPrimitive?.content)
+                assertEquals(expectedEmail, body["email"]?.jsonPrimitive?.content)
+                assertEquals(expectedType.name.lowercase(), body["type"]?.jsonPrimitive?.content)
+                respondJson(
+                    buildJsonObject {
+                        put("status", "ok") // verified but no session
+                    }
+                )
+            }
+            assertIs<OtpVerifyResult.VerifiedNoSession>(client.auth.verifyEmailOtp(expectedType, expectedEmail, expectedToken, expectedCaptchaToken))
         }
     }
 
@@ -659,7 +689,35 @@ class AuthRequestTest {
                     sampleUserSession()
                 )
             }
-            client.auth.verifyEmailOtp(expectedType, tokenHash = expectedTokenHash, captchaToken = expectedCaptchaToken)
+            val result = client.auth.verifyEmailOtp(expectedType, tokenHash = expectedTokenHash, captchaToken = expectedCaptchaToken)
+            assertIs<OtpVerifyResult.Authenticated>(result)
+        }
+    }
+
+    @Test
+    fun testVerifyEmailOtpWithTokenHashNoSession() {
+        runTest {
+            val expectedType = OtpType.Email.EMAIL
+            val expectedTokenHash = "hash"
+            val expectedCaptchaToken = "captchaToken"
+            val client = createMockedSupabaseClient(configuration = configuration) {
+                assertMethodIs(HttpMethod.Post, it.method)
+                assertPathIs("/verify", it.url.pathAfterVersion())
+                val body = it.body.toJsonElement().jsonObject
+                val metaSecurity = body["gotrue_meta_security"]!!.jsonObject
+                assertEquals(
+                    expectedCaptchaToken,
+                    metaSecurity["captcha_token"]?.jsonPrimitive?.content
+                )
+                assertEquals(expectedTokenHash, body["token_hash"]?.jsonPrimitive?.content)
+                assertEquals(expectedType.name.lowercase(), body["type"]?.jsonPrimitive?.content)
+                respondJson(
+                    buildJsonObject {
+                        put("status", "ok") // verified but no session
+                    }
+                )
+            }
+            assertIs<OtpVerifyResult.VerifiedNoSession>(client.auth.verifyEmailOtp(expectedType, tokenHash = expectedTokenHash, captchaToken = expectedCaptchaToken))
         }
     }
 
