@@ -300,6 +300,11 @@ interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
      * @throws RestException or one of its subclasses if receiving an error response. If the error response contains a error code, an [AuthRestException] will be thrown which can be used to easier identify the problem.
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
+     * @return [OtpVerifyResult.Authenticated] if the OTP was verified and a session was returned.
+     *
+     * [OtpVerifyResult.VerifiedNoSession] if the session was verified but no session was returned (for example when changing the E-Mail with the "Secure email change enabled" option enabled)
+     * @see OtpVerifyResult.VerifiedNoSession
+     * @see OtpVerifyResult.Authenticated
      */
     suspend fun verifyEmailOtp(type: OtpType.Email, email: String, token: String, captchaToken: String? = null): OtpVerifyResult
 
