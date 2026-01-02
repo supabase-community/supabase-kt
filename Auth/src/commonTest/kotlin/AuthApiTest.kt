@@ -2,6 +2,7 @@ import io.github.jan.supabase.SupabaseClientBuilder
 import io.github.jan.supabase.auth.Auth
 import io.github.jan.supabase.auth.AuthConfig
 import io.github.jan.supabase.auth.FlowType
+import io.github.jan.supabase.auth.MemorySessionManager
 import io.github.jan.supabase.auth.OtpType
 import io.github.jan.supabase.auth.PKCEConstants
 import io.github.jan.supabase.auth.SignOutScope
@@ -35,6 +36,8 @@ import kotlin.test.assertEquals
 import kotlin.test.assertIs
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
+import kotlin.time.Clock
+import kotlin.time.Duration.Companion.minutes
 
 class AuthRequestTest {
 
@@ -730,8 +733,17 @@ class AuthRequestTest {
     @Test
     fun testRefreshSession() {
         runTest {
+            val configurationWithExpiredSession: SupabaseClientBuilder.() -> Unit = {
+                install(Auth) {
+                    minimalConfig()
+                    autoLoadFromStorage = true
+                    sessionManager = MemorySessionManager(userSession(expiresIn = 0).copy(expiresAt = Clock.System.now()-5.minutes))
+                    flowType = FlowType.PKCE
+                }
+            }
             val expectedRefreshToken = "refreshToken"
-            val client = createMockedSupabaseClient(configuration = configuration) {
+            val expectedSession = userSession()
+            val client = createMockedSupabaseClient(configuration = configurationWithExpiredSession) {
                 assertMethodIs(HttpMethod.Post, it.method)
                 assertPathIs("/token", it.url.pathAfterVersion())
                 val parameters = it.url.parameters
@@ -739,10 +751,47 @@ class AuthRequestTest {
                 val body = it.body.toJsonElement().jsonObject
                 assertEquals(expectedRefreshToken, body["refresh_token"]?.jsonPrimitive?.content)
                 respondJson(
-                    sampleUserSession()
+                    expectedSession
                 )
             }
-            client.auth.refreshSession(expectedRefreshToken)
+            client.auth.awaitInitialization()
+            client.auth.config.alwaysAutoRefresh = true // this config override is for catching edge cases (like for #1132)
+            val session = client.auth.refreshSession(expectedRefreshToken)
+            assertEquals(expectedSession, session)
+        }
+    }
+
+    @Test
+    fun testRefreshCurrentSession() {
+        runTest {
+            val configurationWithExpiredSession: SupabaseClientBuilder.() -> Unit = {
+                install(Auth) {
+                    minimalConfig()
+                    autoLoadFromStorage = true
+                    sessionManager = MemorySessionManager(userSession(expiresIn = 0).copy(expiresAt = Clock.System.now()-5.minutes, refreshToken = "refreshToken"))
+                    flowType = FlowType.PKCE
+                }
+            }
+            val expectedRefreshToken = "refreshToken"
+            val expectedSession = userSession()
+            val client = createMockedSupabaseClient(configuration = configurationWithExpiredSession) {
+                assertMethodIs(HttpMethod.Post, it.method)
+                assertPathIs("/token", it.url.pathAfterVersion())
+                val parameters = it.url.parameters
+                assertEquals("refresh_token", parameters["grant_type"])
+                val body = it.body.toJsonElement().jsonObject
+                assertEquals(expectedRefreshToken, body["refresh_token"]?.jsonPrimitive?.content)
+                respondJson(
+                    expectedSession
+                )
+            }
+            client.auth.awaitInitialization()
+            client.auth.config.alwaysAutoRefresh = true // this config override is for catching edge cases (like for #1132)
+            client.auth.refreshCurrentSession()
+            assertIs<SessionStatus.Authenticated>(client.auth.sessionStatus.value)
+            val status = client.auth.sessionStatus.value as SessionStatus.Authenticated
+            assertIs<SessionSource.Refresh>(status.source)
+            assertEquals(expectedSession, status.session)
         }
     }
 
