@@ -30,9 +30,14 @@ internal fun openUrl(uri: Uri, action: ExternalAuthAction) {
  * This handles the deeplinks for implicit and PKCE flow.
  * @param intent The intent from the activity
  * @param onSessionSuccess The callback when the session was successfully imported
+ * @param onError Callback invoked if an error occurs during the [Auth.exchangeCodeForSession] call.
  */
 @OptIn(SupabaseInternal::class)
-fun SupabaseClient.handleDeeplinks(intent: Intent, onSessionSuccess: (UserSession) -> Unit = {}) {
+fun SupabaseClient.handleDeeplinks(
+    intent: Intent,
+    onSessionSuccess: (UserSession) -> Unit = {},
+    onError: (Throwable) -> Unit = {}
+) {
     val data = intent.data ?: return
     val scheme = data.scheme ?: return
     val host = data.host ?: return
@@ -50,8 +55,12 @@ fun SupabaseClient.handleDeeplinks(intent: Intent, onSessionSuccess: (UserSessio
             }
             val code = data.getQueryParameter("code") ?: return
             (auth as AuthImpl).authScope.launch {
-                this@handleDeeplinks.auth.exchangeCodeForSession(code)
-                onSessionSuccess(this@handleDeeplinks.auth.currentSessionOrNull() ?: error("No session available"))
+                try {
+                    this@handleDeeplinks.auth.exchangeCodeForSession(code)
+                    onSessionSuccess(this@handleDeeplinks.auth.currentSessionOrNull() ?: error("No session available"))
+                } catch (e: Throwable) {
+                    onError(e)
+                }
             }
         }
     }
