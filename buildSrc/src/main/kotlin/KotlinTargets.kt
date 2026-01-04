@@ -1,4 +1,6 @@
+import com.android.build.api.dsl.androidLibrary
 import org.gradle.kotlin.dsl.assign
+import org.gradle.kotlin.dsl.extra
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
@@ -39,10 +41,18 @@ fun KotlinMultiplatformExtension.configuredJvmTarget(jvmTarget: JvmTarget = JvmT
     }
 }
 
-fun KotlinMultiplatformExtension.configuredAndroidTarget(jvmTarget: JvmTarget = JvmTarget.JVM_1_8) {
-    androidTarget {
-        publishLibraryVariants("release", "debug")
-        compilerOptions.jvmTarget = jvmTarget
+fun KotlinMultiplatformExtension.configuredAndroidTarget(
+    jvmTarget: JvmTarget = JvmTarget.JVM_1_8,
+) {
+    androidLibrary {
+        compileSdk = 36
+        minSdk = 23
+        this.namespace = namespace ?: "${project.extra["base-group"].toString().replace("-", ".")}.${project.name.replace("-", "")}.library"
+        compilations.configureEach {
+            compilerOptions.configure {
+                this.jvmTarget.set(jvmTarget)
+            }
+        }
     }
 }
 

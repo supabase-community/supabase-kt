@@ -1,6 +1,6 @@
 plugins {
     id(libs.plugins.kotlin.multiplatform.get().pluginId)
-    id(libs.plugins.android.library.get().pluginId)
+    id(libs.plugins.android.kotlin.multiplatform.library.get().pluginId)
 }
 
 description = "Extends supabase-kt with a Edge Functions Client"
@@ -26,5 +26,3 @@ kotlin {
         }
     }
 }
-
-configureLibraryAndroidTarget()

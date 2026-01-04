@@ -1,6 +1,7 @@
 plugins {
     id(libs.plugins.kotlin.multiplatform.get().pluginId)
-    id(libs.plugins.android.library.get().pluginId)
+   // id(libs.plugins.android.kotlin.multiplatform.library.get().pluginId)
+    id(libs.plugins.android.kotlin.multiplatform.library.get().pluginId)
     id(libs.plugins.detekt.get().pluginId)
     id(libs.plugins.dokka.get().pluginId)
     alias(libs.plugins.kotlinx.plugin.serialization)
@@ -63,4 +64,3 @@ kotlin {
     }
 }
 
-configureLibraryAndroidTarget()
