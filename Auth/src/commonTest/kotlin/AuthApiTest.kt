@@ -2,7 +2,9 @@ import io.github.jan.supabase.SupabaseClientBuilder
 import io.github.jan.supabase.auth.Auth
 import io.github.jan.supabase.auth.AuthConfig
 import io.github.jan.supabase.auth.FlowType
+import io.github.jan.supabase.auth.MemorySessionManager
 import io.github.jan.supabase.auth.OtpType
+import io.github.jan.supabase.auth.OtpVerifyResult
 import io.github.jan.supabase.auth.PKCEConstants
 import io.github.jan.supabase.auth.SignOutScope
 import io.github.jan.supabase.auth.auth
@@ -30,10 +32,13 @@ import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.put
 import kotlin.test.Test
+import kotlin.test.assertContains
 import kotlin.test.assertEquals
 import kotlin.test.assertIs
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
+import kotlin.time.Clock
+import kotlin.time.Duration.Companion.minutes
 
 class AuthRequestTest {
 
@@ -110,7 +115,7 @@ class AuthRequestTest {
                 data = userData
             }
             assertNotNull(user)
-            assertEquals(expectedEmail, user?.email, "Email should be equal")
+            assertEquals(expectedEmail, user.email, "Email should be equal")
             assertNotNull(client.auth.currentSessionOrNull(), "Session should not be null")
             assertEquals(client.auth.sessionSource(), SessionSource.SignUp(Email))
         }
@@ -574,7 +579,8 @@ class AuthRequestTest {
         runTest {
             val expectedEmail = "example@email.com"
             val expectedCaptchaToken = "captchaToken"
-            val expectedRedirectUrl = "https://example.com"
+            val expectedRedirectUrl = "https://example.com?someParama=true&another=one" // Test that url params aren't stripped away
+            val encodedRedirectUrl = "https%3A%2F%2Fexample.com%3FsomeParama%3Dtrue%26another%3Done"
             val client = createMockedSupabaseClient(configuration = configuration) {
                 assertMethodIs(HttpMethod.Post, it.method)
                 assertPathIs("/recover", it.url.pathAfterVersion())
@@ -586,6 +592,7 @@ class AuthRequestTest {
                     metaSecurity["captcha_token"]?.jsonPrimitive?.content
                 )
                 assertEquals(expectedEmail, body["email"]?.jsonPrimitive?.content)
+                assertContains(it.url.toString(), encodedRedirectUrl)
                 assertEquals(expectedRedirectUrl, params["redirect_to"])
                 containsCodeChallenge(body)
                 respondJson(
@@ -631,7 +638,36 @@ class AuthRequestTest {
                     sampleUserSession()
                 )
             }
-            client.auth.verifyEmailOtp(expectedType, expectedEmail, expectedToken, expectedCaptchaToken)
+            assertIs<OtpVerifyResult.Authenticated>(client.auth.verifyEmailOtp(expectedType, expectedEmail, expectedToken, expectedCaptchaToken))
+        }
+    }
+
+    @Test
+    fun testVerifyEmailOtpNoSession() {
+        runTest {
+            val expectedType = OtpType.Email.EMAIL
+            val expectedToken = "token"
+            val expectedEmail = "example@email.com"
+            val expectedCaptchaToken = "captchaToken"
+            val client = createMockedSupabaseClient(configuration = configuration) {
+                assertMethodIs(HttpMethod.Post, it.method)
+                assertPathIs("/verify", it.url.pathAfterVersion())
+                val body = it.body.toJsonElement().jsonObject
+                val metaSecurity = body["gotrue_meta_security"]!!.jsonObject
+                assertEquals(
+                    expectedCaptchaToken,
+                    metaSecurity["captcha_token"]?.jsonPrimitive?.content
+                )
+                assertEquals(expectedToken, body["token"]?.jsonPrimitive?.content)
+                assertEquals(expectedEmail, body["email"]?.jsonPrimitive?.content)
+                assertEquals(expectedType.name.lowercase(), body["type"]?.jsonPrimitive?.content)
+                respondJson(
+                    buildJsonObject {
+                        put("status", "ok") // verified but no session
+                    }
+                )
+            }
+            assertIs<OtpVerifyResult.VerifiedNoSession>(client.auth.verifyEmailOtp(expectedType, expectedEmail, expectedToken, expectedCaptchaToken))
         }
     }
 
@@ -656,7 +692,35 @@ class AuthRequestTest {
                     sampleUserSession()
                 )
             }
-            client.auth.verifyEmailOtp(expectedType, tokenHash = expectedTokenHash, captchaToken = expectedCaptchaToken)
+            val result = client.auth.verifyEmailOtp(expectedType, tokenHash = expectedTokenHash, captchaToken = expectedCaptchaToken)
+            assertIs<OtpVerifyResult.Authenticated>(result)
+        }
+    }
+
+    @Test
+    fun testVerifyEmailOtpWithTokenHashNoSession() {
+        runTest {
+            val expectedType = OtpType.Email.EMAIL
+            val expectedTokenHash = "hash"
+            val expectedCaptchaToken = "captchaToken"
+            val client = createMockedSupabaseClient(configuration = configuration) {
+                assertMethodIs(HttpMethod.Post, it.method)
+                assertPathIs("/verify", it.url.pathAfterVersion())
+                val body = it.body.toJsonElement().jsonObject
+                val metaSecurity = body["gotrue_meta_security"]!!.jsonObject
+                assertEquals(
+                    expectedCaptchaToken,
+                    metaSecurity["captcha_token"]?.jsonPrimitive?.content
+                )
+                assertEquals(expectedTokenHash, body["token_hash"]?.jsonPrimitive?.content)
+                assertEquals(expectedType.name.lowercase(), body["type"]?.jsonPrimitive?.content)
+                respondJson(
+                    buildJsonObject {
+                        put("status", "ok") // verified but no session
+                    }
+                )
+            }
+            assertIs<OtpVerifyResult.VerifiedNoSession>(client.auth.verifyEmailOtp(expectedType, tokenHash = expectedTokenHash, captchaToken = expectedCaptchaToken))
         }
     }
 
@@ -715,6 +779,7 @@ class AuthRequestTest {
                 assertEquals(expectedScope.name.lowercase(), parameters["scope"])
                 respond("")
             }
+            client.auth.awaitInitialization()
             client.auth.importSession(Json.decodeFromString(sampleUserSession()))
             assertNotNull(client.auth.currentSessionOrNull(), "Session should not be null")
             client.auth.signOut(expectedScope)
@@ -726,8 +791,17 @@ class AuthRequestTest {
     @Test
     fun testRefreshSession() {
         runTest {
+            val configurationWithExpiredSession: SupabaseClientBuilder.() -> Unit = {
+                install(Auth) {
+                    minimalConfig()
+                    autoLoadFromStorage = true
+                    sessionManager = MemorySessionManager(userSession(expiresIn = 0).copy(expiresAt = Clock.System.now()-5.minutes))
+                    flowType = FlowType.PKCE
+                }
+            }
             val expectedRefreshToken = "refreshToken"
-            val client = createMockedSupabaseClient(configuration = configuration) {
+            val expectedSession = userSession()
+            val client = createMockedSupabaseClient(configuration = configurationWithExpiredSession) {
                 assertMethodIs(HttpMethod.Post, it.method)
                 assertPathIs("/token", it.url.pathAfterVersion())
                 val parameters = it.url.parameters
@@ -735,10 +809,47 @@ class AuthRequestTest {
                 val body = it.body.toJsonElement().jsonObject
                 assertEquals(expectedRefreshToken, body["refresh_token"]?.jsonPrimitive?.content)
                 respondJson(
-                    sampleUserSession()
+                    expectedSession
                 )
             }
-            client.auth.refreshSession(expectedRefreshToken)
+            client.auth.awaitInitialization()
+            client.auth.config.alwaysAutoRefresh = true // this config override is for catching edge cases (like for #1132)
+            val session = client.auth.refreshSession(expectedRefreshToken)
+            assertEquals(expectedSession, session)
+        }
+    }
+
+    @Test
+    fun testRefreshCurrentSession() {
+        runTest {
+            val configurationWithExpiredSession: SupabaseClientBuilder.() -> Unit = {
+                install(Auth) {
+                    minimalConfig()
+                    autoLoadFromStorage = true
+                    sessionManager = MemorySessionManager(userSession(expiresIn = 0).copy(expiresAt = Clock.System.now()-5.minutes, refreshToken = "refreshToken"))
+                    flowType = FlowType.PKCE
+                }
+            }
+            val expectedRefreshToken = "refreshToken"
+            val expectedSession = userSession()
+            val client = createMockedSupabaseClient(configuration = configurationWithExpiredSession) {
+                assertMethodIs(HttpMethod.Post, it.method)
+                assertPathIs("/token", it.url.pathAfterVersion())
+                val parameters = it.url.parameters
+                assertEquals("refresh_token", parameters["grant_type"])
+                val body = it.body.toJsonElement().jsonObject
+                assertEquals(expectedRefreshToken, body["refresh_token"]?.jsonPrimitive?.content)
+                respondJson(
+                    expectedSession
+                )
+            }
+            client.auth.awaitInitialization()
+            client.auth.config.alwaysAutoRefresh = true // this config override is for catching edge cases (like for #1132)
+            client.auth.refreshCurrentSession()
+            assertIs<SessionStatus.Authenticated>(client.auth.sessionStatus.value)
+            val status = client.auth.sessionStatus.value as SessionStatus.Authenticated
+            assertIs<SessionSource.Refresh>(status.source)
+            assertEquals(expectedSession, status.session)
         }
     }
 

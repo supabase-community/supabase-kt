@@ -3,6 +3,7 @@ package io.github.jan.supabase.storage
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.SupabaseSerializer
 import io.github.jan.supabase.annotations.SupabaseInternal
+import io.github.jan.supabase.auth.AuthDependentPluginConfig
 import io.github.jan.supabase.auth.authenticatedSupabaseApi
 import io.github.jan.supabase.bodyOrNull
 import io.github.jan.supabase.collections.AtomicMutableMap
@@ -138,8 +139,9 @@ interface Storage : MainPlugin<Storage.Config>, CustomSerializationPlugin {
     data class Config(
         var transferTimeout: Duration = 120.seconds,
         @PublishedApi internal var resumable: Resumable = Resumable(),
-        override var serializer: SupabaseSerializer? = null
-    ) : MainConfig(), CustomSerializationConfig {
+        override var serializer: SupabaseSerializer? = null,
+        override var requireValidSession: Boolean = false,
+    ) : MainConfig(), CustomSerializationConfig, AuthDependentPluginConfig {
 
         /**
          * @param cache the cache for caching resumable upload urls
@@ -210,11 +212,11 @@ internal class StorageImpl(override val supabaseClient: SupabaseClient, override
     override val serializer: SupabaseSerializer = config.serializer ?: supabaseClient.defaultSerializer
 
     @OptIn(SupabaseInternal::class)
-    internal val api = supabaseClient.authenticatedSupabaseApi(this) {
+    internal val api = supabaseClient.authenticatedSupabaseApi(this, defaultRequest = {
         timeout {
             requestTimeoutMillis = config.transferTimeout.inWholeMilliseconds
         }
-    }
+    })
 
     private val resumableClients = AtomicMutableMap<String, BucketApi>()
 

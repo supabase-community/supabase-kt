@@ -4,6 +4,7 @@ import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.SupabaseSerializer
 import io.github.jan.supabase.annotations.SupabaseInternal
 import io.github.jan.supabase.auth.Auth
+import io.github.jan.supabase.auth.AuthDependentPluginConfig
 import io.github.jan.supabase.auth.authenticatedSupabaseApi
 import io.github.jan.supabase.encode
 import io.github.jan.supabase.exceptions.BadRequestRestException
@@ -141,7 +142,7 @@ class Functions(override val config: Config, override val supabaseClient: Supaba
      * @param jwtToken A jwt token to use for the requests. If not provided, the token from the [Auth] plugin, or the supabaseKey will be used
      * @property serializer A serializer used for serializing/deserializing objects e.g. in [Functions.invoke] or [EdgeFunction.invoke]. Defaults to [KotlinXSerializer]
      */
-    class Config : MainConfig(), CustomSerializationConfig {
+    class Config : MainConfig(), CustomSerializationConfig, AuthDependentPluginConfig {
 
         override var serializer: SupabaseSerializer? = null
 
@@ -149,6 +150,8 @@ class Functions(override val config: Config, override val supabaseClient: Supaba
          * The default region to use when invoking a function
          */
         var defaultRegion: FunctionRegion = FunctionRegion.ANY
+
+        override var requireValidSession: Boolean = false
 
     }
 

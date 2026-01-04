@@ -2,14 +2,13 @@ package io.github.jan.supabase.auth.admin
 
 import io.github.jan.supabase.annotations.SupabaseInternal
 import io.github.jan.supabase.auth.Auth
-import io.github.jan.supabase.auth.AuthImpl
+import io.github.jan.supabase.auth.AuthenticatedSupabaseApi
 import io.github.jan.supabase.auth.SignOutScope
 import io.github.jan.supabase.auth.user.UserInfo
 import io.github.jan.supabase.auth.user.UserMfaFactor
 import io.github.jan.supabase.putJsonObject
 import io.github.jan.supabase.safeBody
 import io.github.jan.supabase.supabaseJson
-import io.ktor.client.call.body
 import io.ktor.client.request.parameter
 import io.ktor.http.HttpHeaders
 import kotlinx.serialization.json.Json
@@ -99,9 +98,7 @@ interface AdminApi {
 }
 
 @PublishedApi
-internal class AdminApiImpl(val gotrue: Auth) : AdminApi {
-
-    val api = (gotrue as AuthImpl).api
+internal class AdminApiImpl(val api: AuthenticatedSupabaseApi) : AdminApi {
 
     override suspend fun signOut(jwt: String, scope: SignOutScope) {
         api.post("logout") {
@@ -124,7 +121,7 @@ internal class AdminApiImpl(val gotrue: Auth) : AdminApi {
         return api.get("admin/users") {
             page?.let { url.parameters.append("page", it.toString()) }
             perPage?.let { url.parameters.append("per_page", it.toString()) }
-        }.body<JsonObject>().let { supabaseJson.decodeFromJsonElement(it["users"] ?: error("Didn't get users json field on method retrieveUsers. Full body: $it")) }
+        }.safeBody<JsonObject>().let { supabaseJson.decodeFromJsonElement(it["users"] ?: error("Didn't get users json field on method retrieveUsers. Full body: $it")) }
     }
 
     override suspend fun retrieveUserById(uid: String): UserInfo {
@@ -183,6 +180,6 @@ suspend inline fun <reified C : LinkType.Config> AdminApi.generateLinkFor(
         put("type", linkType.type)
         putJsonObject(Json.encodeToJsonElement(generatedConfig).jsonObject)
     }
-    val user = api.postJson("admin/generate_link", body) { redirectTo?.let { url.parameters.append("redirect_to", it) }}.body<UserInfo>()
+    val user = api.postJson("admin/generate_link", body) { redirectTo?.let { url.parameters.append("redirect_to", it) }}.safeBody<UserInfo>()
     return user.actionLink!! to user
 }

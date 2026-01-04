@@ -1,9 +1,11 @@
 package io.github.jan.supabase.auth
 
+import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.SupabaseClientBuilder
 import io.github.jan.supabase.SupabaseSerializer
 import io.github.jan.supabase.annotations.SupabaseExperimental
 import io.github.jan.supabase.annotations.SupabaseInternal
+import io.github.jan.supabase.auth.user.UserSession
 import io.github.jan.supabase.plugins.CustomSerializationConfig
 import io.github.jan.supabase.plugins.MainConfig
 import kotlinx.coroutines.CoroutineDispatcher
@@ -13,12 +15,12 @@ import kotlin.time.Duration.Companion.seconds
 /**
  * The configuration for [Auth]
  */
-expect class AuthConfig() : CustomSerializationConfig, AuthConfigDefaults
+expect class AuthConfig() : AuthConfigDefaults
 
 /**
  * The default values for the [AuthConfig]
  */
-open class AuthConfigDefaults : MainConfig() {
+open class AuthConfigDefaults : MainConfig(), AuthDependentPluginConfig, CustomSerializationConfig {
 
     /**
      * The duration after which [Auth] should retry refreshing a session, when it failed due to network issues
@@ -64,7 +66,7 @@ open class AuthConfigDefaults : MainConfig() {
     /**
      * A serializer used for serializing/deserializing objects e.g. in [Auth.signInWith]. Defaults to [SupabaseClientBuilder.defaultSerializer], when null.
      */
-    var serializer: SupabaseSerializer? = null
+    override var serializer: SupabaseSerializer? = null
 
     /**
      * The deeplink scheme used for the implicit and PKCE flow. When null, deeplinks won't be used as redirect urls
@@ -109,6 +111,20 @@ open class AuthConfigDefaults : MainConfig() {
      */
     @SupabaseInternal
     var autoSetupPlatform: Boolean = true
+
+    /**
+     * Whether to check if the current session is expired on an authenticated request and possibly try to refresh it.
+     *
+     * **Note: This option is experimental and is a fail-safe for when the auto refresh fails. This option may be removed without notice.**
+     */
+    @SupabaseExperimental
+    var checkSessionOnRequest: Boolean = true
+
+    /**
+     * Whether to require a valid [UserSession] in the [Auth] plugin to make any request with this plugin. The [SupabaseClient.supabaseKey] cannot be used as fallback.
+     */
+    @SupabaseExperimental
+    override var requireValidSession: Boolean = false
 
 }
 
