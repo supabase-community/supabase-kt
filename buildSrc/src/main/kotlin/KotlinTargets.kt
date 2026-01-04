@@ -45,8 +45,8 @@ fun KotlinMultiplatformExtension.configuredAndroidTarget(
     jvmTarget: JvmTarget = JvmTarget.JVM_1_8,
 ) {
     androidLibrary {
-        compileSdk = 35
-        minSdk = 21
+        compileSdk = 36
+        minSdk = 23
         this.namespace = namespace ?: "${project.extra["base-group"].toString().replace("-", ".")}.${project.name.replace("-", "")}.library"
         compilations.configureEach {
             compilerOptions.configure {
