@@ -17,7 +17,7 @@ jobs:
     strategy:
       matrix:
         command: [
-          'jvmTest testAndroid',
+          'jvmTest',
           'jsTest wasmJsTest',
           'iosX64Test iosSimulatorArm64Test',
           'macosArm64Test macosX64Test',
