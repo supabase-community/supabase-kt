@@ -257,11 +257,12 @@ interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
      * @param type The email otp type
      * @param email The email to resend the otp to
      * @param captchaToken The captcha token to use
+     * @param redirectUrl The redirect Url
      * @throws RestException or one of its subclasses if receiving an error response. If the error response contains a error code, an [AuthRestException] will be thrown which can be used to easier identify the problem.
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
-    suspend fun resendEmail(type: OtpType.Email, email: String, captchaToken: String? = null)
+    suspend fun resendEmail(type: OtpType.Email, email: String, captchaToken: String? = null, redirectUrl: String? = defaultRedirectUrl())
 
     /**
      * Resends an existing SMS OTP or phone change OTP.
