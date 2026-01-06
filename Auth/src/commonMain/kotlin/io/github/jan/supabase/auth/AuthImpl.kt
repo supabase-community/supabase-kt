@@ -268,9 +268,10 @@ internal class AuthImpl(
         })
     }
 
-    override suspend fun resendEmail(type: OtpType.Email, email: String, captchaToken: String?) =
+    override suspend fun resendEmail(type: OtpType.Email, email: String, captchaToken: String?, redirectUrl: String?) =
         resend(type.type) {
             put("email", email)
+            put("redirect_to", redirectUrl)
             captchaToken?.let(::putCaptchaToken)
         }
 
