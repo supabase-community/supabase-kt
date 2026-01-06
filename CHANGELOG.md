@@ -1,5 +1,55 @@
 # Changelog
 
+### 3.3.0 - January 4, 2026
+
+### Core
+
+* Update Kotlin to version `3.3.0`
+* fix: Make OS version optional in headers by @rafsanjani in https://github.com/supabase-community/supabase-kt/pull/1088
+* Implement Native Google OAuth iOS in sample by @hieuwu in https://github.com/supabase-community/supabase-kt/pull/1093
+* Mask sensitive information in `RestException` by @jan-tennert in https://github.com/supabase-community/supabase-kt/pull/1113
+* Migrate to new Multiplatform Android Plugin by @jan-tennert in https://github.com/supabase-community/supabase-kt/pull/1013
+* Change `body()` calls to `safeBody()` by @jan-tennert in https://github.com/supabase-community/supabase-kt/pull/1131
+
+### Auth
+
+* Refactor platform specific auth initialization by @jan-tennert in https://github.com/supabase-community/supabase-kt/pull/1100
+* Add session failsafe and option to require a session for requests by @jan-tennert in https://github.com/supabase-community/supabase-kt/pull/1071
+  - When trying to make a request with an expired access token, the client will try to force-refresh the session
+  - There is a new option for all plugins to require the user to be authenticated to make requests with that plugin (instead of falling back to the api key as the access token). Note that some methods ignore this option.
+* Add `onError` parameter to `handleDeeplink` methods by @jan-tennert in https://github.com/supabase-community/supabase-kt/pull/1136
+  This is meant to handle exceptions happening when verifying the PKCE code contained in the deeplink
+* Handle secure email changes in `Auth#verify` by @jan-tennert in https://github.com/supabase-community/supabase-kt/pull/1130
+  `Auth#verifyEmailOtp()` will now return an `OtpVerifyResult`, depending on if the response contains a session.
+* Expose `Auth#defaultRedirectUrl()` by @jan-tennert in https://github.com/supabase-community/supabase-kt/pull/1134
+* Fix infinite recursion for expired sessions by @jan-tennert in https://github.com/supabase-community/supabase-kt/pull/1133
+* Fix a bug causing the sessionStatus to be set earlier than loading from storage by @jan-tennert in https://github.com/supabase-community/supabase-kt/pull/1128
+* Fix `redirect_to` url parameter for `resetPasswordForEmail()` and `getOAuthUrl()` values not being encoded by @jan-tennert in https://github.com/supabase-community/supabase-kt/pull/1125
+
+### Realtime
+
+* Classify events with error status code as error events by @jan-tennert in https://github.com/supabase-community/supabase-kt/pull/1123
+
+### Compose Auth
+
+- **Implement Native Google OAuth for Apple targets** by @hieuwu in https://github.com/supabase-community/supabase-kt-plugins/pull/45 also big thanks to @dosier!
+  Checkout [the README](https://github.com/supabase-community/supabase-kt-plugins/tree/main/ComposeAuth#native-google-auth-on-ios) for more information
+
+### Postgrest
+
+* only escape filters inside logical expressions and `in` lists by @sproctor in https://github.com/supabase-community/supabase-kt/pull/1090
+
+### Storage
+
+* Add support for bucket pagination and sorting by @jan-tennert in https://github.com/supabase-community/supabase-kt/pull/1087
+### 3.2.6 - October 29, 2025
+
+- Update Kotlin to version `2.2.21`
+
+### Postgrest
+
+- Do not escape numbers in Postgrest & escape `filterNot` by @jan-tennert in https://github.com/supabase-community/supabase-kt/pull/1084
+
 ### 3.2.5 - October 15, 2025
 
 ### Auth

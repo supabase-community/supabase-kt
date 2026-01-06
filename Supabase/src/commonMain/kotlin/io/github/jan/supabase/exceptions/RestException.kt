@@ -1,5 +1,7 @@
 package io.github.jan.supabase.exceptions
 
+import io.github.jan.supabase.StringMasking.maskHeaders
+import io.github.jan.supabase.StringMasking.maskUrl
 import io.ktor.client.statement.HttpResponse
 import io.ktor.client.statement.request
 
@@ -17,8 +19,8 @@ import io.ktor.client.statement.request
  */
 open class RestException(val error: String, val description: String?, val response: HttpResponse): Exception("""
         $error${description?.let { "\n$it" } ?: ""}
-        URL: ${response.request.url}
-        Headers: ${response.request.headers.entries()}
+        URL: ${maskUrl(response.request.url)}
+        Headers: ${maskHeaders(response.request.headers)}
         Http Method: ${response.request.method.value}
 """.trimIndent()) {
 

@@ -17,7 +17,7 @@ fun libraryModules(withBom: Boolean = true, init: Project.() -> Unit) = configur
 
 plugins {
     id(libs.plugins.kotlin.multiplatform.get().pluginId) apply false
-    id(libs.plugins.android.library.get().pluginId) apply false
+    id(libs.plugins.android.kotlin.multiplatform.library.get().pluginId) apply false
     id(libs.plugins.detekt.get().pluginId) apply false
     id(libs.plugins.dokka.get().pluginId)
     alias(libs.plugins.kotlinx.plugin.serialization) apply false

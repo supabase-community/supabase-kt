@@ -8,12 +8,16 @@ on:
     branches:
       - 'master'
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   test:
     strategy:
       matrix:
         command: [
-          'jvmTest testDebugUnitTest testReleaseUnitTest',
+          'jvmTest',
           'jsTest wasmJsTest',
           'iosX64Test iosSimulatorArm64Test',
           'macosArm64Test macosX64Test',

@@ -5,6 +5,7 @@ import io.github.jan.supabase.realtime.Realtime
 import io.github.jan.supabase.realtime.RealtimeChannel
 import io.github.jan.supabase.realtime.RealtimeChannelImpl
 import io.github.jan.supabase.realtime.RealtimeMessage
+import kotlinx.serialization.json.jsonPrimitive
 import kotlin.concurrent.atomics.incrementAndFetch
 
 /**
@@ -16,16 +17,16 @@ data object RErrorEvent : RealtimeEvent {
         channel as RealtimeChannelImpl
         val currentAttempt = channel.joinAttempt.incrementAndFetch()
         if(currentAttempt >= channel.realtime.config.maxAttempts) {
-            Realtime.logger.e { "Failed to rejoin channel ${message.topic} after $currentAttempt attempts. Giving up." }
+            Realtime.logger.e { "Failed to rejoin channel ${message.topic} after $currentAttempt attempts. Giving up. ${message.payload}" }
             channel.updateStatus(RealtimeChannel.Status.UNSUBSCRIBED)
             return
         }
-        Realtime.logger.e { "Received an error in channel ${message.topic}. That could be as a result of an invalid access token. Trying to rejoin the channel..." }
+        Realtime.logger.e { "Received an error in channel ${message.topic}. That could be as a result of an invalid access token. Trying to rejoin the channel...\n${message.payload}" }
         channel.scheduleRejoin()
     }
 
     override fun appliesTo(message: RealtimeMessage): Boolean {
-        return message.event == RealtimeChannel.CHANNEL_EVENT_ERROR
+        return message.event == RealtimeChannel.CHANNEL_EVENT_ERROR || message.payload["status"]?.jsonPrimitive?.content == "error"
     }
 
 }

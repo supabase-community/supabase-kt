@@ -25,13 +25,11 @@ import io.github.jan.supabase.auth.user.UserUpdateBuilder
 import io.github.jan.supabase.exceptions.HttpRequestException
 import io.github.jan.supabase.exceptions.RestException
 import io.github.jan.supabase.logging.SupabaseLogger
-import io.github.jan.supabase.logging.e
 import io.github.jan.supabase.plugins.CustomSerializationPlugin
 import io.github.jan.supabase.plugins.MainPlugin
 import io.github.jan.supabase.plugins.SupabasePluginProvider
 import io.ktor.client.plugins.HttpRequestTimeoutException
-import kotlinx.coroutines.currentCoroutineContext
-import kotlinx.coroutines.ensureActive
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.serialization.json.JsonObject
@@ -91,6 +89,12 @@ interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
      * The cache for the code verifier. This is used for PKCE authentication. Can be customized via [AuthConfig.codeVerifierCache]
      */
     val codeVerifierCache: CodeVerifierCache
+
+    /**
+     * The coroutine scope used for background auth requests (e.g. session refreshes)
+     */
+    @SupabaseInternal
+    val authScope: CoroutineScope
 
     /**
      * Signs up a new user with the specified [provider]
@@ -297,18 +301,28 @@ interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
      * @throws RestException or one of its subclasses if receiving an error response. If the error response contains a error code, an [AuthRestException] will be thrown which can be used to easier identify the problem.
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
+     * @return [OtpVerifyResult.Authenticated] if the OTP was verified and a session was returned.
+     *
+     * [OtpVerifyResult.VerifiedNoSession] if the session was verified but no session was returned (for example when changing the E-Mail with the "Secure email change enabled" option enabled)
+     * @see OtpVerifyResult.VerifiedNoSession
+     * @see OtpVerifyResult.Authenticated
      */
-    suspend fun verifyEmailOtp(type: OtpType.Email, email: String, token: String, captchaToken: String? = null)
+    suspend fun verifyEmailOtp(type: OtpType.Email, email: String, token: String, captchaToken: String? = null): OtpVerifyResult
 
     /**
-     * Verifies a email otp token hash received via email
+     * Verifies an email otp token hash received via email
      * @param type The type of the verification
      * @param tokenHash The token hash used to verify
      * @throws RestException or one of its subclasses if receiving an error response. If the error response contains a error code, an [AuthRestException] will be thrown which can be used to easier identify the problem.
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
+     * @return [OtpVerifyResult.Authenticated] if the OTP was verified and a session was returned.
+     *
+     * [OtpVerifyResult.VerifiedNoSession] if the session was verified but no session was returned (for example when changing the E-Mail with the "Secure email change enabled" option enabled)
+     * @see OtpVerifyResult.VerifiedNoSession
+     * @see OtpVerifyResult.Authenticated
      */
-    suspend fun verifyEmailOtp(type: OtpType.Email, tokenHash: String, captchaToken: String? = null)
+    suspend fun verifyEmailOtp(type: OtpType.Email, tokenHash: String, captchaToken: String? = null): OtpVerifyResult
 
     /**
      * Verifies a phone/sms otp
@@ -497,6 +511,7 @@ interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
         const val API_VERSION = 1
 
         override fun createConfig(init: AuthConfig.() -> Unit) = AuthConfig().apply(init)
+
         override fun create(supabaseClient: SupabaseClient, config: AuthConfig): Auth = AuthImpl(supabaseClient, config)
 
     }
@@ -508,11 +523,3 @@ interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
  */
 val SupabaseClient.auth: Auth
     get() = pluginManager.getPlugin(Auth)
-
-private suspend fun Auth.tryToGetUser(jwt: String) = try {
-    retrieveUser(jwt)
-} catch (e: Exception) {
-    currentCoroutineContext().ensureActive()
-    Auth.logger.e(e) { "Couldn't retrieve user using your custom jwt token. If you use the project secret ignore this message" }
-    null
-}

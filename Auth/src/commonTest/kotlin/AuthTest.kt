@@ -24,6 +24,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.json.buildJsonObject
 import kotlin.test.Test
+import kotlin.test.assertContains
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 import kotlin.test.assertIs
@@ -39,36 +40,32 @@ class AuthTest {
     }
 
     @Test
-    fun testLoadingSessionFromStorage() {
-        runTest {
-            val sessionManager = MemorySessionManager(userSession())
-            val client = createMockedSupabaseClient(
-                configuration = {
-                    install(Auth) {
-                        minimalConfig()
-                        this.sessionManager = sessionManager
-                        autoLoadFromStorage = true
-                    }
+    fun testLoadingSessionFromStorage() = runTest {
+        val sessionManager = MemorySessionManager(userSession())
+        val client = createMockedSupabaseClient(
+            configuration = {
+                install(Auth) {
+                    minimalConfig()
+                    this.sessionManager = sessionManager
+                    autoLoadFromStorage = true
                 }
-            )
-            client.auth.awaitInitialization()
-            assertIs<SessionStatus.Authenticated>(client.auth.sessionStatus.value)
-        }
+            }
+        )
+        client.auth.awaitInitialization()
+        assertIs<SessionStatus.Authenticated>(client.auth.sessionStatus.value)
     }
 
     @Test
-    fun testErrorWhenUsingAccessToken() {
-        runTest {
-            assertFailsWith<IllegalStateException> {
-                createMockedSupabaseClient(
-                    configuration = {
-                        accessToken = {
-                            "myToken"
-                        }
-                        install(Auth)
+    fun testErrorWhenUsingAccessToken() = runTest {
+        assertFailsWith<IllegalStateException> {
+            createMockedSupabaseClient(
+                configuration = {
+                    accessToken = {
+                        "myToken"
                     }
-                )
-            }
+                    install(Auth)
+                }
+            )
         }
     }
 
@@ -118,6 +115,7 @@ class AuthTest {
                     assertIs<SessionSource.Refresh>(item.source)
                     assertEquals(newSession.expiresIn, client.auth.currentSessionOrNull()?.expiresIn)
                 }
+            client.auth.stopAutoRefreshForCurrentSession()
         }
     }
 
@@ -174,13 +172,13 @@ class AuthTest {
                 assertIs<AuthEvent.RefreshFailure>(event)
                 assertIs<RefreshFailureCause.NetworkError>(event.cause)
             }
+            client.auth.stopAutoRefreshForCurrentSession()
         }
     }
 
     @Test
     fun testAutoRefreshFailureServerErrorValidSession() {
         runTest {
-            val newSession = userSession()
             val client = createMockedSupabaseClient(configuration = {
                 install(Auth) {
                     minimalConfig()
@@ -190,6 +188,7 @@ class AuthTest {
             }) {
                 respondError(HttpStatusCode.InternalServerError, "{}")
             }
+            client.auth.awaitInitialization()
             assertIs<SessionStatus.NotAuthenticated>(client.auth.sessionStatus.value)
             val session = userSession(expiresIn = 1)
             client.auth.importSession(session)
@@ -199,6 +198,7 @@ class AuthTest {
                 assertIs<AuthEvent.RefreshFailure>(event)
                 assertIs<RefreshFailureCause.InternalServerError>(event.cause)
             }
+            client.auth.stopAutoRefreshForCurrentSession()
         }
     }
 
@@ -237,13 +237,14 @@ class AuthTest {
     fun testGetOAuthUrl() {
         runTest {
             val expectedProvider = Github
-            val expectedRedirectUrl = "https://example.com/auth/callback"
+            val expectedRedirectUrl = "https://example.com?someParama=true&another=one" // Test that url params aren't stripped away
+            val encodedRedirectUrl = "https%3A%2F%2Fexample.com%3FsomeParama%3Dtrue%26another%3Done"
             val endpoint = "authorize/custom/endpoint"
             val supabaseUrl = "https://id.supabase.co"
             val client = createMockedSupabaseClient(supabaseUrl = supabaseUrl, configuration = configuration)
             client.auth.awaitInitialization()
             val url = Url(client.auth.getOAuthUrl(expectedProvider, expectedRedirectUrl, endpoint) {
-                queryParams["key"] = "value"
+                queryParams["key"] = "value.!.,with?special"
                 scopes.add("scope1")
                 scopes.add("scope2")
             })
@@ -255,13 +256,21 @@ class AuthTest {
                 expectedProvider.name,
                 url.parameters["provider"]
             )
+            assertContains(
+                url.toString(),
+                encodedRedirectUrl
+            )
             assertEquals(
                 expectedRedirectUrl,
                 url.parameters["redirect_to"]
             )
             assertEquals(
-                "value",
+                "value.!.,with?special",
                 url.parameters["key"]
+            )
+            assertContains(
+                url.toString(),
+                "value.%21.%2Cwith%3Fspecial"
             )
             assertEquals(
                 "scope1 scope2",

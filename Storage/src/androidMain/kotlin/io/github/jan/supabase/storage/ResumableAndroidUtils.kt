@@ -17,7 +17,7 @@ import io.ktor.utils.io.jvm.javaio.toByteReadChannel
 suspend fun ResumableClient.createOrContinueUpload(path: String, uri: Uri, options: UploadOptionBuilder.() -> Unit = {}) = createOrContinueUpload(uri.createByteReader(), uri.toString(), uri.contentSize, path, options)
 
 @SuppressLint("Recycle")
-private suspend fun Uri.createByteReader(): suspend (Long) -> ByteReadChannel = { offset: Long ->
+private fun Uri.createByteReader(): suspend (Long) -> ByteReadChannel = { offset: Long ->
     val context = applicationContext()
     val inputStream = context.contentResolver.openInputStream(this) ?: throw IllegalArgumentException("Uri is not readable")
     inputStream.toByteReadChannel().apply { discard(offset) }

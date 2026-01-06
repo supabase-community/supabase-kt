@@ -1,5 +1,5 @@
 import androidx.compose.ui.ExperimentalComposeUiApi
-import androidx.compose.ui.window.CanvasBasedWindow
+import androidx.compose.ui.window.ComposeViewport
 import io.github.jan.supabase.common.App
 import io.github.jan.supabase.common.AppViewModel
 import io.github.jan.supabase.common.di.initKoin
@@ -18,7 +18,7 @@ fun main() {
     initKoin()
     val root = RootComponent()
     onWasmReady {
-        CanvasBasedWindow(title = "MFA App") {
+        ComposeViewport("ComposeTarget") {
             App(root.viewModel)
         }
     }

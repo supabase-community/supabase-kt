@@ -1,14 +1,13 @@
 package io.github.jan.supabase.auth
 
 import io.github.jan.supabase.auth.server.HttpCallbackHtml
-import io.github.jan.supabase.plugins.CustomSerializationConfig
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
 
 /**
  * The configuration for [Auth]
  */
-actual class AuthConfig : CustomSerializationConfig, AuthConfigDefaults() {
+actual class AuthConfig : AuthConfigDefaults() {
 
     internal var httpCallbackConfig: HttpCallbackConfig = HttpCallbackConfig()
 

@@ -14,8 +14,8 @@ import io.github.jan.supabase.auth.redirectTo
 import io.github.jan.supabase.auth.user.UserSession
 import io.github.jan.supabase.logging.w
 import io.github.jan.supabase.putJsonObject
+import io.github.jan.supabase.safeBody
 import io.github.jan.supabase.supabaseJson
-import io.ktor.client.call.body
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonObject
@@ -59,10 +59,10 @@ sealed interface DefaultAuthProvider<C, R> : AuthProvider<C, R> {
         val encodedCredentials = encodeCredentials(config)
         val gotrue = supabaseClient.auth as AuthImpl
         val url = "token?grant_type=$grantType"
-        val response = gotrue.api.postJson(url, encodedCredentials) {
+        val response = gotrue.publicApi.postJson(url, encodedCredentials) {
             redirectUrl?.let { redirectTo(it) }
         }
-        response.body<UserSession>().also {
+        response.safeBody<UserSession>().also {
             onSuccess(it)
         }
     }
@@ -87,7 +87,7 @@ sealed interface DefaultAuthProvider<C, R> : AuthProvider<C, R> {
             Phone -> "signup"
             IDToken -> "token?grant_type=id_token"
         }
-        val response = gotrue.api.postJson(url, buildJsonObject {
+        val response = gotrue.publicApi.postJson(url, buildJsonObject {
             putJsonObject(body)
             if (codeChallenge != null) {
                 putCodeChallenge(codeChallenge)
@@ -95,7 +95,7 @@ sealed interface DefaultAuthProvider<C, R> : AuthProvider<C, R> {
         }) {
             redirectUrl?.let { redirectTo(it) }
         }
-        val json = response.body<JsonObject>()
+        val json = response.safeBody<JsonObject>()
         if (json.containsKey("access_token")) {
             runCatching {
                 val userSession = supabaseJson.decodeFromJsonElement<UserSession>(json)

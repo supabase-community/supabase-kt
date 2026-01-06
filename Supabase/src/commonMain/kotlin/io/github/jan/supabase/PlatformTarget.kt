@@ -12,7 +12,7 @@ enum class PlatformTarget {
 
 data class OSInformation(
     val name: String,
-    val version: String
+    val version: String?
 ) {
 
     companion object {

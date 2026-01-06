@@ -1,6 +1,7 @@
 package io.github.jan.supabase.auth
 
 import io.github.jan.supabase.SupabaseClient
+import io.github.jan.supabase.auth.url.handledUrlParameterError
 import io.github.jan.supabase.auth.user.UserSession
 import io.github.jan.supabase.logging.d
 import kotlinx.coroutines.launch
@@ -13,8 +14,13 @@ import platform.Foundation.NSURLQueryItem
  * This handles the deeplinks for the implicit and the PKCE flow.
  * @param url The url from the ios app delegate
  * @param onSessionSuccess The callback when the session was successfully imported
+ * @param onError Callback invoked if an error occurs during the [Auth.exchangeCodeForSession] call.
  */
-fun SupabaseClient.handleDeeplinks(url: NSURL, onSessionSuccess: (UserSession) -> Unit = {}) {
+fun SupabaseClient.handleDeeplinks(
+    url: NSURL,
+    onSessionSuccess: (UserSession) -> Unit = {},
+    onError: (Throwable) -> Unit = {}
+) {
     if (url.scheme != auth.config.scheme || url.host != auth.config.host) {
         Auth.logger.d { "Received deeplink with wrong scheme or host" }
         return
@@ -38,8 +44,12 @@ fun SupabaseClient.handleDeeplinks(url: NSURL, onSessionSuccess: (UserSession) -
             val code = getQueryItem(components, "code") ?: return
             val scope = (auth as AuthImpl).authScope
             scope.launch {
-                auth.exchangeCodeForSession(code)
-                onSessionSuccess(auth.currentSessionOrNull() ?: error("No session available"))
+                try {
+                    this@handleDeeplinks.auth.exchangeCodeForSession(code)
+                    onSessionSuccess(this@handleDeeplinks.auth.currentSessionOrNull() ?: error("No session available"))
+                } catch (e: Throwable) {
+                    onError(e)
+                }
             }
         }
     }

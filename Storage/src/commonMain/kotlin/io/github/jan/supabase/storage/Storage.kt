@@ -3,6 +3,7 @@ package io.github.jan.supabase.storage
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.SupabaseSerializer
 import io.github.jan.supabase.annotations.SupabaseInternal
+import io.github.jan.supabase.auth.AuthDependentPluginConfig
 import io.github.jan.supabase.auth.authenticatedSupabaseApi
 import io.github.jan.supabase.bodyOrNull
 import io.github.jan.supabase.collections.AtomicMutableMap
@@ -75,7 +76,16 @@ interface Storage : MainPlugin<Storage.Config>, CustomSerializationPlugin {
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
-    suspend fun retrieveBuckets(): List<Bucket>
+    suspend fun listBuckets(filter: BucketFilter.() -> Unit = {}): List<Bucket>
+
+    /**
+     * Returns all buckets in the storage
+     * @throws RestException or one of its subclasses if receiving an error response
+     * @throws HttpRequestTimeoutException if the request timed out
+     * @throws HttpRequestException on network related issues
+     */
+    @Deprecated("Use listBuckets instead", ReplaceWith("listBuckets()"))
+    suspend fun retrieveBuckets(): List<Bucket> = listBuckets()
 
     /**
      * Retrieves a bucket by its [bucketId]
@@ -83,7 +93,16 @@ interface Storage : MainPlugin<Storage.Config>, CustomSerializationPlugin {
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
-    suspend fun retrieveBucketById(bucketId: String): Bucket?
+    suspend fun getBucket(bucketId: String): Bucket?
+
+    /**
+     * Retrieves a bucket by its [bucketId]
+     * @throws RestException or one of its subclasses if receiving an error response
+     * @throws HttpRequestTimeoutException if the request timed out
+     * @throws HttpRequestException on network related issues
+     */
+    @Deprecated("Use getBucket instead", ReplaceWith("getBucket(bucketId)"))
+    suspend fun retrieveBucketById(bucketId: String): Bucket? = getBucket(bucketId)
 
     /**
      * Empties a bucket by its [bucketId]
@@ -120,8 +139,9 @@ interface Storage : MainPlugin<Storage.Config>, CustomSerializationPlugin {
     data class Config(
         var transferTimeout: Duration = 120.seconds,
         @PublishedApi internal var resumable: Resumable = Resumable(),
-        override var serializer: SupabaseSerializer? = null
-    ) : MainConfig(), CustomSerializationConfig {
+        override var serializer: SupabaseSerializer? = null,
+        override var requireValidSession: Boolean = false,
+    ) : MainConfig(), CustomSerializationConfig, AuthDependentPluginConfig {
 
         /**
          * @param cache the cache for caching resumable upload urls
@@ -192,17 +212,22 @@ internal class StorageImpl(override val supabaseClient: SupabaseClient, override
     override val serializer: SupabaseSerializer = config.serializer ?: supabaseClient.defaultSerializer
 
     @OptIn(SupabaseInternal::class)
-    internal val api = supabaseClient.authenticatedSupabaseApi(this) {
+    internal val api = supabaseClient.authenticatedSupabaseApi(this, defaultRequest = {
         timeout {
             requestTimeoutMillis = config.transferTimeout.inWholeMilliseconds
         }
-    }
+    })
 
     private val resumableClients = AtomicMutableMap<String, BucketApi>()
 
-    override suspend fun retrieveBuckets(): List<Bucket> = api.get("bucket").safeBody()
+    override suspend fun listBuckets(filter: BucketFilter.() -> Unit): List<Bucket> {
+        val response = api.get("bucket") {
+            url.parameters.appendAll(BucketFilter().apply(filter).build())
+        }
+        return response.safeBody()
+    }
 
-    override suspend fun retrieveBucketById(bucketId: String): Bucket? = api.get("bucket/$bucketId").safeBody()
+    override suspend fun getBucket(bucketId: String): Bucket? = api.get("bucket/$bucketId").safeBody()
 
     override suspend fun deleteBucket(bucketId: String) {
         api.delete("bucket/$bucketId")

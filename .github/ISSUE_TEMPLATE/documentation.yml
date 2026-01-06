@@ -1,0 +1,28 @@
+name: Documentation enhancement
+description: Template for documentation enhancement requests
+title: '[Docs]: '
+labels: ["enhancement", "documentation"]
+body:
+  - type: checkboxes
+    id: latest-version
+    attributes:
+      label: General Info
+      options:
+        - label: I checked the latest Supabase documentation
+          required: true
+        - label: I checked for similar requests
+          required: true
+  - type: input
+    id: links
+    attributes:
+      label: Affected pages
+      description: 'Please provide the links to affected documentation pages, if your issue is about specific parts of the documentation'
+    validations:
+      required: false
+  - type: textarea
+    id: documentation-request
+    attributes:
+      label: Documentation enhancement/issue
+      description: Please describe what part of the documentation should be improved or what should be added to the documentation
+    validations:
+      required: true

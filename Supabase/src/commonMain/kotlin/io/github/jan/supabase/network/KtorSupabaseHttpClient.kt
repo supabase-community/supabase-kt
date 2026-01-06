@@ -2,7 +2,6 @@
 package io.github.jan.supabase.network
 
 import io.github.jan.supabase.BuildConfig
-import io.github.jan.supabase.OSInformation
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.annotations.SupabaseInternal
 import io.github.jan.supabase.exceptions.HttpRequestException
@@ -11,7 +10,6 @@ import io.github.jan.supabase.logging.e
 import io.github.jan.supabase.supabaseJson
 import io.ktor.client.HttpClient
 import io.ktor.client.HttpClientConfig
-import io.ktor.client.engine.HttpClientEngine
 import io.ktor.client.plugins.DefaultRequest
 import io.ktor.client.plugins.HttpRequestTimeoutException
 import io.ktor.client.plugins.HttpTimeout
@@ -40,15 +38,19 @@ typealias HttpRequestOverride = HttpRequestBuilder.() -> Unit
  */
 @OptIn(SupabaseInternal::class)
 class KtorSupabaseHttpClient @SupabaseInternal constructor(
-    private val supabaseKey: String,
-    modifiers: List<HttpClientConfig<*>.() -> Unit> = listOf(),
-    private val requestTimeout: Long,
-    engine: HttpClientEngine? = null,
-    private val osInformation: OSInformation?
+    private val supabase: SupabaseClient
 ): SupabaseHttpClient() {
 
+    private val supabaseKey = supabase.supabaseKey
+    private val osInformation = supabase.config.osInformation
+
+    private val networkConfig = supabase.config.networkConfig
+    private val requestTimeout = networkConfig.requestTimeout
+    private val engine = networkConfig.httpEngine
+    private val modifiers = networkConfig.httpConfigOverrides
+
     init {
-        SupabaseClient.LOGGER.d { "Creating KtorSupabaseHttpClient with request timeout $requestTimeout ms, HttpClientEngine: $engine" }
+        SupabaseClient.LOGGER.d { "Creating KtorSupabaseHttpClient with request timeout $requestTimeout, HttpClientEngine: $engine" }
     }
 
     @SupabaseInternal
@@ -63,11 +65,10 @@ class KtorSupabaseHttpClient @SupabaseInternal constructor(
         }
         val endPoint = request.url.encodedPath
         SupabaseClient.LOGGER.d { "Starting ${request.method.value} request to endpoint $endPoint" }
-
         val response = try {
             httpClient.request(url, builder)
         } catch(e: HttpRequestTimeoutException) {
-            SupabaseClient.LOGGER.e { "${request.method.value} request to endpoint $endPoint timed out after $requestTimeout ms" }
+            SupabaseClient.LOGGER.e { "${request.method.value} request to endpoint $endPoint timed out after $requestTimeout" }
             throw e
         } catch(e: CancellationException) {
             SupabaseClient.LOGGER.e { "${request.method.value} request to endpoint $endPoint was cancelled"}
@@ -92,7 +93,7 @@ class KtorSupabaseHttpClient @SupabaseInternal constructor(
         val response = try {
             httpClient.prepareRequest(url, builder)
         } catch(e: HttpRequestTimeoutException) {
-            SupabaseClient.LOGGER.e { "Request timed out after $requestTimeout ms on url $url" }
+            SupabaseClient.LOGGER.e { "Request timed out after $requestTimeout on url $url" }
             throw e
         } catch(e: CancellationException) {
             SupabaseClient.LOGGER.e { "Request was cancelled on url $url" }
@@ -115,7 +116,10 @@ class KtorSupabaseHttpClient @SupabaseInternal constructor(
                 append("X-Client-Info", "supabase-kt/${BuildConfig.PROJECT_VERSION}")
                 osInformation?.let {
                     append("X-Supabase-Client-Platform", it.name)
-                    append("X-Supabase-Client-Platform-Version", it.version)
+
+                    it.version?.let { version ->
+                        append("X-Supabase-Client-Platform-Version", version)
+                    }
                 }
             }
             port = HTTPS_PORT
@@ -124,7 +128,7 @@ class KtorSupabaseHttpClient @SupabaseInternal constructor(
             json(supabaseJson)
         }
         install(HttpTimeout) {
-            requestTimeoutMillis = requestTimeout
+            requestTimeoutMillis = requestTimeout.inWholeMilliseconds
         }
         modifiers.forEach { it.invoke(this) }
     }
