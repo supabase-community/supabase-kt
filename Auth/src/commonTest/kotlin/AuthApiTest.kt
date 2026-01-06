@@ -531,9 +531,13 @@ class AuthRequestTest {
             val expectedEmail = "example@email.com"
             val expectedType = OtpType.Email.SIGNUP
             val expectedCaptchaToken = "captchaToken"
+            val expectedUrl = "https://example.com"
             val client = createMockedSupabaseClient(configuration = configuration) {
                 assertMethodIs(HttpMethod.Post, it.method)
                 assertPathIs("/resend", it.url.pathAfterVersion())
+                val params = it.url.parameters
+                assertEquals(expectedUrl, params["redirect_to"])
+
                 val body = it.body.toJsonElement().jsonObject
                 val metaSecurity = body["gotrue_meta_security"]!!.jsonObject
                 assertEquals(expectedCaptchaToken, metaSecurity["captcha_token"]?.jsonPrimitive?.content)
@@ -543,7 +547,7 @@ class AuthRequestTest {
                     sampleUserObject(email = expectedEmail)
                 )
             }
-            client.auth.resendEmail(expectedType, expectedEmail, expectedCaptchaToken)
+            client.auth.resendEmail(expectedType, expectedEmail, expectedCaptchaToken, expectedUrl)
         }
     }
 

@@ -261,15 +261,17 @@ internal class AuthImpl(
         return userInfo
     }
 
-    private suspend fun resend(type: String, body: JsonObjectBuilder.() -> Unit) {
+    private suspend fun resend(type: String, redirectUrl: String? = null, body: JsonObjectBuilder.() -> Unit) {
         api.postJson("resend", buildJsonObject {
             put("type", type)
             putJsonObject(buildJsonObject(body))
-        })
+        }) {
+            redirectUrl?.let { url.parameters["redirect_to"] = it }
+        }
     }
 
     override suspend fun resendEmail(type: OtpType.Email, email: String, captchaToken: String?, redirectUrl: String?) =
-        resend(type.type) {
+        resend(type.type, redirectUrl = redirectUrl) {
             put("email", email)
             put("redirect_to", redirectUrl)
             captchaToken?.let(::putCaptchaToken)
