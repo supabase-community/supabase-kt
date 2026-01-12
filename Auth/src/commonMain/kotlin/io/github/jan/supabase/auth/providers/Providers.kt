@@ -67,9 +67,21 @@ data object Twitch : OAuthProvider() {
 
 }
 
+/**
+ * OAuth 1.0a
+ */
 data object Twitter : OAuthProvider() {
 
     override val name = "twitter"
+
+}
+
+/**
+ * OAuth 2.0
+ */
+data object X : OAuthProvider() {
+
+    override val name = "x"
 
 }
 
