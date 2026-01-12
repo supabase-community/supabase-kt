@@ -53,6 +53,14 @@ data class UserInfo(
     val phoneConfirmedAt: Instant? = null,
     @SerialName("action_link")
     val actionLink: String? = null,
+    @SerialName("is_anonymous")
+    val isAnonymous: Boolean? = null,
+    @SerialName("is_sso_user")
+    val isSSOUser: Boolean? = null,
+    @SerialName("banned_until")
+    val bannedUntil: Instant? = null,
+    @SerialName("deleted_at")
+    val deletedAt: Instant? = null
 )
 
 @Serializable
@@ -66,7 +74,9 @@ data class UserMfaFactor(
     @SerialName("friendly_name")
     val friendlyName: String? = null,
     @SerialName("factor_type")
-    val factorType: String
+    val factorType: String,
+    @SerialName("last_challenged_at")
+    val lastChallengedAt: Instant? = null,
 ) {
 
     val isVerified: Boolean
