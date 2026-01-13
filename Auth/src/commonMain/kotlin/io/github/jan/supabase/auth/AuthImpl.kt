@@ -5,6 +5,10 @@ import io.github.jan.supabase.annotations.SupabaseExperimental
 import io.github.jan.supabase.annotations.SupabaseInternal
 import io.github.jan.supabase.auth.admin.AdminApi
 import io.github.jan.supabase.auth.admin.AdminApiImpl
+import io.github.jan.supabase.auth.claims.ClaimsRequestBuilder
+import io.github.jan.supabase.auth.claims.ClaimsResponse
+import io.github.jan.supabase.auth.claims.JWK
+import io.github.jan.supabase.auth.claims.JwtHeader
 import io.github.jan.supabase.auth.event.AuthEvent
 import io.github.jan.supabase.auth.exception.AuthRestException
 import io.github.jan.supabase.auth.exception.AuthSessionMissingException
@@ -36,7 +40,6 @@ import io.github.jan.supabase.network.supabaseApi
 import io.github.jan.supabase.putJsonObject
 import io.github.jan.supabase.safeBody
 import io.github.jan.supabase.supabaseJson
-import io.ktor.client.call.body
 import io.ktor.client.request.parameter
 import io.ktor.client.statement.HttpResponse
 import io.ktor.client.statement.bodyAsText
@@ -63,13 +66,16 @@ import kotlinx.serialization.json.JsonObjectBuilder
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.contentOrNull
 import kotlinx.serialization.json.encodeToJsonElement
+import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.put
 import kotlin.time.Clock
+import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
 private const val SESSION_REFRESH_THRESHOLD = 0.8
+private val JWKS_TTL = 10.minutes
 @Suppress("MagicNumber") // see #631
 private val SIGNOUT_IGNORE_CODES = listOf(401, 403, 404)
 
@@ -389,6 +395,36 @@ internal class AuthImpl(
         verify(type.type, token, captchaToken) {
             put("phone", phone)
         }
+    }
+
+    override suspend fun getClaims(jwt: String?, options: ClaimsRequestBuilder.() -> Unit): ClaimsResponse {
+        val token = jwt ?: currentAccessTokenOrNull() ?: error("No access token found")
+        val (claims, rawHeader, rawPayload) = decodeJwt(token)
+        val options = ClaimsRequestBuilder().apply(options)
+
+        if(!options.allowExpired) {
+            val exp = claims.claims.exp
+            val now = Clock.System.now()
+            require(exp != null && exp <= now) { // Correct exception ?
+                "JWT has expired"
+            }
+        }
+
+        val signingKey = if(claims.header.alg == JwtHeader.Algorithm.HS256 || claims.header.kid == null) null else {
+
+        }
+    }
+
+    private suspend fun fetchJwk(kid: String, jwks: List<JWK>): JWK? {
+        jwks.find { it.kid == kid }?.let { return it } // try to fetch in the supplied jwks
+        val now = Clock.System.now()
+        config.jwkCache.get()?.let { entry ->
+            val jwk = entry.jwks.find { jwk -> jwk.kid == kid }
+            if(jwk != null && entry.cachedAt + JWKS_TTL > now) return jwk
+        }
+        val response = unauthenticatedApi.get(".well-known/jwks.json").safeBody<JsonObject>()
+        if(!response.containsKey("keys") || response.getValue("keys").jsonArray.isEmpty()) return null
+
     }
 
     override suspend fun retrieveUser(jwt: String): UserInfo {

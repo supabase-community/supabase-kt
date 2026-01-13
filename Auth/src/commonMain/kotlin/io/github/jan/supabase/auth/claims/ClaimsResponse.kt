@@ -7,7 +7,7 @@ import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonObject
 import kotlin.time.Instant
 
-data class ClaimsResponse(
+class ClaimsResponse(
     val claims: JwtPayload,
     val header: JwtHeader,
     val signature: ByteArray
@@ -15,8 +15,8 @@ data class ClaimsResponse(
 
 data class JwtHeader(
     val alg: Algorithm,
-    val kid: String,
-    val typ: String
+    val kid: String? = null,
+    val typ: String? = null
 ) {
     enum class Algorithm {
         RS256, ES256, HS256
@@ -25,15 +25,15 @@ data class JwtHeader(
 
 data class JwtPayload(
     // required claims
-    val iss: String,
-    val sub: String,
-    val aud: List<String>,
-    val exp: Instant,
-    val iat: Instant,
-    val role: String,
-    val aal: AuthenticatorAssuranceLevel,
+    val iss: String? = null,
+    val sub: String? = null,
+    val aud: List<String>? = null, //TODO: LIst or String
+    val exp: Instant? = null,
+    val iat: Instant? = null,
+    val role: String? = null,
+    val aal: AuthenticatorAssuranceLevel? = null,
     @SerialName("session_id")
-    val sessionId: String,
+    val sessionId: String? = null,
 
     // standard optional claims
     val email: String? = null,
@@ -53,5 +53,5 @@ data class JwtPayload(
     // special claims
     val ref: String? = null,
 
-    private val customClaims: Map<String, JsonElement>
+    val customClaims: Map<String, JsonElement>
 )

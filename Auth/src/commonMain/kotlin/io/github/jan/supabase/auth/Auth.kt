@@ -5,6 +5,7 @@ import io.github.jan.supabase.annotations.SupabaseExperimental
 import io.github.jan.supabase.annotations.SupabaseInternal
 import io.github.jan.supabase.auth.admin.AdminApi
 import io.github.jan.supabase.auth.claims.ClaimsRequestBuilder
+import io.github.jan.supabase.auth.claims.ClaimsResponse
 import io.github.jan.supabase.auth.event.AuthEvent
 import io.github.jan.supabase.auth.exception.AuthRestException
 import io.github.jan.supabase.auth.exception.AuthWeakPasswordException
@@ -450,7 +451,7 @@ interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
     suspend fun getClaims(
         jwt: String? = null,
         options: ClaimsRequestBuilder.() -> Unit = {}
-    )
+    ): ClaimsResponse
 
     /**
      * Returns the url to use for oAuth
