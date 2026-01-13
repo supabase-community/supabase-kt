@@ -4,6 +4,7 @@ import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.annotations.SupabaseExperimental
 import io.github.jan.supabase.annotations.SupabaseInternal
 import io.github.jan.supabase.auth.admin.AdminApi
+import io.github.jan.supabase.auth.claims.ClaimsRequestBuilder
 import io.github.jan.supabase.auth.event.AuthEvent
 import io.github.jan.supabase.auth.exception.AuthRestException
 import io.github.jan.supabase.auth.exception.AuthWeakPasswordException
@@ -430,6 +431,26 @@ interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
      * Starts auto refreshing the current session
      */
     suspend fun startAutoRefreshForCurrentSession()
+
+    /**
+     * Extracts the JWT claims present in the access token by first verifying the
+     * JWT against the server's JSON Web Key Set endpoint
+     * `/.well-known/jwks.json` which is often cached, resulting in significantly
+     * faster responses. Prefer this method over [retrieveUser] which always
+     * sends a request to the Auth server for each JWT.
+     *
+     * If the project is not using an asymmetric JWT signing key (like ECC or
+     * RSA) it always sends a request to the Auth server (similar to [retrieveUser]) to verify the JWT.
+     *
+     * @param jwt An optional specific JWT you wish to verify, not the one you
+     *            can obtain from [currentSessionOrNull].
+     * @param options Various additional options that allow you to customize the
+     *                behavior of this method.
+     */
+    suspend fun getClaims(
+        jwt: String? = null,
+        options: ClaimsRequestBuilder.() -> Unit = {}
+    )
 
     /**
      * Returns the url to use for oAuth
