@@ -1,5 +1,7 @@
 package io.github.jan.supabase.auth.mfa
 
+import io.github.jan.supabase.auth.AMREntry
+
 /**
  * The assurance level of a session
  */
@@ -34,8 +36,10 @@ enum class AuthenticatorAssuranceLevel {
 /**
  * @param current The current assurance level of the session
  * @param next The next possible assurance level (for the next login)
+ * @param currentAuthenticationMethods A list of current AMR entries
  */
 data class MfaLevel(
     val current: AuthenticatorAssuranceLevel,
-    val next: AuthenticatorAssuranceLevel
+    val next: AuthenticatorAssuranceLevel,
+    val currentAuthenticationMethods: List<AMREntry>
 )

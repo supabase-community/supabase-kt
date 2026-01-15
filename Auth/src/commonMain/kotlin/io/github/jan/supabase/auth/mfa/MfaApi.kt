@@ -2,16 +2,15 @@ package io.github.jan.supabase.auth.mfa
 
 import io.github.jan.supabase.auth.Auth
 import io.github.jan.supabase.auth.AuthImpl
+import io.github.jan.supabase.auth.decodeJwt
 import io.github.jan.supabase.auth.providers.builtin.Phone
 import io.github.jan.supabase.auth.status.SessionStatus
 import io.github.jan.supabase.auth.user.UserMfaFactor
 import io.github.jan.supabase.auth.user.UserSession
 import io.github.jan.supabase.putJsonObject
 import io.github.jan.supabase.safeBody
-import io.ktor.util.decodeBase64String
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.jsonPrimitive
@@ -175,12 +174,12 @@ internal class MfaApiImpl(
     }
 
     override fun getAuthenticatorAssuranceLevel(): MfaLevel {
+        val session = auth.currentSessionOrNull()
         val jwt = auth.currentAccessTokenOrNull() ?: error("Current session is null")
-        val parts = jwt.split(".")
-        val decodedJwt = Json.decodeFromString<JsonObject>(parts[1].decodeBase64String())
-        val aal = AuthenticatorAssuranceLevel.from(decodedJwt["aal"]?.jsonPrimitive?.content ?: error("No 'aal' claim found in JWT"))
+        val decodedJwt = decodeJwt(jwt)
+        val aal = decodedJwt.claimsResponse.claims.aal ?: error("No 'aal' claim found in JWT")
         val nextAal = if (verifiedFactors.isNotEmpty()) AuthenticatorAssuranceLevel.AAL2 else AuthenticatorAssuranceLevel.AAL1
-        return MfaLevel(aal, nextAal)
+        return MfaLevel(aal, nextAal, decodedJwt.claimsResponse.claims.amr ?: emptyList())
     }
 
 
