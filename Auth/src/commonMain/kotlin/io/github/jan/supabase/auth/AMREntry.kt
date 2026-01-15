@@ -1,3 +1,4 @@
+@file:Suppress("UndocumentedPublicClass", "UndocumentedPublicFunction", "UndocumentedPublicProperty")
 package io.github.jan.supabase.auth
 
 import io.github.jan.supabase.auth.mfa.MfaApi
