@@ -36,6 +36,7 @@ enum class AuthenticatorAssuranceLevel {
 /**
  * @param current The current assurance level of the session
  * @param next The next possible assurance level (for the next login)
+ * @param currentAuthenticationMethods A list of current AMR entries
  */
 data class MfaLevel(
     val current: AuthenticatorAssuranceLevel,

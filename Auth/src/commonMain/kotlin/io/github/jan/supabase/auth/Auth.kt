@@ -9,6 +9,8 @@ import io.github.jan.supabase.auth.claims.ClaimsResponse
 import io.github.jan.supabase.auth.event.AuthEvent
 import io.github.jan.supabase.auth.exception.AuthRestException
 import io.github.jan.supabase.auth.exception.AuthWeakPasswordException
+import io.github.jan.supabase.auth.exception.InvalidJwtException
+import io.github.jan.supabase.auth.exception.TokenExpiredException
 import io.github.jan.supabase.auth.mfa.MfaApi
 import io.github.jan.supabase.auth.providers.AuthProvider
 import io.github.jan.supabase.auth.providers.ExternalAuthConfigDefaults
@@ -447,6 +449,9 @@ interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
      *            can obtain from [currentSessionOrNull].
      * @param options Various additional options that allow you to customize the
      *                behavior of this method.
+     * @throws TokenExpiredException when trying to get the claims of an expired [jwt] and [ClaimsRequestBuilder.allowExpired] is set to false
+     * @throws InvalidJwtException if the [jwt] is invalid
+     * @throws AuthRestException on any REST-related error responses during the fetching of the JWKs or retrieving of the current user data
      */
     suspend fun getClaims(
         jwt: String? = null,

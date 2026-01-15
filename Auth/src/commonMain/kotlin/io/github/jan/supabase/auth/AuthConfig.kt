@@ -6,7 +6,7 @@ import io.github.jan.supabase.SupabaseSerializer
 import io.github.jan.supabase.annotations.SupabaseExperimental
 import io.github.jan.supabase.annotations.SupabaseInternal
 import io.github.jan.supabase.auth.claims.JwkCache
-import io.github.jan.supabase.auth.claims.JwkCacheImpl
+import io.github.jan.supabase.auth.claims.SharedJwkCache
 import io.github.jan.supabase.auth.user.UserSession
 import io.github.jan.supabase.plugins.CustomSerializationConfig
 import io.github.jan.supabase.plugins.MainConfig
@@ -128,8 +128,10 @@ open class AuthConfigDefaults : MainConfig(), AuthDependentPluginConfig, CustomS
     @SupabaseExperimental
     override var requireValidSession: Boolean = false
 
-    //TODO: Docs
-    var jwkCache: JwkCache = JwkCacheImpl()
+    /**
+     * A [JwkCache] is used to
+     */
+    var jwkCache: JwkCache = SharedJwkCache
 
 }
 

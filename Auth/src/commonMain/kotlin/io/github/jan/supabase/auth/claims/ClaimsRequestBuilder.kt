@@ -1,26 +1,18 @@
 package io.github.jan.supabase.auth.claims
 
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
+import io.github.jan.supabase.auth.Auth
 
+/**
+ * A builder for [Auth.getClaims]
+ */
 data class ClaimsRequestBuilder(
+    /**
+     * Whether allow expired JWTs
+     */
     var allowExpired: Boolean = false,
+    /**
+     * A custom list of [JWK]s.
+     */
     val jwks: MutableList<JWK> = mutableListOf()
 )
 
-@Serializable
-data class JWK(
-    val kty: KeyType,
-    @SerialName("key_ops")
-    val keyOps: List<String>,
-    val alg: String? = null,
-    val kid: String? = null,
-    val extraParams: Map<String, String> = emptyMap()
-) {
-
-    @Serializable
-    enum class KeyType(val value: String) {
-        RSA("RSA"), EC("EC"), @SerialName("oct") OCT("oct");
-    }
-
-}
