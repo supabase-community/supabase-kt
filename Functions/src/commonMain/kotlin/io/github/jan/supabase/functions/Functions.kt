@@ -11,6 +11,7 @@ import io.github.jan.supabase.exceptions.BadRequestRestException
 import io.github.jan.supabase.exceptions.NotFoundRestException
 import io.github.jan.supabase.exceptions.RestException
 import io.github.jan.supabase.exceptions.UnauthorizedRestException
+import io.github.jan.supabase.exceptions.UnknownRestException
 import io.github.jan.supabase.plugins.CustomSerializationConfig
 import io.github.jan.supabase.plugins.CustomSerializationPlugin
 import io.github.jan.supabase.plugins.MainConfig
@@ -132,7 +133,7 @@ class Functions(override val config: Config, override val supabaseClient: Supaba
             HttpStatusCode.Unauthorized -> UnauthorizedRestException(error, response)
             HttpStatusCode.NotFound -> NotFoundRestException(error, response)
             HttpStatusCode.BadRequest -> BadRequestRestException(error, response)
-            else -> UnauthorizedRestException(error, response)
+            else -> UnknownRestException(error, response)
         }
     }
 
