@@ -10,6 +10,7 @@ import kotlin.io.encoding.Base64
 private val BASE64_REGEX by lazy {
     Regex("/^([a-z0-9_-]{4})*($|[a-z0-9_-]{3}$|[a-z0-9_-]{2}$)$/i")
 }
+private const val JWT_PARTS = 3
 
 internal data class JWTData(
     val claimsResponse: ClaimsResponse,
@@ -20,7 +21,7 @@ internal data class JWTData(
 internal fun decodeJwt(jwt: String): JWTData {
     val parts = jwt.split(".")
 
-    require(parts.size == 3) {
+    require(parts.size == JWT_PARTS) {
         "Invalid JWT structure"
     }
 

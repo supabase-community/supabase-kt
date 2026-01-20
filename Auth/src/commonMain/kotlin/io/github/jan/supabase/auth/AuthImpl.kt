@@ -425,15 +425,21 @@ internal class AuthImpl(
             retrieveUser(token) // the method would throw an exception if the token was invalid
             return claims
         } else {
-            val algo = when(val alg = claims.header.alg) {
-                JwtHeader.Algorithm.RS256 -> RSA.PKCS1
-                JwtHeader.Algorithm.ES256 -> ECDSA
+            val verified = when(val alg = claims.header.alg) {
+                JwtHeader.Algorithm.RS256 -> {
+                    val keyDecoder = CryptographyProvider.Default
+                        .get(RSA.PKCS1).publicKeyDecoder(SHA256)
+                    val key = keyDecoder.decodeFromByteString(RSA.PublicKey.Format.JWK, signingKey.jwk.toString().encodeToByteString())
+                    key.signatureVerifier().tryVerifySignature(token.encodeToByteArray(), claims.signature)
+                }
+                JwtHeader.Algorithm.ES256 -> {
+                    val keyDecoder = CryptographyProvider.Default
+                        .get(ECDSA).publicKeyDecoder(EC.Curve.P256)
+                    val key = keyDecoder.decodeFromByteString(EC.PublicKey.Format.DER, signingKey.jwk.toString().encodeToByteString())
+                    key.signatureVerifier(SHA256, ECDSA.SignatureFormat.DER).tryVerifySignature(token.encodeToByteArray(), claims.signature)
+                }
                 else -> error("Invalid alg claim $alg")
             }
-            val keyDecoder = CryptographyProvider.Default
-                .get(ECDSA).publicKeyDecoder(EC.Curve.P256)
-            val key = keyDecoder.decodeFromByteString(EC.PublicKey.Format.DER, signingKey.jwk.toString().encodeToByteString())
-            val verified = key.signatureVerifier(SHA256, ECDSA.SignatureFormat.DER).tryVerifySignature(token.encodeToByteArray(), claims.signature)
             if(!verified) throw InvalidJwtException()
             return claims
         }

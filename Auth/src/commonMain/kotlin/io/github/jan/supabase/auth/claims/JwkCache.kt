@@ -27,7 +27,6 @@ interface JwkCache {
     /**
      * Updates the current cache entry with [entry]
      */
-
     suspend fun set(entry: JwkCacheEntry)
 
 }

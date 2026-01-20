@@ -1,5 +1,6 @@
 package io.github.jan.supabase.auth
 
+import io.github.jan.supabase.annotations.SupabaseInternal
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonNull
 import kotlinx.serialization.json.JsonObject
@@ -24,6 +25,7 @@ internal inline operator fun <reified T> JsonObject.getValue(thisRef: Any?, prop
     return this[property.name]?.let { Json.decodeFromJsonElement(it) } ?: error("No entry found with key ${property.name}")
 }
 
+@SupabaseInternal
 inline fun <reified T> JsonObject.decodeValue(key: String): T? = this[key]?.let { Json.decodeFromJsonElement(it) }
 
 internal fun JsonObject.withKey(key: String) = JsonObjectModifier(this, key)
