@@ -15,7 +15,7 @@ import kotlin.time.Instant
 /**
  * JWT Payload containing claims for Supabase authentication tokens.
  *
- * Required claims (iss, aud, exp, iat, sub, role, aal, session_id) are inherited from RequiredClaims.
+ * Required claims are iss, aud, exp, iat, sub, role, aal, session_id.
  * All other claims are optional as they can be customized via Custom Access Token Hooks.
  *
  * see https://supabase.com/docs/guides/auth/jwt-fields

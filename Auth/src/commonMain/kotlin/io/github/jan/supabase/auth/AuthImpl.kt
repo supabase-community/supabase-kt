@@ -1,3 +1,4 @@
+@file:Suppress("LargeClass")
 package io.github.jan.supabase.auth
 
 import dev.whyoleg.cryptography.CryptographyProvider
