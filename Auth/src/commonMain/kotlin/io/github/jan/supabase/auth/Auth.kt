@@ -449,6 +449,13 @@ interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
     fun stopAutoRefreshForCurrentSession()
 
     /**
+     * Returns debug information about the state of the auto-refresher.
+     * If the value is null, the auto-refresh never started.
+     */
+    @SupabaseInternal
+    fun autoRefreshInformation(): SessionRefreshInformation?
+
+    /**
      * Returns the current access token, or null if no session is available
      */
     fun currentAccessTokenOrNull() = currentSessionOrNull()?.accessToken
