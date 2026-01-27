@@ -36,7 +36,6 @@ import io.github.jan.supabase.network.supabaseApi
 import io.github.jan.supabase.putJsonObject
 import io.github.jan.supabase.safeBody
 import io.github.jan.supabase.supabaseJson
-import io.ktor.client.call.body
 import io.ktor.client.request.parameter
 import io.ktor.client.statement.HttpResponse
 import io.ktor.client.statement.bodyAsText
@@ -68,6 +67,7 @@ import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.put
 import kotlin.time.Clock
 import kotlin.time.Duration.Companion.seconds
+import kotlin.time.Instant
 
 private const val SESSION_REFRESH_THRESHOLD = 0.8
 @Suppress("MagicNumber") // see #631
@@ -96,6 +96,7 @@ internal class AuthImpl(
     override val admin: AdminApi = AdminApiImpl(publicApi)
     override val mfa: MfaApi = MfaApiImpl(this)
     var sessionJob: Job? = null
+    var refreshInformation: SessionRefreshInformation? = null
     override val isAutoRefreshRunning: Boolean
         get() = sessionJob?.isActive == true
 
@@ -443,6 +444,7 @@ internal class AuthImpl(
                 ?: error("No refresh token found in current session")
         )
         importSession(newSession, source = SessionSource.Refresh(currentSessionOrNull() ?: error("No session found")))
+        updateRefreshInformation(null, Clock.System.now())
     }
 
     override suspend fun importSession(
@@ -537,18 +539,31 @@ internal class AuthImpl(
     }
 
     private suspend fun delayBeforeExpiry(session: UserSession) {
+        val now = Clock.System.now()
         val timeAtBeginningOfSession = session.expiresAt - session.expiresIn.seconds
 
         // 80% of the way to session.expiresAt
         val targetRefreshTime = timeAtBeginningOfSession + (session.expiresIn.seconds * SESSION_REFRESH_THRESHOLD)
 
-        val delayDuration = targetRefreshTime - Clock.System.now()
-
+        val delayDuration = targetRefreshTime - now
+        updateRefreshInformation(targetRefreshTime, null)
         Auth.logger.d {
             "Refreshing session in $delayDuration."
         }
         // if the delayDuration is negative, delay() will not delay
         delay(delayDuration)
+    }
+
+    private fun updateRefreshInformation(
+        refreshingAt: Instant?,
+        lastRefreshedAt: Instant?,
+    ) {
+        refreshInformation = refreshInformation?.copy(refreshingAt = refreshingAt ?: refreshInformation?.refreshingAt, lastRefreshedAt = lastRefreshedAt ?: refreshInformation?.lastRefreshedAt)
+            ?: SessionRefreshInformation(
+                Clock.System.now(),
+                lastRefreshedAt,
+                refreshingAt
+            )
     }
 
     private suspend fun handleExpiredSession(session: UserSession, autoRefresh: Boolean = true) {
@@ -571,6 +586,9 @@ internal class AuthImpl(
         sessionJob?.cancel()
         sessionJob = null
     }
+
+    @SupabaseInternal
+    override fun autoRefreshInformation(): SessionRefreshInformation? = refreshInformation
 
     override suspend fun loadFromStorage(autoRefresh: Boolean): Boolean = loadFromStorage(autoRefresh, false)
 
