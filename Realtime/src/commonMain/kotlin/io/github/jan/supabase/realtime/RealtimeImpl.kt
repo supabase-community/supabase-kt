@@ -2,6 +2,7 @@ package io.github.jan.supabase.realtime
 
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.auth.Auth
+import io.github.jan.supabase.auth.JWTUtils
 import io.github.jan.supabase.auth.status.SessionStatus
 import io.github.jan.supabase.buildUrl
 import io.github.jan.supabase.collections.AtomicMutableMap
@@ -16,7 +17,6 @@ import io.github.jan.supabase.realtime.websocket.RealtimeWebsocket
 import io.ktor.client.statement.HttpResponse
 import io.ktor.http.URLProtocol
 import io.ktor.http.path
-import io.ktor.util.decodeBase64String
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
@@ -30,11 +30,7 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
-import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.buildJsonObject
-import kotlinx.serialization.json.jsonPrimitive
-import kotlinx.serialization.json.longOrNull
 import kotlin.concurrent.atomics.AtomicInt
 import kotlin.concurrent.atomics.AtomicReference
 import kotlin.concurrent.atomics.fetchAndIncrement
@@ -190,11 +186,10 @@ import kotlin.time.Clock
         val newToken = token ?: config.accessToken(supabaseClient)
 
         if(newToken != null) {
-            val parsed = Json.decodeFromString<JsonObject>(newToken.split(".")[1].decodeBase64String())
-            val exp = parsed["exp"]?.jsonPrimitive?.longOrNull ?: error("No exp found in token")
-            val now = Clock.System.now().epochSeconds
+            val exp = JWTUtils.decodeJwt(newToken).claimsResponse.claims.exp ?: error("exp claim missing")
+            val now = Clock.System.now()
             val diff = exp - now
-            if(diff < 0) {
+            if(diff.isNegative()) {
                 Realtime.logger.w { "Token is expired. Not sending it to realtime." }
                 return
             }

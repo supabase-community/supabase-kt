@@ -2,6 +2,8 @@ import app.cash.turbine.test
 import io.github.jan.supabase.SupabaseClientBuilder
 import io.github.jan.supabase.auth.Auth
 import io.github.jan.supabase.auth.auth
+import io.github.jan.supabase.auth.claims.JwtHeader
+import io.github.jan.supabase.auth.encodeToBase64Url
 import io.github.jan.supabase.auth.mfa.AuthenticatorAssuranceLevel
 import io.github.jan.supabase.auth.mfa.FactorType
 import io.github.jan.supabase.auth.mfa.MfaStatus
@@ -18,8 +20,8 @@ import io.github.jan.supabase.testing.respondJson
 import io.github.jan.supabase.testing.toJsonElement
 import io.ktor.client.engine.mock.respond
 import io.ktor.http.HttpMethod
-import io.ktor.util.encodeBase64
 import kotlinx.coroutines.test.runTest
+import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
@@ -135,6 +137,7 @@ class MfaApiTest {
         client.auth.mfa.unenroll(expectedFactorId)
     }
 
+    // Todo: Add AMR entry test
     @Test
     fun testGetAALC1() {
         testGetAAL(AuthenticatorAssuranceLevel.AAL1, AuthenticatorAssuranceLevel.AAL1)
@@ -148,6 +151,11 @@ class MfaApiTest {
     @Test
     fun testGetAALC3() {
         testGetAAL(AuthenticatorAssuranceLevel.AAL2, AuthenticatorAssuranceLevel.AAL2)
+    }
+
+    @Test
+    fun testGetAALCustom() {
+        testGetAAL(AuthenticatorAssuranceLevel.AAL1, AuthenticatorAssuranceLevel.AAL1, "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWUsImlhdCI6MTUxNjIzOTAyMiwiYWFsIjoiYWFsMSJ9.8kejyA6926zNuyTWhtDWvTChv7_DoilPe0RCNETQnG4")
     }
 
     @Test
@@ -202,7 +210,8 @@ class MfaApiTest {
         val data = buildJsonObject {
             put("aal", currentAAL.name.lowercase())
         }
-        val token = "ignore.${data.toString().encodeBase64()}"
+        val header = Json.encodeToString(JwtHeader(JwtHeader.Algorithm.HS256))
+        val token = "${header.encodeToBase64Url()}.${data.toString().encodeToBase64Url()}.${"ignore".encodeToBase64Url()}"
         val client = createMockedSupabaseClient(
             configuration = configuration
         ) {
@@ -214,22 +223,26 @@ class MfaApiTest {
 
     private fun testGetAAL(
         current: AuthenticatorAssuranceLevel,
-        next: AuthenticatorAssuranceLevel
+        next: AuthenticatorAssuranceLevel,
+        customJwt: String? = null
     ) {
         runTest {
             val data = buildJsonObject {
                 put("aal", current.name.lowercase())
             }
-            val token = "ignore.${data.toString().encodeBase64()}"
+            val header = Json.encodeToString(JwtHeader(JwtHeader.Algorithm.HS256))
+            val token = "${header.encodeToBase64Url()}.${data.toString().encodeToBase64Url()}.${"ignore".encodeToBase64Url()}"
             val client = createMockedSupabaseClient(
                 configuration = configuration
             ) {
                 respond("")
             }
             client.auth.awaitInitialization()
-            val factors = if(next == AuthenticatorAssuranceLevel.AAL1) emptyList() else listOf(verifiedFactor())
-            client.auth.importSession(userSession(customToken = token, user = UserInfo(id = "id", aud = "aud", factors = factors)))
-            val (c, n) = client.auth.mfa.getAuthenticatorAssuranceLevel()
+            if(customJwt == null) {
+                val factors = if(next == AuthenticatorAssuranceLevel.AAL1) emptyList() else listOf(verifiedFactor())
+                client.auth.importSession(userSession(customToken = token, user = UserInfo(id = "id", aud = "aud", factors = factors)))
+            }
+            val (c, n) = client.auth.mfa.getAuthenticatorAssuranceLevel(customJwt)
             assertEquals(current.name.lowercase(), c.name.lowercase())
             assertEquals(next.name.lowercase(), n.name.lowercase())
         }
