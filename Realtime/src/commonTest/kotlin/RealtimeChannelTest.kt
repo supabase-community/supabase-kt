@@ -19,10 +19,10 @@ import io.github.jan.supabase.realtime.channel
 import io.github.jan.supabase.realtime.postgresChangeFlow
 import io.github.jan.supabase.realtime.realtime
 import io.github.jan.supabase.testing.assertPathIs
+import io.github.jan.supabase.testing.encodeBase64
 import io.github.jan.supabase.testing.pathAfterVersion
 import io.github.jan.supabase.testing.toJsonElement
 import io.ktor.client.engine.mock.respond
-import io.ktor.util.encodeBase64
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.launchIn
@@ -47,7 +47,7 @@ import kotlin.time.Clock
 
 val EXAMPLE_JWT = buildString {
     append("test.")
-    append(buildJsonObject { put("exp", Clock.System.now().epochSeconds + 500) }.toString().encodeBase64())
+    append(buildJsonObject { put("exp", Clock.System.now().epochSeconds + 500) }.encodeBase64())
     append(".test")
 }
 

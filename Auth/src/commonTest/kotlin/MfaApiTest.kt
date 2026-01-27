@@ -13,12 +13,12 @@ import io.github.jan.supabase.auth.user.UserSession
 import io.github.jan.supabase.testing.assertMethodIs
 import io.github.jan.supabase.testing.assertPathIs
 import io.github.jan.supabase.testing.createMockedSupabaseClient
+import io.github.jan.supabase.testing.encodeBase64
 import io.github.jan.supabase.testing.pathAfterVersion
 import io.github.jan.supabase.testing.respondJson
 import io.github.jan.supabase.testing.toJsonElement
 import io.ktor.client.engine.mock.respond
 import io.ktor.http.HttpMethod
-import io.ktor.util.encodeBase64
 import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.jsonObject
@@ -202,7 +202,7 @@ class MfaApiTest {
         val data = buildJsonObject {
             put("aal", currentAAL.name.lowercase())
         }
-        val token = "ignore.${data.toString().encodeBase64()}"
+        val token = "ignore.${data.encodeBase64()}"
         val client = createMockedSupabaseClient(
             configuration = configuration
         ) {
@@ -220,7 +220,7 @@ class MfaApiTest {
             val data = buildJsonObject {
                 put("aal", current.name.lowercase())
             }
-            val token = "ignore.${data.toString().encodeBase64()}"
+            val token = "ignore.${data.encodeBase64()}"
             val client = createMockedSupabaseClient(
                 configuration = configuration
             ) {
