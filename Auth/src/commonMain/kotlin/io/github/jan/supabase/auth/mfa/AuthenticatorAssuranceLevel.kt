@@ -1,19 +1,24 @@
 package io.github.jan.supabase.auth.mfa
 
 import io.github.jan.supabase.auth.AMREntry
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
 /**
  * The assurance level of a session
  */
+@Serializable
 enum class AuthenticatorAssuranceLevel {
     /**
      * The user is logged in using a provider (Password, OAuth, etc.)
      */
+    @SerialName("aal1")
     AAL1,
 
     /**
      * The user is logged in using at least one MFA factor
      */
+    @SerialName("aal2")
     AAL2;
 
     companion object {

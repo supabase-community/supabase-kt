@@ -2,9 +2,11 @@
 package io.github.jan.supabase.auth.claims
 
 import io.github.jan.supabase.auth.AMREntry
+import io.github.jan.supabase.auth.JWT_JSON_INSTANCE
 import io.github.jan.supabase.auth.decodeValue
 import io.github.jan.supabase.auth.mfa.AuthenticatorAssuranceLevel
 import io.github.jan.supabase.auth.optional
+import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonObject
@@ -20,12 +22,33 @@ import kotlin.time.Instant
  *
  * see https://supabase.com/docs/guides/auth/jwt-fields
  */
-class ClaimsResponse(
+data class ClaimsResponse(
     val claims: JwtPayload,
     val header: JwtHeader,
     val signature: ByteArray
-)
+) {
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other == null || this::class != other::class) return false
 
+        other as ClaimsResponse
+
+        if (claims != other.claims) return false
+        if (header != other.header) return false
+        if (!signature.contentEquals(other.signature)) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = claims.hashCode()
+        result = 31 * result + header.hashCode()
+        result = 31 * result + signature.contentHashCode()
+        return result
+    }
+}
+
+@Serializable
 data class JwtHeader(
     val alg: Algorithm,
     val kid: String? = null,
@@ -48,8 +71,8 @@ class JwtPayload(
         is JsonPrimitive -> listOf(Json.decodeFromJsonElement(value))
         else -> null
     }
-    val exp: Instant? by claims.optional
-    val iat: Instant? by claims.optional
+    val exp: Instant? by lazy { claims.decodeValue<Long>("exp")?.let { Instant.fromEpochMilliseconds(it) } }
+    val iat: Instant? by lazy { claims.decodeValue<Long>("iat")?.let { Instant.fromEpochMilliseconds(it) } }
     val role: String? by claims.optional
     val aal: AuthenticatorAssuranceLevel? by claims.optional
     val sessionId: String? by claims.optional.withKey("session_id")
@@ -61,7 +84,7 @@ class JwtPayload(
 
     // optional claims
     val jti: String? by claims.optional
-    val nbf: Instant? by claims.optional
+    val nbf: Instant? by lazy { claims.decodeValue<Long>("nbf")?.let { Instant.fromEpochMilliseconds(it) } }
     val appMetadata: JsonObject? by claims.optional.withKey("app_metadata")
     val userMetadata: JsonObject? by claims.optional.withKey("user_metadata")
     val amr: List<AMREntry>? by claims.optional
@@ -69,7 +92,7 @@ class JwtPayload(
     // special claims
     val ref: String? by claims.optional
 
-    inline fun <reified T> getClaimOrNull(key: String): T? = claims.decodeValue(key)
+    inline fun <reified T> getClaimOrNull(key: String): T? = claims.decodeValue(key, JWT_JSON_INSTANCE)
 
     inline fun <reified T> getClaim(key: String) = getClaimOrNull<T>(key) ?: error("Param not found")
 

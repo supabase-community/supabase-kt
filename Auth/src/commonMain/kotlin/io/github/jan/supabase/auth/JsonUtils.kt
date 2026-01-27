@@ -22,11 +22,11 @@ internal fun JsonObjectBuilder.putCodeChallenge(codeChallenge: String) {
 }
 
 internal inline operator fun <reified T> JsonObject.getValue(thisRef: Any?, property: KProperty<*>): T {
-    return this[property.name]?.let { Json.decodeFromJsonElement(it) } ?: error("No entry found with key ${property.name}")
+    return this[property.name]?.let { JWT_JSON_INSTANCE.decodeFromJsonElement(it) } ?: error("No entry found with key ${property.name}")
 }
 
 @SupabaseInternal
-inline fun <reified T> JsonObject.decodeValue(key: String): T? = this[key]?.let { Json.decodeFromJsonElement(it) }
+inline fun <reified T> JsonObject.decodeValue(key: String, json: Json = Json): T? = this[key]?.let { json.decodeFromJsonElement(it) }
 
 internal fun JsonObject.withKey(key: String) = JsonObjectModifier(this, key)
 
@@ -42,7 +42,7 @@ internal class JsonObjectModifier(
     fun withKey(key: String) = JsonObjectModifier(json, key)
 
     inline operator fun <reified T> getValue(thisRef: Any?, property: KProperty<*>): T {
-        return json[withKey]?.let { Json.decodeFromJsonElement(it) } ?: error("No entry found with key ${property.name}")
+        return json[withKey]?.let { JWT_JSON_INSTANCE.decodeFromJsonElement(it) } ?: error("No entry found with key ${property.name}")
     }
 
 }
@@ -57,7 +57,7 @@ internal class OptionalJsonObjectModifier(
     inline operator fun <reified T> getValue(thisRef: Any?, property: KProperty<*>): T? {
         return json[withKey ?: property.name]?.let {
             if(it is JsonNull) return null
-            Json.decodeFromJsonElement(it)
+            JWT_JSON_INSTANCE.decodeFromJsonElement(it)
         }
     }
 

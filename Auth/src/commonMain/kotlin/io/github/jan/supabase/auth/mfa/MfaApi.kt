@@ -92,8 +92,9 @@ interface MfaApi {
 
     /**
      * Parses the current JWT and returns the AuthenticatorAssuranceLevel for the current session and the next session
+     * @param jwt A custom jwt. If null, the jwt from [Auth.currentAccessTokenOrNull] will be used.
      */
-    fun getAuthenticatorAssuranceLevel(): MfaLevel
+    fun getAuthenticatorAssuranceLevel(jwt: String? = null): MfaLevel
 
 }
 
@@ -173,9 +174,8 @@ internal class MfaApiImpl(
         api.delete("factors/$factorId")
     }
 
-    override fun getAuthenticatorAssuranceLevel(): MfaLevel {
-        val session = auth.currentSessionOrNull()
-        val jwt = auth.currentAccessTokenOrNull() ?: error("Current session is null")
+    override fun getAuthenticatorAssuranceLevel(jwt: String?): MfaLevel {
+        val jwt = jwt ?: auth.currentAccessTokenOrNull() ?: error("Current session is null")
         val decodedJwt = decodeJwt(jwt)
         val aal = decodedJwt.claimsResponse.claims.aal ?: error("No 'aal' claim found in JWT")
         val nextAal = if (verifiedFactors.isNotEmpty()) AuthenticatorAssuranceLevel.AAL2 else AuthenticatorAssuranceLevel.AAL1
