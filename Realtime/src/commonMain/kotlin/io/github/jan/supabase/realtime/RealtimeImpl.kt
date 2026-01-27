@@ -16,7 +16,6 @@ import io.github.jan.supabase.realtime.websocket.RealtimeWebsocket
 import io.ktor.client.statement.HttpResponse
 import io.ktor.http.URLProtocol
 import io.ktor.http.path
-import io.ktor.util.decodeBase64String
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
@@ -39,6 +38,7 @@ import kotlin.concurrent.atomics.AtomicInt
 import kotlin.concurrent.atomics.AtomicReference
 import kotlin.concurrent.atomics.fetchAndIncrement
 import kotlin.concurrent.atomics.incrementAndFetch
+import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
 import kotlin.time.Clock
 
@@ -190,8 +190,12 @@ import kotlin.time.Clock
         val newToken = token ?: config.accessToken(supabaseClient)
 
         if(newToken != null) {
-            val parsed = Json.decodeFromString<JsonObject>(newToken.split(".")[1].decodeBase64String())
-            val exp = parsed["exp"]?.jsonPrimitive?.longOrNull ?: error("No exp found in token")
+            val decodedString = Base64.UrlSafe
+                .withPadding(Base64.PaddingOption.ABSENT_OPTIONAL)
+                .decode(newToken.split(".")[1])
+                .decodeToString()
+            val payload = Json.decodeFromString<JsonObject>(decodedString)
+            val exp = payload["exp"]?.jsonPrimitive?.longOrNull ?: error("No exp found in token")
             val now = Clock.System.now().epochSeconds
             val diff = exp - now
             if(diff < 0) {
