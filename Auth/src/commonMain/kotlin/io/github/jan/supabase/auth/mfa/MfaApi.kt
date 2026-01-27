@@ -177,7 +177,7 @@ internal class MfaApiImpl(
     override fun getAuthenticatorAssuranceLevel(): MfaLevel {
         val jwt = auth.currentAccessTokenOrNull() ?: error("Current session is null")
         val decodedString = Base64.UrlSafe
-            .withPadding(Base64.PaddingOption.ABSENT_OPTIONAL)
+            .withPadding(Base64.PaddingOption.ABSENT)
             .decode(jwt.split(".")[1])
             .decodeToString()
         val payload = Json.decodeFromString<JsonObject>(decodedString)

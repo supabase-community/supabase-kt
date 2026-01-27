@@ -191,7 +191,7 @@ import kotlin.time.Clock
 
         if(newToken != null) {
             val decodedString = Base64.UrlSafe
-                .withPadding(Base64.PaddingOption.ABSENT_OPTIONAL)
+                .withPadding(Base64.PaddingOption.ABSENT)
                 .decode(newToken.split(".")[1])
                 .decodeToString()
             val payload = Json.decodeFromString<JsonObject>(decodedString)
