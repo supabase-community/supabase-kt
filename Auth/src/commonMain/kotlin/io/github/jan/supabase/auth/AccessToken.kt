@@ -53,6 +53,7 @@ private suspend fun SupabaseClient.checkAccessToken(token: String) {
             """
                 Authenticated request attempted with expired access token. This should not happen. Please report this issue. Trying to refresh session before...
                 Auto refresh running: $autoRefreshRunning
+                Auto-refresher information: ${auth.autoRefreshInformation()}
                 OS: ${OSInformation.CURRENT}
                 Session: ${StringMasking.maskSession(currentSession)}
             """.trimIndent()
