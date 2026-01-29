@@ -1,8 +1,6 @@
 @file:Suppress("UndocumentedPublicClass", "UndocumentedPublicFunction", "UndocumentedPublicProperty")
-package io.github.jan.supabase.auth.claims
+package io.github.jan.supabase.auth.jwt
 
-import io.github.jan.supabase.auth.AMREntry
-import io.github.jan.supabase.auth.JWT_JSON_INSTANCE
 import io.github.jan.supabase.auth.decodeValue
 import io.github.jan.supabase.auth.mfa.AuthenticatorAssuranceLevel
 import io.github.jan.supabase.auth.optional
@@ -71,8 +69,8 @@ class JwtPayload(
         is JsonPrimitive -> listOf(Json.decodeFromJsonElement(value))
         else -> null
     }
-    val exp: Instant? by lazy { claims.decodeValue<Long>("exp")?.let { Instant.fromEpochMilliseconds(it) } }
-    val iat: Instant? by lazy { claims.decodeValue<Long>("iat")?.let { Instant.fromEpochMilliseconds(it) } }
+    val exp: Instant? by lazy { claims.decodeValue<Long>("exp")?.let { Instant.fromEpochSeconds(it) } }
+    val iat: Instant? by lazy { claims.decodeValue<Long>("iat")?.let { Instant.fromEpochSeconds(it) } }
     val role: String? by claims.optional
     val aal: AuthenticatorAssuranceLevel? by claims.optional
     val sessionId: String? by claims.optional.withKey("session_id")
@@ -84,7 +82,7 @@ class JwtPayload(
 
     // optional claims
     val jti: String? by claims.optional
-    val nbf: Instant? by lazy { claims.decodeValue<Long>("nbf")?.let { Instant.fromEpochMilliseconds(it) } }
+    val nbf: Instant? by lazy { claims.decodeValue<Long>("nbf")?.let { Instant.fromEpochSeconds(it) } }
     val appMetadata: JsonObject? by claims.optional.withKey("app_metadata")
     val userMetadata: JsonObject? by claims.optional.withKey("user_metadata")
     val amr: List<AMREntry>? by claims.optional
@@ -92,7 +90,7 @@ class JwtPayload(
     // special claims
     val ref: String? by claims.optional
 
-    inline fun <reified T> getClaimOrNull(key: String): T? = claims.decodeValue(key, JWT_JSON_INSTANCE)
+    inline fun <reified T> getClaimOrNull(key: String): T? = claims.decodeValue(key, Json)
 
     inline fun <reified T> getClaim(key: String) = getClaimOrNull<T>(key) ?: error("Param not found")
 

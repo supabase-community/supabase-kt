@@ -2,7 +2,7 @@ package io.github.jan.supabase.auth.mfa
 
 import io.github.jan.supabase.auth.Auth
 import io.github.jan.supabase.auth.AuthImpl
-import io.github.jan.supabase.auth.decodeJwt
+import io.github.jan.supabase.auth.jwt.JWTUtils
 import io.github.jan.supabase.auth.providers.builtin.Phone
 import io.github.jan.supabase.auth.status.SessionStatus
 import io.github.jan.supabase.auth.user.UserMfaFactor
@@ -176,7 +176,7 @@ internal class MfaApiImpl(
 
     override fun getAuthenticatorAssuranceLevel(jwt: String?): MfaLevel {
         val jwt = jwt ?: auth.currentAccessTokenOrNull() ?: error("Current session is null")
-        val decodedJwt = decodeJwt(jwt)
+        val decodedJwt = JWTUtils.decodeJwt(jwt)
         val aal = decodedJwt.claimsResponse.claims.aal ?: error("No 'aal' claim found in JWT")
         val nextAal = if (verifiedFactors.isNotEmpty()) AuthenticatorAssuranceLevel.AAL2 else AuthenticatorAssuranceLevel.AAL1
         return MfaLevel(aal, nextAal, decodedJwt.claimsResponse.claims.amr ?: emptyList())

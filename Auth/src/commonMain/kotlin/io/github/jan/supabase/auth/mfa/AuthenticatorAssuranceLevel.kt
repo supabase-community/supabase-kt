@@ -1,6 +1,6 @@
 package io.github.jan.supabase.auth.mfa
 
-import io.github.jan.supabase.auth.AMREntry
+import io.github.jan.supabase.auth.jwt.AMREntry
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 

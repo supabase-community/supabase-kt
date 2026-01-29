@@ -1,4 +1,4 @@
-import io.github.jan.supabase.auth.JWTUtils
+import io.github.jan.supabase.auth.jwt.JWTUtils
 import io.github.jan.supabase.realtime.Realtime
 import io.github.jan.supabase.realtime.RealtimeImpl
 import io.github.jan.supabase.realtime.RealtimeMessage

@@ -1,5 +1,5 @@
 @file:Suppress("UndocumentedPublicClass", "UndocumentedPublicFunction", "UndocumentedPublicProperty")
-package io.github.jan.supabase.auth.claims
+package io.github.jan.supabase.auth.jwt
 
 import io.github.jan.supabase.auth.decodeValue
 import io.github.jan.supabase.auth.optional

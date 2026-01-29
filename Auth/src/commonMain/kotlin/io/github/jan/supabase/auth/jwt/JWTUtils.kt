@@ -1,9 +1,6 @@
-package io.github.jan.supabase.auth
+package io.github.jan.supabase.auth.jwt
 
 import io.github.jan.supabase.annotations.SupabaseInternal
-import io.github.jan.supabase.auth.claims.ClaimsResponse
-import io.github.jan.supabase.auth.claims.JwtHeader
-import io.github.jan.supabase.auth.claims.JwtPayload
 import kotlinx.io.bytestring.encode
 import kotlinx.io.bytestring.encodeToByteString
 import kotlinx.serialization.json.Json

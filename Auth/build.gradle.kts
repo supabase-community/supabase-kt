@@ -40,6 +40,7 @@ kotlin {
                 addModules(SupabaseModule.SUPABASE)
              //   implementation(libs.krypto)
              //   implementation(libs.secure.random) replaced by crypto
+             //   api(libs.bundles.jwt)
                 api(libs.okio)
                 implementation(libs.crypto)
                 implementation(libs.crypto.optimal)

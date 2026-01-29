@@ -1,4 +1,4 @@
-package io.github.jan.supabase.auth.claims
+package io.github.jan.supabase.auth.jwt
 
 import io.github.jan.supabase.auth.Auth
 import kotlin.concurrent.atomics.AtomicReference

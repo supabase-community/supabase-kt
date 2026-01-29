@@ -857,6 +857,70 @@ class AuthRequestTest {
         }
     }
 
+    @Test
+    fun testGetClaimsHS256() {
+        runTest {
+            val jwt = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWUsImlhdCI6MTUxNjIzOTAyMn0.KMUFsIDTnFmyG3nMiGM6H9FNFUROf3wh7SmqJp-QV30"
+            val client = createMockedSupabaseClient(configuration = configuration) {
+                assertMethodIs(HttpMethod.Get, it.method)
+                assertPathIs("/user", it.url.pathAfterVersion())
+                assertEquals("Bearer $jwt", it.headers["Authorization"])
+                respondJson(
+                    sampleUserObject()
+                )
+            }
+            val claimsResponse = client.auth.getClaims(jwt) {
+                allowExpired = true
+            }
+            assertEquals("1234567890", claimsResponse.claims.sub)
+            assertEquals("John Doe", claimsResponse.claims.getClaim<String>("name"))
+            assertEquals(true, claimsResponse.claims.getClaim<Boolean>("admin"))
+        }
+    }
+
+    @Test
+    fun testGetClaimsRS256FetchesJwks() {
+        runTest {
+            val jwt = "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6InRlc3Qta2V5LWlkIn0.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWUsImlhdCI6MTUxNjIzOTAyMn0.dGVzdC1zaWduYXR1cmU"
+            var jwksFetched = false
+            val client = createMockedSupabaseClient(configuration = configuration) {
+                when {
+                    it.url.encodedPath.contains(".well-known/jwks.json") -> {
+                        jwksFetched = true
+                        assertMethodIs(HttpMethod.Get, it.method)
+                        respondJson(sampleJwksResponse())
+                    }
+                    else -> respond("")
+                }
+            }
+            // The signature verification will fail since we're using a dummy signature, but this test verifies the JWKS endpoint is called correctly for RS256
+            try {
+                client.auth.getClaims(jwt) {
+                    allowExpired = true
+                }
+            } catch (_: Exception) {
+                // Expected - signature verification fails with dummy data
+            }
+            assertEquals(true, jwksFetched, "JWKS endpoint should be fetched for RS256 algorithm")
+        }
+    }
+
+    private fun sampleJwksResponse() = """
+        {
+            "keys": [
+                {
+                    "kty": "RSA",
+                    "kid": "test-key-id",
+                    "use": "sig",
+                    "alg": "RS256",
+                    "n": "0vx7agoebGcQSuuPiLJXZptN9nndrQmbXEps2aiAFbWhM78LhWx4cbbfAAtVT86zwu1RK7aPFFxuhDR1L6tSoc_BJECPebWKRXjBZCiFV4n3oknjhMstn64tZ_2W-5JsGY4Hc5n9yBXArwl93lqt7_RN5w6Cf0h4QyQ5v-65YGjQR0_FDW2QvzqY368QQMicAtaSqzs8KJZgnYb9c7d0zgdAZHzu6qMQvRL5hajrn1n91CbOpbISD08qNLyrdkt-bFTWhAI4vMQFh6WeZu0fM4lFd2NcRwr3XPksINHaQ-G_xBniIqbw0Ls1jF44-csFCur-kEgU8awapJzKnqDKgw",
+                    "e": "AQAB",
+                    "key_ops": ["verify"]
+                }
+            ]
+        }
+    """.trimIndent()
+
     private fun sampleUserObject(email: String? = null, phone: String? = null) = """
         {
             "id": "id",

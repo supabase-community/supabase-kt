@@ -5,8 +5,8 @@ import io.github.jan.supabase.SupabaseClientBuilder
 import io.github.jan.supabase.SupabaseSerializer
 import io.github.jan.supabase.annotations.SupabaseExperimental
 import io.github.jan.supabase.annotations.SupabaseInternal
-import io.github.jan.supabase.auth.claims.JwkCache
-import io.github.jan.supabase.auth.claims.SharedJwkCache
+import io.github.jan.supabase.auth.jwt.JwkCache
+import io.github.jan.supabase.auth.jwt.SharedJwkCache
 import io.github.jan.supabase.auth.user.UserSession
 import io.github.jan.supabase.plugins.CustomSerializationConfig
 import io.github.jan.supabase.plugins.MainConfig

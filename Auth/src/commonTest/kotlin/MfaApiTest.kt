@@ -2,8 +2,8 @@ import app.cash.turbine.test
 import io.github.jan.supabase.SupabaseClientBuilder
 import io.github.jan.supabase.auth.Auth
 import io.github.jan.supabase.auth.auth
-import io.github.jan.supabase.auth.claims.JwtHeader
-import io.github.jan.supabase.auth.encodeToBase64Url
+import io.github.jan.supabase.auth.jwt.JWTUtils
+import io.github.jan.supabase.auth.jwt.JwtHeader
 import io.github.jan.supabase.auth.mfa.AuthenticatorAssuranceLevel
 import io.github.jan.supabase.auth.mfa.FactorType
 import io.github.jan.supabase.auth.mfa.MfaStatus
@@ -211,7 +211,7 @@ class MfaApiTest {
             put("aal", currentAAL.name.lowercase())
         }
         val header = Json.encodeToString(JwtHeader(JwtHeader.Algorithm.HS256))
-        val token = "${header.encodeToBase64Url()}.${data.toString().encodeToBase64Url()}.${"ignore".encodeToBase64Url()}"
+        val token = "${JWTUtils.encodeToBase64Url(header)}.${JWTUtils.encodeToBase64Url(data.toString())}.${JWTUtils.encodeToBase64Url("ignore")}"
         val client = createMockedSupabaseClient(
             configuration = configuration
         ) {
@@ -231,7 +231,7 @@ class MfaApiTest {
                 put("aal", current.name.lowercase())
             }
             val header = Json.encodeToString(JwtHeader(JwtHeader.Algorithm.HS256))
-            val token = "${header.encodeToBase64Url()}.${data.toString().encodeToBase64Url()}.${"ignore".encodeToBase64Url()}"
+            val token = "${JWTUtils.encodeToBase64Url(header)}.${JWTUtils.encodeToBase64Url(data.toString())}.${JWTUtils.encodeToBase64Url("ignore")}"
             val client = createMockedSupabaseClient(
                 configuration = configuration
             ) {

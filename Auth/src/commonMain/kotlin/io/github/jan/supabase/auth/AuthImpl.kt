@@ -11,17 +11,21 @@ import io.github.jan.supabase.annotations.SupabaseExperimental
 import io.github.jan.supabase.annotations.SupabaseInternal
 import io.github.jan.supabase.auth.admin.AdminApi
 import io.github.jan.supabase.auth.admin.AdminApiImpl
-import io.github.jan.supabase.auth.claims.ClaimsRequestBuilder
-import io.github.jan.supabase.auth.claims.ClaimsResponse
-import io.github.jan.supabase.auth.claims.JWK
-import io.github.jan.supabase.auth.claims.JwkCacheEntry
-import io.github.jan.supabase.auth.claims.JwtHeader
 import io.github.jan.supabase.auth.event.AuthEvent
 import io.github.jan.supabase.auth.exception.AuthRestException
 import io.github.jan.supabase.auth.exception.AuthSessionMissingException
 import io.github.jan.supabase.auth.exception.AuthWeakPasswordException
 import io.github.jan.supabase.auth.exception.InvalidJwtException
 import io.github.jan.supabase.auth.exception.TokenExpiredException
+import io.github.jan.supabase.auth.jwt.ClaimsRequestBuilder
+import io.github.jan.supabase.auth.jwt.ClaimsResponse
+import io.github.jan.supabase.auth.jwt.JWK
+import io.github.jan.supabase.auth.jwt.JWTUtils
+import io.github.jan.supabase.auth.jwt.JwkCacheEntry
+import io.github.jan.supabase.auth.jwt.JwtHeader
+import io.github.jan.supabase.auth.jwt.ecJwkToDer
+import io.github.jan.supabase.auth.jwt.ecdsaRawToDer
+import io.github.jan.supabase.auth.jwt.rsaJwkToDer
 import io.github.jan.supabase.auth.mfa.MfaApi
 import io.github.jan.supabase.auth.mfa.MfaApiImpl
 import io.github.jan.supabase.auth.providers.AuthProvider
@@ -70,7 +74,7 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-import kotlinx.io.bytestring.encodeToByteString
+import kotlinx.io.bytestring.ByteString
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonObjectBuilder
 import kotlinx.serialization.json.buildJsonObject
@@ -409,13 +413,13 @@ internal class AuthImpl(
 
     override suspend fun getClaims(jwt: String?, options: ClaimsRequestBuilder.() -> Unit): ClaimsResponse {
         val token = jwt ?: currentAccessTokenOrNull() ?: error("No access token found")
-        val (claims, rawHeader, rawPayload) = decodeJwt(token)
+        val (claims, rawHeader, rawPayload) = JWTUtils.decodeJwt(token)
         val options = ClaimsRequestBuilder().apply(options)
 
         if(!options.allowExpired) {
             val exp = claims.claims.exp
             val now = Clock.System.now()
-            if(exp == null || exp > now) throw TokenExpiredException()
+            if(exp == null || exp < now) throw TokenExpiredException()
         }
 
         val signingKey = if(claims.header.alg == JwtHeader.Algorithm.HS256 || claims.header.kid == null) null else {
@@ -423,21 +427,25 @@ internal class AuthImpl(
         }
 
         if(signingKey == null) {
-            retrieveUser(token) // the method would throw an exception if the token was invalid
+            retrieveUser(token)
             return claims
         } else {
+            val signedData = "$rawHeader.$rawPayload".encodeToByteArray()
             val verified = when(val alg = claims.header.alg) {
                 JwtHeader.Algorithm.RS256 -> {
                     val keyDecoder = CryptographyProvider.Default
                         .get(RSA.PKCS1).publicKeyDecoder(SHA256)
-                    val key = keyDecoder.decodeFromByteString(RSA.PublicKey.Format.JWK, signingKey.jwk.toString().encodeToByteString())
-                    key.signatureVerifier().tryVerifySignature(token.encodeToByteArray(), claims.signature)
+                    val derKey = rsaJwkToDer(signingKey)
+                    val key = keyDecoder.decodeFromByteString(RSA.PublicKey.Format.DER, ByteString(derKey))
+                    key.signatureVerifier().tryVerifySignature(signedData, claims.signature)
                 }
                 JwtHeader.Algorithm.ES256 -> {
                     val keyDecoder = CryptographyProvider.Default
                         .get(ECDSA).publicKeyDecoder(EC.Curve.P256)
-                    val key = keyDecoder.decodeFromByteString(EC.PublicKey.Format.DER, signingKey.jwk.toString().encodeToByteString())
-                    key.signatureVerifier(SHA256, ECDSA.SignatureFormat.DER).tryVerifySignature(token.encodeToByteArray(), claims.signature)
+                    val derKey = ecJwkToDer(signingKey)
+                    val key = keyDecoder.decodeFromByteString(EC.PublicKey.Format.DER, ByteString(derKey))
+                    val derSignature = ecdsaRawToDer(claims.signature)
+                    key.signatureVerifier(SHA256, ECDSA.SignatureFormat.DER).tryVerifySignature(signedData, derSignature)
                 }
                 else -> error("Invalid alg claim $alg")
             }
