@@ -35,6 +35,7 @@ data object OTP: AuthProvider<OTP.Config, Unit> {
      * @param captchaToken The captcha token for the request
      * @param channel The channel to send the OTP to. Only applies when [phone] is set. Defaults to SMS when not specified.
      */
+    @Suppress("LongParameterList")
     class Config(
         @PublishedApi internal val serializer: SupabaseSerializer,
         var email: String? = null,
@@ -60,6 +61,17 @@ data object OTP: AuthProvider<OTP.Config, Unit> {
 
     }
 
+    private fun buildOtpRequestBody(config: Config): JsonObject = buildJsonObject {
+        put("create_user", config.createUser)
+        config.data?.let { put("data", it) }
+        config.email?.let {
+            put("email", it)
+        } ?: config.phone?.let {
+            put("phone", it)
+            config.channel?.let { channel -> put("channel", channel.value) }
+        }
+    }
+
     override suspend fun login(
         supabaseClient: SupabaseClient,
         onSuccess: suspend (UserSession) -> Unit,
@@ -71,20 +83,7 @@ data object OTP: AuthProvider<OTP.Config, Unit> {
         require((otpConfig.email != null && otpConfig.email!!.isNotBlank()) || (otpConfig.phone != null && otpConfig.phone!!.isNotBlank())) { "You need to provide either an email or a phone number" }
         require(!(otpConfig.email != null && otpConfig.phone != null)) { "You can only provide either an email or a phone number" }
 
-        val body = buildJsonObject {
-            put("create_user", otpConfig.createUser)
-            otpConfig.data?.let {
-                put("data", it)
-            }
-            otpConfig.email?.let {
-                put("email", it)
-            } ?: otpConfig.phone?.let {
-                put("phone", it)
-                otpConfig.channel?.let { channel ->
-                    put("channel", channel.value)
-                }
-            }
-        }
+        val body = buildOtpRequestBody(otpConfig)
         var codeChallenge: String? = null
         if (supabaseClient.auth.config.flowType == FlowType.PKCE) {
             val codeVerifier = generateCodeVerifier()
