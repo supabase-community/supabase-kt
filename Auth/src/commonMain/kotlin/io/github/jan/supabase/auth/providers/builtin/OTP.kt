@@ -33,6 +33,7 @@ data object OTP: AuthProvider<OTP.Config, Unit> {
      * @param data Additional data to store with the user
      * @param createUser Whether to create a new user if the user doesn't exist
      * @param captchaToken The captcha token for the request
+     * @param channel The channel to send the OTP to. Only applies when [phone] is set. Defaults to SMS when not specified.
      */
     class Config(
         @PublishedApi internal val serializer: SupabaseSerializer,
@@ -40,7 +41,12 @@ data object OTP: AuthProvider<OTP.Config, Unit> {
         var phone: String? = null,
         var data: JsonObject? = null,
         var createUser: Boolean = true,
-        var captchaToken: String? = null
+        var captchaToken: String? = null,
+        /**
+         * The channel to send the OTP to. Only applies when [phone] is set.
+         * Defaults to SMS when not specified.
+         */
+        var channel: Phone.Channel? = null
     ) {
 
         /**
@@ -74,6 +80,9 @@ data object OTP: AuthProvider<OTP.Config, Unit> {
                 put("email", it)
             } ?: otpConfig.phone?.let {
                 put("phone", it)
+                otpConfig.channel?.let { channel ->
+                    put("channel", channel.value)
+                }
             }
         }
         var codeChallenge: String? = null
