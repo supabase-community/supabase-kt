@@ -1,3 +1,4 @@
+@file:Suppress("MagicNumber")
 package io.github.jan.supabase.auth.jwt
 
 internal fun rsaJwkToDer(jwk: JWK): ByteArray {

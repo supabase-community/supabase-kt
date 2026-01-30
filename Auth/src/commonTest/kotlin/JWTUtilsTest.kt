@@ -18,7 +18,7 @@ class JWTUtilsTest {
         assertEquals("1234567890", claims.sub)
         assertEquals("John Doe", claims.getClaim<String>("name"))
         assertTrue { claims.getClaim<Boolean>("admin") }
-        assertEquals(Instant.fromEpochMilliseconds(1516239022), claims.iat)
+        assertEquals(Instant.fromEpochSeconds(1516239022), claims.iat)
         assertContentEquals(JWTUtils.decodeBase64ByteArray("KMUFsIDTnFmyG3nMiGM6H9FNFUROf3wh7SmqJp-QV30"), signature)
     }
 
