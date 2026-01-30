@@ -6,7 +6,6 @@ import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.annotations.SupabaseInternal
 import io.github.jan.supabase.exceptions.HttpRequestException
 import io.github.jan.supabase.logging.d
-import io.github.jan.supabase.logging.e
 import io.github.jan.supabase.supabaseJson
 import io.ktor.client.HttpClient
 import io.ktor.client.HttpClientConfig
@@ -68,13 +67,13 @@ class KtorSupabaseHttpClient @SupabaseInternal constructor(
         val response = try {
             httpClient.request(url, builder)
         } catch(e: HttpRequestTimeoutException) {
-            SupabaseClient.LOGGER.e { "${request.method.value} request to endpoint $endPoint timed out after $requestTimeout" }
+            SupabaseClient.LOGGER.d(e) { "${request.method.value} request to endpoint $endPoint timed out after $requestTimeout" }
             throw e
         } catch(e: CancellationException) {
-            SupabaseClient.LOGGER.e { "${request.method.value} request to endpoint $endPoint was cancelled"}
+            SupabaseClient.LOGGER.d(e) { "${request.method.value} request to endpoint $endPoint was cancelled"}
             throw e
         } catch(e: Exception) {
-            SupabaseClient.LOGGER.e(e) { "${request.method.value} request to endpoint $endPoint failed with exception ${e.message}" }
+            SupabaseClient.LOGGER.d(e) { "${request.method.value} request to endpoint $endPoint failed with exception ${e.message}" }
             throw HttpRequestException(e.message ?: "", request)
         }
         val responseTime = (response.responseTime.timestamp - response.requestTime.timestamp).milliseconds
@@ -93,13 +92,13 @@ class KtorSupabaseHttpClient @SupabaseInternal constructor(
         val response = try {
             httpClient.prepareRequest(url, builder)
         } catch(e: HttpRequestTimeoutException) {
-            SupabaseClient.LOGGER.e { "Request timed out after $requestTimeout on url $url" }
+            SupabaseClient.LOGGER.d(e) { "Request timed out after $requestTimeout on url $url" }
             throw e
         } catch(e: CancellationException) {
-            SupabaseClient.LOGGER.e { "Request was cancelled on url $url" }
+            SupabaseClient.LOGGER.d(e) { "Request was cancelled on url $url" }
             throw e
         } catch(e: Exception) {
-            SupabaseClient.LOGGER.e(e) { "Request failed with ${e.message} on url $url" }
+            SupabaseClient.LOGGER.d(e) { "Request failed with ${e.message} on url $url" }
             throw HttpRequestException(e.message ?: "", request)
         }
         return response

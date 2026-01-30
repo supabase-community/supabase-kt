@@ -5,6 +5,7 @@ import io.github.jan.supabase.StringMasking
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.annotations.SupabaseInternal
 import io.github.jan.supabase.auth.exception.TokenExpiredException
+import io.github.jan.supabase.logging.d
 import io.github.jan.supabase.logging.e
 import io.github.jan.supabase.plugins.MainConfig
 import io.github.jan.supabase.plugins.MainPlugin
@@ -62,7 +63,7 @@ private suspend fun SupabaseClient.checkAccessToken(token: String) {
         try {
             auth.refreshCurrentSession()
         } catch (e: Exception) {
-            Auth.logger.e(e) { "Failed to force-refresh session before making a request with an expired access token" }
+            Auth.logger.d(e) { "Failed to force-refresh session before making a request with an expired access token" }
             throw TokenExpiredException()
         }
     }

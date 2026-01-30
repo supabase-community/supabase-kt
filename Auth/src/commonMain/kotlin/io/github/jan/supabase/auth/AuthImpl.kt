@@ -523,7 +523,7 @@ internal class AuthImpl(
             }
         } catch (e: Exception) {
             currentCoroutineContext().ensureActive()
-            Auth.logger.e(e) { "Couldn't reach Supabase. Either the address doesn't exist or the network might not be on. Retrying in ${config.retryDelay}..." }
+            Auth.logger.d(e) { "Couldn't reach Supabase. Either the address doesn't exist or the network might not be on. Retrying in ${config.retryDelay}..." }
             updateStatus(RefreshFailureCause.NetworkError(e))
             delay(config.retryDelay)
             retry()
