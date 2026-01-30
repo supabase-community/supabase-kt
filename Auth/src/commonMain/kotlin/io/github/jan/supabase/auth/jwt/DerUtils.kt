@@ -61,10 +61,22 @@ private class Asn1Builder {
     private val content = mutableListOf<Byte>()
 
     fun addInteger(value: ByteArray) {
-        val bytes = if (value.isNotEmpty() && value[0] < 0) byteArrayOf(0x00) + value else value
-        content.add(0x02)
-        addLength(bytes.size)
-        content.addAll(bytes.toList())
+        var start = 0
+        while (start < value.size - 1 && value[start].toInt() == 0 && value[start + 1].toInt() >= 0) {
+            start++
+        }
+
+        val trimmed = value.copyOfRange(start, value.size)
+        val needsPadding = trimmed.isNotEmpty() && trimmed[0].toInt() < 0
+
+        content.add(0x02) // Tag
+        if (needsPadding) {
+            addLength(trimmed.size + 1)
+            content.add(0x00)
+        } else {
+            addLength(trimmed.size)
+        }
+        content.addAll(trimmed.toList())
     }
 
     fun addOid(oid: ByteArray) {
