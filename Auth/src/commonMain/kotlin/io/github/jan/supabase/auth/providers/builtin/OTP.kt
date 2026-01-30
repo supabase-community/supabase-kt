@@ -27,28 +27,27 @@ data object OTP: AuthProvider<OTP.Config, Unit> {
      * The configuration for the OTP authentication method
      *
      * Note: Only [email] or [phone] can be set
-     *
-     * @param email The email of the user
-     * @param phone The phone number of the user
-     * @param data Additional data to store with the user
-     * @param createUser Whether to create a new user if the user doesn't exist
-     * @param captchaToken The captcha token for the request
-     * @param channel The channel to send the OTP to. Only applies when [phone] is set. Defaults to SMS when not specified.
      */
-    @Suppress("LongParameterList")
     class Config(
         @PublishedApi internal val serializer: SupabaseSerializer,
-        var email: String? = null,
-        var phone: String? = null,
-        var data: JsonObject? = null,
-        var createUser: Boolean = true,
-        var captchaToken: String? = null,
-        /**
-         * The channel to send the OTP to. Only applies when [phone] is set.
-         * Defaults to SMS when not specified.
-         */
-        var channel: Phone.Channel? = null
     ) {
+        /** The email of the user */
+        var email: String? = null
+
+        /** The phone number of the user */
+        var phone: String? = null
+
+        /** Additional data to store with the user */
+        var data: JsonObject? = null
+
+        /** Whether to create a new user if the user doesn't exist */
+        var createUser: Boolean = true
+
+        /** The captcha token for the request */
+        var captchaToken: String? = null
+
+        /** The channel to send the OTP to. Only applies when [phone] is set. Defaults to SMS when not specified. */
+        var channel: Phone.Channel? = null
 
         /**
          * Sets [data] to the given value.
@@ -58,7 +57,6 @@ data object OTP: AuthProvider<OTP.Config, Unit> {
         inline fun <reified T : Any> data(data: T) {
             this.data = serializer.encodeToJsonElement(data) as JsonObject
         }
-
     }
 
     private fun buildOtpRequestBody(config: Config): JsonObject = buildJsonObject {
