@@ -2,10 +2,11 @@ package io.github.jan.supabase.logging
 
 import co.touchlab.kermit.Logger
 import co.touchlab.kermit.Severity
-import co.touchlab.kermit.loggerConfigInit
+import co.touchlab.kermit.mutableLoggerConfigInit
 import co.touchlab.kermit.platformLogWriter
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.annotations.SupabaseInternal
+import kotlin.concurrent.Volatile
 
 /**
  * An interface for logging in Supabase plugins.
@@ -32,9 +33,7 @@ abstract class SupabaseLogger {
      * @param message The message to log
      */
     inline fun log(level: LogLevel, throwable: Throwable? = null, message: () -> String) {
-        if (level >= (this.level ?: SupabaseClient.DEFAULT_LOG_LEVEL)) {
-            log(level, throwable, message())
-        }
+        log(level, throwable, message()) // the other log method would handle the level
     }
 
     /**
@@ -42,7 +41,12 @@ abstract class SupabaseLogger {
      * @param level The log level
      */
     @SupabaseInternal
-    abstract fun setLevel(level: LogLevel)
+    abstract fun setLevel(level: LogLevel?)
+
+    /**
+     * Returns the current [level], or if null: [SupabaseClient.DEFAULT_LOG_LEVEL].
+     */
+    fun getLevelOrDefault() = level ?: SupabaseClient.DEFAULT_LOG_LEVEL
 
 }
 
@@ -52,15 +56,16 @@ abstract class SupabaseLogger {
  * @param tag The tag for this logger
  */
 internal class KermitSupabaseLogger(
-    initialLevel: LogLevel,
+    initialLevel: LogLevel?,
     tag: String,
 ) : SupabaseLogger() {
 
-    override var level: LogLevel = initialLevel
+    @Volatile
+    override var level: LogLevel? = initialLevel
         private set
 
     private val logger: Logger = Logger(
-        config = loggerConfigInit(platformLogWriter(), minSeverity = level.toSeverity()),
+        config = mutableLoggerConfigInit(platformLogWriter(), minSeverity = getLevelOrDefault().toSeverity()),
         tag = tag,
     )
 
@@ -77,9 +82,9 @@ internal class KermitSupabaseLogger(
     }
 
     @SupabaseInternal
-    override fun setLevel(level: LogLevel) {
+    override fun setLevel(level: LogLevel?) {
         this.level = level
-        logger.mutableConfig.minSeverity = level.toSeverity()
+        logger.mutableConfig.minSeverity = getLevelOrDefault().toSeverity()
     }
 
 }
