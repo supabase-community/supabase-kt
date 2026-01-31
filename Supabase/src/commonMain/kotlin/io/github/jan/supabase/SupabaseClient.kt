@@ -10,6 +10,7 @@ import io.github.jan.supabase.network.KtorSupabaseHttpClient
 import io.github.jan.supabase.plugins.PluginManager
 import io.github.jan.supabase.plugins.SupabasePlugin
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlin.concurrent.Volatile
 
 /**
  * The main class to interact with Supabase.
@@ -80,14 +81,11 @@ interface SupabaseClient {
         /**
          * The default minimum logging level used for plugins. Can be changed within the [SupabaseClientBuilder]
          */
-        var DEFAULT_LOG_LEVEL: LogLevel
-            get() = LOGGER.level ?: error("The default log level should not be null")
-            internal set(value) {
-                LOGGER.setLevel(value)
-            }
+        @Volatile
+        var DEFAULT_LOG_LEVEL: LogLevel = LogLevel.INFO
+            internal set
 
-        // This logger also provides the default log level for all other loggers
-        val LOGGER: SupabaseLogger = createLogger("Supabase-Core", LogLevel.INFO)
+        val LOGGER: SupabaseLogger = createLogger("Supabase-Core")
 
         /**
          * Creates a new [SupabaseLogger] using the [KermitSupabaseLogger] implementation.
