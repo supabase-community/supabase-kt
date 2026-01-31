@@ -27,21 +27,27 @@ data object OTP: AuthProvider<OTP.Config, Unit> {
      * The configuration for the OTP authentication method
      *
      * Note: Only [email] or [phone] can be set
-     *
-     * @param email The email of the user
-     * @param phone The phone number of the user
-     * @param data Additional data to store with the user
-     * @param createUser Whether to create a new user if the user doesn't exist
-     * @param captchaToken The captcha token for the request
      */
     class Config(
         @PublishedApi internal val serializer: SupabaseSerializer,
-        var email: String? = null,
-        var phone: String? = null,
-        var data: JsonObject? = null,
-        var createUser: Boolean = true,
-        var captchaToken: String? = null
     ) {
+        /** The email of the user */
+        var email: String? = null
+
+        /** The phone number of the user */
+        var phone: String? = null
+
+        /** Additional data to store with the user */
+        var data: JsonObject? = null
+
+        /** Whether to create a new user if the user doesn't exist */
+        var createUser: Boolean = true
+
+        /** The captcha token for the request */
+        var captchaToken: String? = null
+
+        /** The channel to send the OTP to. Only applies when [phone] is set. Defaults to SMS when not specified. */
+        var channel: Phone.Channel? = null
 
         /**
          * Sets [data] to the given value.
@@ -51,7 +57,17 @@ data object OTP: AuthProvider<OTP.Config, Unit> {
         inline fun <reified T : Any> data(data: T) {
             this.data = serializer.encodeToJsonElement(data) as JsonObject
         }
+    }
 
+    private fun buildOtpRequestBody(config: Config): JsonObject = buildJsonObject {
+        put("create_user", config.createUser)
+        config.data?.let { put("data", it) }
+        config.email?.let {
+            put("email", it)
+        } ?: config.phone?.let {
+            put("phone", it)
+            config.channel?.let { channel -> put("channel", channel.value) }
+        }
     }
 
     override suspend fun login(
@@ -65,17 +81,7 @@ data object OTP: AuthProvider<OTP.Config, Unit> {
         require((otpConfig.email != null && otpConfig.email!!.isNotBlank()) || (otpConfig.phone != null && otpConfig.phone!!.isNotBlank())) { "You need to provide either an email or a phone number" }
         require(!(otpConfig.email != null && otpConfig.phone != null)) { "You can only provide either an email or a phone number" }
 
-        val body = buildJsonObject {
-            put("create_user", otpConfig.createUser)
-            otpConfig.data?.let {
-                put("data", it)
-            }
-            otpConfig.email?.let {
-                put("email", it)
-            } ?: otpConfig.phone?.let {
-                put("phone", it)
-            }
-        }
+        val body = buildOtpRequestBody(otpConfig)
         var codeChallenge: String? = null
         if (supabaseClient.auth.config.flowType == FlowType.PKCE) {
             val codeVerifier = generateCodeVerifier()

@@ -288,6 +288,84 @@ class AuthRequestTest {
     }
 
     @Test
+    fun testSignUpOtpWithPhoneWhatsApp() {
+        runTest {
+            val expectedPhone = "+1234567890"
+            val captchaToken = "captchaToken"
+            val userData = buildJsonObject {
+                put("key", "value")
+            }
+            val expectedUrl = "https://example.com"
+            val client = createMockedSupabaseClient(configuration = configuration) {
+                val body = it.body.toJsonElement().jsonObject
+                val metaSecurity = body["gotrue_meta_security"]!!.jsonObject
+                val params = it.url.parameters
+                assertEquals(expectedUrl, params["redirect_to"])
+                assertMethodIs(HttpMethod.Post, it.method)
+                assertPathIs("/otp", it.url.pathAfterVersion())
+                assertEquals(expectedPhone, body["phone"]?.jsonPrimitive?.content)
+                assertEquals("whatsapp", body["channel"]?.jsonPrimitive?.content)
+                assertEquals(captchaToken, metaSecurity["captcha_token"]?.jsonPrimitive?.content)
+                assertEquals(userData, body["data"]!!.jsonObject)
+                containsCodeChallenge(body)
+                respond("")
+            }
+            client.auth.signUpWith(OTP, redirectUrl = expectedUrl) {
+                phone = expectedPhone
+                channel = Phone.Channel.WHATSAPP
+                this.captchaToken = captchaToken
+                data = userData
+            }
+        }
+    }
+
+    @Test
+    fun testSignUpOtpWithPhoneSmsChannel() {
+        runTest {
+            val expectedPhone = "+1234567890"
+            val expectedUrl = "https://example.com"
+            val client = createMockedSupabaseClient(configuration = configuration) {
+                val body = it.body.toJsonElement().jsonObject
+                val params = it.url.parameters
+                assertEquals(expectedUrl, params["redirect_to"])
+                assertMethodIs(HttpMethod.Post, it.method)
+                assertPathIs("/otp", it.url.pathAfterVersion())
+                assertEquals(expectedPhone, body["phone"]?.jsonPrimitive?.content)
+                assertEquals("sms", body["channel"]?.jsonPrimitive?.content)
+                containsCodeChallenge(body)
+                respond("")
+            }
+            client.auth.signUpWith(OTP, redirectUrl = expectedUrl) {
+                phone = expectedPhone
+                channel = Phone.Channel.SMS
+            }
+        }
+    }
+
+    @Test
+    fun testSignUpOtpWithEmailIgnoresChannel() {
+        runTest {
+            val expectedEmail = "example@email.com"
+            val expectedUrl = "https://example.com"
+            val client = createMockedSupabaseClient(configuration = configuration) {
+                val body = it.body.toJsonElement().jsonObject
+                val params = it.url.parameters
+                assertEquals(expectedUrl, params["redirect_to"])
+                assertMethodIs(HttpMethod.Post, it.method)
+                assertPathIs("/otp", it.url.pathAfterVersion())
+                assertEquals(expectedEmail, body["email"]?.jsonPrimitive?.content)
+                assertNull(body["channel"], "Channel should not be present for email OTP")
+                containsCodeChallenge(body)
+                respond("")
+            }
+            client.auth.signUpWith(OTP, redirectUrl = expectedUrl) {
+                email = expectedEmail
+                channel = Phone.Channel.WHATSAPP // This should be ignored for email
+            }
+        }
+    }
+
+    @Test
     fun testSignInWithIDToken() {
         runTest {
             val captchaToken = "captchaToken"
