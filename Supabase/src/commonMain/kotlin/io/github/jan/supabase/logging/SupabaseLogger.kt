@@ -33,7 +33,7 @@ abstract class SupabaseLogger {
      * @param message The message to log
      */
     inline fun log(level: LogLevel, throwable: Throwable? = null, message: () -> String) {
-        if (level >= (this.level ?: SupabaseClient.DEFAULT_LOG_LEVEL)) {
+        if (level >= getLevelOrDefault()) {
             log(level, throwable, message())
         }
     }
