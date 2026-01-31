@@ -29,8 +29,9 @@ androidx-compat = "1.7.1"
 androidx-lifecycle = "2.10.0"
 filekit = "0.8.8"
 kotlinx-browser = "0.5.0"
-secure-random = "0.6.0"
 immutable-collections = "0.4.0"
+crypto = "0.5.0"
+jwt-kt = "1.2.1"
 
 [plugins]
 kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
@@ -94,7 +95,6 @@ multiplatform-settings-test = { module = "com.russhwolf:multiplatform-settings-t
 apollo-kotlin = { module = "com.apollographql.apollo:apollo-runtime", version.ref = "apollo-kotlin" }
 
 #krypto = { module = "com.soywiz:korlibs-crypto", version.ref = "korlibs" }
-secure-random = { module = "org.kotlincrypto.random:crypto-rand", version.ref = "secure-random" }
 okio = { module = "com.squareup.okio:okio", version.ref = "okio" }
 
 moshi = { module = "com.squareup.moshi:moshi", version.ref = "moshi" }
@@ -106,6 +106,9 @@ jackson-kotlin = { module = "com.fasterxml.jackson.module:jackson-module-kotlin"
 turbine = { module = "app.cash.turbine:turbine", version = "1.2.1" }
 
 coil2 = { module = "io.coil-kt:coil", version.ref = "coil2" }
+
+crypto = { module = "dev.whyoleg.cryptography:cryptography-core", version.ref = "crypto" }
+crypto-optimal = { module = "dev.whyoleg.cryptography:cryptography-provider-optimal", version.ref = "crypto" }
 
 # Sample dependencies
 koin-core = { module = "io.insert-koin:koin-core", version.ref = "koin" }

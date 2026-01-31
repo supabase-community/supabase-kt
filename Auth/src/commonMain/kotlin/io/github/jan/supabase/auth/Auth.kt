@@ -7,6 +7,10 @@ import io.github.jan.supabase.auth.admin.AdminApi
 import io.github.jan.supabase.auth.event.AuthEvent
 import io.github.jan.supabase.auth.exception.AuthRestException
 import io.github.jan.supabase.auth.exception.AuthWeakPasswordException
+import io.github.jan.supabase.auth.exception.InvalidJwtException
+import io.github.jan.supabase.auth.exception.TokenExpiredException
+import io.github.jan.supabase.auth.jwt.ClaimsRequestBuilder
+import io.github.jan.supabase.auth.jwt.ClaimsResponse
 import io.github.jan.supabase.auth.mfa.MfaApi
 import io.github.jan.supabase.auth.providers.AuthProvider
 import io.github.jan.supabase.auth.providers.ExternalAuthConfigDefaults
@@ -430,6 +434,29 @@ interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
      * Starts auto refreshing the current session
      */
     suspend fun startAutoRefreshForCurrentSession()
+
+    /**
+     * Extracts the JWT claims present in the access token by first verifying the
+     * JWT against the server's JSON Web Key Set endpoint
+     * `/.well-known/jwks.json` which is often cached, resulting in significantly
+     * faster responses. Prefer this method over [retrieveUser] which always
+     * sends a request to the Auth server for each JWT.
+     *
+     * If the project is not using an asymmetric JWT signing key (like ECC or
+     * RSA) it always sends a request to the Auth server (similar to [retrieveUser]) to verify the JWT.
+     *
+     * @param jwt An optional specific JWT you wish to verify, not the one you
+     *            can obtain from [currentSessionOrNull].
+     * @param options Various additional options that allow you to customize the
+     *                behavior of this method.
+     * @throws TokenExpiredException when trying to get the claims of an expired [jwt] and [ClaimsRequestBuilder.allowExpired] is set to false
+     * @throws InvalidJwtException if the [jwt] is invalid
+     * @throws AuthRestException on any REST-related error responses during the fetching of the JWKs or retrieving of the current user data
+     */
+    suspend fun getClaims(
+        jwt: String? = null,
+        options: ClaimsRequestBuilder.() -> Unit = {}
+    ): ClaimsResponse
 
     /**
      * Returns the url to use for oAuth

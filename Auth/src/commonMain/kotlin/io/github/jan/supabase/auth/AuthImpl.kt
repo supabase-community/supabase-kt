@@ -1,5 +1,11 @@
+@file:Suppress("LargeClass")
 package io.github.jan.supabase.auth
 
+import dev.whyoleg.cryptography.CryptographyProvider
+import dev.whyoleg.cryptography.algorithms.EC
+import dev.whyoleg.cryptography.algorithms.ECDSA
+import dev.whyoleg.cryptography.algorithms.RSA
+import dev.whyoleg.cryptography.algorithms.SHA256
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.annotations.SupabaseExperimental
 import io.github.jan.supabase.annotations.SupabaseInternal
@@ -9,6 +15,17 @@ import io.github.jan.supabase.auth.event.AuthEvent
 import io.github.jan.supabase.auth.exception.AuthRestException
 import io.github.jan.supabase.auth.exception.AuthSessionMissingException
 import io.github.jan.supabase.auth.exception.AuthWeakPasswordException
+import io.github.jan.supabase.auth.exception.InvalidJwtException
+import io.github.jan.supabase.auth.exception.TokenExpiredException
+import io.github.jan.supabase.auth.jwt.ClaimsRequestBuilder
+import io.github.jan.supabase.auth.jwt.ClaimsResponse
+import io.github.jan.supabase.auth.jwt.JWK
+import io.github.jan.supabase.auth.jwt.JWTUtils
+import io.github.jan.supabase.auth.jwt.JwkCacheEntry
+import io.github.jan.supabase.auth.jwt.JwtHeader
+import io.github.jan.supabase.auth.jwt.ecJwkToDer
+import io.github.jan.supabase.auth.jwt.ecdsaRawToDer
+import io.github.jan.supabase.auth.jwt.rsaJwkToDer
 import io.github.jan.supabase.auth.mfa.MfaApi
 import io.github.jan.supabase.auth.mfa.MfaApiImpl
 import io.github.jan.supabase.auth.providers.AuthProvider
@@ -57,19 +74,23 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import kotlinx.io.bytestring.ByteString
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonObjectBuilder
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.contentOrNull
 import kotlinx.serialization.json.encodeToJsonElement
+import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.put
 import kotlin.time.Clock
+import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.Instant
 
 private const val SESSION_REFRESH_THRESHOLD = 0.8
+private val JWKS_TTL = 10.minutes
 @Suppress("MagicNumber") // see #631
 private val SIGNOUT_IGNORE_CODES = listOf(401, 403, 404)
 
@@ -390,6 +411,68 @@ internal class AuthImpl(
         verify(type.type, token, captchaToken) {
             put("phone", phone)
         }
+    }
+
+    override suspend fun getClaims(jwt: String?, options: ClaimsRequestBuilder.() -> Unit): ClaimsResponse {
+        val token = jwt ?: currentAccessTokenOrNull() ?: error("No access token found")
+        val (claims, rawHeader, rawPayload) = JWTUtils.decodeJwt(token)
+        val options = ClaimsRequestBuilder().apply(options)
+
+        if(!options.allowExpired) {
+            val exp = claims.claims.exp
+            val now = Clock.System.now()
+            if(exp == null || exp < now) throw TokenExpiredException()
+        }
+
+        val signingKey = if(claims.header.alg == JwtHeader.Algorithm.HS256 || claims.header.kid == null) null else {
+            fetchJwk(claims.header.kid, options.jwks)
+        }
+
+        if(signingKey == null) {
+            retrieveUser(token)
+            return claims
+        } else {
+            val signedData = "$rawHeader.$rawPayload".encodeToByteArray()
+            val verified = when(val alg = claims.header.alg) {
+                JwtHeader.Algorithm.RS256 -> {
+                    val keyDecoder = CryptographyProvider.Default
+                        .get(RSA.PKCS1).publicKeyDecoder(SHA256)
+                    val derKey = rsaJwkToDer(signingKey)
+                    val key = keyDecoder.decodeFromByteString(RSA.PublicKey.Format.DER, ByteString(derKey))
+                    key.signatureVerifier().tryVerifySignature(signedData, claims.signature)
+                }
+                JwtHeader.Algorithm.ES256 -> {
+                    val keyDecoder = CryptographyProvider.Default
+                        .get(ECDSA).publicKeyDecoder(EC.Curve.P256)
+                    val derKey = ecJwkToDer(signingKey)
+                    val key = keyDecoder.decodeFromByteString(EC.PublicKey.Format.DER, ByteString(derKey))
+                    val derSignature = ecdsaRawToDer(claims.signature)
+                    key.signatureVerifier(SHA256, ECDSA.SignatureFormat.DER).tryVerifySignature(signedData, derSignature)
+                }
+                else -> error("Invalid alg claim $alg")
+            }
+            if(!verified) throw InvalidJwtException()
+            return claims
+        }
+    }
+
+    private suspend fun fetchJwk(kid: String, jwks: List<JWK>): JWK? {
+        jwks.find { it.kid == kid }?.let { return it } // try to fetch in the supplied jwks
+        val now = Clock.System.now()
+        config.jwkCache.get()?.let { entry -> // try to fetch from local cache
+            val jwk = entry.jwks.find { jwk -> jwk.kid == kid }
+            if(jwk != null && entry.cachedAt + JWKS_TTL > now) return jwk
+        }
+        val response = unauthenticatedApi.get(".well-known/jwks.json").safeBody<JsonObject>() // fetch from the api
+        val keysArray = response["keys"]?.jsonArray
+        if(!response.containsKey("keys") || keysArray?.isEmpty() ?: true) return null
+        val keys = keysArray.map { JWK(it.jsonObject) }
+        config.jwkCache.set(JwkCacheEntry(
+            keys,
+            now
+        ))
+        val key = keys.find { it.kid == kid }
+        return key
     }
 
     override suspend fun retrieveUser(jwt: String): UserInfo {

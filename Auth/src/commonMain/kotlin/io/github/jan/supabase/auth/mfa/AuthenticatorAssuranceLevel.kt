@@ -1,17 +1,24 @@
 package io.github.jan.supabase.auth.mfa
 
+import io.github.jan.supabase.auth.jwt.AMREntry
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+
 /**
  * The assurance level of a session
  */
+@Serializable
 enum class AuthenticatorAssuranceLevel {
     /**
      * The user is logged in using a provider (Password, OAuth, etc.)
      */
+    @SerialName("aal1")
     AAL1,
 
     /**
      * The user is logged in using at least one MFA factor
      */
+    @SerialName("aal2")
     AAL2;
 
     companion object {
@@ -34,8 +41,10 @@ enum class AuthenticatorAssuranceLevel {
 /**
  * @param current The current assurance level of the session
  * @param next The next possible assurance level (for the next login)
+ * @param currentAuthenticationMethods A list of current AMR entries
  */
 data class MfaLevel(
     val current: AuthenticatorAssuranceLevel,
-    val next: AuthenticatorAssuranceLevel
+    val next: AuthenticatorAssuranceLevel,
+    val currentAuthenticationMethods: List<AMREntry>
 )
