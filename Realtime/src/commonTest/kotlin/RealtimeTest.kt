@@ -107,7 +107,7 @@ class RealtimeTest {
     }
 
     private fun generateToken(exp: Long) = buildString {
-        append("test.")
+        append("${JWTUtils.encodeToBase64Url("{\"alg\":\"HS256\"}")}.")
         append(JWTUtils.encodeToBase64Url(buildJsonObject {
             put("exp", exp)
         }.toString()))
