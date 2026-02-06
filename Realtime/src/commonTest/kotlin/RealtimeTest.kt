@@ -1,9 +1,9 @@
+import io.github.jan.supabase.auth.jwt.JWTUtils
 import io.github.jan.supabase.realtime.Realtime
 import io.github.jan.supabase.realtime.RealtimeImpl
 import io.github.jan.supabase.realtime.RealtimeMessage
 import io.github.jan.supabase.realtime.channel
 import io.github.jan.supabase.realtime.realtime
-import io.ktor.util.encodeBase64
 import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
@@ -107,10 +107,10 @@ class RealtimeTest {
     }
 
     private fun generateToken(exp: Long) = buildString {
-        append("test.")
-        append(buildJsonObject {
+        append("${JWTUtils.encodeToBase64Url("{\"alg\":\"HS256\"}")}.")
+        append(JWTUtils.encodeToBase64Url(buildJsonObject {
             put("exp", exp)
-        }.toString().encodeBase64())
+        }.toString()))
         append(".test")
     }
 

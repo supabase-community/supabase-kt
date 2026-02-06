@@ -39,8 +39,11 @@ kotlin {
             dependencies {
                 addModules(SupabaseModule.SUPABASE)
              //   implementation(libs.krypto)
-                implementation(libs.secure.random)
+             //   implementation(libs.secure.random) replaced by crypto
+             //   api(libs.bundles.jwt)
                 api(libs.okio)
+                implementation(libs.crypto)
+                implementation(libs.crypto.optimal)
             }
         }
         val desktopMain by getting {
