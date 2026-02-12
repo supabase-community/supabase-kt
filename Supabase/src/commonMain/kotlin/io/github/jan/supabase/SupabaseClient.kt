@@ -10,6 +10,7 @@ import io.github.jan.supabase.network.KtorSupabaseHttpClient
 import io.github.jan.supabase.plugins.PluginManager
 import io.github.jan.supabase.plugins.SupabasePlugin
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlin.concurrent.Volatile
 
 /**
  * The main class to interact with Supabase.
@@ -80,6 +81,7 @@ interface SupabaseClient {
         /**
          * The default minimum logging level used for plugins. Can be changed within the [SupabaseClientBuilder]
          */
+        @Volatile
         var DEFAULT_LOG_LEVEL = LogLevel.INFO
             internal set
 
