@@ -6,6 +6,7 @@ import co.touchlab.kermit.loggerConfigInit
 import co.touchlab.kermit.platformLogWriter
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.annotations.SupabaseInternal
+import kotlin.concurrent.Volatile
 
 /**
  * An interface for logging in Supabase plugins.
@@ -13,7 +14,7 @@ import io.github.jan.supabase.annotations.SupabaseInternal
 abstract class SupabaseLogger {
 
     /**
-     * The minimum log level to handle for this logger. If null, the [SupabaseClient.DEFAULT_LOG_LEVEL] will be used.
+     * The minimum log level to handle for this logger. If null, [SupabaseClient.DEFAULT_LOG_LEVEL] will be used.
      */
     abstract val level: LogLevel?
 
@@ -38,11 +39,11 @@ abstract class SupabaseLogger {
     }
 
     /**
-     * Set the log level for this logger
+     * Set the log level for this logger. If set to `null`, [SupabaseClient.DEFAULT_LOG_LEVEL] will be used.
      * @param level The log level
      */
     @SupabaseInternal
-    abstract fun setLevel(level: LogLevel)
+    abstract fun setLevel(level: LogLevel?)
 
 }
 
@@ -52,20 +53,23 @@ abstract class SupabaseLogger {
  * @param tag The tag for this logger
  */
 internal class KermitSupabaseLogger(
-    initialLevel: LogLevel,
+    initialLevel: LogLevel?,
     tag: String,
 ) : SupabaseLogger() {
 
-    override var level: LogLevel = initialLevel
+    @Volatile
+    override var level: LogLevel? = initialLevel
         private set
 
     private val logger: Logger = Logger(
-        config = loggerConfigInit(platformLogWriter(), minSeverity = level.toSeverity()),
+        config = loggerConfigInit(platformLogWriter(), minSeverity = Severity.Debug),
         tag = tag,
     )
 
     override fun log(level: LogLevel, throwable: Throwable?, message: String) {
-        logger.log(level.toSeverity(), logger.tag, throwable, message)
+        if (level >= getLevelOrDefault()) {
+            logger.processLog(level.toSeverity(), logger.tag, throwable, message)
+        }
     }
 
     private fun LogLevel.toSeverity() = when (this) {
@@ -77,9 +81,12 @@ internal class KermitSupabaseLogger(
     }
 
     @SupabaseInternal
-    override fun setLevel(level: LogLevel) {
+    override fun setLevel(level: LogLevel?) {
         this.level = level
-        logger.mutableConfig.minSeverity = level.toSeverity()
+    }
+
+    private fun getLevelOrDefault(): LogLevel {
+        return this.level ?: SupabaseClient.DEFAULT_LOG_LEVEL
     }
 
 }
