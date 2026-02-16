@@ -11,9 +11,10 @@ import kotlin.reflect.javaType
  */
 class JacksonSerializer(private val mapper: ObjectMapper = jacksonObjectMapper()) : SupabaseSerializer {
 
-    override fun <T : Any> encode(type: KType, value: T): String = mapper.writeValueAsString(value)
+    override fun <T> encode(type: KType, value: T): String = mapper.writeValueAsString(value)
 
     @OptIn(ExperimentalStdlibApi::class)
-    override fun <T : Any> decode(type: KType, value: String): T = mapper.readValue(value, mapper.constructType(type.javaType))
+    @Suppress("UNCHECKED_CAST")
+    override fun <T> decode(type: KType, value: String): T = mapper.readValue(value, mapper.constructType(type.javaType)) as T
 
 }

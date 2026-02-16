@@ -14,12 +14,13 @@ class MoshiSerializer(
 ) : SupabaseSerializer {
 
     @OptIn(ExperimentalStdlibApi::class)
-    override fun <T : Any> encode(type: KType, value: T): String = moshi.adapter<T>(type).toJson(value)
+    override fun <T> encode(type: KType, value: T): String = moshi.adapter<T>(type).toJson(value)
 
     @OptIn(ExperimentalStdlibApi::class)
-    override fun <T : Any> decode(type: KType, value: String): T {
+    @Suppress("UNCHECKED_CAST")
+    override fun <T> decode(type: KType, value: String): T {
         val adapter = moshi.adapter<T>(type)
-        return adapter.fromJson(value) ?: error("Failed to decode $value")
+        return adapter.fromJson(value) as T
     }
 
 }

@@ -19,6 +19,9 @@ import io.ktor.client.request.HttpRequestData
 import io.ktor.client.request.HttpResponseData
 import io.ktor.http.HttpMethod
 import kotlinx.coroutines.test.runTest
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.SerializationException
+import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.buildJsonArray
@@ -29,6 +32,7 @@ import kotlinx.serialization.json.put
 import kotlin.test.Test
 import kotlin.test.assertContains
 import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 import kotlin.test.assertNull
 
 class PostgrestTest {
@@ -359,6 +363,230 @@ class PostgrestTest {
             }
         }
     }
+
+    @Test
+    fun testRpcReturnsNull() {
+        val supabase = createMockedSupabaseClient(
+            configuration = configureClient
+        ) {
+            respond("null")
+        }
+
+        runTest {
+            val result = supabase.postgrest.rpc("get_nullable_value")
+            val value = result.decodeAs<String?>()
+            assertNull(value)
+        }
+    }
+
+    @Test
+    fun testRpcReturnsStringNull() {
+        val supabase = createMockedSupabaseClient(
+            configuration = configureClient
+        ) {
+            respond("\"null\"")
+        }
+
+        runTest {
+            val result = supabase.postgrest.rpc("get_text_value")
+            val value = result.decodeAs<String?>()
+            assertEquals("null", value)
+        }
+    }
+
+    /** Decode Truth Table **/
+
+    @Serializable
+    data class TestObject(val data: String) {
+        companion object {
+            val mock = TestObject("mockData")
+        }
+    }
+
+    @Test
+    fun testDecodeAsNonNullTypeMatchingResponseAndResult() {
+        val supabase = createMockedSupabaseClient(configuration = configureClient) {
+            respond(Json.encodeToString(TestObject.mock))
+        }
+        runTest {
+            val result = supabase.postgrest.rpc("function")
+            val value = result.decodeAs<TestObject>()
+            assertEquals(TestObject.mock, value)
+        }
+    }
+
+    @Test
+    fun testDecodeAsNonNullTypeMismatchedResponseFailure() {
+        val supabase = createMockedSupabaseClient(configuration = configureClient) {
+            respond("[]")
+        }
+        runTest {
+            val result = supabase.postgrest.rpc("function")
+            assertFailsWith<SerializationException> {
+                result.decodeAs<TestObject>()
+            }
+        }
+    }
+
+    @Test
+    fun testDecodeAsNonNullTypeNullResponseFailure() {
+        val supabase = createMockedSupabaseClient(configuration = configureClient) {
+            respond("null")
+        }
+        runTest {
+            val result = supabase.postgrest.rpc("function")
+            assertFailsWith<SerializationException> {
+                result.decodeAs<TestObject>()
+            }
+        }
+    }
+
+    @Test
+    fun testDecodeAsNullableTypeMatchingResponseAndResult() {
+        val supabase = createMockedSupabaseClient(configuration = configureClient) {
+            respond(Json.encodeToString(TestObject.mock))
+        }
+        runTest {
+            val result = supabase.postgrest.rpc("function")
+            val value = result.decodeAs<TestObject?>()
+            assertEquals(TestObject.mock, value)
+        }
+    }
+
+    @Test
+    fun testDecodeAsNullableTypeMismatchedResponseFailure() {
+        val supabase = createMockedSupabaseClient(configuration = configureClient) {
+            respond("[]")
+        }
+        runTest {
+            val result = supabase.postgrest.rpc("function")
+            assertFailsWith<SerializationException> {
+                result.decodeAs<TestObject?>()
+            }
+        }
+    }
+
+    @Test
+    fun testDecodeAsNullableTypeNullResponseNullResult() {
+        val supabase = createMockedSupabaseClient(configuration = configureClient) {
+            respond("null")
+        }
+        runTest {
+            val result = supabase.postgrest.rpc("function")
+            val value = result.decodeAs<TestObject?>()
+            assertNull(value)
+        }
+    }
+
+    @Test
+    fun testDecodeAsOrNullNonNullTypeMatchingResponseAndResult() {
+        val supabase = createMockedSupabaseClient(configuration = configureClient) {
+            respond(Json.encodeToString(TestObject.mock))
+        }
+        runTest {
+            val result = supabase.postgrest.rpc("function")
+            val value = result.decodeAsOrNull<TestObject>()
+            assertEquals(TestObject.mock, value)
+        }
+    }
+
+    @Test
+    fun testDecodeAsOrNullNonNullTypeMismatchedResponseNullResult() {
+        val supabase = createMockedSupabaseClient(configuration = configureClient) {
+            respond("[]")
+        }
+        runTest {
+            val result = supabase.postgrest.rpc("function")
+            val value = result.decodeAsOrNull<TestObject>()
+            assertNull(value)
+        }
+    }
+
+    @Test
+    fun testDecodeAsOrNullNonNullTypeNullResponseNullResult() {
+        val supabase = createMockedSupabaseClient(configuration = configureClient) {
+            respond("null")
+        }
+        runTest {
+            val result = supabase.postgrest.rpc("function")
+            val value = result.decodeAsOrNull<TestObject>()
+            assertNull(value)
+        }
+    }
+
+    @Test
+    fun testDecodeAsOrNullNullableTypeMatchingResponseAndResult() {
+        val supabase = createMockedSupabaseClient(configuration = configureClient) {
+            respond(Json.encodeToString(TestObject.mock))
+        }
+        runTest {
+            val result = supabase.postgrest.rpc("function")
+            val value = result.decodeAsOrNull<TestObject?>()
+            assertEquals(TestObject.mock, value)
+        }
+    }
+
+    @Test
+    fun testDecodeAsOrNullNullableTypeMismatchedResponseNullResult() {
+        val supabase = createMockedSupabaseClient(configuration = configureClient) {
+            respond("[]")
+        }
+        runTest {
+            val result = supabase.postgrest.rpc("function")
+            val value = result.decodeAsOrNull<TestObject?>()
+            assertNull(value)
+        }
+    }
+
+    @Test
+    fun testDecodeAsOrNullNullableTypeNullResponseNullResult() {
+        val supabase = createMockedSupabaseClient(configuration = configureClient) {
+            respond("null")
+        }
+        runTest {
+            val result = supabase.postgrest.rpc("function")
+            val value = result.decodeAsOrNull<TestObject?>()
+            assertNull(value)
+        }
+    }
+
+    @Test
+    fun testDecodeListNullableTypeMatchingResponseAndResult() {
+        val supabase = createMockedSupabaseClient(configuration = configureClient) {
+            respond(Json.encodeToString(listOf(TestObject.mock,TestObject.mock)))
+        }
+        runTest {
+            val result = supabase.postgrest.rpc("function")
+            val value = result.decodeList<TestObject?>()
+            assertEquals(listOf(TestObject.mock,TestObject.mock), value)
+        }
+    }
+
+    @Test
+    fun testDecodeListNullableTypeListOfMismatchedResponseFailure() {
+        val supabase = createMockedSupabaseClient(configuration = configureClient) {
+            respond("[[], []]")
+        }
+        runTest {
+            val result = supabase.postgrest.rpc("function")
+            assertFailsWith<SerializationException> {
+                result.decodeList<TestObject?>()
+            }
+        }
+    }
+
+    @Test
+    fun testDecodeListNullableTypeListOfNullResponseListOfNullResult() {
+        val supabase = createMockedSupabaseClient(configuration = configureClient) {
+            respond("[null, null]")
+        }
+        runTest {
+            val result = supabase.postgrest.rpc("function")
+            val value = result.decodeList<TestObject?>()
+            assertEquals(listOf(null,null), value)
+        }
+    }
+
 
     private fun testClient(
         table: String = "table",
