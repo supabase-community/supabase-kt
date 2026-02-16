@@ -14,7 +14,7 @@ class MoshiSerializer(
 ) : SupabaseSerializer {
 
     @OptIn(ExperimentalStdlibApi::class)
-    override fun <T> encode(type: KType, value: T): String = moshi.adapter<T>(type).toJson(value)
+    override fun <T> encode(type: KType, value: T): String = moshi.adapter<T>(type).serializeNulls().toJson(value)
 
     @OptIn(ExperimentalStdlibApi::class)
     @Suppress("UNCHECKED_CAST")
