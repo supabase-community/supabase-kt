@@ -1,6 +1,8 @@
 import app.cash.turbine.test
 import io.github.jan.supabase.auth.Auth
 import io.github.jan.supabase.auth.auth
+import io.github.jan.supabase.auth.jwt.JWTUtils
+import io.github.jan.supabase.auth.jwt.JwtHeader
 import io.github.jan.supabase.auth.minimalConfig
 import io.github.jan.supabase.postgrest.query.filter.FilterOperation
 import io.github.jan.supabase.postgrest.query.filter.FilterOperator
@@ -46,9 +48,9 @@ import kotlin.test.assertFailsWith
 import kotlin.time.Clock
 
 val EXAMPLE_JWT = buildString {
-    append("test.")
+    append(JWTUtils.encodeToBase64Url(Json.encodeToString(JwtHeader(JwtHeader.Algorithm.HS256))) + ".")
     append(buildJsonObject { put("exp", Clock.System.now().epochSeconds + 500) }.toString().encodeBase64())
-    append(".test")
+    append("." + JWTUtils.encodeToBase64Url("test"))
 }
 
 class RealtimeChannelTest {
