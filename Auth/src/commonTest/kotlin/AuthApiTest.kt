@@ -1,3 +1,4 @@
+import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.SupabaseClientBuilder
 import io.github.jan.supabase.auth.Auth
 import io.github.jan.supabase.auth.AuthConfig
@@ -74,7 +75,7 @@ class AuthRequestTest {
                 respondJson(
                     sampleUserObject(email = expectedEmail)
                 )
-            }
+            }.awaitInit()
             val user = client.auth.signUpWith(Email, redirectUrl = expectedUrl) {
                 email = expectedEmail
                 password = expectedPassword
@@ -107,7 +108,7 @@ class AuthRequestTest {
                 respondJson(
                     sampleSessionWithUserData(email = "example@email.com", phone = "+1234567890")
                 )
-            }
+            }.awaitInit()
             val user = client.auth.signUpWith(Email) {
                 email = expectedEmail
                 password = expectedPassword
@@ -143,7 +144,7 @@ class AuthRequestTest {
                 respondJson(
                     sampleUserSession()
                 )
-            }
+            }.awaitInit()
             val user = client.auth.signUpWith(Email) {
                 email = expectedEmail
                 password = expectedPassword
@@ -178,7 +179,7 @@ class AuthRequestTest {
                 respondJson(
                     sampleSessionWithUserData()
                 )
-            }
+            }.awaitInit()
             val user = client.auth.signUpWith(Phone) {
                 phone = expectedPhone
                 password = expectedPassword
@@ -216,7 +217,7 @@ class AuthRequestTest {
                 respondJson(
                     sampleUserObject(phone = expectedPhone)
                 )
-            }
+            }.awaitInit()
             val user = client.auth.signUpWith(Phone, redirectUrl = expectedUrl) {
                 phone = expectedPhone
                 password = expectedPassword
@@ -248,7 +249,7 @@ class AuthRequestTest {
                 assertEquals(userData, body["data"]!!.jsonObject)
                 containsCodeChallenge(body)
                 respond("")
-            }
+            }.awaitInit()
             client.auth.signUpWith(OTP, redirectUrl = expectedUrl) {
                 phone = expectedPhone
                 this.captchaToken = captchaToken
@@ -278,7 +279,7 @@ class AuthRequestTest {
                 assertEquals(userData, body["data"]!!.jsonObject)
                 containsCodeChallenge(body)
                 respond("")
-            }
+            }.awaitInit()
             client.auth.signUpWith(OTP, redirectUrl = expectedUrl) {
                 email = expectedEmail
                 this.captchaToken = captchaToken
@@ -309,7 +310,7 @@ class AuthRequestTest {
                 assertEquals(userData, body["data"]!!.jsonObject)
                 containsCodeChallenge(body)
                 respond("")
-            }
+            }.awaitInit()
             client.auth.signUpWith(OTP, redirectUrl = expectedUrl) {
                 phone = expectedPhone
                 channel = Phone.Channel.WHATSAPP
@@ -334,7 +335,7 @@ class AuthRequestTest {
                 assertEquals("sms", body["channel"]?.jsonPrimitive?.content)
                 containsCodeChallenge(body)
                 respond("")
-            }
+            }.awaitInit()
             client.auth.signUpWith(OTP, redirectUrl = expectedUrl) {
                 phone = expectedPhone
                 channel = Phone.Channel.SMS
@@ -357,7 +358,7 @@ class AuthRequestTest {
                 assertNull(body["channel"], "Channel should not be present for email OTP")
                 containsCodeChallenge(body)
                 respond("")
-            }
+            }.awaitInit()
             client.auth.signUpWith(OTP, redirectUrl = expectedUrl) {
                 email = expectedEmail
                 channel = Phone.Channel.WHATSAPP // This should be ignored for email
@@ -392,7 +393,7 @@ class AuthRequestTest {
                 respondJson(
                     sampleUserSession()
                 )
-            }
+            }.awaitInit()
             client.auth.signInWith(IDToken) {
                 this.captchaToken = captchaToken
                 data = userData
@@ -423,7 +424,7 @@ class AuthRequestTest {
                 respondJson(
                     sampleUserSession()
                 )
-            }
+            }.awaitInit()
             client.auth.signInAnonymously(
                 captchaToken = captchaToken,
                 data = userData
@@ -458,7 +459,7 @@ class AuthRequestTest {
                     }
                     """.trimIndent()
                 )
-            }
+            }.awaitInit()
             val url = client.auth.linkIdentity(expectedProvider, redirectUrl = expectedRedirectUrl) {
                 scopes.addAll(expectedScopes)
                 queryParams.putAll(expectedUrlParams)
@@ -490,7 +491,7 @@ class AuthRequestTest {
                 respondJson(
                     sampleUserSession()
                 )
-            }
+            }.awaitInit()
             client.auth.linkIdentityWithIdToken(expectedProvider, expectedIdToken) {
                 accessToken = expectedAccessToken
                 nonce = expectedNonce
@@ -509,7 +510,7 @@ class AuthRequestTest {
                 respondJson(
                     sampleUserObject()
                 )
-            }
+            }.awaitInit()
             client.auth.unlinkIdentity(expectedIdentityId)
         }
     }
@@ -536,7 +537,7 @@ class AuthRequestTest {
                     }
                     """.trimIndent()
                 )
-            }
+            }.awaitInit()
             val result = client.auth.retrieveSSOUrl(redirectUrl = expectedRedirectUrl) {
                 this.domain = expectedDomain
                 this.captchaToken = expectedCaptchaToken
@@ -567,7 +568,7 @@ class AuthRequestTest {
                     }
                     """.trimIndent()
                 )
-            }
+            }.awaitInit()
             val result = client.auth.retrieveSSOUrl(redirectUrl = expectedRedirectUrl) {
                 this.providerId = expectedProviderId
                 this.captchaToken = expectedCaptchaToken
@@ -596,7 +597,7 @@ class AuthRequestTest {
                 respondJson(
                     sampleUserObject(email = expectedEmail, phone = expectedPhone)
                 )
-            }
+            }.awaitInit()
             val user = client.auth.updateUser {
                 email = expectedEmail
                 phone = expectedPhone
@@ -629,7 +630,7 @@ class AuthRequestTest {
                 respondJson(
                     sampleUserObject(email = expectedEmail)
                 )
-            }
+            }.awaitInit()
             client.auth.resendEmail(expectedType, expectedEmail, expectedCaptchaToken, expectedUrl)
         }
     }
@@ -651,7 +652,7 @@ class AuthRequestTest {
                 respondJson(
                     sampleUserObject(email = expectedPhone)
                 )
-            }
+            }.awaitInit()
             client.auth.resendPhone(expectedType, expectedPhone, expectedCaptchaToken)
         }
     }
@@ -680,7 +681,7 @@ class AuthRequestTest {
                 respondJson(
                     sampleUserObject(email = expectedEmail)
                 )
-            }
+            }.awaitInit()
             client.auth.resetPasswordForEmail(expectedEmail, expectedRedirectUrl, expectedCaptchaToken)
         }
     }
@@ -692,7 +693,7 @@ class AuthRequestTest {
                 assertMethodIs(HttpMethod.Get, it.method)
                 assertPathIs("/reauthenticate", it.url.pathAfterVersion())
                 respond("")
-            }
+            }.awaitInit()
             client.auth.reauthenticate()
         }
     }
@@ -719,7 +720,7 @@ class AuthRequestTest {
                 respondJson(
                     sampleUserSession()
                 )
-            }
+            }.awaitInit()
             assertIs<OtpVerifyResult.Authenticated>(client.auth.verifyEmailOtp(expectedType, expectedEmail, expectedToken, expectedCaptchaToken))
         }
     }
@@ -748,7 +749,7 @@ class AuthRequestTest {
                         put("status", "ok") // verified but no session
                     }
                 )
-            }
+            }.awaitInit()
             assertIs<OtpVerifyResult.VerifiedNoSession>(client.auth.verifyEmailOtp(expectedType, expectedEmail, expectedToken, expectedCaptchaToken))
         }
     }
@@ -773,7 +774,7 @@ class AuthRequestTest {
                 respondJson(
                     sampleUserSession()
                 )
-            }
+            }.awaitInit()
             val result = client.auth.verifyEmailOtp(expectedType, tokenHash = expectedTokenHash, captchaToken = expectedCaptchaToken)
             assertIs<OtpVerifyResult.Authenticated>(result)
         }
@@ -801,7 +802,7 @@ class AuthRequestTest {
                         put("status", "ok") // verified but no session
                     }
                 )
-            }
+            }.awaitInit()
             assertIs<OtpVerifyResult.VerifiedNoSession>(client.auth.verifyEmailOtp(expectedType, tokenHash = expectedTokenHash, captchaToken = expectedCaptchaToken))
         }
     }
@@ -828,7 +829,7 @@ class AuthRequestTest {
                 respondJson(
                     sampleUserSession()
                 )
-            }
+            }.awaitInit()
             client.auth.verifyPhoneOtp(expectedType, expectedPhone, expectedToken, expectedCaptchaToken)
         }
     }
@@ -844,7 +845,7 @@ class AuthRequestTest {
                 respondJson(
                     sampleUserObject()
                 )
-            }
+            }.awaitInit()
             val user = client.auth.retrieveUser(expectedJWT)
             assertNotNull(user, "User should not be null")
         }
@@ -860,7 +861,7 @@ class AuthRequestTest {
                 val parameters = it.url.parameters
                 assertEquals(expectedScope.name.lowercase(), parameters["scope"])
                 respond("")
-            }
+            }.awaitInit()
             client.auth.awaitInitialization()
             client.auth.importSession(Json.decodeFromString(sampleUserSession()))
             assertNotNull(client.auth.currentSessionOrNull(), "Session should not be null")
@@ -893,7 +894,7 @@ class AuthRequestTest {
                 respondJson(
                     expectedSession
                 )
-            }
+            }.awaitInit()
             client.auth.awaitInitialization()
             client.auth.config.alwaysAutoRefresh = true // this config override is for catching edge cases (like for #1132)
             val session = client.auth.refreshSession(expectedRefreshToken)
@@ -924,7 +925,7 @@ class AuthRequestTest {
                 respondJson(
                     expectedSession
                 )
-            }
+            }.awaitInit()
             client.auth.awaitInitialization()
             client.auth.config.alwaysAutoRefresh = true // this config override is for catching edge cases (like for #1132)
             client.auth.refreshCurrentSession()
@@ -946,7 +947,7 @@ class AuthRequestTest {
                 respondJson(
                     sampleUserObject()
                 )
-            }
+            }.awaitInit()
             val claimsResponse = client.auth.getClaims(jwt) {
                 allowExpired = true
             }
@@ -970,7 +971,7 @@ class AuthRequestTest {
                     }
                     else -> respond("")
                 }
-            }
+            }.awaitInit()
             // The signature verification will fail since we're using a dummy signature, but this test verifies the JWKS endpoint is called correctly for RS256
             try {
                 client.auth.getClaims(jwt) {
@@ -1039,6 +1040,11 @@ class AuthRequestTest {
     private fun containsCodeChallenge(body: JsonObject) {
         assertNotNull(body["code_challenge"])
         assertEquals(PKCEConstants.CHALLENGE_METHOD, body["code_challenge_method"]?.jsonPrimitive?.content)
+    }
+
+    private suspend fun SupabaseClient.awaitInit(): SupabaseClient {
+        auth.awaitInitialization()
+        return this
     }
 
 }
