@@ -13,7 +13,8 @@ class MoshiSerializerTest {
         val supabaseClient = createMockedSupabaseClient(
             configuration = {
                 defaultSerializer = serializer
-            })
+            }
+        )
         assertEquals(serializer, supabaseClient.defaultSerializer)
         val value = mapOf("key" to "value")
         val encoded = serializer.encode(value)
