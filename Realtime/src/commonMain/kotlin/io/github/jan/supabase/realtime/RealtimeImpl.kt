@@ -158,6 +158,9 @@ import kotlin.time.Clock
         ws?.disconnect()
         ws = null
         heartbeatJob?.cancel()
+        for ((_, channel) in subscriptions) {
+            channel.teardown()
+        }
         _status.value = Realtime.Status.DISCONNECTED
     }
 

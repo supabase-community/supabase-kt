@@ -46,6 +46,8 @@ interface CallbackManager {
 
     fun setServerChanges(changes: List<PostgresJoinConfig>)
 
+    fun reset()
+
 }
 
 private typealias BroadcastMap = PersistentMap<String, PersistentList<RealtimeCallback.BroadcastCallback>>
@@ -67,6 +69,15 @@ internal class CallbackManagerImpl(
     private val broadcastEventId = AtomicReference<PersistentMap<Int, String>>(persistentHashMapOf())
 
     private val postgresCallbacks = AtomicReference<PostgresMap>(persistentHashMapOf())
+
+    override fun reset() {
+        postgresCallbacks.store(persistentHashMapOf())
+        broadcastEventId.store(persistentHashMapOf())
+        broadcastCallbacks.store(persistentHashMapOf())
+        presenceCallbacks.store(persistentHashMapOf())
+        _serverChanges.store(emptyList())
+        nextId.store(0)
+    }
 
     override fun addBroadcastCallback(event: String, callback: (JsonObject) -> Unit): RealtimeCallbackId.Broadcast {
         val id = nextId.fetchAndIncrement()

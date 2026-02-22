@@ -58,6 +58,11 @@ internal class RealtimeChannelImpl(
     private fun shouldEnablePresence(): Boolean =
         userPresenceEnabled || callbackManager.hasPresenceCallback()
 
+    override fun teardown() {
+        updateStatus(RealtimeChannel.Status.UNSUBSCRIBED)
+        callbackManager.reset()
+    }
+
     @OptIn(SupabaseInternal::class)
     override suspend fun subscribe(blockUntilSubscribed: Boolean) {
         if(realtimeImpl.status.value != Realtime.Status.CONNECTED) {
