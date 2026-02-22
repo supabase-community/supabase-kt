@@ -6,7 +6,6 @@ import io.github.jan.supabase.annotations.SupabaseInternal
 import io.github.jan.supabase.auth.AuthDependentPluginConfig
 import io.github.jan.supabase.auth.authenticatedSupabaseApi
 import io.github.jan.supabase.bodyOrNull
-import io.github.jan.supabase.collections.AtomicMutableMap
 import io.github.jan.supabase.exceptions.BadRequestRestException
 import io.github.jan.supabase.exceptions.HttpRequestException
 import io.github.jan.supabase.exceptions.NotFoundRestException
@@ -218,8 +217,6 @@ internal class StorageImpl(override val supabaseClient: SupabaseClient, override
         }
     })
 
-    private val resumableClients = AtomicMutableMap<String, BucketApi>()
-
     override suspend fun listBuckets(filter: BucketFilter.() -> Unit): List<Bucket> {
         val response = api.get("bucket") {
             url.parameters.appendAll(BucketFilter().apply(filter).build())
@@ -271,9 +268,7 @@ internal class StorageImpl(override val supabaseClient: SupabaseClient, override
         api.post("bucket/$bucketId/empty")
     }
 
-    override fun get(bucketId: String): BucketApi = resumableClients.getOrPut(bucketId) {
-        BucketApiImpl(bucketId, this, config.resumable.cache ?: createDefaultResumableCache())
-    }
+    override fun get(bucketId: String): BucketApi = BucketApiImpl(bucketId, this, config.resumable.cache ?: createDefaultResumableCache())
 
     override suspend fun parseErrorResponse(response: HttpResponse): RestException {
         val statusCode = response.status
