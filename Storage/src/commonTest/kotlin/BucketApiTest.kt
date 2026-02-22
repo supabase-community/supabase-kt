@@ -57,6 +57,22 @@ class BucketApiTest {
     private val bucketId = "bucketId"
 
     @Test
+    fun testCustomHeaders() {
+        runTest {
+            val expectedPrefixes = listOf("data.png", "data2.png", "data3.png")
+            val client = createMockedSupabaseClient(configuration = configureClient) {
+                assertMethodIs(HttpMethod.Delete, it.method)
+                assertPathIs("/object/$bucketId", it.url.pathAfterVersion())
+                assertEquals("value", it.headers["customHeader"])
+                respond("")
+            }
+            client.storage[bucketId]
+                .setHeader("customHeader", "value")
+                .delete(expectedPrefixes)
+        }
+    }
+
+    @Test
     fun testUpload() {
         testUploadMethod(
             method = HttpMethod.Post,

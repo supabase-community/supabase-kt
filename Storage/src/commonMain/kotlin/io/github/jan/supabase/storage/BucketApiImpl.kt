@@ -1,5 +1,6 @@
 package io.github.jan.supabase.storage
 
+import io.github.jan.supabase.auth.withDefaultRequest
 import io.github.jan.supabase.exceptions.RestException
 import io.github.jan.supabase.putJsonObject
 import io.github.jan.supabase.safeBody
@@ -13,12 +14,14 @@ import io.ktor.client.request.setBody
 import io.ktor.client.request.url
 import io.ktor.client.statement.bodyAsChannel
 import io.ktor.http.ContentType
+import io.ktor.http.Headers
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.Url
 import io.ktor.http.content.OutgoingContent
 import io.ktor.http.defaultForFilePath
+import io.ktor.http.headers
 import io.ktor.utils.io.ByteReadChannel
 import io.ktor.utils.io.ByteWriteChannel
 import io.ktor.utils.io.copyTo
@@ -33,11 +36,28 @@ import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
 import kotlin.time.Duration
 
-internal class BucketApiImpl(override val bucketId: String, val storage: StorageImpl, resumableCache: ResumableCache) : BucketApi {
+internal class BucketApiImpl(
+    override val bucketId: String,
+    val storage: StorageImpl,
+    resumableCache: ResumableCache
+) : BucketApi {
+
+    private var headers = Headers.Empty
+    private val api = storage.api.withDefaultRequest {
+        headers.appendAll(this@BucketApiImpl.headers)
+    }
 
     override val supabaseClient = storage.supabaseClient
 
     override val resumable = ResumableClientImpl(this, resumableCache)
+
+    override fun setHeader(name: String, value: String): BucketApi {
+        headers = headers {
+            appendAll(headers)
+            set(name, value)
+        }
+        return this
+    }
 
     override suspend fun update(
         path: String,
@@ -60,7 +80,7 @@ internal class BucketApiImpl(override val bucketId: String, val storage: Storage
     }
 
     override suspend fun createSignedUploadUrl(path: String, upsert: Boolean): UploadSignedUrl {
-        val result = storage.api.post("object/upload/sign/$bucketId/$path") {
+        val result = api.post("object/upload/sign/$bucketId/$path") {
             header(UPSERT_HEADER, upsert.toString())
         }
         val urlPath = result.safeBody<JsonObject>()["url"]?.jsonPrimitive?.content?.substring(1)
@@ -84,7 +104,7 @@ internal class BucketApiImpl(override val bucketId: String, val storage: Storage
         )
 
     override suspend fun delete(paths: Collection<String>) {
-        storage.api.deleteJson("object/$bucketId", buildJsonObject {
+        api.deleteJson("object/$bucketId", buildJsonObject {
             putJsonArray("prefixes") {
                 paths.forEach(this::add)
             }
@@ -92,7 +112,7 @@ internal class BucketApiImpl(override val bucketId: String, val storage: Storage
     }
 
     override suspend fun move(from: String, to: String, destinationBucket: String?) {
-        storage.api.postJson("object/move", buildJsonObject {
+        api.postJson("object/move", buildJsonObject {
             put("bucketId", bucketId)
             put("sourceKey", from)
             put("destinationKey", to)
@@ -101,7 +121,7 @@ internal class BucketApiImpl(override val bucketId: String, val storage: Storage
     }
 
     override suspend fun copy(from: String, to: String, destinationBucket: String?) {
-        storage.api.postJson("object/copy", buildJsonObject {
+        api.postJson("object/copy", buildJsonObject {
             put("bucketId", bucketId)
             put("sourceKey", from)
             put("destinationKey", to)
@@ -115,7 +135,7 @@ internal class BucketApiImpl(override val bucketId: String, val storage: Storage
         transform: ImageTransformation.() -> Unit
     ): String {
         val transformation = ImageTransformation().apply(transform)
-        val body = storage.api.postJson("object/sign/$bucketId/$path", buildJsonObject {
+        val body = api.postJson("object/sign/$bucketId/$path", buildJsonObject {
             put("expiresIn", expiresIn.inWholeSeconds)
             putJsonObject("transform") {
                 putImageTransformation(transformation)
@@ -129,7 +149,7 @@ internal class BucketApiImpl(override val bucketId: String, val storage: Storage
         expiresIn: Duration,
         paths: Collection<String>
     ): List<SignedUrl> {
-        val body = storage.api.postJson("object/sign/$bucketId", buildJsonObject {
+        val body = api.postJson("object/sign/$bucketId", buildJsonObject {
             putJsonArray("paths") {
                 paths.forEach(this::add)
             }
@@ -157,7 +177,7 @@ internal class BucketApiImpl(override val bucketId: String, val storage: Storage
         options: DownloadOptionBuilder.() -> Unit
     ): ByteArray {
         val downloadOptions = DownloadOptionBuilder().apply(options)
-        return storage.api.rawRequest {
+        return api.rawRequest {
             prepareDownloadRequest(path, public, downloadOptions)
             downloadOptions.httpRequestOverrides.forEach { it() }
         }.body()
@@ -187,7 +207,7 @@ internal class BucketApiImpl(override val bucketId: String, val storage: Storage
         options: DownloadOptionBuilder.() -> Unit,
     ) {
         val downloadOptions = DownloadOptionBuilder().apply(options)
-        storage.api.prepareRequest {
+        api.prepareRequest {
             prepareDownloadRequest(path, public, downloadOptions)
             downloadOptions.httpRequestOverrides.forEach { it() }
         }.execute {
@@ -220,20 +240,20 @@ internal class BucketApiImpl(override val bucketId: String, val storage: Storage
         prefix: String,
         filter: BucketListFilter.() -> Unit
     ): List<FileObject> {
-        return storage.api.postJson("object/list/$bucketId", buildJsonObject {
+        return api.postJson("object/list/$bucketId", buildJsonObject {
             put("prefix", prefix)
             putJsonObject(BucketListFilter().apply(filter).build())
         }).safeBody()
     }
 
     override suspend fun info(path: String): FileObjectV2 {
-        val response = storage.api.get("object/info/$bucketId/$path")
+        val response = api.get("object/info/$bucketId/$path")
         return response.safeBody<FileObjectV2>().copy(serializer = storage.serializer)
     }
 
     override suspend fun exists(path: String): Boolean {
         try {
-            storage.api.request("object/$bucketId/$path") {
+            api.request("object/$bucketId/$path") {
                 method = HttpMethod.Head
             }
             return true
@@ -255,7 +275,7 @@ internal class BucketApiImpl(override val bucketId: String, val storage: Storage
     ): FileUploadResponse {
         val path = url.substringAfterLast('/').substringBeforeLast("?")
         val optionBuilder = UploadOptionBuilder(storage.serializer).apply(options)
-        val response = storage.api.request(url) {
+        val response = api.request(url) {
             this.method = method
             defaultUploadRequest(path, data, optionBuilder)
             optionBuilder.httpRequestOverrides.forEach { it() }
