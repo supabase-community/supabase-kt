@@ -41,6 +41,7 @@ import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertNotNull
+import kotlin.test.assertNull
 import kotlin.test.assertTrue
 import kotlin.time.Clock
 import kotlin.time.Duration.Companion.seconds
@@ -60,15 +61,25 @@ class BucketApiTest {
     fun testCustomHeaders() {
         runTest {
             val expectedPrefixes = listOf("data.png", "data2.png", "data3.png")
+            var index = 0
             val client = createMockedSupabaseClient(configuration = configureClient) {
                 assertMethodIs(HttpMethod.Delete, it.method)
+                println("helo")
                 assertPathIs("/object/$bucketId", it.url.pathAfterVersion())
-                assertEquals("value", it.headers["customHeader"])
+                if(index == 0) {
+                    assertEquals("value", it.headers["customHeader"])
+                    index++
+                } else {
+                    assertNull(it.headers["customHeader"])
+                }
                 respond("")
             }
+            val otherBucketApi = client.storage[bucketId]
             client.storage[bucketId]
                 .setHeader("customHeader", "value")
                 .delete(expectedPrefixes)
+
+            otherBucketApi.delete(expectedPrefixes)
         }
     }
 
