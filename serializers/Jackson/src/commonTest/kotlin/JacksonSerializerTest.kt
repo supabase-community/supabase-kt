@@ -28,7 +28,8 @@ class JacksonSerializerTest {
         val supabaseClient = createMockedSupabaseClient(
             configuration = {
                 defaultSerializer = serializer
-            })
+            }
+        )
         assertEquals(serializer, supabaseClient.defaultSerializer)
         val value = mapOf<String, String?>("key" to null)
         val encoded = serializer.encode(value)
