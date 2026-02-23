@@ -25,7 +25,7 @@ class AuthenticatedSupabaseApi @SupabaseInternal constructor(
     resolveUrl: (path: String) -> String,
     parseErrorResponse: (suspend (response: HttpResponse) -> RestException)? = null,
     supabaseClient: SupabaseClient,
-    config: AuthenticatedApiConfig
+    val config: AuthenticatedApiConfig
 ): SupabaseApi(resolveUrl, parseErrorResponse, supabaseClient) {
 
     private val defaultRequest = config.defaultRequest
@@ -94,3 +94,16 @@ fun SupabaseClient.authenticatedSupabaseApi(
     config: AuthenticatedApiConfig
 ) =
     AuthenticatedSupabaseApi(resolveUrl, parseErrorResponse, this, config)
+
+@SupabaseInternal
+fun AuthenticatedSupabaseApi.withDefaultRequest(builder: HttpRequestBuilder.() -> Unit): AuthenticatedSupabaseApi {
+    return AuthenticatedSupabaseApi(
+        this.resolveUrl,
+        this.parseErrorResponse,
+        this.supabaseClient,
+        this.config.copy(defaultRequest = {
+            this@withDefaultRequest.config.defaultRequest?.invoke(this)
+            builder()
+        })
+    )
+}

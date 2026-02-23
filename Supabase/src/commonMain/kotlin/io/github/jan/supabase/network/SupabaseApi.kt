@@ -11,8 +11,8 @@ import io.ktor.client.statement.HttpStatement
 import io.ktor.http.isSuccess
 
 open class SupabaseApi @SupabaseInternal constructor(
-    private val resolveUrl: (path: String) -> String,
-    private val parseErrorResponse: (suspend (response: HttpResponse) -> RestException)? = null,
+    val resolveUrl: (path: String) -> String,
+    val parseErrorResponse: (suspend (response: HttpResponse) -> RestException)? = null,
     val supabaseClient: SupabaseClient
 ) : SupabaseHttpClient() {
 

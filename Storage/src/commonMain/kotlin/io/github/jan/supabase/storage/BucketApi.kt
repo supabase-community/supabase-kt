@@ -31,6 +31,15 @@ interface BucketApi {
     val resumable: ResumableClient
 
     /**
+     * Set an HTTP header for the request.
+     * Creates a shallow copy of headers to avoid mutating shared state.
+     * @param name Header name
+     * @param value Header value
+     * @returns this - For method chaining
+     */
+    fun setHeader(name: String, value: String): BucketApi
+
+    /**
      * Uploads a file in [bucketId] under [path]
      * @param path The path to upload the file to
      * @param data The data to upload
