@@ -1,5 +1,6 @@
 import io.github.jan.supabase.auth.jwt.JWTUtils
 import io.github.jan.supabase.realtime.Realtime
+import io.github.jan.supabase.realtime.RealtimeChannel
 import io.github.jan.supabase.realtime.RealtimeImpl
 import io.github.jan.supabase.realtime.RealtimeMessage
 import io.github.jan.supabase.realtime.channel
@@ -27,6 +28,28 @@ class RealtimeTest {
                     assertEquals(Realtime.Status.CONNECTED, it.realtime.status.value)
                     it.realtime.disconnect()
                     assertEquals(Realtime.Status.DISCONNECTED, it.realtime.status.value)
+                }
+            )
+        }
+    }
+
+    @Test
+    fun testTeardown() {
+        runTest {
+            createTestClient(
+                wsHandler = { r, _ ->
+                    r.receive()
+                },
+                supabaseHandler = {
+                    val channel = it.realtime.channel("test")
+                    assertEquals(Realtime.Status.DISCONNECTED, it.realtime.status.value)
+                    it.realtime.connect()
+                    assertEquals(Realtime.Status.CONNECTED, it.realtime.status.value)
+                    channel.subscribe()
+                    assertEquals(RealtimeChannel.Status.SUBSCRIBING, channel.status.value)
+                    it.realtime.disconnect()
+                    assertEquals(Realtime.Status.DISCONNECTED, it.realtime.status.value)
+                    assertEquals(RealtimeChannel.Status.UNSUBSCRIBED, channel.status.value)
                 }
             )
         }

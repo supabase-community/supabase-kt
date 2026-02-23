@@ -113,6 +113,9 @@ interface RealtimeChannel {
     @SupabaseInternal
     suspend fun scheduleRejoin()
 
+    @SupabaseInternal
+    fun teardown()
+
     /**
      * Represents the status of a channel
      */
