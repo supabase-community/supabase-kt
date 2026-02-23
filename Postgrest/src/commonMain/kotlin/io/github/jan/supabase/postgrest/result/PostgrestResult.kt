@@ -31,12 +31,12 @@ class PostgrestResult(val data: String, val headers: Headers, @PublishedApi inte
     /**
      * Decodes [data] as [T] using
      */
-    inline fun <reified T : Any> decodeAs(): T = postgrest.serializer.decode(data)
+    inline fun <reified T> decodeAs(): T = postgrest.serializer.decode(data)
 
     /**
      * Decodes [data] as [T] using. If there's an error it will return null
      */
-    inline fun <reified T : Any> decodeAsOrNull(): T? = try {
+    inline fun <reified T> decodeAsOrNull(): T? = try {
         decodeAs()
     } catch (e: Exception) {
         null
@@ -45,17 +45,17 @@ class PostgrestResult(val data: String, val headers: Headers, @PublishedApi inte
     /**
      * Decodes [data] as a list of [T]
      */
-    inline fun <reified T : Any> decodeList(): List<T> = decodeAs()
+    inline fun <reified T> decodeList(): List<T> = decodeAs()
 
     /**
      * Decodes [data] as a list of [T] and returns the first item found
      */
-    inline fun <reified T : Any> decodeSingle(): T = decodeList<T>().first()
+    inline fun <reified T> decodeSingle(): T = decodeList<T>().first()
 
     /**
      * Decodes [data] as a list of [T] and returns the first item found or null
      */
-    inline fun <reified T : Any> decodeSingleOrNull(): T? = decodeList<T>().firstOrNull()
+    inline fun <reified T> decodeSingleOrNull(): T? = decodeList<T>().firstOrNull()
 
     /**
      * Returns the data

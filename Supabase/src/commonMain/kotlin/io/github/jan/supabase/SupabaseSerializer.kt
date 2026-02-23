@@ -14,26 +14,26 @@ interface SupabaseSerializer {
     /**
      * Encodes the given [value] to a string
      */
-    fun <T : Any> encode(type: KType, value: T): String
+    fun <T> encode(type: KType, value: T): String
 
     /**
      * Decodes the given [value] to an object of type [T]
      */
-    fun <T : Any> decode(type: KType, value: String): T
+    fun <T> decode(type: KType, value: String): T
 
 }
 
 /**
  * Encodes the given [value] to a string
  */
-inline fun <reified T : Any> SupabaseSerializer.encode(value: T): String = encode(typeOf<T>(), value)
+inline fun <reified T> SupabaseSerializer.encode(value: T): String = encode(typeOf<T>(), value)
 
 /**
  * Encodes the given [value] to a [JsonElement]
  */
-inline fun <reified T : Any> SupabaseSerializer.encodeToJsonElement(value: T): JsonElement = Json.decodeFromString(encode(value))
+inline fun <reified T> SupabaseSerializer.encodeToJsonElement(value: T): JsonElement = Json.decodeFromString(encode(value))
 
 /**
  * Decodes the given [value] to an object of type [T]
  */
-inline fun <reified T : Any> SupabaseSerializer.decode(value: String): T = decode(typeOf<T>(), value)
+inline fun <reified T> SupabaseSerializer.decode(value: String): T = decode(typeOf<T>(), value)
