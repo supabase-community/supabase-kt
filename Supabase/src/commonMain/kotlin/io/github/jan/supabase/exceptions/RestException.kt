@@ -17,12 +17,14 @@ import io.ktor.client.statement.request
  * @see NotFoundRestException
  * @see UnknownRestException
  */
-open class RestException(val error: String, val description: String?, val response: HttpResponse): Exception("""
-        $error${description?.let { "\n$it" } ?: ""}
-        URL: ${maskUrl(response.request.url)}
-        Headers: ${maskHeaders(response.request.headers)}
-        Http Method: ${response.request.method.value}
-""".trimIndent()) {
+open class RestException(val error: String, val description: String?, val response: HttpResponse):
+    Exception(
+        error
+                + (description?.let { "\n$it" } ?: "")
+                + "\nURL: ${maskUrl(response.request.url)}"
+                + "\nHeaders: ${maskHeaders(response.request.headers)}"
+                + "\nHttp Method: ${response.request.method.value}"
+    ) {
 
     /**
      * The status code of the response
