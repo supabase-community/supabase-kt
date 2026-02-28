@@ -177,7 +177,7 @@ import kotlin.time.Clock
         val channel = subscriptions[message.topic] as? RealtimeChannelImpl
         val ref = message.ref?.toIntOrNull()
         if(ref != null && heartbeatRef.compareAndSet(ref, 0)) {
-            Realtime.logger.i { "Heartbeat received" }
+            Realtime.logger.d { "Heartbeat received" }
         } else {
             Realtime.logger.d { "Received event ${message.event} for channel ${channel?.topic}" }
             channel?.onMessage(message)
