@@ -31,8 +31,9 @@ jobs:
         with:
           cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
           cache-read-only: true
-      - name: Publish
+      - name: Publish and release
+        if: inputs.close_and_release == true
         run: ./gradlew -DLibrariesOnly=true publishAndReleaseToMavenCentral --configuration-cache
-      - name: Close and release
-        if: inputs.close_and_release
+      - name: Publish
+        if: inputs.close_and_release == false
         run: ./gradlew -DLibrariesOnly=true publishAllPublicationsToMavenCentral --configuration-cache
