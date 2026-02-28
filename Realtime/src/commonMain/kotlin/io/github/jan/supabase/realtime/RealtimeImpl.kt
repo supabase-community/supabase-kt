@@ -294,7 +294,12 @@ import kotlin.time.Clock
 
     private fun reconnect() {
         scope.launch {
-            disconnect()
+            Realtime.logger.d { "Closing websocket connection" }
+            messageJob?.cancel()
+            ws?.disconnect()
+            ws = null
+            heartbeatJob?.cancel()
+            _status.value = Realtime.Status.DISCONNECTED
             connect(true)
         }
     }
