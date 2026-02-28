@@ -60,7 +60,6 @@ internal class RealtimeChannelImpl(
 
     override fun teardown() {
         updateStatus(RealtimeChannel.Status.UNSUBSCRIBED)
-        callbackManager.reset()
     }
 
     @OptIn(SupabaseInternal::class)
