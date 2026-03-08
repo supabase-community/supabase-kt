@@ -3,6 +3,7 @@ package io.github.jan.supabase.postgrest
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.annotations.SupabaseInternal
 import io.github.jan.supabase.auth.authenticatedSupabaseApi
+import io.github.jan.supabase.auth.withDefaultRequest
 import io.github.jan.supabase.bodyOrNull
 import io.github.jan.supabase.exceptions.RestException
 import io.github.jan.supabase.postgrest.exception.PostgrestRestException
@@ -11,6 +12,7 @@ import io.github.jan.supabase.postgrest.query.PostgrestQueryBuilder
 import io.github.jan.supabase.postgrest.query.request.RpcRequestBuilder
 import io.github.jan.supabase.postgrest.request.RpcRequest
 import io.github.jan.supabase.postgrest.result.PostgrestResult
+import io.ktor.client.plugins.timeout
 import io.ktor.client.statement.HttpResponse
 import kotlinx.serialization.json.JsonObject
 
@@ -25,7 +27,13 @@ internal class PostgrestImpl(override val supabaseClient: SupabaseClient, overri
     override var serializer = config.serializer ?: supabaseClient.defaultSerializer
 
     @OptIn(SupabaseInternal::class)
-    val api = supabaseClient.authenticatedSupabaseApi(this)
+    val api = supabaseClient.authenticatedSupabaseApi(this).withDefaultRequest {
+        timeout {
+            this.requestTimeoutMillis = config.timeout.inWholeMilliseconds
+        }
+        val length = this.url.toString().length
+        if(length > config.urlLengthLimit) error("Your URL length exceeds the limit of ${config.urlLengthLimit} characters ($length). If selecting many fields, consider using views. If filtering with large arrays (e.g., .in('id', [many IDs])), consider using an RPC function to pass values server-side.")
+    }
 
     override fun from(table: String): PostgrestQueryBuilder {
         return PostgrestQueryBuilder(
