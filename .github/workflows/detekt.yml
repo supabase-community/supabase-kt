@@ -1,9 +1,6 @@
 name: Analyze code using detekt
 
 on:
-  push:
-    branches:
-      - 'master'
   pull_request:
     branches:
       - '*'
@@ -14,6 +11,7 @@ concurrency:
 
 jobs:
   analyze:
+    if: github.event.pull_request.draft == false
     runs-on: ubuntu-latest
     steps:
       - name: Checkout sources
