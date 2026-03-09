@@ -238,11 +238,11 @@ internal class BucketApiImpl(
 
     override suspend fun list(
         prefix: String,
-        filter: BucketListFilter.() -> Unit
+        filter: StorageListFilter.Files.() -> Unit
     ): List<FileObject> {
         return api.postJson("object/list/$bucketId", buildJsonObject {
             put("prefix", prefix)
-            putJsonObject(BucketListFilter().apply(filter).build())
+            putJsonObject(StorageListFilter.Files().apply(filter).buildBody())
         }).safeBody()
     }
 

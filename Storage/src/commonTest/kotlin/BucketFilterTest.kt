@@ -1,4 +1,3 @@
-import io.github.jan.supabase.storage.BucketFilter
 import io.github.jan.supabase.storage.SortOrder
 import kotlin.test.Test
 import kotlin.test.assertEquals

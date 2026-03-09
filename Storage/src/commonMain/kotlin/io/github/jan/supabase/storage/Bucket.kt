@@ -34,5 +34,20 @@ data class Bucket(
     @SerialName("allowed_mime_types")
     val allowedMimeTypes: List<String>? = null,
     @SerialName("file_size_limit")
-    val fileSizeLimit: Long? = null
+    val fileSizeLimit: Long? = null,
+    val type: BucketType? = null
 )
+
+/**
+ * Type of storage bucket
+ */
+enum class BucketType {
+    /**
+     * Regular file storage buckets
+     */
+    STANDARD,
+    /**
+     * Iceberg table-based buckets for analytical workloads
+     */
+    ANALYTICS
+}

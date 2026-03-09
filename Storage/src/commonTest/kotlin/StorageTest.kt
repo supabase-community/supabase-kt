@@ -2,7 +2,6 @@ import io.github.jan.supabase.SupabaseClientBuilder
 import io.github.jan.supabase.auth.Auth
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.auth.minimalConfig
-import io.github.jan.supabase.storage.BucketFilter
 import io.github.jan.supabase.storage.SortOrder
 import io.github.jan.supabase.storage.Storage
 import io.github.jan.supabase.storage.resumable.MemoryResumableCache
