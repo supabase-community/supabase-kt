@@ -27,6 +27,7 @@ import io.github.jan.supabase.storage.analytics.StorageAnalyticsClientImpl
 import io.github.jan.supabase.storage.resumable.ResumableCache
 import io.github.jan.supabase.storage.resumable.createDefaultResumableCache
 import io.github.jan.supabase.storage.vectors.StorageVectorsClient
+import io.github.jan.supabase.storage.vectors.StorageVectorsClientImpl
 import io.ktor.client.plugins.HttpRequestTimeoutException
 import io.ktor.client.plugins.timeout
 import io.ktor.client.statement.HttpResponse
@@ -225,7 +226,7 @@ internal class StorageImpl(override val supabaseClient: SupabaseClient, override
     })
 
     override val analytics: StorageAnalyticsClient = StorageAnalyticsClientImpl(api.resolve("iceberg"))
-    override val vectors: StorageVectorsClient = StorageVectorsClient
+    override val vectors: StorageVectorsClient = StorageVectorsClientImpl(api.resolve("vector"))
 
     override suspend fun listBuckets(filter: StorageListFilter.Buckets.() -> Unit): List<Bucket> {
         val response = api.get("bucket") {

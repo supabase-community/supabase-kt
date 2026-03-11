@@ -2,6 +2,7 @@ import io.github.jan.supabase.SupabaseClientBuilder
 import io.github.jan.supabase.auth.Auth
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.auth.minimalConfig
+import io.github.jan.supabase.storage.BucketSortColumn
 import io.github.jan.supabase.storage.SortOrder
 import io.github.jan.supabase.storage.Storage
 import io.github.jan.supabase.storage.resumable.MemoryResumableCache
@@ -192,7 +193,7 @@ class StorageTest {
                 limit = 10
                 offset = 5
                 search = "test"
-                sortBy(BucketFilter.SortColumn.NAME, SortOrder.ASC)
+                sortBy(BucketSortColumn.NAME, SortOrder.ASC)
             }
             assertEquals(1, buckets.size, "Buckets should contain 1 item")
             assertEquals(expectedId, buckets[0].id, "Bucket id should be 'test-bucket'")
