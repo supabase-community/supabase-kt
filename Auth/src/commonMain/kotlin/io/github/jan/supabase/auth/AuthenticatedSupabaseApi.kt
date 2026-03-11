@@ -17,7 +17,8 @@ import io.ktor.client.statement.HttpStatement
 data class AuthenticatedApiConfig(
     val jwtToken: String? = null,
     val defaultRequest: (HttpRequestBuilder.() -> Unit)? = null,
-    val requireSession: Boolean
+    val requireSession: Boolean,
+    val urlLengthLimit: Int? = null
 )
 
 @OptIn(SupabaseInternal::class)
@@ -39,6 +40,7 @@ class AuthenticatedSupabaseApi @SupabaseInternal constructor(
             bearerAuth(accessToken)
             defaultRequest?.invoke(this)
             builder()
+            checkUrlLength()
         }
     }
 
@@ -54,7 +56,14 @@ class AuthenticatedSupabaseApi @SupabaseInternal constructor(
             bearerAuth(accessToken)
             builder()
             defaultRequest?.invoke(this)
+            checkUrlLength()
         }
+    }
+
+    private fun HttpRequestBuilder.checkUrlLength() {
+        if(config.urlLengthLimit == null) return
+        val length = this.url.toString().length
+        if(length > config.urlLengthLimit) error("Your URL length exceeds the limit of ${config.urlLengthLimit} characters ($length). If selecting many fields, consider using views. If filtering with large arrays (e.g., .in('id', [many IDs])), consider using an RPC function to pass values server-side.")
     }
 
 }
@@ -79,9 +88,10 @@ fun SupabaseClient.authenticatedSupabaseApi(
 fun <C> SupabaseClient.authenticatedSupabaseApi(
     plugin: MainPlugin<C>,
     defaultRequest: (HttpRequestBuilder.() -> Unit)? = null,
-    requireSession: Boolean = plugin.config.requireValidSession
+    requireSession: Boolean = plugin.config.requireValidSession,
+    urlLengthLimit: Int? = null
 ): AuthenticatedSupabaseApi where C : MainConfig, C : AuthDependentPluginConfig =
-    authenticatedSupabaseApi(plugin::resolveUrl, plugin::parseErrorResponse, AuthenticatedApiConfig(defaultRequest = defaultRequest, requireSession = requireSession, jwtToken = plugin.config.jwtToken))
+    authenticatedSupabaseApi(plugin::resolveUrl, plugin::parseErrorResponse, AuthenticatedApiConfig(defaultRequest = defaultRequest, requireSession = requireSession, jwtToken = plugin.config.jwtToken, urlLengthLimit = urlLengthLimit))
 
 /**
  * Creates a [AuthenticatedSupabaseApi] with the given [resolveUrl] function. Requires [Auth] to authenticate requests

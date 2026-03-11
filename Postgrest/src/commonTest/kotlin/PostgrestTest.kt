@@ -42,6 +42,24 @@ class PostgrestTest {
     }
 
     @Test
+    fun testUrlLengthLimit() {
+        val supabase = createMockedSupabaseClient(
+            configuration = configureClient
+        ) {
+            respond("")
+        }
+        runTest {
+            assertFailsWith<IllegalStateException> {
+                supabase.from("schema", "table").select {
+                    filter {
+                        eq("someKey", "a".repeat(8000)) //just to hit the limit
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
     fun testSelectHttpMethodGet() {
         val columns = Columns.list("column1", "column2")
         testClient(

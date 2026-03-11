@@ -27,12 +27,10 @@ internal class PostgrestImpl(override val supabaseClient: SupabaseClient, overri
     override var serializer = config.serializer ?: supabaseClient.defaultSerializer
 
     @OptIn(SupabaseInternal::class)
-    val api = supabaseClient.authenticatedSupabaseApi(this).withDefaultRequest {
+    val api = supabaseClient.authenticatedSupabaseApi(this, urlLengthLimit = config.urlLengthLimit).withDefaultRequest {
         timeout {
             this.requestTimeoutMillis = config.timeout.inWholeMilliseconds
         }
-        val length = this.url.toString().length
-        if(length > config.urlLengthLimit) error("Your URL length exceeds the limit of ${config.urlLengthLimit} characters ($length). If selecting many fields, consider using views. If filtering with large arrays (e.g., .in('id', [many IDs])), consider using an RPC function to pass values server-side.")
     }
 
     override fun from(table: String): PostgrestQueryBuilder {
