@@ -8,5 +8,5 @@ import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 
 @SupabaseInternal
-inline fun <reified T> JsonArray.mapValue(key: String) =
+fun JsonArray.mapValue(key: String) =
     map { it.jsonObject[key]?.jsonPrimitive?.contentOrNull ?: throw SerializationException("Key $key missing in object.\n Body: $this") }

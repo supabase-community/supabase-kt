@@ -1,8 +1,11 @@
 package io.github.jan.supabase.storage.vectors.data
 
 import io.github.jan.supabase.dsl.required
-import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.encodeToJsonElement
+import kotlinx.serialization.json.put
 
 /**
  * Options for querying similar vectors (ANN search)
@@ -14,7 +17,6 @@ import kotlinx.serialization.json.JsonObject
  * @property returnDistance Whether to include distance scores
  * @property returnMetadata Whether to include metadata in results
  */
-@Serializable
 class QueryVectorsOptions(
     val vectorBucketName: String,
     val indexName: String
@@ -25,5 +27,15 @@ class QueryVectorsOptions(
     var filter: JsonObject? = null
     var returnDistance: Boolean? = null
     var returnMetadata: Boolean? = null
+
+    internal fun build() = buildJsonObject {
+        put("vectorBucketName", vectorBucketName)
+        put("indexName", indexName)
+        put("queryVector", Json.encodeToJsonElement(queryVector))
+        topK?.let { put("topK", it) }
+        filter?.let { put("filter", it) }
+        returnDistance?.let { put("returnDistance", it) }
+        returnMetadata?.let { put("returnMetadata", it) }
+    }
 
 }

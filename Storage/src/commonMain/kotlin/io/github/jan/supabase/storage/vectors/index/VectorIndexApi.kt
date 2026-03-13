@@ -75,7 +75,7 @@ internal class VectorIndexApiImpl(
 ): VectorIndexApi {
 
     override suspend fun createIndex(options: CreateIndexOptions.() -> Unit) {
-        api.postJson("CreateIndex", CreateIndexOptions(bucketName).apply(options))
+        api.postJson("CreateIndex", CreateIndexOptions(bucketName).apply(options).build())
     }
 
     override suspend fun getIndex(indexName: String): VectorIndex {

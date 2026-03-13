@@ -80,7 +80,7 @@ internal class VectorDataApiImpl(
     }
 
     override suspend fun queryVectors(options: QueryVectorsOptions.() -> Unit): QueryVectorsResponse {
-        return api.postJson("QueryVectors", QueryVectorsOptions(bucketName, indexName).apply(options)).safeBody()
+        return api.postJson("QueryVectors", QueryVectorsOptions(bucketName, indexName).apply(options).build()).safeBody()
     }
 
     override suspend fun deleteVectors(keys: List<String>) {

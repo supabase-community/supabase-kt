@@ -5,5 +5,7 @@ package io.github.jan.supabase.storage.vectors.index
  * Currently only [FLOAT32] is supported
  */
 enum class VectorDataType {
-    FLOAT32
+    FLOAT32;
+
+    val value = this.name.lowercase()
 }

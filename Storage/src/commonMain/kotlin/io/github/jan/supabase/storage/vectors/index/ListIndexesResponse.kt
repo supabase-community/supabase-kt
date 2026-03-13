@@ -2,6 +2,7 @@ package io.github.jan.supabase.storage.vectors.index
 
 import io.github.jan.supabase.serializer.mapValue
 import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonArray
 
 /**
@@ -9,11 +10,12 @@ import kotlinx.serialization.json.JsonArray
  * @property indexes - Array of index names
  * @property nextToken - Token for fetching next page (if more results exist)
  */
+@Serializable
 data class ListIndexesResponse(
     @SerialName("indexes") private val indexesRaw: JsonArray,
     val nextToken: String? = null
 ) {
 
-    val indexes by lazy { indexesRaw.mapValue<String>("indexName") }
+    val indexes by lazy { indexesRaw.mapValue("indexName") }
 
 }

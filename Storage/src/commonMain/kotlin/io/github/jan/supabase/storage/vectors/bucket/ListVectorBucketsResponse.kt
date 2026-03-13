@@ -15,6 +15,6 @@ data class ListVectorBucketsResponse(
     val nextToken: String? = null
 ) {
 
-    val vectorBuckets = vectorBucketsArray.mapValue<String>("vectorBucketName")
+    val vectorBuckets = vectorBucketsArray.mapValue("vectorBucketName")
 
 }
