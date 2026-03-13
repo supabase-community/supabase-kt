@@ -2,9 +2,11 @@ package io.github.jan.supabase.storage
 
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.SupabaseSerializer
+import io.github.jan.supabase.annotations.SupabaseExperimental
 import io.github.jan.supabase.annotations.SupabaseInternal
 import io.github.jan.supabase.auth.AuthDependentPluginConfig
 import io.github.jan.supabase.auth.authenticatedSupabaseApi
+import io.github.jan.supabase.auth.resolve
 import io.github.jan.supabase.bodyOrNull
 import io.github.jan.supabase.exceptions.BadRequestRestException
 import io.github.jan.supabase.exceptions.HttpRequestException
@@ -20,8 +22,12 @@ import io.github.jan.supabase.plugins.MainConfig
 import io.github.jan.supabase.plugins.MainPlugin
 import io.github.jan.supabase.plugins.SupabasePluginProvider
 import io.github.jan.supabase.safeBody
+import io.github.jan.supabase.storage.analytics.StorageAnalyticsClient
+import io.github.jan.supabase.storage.analytics.StorageAnalyticsClientImpl
 import io.github.jan.supabase.storage.resumable.ResumableCache
 import io.github.jan.supabase.storage.resumable.createDefaultResumableCache
+import io.github.jan.supabase.storage.vectors.StorageVectorsClient
+import io.github.jan.supabase.storage.vectors.StorageVectorsClientImpl
 import io.ktor.client.plugins.HttpRequestTimeoutException
 import io.ktor.client.plugins.timeout
 import io.ktor.client.statement.HttpResponse
@@ -52,6 +58,26 @@ import kotlin.time.Duration.Companion.seconds
 interface Storage : MainPlugin<Storage.Config>, CustomSerializationPlugin {
 
     /**
+     * Access vector storage operations.
+     *
+     * **Public alpha:** This API is part of a public alpha release and may not be available to your account type.
+     *
+     * @returns A [StorageVectorsClient] instance configured with the current storage settings.
+     */
+    @SupabaseExperimental
+    val analytics: StorageAnalyticsClient
+
+    /**
+     * Access analytics storage operations using Iceberg tables.
+     *
+     * **Public alpha:** This API is part of a public alpha release and may not be available to your account type.
+     *
+     * @returns A [StorageAnalyticsClient] instance configured with the current storage settings.
+     */
+    @SupabaseExperimental
+    val vectors: StorageVectorsClient
+
+    /**
      * Creates a new bucket in the storage
      * @param id the id of the bucket
      * @param builder overrides bucket config options (like whether the bucket should be public,
@@ -75,16 +101,7 @@ interface Storage : MainPlugin<Storage.Config>, CustomSerializationPlugin {
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
-    suspend fun listBuckets(filter: BucketFilter.() -> Unit = {}): List<Bucket>
-
-    /**
-     * Returns all buckets in the storage
-     * @throws RestException or one of its subclasses if receiving an error response
-     * @throws HttpRequestTimeoutException if the request timed out
-     * @throws HttpRequestException on network related issues
-     */
-    @Deprecated("Use listBuckets instead", ReplaceWith("listBuckets()"))
-    suspend fun retrieveBuckets(): List<Bucket> = listBuckets()
+    suspend fun listBuckets(filter: StorageListFilter.Buckets.() -> Unit = {}): List<Bucket>
 
     /**
      * Retrieves a bucket by its [bucketId]
@@ -93,15 +110,6 @@ interface Storage : MainPlugin<Storage.Config>, CustomSerializationPlugin {
      * @throws HttpRequestException on network related issues
      */
     suspend fun getBucket(bucketId: String): Bucket?
-
-    /**
-     * Retrieves a bucket by its [bucketId]
-     * @throws RestException or one of its subclasses if receiving an error response
-     * @throws HttpRequestTimeoutException if the request timed out
-     * @throws HttpRequestException on network related issues
-     */
-    @Deprecated("Use getBucket instead", ReplaceWith("getBucket(bucketId)"))
-    suspend fun retrieveBucketById(bucketId: String): Bucket? = getBucket(bucketId)
 
     /**
      * Empties a bucket by its [bucketId]
@@ -217,9 +225,12 @@ internal class StorageImpl(override val supabaseClient: SupabaseClient, override
         }
     })
 
-    override suspend fun listBuckets(filter: BucketFilter.() -> Unit): List<Bucket> {
+    override val analytics: StorageAnalyticsClient = StorageAnalyticsClientImpl(api.resolve("iceberg"))
+    override val vectors: StorageVectorsClient = StorageVectorsClientImpl(api.resolve("vector"))
+
+    override suspend fun listBuckets(filter: StorageListFilter.Buckets.() -> Unit): List<Bucket> {
         val response = api.get("bucket") {
-            url.parameters.appendAll(BucketFilter().apply(filter).build())
+            url.parameters.appendAll(StorageListFilter.Buckets().apply(filter).buildParameters())
         }
         return response.safeBody()
     }
