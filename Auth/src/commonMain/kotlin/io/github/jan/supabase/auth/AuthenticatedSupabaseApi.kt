@@ -1,6 +1,7 @@
 @file:Suppress("UndocumentedPublicClass", "UndocumentedPublicFunction")
 package io.github.jan.supabase.auth
 
+import io.github.jan.supabase.StringMasking
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.annotations.SupabaseInternal
 import io.github.jan.supabase.auth.exception.SessionRequiredException
@@ -63,7 +64,7 @@ class AuthenticatedSupabaseApi @SupabaseInternal constructor(
     private fun HttpRequestBuilder.checkUrlLength() {
         if(config.urlLengthLimit == null) return
         val length = this.url.toString().length
-        if(length > config.urlLengthLimit) error("Your URL length exceeds the limit of ${config.urlLengthLimit} characters ($length). If selecting many fields, consider using views. If filtering with large arrays (e.g., .in('id', [many IDs])), consider using an RPC function to pass values server-side.")
+        if(length > config.urlLengthLimit) error("Your URL length exceeds the limit of ${config.urlLengthLimit} characters ($length). Url: ${StringMasking.maskUrl(this.url.build())}")
     }
 
 }
