@@ -11,6 +11,8 @@ import io.ktor.client.request.HttpRequestBuilder
 import io.ktor.client.request.bearerAuth
 import io.ktor.client.statement.HttpResponse
 import io.ktor.client.statement.HttpStatement
+import io.ktor.http.Headers
+import io.ktor.http.headers
 
 typealias ResolveAccessToken = suspend (String?, Boolean) -> String?
 
@@ -34,6 +36,16 @@ class AuthenticatedSupabaseApi @SupabaseInternal constructor(
     private val defaultRequest = config.defaultRequest
     private val jwtToken = config.jwtToken
     private val requireSession = config.requireSession
+
+    override suspend fun getDefaultHeaders(): Headers {
+        val clientHeaders = super.getDefaultHeaders()
+        val accessToken = config.getAccessToken(jwtToken, !requireSession)
+            ?: error("No access token found for default headers")
+        return headers {
+            appendAll(clientHeaders)
+            set("Authorization", "Bearer $accessToken")
+        }
+    }
 
     override suspend fun rawRequest(url: String, builder: HttpRequestBuilder.() -> Unit): HttpResponse {
         val accessToken = config.getAccessToken(jwtToken, !requireSession)

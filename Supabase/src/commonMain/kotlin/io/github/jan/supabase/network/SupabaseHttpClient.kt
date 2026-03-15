@@ -6,6 +6,7 @@ import io.ktor.client.request.setBody
 import io.ktor.client.statement.HttpResponse
 import io.ktor.client.statement.HttpStatement
 import io.ktor.http.ContentType
+import io.ktor.http.Headers
 import io.ktor.http.HttpMethod
 import io.ktor.http.contentType
 
@@ -13,6 +14,8 @@ import io.ktor.http.contentType
  * The base HttpClients used by all main plugins
  */
 abstract class SupabaseHttpClient {
+
+    abstract suspend fun getDefaultHeaders(): Headers
 
     abstract suspend fun request(url: String, builder: HttpRequestBuilder.() -> Unit): HttpResponse
 

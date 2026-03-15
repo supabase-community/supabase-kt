@@ -45,7 +45,10 @@ interface StorageAnalyticsClient {
      */
     suspend fun deleteBucket(name: String): String
 
-    // TODO: from(); decide what to do here, maybe a full KMP wrapper?
+    /**
+     * @return The [IcebergClientConfiguration] with the base url and default headers to create a custom rest iceberg client.
+     */
+    suspend fun getIcebergClientConfiguration(): IcebergClientConfiguration
 
 }
 
@@ -68,6 +71,13 @@ internal class StorageAnalyticsClientImpl(
 
     override suspend fun deleteBucket(name: String): String {
         return api.delete("bucket/$name").safeBody<JsonObject>()["message"]?.jsonPrimitive?.contentOrNull ?: error("Failed to delete bucket")
+    }
+
+    override suspend fun getIcebergClientConfiguration(): IcebergClientConfiguration {
+        return IcebergClientConfiguration(
+            api.resolveUrl(""),
+            api::getDefaultHeaders
+        )
     }
 
 }

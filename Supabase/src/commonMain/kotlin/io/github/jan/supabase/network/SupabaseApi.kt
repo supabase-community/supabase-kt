@@ -8,6 +8,7 @@ import io.github.jan.supabase.plugins.MainPlugin
 import io.ktor.client.request.HttpRequestBuilder
 import io.ktor.client.statement.HttpResponse
 import io.ktor.client.statement.HttpStatement
+import io.ktor.http.Headers
 import io.ktor.http.isSuccess
 
 open class SupabaseApi @SupabaseInternal constructor(
@@ -15,6 +16,10 @@ open class SupabaseApi @SupabaseInternal constructor(
     val parseErrorResponse: (suspend (response: HttpResponse) -> RestException)? = null,
     val httpClient: SupabaseHttpClient
 ) : SupabaseHttpClient() {
+
+    override suspend fun getDefaultHeaders(): Headers {
+        return httpClient.getDefaultHeaders()
+    }
 
     final override suspend fun request(url: String, builder: HttpRequestBuilder.() -> Unit): HttpResponse {
         return rawRequest(resolveUrl(url), builder)
