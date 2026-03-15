@@ -2,8 +2,8 @@ package io.github.jan.supabase.storage.vectors.data
 
 import io.github.jan.supabase.auth.AuthenticatedSupabaseApi
 import io.github.jan.supabase.safeBody
-import io.github.jan.supabase.storage.vectors.data.VectorDataApi.Companion.DELETE_VECTOR_RANGE
 import io.github.jan.supabase.storage.vectors.data.VectorDataApi.Companion.SEGMENT_COUNT_RANGE
+import io.github.jan.supabase.storage.vectors.data.VectorDataApi.Companion.VECTOR_RANGE
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.buildJsonObject
@@ -43,10 +43,14 @@ interface VectorDataApi {
 
     companion object {
 
-        /* Range for vector deletion */
-        val DELETE_VECTOR_RANGE = 1..500
+        /**
+         * Range for vector deletion
+         */
+        val VECTOR_RANGE = 1..500
 
-        /* Range for the segment count */
+        /**
+         * Range for the segment count
+         */
         val SEGMENT_COUNT_RANGE = 1..16
     }
 
@@ -59,7 +63,7 @@ internal class VectorDataApiImpl(
 ): VectorDataApi {
 
     override suspend fun putVectors(vectors: List<VectorObject>) {
-        require(vectors.size in 1..500) {
+        require(vectors.size in VECTOR_RANGE) {
             "Vector batch size must be between 1 and 500 items"
         }
         api.postJson("PutVectors", buildJsonObject {
@@ -95,7 +99,7 @@ internal class VectorDataApiImpl(
     }
 
     override suspend fun deleteVectors(keys: List<String>) {
-        require(keys.size in DELETE_VECTOR_RANGE) {
+        require(keys.size in VECTOR_RANGE) {
             "Keys batch size must be between 1 and 500 items"
         }
         api.postJson("DeleteVectors", buildJsonObject {
