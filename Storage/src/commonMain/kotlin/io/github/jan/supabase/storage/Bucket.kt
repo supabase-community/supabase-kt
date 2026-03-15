@@ -15,6 +15,7 @@ import kotlin.time.Instant
  * @param public Whether the bucket is public
  * @param allowedMimeTypes The allowed mime types for the bucket
  * @param fileSizeLimit The file size limit for the bucket
+ * @param type The bucket type
  * @see BucketBuilder
  * @see Storage.createBucket
  */

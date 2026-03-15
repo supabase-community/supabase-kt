@@ -42,7 +42,8 @@ class AuthenticatedSupabaseApiTest {
             config = AuthenticatedApiConfig(
                 jwtToken = null,
                 defaultRequest = null,
-                requireSession = true
+                requireSession = true,
+                getAccessToken = Auth.defaultResolveAccessToken(client)
             )
         )
 
@@ -71,7 +72,8 @@ class AuthenticatedSupabaseApiTest {
                 defaultRequest = {
                     header(expectedHeaderName, expectedHeaderValue)
                 },
-                requireSession = true
+                requireSession = true,
+                getAccessToken = Auth.defaultResolveAccessToken(client)
             )
         )
 
@@ -95,7 +97,8 @@ class AuthenticatedSupabaseApiTest {
             config = AuthenticatedApiConfig(
                 jwtToken = customToken,
                 defaultRequest = null,
-                requireSession = true
+                requireSession = true,
+                getAccessToken = Auth.defaultResolveAccessToken(client)
             )
         )
 
@@ -115,7 +118,8 @@ class AuthenticatedSupabaseApiTest {
             config = AuthenticatedApiConfig(
                 jwtToken = null,
                 defaultRequest = null,
-                requireSession = true
+                requireSession = true,
+                getAccessToken = Auth.defaultResolveAccessToken(client)
             )
         )
 
@@ -143,7 +147,8 @@ class AuthenticatedSupabaseApiTest {
             config = AuthenticatedApiConfig(
                 jwtToken = null,
                 defaultRequest = null,
-                requireSession = false
+                requireSession = false,
+                getAccessToken = Auth.defaultResolveAccessToken(client)
             )
         )
 
@@ -169,7 +174,8 @@ class AuthenticatedSupabaseApiTest {
             config = AuthenticatedApiConfig(
                 jwtToken = null,
                 defaultRequest = null,
-                requireSession = true
+                requireSession = true,
+                getAccessToken = Auth.defaultResolveAccessToken(client)
             )
         )
 
@@ -196,7 +202,8 @@ class AuthenticatedSupabaseApiTest {
             config = AuthenticatedApiConfig(
                 jwtToken = null,
                 defaultRequest = null,
-                requireSession = true
+                requireSession = true,
+                getAccessToken = Auth.defaultResolveAccessToken(client)
             )
         )
 
@@ -223,7 +230,8 @@ class AuthenticatedSupabaseApiTest {
             config = AuthenticatedApiConfig(
                 jwtToken = null,
                 defaultRequest = null,
-                requireSession = true
+                requireSession = true,
+                getAccessToken = Auth.defaultResolveAccessToken(client)
             )
         )
 
@@ -252,7 +260,8 @@ class AuthenticatedSupabaseApiTest {
             config = AuthenticatedApiConfig(
                 jwtToken = null,
                 defaultRequest = null,
-                requireSession = true
+                requireSession = true,
+                getAccessToken = Auth.defaultResolveAccessToken(client)
             )
         )
 

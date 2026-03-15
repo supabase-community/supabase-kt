@@ -2,7 +2,6 @@ package io.github.jan.supabase.storage.vectors.data
 
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonObject
-import kotlin.jvm.JvmInline
 
 /**
  * Single vector object for insertion/update
@@ -23,7 +22,6 @@ data class VectorObject(
  * @property float32 Array of 32-bit floating point numbers
  */
 @Serializable
-@JvmInline
-value class VectorData(
+class VectorData(
     val float32: FloatArray
 )

@@ -1,9 +1,10 @@
-package index
+package vectors.index
 
 import io.github.jan.supabase.auth.AuthenticatedSupabaseApi
 import io.github.jan.supabase.auth.minimalAuthenticatedApi
 import io.github.jan.supabase.storage.vectors.DistanceMetric
 import io.github.jan.supabase.storage.vectors.data.VectorDataApi
+import io.github.jan.supabase.storage.vectors.index.MetadataConfiguration
 import io.github.jan.supabase.storage.vectors.index.VectorDataType
 import io.github.jan.supabase.storage.vectors.index.VectorIndexApiImpl
 import io.github.jan.supabase.testing.MockedHttpClient
@@ -73,7 +74,7 @@ class VectorIndexApiTest {
             this.dataType = VectorDataType.FLOAT32
             this.dimension = 768
             this.distanceMetric = DistanceMetric.EUCLIDEAN
-            this.metadataConfiguration = io.github.jan.supabase.storage.vectors.index.MetadataConfiguration(
+            this.metadataConfiguration = MetadataConfiguration(
                 nonFilterableMetadataKeys = listOf("description", "raw_text")
             )
         }

@@ -38,7 +38,7 @@ fun <C> SupabaseClient.authenticatedSupabaseApi(
             defaultRequest = defaultRequest,
             requireSession = requireSession,
             jwtToken = plugin.config.jwtToken,
-            getAccessToken = { token, fallback -> resolveAccessToken(token, fallback) }
+            getAccessToken = Auth.defaultResolveAccessToken(this)
         )
     )
 
@@ -57,15 +57,18 @@ fun SupabaseClient.authenticatedSupabaseApi(
 @SupabaseInternal
 fun AuthenticatedSupabaseApi.Companion.minimalAuthenticatedApi(
     httpClient: SupabaseHttpClient,
-    resolveUrl: (path: String) -> String = { it },
+    resolveUrl: (path: String) -> String = { "${DEFAULT_MOCK_URL}/$it" },
     parseErrorResponse: (suspend (response: HttpResponse) -> RestException)? = null,
     config: AuthenticatedApiConfig = AuthenticatedApiConfig("accessToken", requireSession = false, getAccessToken = { token, _ -> token })
 ) = AuthenticatedSupabaseApi(
-    resolveUrl = { "https://supabase.com/$it" },
+    resolveUrl = resolveUrl,
     parseErrorResponse = parseErrorResponse,
     config = config,
     httpClient = httpClient
 )
+
+@SupabaseInternal
+val AuthenticatedSupabaseApi.Companion.DEFAULT_MOCK_URL get() = "https://supabase.com"
 
 @SupabaseInternal
 fun AuthenticatedSupabaseApi.withDefaultRequest(builder: HttpRequestBuilder.() -> Unit): AuthenticatedSupabaseApi {

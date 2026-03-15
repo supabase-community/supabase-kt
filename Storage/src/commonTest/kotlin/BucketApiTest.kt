@@ -441,7 +441,7 @@ class BucketApiTest {
         runTest {
             val expectedLimit = 10
             val expectedOffset = 5
-            val expectedSearch = "data"
+            val expectedSearch = "vectors/data"
             val expectedColumn = "name"
             val expectedOrder = "asc"
             val expectedData = listOf("data.png", "data2.png", "data3.png")

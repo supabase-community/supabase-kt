@@ -9,12 +9,40 @@ import kotlinx.serialization.json.contentOrNull
 import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.put
 
+/**
+ * Interface for managing Analytics Buckets using Iceberg tables
+ */
 interface StorageAnalyticsClient {
 
+    /**
+     * Creates a new analytics bucket using Iceberg tables
+     * Analytics buckets are optimized for analytical queries and data processing
+     *
+     * **Public alpha:** This API is part of a public alpha release and may not be available to your account type.
+     *
+     * @param name A unique name for the bucket you are creating
+     */
     suspend fun createBucket(name: String): AnalyticBucket
 
+    /**
+     * Retrieves the details of all Analytics Storage buckets within an existing project
+     * Only returns buckets of type 'ANALYTICS'
+     *
+     * **Public alpha:** This API is part of a public alpha release and may not be available to your account type.
+     *
+     * @param filter Query parameters for listing buckets
+     */
     suspend fun listBuckets(filter: StorageListFilter.Buckets.() -> Unit = {}): List<AnalyticBucket>
 
+    /**
+     * Deletes an existing analytics bucket
+     * A bucket can't be deleted, if it is not empty
+     * You must first empty the bucket before deletion
+     *
+     * **Public alpha:** This API is part of a public alpha release and may not be available to your account type.
+     *
+     * @param name The unique identifier of the bucket you would like to delete
+     */
     suspend fun deleteBucket(name: String): String
 
     // TODO: from(); decide what to do here, maybe a full KMP wrapper?

@@ -544,6 +544,9 @@ interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
          */
         const val API_VERSION = 1
 
+        @SupabaseInternal
+        fun defaultResolveAccessToken(supabaseClient: SupabaseClient): ResolveAccessToken = { token, fallback -> supabaseClient.resolveAccessToken(token, fallback) }
+
         override fun createConfig(init: AuthConfig.() -> Unit) = AuthConfig().apply(init)
 
         override fun create(supabaseClient: SupabaseClient, config: AuthConfig): Auth = AuthImpl(supabaseClient, config)

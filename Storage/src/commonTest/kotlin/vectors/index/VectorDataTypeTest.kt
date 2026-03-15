@@ -1,4 +1,4 @@
-package index
+package vectors.index
 
 import io.github.jan.supabase.storage.vectors.index.VectorDataType
 import kotlin.test.Test
