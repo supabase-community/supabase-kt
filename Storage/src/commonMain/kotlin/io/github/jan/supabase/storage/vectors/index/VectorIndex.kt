@@ -24,6 +24,4 @@ data class VectorIndex(
     val distanceMetric: DistanceMetric,
     val metadataConfiguration: MetadataConfiguration? = null,
     @Serializable(with = UnixTimestampSerializer::class) private val creationTime: Instant? = null
-) {
-
-}
+)
