@@ -1,7 +1,7 @@
 @file:Suppress("UndocumentedPublicClass", "UndocumentedPublicFunction")
 package io.github.jan.supabase.auth
 
-import io.github.jan.supabase.SupabaseClient
+import io.github.jan.supabase.StringMasking
 import io.github.jan.supabase.annotations.SupabaseInternal
 import io.github.jan.supabase.auth.exception.SessionRequiredException
 import io.github.jan.supabase.exceptions.RestException
@@ -19,7 +19,7 @@ data class AuthenticatedApiConfig(
     val jwtToken: String? = null,
     val defaultRequest: (HttpRequestBuilder.() -> Unit)? = null,
     val requireSession: Boolean,
-    val urlLengthLimit: Int? = null
+    val urlLengthLimit: Int? = null,
     val getAccessToken: ResolveAccessToken
 )
 

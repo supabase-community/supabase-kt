@@ -29,7 +29,8 @@ fun SupabaseClient.authenticatedSupabaseApi(
 fun <C> SupabaseClient.authenticatedSupabaseApi(
     plugin: MainPlugin<C>,
     defaultRequest: (HttpRequestBuilder.() -> Unit)? = null,
-    requireSession: Boolean = plugin.config.requireValidSession
+    requireSession: Boolean = plugin.config.requireValidSession,
+    urlLengthLimit: Int? = null
 ): AuthenticatedSupabaseApi where C : MainConfig, C : AuthDependentPluginConfig =
     authenticatedSupabaseApi(
         plugin::resolveUrl,
@@ -38,7 +39,8 @@ fun <C> SupabaseClient.authenticatedSupabaseApi(
             defaultRequest = defaultRequest,
             requireSession = requireSession,
             jwtToken = plugin.config.jwtToken,
-            getAccessToken = Auth.defaultResolveAccessToken(this)
+            getAccessToken = Auth.defaultResolveAccessToken(this),
+            urlLengthLimit = urlLengthLimit
         )
     )
 
