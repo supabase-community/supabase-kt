@@ -1,6 +1,7 @@
 @file:Suppress("UndocumentedPublicClass", "UndocumentedPublicFunction")
 package io.github.jan.supabase.auth
 
+import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.annotations.SupabaseInternal
 import io.github.jan.supabase.auth.exception.SessionRequiredException
 import io.github.jan.supabase.exceptions.RestException
@@ -18,6 +19,7 @@ data class AuthenticatedApiConfig(
     val jwtToken: String? = null,
     val defaultRequest: (HttpRequestBuilder.() -> Unit)? = null,
     val requireSession: Boolean,
+    val urlLengthLimit: Int? = null
     val getAccessToken: ResolveAccessToken
 )
 
@@ -40,6 +42,7 @@ class AuthenticatedSupabaseApi @SupabaseInternal constructor(
             bearerAuth(accessToken)
             defaultRequest?.invoke(this)
             builder()
+            checkUrlLength()
         }
     }
 
@@ -55,7 +58,14 @@ class AuthenticatedSupabaseApi @SupabaseInternal constructor(
             bearerAuth(accessToken)
             builder()
             defaultRequest?.invoke(this)
+            checkUrlLength()
         }
+    }
+
+    private fun HttpRequestBuilder.checkUrlLength() {
+        if(config.urlLengthLimit == null) return
+        val length = this.url.toString().length
+        if(length > config.urlLengthLimit) error("Your URL length exceeds the limit of ${config.urlLengthLimit} characters ($length). Url: ${StringMasking.maskUrl(this.url.build())}")
     }
 
     companion object
