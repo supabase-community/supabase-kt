@@ -15,6 +15,7 @@ import kotlin.time.Instant
  * @param public Whether the bucket is public
  * @param allowedMimeTypes The allowed mime types for the bucket
  * @param fileSizeLimit The file size limit for the bucket
+ * @param type The bucket type
  * @see BucketBuilder
  * @see Storage.createBucket
  */
@@ -34,5 +35,20 @@ data class Bucket(
     @SerialName("allowed_mime_types")
     val allowedMimeTypes: List<String>? = null,
     @SerialName("file_size_limit")
-    val fileSizeLimit: Long? = null
+    val fileSizeLimit: Long? = null,
+    val type: BucketType? = null
 )
+
+/**
+ * Type of storage bucket
+ */
+enum class BucketType {
+    /**
+     * Regular file storage buckets
+     */
+    STANDARD,
+    /**
+     * Iceberg table-based buckets for analytical workloads
+     */
+    ANALYTICS
+}

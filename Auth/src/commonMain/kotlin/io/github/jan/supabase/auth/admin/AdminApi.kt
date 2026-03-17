@@ -2,8 +2,8 @@ package io.github.jan.supabase.auth.admin
 
 import io.github.jan.supabase.annotations.SupabaseInternal
 import io.github.jan.supabase.auth.Auth
-import io.github.jan.supabase.auth.AuthenticatedSupabaseApi
 import io.github.jan.supabase.auth.SignOutScope
+import io.github.jan.supabase.auth.api.AuthenticatedSupabaseApi
 import io.github.jan.supabase.auth.user.UserInfo
 import io.github.jan.supabase.auth.user.UserMfaFactor
 import io.github.jan.supabase.putJsonObject

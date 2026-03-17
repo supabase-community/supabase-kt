@@ -1,6 +1,5 @@
 package io.github.jan.supabase.storage
 
-import io.github.jan.supabase.auth.withDefaultRequest
 import io.github.jan.supabase.exceptions.RestException
 import io.github.jan.supabase.putJsonObject
 import io.github.jan.supabase.safeBody
@@ -238,11 +237,11 @@ internal class BucketApiImpl(
 
     override suspend fun list(
         prefix: String,
-        filter: BucketListFilter.() -> Unit
+        filter: StorageListFilter.Files.() -> Unit
     ): List<FileObject> {
         return api.postJson("object/list/$bucketId", buildJsonObject {
             put("prefix", prefix)
-            putJsonObject(BucketListFilter().apply(filter).build())
+            putJsonObject(StorageListFilter.Files().apply(filter).buildBody())
         }).safeBody()
     }
 

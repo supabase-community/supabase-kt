@@ -263,7 +263,7 @@ interface BucketApi {
      */
     suspend fun list(
         prefix: String = "",
-        filter: BucketListFilter.() -> Unit = {}
+        filter: StorageListFilter.Files.() -> Unit = {}
     ): List<FileObject>
 
     /**

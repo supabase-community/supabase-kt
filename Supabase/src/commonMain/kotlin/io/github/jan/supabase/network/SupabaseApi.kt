@@ -8,20 +8,25 @@ import io.github.jan.supabase.plugins.MainPlugin
 import io.ktor.client.request.HttpRequestBuilder
 import io.ktor.client.statement.HttpResponse
 import io.ktor.client.statement.HttpStatement
+import io.ktor.http.Headers
 import io.ktor.http.isSuccess
 
 open class SupabaseApi @SupabaseInternal constructor(
     val resolveUrl: (path: String) -> String,
     val parseErrorResponse: (suspend (response: HttpResponse) -> RestException)? = null,
-    val supabaseClient: SupabaseClient
+    val httpClient: SupabaseHttpClient
 ) : SupabaseHttpClient() {
+
+    override suspend fun getDefaultHeaders(): Headers {
+        return httpClient.getDefaultHeaders()
+    }
 
     final override suspend fun request(url: String, builder: HttpRequestBuilder.() -> Unit): HttpResponse {
         return rawRequest(resolveUrl(url), builder)
     }
 
     open suspend fun rawRequest(url: String, builder: HttpRequestBuilder.() -> Unit): HttpResponse {
-        return supabaseClient.httpClient.request(url, builder).also {
+        return httpClient.request(url, builder).also {
             if(!it.status.isSuccess() && parseErrorResponse != null) throw parseErrorResponse.invoke(it)
         }
     }
@@ -29,7 +34,7 @@ open class SupabaseApi @SupabaseInternal constructor(
     override suspend fun prepareRequest(
         url: String,
         builder: HttpRequestBuilder.() -> Unit
-    ): HttpStatement = supabaseClient.httpClient.prepareRequest(resolveUrl(url), builder)
+    ): HttpStatement = httpClient.prepareRequest(resolveUrl(url), builder)
 
     suspend fun prepareRequest(builder: HttpRequestBuilder.() -> Unit): HttpStatement = prepareRequest("", builder)
 
@@ -54,4 +59,4 @@ fun SupabaseClient.supabaseApi(plugin: MainPlugin<*>) = supabaseApi(plugin::reso
  * All requests will be resolved using this function
  */
 @SupabaseInternal
-fun SupabaseClient.supabaseApi(resolveUrl: (path: String) -> String, parseErrorResponse: (suspend (response: HttpResponse) -> RestException)? = null) = SupabaseApi(resolveUrl, parseErrorResponse, this)
+fun SupabaseClient.supabaseApi(resolveUrl: (path: String) -> String, parseErrorResponse: (suspend (response: HttpResponse) -> RestException)? = null) = SupabaseApi(resolveUrl, parseErrorResponse, this.httpClient)

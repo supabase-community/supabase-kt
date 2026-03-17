@@ -14,12 +14,13 @@ import io.ktor.client.plugins.HttpRequestTimeoutException
 import io.ktor.client.plugins.HttpTimeout
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.request.HttpRequestBuilder
-import io.ktor.client.request.headers
 import io.ktor.client.request.prepareRequest
 import io.ktor.client.request.request
 import io.ktor.client.request.url
 import io.ktor.client.statement.HttpResponse
 import io.ktor.client.statement.HttpStatement
+import io.ktor.http.Headers
+import io.ktor.http.HeadersBuilder
 import io.ktor.http.encodedPath
 import io.ktor.serialization.kotlinx.json.json
 import kotlin.coroutines.cancellation.CancellationException
@@ -47,6 +48,12 @@ class KtorSupabaseHttpClient @SupabaseInternal constructor(
     private val requestTimeout = networkConfig.requestTimeout
     private val engine = networkConfig.httpEngine
     private val modifiers = networkConfig.httpConfigOverrides
+
+    override suspend fun getDefaultHeaders(): Headers {
+        return io.ktor.http.headers {
+            defaultHeaders()
+        }
+    }
 
     init {
         SupabaseClient.LOGGER.d { "Creating KtorSupabaseHttpClient with request timeout $requestTimeout, HttpClientEngine: $engine" }
@@ -106,20 +113,24 @@ class KtorSupabaseHttpClient @SupabaseInternal constructor(
 
     fun close() = httpClient.close()
 
+    private fun HeadersBuilder.defaultHeaders() {
+        if(supabaseKey.isNotBlank()) {
+            append("apikey", supabaseKey)
+        }
+        append("X-Client-Info", "supabase-kt/${BuildConfig.PROJECT_VERSION}")
+        osInformation?.let {
+            append("X-Supabase-Client-Platform", it.name)
+
+            it.version?.let { version ->
+                append("X-Supabase-Client-Platform-Version", version)
+            }
+        }
+    }
+
     private fun HttpClientConfig<*>.applyDefaultConfiguration(modifiers: List<HttpClientConfig<*>.() -> Unit>) {
         install(DefaultRequest) {
             headers {
-                if(supabaseKey.isNotBlank()) {
-                    append("apikey", supabaseKey)
-                }
-                append("X-Client-Info", "supabase-kt/${BuildConfig.PROJECT_VERSION}")
-                osInformation?.let {
-                    append("X-Supabase-Client-Platform", it.name)
-
-                    it.version?.let { version ->
-                        append("X-Supabase-Client-Platform-Version", version)
-                    }
-                }
+                defaultHeaders()
             }
             port = HTTPS_PORT
         }

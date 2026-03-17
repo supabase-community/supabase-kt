@@ -4,6 +4,7 @@ import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.annotations.SupabaseExperimental
 import io.github.jan.supabase.annotations.SupabaseInternal
 import io.github.jan.supabase.auth.admin.AdminApi
+import io.github.jan.supabase.auth.api.ResolveAccessToken
 import io.github.jan.supabase.auth.event.AuthEvent
 import io.github.jan.supabase.auth.exception.AuthRestException
 import io.github.jan.supabase.auth.exception.AuthWeakPasswordException
@@ -543,6 +544,9 @@ interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
          * The auth api version to use
          */
         const val API_VERSION = 1
+
+        @SupabaseInternal
+        fun defaultResolveAccessToken(supabaseClient: SupabaseClient): ResolveAccessToken = { token, fallback -> supabaseClient.resolveAccessToken(token, fallback) }
 
         override fun createConfig(init: AuthConfig.() -> Unit) = AuthConfig().apply(init)
 
