@@ -1,7 +1,6 @@
 package vectors.data
 
-import io.github.jan.supabase.auth.AuthenticatedSupabaseApi
-import io.github.jan.supabase.auth.minimalAuthenticatedApi
+import io.github.jan.supabase.auth.api.AuthenticatedSupabaseApi
 import io.github.jan.supabase.storage.vectors.DistanceMetric
 import io.github.jan.supabase.storage.vectors.data.VectorData
 import io.github.jan.supabase.storage.vectors.data.VectorDataApiImpl

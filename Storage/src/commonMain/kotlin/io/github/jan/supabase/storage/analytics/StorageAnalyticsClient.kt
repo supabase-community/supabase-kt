@@ -1,6 +1,6 @@
 package io.github.jan.supabase.storage.analytics
 
-import io.github.jan.supabase.auth.AuthenticatedSupabaseApi
+import io.github.jan.supabase.auth.api.AuthenticatedSupabaseApi
 import io.github.jan.supabase.safeBody
 import io.github.jan.supabase.storage.StorageListFilter
 import kotlinx.serialization.json.JsonObject
@@ -57,7 +57,7 @@ internal class StorageAnalyticsClientImpl(
 ) : StorageAnalyticsClient {
 
     override suspend fun createBucket(name: String): AnalyticBucket {
-        return api.postJson("", buildJsonObject {
+        return api.postJson("bucket", buildJsonObject {
             put("name", name)
         }).safeBody()
     }

@@ -1,7 +1,6 @@
 package analytics
 
-import io.github.jan.supabase.auth.AuthenticatedSupabaseApi
-import io.github.jan.supabase.auth.minimalAuthenticatedApi
+import io.github.jan.supabase.auth.api.AuthenticatedSupabaseApi
 import io.github.jan.supabase.storage.analytics.StorageAnalyticsClientImpl
 import io.github.jan.supabase.testing.MockedHttpClient
 import io.ktor.client.engine.mock.respond
@@ -35,7 +34,7 @@ class StorageAnalyticsClientTest {
         var capturedBody: String? = null
         val api = AuthenticatedSupabaseApi.minimalAuthenticatedApi(
             httpClient = MockedHttpClient {
-                assertEquals("$mockUrl/", it.url.toString())
+                assertEquals("$mockUrl/bucket", it.url.toString())
                 assertEquals(HttpMethod.Post, it.method)
                 capturedBody = (it.body as TextContent).text
                 respond(

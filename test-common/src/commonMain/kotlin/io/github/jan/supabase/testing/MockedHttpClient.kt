@@ -14,11 +14,17 @@ import io.ktor.client.request.prepareRequest
 import io.ktor.client.request.request
 import io.ktor.client.statement.HttpResponse
 import io.ktor.client.statement.HttpStatement
+import io.ktor.http.Headers
 import io.ktor.serialization.kotlinx.json.json
 
 class MockedHttpClient(
-    handler: suspend MockRequestHandleScope.(HttpRequestData) -> HttpResponseData = { respond("") }
+    private val defaultHeaders: Headers = Headers.Empty,
+    handler: suspend MockRequestHandleScope.(HttpRequestData) -> HttpResponseData = { respond("") },
 ): SupabaseHttpClient() {
+
+    override suspend fun getDefaultHeaders(): Headers {
+        return defaultHeaders
+    }
 
     private val httpClient = HttpClient(MockEngine {
         handler(this, it)

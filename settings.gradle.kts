@@ -22,6 +22,7 @@ include("Supabase")
 
 // Test module
 include("test-common")
+include("test")
 
 // Serializers
 include(":serializers:Moshi")

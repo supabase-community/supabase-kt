@@ -1,6 +1,6 @@
 package io.github.jan.supabase.storage.vectors.data
 
-import io.github.jan.supabase.auth.AuthenticatedSupabaseApi
+import io.github.jan.supabase.auth.api.AuthenticatedSupabaseApi
 import io.github.jan.supabase.safeBody
 import io.github.jan.supabase.storage.vectors.data.VectorDataApi.Companion.SEGMENT_COUNT_RANGE
 import io.github.jan.supabase.storage.vectors.data.VectorDataApi.Companion.VECTOR_RANGE

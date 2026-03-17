@@ -1,6 +1,5 @@
 package io.github.jan.supabase.storage
 
-import io.github.jan.supabase.auth.withDefaultRequest
 import io.github.jan.supabase.exceptions.RestException
 import io.github.jan.supabase.putJsonObject
 import io.github.jan.supabase.safeBody

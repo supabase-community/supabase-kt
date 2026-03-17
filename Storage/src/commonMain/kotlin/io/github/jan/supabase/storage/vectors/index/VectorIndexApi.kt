@@ -1,6 +1,6 @@
 package io.github.jan.supabase.storage.vectors.index
 
-import io.github.jan.supabase.auth.AuthenticatedSupabaseApi
+import io.github.jan.supabase.auth.api.AuthenticatedSupabaseApi
 import io.github.jan.supabase.safeBody
 import io.github.jan.supabase.storage.vectors.data.VectorDataApi
 import io.github.jan.supabase.storage.vectors.data.VectorDataApiImpl
