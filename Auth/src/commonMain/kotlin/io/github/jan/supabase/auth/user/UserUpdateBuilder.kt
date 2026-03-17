@@ -19,6 +19,8 @@ import kotlinx.serialization.json.jsonObject
  * @param phone The user's new phone number
  * @param nonce The nonce sent for reauthentication if the user's password is to be updated. Call [Auth.reauthenticate] to send the nonce to the user's email.
  * @param data Extra user metadata
+ * @param currentPassword The user's current password
+ * This is only ever present when the user is resetting their password and GOTRUE_SECURITY_UPDATE_PASSWORD_REQUIRE_CURRENT_PASSWORD is true.
  */
 @Serializable
 data class UserUpdateBuilder(
@@ -28,6 +30,7 @@ data class UserUpdateBuilder(
     var phone: String? = null,
     var nonce: String? = null,
     var data: JsonObject? = null,
+    var currentPassword: String? = null,
     @Transient @PublishedApi internal var serializer: SupabaseSerializer = KotlinXSerializer()
 ) {
 
