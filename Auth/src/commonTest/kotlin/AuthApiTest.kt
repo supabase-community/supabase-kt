@@ -586,6 +586,7 @@ class AuthRequestTest {
                 put("key", "value")
             }
             val expectedPassword = "password"
+            val expectedCurrentPassword = "current"
             val client = createMockedSupabaseClient(configuration = configuration) {
                 assertMethodIs(HttpMethod.Put, it.method)
                 assertPathIs("/user", it.url.pathAfterVersion())
@@ -594,6 +595,7 @@ class AuthRequestTest {
                 assertEquals(expectedPhone, body["phone"]?.jsonPrimitive?.content)
                 assertEquals(expectedData, body["data"]!!.jsonObject)
                 assertEquals(expectedPassword, body["password"]?.jsonPrimitive?.content)
+                assertEquals(expectedCurrentPassword, body["currentPassword"]?.jsonPrimitive?.content)
                 respondJson(
                     sampleUserObject(email = expectedEmail, phone = expectedPhone)
                 )
@@ -603,6 +605,7 @@ class AuthRequestTest {
                 phone = expectedPhone
                 data = expectedData
                 password = expectedPassword
+                currentPassword = expectedCurrentPassword
             }
             assertEquals(expectedEmail, user.email, "Email should be equal")
             assertEquals(expectedPhone, user.phone, "Phone should be equal")
