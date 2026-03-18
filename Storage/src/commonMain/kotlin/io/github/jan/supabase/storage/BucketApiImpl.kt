@@ -30,7 +30,6 @@ import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.put
 import kotlinx.serialization.json.putJsonArray
-import kotlinx.serialization.json.putJsonObject
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
 import kotlin.time.Duration
@@ -136,8 +135,11 @@ internal class BucketApiImpl(
         val transformation = ImageTransformation().apply(transform)
         val body = api.postJson("object/sign/$bucketId/$path", buildJsonObject {
             put("expiresIn", expiresIn.inWholeSeconds)
-            putJsonObject("transform") {
+            val transform = buildJsonObject {
                 putImageTransformation(transformation)
+            }
+            if(transform.isNotEmpty()) {
+                put("transform", transform)
             }
         }).safeBody<JsonObject>()
         return storage.resolveUrl(body["signedURL"]?.jsonPrimitive?.content?.substring(1)
