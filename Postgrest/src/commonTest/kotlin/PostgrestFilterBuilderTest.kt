@@ -106,19 +106,32 @@ class PostgrestFilterBuilderTest {
     }
 
     @Test
-    fun match() {
+    fun regexMatch() {
         val filter = filterToString {
-            match("name", "person")
+            regexMatch("name", "person")
         }
         assertEquals("name=match.person", filter)
     }
 
     @Test
-    fun imatch() {
+    fun regexIMatch() {
         val filter = filterToString {
-            imatch("name", "person")
+            regexIMatch("name", "person")
         }
         assertEquals("name=imatch.person", filter)
+    }
+
+    @Test
+    fun match() {
+        val query = buildMap {
+            put("column1", 1)
+            put("column2", "string")
+            put("column3", 3.0f)
+        }
+        val filter = filterToString {
+            match(query)
+        }
+        assertEquals("column1=eq.1&column2=eq.string&column3=eq.3.0", filter)
     }
 
     @Test
