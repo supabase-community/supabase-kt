@@ -50,7 +50,7 @@ class MfaApiTest {
         val client = createMockedSupabaseClient(
             configuration = configuration
         ) {
-            assertPathIs("/factors", it.url.pathAfterVersion())
+            assertPathIs("/factors/", it.url.pathAfterVersion())
             assertMethodIs(HttpMethod.Post, it.method)
             val body = it.body.toJsonElement().jsonObject
             assertEquals(friendlyName, body["friendly_name"]?.jsonPrimitive?.content)
@@ -84,7 +84,7 @@ class MfaApiTest {
         val client = createMockedSupabaseClient(
             configuration = configuration
         ) {
-            assertPathIs("/factors", it.url.pathAfterVersion())
+            assertPathIs("/factors/", it.url.pathAfterVersion())
             assertMethodIs(HttpMethod.Post, it.method)
             val body = it.body.toJsonElement().jsonObject
             assertEquals(friendlyName, body["friendly_name"]?.jsonPrimitive?.content)

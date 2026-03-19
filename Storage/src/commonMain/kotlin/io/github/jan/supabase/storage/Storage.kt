@@ -278,7 +278,7 @@ internal class StorageImpl(override val supabaseClient: SupabaseClient, override
         api.post("bucket/$bucketId/empty")
     }
 
-    override fun get(bucketId: String): BucketApi = BucketApiImpl(bucketId, this, config.resumable.cache ?: createDefaultResumableCache())
+    override fun get(bucketId: String): BucketApi = BucketApiImpl(bucketId, this, api.resolve("object"), config.resumable.cache ?: createDefaultResumableCache())
 
     override suspend fun parseErrorResponse(response: HttpResponse): RestException {
         val statusCode = response.status
