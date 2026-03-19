@@ -16,7 +16,4 @@ data class MfaChallenge(
     val id: String,
     @SerialName("type") val factorType: String,
     @Serializable(with = UnixTimestampSerializer::class) val expiresAt: Instant
-) {
-
-
-}
+)
