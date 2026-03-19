@@ -15,5 +15,7 @@ import kotlin.time.Instant
 data class MfaChallenge(
     val id: String,
     @SerialName("type") val factorType: String,
-    @Serializable(with = UnixTimestampSerializer::class) val expiresAt: Instant
+    @Serializable(with = UnixTimestampSerializer::class)
+    @SerialName("expires_at")
+    val expiresAt: Instant
 )
