@@ -324,6 +324,39 @@ class BucketApiTest {
     }
 
     @Test
+    fun testCreateSignedUrlEmptyTransform() {
+        runTest {
+            val expectedPath = "folder/data.png"
+            val expectedExpiresIn = 120.seconds
+            val expectedUrl = "/object/sign/$bucketId/folder/data.png?token=12345"
+            val client = createMockedSupabaseClient(configuration = configureClient) {
+                assertMethodIs(HttpMethod.Post, it.method)
+                assertPathIs("/object/sign/$bucketId/$expectedPath", it.url.pathAfterVersion())
+                val content = it.body.toJsonElement().jsonObject
+                assertNull(content["transform"]?.jsonObject)
+                assertEquals(
+                    expectedExpiresIn,
+                    content["expiresIn"]?.jsonPrimitive?.long?.seconds,
+                    "Expires in should be $expectedExpiresIn"
+                )
+                respond(
+                    content = """
+                    { 
+                        "signedURL": "$expectedUrl"
+                    }
+                    """.trimIndent(),
+                    headers = headersOf(
+                        HttpHeaders.ContentType,
+                        ContentType.Application.Json.toString()
+                    )
+                )
+            }
+            val url = client.storage[bucketId].createSignedUrl(expectedPath, expectedExpiresIn)
+            assertEquals(client.storage.resolveUrl(expectedUrl.substring(1)), url, "URL should be $expectedUrl")
+        }
+    }
+
+    @Test
     fun testCreateSignedUrls() {
         runTest {
             val expectedPaths = listOf("folder/data.png", "folder/data2.png", "folder/data3.png")
