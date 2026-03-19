@@ -1,3 +1,4 @@
+import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.SupabaseClientBuilder
 import io.github.jan.supabase.auth.Auth
 import io.github.jan.supabase.auth.auth
@@ -20,6 +21,7 @@ import kotlinx.serialization.json.boolean
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
+import kotlin.test.AfterTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.time.Clock
@@ -33,6 +35,7 @@ class StorageTest {
             }
         }
     }
+    private lateinit var client: SupabaseClient
 
     @Test
     fun testCreateBucket() {
@@ -41,7 +44,7 @@ class StorageTest {
             val public = true
             val fileSizeLimit = "20mb"
             val allowedMimeType = listOf("image/jpeg", "image/png")
-            val client = createMockedSupabaseClient(configuration = configureClient) {
+            client = createMockedSupabaseClient(configuration = configureClient) {
                 val body = it.body.toJsonElement().jsonObject
                 assertMethodIs(HttpMethod.Post, it.method)
                 assertPathIs("/bucket", it.url.pathAfterVersion())
@@ -66,7 +69,7 @@ class StorageTest {
             val public = false
             val fileSizeLimit = "10mb"
             val allowedMimeType = listOf("image/jpeg")
-            val client = createMockedSupabaseClient(configuration = configureClient) {
+            client = createMockedSupabaseClient(configuration = configureClient) {
                 val body = it.body.toJsonElement().jsonObject
                 assertPathIs("/bucket/$name", it.url.pathAfterVersion())
                 assertMethodIs(HttpMethod.Put, it.method)
@@ -87,7 +90,7 @@ class StorageTest {
     fun testDeleteBucket() {
         runTest {
             val name = "test-bucket"
-            val client = createMockedSupabaseClient(configuration = configureClient) {
+            client = createMockedSupabaseClient(configuration = configureClient) {
                 assertPathIs("/bucket/$name", it.url.pathAfterVersion())
                 assertMethodIs(HttpMethod.Delete, it.method)
                 respond("")
@@ -100,7 +103,7 @@ class StorageTest {
     fun testEmptyBucket() {
         runTest {
             val name = "test-bucket"
-            val client = createMockedSupabaseClient(configuration = configureClient) {
+            client = createMockedSupabaseClient(configuration = configureClient) {
                 assertPathIs("/bucket/$name/empty", it.url.pathAfterVersion())
                 assertMethodIs(HttpMethod.Post, it.method)
                 respond("")
@@ -119,7 +122,7 @@ class StorageTest {
             val expectedCreatedAt = Clock.System.now()
             val expectedUpdatedAt = Clock.System.now()
             val owner = "uuid"
-            val client = createMockedSupabaseClient(configuration = configureClient) {
+            client = createMockedSupabaseClient(configuration = configureClient) {
                 assertPathIs("/bucket", it.url.pathAfterVersion())
                 assertMethodIs(HttpMethod.Get, it.method)
                 respond(
@@ -162,7 +165,7 @@ class StorageTest {
             val expectedCreatedAt = Clock.System.now()
             val expectedUpdatedAt = Clock.System.now()
             val owner = "uuid"
-            val client = createMockedSupabaseClient(configuration = configureClient) {
+            client = createMockedSupabaseClient(configuration = configureClient) {
                 assertPathIs("/bucket", it.url.pathAfterVersion())
                 assertMethodIs(HttpMethod.Get, it.method)
                 assertEquals("10", it.url.parameters["limit"], "Limit should be 10")
@@ -210,7 +213,7 @@ class StorageTest {
             val expectedCreatedAt = Clock.System.now()
             val expectedUpdatedAt = Clock.System.now()
             val owner = "uuid"
-            val client = createMockedSupabaseClient(configuration = configureClient) {
+            client = createMockedSupabaseClient(configuration = configureClient) {
                 assertPathIs("/bucket/$expectedId", it.url.pathAfterVersion())
                 assertMethodIs(HttpMethod.Get, it.method)
                 respond(
@@ -244,7 +247,7 @@ class StorageTest {
     fun testAuthHeaderWhenAuthInstalled() {
         runTest {
             val key = "test-key"
-            val client = createMockedSupabaseClient(
+            client = createMockedSupabaseClient(
                 configuration = {
                     install(Storage) {
                         resumable {
@@ -293,6 +296,15 @@ class StorageTest {
 
     private fun JsonArray.toStringArray(): List<String> {
         return map { it.jsonPrimitive.content }
+    }
+
+    @AfterTest
+    fun cleanup() {
+        runTest {
+            if(::client.isInitialized) {
+                client.close()
+            }
+        }
     }
 
 }

@@ -3,6 +3,7 @@ import io.github.jan.supabase.OSInformation
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.logging.LogLevel
 import io.github.jan.supabase.testing.createMockedSupabaseClient
+import io.github.jan.supabase.testing.withMockedSupabaseClient
 import io.ktor.client.engine.mock.respond
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
@@ -15,7 +16,7 @@ class SupabaseClientTest {
     @Test
     fun testClientInfoHeader() {
         runTest {
-            val client = createMockedSupabaseClient(
+            withMockedSupabaseClient(
                 supabaseUrl = "https://example.supabase.co",
                 supabaseKey = "somekey",
                 requestHandler = {
@@ -25,16 +26,16 @@ class SupabaseClientTest {
                         "X-Client-Info header should be set to 'supabase-kt/${BuildConfig.PROJECT_VERSION}'"
                     )
                     respond("")
-                }
+                },
+                clientHandler = { it.httpClient.get("") }
             )
-            client.httpClient.get("")
         }
     }
 
     @Test
     fun testOSVersionHeader() {
         runTest {
-            val client = createMockedSupabaseClient(
+            withMockedSupabaseClient(
                 supabaseUrl = "https://example.supabase.co",
                 supabaseKey = "somekey",
                 requestHandler = {
@@ -55,9 +56,9 @@ class SupabaseClientTest {
                         name = "TestOS",
                         version = "1.0.0",
                     )
-                }
+                },
+                clientHandler = { it.httpClient.get("") }
             )
-            client.httpClient.get("")
         }
     }
 

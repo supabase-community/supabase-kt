@@ -1,4 +1,5 @@
 import app.cash.turbine.test
+import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.SupabaseClientBuilder
 import io.github.jan.supabase.auth.Auth
 import io.github.jan.supabase.auth.auth
@@ -26,6 +27,7 @@ import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.put
+import kotlin.test.AfterTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
@@ -38,6 +40,7 @@ class MfaApiTest {
             minimalConfig()
         }
     }
+    private lateinit var client: SupabaseClient
 
     @Test
     fun testEnrollTOTP() = runTest {
@@ -47,7 +50,7 @@ class MfaApiTest {
         val expectedSecret = "secret"
         val expectedQrCode = "qrCode"
         val expectedUri = "uri"
-        val client = createMockedSupabaseClient(
+        client = createMockedSupabaseClient(
             configuration = configuration
         ) {
             assertPathIs("/factors", it.url.pathAfterVersion())
@@ -81,7 +84,7 @@ class MfaApiTest {
         val friendlyName = "My Factor"
         val expectedId = "123"
         val expectedPhone = "+491638976913"
-        val client = createMockedSupabaseClient(
+        client = createMockedSupabaseClient(
             configuration = configuration
         ) {
             assertPathIs("/factors", it.url.pathAfterVersion())
@@ -127,7 +130,7 @@ class MfaApiTest {
     @Test
     fun testUnenrollFactor() = runTest {
         val expectedFactorId = "123"
-        val client = createMockedSupabaseClient(
+        client = createMockedSupabaseClient(
             configuration = configuration
         ) {
             assertPathIs("/factors/$expectedFactorId", it.url.pathAfterVersion())
@@ -161,7 +164,7 @@ class MfaApiTest {
     @Test
     fun testRetrieveVerifiedFactors() = runTest {
         val expectedFactor = verifiedFactor()
-        val client = createMockedSupabaseClient(
+        client = createMockedSupabaseClient(
             configuration = configuration
         ) {
             respondJson(UserInfo(id = "id", aud = "aud", factors = listOf(expectedFactor)))
@@ -175,11 +178,12 @@ class MfaApiTest {
 
     @Test
     fun testMfaProperties() = runTest {
-        val client = createMockedSupabaseClient(
+        client = createMockedSupabaseClient(
             configuration = configuration
         ) {
             respond("")
         }
+        client.auth.awaitInitialization()
         client.auth.importSession(createSession(AuthenticatorAssuranceLevel.AAL1, AuthenticatorAssuranceLevel.AAL2))
         assertEquals(MfaStatus(enabled = true, active = false), client.auth.mfa.status)
         client.auth.importSession(createSession(AuthenticatorAssuranceLevel.AAL2, AuthenticatorAssuranceLevel.AAL1))
@@ -188,7 +192,7 @@ class MfaApiTest {
 
     @Test
     fun testMfaStatus() = runTest {
-        val client = createMockedSupabaseClient(
+        client = createMockedSupabaseClient(
             configuration = configuration
         ) {
             respond("")
@@ -212,11 +216,6 @@ class MfaApiTest {
         }
         val header = Json.encodeToString(JwtHeader(JwtHeader.Algorithm.HS256))
         val token = "${JWTUtils.encodeToBase64Url(header)}.${JWTUtils.encodeToBase64Url(data.toString())}.${JWTUtils.encodeToBase64Url("ignore")}"
-        val client = createMockedSupabaseClient(
-            configuration = configuration
-        ) {
-            respond("")
-        }
         val factors = if(nextAAL == AuthenticatorAssuranceLevel.AAL1) emptyList() else listOf(verifiedFactor())
         return userSession(customToken = token, user = UserInfo(id = "id", aud = "aud", factors = factors))
     }
@@ -232,7 +231,7 @@ class MfaApiTest {
             }
             val header = Json.encodeToString(JwtHeader(JwtHeader.Algorithm.HS256))
             val token = "${JWTUtils.encodeToBase64Url(header)}.${JWTUtils.encodeToBase64Url(data.toString())}.${JWTUtils.encodeToBase64Url("ignore")}"
-            val client = createMockedSupabaseClient(
+            client = createMockedSupabaseClient(
                 configuration = configuration
             ) {
                 respond("")
@@ -254,7 +253,7 @@ class MfaApiTest {
             val expectedChallengeId = "456"
             val expectedCode = "789"
             val expectedSession = userSession()
-            val client = createMockedSupabaseClient(
+            client = createMockedSupabaseClient(
                 configuration = configuration
             ) {
                 assertPathIs("/factors/$expectedFactorId/verify", it.url.pathAfterVersion())
@@ -281,7 +280,7 @@ class MfaApiTest {
             val expectedChannel = "sms"
             val expectedChallengeId = "456"
             val expiresAt = 1L
-            val client = createMockedSupabaseClient(
+            client = createMockedSupabaseClient(
                 configuration = configuration
             ) {
                 assertPathIs("/factors/$expectedFactorId/challenge", it.url.pathAfterVersion())
@@ -305,6 +304,15 @@ class MfaApiTest {
             assertEquals(expectedChallengeId, challenge.id)
             assertEquals("phone", challenge.factorType)
             assertEquals(expiresAt, challenge.expiresAt.epochSeconds)
+        }
+    }
+
+    @AfterTest
+    fun cleanup() {
+        runTest {
+            if(::client.isInitialized) {
+                client.close()
+            }
         }
     }
 

@@ -77,17 +77,20 @@ suspend fun createTestClient(
         }
         supabaseConfig()
     }
-    coroutineScope {
-        launch {
-            supabaseHandler(supabase)
+    try {
+        coroutineScope {
+            launch {
+                supabaseHandler(supabase)
+            }
+            launch {
+                wsHandler(serverChannel, clientChannel)
+            }.join()
         }
-        launch {
-            wsHandler(serverChannel, clientChannel)
-        }.join()
+    } finally {
+        supabase.close()
+        serverChannel.close()
+        serverChannel.cancel()
+        clientChannel.close()
+        clientChannel.cancel()
     }
-    supabase.close()
-    serverChannel.close()
-    serverChannel.cancel()
-    clientChannel.close()
-    clientChannel.cancel()
 }
