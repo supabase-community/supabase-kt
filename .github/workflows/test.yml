@@ -40,4 +40,4 @@ jobs:
           cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
           cache-read-only: ${{ github.ref != 'refs/heads/master' }}
       - name: Test supabase-kt
-        run: ./gradlew -DLibrariesOnly=true ${{ matrix.command }} --stacktrace --configuration-cache
+        run: ./gradlew -DLibrariesOnly=true ${{ matrix.command }} --info --console=plain --stacktrace --configuration-cache
