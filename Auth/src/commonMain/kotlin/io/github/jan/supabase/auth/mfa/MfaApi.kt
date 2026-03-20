@@ -1,7 +1,7 @@
 package io.github.jan.supabase.auth.mfa
 
 import io.github.jan.supabase.auth.Auth
-import io.github.jan.supabase.auth.AuthImpl
+import io.github.jan.supabase.auth.api.AuthenticatedSupabaseApi
 import io.github.jan.supabase.auth.jwt.JWTUtils
 import io.github.jan.supabase.auth.providers.builtin.Phone
 import io.github.jan.supabase.auth.status.SessionStatus
@@ -100,7 +100,8 @@ interface MfaApi {
 
 @Suppress("DEPRECATION")
 internal class MfaApiImpl(
-    val auth: AuthImpl
+    private val api: AuthenticatedSupabaseApi,
+    private val auth: Auth
 ) : MfaApi {
 
     override val status: MfaStatus
@@ -127,10 +128,8 @@ internal class MfaApiImpl(
     override val verifiedFactors: List<UserMfaFactor>
         get() = auth.currentUserOrNull()?.factors?.filter(UserMfaFactor::isVerified) ?: emptyList()
 
-    val api = auth.userApi
-
     override suspend fun <Config, Response> enroll(factorType: FactorType<Config, Response>, friendlyName: String?, config: Config.() -> Unit): MfaFactor<Response> {
-        val result = api.postJson("factors", buildJsonObject {
+        val result = api.postJson("", buildJsonObject {
             put("factor_type", factorType.value)
             putJsonObject(factorType.encodeConfig(config))
             friendlyName?.let { put("friendly_name", it) }
@@ -145,7 +144,7 @@ internal class MfaApiImpl(
     }
 
     override suspend fun createChallenge(factorId: String, channel: Phone.Channel?): MfaChallenge {
-        val result = api.postJson("factors/$factorId/challenge", buildJsonObject {
+        val result = api.postJson("$factorId/challenge", buildJsonObject {
             if (channel != null) {
                 put("channel", channel.value)
             }
@@ -159,7 +158,7 @@ internal class MfaApiImpl(
         code: String,
         saveSession: Boolean
     ): UserSession {
-        val result = api.postJson("factors/$factorId/verify", buildJsonObject {
+        val result = api.postJson("$factorId/verify", buildJsonObject {
             put("code", code)
             put("challenge_id", challengeId)
         })
@@ -171,7 +170,7 @@ internal class MfaApiImpl(
     }
 
     override suspend fun unenroll(factorId: String) {
-        api.delete("factors/$factorId")
+        api.delete("$factorId")
     }
 
     override fun getAuthenticatorAssuranceLevel(jwt: String?): MfaLevel {

@@ -3,13 +3,21 @@ import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.auth.minimalConfig
 import io.github.jan.supabase.testing.createMockedSupabaseClient
 
-internal fun createMinimalAuthClient(
+internal suspend fun createMinimalAuthClient(
     autoSetup: Boolean,
-) = createMockedSupabaseClient(
-    configuration = {
-        install(Auth) {
-            autoSetupPlatform = autoSetup
-            minimalConfig()
+    authHandler: suspend (Auth) -> Unit
+) {
+    val client = createMockedSupabaseClient(
+        configuration = {
+            install(Auth) {
+                autoSetupPlatform = autoSetup
+                minimalConfig()
+            }
         }
+    )
+    try {
+        authHandler(client.auth)
+    } finally {
+        client.close()
     }
-).auth
+}

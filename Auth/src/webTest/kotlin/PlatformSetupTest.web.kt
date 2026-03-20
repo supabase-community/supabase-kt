@@ -1,4 +1,5 @@
 import app.cash.turbine.test
+import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.auth.Auth
 import io.github.jan.supabase.auth.AuthImpl
 import io.github.jan.supabase.auth.BrowserBridge
@@ -19,6 +20,7 @@ import io.ktor.util.PlatformUtils.IS_BROWSER
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.json.Json
+import kotlin.test.AfterTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
@@ -30,6 +32,8 @@ import kotlin.time.Duration.Companion.hours
 private const val EXAMPLE_URL = "https://example.com/"
 
 class PlatformSetupTest {
+
+    private lateinit var supabase: SupabaseClient
 
     @Test
     fun testPlatformSetupTestNoHash() = runTestOnBrowser {
@@ -176,19 +180,31 @@ class PlatformSetupTest {
         bridge: BrowserBridge = BrowserBridgeMock(),
         flowType: FlowType = FlowType.IMPLICIT,
         requestHandler: suspend MockRequestHandleScope.(HttpRequestData) -> HttpResponseData = { respond("") }
-    ) = createMockedSupabaseClient(
-        configuration = {
-            install(Auth) {
-                autoSetupPlatform = autoSetup
-                autoLoadFromStorage = false
-                alwaysAutoRefresh = false
-                browserBridge = bridge
-                this.flowType = flowType
-                codeVerifierCache = MemoryCodeVerifierCache("verifier") //not important
+    ): Auth {
+        supabase = createMockedSupabaseClient(
+            configuration = {
+                install(Auth) {
+                    autoSetupPlatform = autoSetup
+                    autoLoadFromStorage = false
+                    alwaysAutoRefresh = false
+                    browserBridge = bridge
+                    this.flowType = flowType
+                    codeVerifierCache = MemoryCodeVerifierCache("verifier") //not important
+                }
+            },
+            requestHandler = requestHandler
+        )
+        return supabase.auth
+    }
+
+    @AfterTest
+    fun cleanup() {
+        runTest {
+            if(::supabase.isInitialized) {
+                supabase.close()
             }
-        },
-        requestHandler = requestHandler
-    ).auth
+        }
+    }
 
     private fun runTestOnBrowser(body: suspend TestScope.() -> Unit) = if(IS_BROWSER) runTest(testBody = body) else runTest {}
 

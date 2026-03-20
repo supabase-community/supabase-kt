@@ -121,12 +121,25 @@ class PostgrestFilterBuilder(
     /**
      * Finds all rows where the value of the [column] matches the specified [pattern] using pattern matching
      */
-    fun match(column: String, pattern: String) = filter(column, FilterOperator.MATCH, pattern)
+    fun regexMatch(column: String, pattern: String) = filter(column, FilterOperator.MATCH, pattern)
 
     /**
      * Finds all rows where the value of the [column] matches the specified [pattern] using pattern matching (case-insensitive)
      */
-    fun imatch(column: String, pattern: String) = filter(column, FilterOperator.IMATCH, pattern)
+    fun regexIMatch(column: String, pattern: String) = filter(column, FilterOperator.IMATCH, pattern)
+
+    /**
+     * Match only rows where each column in `query` keys is equal to its
+     * associated value. Shorthand for multiple `.eq()`s.
+     *
+     * @param query The object to filter with, with column names as keys mapped
+     * to their filter values
+     */
+    fun match(query: Map<String, Any>) {
+        for((column, value) in query) {
+            eq(column, value)
+        }
+    }
 
     /**
      * Finds all rows where the value of the [column] equals to one of these values: null,true,false,unknown

@@ -1,3 +1,4 @@
+import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.SupabaseClientBuilder
 import io.github.jan.supabase.auth.Auth
 import io.github.jan.supabase.auth.auth
@@ -16,6 +17,7 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.put
+import kotlin.test.AfterTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -25,11 +27,13 @@ internal val configuration: SupabaseClientBuilder.() -> Unit = {
 
 class FunctionsTest {
 
+    private lateinit var supabase: SupabaseClient
+    
     @Test
     fun testAuthorizationHeaderAuth() {
         runTest {
             val expectedJWT = "jwt"
-            val supabase = createMockedSupabaseClient(
+            supabase = createMockedSupabaseClient(
                 configuration ={
                     install(Auth) {
                         minimalConfig()
@@ -53,7 +57,7 @@ class FunctionsTest {
     fun testAuthorizationHeaderCustomToken() {
         runTest {
             val expectedJWT = "jwt"
-            val supabase = createMockedSupabaseClient(
+            supabase = createMockedSupabaseClient(
                 configuration = {
                     install(Functions) {
                         jwtToken = expectedJWT
@@ -78,7 +82,7 @@ class FunctionsTest {
             val expectedHeaders = Headers.build {
                 append("myHeader", "myValue")
             }
-            val supabase = createMockedSupabaseClient(
+            supabase = createMockedSupabaseClient(
                 configuration = configuration,
                 requestHandler = {
                     assertEquals("POST", it.method.value)
@@ -107,7 +111,7 @@ class FunctionsTest {
             val expectedBody = buildJsonObject {
                 put("key", "value")
             }
-            val supabase = createMockedSupabaseClient(
+            supabase = createMockedSupabaseClient(
                 configuration = configuration,
                 requestHandler = {
                     val body = it.body.toJsonElement().jsonObject
@@ -124,6 +128,15 @@ class FunctionsTest {
                 body = expectedBody,
                 headers = expectedHeaders
             )
+        }
+    }
+
+    @AfterTest
+    fun cleanup() {
+        runTest {
+            if(::supabase.isInitialized) {
+                supabase.close()
+            }
         }
     }
 

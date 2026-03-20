@@ -1,3 +1,4 @@
+import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.SupabaseClientBuilder
 import io.github.jan.supabase.auth.Auth
 import io.github.jan.supabase.auth.SignOutScope
@@ -23,6 +24,7 @@ import kotlinx.serialization.json.encodeToJsonElement
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.put
+import kotlin.test.AfterTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.time.Clock
@@ -34,13 +36,14 @@ class AdminApiTest {
             minimalConfig()
         }
     }
+    private lateinit var client: SupabaseClient
 
     @Test
     fun testSignOut() {
         runTest {
             val jwt = "jwt"
             val scope = SignOutScope.LOCAL
-            val client = createMockedSupabaseClient(
+            client = createMockedSupabaseClient(
                 configuration = configuration
             ) {
                 assertPathIs("/logout", it.url.pathAfterVersion())
@@ -70,7 +73,7 @@ class AdminApiTest {
                 put("type", "app")
             }
             val autoConfirm = true
-            val client = createMockedSupabaseClient(
+            client = createMockedSupabaseClient(
                 configuration = configuration
             ) {
                 assertPathIs("/admin/users", it.url.pathAfterVersion())
@@ -119,7 +122,7 @@ class AdminApiTest {
                 put("type", "app")
             }
             val autoConfirm = true
-            val client = createMockedSupabaseClient(
+            client = createMockedSupabaseClient(
                 configuration = configuration
             ) {
                 assertPathIs("/admin/users", it.url.pathAfterVersion())
@@ -161,7 +164,7 @@ class AdminApiTest {
         runTest {
             val page = 3
             val perPage = 50
-            val client = createMockedSupabaseClient(
+            client = createMockedSupabaseClient(
                 configuration = configuration
             ) {
                 assertPathIs("/admin/users", it.url.pathAfterVersion())
@@ -199,7 +202,7 @@ class AdminApiTest {
         runTest {
             val uid = "uid"
             val email = "email"
-            val client = createMockedSupabaseClient(
+            client = createMockedSupabaseClient(
                 configuration = configuration
             ) {
                 assertPathIs("/admin/users/$uid", it.url.pathAfterVersion())
@@ -228,7 +231,7 @@ class AdminApiTest {
     fun testDeleteUser() {
         runTest {
             val uid = "uid"
-            val client = createMockedSupabaseClient(
+            client = createMockedSupabaseClient(
                 configuration = configuration
             ) {
                 assertPathIs("/admin/users/$uid", it.url.pathAfterVersion())
@@ -247,7 +250,7 @@ class AdminApiTest {
             val data = buildJsonObject {
                 put("type", "user")
             }
-            val client = createMockedSupabaseClient(
+            client = createMockedSupabaseClient(
                 configuration = configuration
             ) {
                 assertPathIs("/invite", it.url.pathAfterVersion())
@@ -281,7 +284,7 @@ class AdminApiTest {
             val banDuration = "300ms"
             val role = "admin"
             val phone = "+123456789"
-            val client = createMockedSupabaseClient(
+            client = createMockedSupabaseClient(
                 configuration = configuration
             ) {
                 assertPathIs("/admin/users/$uid", it.url.pathAfterVersion())
@@ -329,7 +332,7 @@ class AdminApiTest {
         runTest {
             val uid = "uid"
             val factorId = "factorId"
-            val client = createMockedSupabaseClient(
+            client = createMockedSupabaseClient(
                 configuration = configuration
             ) {
                 assertPathIs("/admin/users/$uid/factors/$factorId", it.url.pathAfterVersion())
@@ -352,7 +355,7 @@ class AdminApiTest {
                 friendlyName = "friendlyName",
                 factorType = "factorType",
             )
-            val client = createMockedSupabaseClient(
+            client = createMockedSupabaseClient(
                 configuration = configuration
             ) {
                 assertPathIs("/admin/users/$uid/factors", it.url.pathAfterVersion())
@@ -375,7 +378,7 @@ class AdminApiTest {
         runTest {
             val email = "email"
             val redirectTo = "https://example.com"
-            val client = createMockedSupabaseClient(
+            client = createMockedSupabaseClient(
                 configuration = configuration
             ) {
                 assertPathIs("/admin/generate_link", it.url.pathAfterVersion())
@@ -408,6 +411,15 @@ class AdminApiTest {
             )
             assertEquals("https://example.com", link)
             assertEquals(email, user.email)
+        }
+    }
+
+    @AfterTest
+    fun cleanup() {
+        runTest {
+            if(::client.isInitialized) {
+                client.close()
+            }
         }
     }
 

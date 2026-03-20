@@ -12,8 +12,8 @@ import io.github.jan.supabase.storage.uploadAsFlow
 import io.github.jan.supabase.storage.uploadToSignedUrlAsFlow
 import io.github.jan.supabase.testing.assertMethodIs
 import io.github.jan.supabase.testing.assertPathIs
-import io.github.jan.supabase.testing.createMockedSupabaseClient
 import io.github.jan.supabase.testing.pathAfterVersion
+import io.github.jan.supabase.testing.withMockedSupabaseClient
 import io.ktor.client.engine.mock.MockRequestHandleScope
 import io.ktor.client.engine.mock.respond
 import io.ktor.client.engine.mock.toByteArray
@@ -257,27 +257,31 @@ class BucketApiFlowTest {
     ) {
         runTest {
             val expectedData = dummyData
-            val client = createMockedSupabaseClient(configuration = configureClient) {
-                val data = it.body.toByteArray()
-                assertMethodIs(method, it.method)
-                assertPathIs(urlPath, it.url.pathAfterVersion())
-                assertContentEquals(expectedData, data, "Data should be [1, 2, 3]")
-                assertEquals(ContentType.Image.PNG, it.body.contentType, "Content type should be image/png")
-                extra(this, it)
-                respond(
-                    content = """
+            withMockedSupabaseClient(
+                configuration = configureClient,
+                requestHandler = {
+                    val data = it.body.toByteArray()
+                    assertMethodIs(method, it.method)
+                    assertPathIs(urlPath, it.url.pathAfterVersion())
+                    assertContentEquals(expectedData, data, "Data should be [1, 2, 3]")
+                    assertEquals(ContentType.Image.PNG, it.body.contentType, "Content type should be image/png")
+                    extra(this, it)
+                    respond(
+                        content = """
                     { 
                         "Key": "$expectedPath",
                         "Id": "id"
                     }
                     """.trimIndent(),
-                    headers = headersOf(
-                        HttpHeaders.ContentType,
-                        ContentType.Application.Json.toString()
+                        headers = headersOf(
+                            HttpHeaders.ContentType,
+                            ContentType.Application.Json.toString()
+                        )
                     )
-                )
+                }
+            ) { client ->
+                test(client, expectedPath, expectedData)
             }
-            test(client, expectedPath, expectedData)
         }
     }
 

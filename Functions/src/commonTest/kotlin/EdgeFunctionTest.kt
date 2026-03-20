@@ -1,3 +1,4 @@
+import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.functions.FunctionRegion
 import io.github.jan.supabase.functions.functions
 import io.github.jan.supabase.testing.createMockedSupabaseClient
@@ -11,11 +12,14 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.put
+import kotlin.test.AfterTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class EdgeFunctionTest {
 
+    private lateinit var supabase: SupabaseClient
+    
     @Test
     fun testInvokingWithoutBody() {
         runTest {
@@ -24,7 +28,7 @@ class EdgeFunctionTest {
             val expectedHeaders = Headers.build {
                 append("myHeader", "myValue")
             }
-            val supabase = createMockedSupabaseClient(
+            supabase = createMockedSupabaseClient(
                 configuration = configuration,
                 requestHandler = {
                     assertEquals("POST", it.method.value)
@@ -50,7 +54,7 @@ class EdgeFunctionTest {
             val expectedBody = buildJsonObject {
                 put("key", "value")
             }
-            val supabase = createMockedSupabaseClient(
+            supabase = createMockedSupabaseClient(
                 configuration = configuration,
                 requestHandler = {
                     val body = it.body.toJsonElement().jsonObject
@@ -63,6 +67,15 @@ class EdgeFunctionTest {
             )
             val function = supabase.functions.buildEdgeFunction(expectedName, expectedRegion, expectedHeaders)
             function(expectedBody)
+        }
+    }
+
+    @AfterTest
+    fun cleanup() {
+        runTest {
+            if(::supabase.isInitialized) {
+                supabase.close()
+            }
         }
     }
 

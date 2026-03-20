@@ -1,18 +1,22 @@
+import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.auth.Auth
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.auth.minimalConfig
 import io.github.jan.supabase.auth.resolveAccessToken
 import io.github.jan.supabase.testing.createMockedSupabaseClient
 import kotlinx.coroutines.test.runTest
+import kotlin.test.AfterTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
 
 class AccessTokenTest {
 
+    private lateinit var client: SupabaseClient
+    
     @Test
     fun testAccessTokenWithJwtToken() = runTest {
-        val client = createMockedSupabaseClient(
+        client = createMockedSupabaseClient(
             configuration = {
                 install(Auth) {
                     minimalConfig()
@@ -26,19 +30,19 @@ class AccessTokenTest {
 
     @Test
     fun testAccessTokenWithKeyAsFallback() = runTest {
-        val client = createMockedSupabaseClient(supabaseKey = "myKey")
+        client = createMockedSupabaseClient(supabaseKey = "myKey")
         assertEquals("myKey", client.resolveAccessToken())
     }
 
     @Test
     fun testAccessTokenWithoutKey() = runTest {
-        val client = createMockedSupabaseClient()
+        client = createMockedSupabaseClient()
         assertNull(client.resolveAccessToken(keyAsFallback = false))
     }
 
     @Test
     fun testAccessTokenWithCustomAccessToken() = runTest {
-        val client = createMockedSupabaseClient(
+        client = createMockedSupabaseClient(
             configuration = {
                 accessToken = {
                     "myCustomToken"
@@ -50,7 +54,7 @@ class AccessTokenTest {
 
     @Test
     fun testAccessTokenWithAuth() = runTest {
-        val client = createMockedSupabaseClient(
+        client = createMockedSupabaseClient(
             configuration = {
                 install(Auth) {
                     minimalConfig()
@@ -60,6 +64,15 @@ class AccessTokenTest {
         client.auth.awaitInitialization()
         client.auth.importAuthToken("myAuth")
         assertEquals("myAuth", client.resolveAccessToken())
+    }
+
+    @AfterTest
+    fun cleanup() {
+        runTest {
+            if(::client.isInitialized) {
+                client.close()
+            }
+        }
     }
 
 }

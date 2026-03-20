@@ -1,5 +1,6 @@
 package io.github.jan.supabase.storage
 
+import io.github.jan.supabase.auth.api.AuthenticatedSupabaseApi
 import io.github.jan.supabase.exceptions.RestException
 import io.github.jan.supabase.putJsonObject
 import io.github.jan.supabase.safeBody
@@ -30,19 +31,19 @@ import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.put
 import kotlinx.serialization.json.putJsonArray
-import kotlinx.serialization.json.putJsonObject
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
 import kotlin.time.Duration
 
 internal class BucketApiImpl(
     override val bucketId: String,
-    val storage: StorageImpl,
+    val storage: Storage,
+    api: AuthenticatedSupabaseApi,
     resumableCache: ResumableCache
 ) : BucketApi {
 
     private var headers = Headers.Empty
-    private val api = storage.api.withDefaultRequest {
+    private val api = api.withDefaultRequest {
         headers.appendAll(this@BucketApiImpl.headers)
     }
 
@@ -79,7 +80,7 @@ internal class BucketApiImpl(
     }
 
     override suspend fun createSignedUploadUrl(path: String, upsert: Boolean): UploadSignedUrl {
-        val result = api.post("object/upload/sign/$bucketId/$path") {
+        val result = api.post("upload/sign/$bucketId/$path") {
             header(UPSERT_HEADER, upsert.toString())
         }
         val urlPath = result.safeBody<JsonObject>()["url"]?.jsonPrimitive?.content?.substring(1)
@@ -103,7 +104,7 @@ internal class BucketApiImpl(
         )
 
     override suspend fun delete(paths: Collection<String>) {
-        api.deleteJson("object/$bucketId", buildJsonObject {
+        api.deleteJson("$bucketId", buildJsonObject {
             putJsonArray("prefixes") {
                 paths.forEach(this::add)
             }
@@ -111,7 +112,7 @@ internal class BucketApiImpl(
     }
 
     override suspend fun move(from: String, to: String, destinationBucket: String?) {
-        api.postJson("object/move", buildJsonObject {
+        api.postJson("move", buildJsonObject {
             put("bucketId", bucketId)
             put("sourceKey", from)
             put("destinationKey", to)
@@ -120,7 +121,7 @@ internal class BucketApiImpl(
     }
 
     override suspend fun copy(from: String, to: String, destinationBucket: String?) {
-        api.postJson("object/copy", buildJsonObject {
+        api.postJson("copy", buildJsonObject {
             put("bucketId", bucketId)
             put("sourceKey", from)
             put("destinationKey", to)
@@ -134,10 +135,13 @@ internal class BucketApiImpl(
         transform: ImageTransformation.() -> Unit
     ): String {
         val transformation = ImageTransformation().apply(transform)
-        val body = api.postJson("object/sign/$bucketId/$path", buildJsonObject {
+        val body = api.postJson("sign/$bucketId/$path", buildJsonObject {
             put("expiresIn", expiresIn.inWholeSeconds)
-            putJsonObject("transform") {
+            val transform = buildJsonObject {
                 putImageTransformation(transformation)
+            }
+            if(transform.isNotEmpty()) {
+                put("transform", transform)
             }
         }).safeBody<JsonObject>()
         return storage.resolveUrl(body["signedURL"]?.jsonPrimitive?.content?.substring(1)
@@ -148,7 +152,7 @@ internal class BucketApiImpl(
         expiresIn: Duration,
         paths: Collection<String>
     ): List<SignedUrl> {
-        val body = api.postJson("object/sign/$bucketId", buildJsonObject {
+        val body = api.postJson("sign/$bucketId", buildJsonObject {
             putJsonArray("paths") {
                 paths.forEach(this::add)
             }
@@ -239,20 +243,20 @@ internal class BucketApiImpl(
         prefix: String,
         filter: StorageListFilter.Files.() -> Unit
     ): List<FileObject> {
-        return api.postJson("object/list/$bucketId", buildJsonObject {
+        return api.postJson("list/$bucketId", buildJsonObject {
             put("prefix", prefix)
             putJsonObject(StorageListFilter.Files().apply(filter).buildBody())
         }).safeBody()
     }
 
     override suspend fun info(path: String): FileObjectV2 {
-        val response = api.get("object/info/$bucketId/$path")
+        val response = api.get("info/$bucketId/$path")
         return response.safeBody<FileObjectV2>().copy(serializer = storage.serializer)
     }
 
     override suspend fun exists(path: String): Boolean {
         try {
-            api.request("object/$bucketId/$path") {
+            api.request("$bucketId/$path") {
                 method = HttpMethod.Head
             }
             return true
@@ -262,9 +266,9 @@ internal class BucketApiImpl(
         }
     }
 
-    private fun defaultUploadUrl(path: String) = "object/$bucketId/$path"
+    private fun defaultUploadUrl(path: String) = "$bucketId/$path"
 
-    private fun uploadToSignedUrlUrl(path: String, token: String) = "object/upload/sign/$bucketId/$path?token=$token"
+    private fun uploadToSignedUrlUrl(path: String, token: String) = "upload/sign/$bucketId/$path?token=$token"
 
     internal suspend fun uploadOrUpdate(
         method: HttpMethod,

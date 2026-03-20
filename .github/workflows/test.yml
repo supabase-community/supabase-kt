@@ -18,7 +18,7 @@ jobs:
       matrix:
         command: [
           'jvmTest',
-          'jsTest wasmJsTest',
+          'jsBrowserTest wasmJsBrowserTest',
           'iosX64Test iosSimulatorArm64Test',
           'macosArm64Test macosX64Test',
           'tvosX64Test tvosSimulatorArm64Test',
@@ -40,4 +40,5 @@ jobs:
           cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
           cache-read-only: ${{ github.ref != 'refs/heads/master' }}
       - name: Test supabase-kt
+        timeout-minutes: 20
         run: ./gradlew -DLibrariesOnly=true ${{ matrix.command }} --stacktrace --configuration-cache

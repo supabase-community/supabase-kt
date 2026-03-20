@@ -116,7 +116,7 @@ internal class AuthImpl(
     @OptIn(SupabaseInternal::class)
     internal val userApi = if(config.requireValidSession) supabaseClient.authenticatedSupabaseApi(this) else publicApi
     override val admin: AdminApi = AdminApiImpl(publicApi)
-    override val mfa: MfaApi = MfaApiImpl(this)
+    override val mfa: MfaApi = MfaApiImpl(userApi.resolve("factors"), this)
     var sessionJob: Job? = null
     var refreshInformation: SessionRefreshInformation? = null
     override val isAutoRefreshRunning: Boolean
