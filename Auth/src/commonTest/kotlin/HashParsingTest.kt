@@ -1,3 +1,4 @@
+import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.auth.Auth
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.auth.minimalConfig
@@ -7,16 +8,19 @@ import io.github.jan.supabase.auth.url.getFragmentParts
 import io.github.jan.supabase.auth.url.validateHash
 import io.github.jan.supabase.testing.createMockedSupabaseClient
 import kotlinx.coroutines.test.runTest
+import kotlin.test.AfterTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertIs
 
 class HashParsingTest {
 
+    private lateinit var supabase: SupabaseClient
+    
     // Tests for validateHash
     @Test
     fun testValidateHashWithValidSession() = runTest {
-        val supabase = createMockedSupabaseClient(
+        supabase = createMockedSupabaseClient(
             configuration = {
                 install(Auth) {
                     minimalConfig()
@@ -35,7 +39,7 @@ class HashParsingTest {
 
     @Test
     fun testValidateHashWithValidSessionAndProviderTokens() = runTest {
-        val supabase = createMockedSupabaseClient(
+        supabase = createMockedSupabaseClient(
             configuration = {
                 install(Auth) {
                     minimalConfig()
@@ -54,7 +58,7 @@ class HashParsingTest {
 
     @Test
     fun testValidateHashWithError() = runTest {
-        val supabase = createMockedSupabaseClient(
+        supabase = createMockedSupabaseClient(
             configuration = {
                 install(Auth) {
                     minimalConfig()
@@ -69,7 +73,7 @@ class HashParsingTest {
 
     @Test
     fun testValidateHashWithMissingAccessToken() = runTest {
-        val supabase = createMockedSupabaseClient(
+        supabase = createMockedSupabaseClient(
             configuration = {
                 install(Auth) {
                     minimalConfig()
@@ -84,7 +88,7 @@ class HashParsingTest {
 
     @Test
     fun testValidateHashWithMissingRefreshToken() = runTest {
-        val supabase = createMockedSupabaseClient(
+        supabase = createMockedSupabaseClient(
             configuration = {
                 install(Auth) {
                     minimalConfig()
@@ -99,7 +103,7 @@ class HashParsingTest {
 
     @Test
     fun testValidateHashWithMissingExpiresIn() = runTest {
-        val supabase = createMockedSupabaseClient(
+        supabase = createMockedSupabaseClient(
             configuration = {
                 install(Auth) {
                     minimalConfig()
@@ -114,7 +118,7 @@ class HashParsingTest {
 
     @Test
     fun testValidateHashWithMissingTokenType() = runTest {
-        val supabase = createMockedSupabaseClient(
+        supabase = createMockedSupabaseClient(
             configuration = {
                 install(Auth) {
                     minimalConfig()
@@ -129,7 +133,7 @@ class HashParsingTest {
 
     @Test
     fun testValidateHashWithInvalidExpiresIn() = runTest {
-        val supabase = createMockedSupabaseClient(
+        supabase = createMockedSupabaseClient(
             configuration = {
                 install(Auth) {
                     minimalConfig()
@@ -144,7 +148,7 @@ class HashParsingTest {
 
     @Test
     fun testValidateHashWithEmptyString() = runTest {
-        val supabase = createMockedSupabaseClient(
+        supabase = createMockedSupabaseClient(
             configuration = {
                 install(Auth) {
                     minimalConfig()
@@ -159,7 +163,7 @@ class HashParsingTest {
 
     @Test
     fun testValidateHashWithTypeParameter() = runTest {
-        val supabase = createMockedSupabaseClient(
+        supabase = createMockedSupabaseClient(
             configuration = {
                 install(Auth) {
                     minimalConfig()
@@ -345,6 +349,15 @@ class HashParsingTest {
             "https://example.com:8080/path/to/resource?query1=value1&query2=value2#access_token=token123&expires_in=3600"
 
         assertEquals(expectedUrl, result)
+    }
+
+    @AfterTest
+    fun cleanup() {
+        runTest {
+            if(::supabase.isInitialized) {
+                supabase.close()
+            }
+        }
     }
 
 }

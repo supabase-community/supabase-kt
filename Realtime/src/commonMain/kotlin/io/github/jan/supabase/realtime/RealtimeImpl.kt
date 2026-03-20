@@ -20,6 +20,7 @@ import io.ktor.http.path
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.ensureActive
@@ -242,6 +243,7 @@ import kotlin.time.Clock
 
     override suspend fun close() {
         disconnect()
+        scope.cancel()
     }
 
     override suspend fun block() {

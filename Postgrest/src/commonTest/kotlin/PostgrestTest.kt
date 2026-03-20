@@ -29,6 +29,7 @@ import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.put
+import kotlin.test.AfterTest
 import kotlin.test.Test
 import kotlin.test.assertContains
 import kotlin.test.assertEquals
@@ -40,10 +41,12 @@ class PostgrestTest {
     private val configureClient: SupabaseClientBuilder.() -> Unit = {
         install(Postgrest)
     }
+    
+    private lateinit var supabase: SupabaseClient
 
     @Test
     fun testUrlLengthLimit() {
-        val supabase = createMockedSupabaseClient(
+        supabase = createMockedSupabaseClient(
             configuration = configureClient
         ) {
             respond("")
@@ -341,7 +344,7 @@ class PostgrestTest {
 
     @Test
     fun testRpcNoParameters() {
-        val supabase = createMockedSupabaseClient(
+        supabase = createMockedSupabaseClient(
             configuration = configureClient
         ) {
             assertPathIs("/rpc/function", it.url.pathAfterVersion())
@@ -366,7 +369,7 @@ class PostgrestTest {
         val mockData = buildJsonObject {
             put("key", "value")
         }
-        val supabase = createMockedSupabaseClient(
+        supabase = createMockedSupabaseClient(
             configuration = configureClient
         ) {
             assertPathIs("/rpc/function", it.url.pathAfterVersion())
@@ -384,7 +387,7 @@ class PostgrestTest {
 
     @Test
     fun testRpcReturnsNull() {
-        val supabase = createMockedSupabaseClient(
+        supabase = createMockedSupabaseClient(
             configuration = configureClient
         ) {
             respond("null")
@@ -399,7 +402,7 @@ class PostgrestTest {
 
     @Test
     fun testRpcReturnsStringNull() {
-        val supabase = createMockedSupabaseClient(
+        supabase = createMockedSupabaseClient(
             configuration = configureClient
         ) {
             respond("\"null\"")
@@ -423,7 +426,7 @@ class PostgrestTest {
 
     @Test
     fun testDecodeAsNullableTypeMatchingResponseAndResult() {
-        val supabase = createMockedSupabaseClient(configuration = configureClient) {
+        supabase = createMockedSupabaseClient(configuration = configureClient) {
             respond(Json.encodeToString(TestObject.mock))
         }
         runTest {
@@ -435,7 +438,7 @@ class PostgrestTest {
 
     @Test
     fun testDecodeAsNullableTypeMismatchedResponseFailure() {
-        val supabase = createMockedSupabaseClient(configuration = configureClient) {
+        supabase = createMockedSupabaseClient(configuration = configureClient) {
             respond("[]")
         }
         runTest {
@@ -448,7 +451,7 @@ class PostgrestTest {
 
     @Test
     fun testDecodeAsNullableTypeNullResponseNullResult() {
-        val supabase = createMockedSupabaseClient(configuration = configureClient) {
+        supabase = createMockedSupabaseClient(configuration = configureClient) {
             respond("null")
         }
         runTest {
@@ -463,7 +466,7 @@ class PostgrestTest {
         request: suspend SupabaseClient.(table: String) -> PostgrestResult,
         requestHandler: suspend MockRequestHandleScope.(HttpRequestData) -> HttpResponseData = { respond("")},
     ) {
-        val supabase = createMockedSupabaseClient(
+        supabase = createMockedSupabaseClient(
             configuration = configureClient
         ) {
             assertPathIs("/$table", it.url.pathAfterVersion())
@@ -471,6 +474,15 @@ class PostgrestTest {
         }
         runTest {
             supabase.request(table)
+        }
+    }
+
+    @AfterTest
+    fun cleanup() {
+        runTest {
+            if(::supabase.isInitialized) {
+                supabase.close()
+            }
         }
     }
 

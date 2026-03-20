@@ -32,6 +32,7 @@ import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.put
+import kotlin.test.AfterTest
 import kotlin.test.Test
 import kotlin.test.assertContains
 import kotlin.test.assertEquals
@@ -50,6 +51,8 @@ class AuthRequestTest {
         }
     }
 
+    private lateinit var client: SupabaseClient
+    
     @Test
     fun testSignUpWithEmailNoAutoConfirm() {
         runTest {
@@ -60,7 +63,7 @@ class AuthRequestTest {
                 put("key", "value")
             }
             val expectedUrl = "https://example.com"
-            val client = createMockedSupabaseClient(configuration = configuration) {
+            client = createMockedSupabaseClient(configuration = configuration) {
                 val body = it.body.toJsonElement().jsonObject
                 val metaSecurity = body["gotrue_meta_security"]!!.jsonObject
                 val params = it.url.parameters
@@ -95,7 +98,7 @@ class AuthRequestTest {
             val userData = buildJsonObject {
                 put("key", "value")
             }
-            val client = createMockedSupabaseClient(configuration = configuration) {
+            client = createMockedSupabaseClient(configuration = configuration) {
                 val body = it.body.toJsonElement().jsonObject
                 val metaSecurity = body["gotrue_meta_security"]!!.jsonObject
                 assertMethodIs(HttpMethod.Post, it.method)
@@ -131,7 +134,7 @@ class AuthRequestTest {
             val userData = buildJsonObject {
                 put("key", "value")
             }
-            val client = createMockedSupabaseClient(configuration = configuration) {
+            client = createMockedSupabaseClient(configuration = configuration) {
                 val body = it.body.toJsonElement().jsonObject
                 val metaSecurity = body["gotrue_meta_security"]!!.jsonObject
                 assertMethodIs(HttpMethod.Post, it.method)
@@ -166,7 +169,7 @@ class AuthRequestTest {
             val userData = buildJsonObject {
                 put("key", "value")
             }
-            val client = createMockedSupabaseClient(configuration = configuration) {
+            client = createMockedSupabaseClient(configuration = configuration) {
                 val body = it.body.toJsonElement().jsonObject
                 val metaSecurity = body["gotrue_meta_security"]!!.jsonObject
                 assertMethodIs(HttpMethod.Post, it.method)
@@ -202,7 +205,7 @@ class AuthRequestTest {
                 put("key", "value")
             }
             val expectedUrl = "https://example.com"
-            val client = createMockedSupabaseClient(configuration = configuration) {
+            client = createMockedSupabaseClient(configuration = configuration) {
                 val body = it.body.toJsonElement().jsonObject
                 val metaSecurity = body["gotrue_meta_security"]!!.jsonObject
                 val params = it.url.parameters
@@ -237,7 +240,7 @@ class AuthRequestTest {
                 put("key", "value")
             }
             val expectedUrl = "https://example.com"
-            val client = createMockedSupabaseClient(configuration = configuration) {
+            client = createMockedSupabaseClient(configuration = configuration) {
                 val body = it.body.toJsonElement().jsonObject
                 val metaSecurity = body["gotrue_meta_security"]!!.jsonObject
                 val params = it.url.parameters
@@ -267,7 +270,7 @@ class AuthRequestTest {
                 put("key", "value")
             }
             val expectedUrl = "https://example.com"
-            val client = createMockedSupabaseClient(configuration = configuration) {
+            client = createMockedSupabaseClient(configuration = configuration) {
                 val body = it.body.toJsonElement().jsonObject
                 val metaSecurity = body["gotrue_meta_security"]!!.jsonObject
                 val params = it.url.parameters
@@ -297,7 +300,7 @@ class AuthRequestTest {
                 put("key", "value")
             }
             val expectedUrl = "https://example.com"
-            val client = createMockedSupabaseClient(configuration = configuration) {
+            client = createMockedSupabaseClient(configuration = configuration) {
                 val body = it.body.toJsonElement().jsonObject
                 val metaSecurity = body["gotrue_meta_security"]!!.jsonObject
                 val params = it.url.parameters
@@ -325,7 +328,7 @@ class AuthRequestTest {
         runTest {
             val expectedPhone = "+1234567890"
             val expectedUrl = "https://example.com"
-            val client = createMockedSupabaseClient(configuration = configuration) {
+            client = createMockedSupabaseClient(configuration = configuration) {
                 val body = it.body.toJsonElement().jsonObject
                 val params = it.url.parameters
                 assertEquals(expectedUrl, params["redirect_to"])
@@ -348,7 +351,7 @@ class AuthRequestTest {
         runTest {
             val expectedEmail = "example@email.com"
             val expectedUrl = "https://example.com"
-            val client = createMockedSupabaseClient(configuration = configuration) {
+            client = createMockedSupabaseClient(configuration = configuration) {
                 val body = it.body.toJsonElement().jsonObject
                 val params = it.url.parameters
                 assertEquals(expectedUrl, params["redirect_to"])
@@ -377,7 +380,7 @@ class AuthRequestTest {
             val expectedProvider = Google
             val expectedAccessToken = "accessToken"
             val expectedNonce = "nonce"
-            val client = createMockedSupabaseClient(configuration = configuration) {
+            client = createMockedSupabaseClient(configuration = configuration) {
                 val body = it.body.toJsonElement().jsonObject
                 val metaSecurity = body["gotrue_meta_security"]!!.jsonObject
                 val params = it.url.parameters
@@ -414,7 +417,7 @@ class AuthRequestTest {
             val userData = buildJsonObject {
                 put("key", "value")
             }
-            val client = createMockedSupabaseClient(configuration = configuration) {
+            client = createMockedSupabaseClient(configuration = configuration) {
                 assertMethodIs(HttpMethod.Post, it.method)
                 assertPathIs("/signup", it.url.pathAfterVersion())
                 val body = it.body.toJsonElement().jsonObject
@@ -442,7 +445,7 @@ class AuthRequestTest {
             val expectedScopes = listOf("scope1", "scope2")
             val expectedUrlParams = mapOf("key" to "value")
             val providerUrl = "https://example.com"
-            val client = createMockedSupabaseClient(configuration = configuration) {
+            client = createMockedSupabaseClient(configuration = configuration) {
                 val params = it.url.parameters
                 assertEquals(expectedRedirectUrl, params["redirect_to"])
                 assertMethodIs(HttpMethod.Get, it.method)
@@ -476,7 +479,7 @@ class AuthRequestTest {
             val expectedIdToken = "idToken"
             val expectedAccessToken = "accessToken"
             val expectedNonce = "nonce"
-            val client = createMockedSupabaseClient(configuration = configuration) {
+            client = createMockedSupabaseClient(configuration = configuration) {
                 val body = it.body.toJsonElement().jsonObject
                 val params = it.url.parameters
                 assertMethodIs(HttpMethod.Post, it.method)
@@ -504,7 +507,7 @@ class AuthRequestTest {
     fun testUnlinkIdentity() {
         runTest {
             val expectedIdentityId = "identityId"
-            val client = createMockedSupabaseClient(configuration = configuration) {
+            client = createMockedSupabaseClient(configuration = configuration) {
                 assertMethodIs(HttpMethod.Delete, it.method)
                 assertPathIs("/user/identities/$expectedIdentityId", it.url.pathAfterVersion())
                 respondJson(
@@ -522,7 +525,7 @@ class AuthRequestTest {
             val expectedDomain = "https://example.com"
             val expectedCaptchaToken = "captchaToken"
             val expectedUrl = "https://ssourl.com"
-            val client = createMockedSupabaseClient(configuration = configuration) {
+            client = createMockedSupabaseClient(configuration = configuration) {
                 assertMethodIs(HttpMethod.Post, it.method)
                 assertPathIs("/sso", it.url.pathAfterVersion())
                 val body = it.body.toJsonElement().jsonObject
@@ -553,7 +556,7 @@ class AuthRequestTest {
             val expectedProviderId = "providerId"
             val expectedCaptchaToken = "captchaToken"
             val expectedUrl = "https://ssourl.com"
-            val client = createMockedSupabaseClient(configuration = configuration) {
+            client = createMockedSupabaseClient(configuration = configuration) {
                 assertMethodIs(HttpMethod.Post, it.method)
                 assertPathIs("/sso", it.url.pathAfterVersion())
                 val body = it.body.toJsonElement().jsonObject
@@ -587,7 +590,7 @@ class AuthRequestTest {
             }
             val expectedPassword = "password"
             val expectedCurrentPassword = "current"
-            val client = createMockedSupabaseClient(configuration = configuration) {
+            client = createMockedSupabaseClient(configuration = configuration) {
                 assertMethodIs(HttpMethod.Put, it.method)
                 assertPathIs("/user", it.url.pathAfterVersion())
                 val body = it.body.toJsonElement().jsonObject
@@ -619,7 +622,7 @@ class AuthRequestTest {
             val expectedType = OtpType.Email.SIGNUP
             val expectedCaptchaToken = "captchaToken"
             val expectedUrl = "https://example.com"
-            val client = createMockedSupabaseClient(configuration = configuration) {
+            client = createMockedSupabaseClient(configuration = configuration) {
                 assertMethodIs(HttpMethod.Post, it.method)
                 assertPathIs("/resend", it.url.pathAfterVersion())
                 val params = it.url.parameters
@@ -644,7 +647,7 @@ class AuthRequestTest {
             val expectedPhone = "+1234567890"
             val expectedType = OtpType.Phone.PHONE_CHANGE
             val expectedCaptchaToken = "captchaToken"
-            val client = createMockedSupabaseClient(configuration = configuration) {
+            client = createMockedSupabaseClient(configuration = configuration) {
                 assertMethodIs(HttpMethod.Post, it.method)
                 assertPathIs("/resend", it.url.pathAfterVersion())
                 val body = it.body.toJsonElement().jsonObject
@@ -667,7 +670,7 @@ class AuthRequestTest {
             val expectedCaptchaToken = "captchaToken"
             val expectedRedirectUrl = "https://example.com?someParama=true&another=one" // Test that url params aren't stripped away
             val encodedRedirectUrl = "https%3A%2F%2Fexample.com%3FsomeParama%3Dtrue%26another%3Done"
-            val client = createMockedSupabaseClient(configuration = configuration) {
+            client = createMockedSupabaseClient(configuration = configuration) {
                 assertMethodIs(HttpMethod.Post, it.method)
                 assertPathIs("/recover", it.url.pathAfterVersion())
                 val params = it.url.parameters
@@ -692,7 +695,7 @@ class AuthRequestTest {
     @Test
     fun testReauthenticate() {
         runTest {
-            val client = createMockedSupabaseClient(configuration = configuration) {
+            client = createMockedSupabaseClient(configuration = configuration) {
                 assertMethodIs(HttpMethod.Get, it.method)
                 assertPathIs("/reauthenticate", it.url.pathAfterVersion())
                 respond("")
@@ -708,7 +711,7 @@ class AuthRequestTest {
             val expectedToken = "token"
             val expectedEmail = "example@email.com"
             val expectedCaptchaToken = "captchaToken"
-            val client = createMockedSupabaseClient(configuration = configuration) {
+            client = createMockedSupabaseClient(configuration = configuration) {
                 assertMethodIs(HttpMethod.Post, it.method)
                 assertPathIs("/verify", it.url.pathAfterVersion())
                 val body = it.body.toJsonElement().jsonObject
@@ -735,7 +738,7 @@ class AuthRequestTest {
             val expectedToken = "token"
             val expectedEmail = "example@email.com"
             val expectedCaptchaToken = "captchaToken"
-            val client = createMockedSupabaseClient(configuration = configuration) {
+            client = createMockedSupabaseClient(configuration = configuration) {
                 assertMethodIs(HttpMethod.Post, it.method)
                 assertPathIs("/verify", it.url.pathAfterVersion())
                 val body = it.body.toJsonElement().jsonObject
@@ -763,7 +766,7 @@ class AuthRequestTest {
             val expectedType = OtpType.Email.EMAIL
             val expectedTokenHash = "hash"
             val expectedCaptchaToken = "captchaToken"
-            val client = createMockedSupabaseClient(configuration = configuration) {
+            client = createMockedSupabaseClient(configuration = configuration) {
                 assertMethodIs(HttpMethod.Post, it.method)
                 assertPathIs("/verify", it.url.pathAfterVersion())
                 val body = it.body.toJsonElement().jsonObject
@@ -789,7 +792,7 @@ class AuthRequestTest {
             val expectedType = OtpType.Email.EMAIL
             val expectedTokenHash = "hash"
             val expectedCaptchaToken = "captchaToken"
-            val client = createMockedSupabaseClient(configuration = configuration) {
+            client = createMockedSupabaseClient(configuration = configuration) {
                 assertMethodIs(HttpMethod.Post, it.method)
                 assertPathIs("/verify", it.url.pathAfterVersion())
                 val body = it.body.toJsonElement().jsonObject
@@ -817,7 +820,7 @@ class AuthRequestTest {
             val expectedToken = "token"
             val expectedPhone = "+1234567890"
             val expectedCaptchaToken = "captchaToken"
-            val client = createMockedSupabaseClient(configuration = configuration) {
+            client = createMockedSupabaseClient(configuration = configuration) {
                 assertMethodIs(HttpMethod.Post, it.method)
                 assertPathIs("/verify", it.url.pathAfterVersion())
                 val body = it.body.toJsonElement().jsonObject
@@ -841,7 +844,7 @@ class AuthRequestTest {
     fun testRetrieveUser() {
         runTest {
             val expectedJWT = "token"
-            val client = createMockedSupabaseClient(configuration = configuration) {
+            client = createMockedSupabaseClient(configuration = configuration) {
                 assertMethodIs(HttpMethod.Get, it.method)
                 assertPathIs("/user", it.url.pathAfterVersion())
                 assertEquals("Bearer $expectedJWT", it.headers["Authorization"])
@@ -858,7 +861,7 @@ class AuthRequestTest {
     fun testSignOut() {
         runTest {
             val expectedScope = SignOutScope.LOCAL
-            val client = createMockedSupabaseClient(configuration = configuration) {
+            client = createMockedSupabaseClient(configuration = configuration) {
                 assertMethodIs(HttpMethod.Post, it.method)
                 assertPathIs("/logout", it.url.pathAfterVersion())
                 val parameters = it.url.parameters
@@ -887,7 +890,7 @@ class AuthRequestTest {
             }
             val expectedRefreshToken = "refreshToken"
             val expectedSession = userSession()
-            val client = createMockedSupabaseClient(configuration = configurationWithExpiredSession) {
+            client = createMockedSupabaseClient(configuration = configurationWithExpiredSession) {
                 assertMethodIs(HttpMethod.Post, it.method)
                 assertPathIs("/token", it.url.pathAfterVersion())
                 val parameters = it.url.parameters
@@ -918,7 +921,7 @@ class AuthRequestTest {
             }
             val expectedRefreshToken = "refreshToken"
             val expectedSession = userSession()
-            val client = createMockedSupabaseClient(configuration = configurationWithExpiredSession) {
+            client = createMockedSupabaseClient(configuration = configurationWithExpiredSession) {
                 assertMethodIs(HttpMethod.Post, it.method)
                 assertPathIs("/token", it.url.pathAfterVersion())
                 val parameters = it.url.parameters
@@ -943,7 +946,7 @@ class AuthRequestTest {
     fun testGetClaimsHS256() {
         runTest {
             val jwt = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWUsImlhdCI6MTUxNjIzOTAyMn0.KMUFsIDTnFmyG3nMiGM6H9FNFUROf3wh7SmqJp-QV30"
-            val client = createMockedSupabaseClient(configuration = configuration) {
+            client = createMockedSupabaseClient(configuration = configuration) {
                 assertMethodIs(HttpMethod.Get, it.method)
                 assertPathIs("/user", it.url.pathAfterVersion())
                 assertEquals("Bearer $jwt", it.headers["Authorization"])
@@ -965,7 +968,7 @@ class AuthRequestTest {
         runTest {
             val jwt = "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6InRlc3Qta2V5LWlkIn0.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWUsImlhdCI6MTUxNjIzOTAyMn0.dGVzdC1zaWduYXR1cmU"
             var jwksFetched = false
-            val client = createMockedSupabaseClient(configuration = configuration) {
+            client = createMockedSupabaseClient(configuration = configuration) {
                 when {
                     it.url.encodedPath.contains(".well-known/jwks.json") -> {
                         jwksFetched = true
@@ -1048,6 +1051,15 @@ class AuthRequestTest {
     private suspend fun SupabaseClient.awaitInit(): SupabaseClient {
         auth.awaitInitialization()
         return this
+    }
+
+    @AfterTest
+    fun cleanup() {
+        runTest {
+            if(::client.isInitialized) {
+                client.close()
+            }
+        }
     }
 
 }

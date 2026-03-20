@@ -1,4 +1,3 @@
-import io.github.jan.supabase.auth.AuthImpl
 import io.github.jan.supabase.auth.setupPlatform
 import io.github.jan.supabase.auth.status.SessionStatus
 import kotlinx.coroutines.test.runTest
@@ -9,17 +8,19 @@ class PlatformSetupTest {
 
     @kotlin.test.Test
     fun testPlatformSetupTestNoAutoLoad() = runTest {
-        val auth = createMinimalAuthClient(autoSetup = false)
-        auth.setupPlatform()
-        assertIs<SessionStatus.NotAuthenticated>(auth.sessionStatus.value)
+        val auth = createMinimalAuthClient(autoSetup = false) {
+            it.setupPlatform()
+            assertIs<SessionStatus.NotAuthenticated>(it.sessionStatus.value)
+        }
     }
 
     @kotlin.test.Test
     fun testPlatformSetupTestAutoLoad() =  runTest {
-        val auth = createMinimalAuthClient(autoSetup = true) as AuthImpl
-        assertEquals(SessionStatus.Initializing, auth.sessionStatus.value)
-        auth.setupPlatform()
-        assertIs<SessionStatus.NotAuthenticated>(auth.sessionStatus.value)
+        val auth = createMinimalAuthClient(autoSetup = true) {
+            assertEquals(SessionStatus.Initializing, it.sessionStatus.value)
+            it.setupPlatform()
+            assertIs<SessionStatus.NotAuthenticated>(it.sessionStatus.value)
+        }
     }
 
 }

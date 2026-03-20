@@ -126,12 +126,12 @@ class PostgrestFilterBuilderTest {
         val query = buildMap {
             put("column1", 1)
             put("column2", "string")
-            put("column3", 3.0f)
+            put("column3", 3.5f)
         }
         val filter = filterToString {
             match(query)
         }
-        assertEquals("column1=eq.1&column2=eq.string&column3=eq.3.0", filter)
+        assertEquals("column1=eq.1&column2=eq.string&column3=eq.3.5", filter)
     }
 
     @Test

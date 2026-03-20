@@ -27,3 +27,23 @@ fun createMockedSupabaseClient(
         configuration()
     }
 }
+
+suspend fun <T> withMockedSupabaseClient(
+    supabaseUrl: String = "https://projectref.supabase.co",
+    supabaseKey: String = "project-anon-key",
+    configuration: SupabaseClientBuilder.() -> Unit = {},
+    requestHandler: suspend MockRequestHandleScope.(HttpRequestData) -> HttpResponseData = { respond("") },
+    clientHandler: suspend (SupabaseClient) -> T,
+): T {
+    val client = createMockedSupabaseClient(
+        supabaseUrl = supabaseUrl,
+        supabaseKey = supabaseKey,
+        configuration = configuration,
+        requestHandler = requestHandler
+    )
+    return try {
+        clientHandler(client)
+    } finally {
+        client.close()
+    }
+}

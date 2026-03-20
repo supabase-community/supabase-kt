@@ -1,3 +1,4 @@
+import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.SupabaseClientBuilder
 import io.github.jan.supabase.auth.Auth
 import io.github.jan.supabase.auth.auth
@@ -14,6 +15,7 @@ import kotlinx.serialization.json.add
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
 import kotlinx.serialization.json.putJsonArray
+import kotlin.test.AfterTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFails
@@ -28,11 +30,13 @@ class AuthRestExceptionTest {
             minimalConfig()
         }
     }
+    
+    private lateinit var client: SupabaseClient
 
     @Test
     fun testErrorsWithErrorCode() {
         runTest {
-            val client = createMockedSupabaseClient(
+            client = createMockedSupabaseClient(
                 configuration = configuration,
                 requestHandler = {
                     respondJson(
@@ -58,7 +62,7 @@ class AuthRestExceptionTest {
     @Test
     fun testPasswordWeakAuthRestException() {
         runTest {
-            val client = createMockedSupabaseClient(
+            client = createMockedSupabaseClient(
                 configuration = configuration,
                 requestHandler = {
                     respondJson(
@@ -91,7 +95,7 @@ class AuthRestExceptionTest {
     @Test
     fun testErrorsWithoutErrorCode() {
         runTest {
-            val client = createMockedSupabaseClient(
+            client = createMockedSupabaseClient(
                 configuration = configuration,
                 requestHandler = {
                     respondJson(
@@ -110,6 +114,15 @@ class AuthRestExceptionTest {
             }
             assertIsNot<AuthRestException>(exception)
             assertIs<BadRequestRestException>(exception)
+        }
+    }
+
+    @AfterTest
+    fun cleanup() {
+        runTest {
+            if(::client.isInitialized) {
+                client.close()
+            }
         }
     }
 
