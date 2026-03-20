@@ -1,16 +1,21 @@
+import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.decode
 import io.github.jan.supabase.encode
 import io.github.jan.supabase.serializer.MoshiSerializer
 import io.github.jan.supabase.testing.createMockedSupabaseClient
+import kotlinx.coroutines.test.runTest
 import org.junit.Test
+import kotlin.test.AfterTest
 import kotlin.test.assertEquals
 
 class MoshiSerializerTest {
 
+    private lateinit var supabaseClient: SupabaseClient
+    
     @Test
     fun testMoshiSerializer() {
         val serializer = MoshiSerializer()
-        val supabaseClient = createMockedSupabaseClient(
+        supabaseClient = createMockedSupabaseClient(
             configuration = {
                 defaultSerializer = serializer
             }
@@ -25,7 +30,7 @@ class MoshiSerializerTest {
     @Test
     fun testMoshiSerializerForNulls() {
         val serializer = MoshiSerializer()
-        val supabaseClient = createMockedSupabaseClient(
+        supabaseClient = createMockedSupabaseClient(
             configuration = {
                 defaultSerializer = serializer
             })
@@ -34,5 +39,14 @@ class MoshiSerializerTest {
         val encoded = serializer.encode(value)
         val decoded = serializer.decode<Map<String, String?>>(encoded)
         assertEquals(value, decoded)
+    }
+
+    @AfterTest
+    fun cleanup() {
+        runTest {
+            if(::supabaseClient.isInitialized) {
+                supabaseClient.close()
+            }
+        }
     }
 }

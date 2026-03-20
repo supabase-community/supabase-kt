@@ -1,4 +1,5 @@
 import app.cash.turbine.test
+import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.SupabaseClientBuilder
 import io.github.jan.supabase.auth.Auth
 import io.github.jan.supabase.auth.MemorySessionManager
@@ -23,6 +24,7 @@ import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.json.buildJsonObject
+import kotlin.test.AfterTest
 import kotlin.test.Test
 import kotlin.test.assertContains
 import kotlin.test.assertEquals
@@ -38,11 +40,12 @@ class AuthTest {
             minimalConfig()
         }
     }
+    private lateinit var client: SupabaseClient
 
     @Test
     fun testLoadingSessionFromStorage() = runTest {
         val sessionManager = MemorySessionManager(userSession())
-        val client = createMockedSupabaseClient(
+        client = createMockedSupabaseClient(
             configuration = {
                 install(Auth) {
                     minimalConfig()
@@ -73,7 +76,7 @@ class AuthTest {
     fun testSavingSessionToStorage() {
         runTest {
             val sessionManager = MemorySessionManager()
-            val client = createMockedSupabaseClient(
+            client = createMockedSupabaseClient(
                 configuration = {
                     install(Auth) {
                         minimalConfig()
@@ -96,7 +99,7 @@ class AuthTest {
     fun testImportExpiredSession() {
         runTest {
             val newSession = userSession()
-            val client = createMockedSupabaseClient(configuration = {
+            client = createMockedSupabaseClient(configuration = {
                 install(Auth) {
                     minimalConfig()
                     alwaysAutoRefresh = true
@@ -123,7 +126,7 @@ class AuthTest {
     fun testAutoRefreshSession() {
         runTest {
             val newSession = userSession()
-            val client = createMockedSupabaseClient(configuration = {
+            client = createMockedSupabaseClient(configuration = {
                 install(Auth) {
                     minimalConfig()
                     autoLoadFromStorage = false
@@ -153,7 +156,7 @@ class AuthTest {
     fun testAutoRefreshFailureNetworkValidSession() {
         runTest {
             val newSession = userSession()
-            val client = createMockedSupabaseClient(configuration = {
+            client = createMockedSupabaseClient(configuration = {
                 install(Auth) {
                     minimalConfig()
                     alwaysAutoRefresh = true
@@ -179,7 +182,7 @@ class AuthTest {
     @Test
     fun testAutoRefreshFailureServerErrorValidSession() {
         runTest {
-            val client = createMockedSupabaseClient(configuration = {
+            client = createMockedSupabaseClient(configuration = {
                 install(Auth) {
                     minimalConfig()
                     alwaysAutoRefresh = true
@@ -207,7 +210,7 @@ class AuthTest {
         runTest {
             var first = true
             val newSession = userSession()
-            val client = createMockedSupabaseClient(configuration = {
+            client = createMockedSupabaseClient(configuration = {
                 install(Auth) {
                     minimalConfig()
                     alwaysAutoRefresh = false
@@ -241,7 +244,7 @@ class AuthTest {
             val encodedRedirectUrl = "https%3A%2F%2Fexample.com%3FsomeParama%3Dtrue%26another%3Done"
             val endpoint = "authorize/custom/endpoint"
             val supabaseUrl = "https://id.supabase.co"
-            val client = createMockedSupabaseClient(supabaseUrl = supabaseUrl, configuration = configuration)
+            client = createMockedSupabaseClient(supabaseUrl = supabaseUrl, configuration = configuration)
             client.auth.awaitInitialization()
             val url = Url(client.auth.getOAuthUrl(expectedProvider, expectedRedirectUrl, endpoint) {
                 queryParams["key"] = "value.!.,with?special"
@@ -283,7 +286,7 @@ class AuthTest {
     @Test
     fun testSessionMethods() {
         runTest {
-            val client = createMockedSupabaseClient(configuration = configuration)
+            client = createMockedSupabaseClient(configuration = configuration)
             client.auth.awaitInitialization()
             val expectedIdentities = listOf(Identity("id", buildJsonObject {  }, provider = "provider", userId = "userId"))
             val expectedUser = UserInfo(
@@ -311,13 +314,22 @@ class AuthTest {
     @Test
     fun testClearSession() {
         runTest {
-            val client = createMockedSupabaseClient(configuration = configuration)
+            client = createMockedSupabaseClient(configuration = configuration)
             client.auth.awaitInitialization()
             val session = userSession()
             client.auth.importSession(session)
             assertIs<SessionStatus.Authenticated>(client.auth.sessionStatus.value)
             client.auth.clearSession()
             assertIs<SessionStatus.NotAuthenticated>(client.auth.sessionStatus.value)
+        }
+    }
+
+    @AfterTest
+    fun cleanup() {
+        runTest {
+            if(::client.isInitialized) {
+                client.close()
+            }
         }
     }
 
