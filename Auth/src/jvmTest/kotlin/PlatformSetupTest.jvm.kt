@@ -7,7 +7,7 @@ class PlatformSetupTest {
 
     @kotlin.test.Test
     fun testPlatformSetupTestNoAutoLoad() = runTest {
-        val auth = createMinimalAuthClient(autoSetup = false) {
+        createMinimalAuthClient(autoSetup = false) {
             it.setupPlatform()
             assertIs<SessionStatus.NotAuthenticated>(it.sessionStatus.value)
         }
