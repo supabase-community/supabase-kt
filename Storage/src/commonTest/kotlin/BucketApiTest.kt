@@ -571,7 +571,7 @@ class BucketApiTest {
         for(code in statusCodes) {
             runTest {
                 val expectedPath = "data.png"
-                val client = createMockedSupabaseClient(configuration = configureClient) {
+                client = createMockedSupabaseClient(configuration = configureClient) {
                     assertMethodIs(HttpMethod.Head, it.method)
                     assertPathIs("/object/$bucketId/$expectedPath", it.url.pathAfterVersion())
                     respondError(HttpStatusCode(code, "Not Found"))

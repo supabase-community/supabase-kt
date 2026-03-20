@@ -1,5 +1,6 @@
 package api
 
+import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.SupabaseClientBuilder
 import io.github.jan.supabase.auth.Auth
 import io.github.jan.supabase.auth.api.authenticatedSupabaseApi
@@ -10,6 +11,7 @@ import io.github.jan.supabase.testing.createMockedSupabaseClient
 import io.ktor.client.engine.mock.respond
 import io.ktor.client.request.header
 import kotlinx.coroutines.test.runTest
+import kotlin.test.AfterTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
@@ -21,6 +23,7 @@ class AuthenticatedApiExtensionTests {
             minimalConfig()
         }
     }
+    private lateinit var client: SupabaseClient
 
     @Test
     fun testBaseUrlOverloadWithBuilderOptions() = runTest {
@@ -28,7 +31,7 @@ class AuthenticatedApiExtensionTests {
         val expectedHeaderName = "X-Builder-Header"
         val expectedHeaderValue = "builder-value"
 
-        val client = createMockedSupabaseClient(configuration = configuration) {
+        client = createMockedSupabaseClient(configuration = configuration) {
             assertEquals("Bearer $expectedToken", it.headers["Authorization"])
             assertEquals(expectedHeaderValue, it.headers[expectedHeaderName])
             assertTrue(it.url.toString().contains("https://api.example.com/test"))
@@ -54,7 +57,7 @@ class AuthenticatedApiExtensionTests {
     fun testResolveExtensionAddsPathPrefix() = runTest {
         val expectedToken = "test-access-token"
 
-        val client = createMockedSupabaseClient(configuration = configuration) {
+        client = createMockedSupabaseClient(configuration = configuration) {
             assertEquals("Bearer $expectedToken", it.headers["Authorization"])
             assertTrue(it.url.toString().contains("https://api.example.com/nested/test"))
             respond("")
@@ -77,7 +80,7 @@ class AuthenticatedApiExtensionTests {
         val firstHeader = "X-Default-1"
         val secondHeader = "X-Default-2"
 
-        val client = createMockedSupabaseClient(configuration = configuration) {
+        client = createMockedSupabaseClient(configuration = configuration) {
             assertEquals("Bearer $expectedToken", it.headers["Authorization"])
             assertEquals("a", it.headers[firstHeader])
             assertEquals("b", it.headers[secondHeader])
@@ -110,4 +113,14 @@ class AuthenticatedApiExtensionTests {
         tokenType = "Bearer",
         user = null
     )
+
+    @AfterTest
+    fun cleanup() {
+        runTest {
+            if(::client.isInitialized) {
+                client.close()
+            }
+        }
+    }
+
 }

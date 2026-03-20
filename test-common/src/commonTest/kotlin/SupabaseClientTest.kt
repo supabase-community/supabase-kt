@@ -6,6 +6,7 @@ import io.github.jan.supabase.testing.createMockedSupabaseClient
 import io.github.jan.supabase.testing.withMockedSupabaseClient
 import io.ktor.client.engine.mock.respond
 import kotlinx.coroutines.test.runTest
+import kotlin.test.AfterTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertIs
@@ -13,6 +14,8 @@ import kotlin.test.assertNotNull
 
 class SupabaseClientTest {
 
+    private lateinit var client: SupabaseClient
+    
     @Test
     fun testClientInfoHeader() {
         runTest {
@@ -65,7 +68,7 @@ class SupabaseClientTest {
     @Test
     fun testAccessTokenProvider() {
         runTest {
-            val client = createMockedSupabaseClient(
+            client = createMockedSupabaseClient(
                 configuration = {
                     accessToken = {
                         "myToken"
@@ -92,7 +95,7 @@ class SupabaseClientTest {
 
     @Test
     fun testDefaultSerializer() {
-        val client = createMockedSupabaseClient(
+        client = createMockedSupabaseClient(
             configuration = {
                 defaultSerializer = DummySerializer()
             }
@@ -102,7 +105,7 @@ class SupabaseClientTest {
 
     @Test
     fun testClientBuilderParametersWithHttpsUrl() {
-        val client = createMockedSupabaseClient(
+        client = createMockedSupabaseClient(
             supabaseUrl = "https://example.supabase.co",
             supabaseKey = "somekey"
         )
@@ -117,7 +120,7 @@ class SupabaseClientTest {
 
     @Test
     fun testClientBuilderPlugins() {
-        val client = createMockedSupabaseClient(
+        client = createMockedSupabaseClient(
             supabaseUrl = "example.supabase.co",
             supabaseKey = "somekey",
             configuration =  {
@@ -135,6 +138,15 @@ class SupabaseClientTest {
             client.supabaseHttpUrl,
             "Supabase http url should be https://example.supabase.co because the plugin modifies it"
         )
+    }
+
+    @AfterTest
+    fun cleanup() {
+        runTest {
+            if(::client.isInitialized) {
+                client.close()
+            }
+        }
     }
 
 }

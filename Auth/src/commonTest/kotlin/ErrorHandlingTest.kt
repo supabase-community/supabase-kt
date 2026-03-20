@@ -1,4 +1,5 @@
 import app.cash.turbine.test
+import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.auth.Auth
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.auth.event.AuthEvent
@@ -11,6 +12,7 @@ import io.github.jan.supabase.auth.user.UserSession
 import io.github.jan.supabase.testing.createMockedSupabaseClient
 import io.ktor.http.Url
 import kotlinx.coroutines.test.runTest
+import kotlin.test.AfterTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
@@ -22,6 +24,8 @@ import kotlin.time.Duration.Companion.seconds
 
 class ErrorHandlingTest {
 
+    private lateinit var supabase: SupabaseClient
+    
     // Tests for checkForUrlParameterError
     @Test
     fun testCheckForUrlParameterErrorWithAllParameters() {
@@ -77,7 +81,7 @@ class ErrorHandlingTest {
     fun testHandledUrlParameterErrorWithValidError() = runTest {
         val url =
             Url("https://example.com/?error=invalid_request&error_code=otp_expired&error_description=Invalid+request")
-        val supabase = createMockedSupabaseClient(
+        supabase = createMockedSupabaseClient(
             configuration = {
                 install(Auth) {
                     minimalConfig()
@@ -102,7 +106,7 @@ class ErrorHandlingTest {
     @Test
     fun testHandledUrlParameterErrorWithNoError() = runTest {
         val url = Url("https://example.com/")
-        val supabase = createMockedSupabaseClient(
+        supabase = createMockedSupabaseClient(
             configuration = {
                 install(Auth) {
                     minimalConfig()
@@ -124,7 +128,7 @@ class ErrorHandlingTest {
 
     @Test
     fun testHandledUrlParameterErrorWithEmptyParameters() = runTest {
-        val supabase = createMockedSupabaseClient(
+        supabase = createMockedSupabaseClient(
             configuration = {
                 install(Auth) {
                     minimalConfig()
@@ -135,6 +139,15 @@ class ErrorHandlingTest {
         val handled = supabase.auth.handledUrlParameterError { null }
 
         assertFalse { handled }
+    }
+
+    @AfterTest
+    fun cleanup() {
+        runTest {
+            if(::supabase.isInitialized) {
+                supabase.close()
+            }
+        }
     }
 
 }
