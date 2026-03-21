@@ -6,3 +6,5 @@
 local.properties
 .kotlin
 kotlin-js-store
+integration-test/supabase/.temp/
+integration-test/supabase/.branches/

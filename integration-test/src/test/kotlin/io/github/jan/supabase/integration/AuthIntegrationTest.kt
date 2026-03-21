@@ -1,0 +1,117 @@
+package io.github.jan.supabase.integration
+
+import io.github.jan.supabase.auth.auth
+import io.github.jan.supabase.auth.providers.builtin.Email
+import io.github.jan.supabase.auth.status.SessionStatus
+import io.github.jan.supabase.exceptions.RestException
+import kotlinx.coroutines.test.runTest
+import org.junit.jupiter.api.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertIs
+import kotlin.test.assertNotNull
+import kotlin.test.assertFailsWith
+
+class AuthIntegrationTest : IntegrationTestBase() {
+
+    @Test
+    fun testSignUpWithEmail() = runTest {
+        val client = createTestClient()
+        val email = "signup-${System.nanoTime()}@example.com"
+        val password = "test-password-123!"
+
+        client.auth.signUpWith(Email) {
+            this.email = email
+            this.password = password
+        }
+
+        val status = client.auth.sessionStatus.value
+        assertIs<SessionStatus.Authenticated>(status)
+        assertNotNull(status.session.accessToken)
+    }
+
+    @Test
+    fun testSignInWithEmail() = runTest {
+        val client = createTestClient()
+        val email = "signin-${System.nanoTime()}@example.com"
+        val password = "test-password-123!"
+
+        // Sign up first
+        client.auth.signUpWith(Email) {
+            this.email = email
+            this.password = password
+        }
+        client.auth.signOut()
+
+        // Sign in
+        client.auth.signInWith(Email) {
+            this.email = email
+            this.password = password
+        }
+
+        val status = client.auth.sessionStatus.value
+        assertIs<SessionStatus.Authenticated>(status)
+        assertNotNull(status.session.accessToken)
+        assertNotNull(status.session.refreshToken)
+    }
+
+    @Test
+    fun testSignOut() = runTest {
+        val client = createAuthenticatedClient()
+
+        assertIs<SessionStatus.Authenticated>(client.auth.sessionStatus.value)
+
+        client.auth.signOut()
+
+        assertIs<SessionStatus.NotAuthenticated>(client.auth.sessionStatus.value)
+    }
+
+    @Test
+    fun testGetUser() = runTest {
+        val client = createAuthenticatedClient()
+
+        val user = client.auth.retrieveUserForCurrentSession()
+
+        assertNotNull(user.id)
+        assertNotNull(user.email)
+    }
+
+    @Test
+    fun testUpdateUser() = runTest {
+        val client = createAuthenticatedClient()
+
+        val updatedUser = client.auth.updateUser {
+            data {
+                put("display_name", kotlinx.serialization.json.JsonPrimitive("Test User"))
+            }
+        }
+
+        assertNotNull(updatedUser.userMetadata)
+        assertEquals(
+            "Test User",
+            updatedUser.userMetadata?.get("display_name")?.let {
+                (it as? kotlinx.serialization.json.JsonPrimitive)?.content
+            }
+        )
+    }
+
+    @Test
+    fun testSignUpDuplicateEmail() = runTest {
+        val client = createTestClient()
+        val email = "duplicate-${System.nanoTime()}@example.com"
+        val password = "test-password-123!"
+
+        client.auth.signUpWith(Email) {
+            this.email = email
+            this.password = password
+        }
+
+        // Create a second client to attempt duplicate signup
+        val client2 = createTestClient()
+        assertFailsWith<RestException> {
+            client2.auth.signUpWith(Email) {
+                this.email = email
+                this.password = password
+            }
+        }
+    }
+}

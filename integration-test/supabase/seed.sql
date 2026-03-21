@@ -1,0 +1,1 @@
+-- Seed file placeholder: integration tests create their own data
