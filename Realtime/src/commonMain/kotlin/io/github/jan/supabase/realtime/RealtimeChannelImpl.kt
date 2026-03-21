@@ -233,6 +233,9 @@ internal class RealtimeChannelImpl(
         awaitClose { callbackManager.removeCallbackById(id) }
     }
 
+    @OptIn(SupabaseInternal::class)
+    override fun presenceState(): Map<String, Presence> = callbackManager.presenceState()
+
     override fun presenceChangeFlow(): Flow<PresenceAction> = callbackFlow {
         val callback: (PresenceAction) -> Unit = { action ->
             trySend(action)

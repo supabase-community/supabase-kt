@@ -419,6 +419,52 @@ class RealtimeChannelTest {
         }
     }
 
+    @Test
+    fun testPresenceStateUpdatedOnPresenceEvents() {
+        val channelId = "channelId"
+        runTest {
+            createTestClient(
+                wsHandler = { i, o ->
+                    handleSubscribe(i, o, channelId, true)
+                    // Send presence join for user1 and user2, then leave for user1
+                    o.sendPresence(
+                        channelId,
+                        mapOf(
+                            "user1" to Presence("ref1", buildJsonObject { put("name", "Alice") }),
+                            "user2" to Presence("ref2", buildJsonObject { put("name", "Bob") })
+                        ),
+                        mapOf()
+                    )
+                    o.sendPresence(
+                        channelId,
+                        mapOf(),
+                        mapOf("user1" to Presence("ref1", buildJsonObject { put("name", "Alice") }))
+                    )
+                },
+                supabaseHandler = {
+                    val channel = it.channel(channelId)
+                    assertEquals(emptyMap(), channel.presenceState())
+                    coroutineScope {
+                        launch {
+                            channel.presenceChangeFlow().test(FLOW_TIMEOUT) {
+                                // Consume both presence events (join + leave)
+                                awaitItem()
+                                awaitItem()
+                                // After all events: only user2 should remain
+                                assertEquals(1, channel.presenceState().size)
+                                assertEquals(null, channel.presenceState()["user1"])
+                                assertEquals("ref2", channel.presenceState()["user2"]?.presenceRef)
+                            }
+                        }
+                        launch {
+                            channel.subscribe(true)
+                        }
+                    }.join()
+                }
+            )
+        }
+    }
+
     //For more complex tests we need integration tests
 
     private fun RealtimeChannel.flowFromEventType(event: String, schema: String, table: String, filter: FilterOperation): Flow<PostgresAction> {

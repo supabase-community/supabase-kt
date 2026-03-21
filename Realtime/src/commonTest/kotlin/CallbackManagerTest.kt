@@ -62,6 +62,68 @@ class CallbackManagerTest {
     }
 
     @Test
+    fun testPresenceStateTracksJoins() {
+        val cm = CallbackManagerImpl()
+        val presence1 = Presence("ref1", buildJsonObject { put("name", "Alice") })
+        val presence2 = Presence("ref2", buildJsonObject { put("name", "Bob") })
+
+        assertTrue(cm.presenceState().isEmpty())
+
+        cm.triggerPresenceDiff(mapOf("user1" to presence1), mapOf())
+        assertEquals(mapOf("user1" to presence1), cm.presenceState())
+
+        cm.triggerPresenceDiff(mapOf("user2" to presence2), mapOf())
+        assertEquals(mapOf("user1" to presence1, "user2" to presence2), cm.presenceState())
+    }
+
+    @Test
+    fun testPresenceStateTracksLeaves() {
+        val cm = CallbackManagerImpl()
+        val presence1 = Presence("ref1", buildJsonObject { put("name", "Alice") })
+        val presence2 = Presence("ref2", buildJsonObject { put("name", "Bob") })
+
+        cm.triggerPresenceDiff(mapOf("user1" to presence1, "user2" to presence2), mapOf())
+        assertEquals(2, cm.presenceState().size)
+
+        cm.triggerPresenceDiff(mapOf(), mapOf("user1" to presence1))
+        assertEquals(mapOf("user2" to presence2), cm.presenceState())
+    }
+
+    @Test
+    fun testPresenceStateHandlesJoinAndLeaveInSameDiff() {
+        val cm = CallbackManagerImpl()
+        val presence1 = Presence("ref1", buildJsonObject { put("name", "Alice") })
+        val presence2 = Presence("ref2", buildJsonObject { put("name", "Bob") })
+
+        cm.triggerPresenceDiff(mapOf("user1" to presence1), mapOf())
+        cm.triggerPresenceDiff(mapOf("user2" to presence2), mapOf("user1" to presence1))
+        assertEquals(mapOf("user2" to presence2), cm.presenceState())
+    }
+
+    @Test
+    fun testPresenceStateUpdatesExistingKey() {
+        val cm = CallbackManagerImpl()
+        val presence1 = Presence("ref1", buildJsonObject { put("name", "Alice") })
+        val presence1Updated = Presence("ref1", buildJsonObject { put("name", "Alice Updated") })
+
+        cm.triggerPresenceDiff(mapOf("user1" to presence1), mapOf())
+        cm.triggerPresenceDiff(mapOf("user1" to presence1Updated), mapOf())
+        assertEquals(mapOf("user1" to presence1Updated), cm.presenceState())
+    }
+
+    @Test
+    fun testPresenceStateResetOnReset() {
+        val cm = CallbackManagerImpl()
+        val presence1 = Presence("ref1", buildJsonObject { put("name", "Alice") })
+
+        cm.triggerPresenceDiff(mapOf("user1" to presence1), mapOf())
+        assertFalse(cm.presenceState().isEmpty())
+
+        cm.reset()
+        assertTrue(cm.presenceState().isEmpty())
+    }
+
+    @Test
     fun testPostgresCallbacks() {
         val events = listOf("INSERT", "UPDATE", "DELETE", "*")
         for(event in events) {

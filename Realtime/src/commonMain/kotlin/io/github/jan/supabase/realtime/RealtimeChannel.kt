@@ -87,6 +87,20 @@ interface RealtimeChannel {
     fun <T : Any> RealtimeChannel.broadcastFlowInternal(type: KType, event: String): Flow<T>
 
     /**
+     * Returns the current presence state as a map of keys to [Presence] objects.
+     * This is a snapshot of all currently tracked presences in the channel.
+     *
+     * Example:
+     * ```kotlin
+     * val state = channel.presenceState()
+     * state.forEach { (key, presence) ->
+     *     println("$key is present with state: ${presence.state}")
+     * }
+     * ```
+     */
+    fun presenceState(): Map<String, Presence>
+
+    /**
      * Listen for clients joining / leaving the channel using presences
      *
      * Example:
