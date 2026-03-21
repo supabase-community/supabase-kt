@@ -3,6 +3,7 @@ package io.github.jan.supabase.integration
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.postgrest.from
 import kotlinx.coroutines.test.runTest
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
@@ -15,8 +16,8 @@ class PostgrestIntegrationTest : IntegrationTestBase() {
         val id: String? = null,
         val name: String,
         val description: String? = null,
-        val user_id: String? = null,
-        val created_at: String? = null
+        @SerialName("user_id") val userId: String? = null,
+        @SerialName("created_at") val createdAt: String? = null
     )
 
     @Test
@@ -25,7 +26,7 @@ class PostgrestIntegrationTest : IntegrationTestBase() {
         val userId = client.auth.currentUserOrNull()?.id
 
         val itemName = "test-item-${System.nanoTime()}"
-        client.from("test_items").insert(TestItem(name = itemName, description = "A test item", user_id = userId))
+        client.from("test_items").insert(TestItem(name = itemName, description = "A test item", userId = userId))
 
         val items = client.from("test_items").select {
             filter {
@@ -44,7 +45,7 @@ class PostgrestIntegrationTest : IntegrationTestBase() {
         val userId = client.auth.currentUserOrNull()?.id
 
         val itemName = "update-test-${System.nanoTime()}"
-        client.from("test_items").insert(TestItem(name = itemName, description = "original", user_id = userId))
+        client.from("test_items").insert(TestItem(name = itemName, description = "original", userId = userId))
 
         client.from("test_items").update({
             set("description", "updated")
@@ -69,7 +70,7 @@ class PostgrestIntegrationTest : IntegrationTestBase() {
         val userId = client.auth.currentUserOrNull()?.id
 
         val itemName = "delete-test-${System.nanoTime()}"
-        client.from("test_items").insert(TestItem(name = itemName, description = "to delete", user_id = userId))
+        client.from("test_items").insert(TestItem(name = itemName, description = "to delete", userId = userId))
 
         client.from("test_items").delete {
             filter {
@@ -92,7 +93,7 @@ class PostgrestIntegrationTest : IntegrationTestBase() {
         val userIdA = clientA.auth.currentUserOrNull()?.id
 
         val itemName = "rls-test-${System.nanoTime()}"
-        clientA.from("test_items").insert(TestItem(name = itemName, description = "user A's item", user_id = userIdA))
+        clientA.from("test_items").insert(TestItem(name = itemName, description = "user A's item", userId = userIdA))
 
         // User B should not see User A's items
         val clientB = createAuthenticatedClient()
@@ -113,9 +114,9 @@ class PostgrestIntegrationTest : IntegrationTestBase() {
 
         // Insert multiple items
         client.from("test_items").insert(listOf(
-            TestItem(name = "${prefix}-alpha", description = "first", user_id = userId),
-            TestItem(name = "${prefix}-beta", description = "second", user_id = userId),
-            TestItem(name = "${prefix}-gamma", description = "third", user_id = userId)
+            TestItem(name = "${prefix}-alpha", description = "first", userId = userId),
+            TestItem(name = "${prefix}-beta", description = "second", userId = userId),
+            TestItem(name = "${prefix}-gamma", description = "third", userId = userId)
         ))
 
         // Test eq filter
@@ -141,7 +142,7 @@ class PostgrestIntegrationTest : IntegrationTestBase() {
         val authClient = createAuthenticatedClient()
         val userId = authClient.auth.currentUserOrNull()?.id
         val itemName = "anon-test-${System.nanoTime()}"
-        authClient.from("test_items").insert(TestItem(name = itemName, description = "visible to anon", user_id = userId))
+        authClient.from("test_items").insert(TestItem(name = itemName, description = "visible to anon", userId = userId))
 
         // Read as anon
         val anonClient = createTestClient()

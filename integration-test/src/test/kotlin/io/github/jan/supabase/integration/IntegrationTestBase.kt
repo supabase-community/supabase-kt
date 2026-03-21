@@ -1,6 +1,7 @@
 package io.github.jan.supabase.integration
 
 import io.github.jan.supabase.SupabaseClient
+import io.github.jan.supabase.SupabaseClientBuilder
 import io.github.jan.supabase.auth.Auth
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.auth.providers.builtin.Email
@@ -24,7 +25,7 @@ abstract class IntegrationTestBase {
 
     fun createTestClient(
         key: String = supabaseAnonKey,
-        configure: io.github.jan.supabase.SupabaseClientBuilder.() -> Unit = {}
+        configure: SupabaseClientBuilder.() -> Unit = {}
     ): SupabaseClient {
         val client = createSupabaseClient(supabaseUrl, key) {
             install(Auth) {

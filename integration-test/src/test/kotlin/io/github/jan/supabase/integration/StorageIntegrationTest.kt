@@ -6,6 +6,7 @@ import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Test
 import kotlin.test.assertContentEquals
 import kotlin.test.assertFailsWith
+import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 class StorageIntegrationTest : IntegrationTestBase() {
@@ -39,10 +40,7 @@ class StorageIntegrationTest : IntegrationTestBase() {
         bucket.upload(path, content)
         bucket.delete(path)
 
-        // Verify file is gone by attempting to download
-        assertFailsWith<RestException> {
-            bucket.downloadAuthenticated(path)
-        }
+        assertFalse(bucket.exists(path))
     }
 
     @Test
