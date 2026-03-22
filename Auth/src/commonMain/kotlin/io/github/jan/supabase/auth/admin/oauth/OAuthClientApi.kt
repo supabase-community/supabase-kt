@@ -61,7 +61,7 @@ internal class OAuthClientApiImpl(val api: AuthenticatedSupabaseApi) : OAuthClie
         return api.get("admin/oauth/clients") {
             page?.let { url.parameters.append("page", it.toString()) }
             perPage?.let { url.parameters.append("per_page", it.toString()) }
-        }.safeBody()
+        }.safeBody<OAuthClientListResponse>().clients
     }
 
     override suspend fun createClient(builder: CreateOAuthClientBuilder.() -> Unit): OAuthClient {

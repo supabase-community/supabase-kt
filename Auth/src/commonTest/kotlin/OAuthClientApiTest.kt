@@ -35,7 +35,6 @@ class OAuthClientApiTest {
     }
 
     private val sampleClient = OAuthClient(
-        id = "test-id",
         clientId = "test-client-id",
         clientSecret = "test-secret",
         clientName = "Test App",
@@ -62,7 +61,7 @@ class OAuthClientApiTest {
                 assertEquals(page.toString(), params["page"])
                 assertEquals(perPage.toString(), params["per_page"])
                 respondJson(
-                    Json.encodeToJsonElement(listOf(sampleClient))
+                    """{"clients": ${Json.encodeToString(listOf(sampleClient))}}"""
                 )
             }
             val clients = client.auth.admin.oauth.listClients(page = page, perPage = perPage)
@@ -176,7 +175,6 @@ class OAuthClientApiTest {
     fun testOAuthClientDeserialization() {
         val json = """
             {
-                "id": "uuid",
                 "client_id": "cid",
                 "client_secret": "secret",
                 "client_name": "App",
@@ -191,7 +189,6 @@ class OAuthClientApiTest {
             }
         """.trimIndent()
         val client = Json.decodeFromString<OAuthClient>(json)
-        assertEquals("uuid", client.id)
         assertEquals("cid", client.clientId)
         assertEquals(OAuthClientType.PUBLIC, client.clientType)
         assertEquals(OAuthClientGrantType.AUTHORIZATION_CODE, client.grantTypes.first())

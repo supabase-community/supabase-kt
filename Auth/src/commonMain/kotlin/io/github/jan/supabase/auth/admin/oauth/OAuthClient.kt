@@ -59,11 +59,18 @@ enum class OAuthClientTokenEndpointAuthMethod {
 }
 
 /**
+ * Wrapper for the list clients response.
+ */
+@Serializable
+internal data class OAuthClientListResponse(
+    val clients: List<OAuthClient> = emptyList()
+)
+
+/**
  * Represents an OAuth 2.1 client registered with the Supabase Auth server.
  */
 @Serializable
 data class OAuthClient(
-    val id: String,
     @SerialName("client_id")
     val clientId: String,
     @SerialName("client_secret")
