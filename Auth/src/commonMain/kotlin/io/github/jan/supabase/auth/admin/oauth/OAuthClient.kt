@@ -1,3 +1,5 @@
+@file:Suppress("UndocumentedPublicProperty")
+
 package io.github.jan.supabase.auth.admin.oauth
 
 import kotlinx.serialization.SerialName
@@ -68,6 +70,20 @@ internal data class OAuthClientListResponse(
 
 /**
  * Represents an OAuth 2.1 client registered with the Supabase Auth server.
+ * @param clientId The unique identifier for the OAuth client
+ * @param clientSecret The client secret (only returned on create/regenerate)
+ * @param clientName The display name of the client
+ * @param clientType The client type (public or confidential)
+ * @param clientUri The URI of the client's homepage
+ * @param logoUri The URI of the client's logo
+ * @param redirectUris The allowed redirect URIs
+ * @param grantTypes The allowed grant types
+ * @param responseTypes The allowed response types
+ * @param scope The allowed scope
+ * @param tokenEndpointAuthMethod The token endpoint authentication method
+ * @param registrationType The registration type (dynamic or manual)
+ * @param createdAt The creation timestamp
+ * @param updatedAt The last update timestamp
  */
 @Serializable
 data class OAuthClient(
