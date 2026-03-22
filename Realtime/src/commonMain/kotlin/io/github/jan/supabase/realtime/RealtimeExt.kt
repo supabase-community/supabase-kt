@@ -63,10 +63,17 @@ inline fun <reified Data> RealtimeChannel.currentPresences(
  * If you want more control, use the [RealtimeChannel.presenceChangeFlow] function.
  * @return a [Flow] of the current presences in a list. This list is updated and emitted whenever a presence joins or leaves.
  */
-@OptIn(SupabaseInternal::class)
 inline fun <reified Data> RealtimeChannel.presenceDataFlow(): Flow<List<Data>> {
+    val cache = AtomicMutableMap<String, Data>()
     return presenceChangeFlow().map {
-        currentPresences<Data>()
+        // order matters here, leaves events must happen first for updates to work properly
+        it.leaves.forEach { (key, _) ->
+            cache.remove(key)
+        }
+        it.joins.forEach { (key, presence) ->
+            cache[key] = presence.stateAs<Data>(supabaseClient.realtime.serializer)
+        }
+        cache.values.toList()
     }
 }
 
