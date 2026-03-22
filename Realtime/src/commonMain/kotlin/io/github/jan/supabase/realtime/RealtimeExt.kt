@@ -2,6 +2,7 @@
 
 package io.github.jan.supabase.realtime
 
+import io.github.jan.supabase.annotations.SupabaseInternal
 import io.github.jan.supabase.collections.AtomicMutableMap
 import io.github.jan.supabase.exceptions.NotFoundRestException
 import io.github.jan.supabase.exceptions.UnknownRestException
@@ -28,22 +29,44 @@ internal fun <Data> List<PrimaryKey<Data>>.producer(data: Data): String =
     fold("") { value, pk -> value + pk.producer(data) }
 
 /**
+ * Returns the current presences as a typed list. This is a snapshot of all
+ * currently tracked presences in the channel, deserialized as [Data].
+ *
+ * Example:
+ * ```kotlin
+ * @Serializable
+ * data class UserPresence(val name: String)
+ *
+ * val onlineUsers = channel.currentPresences<UserPresence>()
+ * ```
+ *
+ * @param ignoreOtherTypes Whether to ignore presences that cannot be decoded
+ *   as [Data] (e.g. your own presence without state). Defaults to true.
+ */
+@OptIn(SupabaseInternal::class)
+inline fun <reified Data> RealtimeChannel.currentPresences(
+    ignoreOtherTypes: Boolean = true
+): List<Data> {
+    val serializer = supabaseClient.realtime.serializer
+    return callbackManager.presenceState().values.mapNotNull { presence ->
+        if (ignoreOtherTypes) {
+            presence.stateAsOrNull<Data>(serializer)
+        } else {
+            presence.stateAs<Data>(serializer)
+        }
+    }
+}
+
+/**
  * Listens for presence changes and caches the presences based on their keys. This function automatically handles joins and leaves.
  *
  * If you want more control, use the [RealtimeChannel.presenceChangeFlow] function.
  * @return a [Flow] of the current presences in a list. This list is updated and emitted whenever a presence joins or leaves.
  */
+@OptIn(SupabaseInternal::class)
 inline fun <reified Data> RealtimeChannel.presenceDataFlow(): Flow<List<Data>> {
-    val cache = AtomicMutableMap<String, Data>()
     return presenceChangeFlow().map {
-        // order matters here, leaves events must happen first for updates to work properly
-        it.leaves.forEach { (key, _) ->
-            cache.remove(key)
-        }
-        it.joins.forEach { (key, presence) ->
-            cache[key] = presence.stateAs<Data>(supabaseClient.realtime.serializer)
-        }
-        cache.values.toList()
+        currentPresences<Data>()
     }
 }
 

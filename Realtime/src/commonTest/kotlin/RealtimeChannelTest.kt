@@ -18,8 +18,10 @@ import io.github.jan.supabase.realtime.RealtimeJoinPayload
 import io.github.jan.supabase.realtime.RealtimeMessage
 import io.github.jan.supabase.realtime.broadcastFlow
 import io.github.jan.supabase.realtime.channel
+import io.github.jan.supabase.realtime.currentPresences
 import io.github.jan.supabase.realtime.postgresChangeFlow
 import io.github.jan.supabase.realtime.realtime
+import kotlinx.serialization.Serializable
 import io.github.jan.supabase.testing.assertPathIs
 import io.github.jan.supabase.testing.pathAfterVersion
 import io.github.jan.supabase.testing.toJsonElement
@@ -419,8 +421,11 @@ class RealtimeChannelTest {
         }
     }
 
+    @Serializable
+    data class PresenceUser(val name: String)
+
     @Test
-    fun testPresenceStateUpdatedOnPresenceEvents() {
+    fun testCurrentPresencesUpdatedOnPresenceEvents() {
         val channelId = "channelId"
         runTest {
             createTestClient(
@@ -443,7 +448,7 @@ class RealtimeChannelTest {
                 },
                 supabaseHandler = {
                     val channel = it.channel(channelId)
-                    assertEquals(emptyMap(), channel.presenceState())
+                    assertEquals(emptyList(), channel.currentPresences<PresenceUser>())
                     coroutineScope {
                         launch {
                             channel.presenceChangeFlow().test(FLOW_TIMEOUT) {
@@ -451,9 +456,9 @@ class RealtimeChannelTest {
                                 awaitItem()
                                 awaitItem()
                                 // After all events: only user2 should remain
-                                assertEquals(1, channel.presenceState().size)
-                                assertEquals(null, channel.presenceState()["user1"])
-                                assertEquals("ref2", channel.presenceState()["user2"]?.presenceRef)
+                                val presences = channel.currentPresences<PresenceUser>()
+                                assertEquals(1, presences.size)
+                                assertEquals("Bob", presences.first().name)
                             }
                         }
                         launch {
