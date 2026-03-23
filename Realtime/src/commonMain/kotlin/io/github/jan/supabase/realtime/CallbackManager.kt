@@ -36,6 +36,11 @@ interface CallbackManager {
 
     fun hasPresenceCallback(): Boolean
 
+    /**
+     * Returns the current presence state as a map of keys to [Presence] objects.
+     */
+    fun presenceState(): Map<String, Presence>
+
     fun addBroadcastCallback(event: String, callback: (JsonObject) -> Unit): RealtimeCallbackId.Broadcast
 
     fun addPostgresCallback(filter: PostgresJoinConfig, callback: (PostgresAction) -> Unit): RealtimeCallbackId.Postgres
@@ -62,6 +67,7 @@ internal class CallbackManagerImpl(
     private val _serverChanges = AtomicReference(listOf<PostgresJoinConfig>())
     val serverChanges: List<PostgresJoinConfig> get() = _serverChanges.load()
 
+    private val currentPresenceState = AtomicReference<PersistentMap<String, Presence>>(persistentHashMapOf())
     private val presenceCallbacks = AtomicReference<PresenceMap>(persistentHashMapOf())
 
     private val broadcastCallbacks = AtomicReference<BroadcastMap>(persistentHashMapOf())
@@ -75,6 +81,7 @@ internal class CallbackManagerImpl(
         broadcastEventId.store(persistentHashMapOf())
         broadcastCallbacks.store(persistentHashMapOf())
         presenceCallbacks.store(persistentHashMapOf())
+        currentPresenceState.store(persistentHashMapOf())
         _serverChanges.store(emptyList())
         nextId.store(0)
     }
@@ -111,8 +118,16 @@ internal class CallbackManagerImpl(
     }
 
     override fun triggerPresenceDiff(joins: Map<String, Presence>, leaves: Map<String, Presence>) {
+        currentPresenceState.update { state ->
+            var updated = state
+            leaves.keys.forEach { key -> updated = updated.remove(key) }
+            joins.forEach { (key, presence) -> updated = updated.put(key, presence) }
+            updated
+        }
         presenceCallbacks.load().values.forEach { it.callback(PresenceActionImpl(serializer, joins, leaves)) }
     }
+
+    override fun presenceState(): Map<String, Presence> = currentPresenceState.load()
 
     override fun hasPresenceCallback(): Boolean {
         return presenceCallbacks.load().isNotEmpty()

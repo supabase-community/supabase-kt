@@ -18,8 +18,10 @@ import io.github.jan.supabase.realtime.RealtimeJoinPayload
 import io.github.jan.supabase.realtime.RealtimeMessage
 import io.github.jan.supabase.realtime.broadcastFlow
 import io.github.jan.supabase.realtime.channel
+import io.github.jan.supabase.realtime.currentPresences
 import io.github.jan.supabase.realtime.postgresChangeFlow
 import io.github.jan.supabase.realtime.realtime
+import kotlinx.serialization.Serializable
 import io.github.jan.supabase.testing.assertPathIs
 import io.github.jan.supabase.testing.pathAfterVersion
 import io.github.jan.supabase.testing.toJsonElement
@@ -414,6 +416,55 @@ class RealtimeChannelTest {
                         assertEquals(RealtimeChannel.Status.SUBSCRIBED, awaitItem())
                         job.cancel()
                     }
+                }
+            )
+        }
+    }
+
+    @Serializable
+    data class PresenceUser(val name: String)
+
+    @Test
+    fun testCurrentPresencesUpdatedOnPresenceEvents() {
+        val channelId = "channelId"
+        runTest {
+            createTestClient(
+                wsHandler = { i, o ->
+                    handleSubscribe(i, o, channelId, true)
+                    // Send presence join for user1 and user2, then leave for user1
+                    o.sendPresence(
+                        channelId,
+                        mapOf(
+                            "user1" to Presence("ref1", buildJsonObject { put("name", "Alice") }),
+                            "user2" to Presence("ref2", buildJsonObject { put("name", "Bob") })
+                        ),
+                        mapOf()
+                    )
+                    o.sendPresence(
+                        channelId,
+                        mapOf(),
+                        mapOf("user1" to Presence("ref1", buildJsonObject { put("name", "Alice") }))
+                    )
+                },
+                supabaseHandler = {
+                    val channel = it.channel(channelId)
+                    assertEquals(emptyList(), channel.currentPresences<PresenceUser>())
+                    coroutineScope {
+                        launch {
+                            channel.presenceChangeFlow().test(FLOW_TIMEOUT) {
+                                // Consume both presence events (join + leave)
+                                awaitItem()
+                                awaitItem()
+                                // After all events: only user2 should remain
+                                val presences = channel.currentPresences<PresenceUser>()
+                                assertEquals(1, presences.size)
+                                assertEquals("Bob", presences.first().name)
+                            }
+                        }
+                        launch {
+                            channel.subscribe(true)
+                        }
+                    }.join()
                 }
             )
         }
