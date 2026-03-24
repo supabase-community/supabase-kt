@@ -1,5 +1,90 @@
 # Changelog
 
+### 3.5.0 - March 25, 2026
+
+### Core
+
+* Fix indentation on error lines by @sproctor in https://github.com/supabase-community/supabase-kt/pull/1184
+* Separate sub-APIs from parent APIs by @jan-tennert in https://github.com/supabase-community/supabase-kt/pull/1216
+* Add integration testing infrastructure with local Supabase by @thagikura in https://github.com/supabase-community/supabase-kt/pull/1217
+* Use new unix serializer for timestamps by @jan-tennert in https://github.com/supabase-community/supabase-kt/pull/1215
+* Documentation improvements by @jan-tennert in https://github.com/supabase/supabase/pull/44141
+
+### Storage
+
+* [Fix] Use options parameter in createOrContinueUpload by @vojta-horanek in https://github.com/supabase-community/supabase-kt/pull/1188
+* Add experimental support for vector, analytic buckets & storage, auth improvements by @jan-tennert in https://github.com/supabase-community/supabase-kt/pull/1196
+* do not rewrite signed URL to render endpoint for empty transform object by @jan-tennert in https://github.com/supabase-community/supabase-kt/pull/1212
+
+### Postgrest
+
+* Add `urlLengthLimit` and `timeout` option to postgrest by @jan-tennert in https://github.com/supabase-community/supabase-kt/pull/1190
+* Rename regex match method and add match method by @jan-tennert in https://github.com/supabase-community/supabase-kt/pull/1213
+
+### Auth
+
+* Add `currentPassword` to `UserUpdateBuilder` by @jan-tennert in https://github.com/supabase-community/supabase-kt/pull/1211
+
+### Compose Auth
+
+Because I forgot to put it in the previous changelog:
+- The credentials when successfully signing in via native auth are now exposed, so you can access data like name, phone number, etc. This is currently only supported for Native Google Auth on Android and Native Apple Auth on iOS:
+```kotlin
+is NativeSignInResult.Success -> {
+    val credential = result.data.google.credential
+    credential.displayName 
+    credential.phoneNumber
+    // ...
+}
+```
+
+### Realtime
+
+* Add presenceState() query API to RealtimeChannel by @thagikura in https://github.com/supabase-community/supabase-kt/pull/1221
+
+## New Contributors
+* @vojta-horanek made their first contribution in https://github.com/supabase-community/supabase-kt/pull/1188
+* @thagikura made their first contribution in https://github.com/supabase-community/supabase-kt/pull/1217
+
+### 3.4.1 - February 28, 2026
+
+### Core
+
+* Actually fix changing the log level by @jan-tennert in https://github.com/supabase-community/supabase-kt/pull/1182
+
+### Realtime
+
+* don't teardown channels on reconnect by @sproctor in https://github.com/supabase-community/supabase-kt/pull/1186
+
+### 3.4.0 - February 25, 2026
+
+### Core
+
+* Allow nullable types in SupabaseSerializer and Postgrest decoding by @ferhatwi in https://github.com/supabase-community/supabase-kt/pull/1175
+* Switch log level for network issue related logs to DEBUG by @jan-tennert in https://github.com/supabase-community/supabase-kt/pull/1159
+* Temporary fix for the log level by @jan-tennert in https://github.com/supabase-community/supabase-kt/pull/1169
+
+### Auth
+
+* Add redirectUrl to resendEmail by @hieuwu in https://github.com/supabase-community/supabase-kt/pull/1138
+* Add X provider by @jan-tennert in https://github.com/supabase-community/supabase-kt/pull/1140
+* Add missing properties to `UserInfo` and `UserMFAFactor` by @jan-tennert in https://github.com/supabase-community/supabase-kt/pull/1139
+* Add further debug information to requests with an expired token by @jan-tennert in https://github.com/supabase-community/supabase-kt/pull/1149
+* Add channel parameter to OTP provider for WhatsApp support by @JOsacky in https://github.com/supabase-community/supabase-kt/pull/1158
+* Add `Auth#getClaims()` API and migrate to KotlinX IO by @jan-tennert in https://github.com/supabase-community/supabase-kt/pull/1141
+
+### Functions
+
+* Fix invalid default rest exception in `Functions#parseErrorResponse()` by @jan-tennert in https://github.com/supabase-community/supabase-kt/pull/1142
+
+### Storage
+
+* Add `setHeader()` to BucketApi by @jan-tennert in https://github.com/supabase-community/supabase-kt/pull/1177
+
+### Realtime
+
+* Teardown channels after disconnecting from realtime by @jan-tennert in https://github.com/supabase-community/supabase-kt/pull/1178
+
 ### 3.3.0 - January 4, 2026
 
 ### Core
