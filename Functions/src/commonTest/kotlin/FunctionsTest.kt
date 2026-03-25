@@ -5,14 +5,19 @@ import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.auth.minimalConfig
 import io.github.jan.supabase.functions.FunctionRegion
 import io.github.jan.supabase.functions.Functions
+import io.github.jan.supabase.functions.asFlow
 import io.github.jan.supabase.functions.functions
 import io.github.jan.supabase.testing.createMockedSupabaseClient
 import io.github.jan.supabase.testing.pathAfterVersion
 import io.github.jan.supabase.testing.toJsonElement
 import io.ktor.client.engine.mock.respond
+import io.ktor.client.statement.bodyAsText
 import io.ktor.http.ContentType
 import io.ktor.http.Headers
 import io.ktor.http.HttpHeaders
+import io.ktor.http.headersOf
+import io.ktor.utils.io.readLine
+import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.jsonObject
@@ -128,6 +133,79 @@ class FunctionsTest {
                 body = expectedBody,
                 headers = expectedHeaders
             )
+        }
+    }
+
+    @Test
+    fun testInvokeStreaming() {
+        runTest {
+            val expectedName = "myFunction"
+            val expectedRegion = FunctionRegion.EU_WEST_1
+            val sseContent = "data: hello\ndata: world\ndata: done"
+            supabase = createMockedSupabaseClient(
+                configuration = configuration,
+                requestHandler = {
+                    assertEquals("POST", it.method.value)
+                    assertEquals("/$expectedName", it.url.pathAfterVersion())
+                    assertEquals(expectedRegion.value, it.headers["x-region"])
+                    respond(
+                        content = sseContent,
+                        headers = headersOf(HttpHeaders.ContentType, ContentType.Text.EventStream.toString())
+                    )
+                }
+            )
+            val channel = supabase.functions.invokeStreaming(
+                function = expectedName,
+                region = expectedRegion
+            )
+            assertEquals("data: hello", channel.readLine())
+            assertEquals("data: world", channel.readLine())
+            assertEquals("data: done", channel.readLine())
+        }
+    }
+
+    @Test
+    fun testInvokeStreamingAsFlow() {
+        runTest {
+            val expectedName = "myFunction"
+            val sseContent = "data: hello\ndata: world\ndata: done"
+            supabase = createMockedSupabaseClient(
+                configuration = configuration,
+                requestHandler = {
+                    respond(
+                        content = sseContent,
+                        headers = headersOf(HttpHeaders.ContentType, ContentType.Text.EventStream.toString())
+                    )
+                }
+            )
+            val lines = supabase.functions.invokeStreaming(
+                function = expectedName
+            ).asFlow().toList()
+            assertEquals(listOf("data: hello", "data: world", "data: done"), lines)
+        }
+    }
+
+    @Test
+    fun testPrepareInvoke() {
+        runTest {
+            val expectedName = "myFunction"
+            val expectedRegion = FunctionRegion.EU_WEST_1
+            supabase = createMockedSupabaseClient(
+                configuration = configuration,
+                requestHandler = {
+                    assertEquals("POST", it.method.value)
+                    assertEquals("/$expectedName", it.url.pathAfterVersion())
+                    assertEquals(expectedRegion.value, it.headers["x-region"])
+                    respond("streaming content")
+                }
+            )
+            val statement = supabase.functions.prepareInvoke(
+                function = expectedName,
+                region = expectedRegion
+            )
+            statement.execute { response ->
+                assertEquals("streaming content", response.bodyAsText())
+            }
         }
     }
 

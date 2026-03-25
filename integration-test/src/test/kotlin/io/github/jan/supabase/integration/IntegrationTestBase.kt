@@ -6,6 +6,7 @@ import io.github.jan.supabase.auth.Auth
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.auth.providers.builtin.Email
 import io.github.jan.supabase.createSupabaseClient
+import io.github.jan.supabase.functions.Functions
 import io.github.jan.supabase.postgrest.Postgrest
 import io.github.jan.supabase.storage.Storage
 import kotlinx.coroutines.runBlocking
@@ -31,6 +32,7 @@ abstract class IntegrationTestBase {
             install(Auth) {
                 alwaysAutoRefresh = false
             }
+            install(Functions)
             install(Postgrest)
             install(Storage)
             configure()
