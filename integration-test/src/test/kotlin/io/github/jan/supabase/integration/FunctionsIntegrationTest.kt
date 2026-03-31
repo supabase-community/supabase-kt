@@ -1,6 +1,5 @@
 package io.github.jan.supabase.integration
 
-import io.github.jan.supabase.functions.asFlow
 import io.github.jan.supabase.functions.functions
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.ContentType
@@ -32,9 +31,10 @@ class FunctionsIntegrationTest : IntegrationTestBase() {
     }
 
     @Test
-    fun `invoke streaming function returns SSE lines`() = runTest {
+    fun `invokeSSE receives server-sent events`() = runTest {
         val client = createAuthenticatedClient()
-        val lines = client.functions.invokeStreaming("sse").asFlow().toList()
-        assertEquals(listOf("data: hello", "", "data: world", "", "data: done", ""), lines)
+        val events = client.functions.invokeSSE("sse").toList()
+        val dataValues = events.map { it.data }
+        assertEquals(listOf("hello", "world", "done"), dataValues)
     }
 }
