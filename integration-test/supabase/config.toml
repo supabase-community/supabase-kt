@@ -18,6 +18,9 @@ enabled = false
 enabled = true
 site_url = "http://127.0.0.1:3000"
 
+[auth.oauth_server]
+enabled = true
+
 [auth.email]
 enable_signup = true
 double_confirm_changes = false

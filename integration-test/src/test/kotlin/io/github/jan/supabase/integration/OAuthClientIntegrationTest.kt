@@ -10,7 +10,6 @@ import io.github.jan.supabase.exceptions.RestException
 import io.github.jan.supabase.postgrest.Postgrest
 import io.github.jan.supabase.storage.Storage
 import kotlinx.coroutines.test.runTest
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
@@ -21,28 +20,9 @@ import kotlin.test.assertTrue
  * Integration tests for the OAuth 2.1 client admin API.
  *
  * Requirements:
- * - GoTrue >= v2.188.0 (the admin/oauth/clients endpoints don't exist in earlier versions)
- * - GOTRUE_OAUTH_SERVER_ENABLED=true environment variable set on the GoTrue container
- *
- * As of Supabase CLI v2.78.1, the bundled GoTrue is v2.187.0 which does not support these
- * endpoints. To run these tests locally:
- *
- * 1. Pull a newer GoTrue image:
- *    docker pull public.ecr.aws/supabase/gotrue:v2.188.1
- *    docker tag public.ecr.aws/supabase/gotrue:v2.188.1 public.ecr.aws/supabase/gotrue:v2.187.0
- *
- * 2. Start Supabase, then restart the auth container with the feature flag:
- *    supabase start --workdir integration-test
- *    docker stop supabase_auth_supabase-kt-tests && docker rm supabase_auth_supabase-kt-tests
- *    docker run -d --name supabase_auth_supabase-kt-tests \
- *      --network supabase_network_supabase-kt-tests \
- *      --env-file <(docker inspect supabase_auth_supabase-kt-tests | jq -r '.[0].Config.Env[]') \
- *      -e GOTRUE_OAUTH_SERVER_ENABLED=true \
- *      public.ecr.aws/supabase/gotrue:v2.187.0 gotrue
- *
- * These tests were verified against GoTrue v2.188.1 with GOTRUE_OAUTH_SERVER_ENABLED=true.
+ * - Supabase CLI >= v2.84.2 (bundles GoTrue v2.188.1 with OAuth server support)
+ * - [auth.oauth_server] enabled = true in config.toml
  */
-@Disabled("Requires GoTrue >= v2.188.0 with GOTRUE_OAUTH_SERVER_ENABLED=true. Remove when CI supports it.")
 class OAuthClientIntegrationTest : IntegrationTestBase() {
 
     private fun createServiceRoleClient() = createSupabaseClient(supabaseUrl, supabaseServiceRoleKey) {
