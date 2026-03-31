@@ -71,6 +71,9 @@ class EdgeFunctionTest {
         }
     }
 
+    // invokeSSE() cannot be unit-tested with MockEngine because it lacks SSECapability.
+    // SSE streaming is covered by FunctionsIntegrationTest instead.
+
     @Test
     fun testPrepareInvoke() {
         runTest {
