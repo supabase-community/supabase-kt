@@ -27,6 +27,11 @@ import kotlinx.serialization.json.put
 interface AdminApi {
 
     /**
+     * The OAuth client management API
+     */
+    val oauth: OAuthClientApi
+
+    /**
      * Creates a new user using an email and password
      * @return the newly created user
      */
@@ -96,11 +101,6 @@ interface AdminApi {
      * @param factorId the id of the factor
      */
     suspend fun deleteFactor(uid: String, factorId: String)
-
-    /**
-     * The OAuth client management API
-     */
-    val oauth: OAuthClientApi
 
 }
 
