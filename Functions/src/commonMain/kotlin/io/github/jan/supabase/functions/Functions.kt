@@ -7,9 +7,9 @@ import io.github.jan.supabase.annotations.SupabaseInternal
 import io.github.jan.supabase.auth.Auth
 import io.github.jan.supabase.auth.AuthDependentPluginConfig
 import io.github.jan.supabase.auth.api.authenticatedSupabaseApi
-import io.github.jan.supabase.decode
 import io.github.jan.supabase.encode
 import io.github.jan.supabase.exceptions.BadRequestRestException
+import io.github.jan.supabase.exceptions.HttpRequestException
 import io.github.jan.supabase.exceptions.NotFoundRestException
 import io.github.jan.supabase.exceptions.RestException
 import io.github.jan.supabase.exceptions.UnauthorizedRestException
@@ -24,7 +24,6 @@ import io.ktor.client.plugins.HttpRequestTimeoutException
 import io.ktor.client.plugins.sse.SSE
 import io.ktor.client.plugins.sse.sse
 import io.ktor.client.request.HttpRequestBuilder
-import io.ktor.client.request.bearerAuth
 import io.ktor.client.request.header
 import io.ktor.client.request.setBody
 import io.ktor.client.statement.HttpResponse
@@ -116,32 +115,6 @@ class Functions(override val config: Config, override val supabaseClient: Supaba
         header("x-region", region.value)
     }
 
-    // ---- Streaming API ----
-    //
-    // Two approaches for consuming streaming edge function responses:
-    //
-    //   1. invokeSSE()    – uses Ktor's SSE plugin and returns a Flow<FunctionServerSentEvent>
-    //                       with parsed event fields and decodeAs<T>() support.
-    //   2. prepareInvoke() – returns an HttpStatement for full control over the
-    //                        HTTP lifecycle (raw byte streaming, execute / cancel / retry).
-    //
-    // Examples:
-    //
-    // ```kotlin
-    // // SSE streaming (e.g. LLM token streaming)
-    // supabase.functions.invokeSSE("my-function").collect { event ->
-    //     event.data       // the raw string data
-    //     event.event      // the event type, if present
-    //     event.decodeAs<MyType>()  // decode data as a typed object
-    // }
-    //
-    // // Full control via HttpStatement (raw byte streaming)
-    // val statement = supabase.functions.prepareInvoke("my-function")
-    // statement.execute { response ->
-    //     response.bodyAsChannel().copyTo(outputChannel)
-    // }
-    // ```
-
     /**
      * Invokes a remote edge function that returns Server-Sent Events (SSE) and returns
      * a [Flow] of [FunctionServerSentEvent]. Each event provides access to [data][FunctionServerSentEvent.data],
@@ -149,6 +122,9 @@ class Functions(override val config: Config, override val supabaseClient: Supaba
      * a [decodeAs][FunctionServerSentEvent.decodeAs] method for deserializing the data payload.
      *
      * The authorization token is automatically added to the request.
+     * Ktor's SSE plugin requires direct [io.ktor.client.HttpClient] access, so this method uses the raw client
+     * with [api.getDefaultHeaders] to include the authentication token (base headers like apikey
+     * are already applied by Ktor's DefaultRequest plugin).
      * @param function The function to invoke. If name of the function is renamed, use the slug after URL
      * @param region The region where the function is invoked
      * @param builder The request builder to configure the request
@@ -285,30 +261,3 @@ class Functions(override val config: Config, override val supabaseClient: Supaba
 val SupabaseClient.functions: Functions
     get() = pluginManager.getPlugin(Functions)
 
-/**
- * Represents a Server-Sent Event received from an edge function.
- *
- * This is a wrapper around Ktor's [io.ktor.sse.ServerSentEvent] that adds [decodeAs] for
- * conveniently deserializing the [data] payload using the Functions plugin's serializer.
- *
- * @property data The event data payload, if present
- * @property event The event type, if present
- * @property id The event ID, if present
- */
-class FunctionServerSentEvent(
-    val data: String?,
-    val event: String?,
-    val id: String?,
-    @PublishedApi internal val serializer: SupabaseSerializer
-) {
-
-    /**
-     * Decodes the [data] payload as the specified type [T] using the Functions plugin's serializer.
-     * @throws IllegalStateException if [data] is null
-     */
-    inline fun <reified T> decodeAs(): T {
-        val raw = data ?: error("Cannot decode SSE event: data is null")
-        return serializer.decode(raw)
-    }
-
-}
