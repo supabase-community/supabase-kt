@@ -5,6 +5,7 @@ import io.github.jan.supabase.testing.createMockedSupabaseClient
 import io.github.jan.supabase.testing.pathAfterVersion
 import io.github.jan.supabase.testing.toJsonElement
 import io.ktor.client.engine.mock.respond
+import io.ktor.client.statement.bodyAsText
 import io.ktor.http.ContentType
 import io.ktor.http.Headers
 import io.ktor.http.HttpHeaders
@@ -19,7 +20,7 @@ import kotlin.test.assertEquals
 class EdgeFunctionTest {
 
     private lateinit var supabase: SupabaseClient
-    
+
     @Test
     fun testInvokingWithoutBody() {
         runTest {
@@ -67,6 +68,31 @@ class EdgeFunctionTest {
             )
             val function = supabase.functions.buildEdgeFunction(expectedName, expectedRegion, expectedHeaders)
             function(expectedBody)
+        }
+    }
+
+    // invokeSSE() cannot be unit-tested with MockEngine because it lacks SSECapability.
+    // SSE streaming is covered by FunctionsIntegrationTest instead.
+
+    @Test
+    fun testPrepareInvoke() {
+        runTest {
+            val expectedName = "myFunction"
+            val expectedRegion = FunctionRegion.EU_WEST_1
+            supabase = createMockedSupabaseClient(
+                configuration = configuration,
+                requestHandler = {
+                    assertEquals("POST", it.method.value)
+                    assertEquals("/$expectedName", it.url.pathAfterVersion())
+                    assertEquals(expectedRegion.value, it.headers["x-region"])
+                    respond("streaming content")
+                }
+            )
+            val function = supabase.functions.buildEdgeFunction(expectedName, expectedRegion)
+            val statement = function.prepareInvoke()
+            statement.execute { response ->
+                assertEquals("streaming content", response.bodyAsText())
+            }
         }
     }
 

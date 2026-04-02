@@ -1,6 +1,7 @@
 package io.github.jan.supabase.functions
 
 import io.github.jan.supabase.SupabaseClient
+import io.github.jan.supabase.SupabaseClientBuilder
 import io.github.jan.supabase.SupabaseSerializer
 import io.github.jan.supabase.annotations.SupabaseInternal
 import io.github.jan.supabase.auth.Auth
@@ -8,6 +9,7 @@ import io.github.jan.supabase.auth.AuthDependentPluginConfig
 import io.github.jan.supabase.auth.api.authenticatedSupabaseApi
 import io.github.jan.supabase.encode
 import io.github.jan.supabase.exceptions.BadRequestRestException
+import io.github.jan.supabase.exceptions.HttpRequestException
 import io.github.jan.supabase.exceptions.NotFoundRestException
 import io.github.jan.supabase.exceptions.RestException
 import io.github.jan.supabase.exceptions.UnauthorizedRestException
@@ -19,14 +21,20 @@ import io.github.jan.supabase.plugins.MainPlugin
 import io.github.jan.supabase.plugins.SupabasePluginProvider
 import io.github.jan.supabase.serializer.KotlinXSerializer
 import io.ktor.client.plugins.HttpRequestTimeoutException
+import io.ktor.client.plugins.sse.SSE
+import io.ktor.client.plugins.sse.sse
 import io.ktor.client.request.HttpRequestBuilder
 import io.ktor.client.request.header
 import io.ktor.client.request.setBody
 import io.ktor.client.statement.HttpResponse
+import io.ktor.client.statement.HttpStatement
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.Headers
 import io.ktor.http.HttpHeaders
+import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 
 /**
  * Plugin to interact with the supabase Edge Functions API
@@ -108,6 +116,67 @@ class Functions(override val config: Config, override val supabaseClient: Supaba
     }
 
     /**
+     * Invokes a remote edge function that returns Server-Sent Events (SSE) and returns
+     * a [Flow] of [FunctionServerSentEvent]. Each event provides access to [data][FunctionServerSentEvent.data],
+     * [event][FunctionServerSentEvent.event], and [id][FunctionServerSentEvent.id] fields, as well as
+     * a [decodeAs][FunctionServerSentEvent.decodeAs] method for deserializing the data payload.
+     *
+     * The authorization token is automatically added to the request.
+     * Ktor's SSE plugin requires direct [io.ktor.client.HttpClient] access, so this method uses the raw client
+     * with [api.getDefaultHeaders] to include the authentication token (base headers like apikey
+     * are already applied by Ktor's DefaultRequest plugin).
+     * @param function The function to invoke. If name of the function is renamed, use the slug after URL
+     * @param region The region where the function is invoked
+     * @param builder The request builder to configure the request
+     * @return A [Flow] of [FunctionServerSentEvent] representing the SSE stream
+     * @throws HttpRequestTimeoutException if the request timed out
+     * @throws HttpRequestException on network related issues
+     */
+    @OptIn(SupabaseInternal::class)
+    fun invokeSSE(
+        function: String,
+        region: FunctionRegion = config.defaultRegion,
+        builder: HttpRequestBuilder.() -> Unit = {}
+    ): Flow<FunctionServerSentEvent> = flow {
+        val defaultHeaders = api.getDefaultHeaders()
+        val resolvedUrl = resolveUrl(function)
+        val ktorClient = supabaseClient.httpClient.httpClient
+        ktorClient.sse(
+            urlString = resolvedUrl,
+            request = {
+                method = HttpMethod.Post
+                headers.appendAll(defaultHeaders)
+                header("x-region", region.value)
+                builder()
+            }
+        ) {
+            incoming.collect { event ->
+                emit(FunctionServerSentEvent(
+                    data = event.data,
+                    event = event.event,
+                    id = event.id,
+                    serializer = this@Functions.serializer
+                ))
+            }
+        }
+    }
+
+    /**
+     * Prepares an invocation of a remote edge function, returning an [HttpStatement] for streaming
+     * or other advanced response handling. The authorization token is automatically added to the request.
+     * @param function The function to invoke. If name of the function is renamed, use the slug after URL
+     * @param region The region where the function is invoked
+     * @param builder The request builder to configure the request
+     */
+    suspend inline fun prepareInvoke(function: String, region: FunctionRegion = config.defaultRegion, crossinline builder: HttpRequestBuilder.() -> Unit = {}): HttpStatement {
+        return api.prepareRequest(function) {
+            method = HttpMethod.Post
+            builder()
+            header("x-region", region.value)
+        }
+    }
+
+    /**
      * Builds an [EdgeFunction] which can be invoked multiple times
      * @param function The function name. If name of the function is renamed, use the slug after URL
      * @param headers Headers to add to the requests when invoking the function
@@ -176,6 +245,11 @@ class Functions(override val config: Config, override val supabaseClient: Supaba
 
         override fun createConfig(init: Config.() -> Unit) = Config().apply(init)
 
+        override fun setup(builder: SupabaseClientBuilder, config: Config) {
+            builder.httpConfig {
+                install(SSE)
+            }
+        }
 
     }
 
@@ -186,3 +260,4 @@ class Functions(override val config: Config, override val supabaseClient: Supaba
  */
 val SupabaseClient.functions: Functions
     get() = pluginManager.getPlugin(Functions)
+
