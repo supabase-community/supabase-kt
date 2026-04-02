@@ -1,0 +1,18 @@
+package io.github.jan.supabase.auth.oauth
+
+import kotlinx.serialization.SerialName
+
+/**
+ * OAuth client details in an authorization request.
+ * Only relevant when the OAuth 2.1 server is enabled in Supabase Auth.
+ * @param id Unique identifier for the OAuth client (UUID)
+ * @param name Human-readable name of the OAuth client
+ * @param uri URI of the OAuth client's website
+ * @param logoUri URI of the OAuth client's logo
+ */
+data class OAuthAuthorizationClient(
+    val id: String,
+    val name: String,
+    val uri: String,
+    @SerialName("logo_uri") val logoUri: String
+)
