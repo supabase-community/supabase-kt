@@ -1,6 +1,8 @@
 # Changelog
 
-### 3.5.0 - March 25, 2026
+### 3.5.0 - April 02, 2026
+
+# Changes
 
 ### Core
 
@@ -24,6 +26,15 @@
 ### Auth
 
 * Add `currentPassword` to `UserUpdateBuilder` by @jan-tennert in https://github.com/supabase-community/supabase-kt/pull/1211
+* Fix flaky JS browser test timeout in testLoadingSessionFromStorage by @thagikura in https://github.com/supabase-community/supabase-kt/pull/1233
+
+### Functions
+
+* Add streaming support for Edge Function responses by @thagikura in https://github.com/supabase-community/supabase-kt/pull/1228
+
+### Realtime
+
+* Add presenceState() query API to RealtimeChannel by @thagikura in https://github.com/supabase-community/supabase-kt/pull/1221
 
 ### Compose Auth
 
@@ -37,14 +48,6 @@ is NativeSignInResult.Success -> {
     // ...
 }
 ```
-
-### Realtime
-
-* Add presenceState() query API to RealtimeChannel by @thagikura in https://github.com/supabase-community/supabase-kt/pull/1221
-
-## New Contributors
-* @vojta-horanek made their first contribution in https://github.com/supabase-community/supabase-kt/pull/1188
-* @thagikura made their first contribution in https://github.com/supabase-community/supabase-kt/pull/1217
 
 ### 3.4.1 - February 28, 2026
 
