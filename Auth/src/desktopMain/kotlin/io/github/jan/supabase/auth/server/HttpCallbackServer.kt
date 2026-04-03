@@ -28,7 +28,7 @@ internal suspend fun createServer(
 ) {
     auth as AuthImpl
     Auth.logger.d { "Creating OAuth callback server" }
-    val server = embeddedServer(CIO, port = 0) {
+    val server = embeddedServer(CIO, port = auth.config.httpCallbackConfig.httpPort) {
         routing {
             configureRoutes(
                 auth,
