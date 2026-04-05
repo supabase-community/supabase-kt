@@ -276,7 +276,7 @@ internal class BucketApiImpl(
         data: UploadData,
         options: UploadOptionBuilder.() -> Unit,
     ): FileUploadResponse {
-        val path = url.substringAfterLast('/').substringBeforeLast("?")
+        val path = url.substringAfter("$bucketId/").substringBeforeLast("?")
         val optionBuilder = UploadOptionBuilder(storage.serializer).apply(options)
         val response = api.request(url) {
             this.method = method
