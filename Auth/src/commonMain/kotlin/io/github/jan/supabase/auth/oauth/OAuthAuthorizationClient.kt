@@ -15,6 +15,6 @@ import kotlinx.serialization.Serializable
 data class OAuthAuthorizationClient(
     val id: String,
     val name: String,
-    val uri: String,
-    @SerialName("logo_uri") val logoUri: String
+    val uri: String? = null,
+    @SerialName("logo_uri") val logoUri: String? = null
 )

@@ -41,8 +41,8 @@ abstract class IntegrationTestBase {
         return client
     }
 
-    suspend fun createAuthenticatedClient(): SupabaseClient {
-        val client = createTestClient()
+    suspend fun createAuthenticatedClient(configure: SupabaseClientBuilder.() -> Unit = {}): SupabaseClient {
+        val client = createTestClient(configure = configure)
         val email = "test-${System.nanoTime()}@example.com"
         val password = "test-password-123!"
         client.auth.signUpWith(Email) {

@@ -1,15 +1,17 @@
-package io.github.jan.supabase.integration
+package io.github.jan.supabase.integration.auth
 
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.auth.providers.builtin.Email
 import io.github.jan.supabase.auth.status.SessionStatus
 import io.github.jan.supabase.exceptions.RestException
+import io.github.jan.supabase.integration.IntegrationTestBase
 import kotlinx.coroutines.test.runTest
+import kotlinx.serialization.json.JsonPrimitive
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 import kotlin.test.assertIs
 import kotlin.test.assertNotNull
-import kotlin.test.assertFailsWith
 
 class AuthIntegrationTest : IntegrationTestBase() {
 
@@ -81,7 +83,7 @@ class AuthIntegrationTest : IntegrationTestBase() {
 
         val updatedUser = client.auth.updateUser {
             data {
-                put("display_name", kotlinx.serialization.json.JsonPrimitive("Test User"))
+                put("display_name", JsonPrimitive("Test User"))
             }
         }
 
@@ -89,7 +91,7 @@ class AuthIntegrationTest : IntegrationTestBase() {
         assertEquals(
             "Test User",
             updatedUser.userMetadata?.get("display_name")?.let {
-                (it as? kotlinx.serialization.json.JsonPrimitive)?.content
+                (it as? JsonPrimitive)?.content
             }
         )
     }
