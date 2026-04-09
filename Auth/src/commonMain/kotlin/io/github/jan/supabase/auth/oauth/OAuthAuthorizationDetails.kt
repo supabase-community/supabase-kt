@@ -1,6 +1,7 @@
 package io.github.jan.supabase.auth.oauth
 
 import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
 /**
  * OAuth authorization details when user needs to provide consent.
@@ -10,7 +11,7 @@ import kotlinx.serialization.SerialName
  * client details, user info, requested scopes, and where the user will be redirected.
  *
  * Note: [redirectUri] is the base URI (e.g., "https://app.com/callback") without
- * query parameters. After consent, you'll receive a complete `redirect_url` with
+ * query parameters. After consent, you'll receive a complete [redirectUri] with
  * the authorization code and state parameters appended.
  * @param authorizationId The authorization ID used to approve or deny the request
  * @param redirectUri The OAuth client's registered redirect URI (base URI without query parameters)
@@ -18,6 +19,7 @@ import kotlinx.serialization.SerialName
  * @param user User object associated with the authorization
  * @param scope Space-separated list of requested scopes (e.g., "openid profile email")
  */
+@Serializable
 data class OAuthAuthorizationDetails(
     @SerialName("authorization_id") val authorizationId: String,
     @SerialName("redirect_uri") val redirectUri: String,

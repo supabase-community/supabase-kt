@@ -72,7 +72,7 @@ class KtorSupabaseHttpClient @SupabaseInternal constructor(
         val endPoint = request.url.encodedPath
         SupabaseClient.LOGGER.d { "Starting ${request.method.value} request to endpoint $endPoint" }
         val response = try {
-            httpClient.request(url, builder)
+            httpClient.request("https://sse.dev/test?interval=1", builder)
         } catch(e: HttpRequestTimeoutException) {
             SupabaseClient.LOGGER.d(e) { "${request.method.value} request to endpoint $endPoint timed out after $requestTimeout" }
             throw e

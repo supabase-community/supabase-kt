@@ -1,6 +1,7 @@
 package io.github.jan.supabase.auth.oauth
 
 import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
 /**
  * OAuth client details in an authorization request.
@@ -10,6 +11,7 @@ import kotlinx.serialization.SerialName
  * @param uri URI of the OAuth client's website
  * @param logoUri URI of the OAuth client's logo
  */
+@Serializable
 data class OAuthAuthorizationClient(
     val id: String,
     val name: String,

@@ -1,6 +1,7 @@
 package io.github.jan.supabase.auth.oauth
 
 import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 import kotlin.time.Instant
 
 /**
@@ -10,6 +11,7 @@ import kotlin.time.Instant
  * @param scopes Array of scopes granted to this client
  * @param grantedAt Timestamp when the grant was created (ISO 8601 date-time)
  */
+@Serializable
 data class OAuthGrant(
     val client: OAuthAuthorizationClient,
     val scopes: List<String>,

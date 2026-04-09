@@ -1,6 +1,7 @@
 package io.github.jan.supabase.auth.oauth
 
 import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
 /**
  * OAuth redirect response when user has already consented or after consent decision.
@@ -16,4 +17,5 @@ import kotlinx.serialization.SerialName
  * query parameters, along with the state parameter if one was provided.
  * @param redirectUrl Complete redirect URL with authorization code and state parameters (e.g., "https://app.com/callback?code=xxx&state=yyy")
  */
+@Serializable
 data class OAuthRedirect(@SerialName("redirect_url") val redirectUrl: String) : OAuthAuthorizationDetailResponse
