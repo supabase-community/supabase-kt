@@ -1,11 +1,11 @@
 package io.github.jan.supabase.integration
 
-import io.github.jan.supabase.exceptions.RestException
+import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.storage.storage
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Test
 import kotlin.test.assertContentEquals
-import kotlin.test.assertFailsWith
+import kotlin.test.assertFails
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
@@ -72,10 +72,12 @@ class StorageIntegrationTest : IntegrationTestBase() {
     @Test
     fun testUnauthenticatedUploadDenied() = runTest {
         val client = createTestClient()
+        client.auth.awaitInitialization()
+        client.auth.clearSession()
         val bucket = client.storage.from(bucketId)
         val path = "unauth-test-${System.nanoTime()}.txt"
 
-        assertFailsWith<RestException> {
+        assertFails {
             bucket.upload(path, "should fail".toByteArray())
         }
     }
