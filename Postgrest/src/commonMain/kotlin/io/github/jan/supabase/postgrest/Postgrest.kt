@@ -108,7 +108,12 @@ interface Postgrest : MainPlugin<Postgrest.Config>, CustomSerializationPlugin {
         var propertyConversionMethod: PropertyConversionMethod = PropertyConversionMethod.CAMEL_CASE_TO_SNAKE_CASE,
         override var requireValidSession: Boolean = false,
         var urlLengthLimit: Int = 8000,
-        var timeout: Duration = 30.seconds
+        var timeout: Duration = 30.seconds,
+        /**
+         * Maximum number of retries for idempotent requests (GET, HEAD) that fail with
+         * transient errors (network errors, HTTP 503/520). Set to 0 to disable retries.
+         */
+        var maxRetries: Int = 3,
     ): MainConfig(), CustomSerializationConfig, AuthDependentPluginConfig {
 
         override var serializer: SupabaseSerializer? = null

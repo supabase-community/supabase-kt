@@ -74,7 +74,8 @@ internal class PostgrestImpl(override val supabaseClient: SupabaseClient, overri
             urlParams = urlParams,
             body = body,
             schema = requestBuilder.schema,
-            headers = requestBuilder.headers.build()
+            headers = requestBuilder.headers.build(),
+            retry = requestBuilder.retry,
         )
         return RestRequestExecutor.execute(postgrest = this, path = "rpc/$function", request = rpcRequest)
     }

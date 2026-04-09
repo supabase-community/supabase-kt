@@ -53,7 +53,8 @@ class PostgrestQueryBuilder(
             count = requestBuilder.count,
             urlParams = requestBuilder.params.mapToFirstValue(),
             schema = schema,
-            headers = requestBuilder.headers.build()
+            headers = requestBuilder.headers.build(),
+            retry = requestBuilder.retry,
         )
         return RestRequestExecutor.execute(postgrest = postgrest,path = table, request = selectRequest)
     }

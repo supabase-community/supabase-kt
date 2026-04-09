@@ -31,6 +31,21 @@ open class PostgrestRequestBuilder(@PublishedApi internal val propertyConversion
     @SupabaseExperimental val headers: HeadersBuilder = HeadersBuilder()
 
     /**
+     * Whether to retry this request on transient errors (network errors, HTTP 503/520).
+     * Only applies to idempotent requests (GET, HEAD) — non-idempotent requests are never retried.
+     * Set to `false` to disable retries for this specific request.
+     */
+    var retry: Boolean = true
+        private set
+
+    /**
+     * Disables automatic retries for this request.
+     */
+    fun noRetry() {
+        this.retry = false
+    }
+
+    /**
      * Setting [count] allows to use [PostgrestResult.countOrNull] to get the total amount of items in the database.
      * @param count algorithm to use to count rows in the table or view.
      */

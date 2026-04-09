@@ -22,5 +22,7 @@ sealed interface PostgrestRequest {
     val returning: Returning get() = Returning.Minimal
     val prefer: List<String>
     val schema: String
+    /** Whether to retry on transient errors. Only applies to idempotent methods (GET, HEAD). */
+    val retry: Boolean get() = true
 
 }
