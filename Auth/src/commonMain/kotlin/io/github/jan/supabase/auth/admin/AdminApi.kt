@@ -5,6 +5,8 @@ import io.github.jan.supabase.auth.Auth
 import io.github.jan.supabase.auth.SignOutScope
 import io.github.jan.supabase.auth.api.AuthenticatedSupabaseApi
 import io.github.jan.supabase.auth.user.UserInfo
+import io.github.jan.supabase.auth.admin.oauth.OAuthClientApi
+import io.github.jan.supabase.auth.admin.oauth.OAuthClientApiImpl
 import io.github.jan.supabase.auth.user.UserMfaFactor
 import io.github.jan.supabase.putJsonObject
 import io.github.jan.supabase.safeBody
@@ -23,6 +25,11 @@ import kotlinx.serialization.json.put
  * The admin interface for the supabase auth module. Service role access token is required. Import it via [Auth.importAuthToken]. Never share it publicly
  */
 interface AdminApi {
+
+    /**
+     * The OAuth client management API
+     */
+    val oauth: OAuthClientApi
 
     /**
      * Creates a new user using an email and password
@@ -99,6 +106,8 @@ interface AdminApi {
 
 @PublishedApi
 internal class AdminApiImpl(val api: AuthenticatedSupabaseApi) : AdminApi {
+
+    override val oauth: OAuthClientApi = OAuthClientApiImpl(api)
 
     override suspend fun signOut(jwt: String, scope: SignOutScope) {
         api.post("logout") {
