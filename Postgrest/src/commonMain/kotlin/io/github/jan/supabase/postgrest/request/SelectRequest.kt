@@ -11,6 +11,7 @@ import io.ktor.http.HttpMethod
     override val urlParams: Map<String, String>,
     override val schema: String,
     override val headers: Headers = Headers.Empty,
+    override val retry: Boolean = true,
 ): PostgrestRequest {
 
     override val method = if (head) HttpMethod.Head else HttpMethod.Get

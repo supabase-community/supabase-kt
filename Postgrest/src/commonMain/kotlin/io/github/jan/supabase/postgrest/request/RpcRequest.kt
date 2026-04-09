@@ -12,7 +12,8 @@ internal class RpcRequest(
     override val urlParams: Map<String, String>,
     override val body: JsonElement? = null,
     override val schema: String = "public",
-    override val headers: Headers = Headers.Empty
+    override val headers: Headers = Headers.Empty,
+    override val retry: Boolean = true,
 ) : PostgrestRequest {
 
     override val prefer = if (count != null) listOf("count=${count.identifier}") else listOf()
