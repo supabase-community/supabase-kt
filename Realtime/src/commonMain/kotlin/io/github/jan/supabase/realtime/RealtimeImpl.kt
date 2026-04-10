@@ -29,6 +29,8 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.serialization.json.buildJsonObject
 import kotlin.concurrent.atomics.AtomicBoolean
 import kotlin.concurrent.atomics.AtomicInt
@@ -48,6 +50,7 @@ import kotlin.time.Clock
     private val _subscriptions = AtomicMutableMap<String, RealtimeChannel>()
     override val subscriptions: Map<String, RealtimeChannel> = _subscriptions
     private val scope = CoroutineScope(supabaseClient.coroutineDispatcher + SupervisorJob())
+    private val mutex = Mutex()
     private val isReconnecting = AtomicBoolean(false)
     private val _accessToken = AtomicReference<String?>(null)
     val accessToken get() = _accessToken.load()
@@ -67,13 +70,14 @@ import kotlin.time.Clock
 
     override suspend fun connect() = connect(false)
 
-    private suspend fun connect(reconnect: Boolean) {
+    private suspend fun connect(reconnect: Boolean) = mutex.withLock {
         if (reconnect) {
             delay(config.reconnectDelay)
             Realtime.logger.d { "Reconnecting..." }
         }
         // Prevent multiple sources from starting the connection concurrently
-        if (!_status.compareAndSet(Realtime.Status.DISCONNECTED, Realtime.Status.CONNECTING)) return
+        if (!_status.compareAndSet(Realtime.Status.DISCONNECTED, Realtime.Status.CONNECTING))
+            return@withLock
         try {
             ws = websocketFactory.create(websocketUrl)
             _status.value = Realtime.Status.CONNECTED
