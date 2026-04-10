@@ -14,8 +14,12 @@ import kotlinx.coroutines.delay
 internal data object RestRequestExecutor : RequestExecutor {
 
     private val RETRYABLE_METHODS = setOf(HttpMethod.Get, HttpMethod.Head)
-    private val RETRYABLE_STATUS_CODES = setOf(503, 520)
+    private const val HTTP_SERVICE_UNAVAILABLE = 503
+    private const val HTTP_UNKNOWN_ERROR = 520
+    private val RETRYABLE_STATUS_CODES = setOf(HTTP_SERVICE_UNAVAILABLE, HTTP_UNKNOWN_ERROR)
     private const val MAX_RETRY_DELAY_MS = 30_000L
+    private const val BASE_DELAY_MS = 1000L
+    private const val BACKOFF_MULTIPLIER = 2.0
 
     override suspend fun execute(
         postgrest: Postgrest,
@@ -57,10 +61,8 @@ internal data object RestRequestExecutor : RequestExecutor {
         throw lastException!!
     }
 
-    private val BASE_DELAY_MS = 1000L
-
     private fun getRetryDelay(attempt: Int): Long {
-        val exponentialDelay = BASE_DELAY_MS * 2.0.pow(attempt).toLong()
+        val exponentialDelay = BASE_DELAY_MS * BACKOFF_MULTIPLIER.pow(attempt).toLong()
         return minOf(exponentialDelay, MAX_RETRY_DELAY_MS)
     }
 
