@@ -5,6 +5,7 @@ import io.ktor.http.Headers
 import io.ktor.http.HttpMethod
 import kotlinx.serialization.json.JsonElement
 
+@Suppress("LongParameterList")
 @PublishedApi
 internal class RpcRequest(
     override val method: HttpMethod,
