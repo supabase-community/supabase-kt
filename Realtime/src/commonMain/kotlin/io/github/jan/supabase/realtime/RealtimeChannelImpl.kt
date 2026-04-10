@@ -68,6 +68,8 @@ internal class RealtimeChannelImpl(
         if(realtimeImpl.status.value != Realtime.Status.CONNECTED) {
             if(!realtimeImpl.config.connectOnSubscribe) error("You can't subscribe to a channel while the realtime client is not connected. Did you forget to call `realtime.connect()`?")
             realtimeImpl.connect()
+            // If connect fails, it will schedule a retry, wait for the connection
+            realtimeImpl.status.first { it == Realtime.Status.CONNECTED }
         }
         if(!realtimeImpl.subscriptions.containsKey(topic)) {
             realtime.addChannel(this)
