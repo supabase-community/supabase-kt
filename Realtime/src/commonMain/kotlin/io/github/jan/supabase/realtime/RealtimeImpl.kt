@@ -65,13 +65,13 @@ import kotlin.time.Clock
 
     override suspend fun connect() = connect(false)
 
-    suspend fun connect(reconnect: Boolean): Unit = mutex.withLock {
+    private suspend fun connect(reconnect: Boolean) {
+        // Prevent multiple sources from starting the connection concurrently
+        if (!_status.compareAndSet(Realtime.Status.DISCONNECTED, Realtime.Status.CONNECTING)) return
         if (reconnect) {
             delay(config.reconnectDelay)
             Realtime.logger.d { "Reconnecting..." }
         }
-        if (status.value == Realtime.Status.CONNECTED) return
-        _status.value = Realtime.Status.CONNECTING
         try {
             ws = websocketFactory.create(websocketUrl)
             _status.value = Realtime.Status.CONNECTED
