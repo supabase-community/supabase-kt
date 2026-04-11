@@ -373,9 +373,6 @@ class AuthRequestTest {
     fun testSignInWithIDToken() {
         runTest {
             val captchaToken = "captchaToken"
-            val userData = buildJsonObject {
-                put("key", "value")
-            }
             val expectedIdToken = "idToken"
             val expectedProvider = Google
             val expectedAccessToken = "accessToken"
@@ -388,7 +385,6 @@ class AuthRequestTest {
                 assertPathIs("/token", it.url.pathAfterVersion())
                 assertEquals("id_token", params["grant_type"])
                 assertEquals(captchaToken, metaSecurity["captcha_token"]?.jsonPrimitive?.content)
-                assertEquals(userData, body["data"]!!.jsonObject)
                 assertEquals(expectedIdToken, body["id_token"]?.jsonPrimitive?.content)
                 assertEquals(expectedProvider.name, body["provider"]?.jsonPrimitive?.content)
                 assertEquals(expectedAccessToken, body["access_token"]?.jsonPrimitive?.content)
@@ -399,7 +395,6 @@ class AuthRequestTest {
             }.awaitInit()
             client.auth.signInWith(IDToken) {
                 this.captchaToken = captchaToken
-                data = userData
                 this.idToken = expectedIdToken
                 provider = expectedProvider
                 this.nonce = expectedNonce
