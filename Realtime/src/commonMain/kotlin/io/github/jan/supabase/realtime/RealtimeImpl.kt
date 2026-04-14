@@ -32,6 +32,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.serialization.json.buildJsonObject
+import kotlin.concurrent.atomics.AtomicBoolean
 import kotlin.concurrent.atomics.AtomicInt
 import kotlin.concurrent.atomics.AtomicReference
 import kotlin.concurrent.atomics.fetchAndIncrement
@@ -50,6 +51,7 @@ import kotlin.time.Clock
     override val subscriptions: Map<String, RealtimeChannel> = _subscriptions
     private val scope = CoroutineScope(supabaseClient.coroutineDispatcher + SupervisorJob())
     private val mutex = Mutex()
+    private val isReconnecting = AtomicBoolean(false)
     private val _accessToken = AtomicReference<String?>(null)
     val accessToken get() = _accessToken.load()
     private var heartbeatJob: Job? = null
@@ -68,7 +70,7 @@ import kotlin.time.Clock
 
     override suspend fun connect() = connect(false)
 
-    suspend fun connect(reconnect: Boolean): Unit = mutex.withLock {
+    private suspend fun connect(reconnect: Boolean): Unit = mutex.withLock {
         if (reconnect) {
             delay(config.reconnectDelay)
             Realtime.logger.d { "Reconnecting..." }
@@ -83,6 +85,7 @@ import kotlin.time.Clock
             startHeartbeating()
             if(reconnect) {
                 rejoinChannels()
+                isReconnecting.store(false)
             }
         } catch(e: Exception) {
             currentCoroutineContext().ensureActive()
@@ -90,6 +93,9 @@ import kotlin.time.Clock
                 Error while trying to connect to realtime websocket. Trying again in ${config.reconnectDelay}
                 URL: $websocketUrl
                 """.trimIndent() }
+            if(reconnect) {
+                isReconnecting.store(false)
+            }
             reconnect()
         }
     }
@@ -160,7 +166,7 @@ import kotlin.time.Clock
         ws = null
         heartbeatJob?.cancel()
         for ((_, channel) in subscriptions) {
-            channel.teardown()
+            channel.updateStatus(RealtimeChannel.Status.UNSUBSCRIBED)
         }
         _status.value = Realtime.Status.DISCONNECTED
     }
@@ -244,6 +250,9 @@ import kotlin.time.Clock
     override suspend fun close() {
         disconnect()
         scope.cancel()
+        for ((_, channel) in subscriptions) {
+            channel.teardown()
+        }
     }
 
     override suspend fun block() {
@@ -295,14 +304,11 @@ import kotlin.time.Clock
     }
 
     private fun reconnect() {
-        scope.launch {
-            Realtime.logger.d { "Closing websocket connection" }
-            messageJob?.cancel()
-            ws?.disconnect()
-            ws = null
-            heartbeatJob?.cancel()
-            _status.value = Realtime.Status.DISCONNECTED
-            connect(true)
+        if(isReconnecting.compareAndSet(expectedValue = false, newValue = true)) {
+            scope.launch {
+                disconnect()
+                connect(true)
+            }
         }
     }
 
