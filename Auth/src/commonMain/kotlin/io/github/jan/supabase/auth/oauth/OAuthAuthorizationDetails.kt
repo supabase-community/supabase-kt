@@ -11,7 +11,7 @@ import kotlinx.serialization.Serializable
  * client details, user info, requested scopes, and where the user will be redirected.
  *
  * Note: [redirectUri] is the base URI (e.g., "https://app.com/callback") without
- * query parameters. After consent, you'll receive a complete [redirectUri] with
+ * query parameters. After consent, you'll receive a complete redirect url with
  * the authorization code and state parameters appended.
  * @param authorizationId The authorization ID used to approve or deny the request
  * @param redirectUri The OAuth client's registered redirect URI (base URI without query parameters)

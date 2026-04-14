@@ -18,7 +18,7 @@ sealed interface OAuthAuthorizationDetailResponse {
             when {
                 "redirect_uri" in element.jsonObject -> OAuthAuthorizationDetails.serializer()
                 "redirect_url" in element.jsonObject -> OAuthRedirect.serializer()
-                else -> error("Unknown shape")
+                else -> error("Unknown response body")
             }
     }
 

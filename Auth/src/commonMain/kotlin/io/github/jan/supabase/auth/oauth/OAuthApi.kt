@@ -17,9 +17,9 @@ interface OAuthApi {
      * Retrieves details about an OAuth authorization request.
      * Only relevant when the OAuth 2.1 server is enabled in Supabase Auth.
      *
-     * Returns authorization details including client info, scopes, and user information.
+     * Returns [OAuthAuthorizationDetails] including client info, scopes, and user information.
      * If the response includes only a redirect_url field, it means consent was already given - the caller
-     * should handle the redirect manually if needed.
+     * should handle the redirect manually if needed, so a [OAuthRedirect] will be returned.
      * @param authorizationId The corresponding authorization id
      */
     suspend fun getAuthorizationDetails(
