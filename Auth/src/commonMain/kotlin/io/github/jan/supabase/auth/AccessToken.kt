@@ -50,7 +50,7 @@ private suspend fun SupabaseClient.checkAccessToken(token: String) {
     val autoRefreshEnabled = auth.config.alwaysAutoRefresh
     if (sessionExistsAndExpired && autoRefreshEnabled) {
         val autoRefreshRunning = auth.isAutoRefreshRunning
-        Auth.logger.e {
+        auth.logger.e {
             """
                 Authenticated request attempted with expired access token. This should not happen. Please report this issue. Trying to refresh session before...
                 Auto refresh running: $autoRefreshRunning
@@ -63,7 +63,7 @@ private suspend fun SupabaseClient.checkAccessToken(token: String) {
         try {
             auth.refreshCurrentSession()
         } catch (e: Exception) {
-            Auth.logger.d(e) { "Failed to force-refresh session before making a request with an expired access token" }
+            auth.logger.d(e) { "Failed to force-refresh session before making a request with an expired access token" }
             throw TokenExpiredException()
         }
     }

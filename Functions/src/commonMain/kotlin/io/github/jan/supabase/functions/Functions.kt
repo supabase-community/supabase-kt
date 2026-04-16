@@ -14,6 +14,8 @@ import io.github.jan.supabase.exceptions.NotFoundRestException
 import io.github.jan.supabase.exceptions.RestException
 import io.github.jan.supabase.exceptions.UnauthorizedRestException
 import io.github.jan.supabase.exceptions.UnknownRestException
+import io.github.jan.supabase.logging.SupabaseLogger
+import io.github.jan.supabase.logging.createLogger
 import io.github.jan.supabase.plugins.CustomSerializationConfig
 import io.github.jan.supabase.plugins.CustomSerializationPlugin
 import io.github.jan.supabase.plugins.MainConfig
@@ -56,6 +58,7 @@ import kotlinx.coroutines.flow.flow
  */
 class Functions(override val config: Config, override val supabaseClient: SupabaseClient) : MainPlugin<Functions.Config>, CustomSerializationPlugin {
 
+    override val logger: SupabaseLogger = supabaseClient.createLogger(Functions.LOGGING_TAG, config)
     override val apiVersion: Int
         get() = API_VERSION
 
@@ -80,7 +83,7 @@ class Functions(override val config: Config, override val supabaseClient: Supaba
     suspend inline operator fun invoke(function: String, region: FunctionRegion = config.defaultRegion, crossinline builder: HttpRequestBuilder.() -> Unit): HttpResponse {
         return api.post(function) {
             builder()
-            header("x-region", region.value)
+            header(X_REGION_HEADER, region.value)
         }
     }
 
@@ -97,7 +100,7 @@ class Functions(override val config: Config, override val supabaseClient: Supaba
      */
     suspend inline operator fun <reified T : Any> invoke(function: String, body: T, region: FunctionRegion = config.defaultRegion, headers: Headers = Headers.Empty): HttpResponse = invoke(function) {
         this.headers.appendAll(headers)
-        header("x-region", region.value)
+        header(X_REGION_HEADER, region.value)
         setBody(serializer.encode(body))
     }
 
@@ -112,7 +115,7 @@ class Functions(override val config: Config, override val supabaseClient: Supaba
      */
     suspend inline operator fun invoke(function: String, region: FunctionRegion = config.defaultRegion, headers: Headers = Headers.Empty): HttpResponse = invoke(function) {
         this.headers.appendAll(headers)
-        header("x-region", region.value)
+        header(X_REGION_HEADER, region.value)
     }
 
     /**
@@ -146,7 +149,7 @@ class Functions(override val config: Config, override val supabaseClient: Supaba
             request = {
                 method = HttpMethod.Post
                 headers.appendAll(defaultHeaders)
-                header("x-region", region.value)
+                header(X_REGION_HEADER, region.value)
                 builder()
             }
         ) {
@@ -172,7 +175,7 @@ class Functions(override val config: Config, override val supabaseClient: Supaba
         return api.prepareRequest(function) {
             method = HttpMethod.Post
             builder()
-            header("x-region", region.value)
+            header(X_REGION_HEADER, region.value)
         }
     }
 
@@ -191,7 +194,7 @@ class Functions(override val config: Config, override val supabaseClient: Supaba
         functionName = function,
         headers = Headers.build {
             appendAll(headers)
-            append("x-region", region.value)
+            append(X_REGION_HEADER, region.value)
         },
         supabaseClient = supabaseClient
     )
@@ -232,7 +235,15 @@ class Functions(override val config: Config, override val supabaseClient: Supaba
 
         override val key = "functions"
 
-        override val logger = SupabaseClient.createLogger("Supabase-Functions")
+        /**
+         * The tag for the Functions logger.
+         */
+        const val LOGGING_TAG = "Supabase-Functions"
+
+        /**
+         * The header for specifying which region the function should be called in
+         */
+        const val X_REGION_HEADER = "x-region"
 
         /**
          * The current functions api version

@@ -18,11 +18,11 @@ internal fun Routing.configureRoutes(
     get("/") {
         val code = call.parameters["code"]
         if (auth.handledUrlParameterError { call.parameters[it] }) {
-            errorResponse()
+            auth.errorResponse(this)
         } else if(code != null) {
             val session = auth.exchangeCodeForSession(code, false)
             onSuccess(session)
-            Auth.logger.d {
+            auth.logger.d {
                 "Successfully authenticated user with OAuth using the PKCE flow"
             }
             shutdown(call, auth.config.httpCallbackConfig.redirectHtml)
@@ -31,11 +31,11 @@ internal fun Routing.configureRoutes(
         }
     }
     get("/callback") {
-        Auth.logger.d {
+        auth.logger.d {
             "Received request on OAuth callback route"
         }
         if (auth.handledUrlParameterError { call.parameters[it] }) {
-            errorResponse()
+            auth.errorResponse(this)
             return@get
         }
         val accessToken = call.parameters["access_token"] ?: return@get
@@ -47,18 +47,18 @@ internal fun Routing.configureRoutes(
         val type = call.parameters["type"].orEmpty()
         val user = auth.retrieveUser(accessToken)
         onSuccess(UserSession(accessToken, refreshToken, providerRefreshToken, providerToken, expiresIn, tokenType, user, type))
-        Auth.logger.d {
+        auth.logger.d {
             "Successfully authenticated user with OAuth using the implicit flow"
         }
         shutdown(call, auth.config.httpCallbackConfig.redirectHtml)
     }
 }
 
-private suspend fun RoutingContext.errorResponse() {
-    Auth.logger.d {
+private suspend fun Auth.errorResponse(ctx: RoutingContext) {
+    logger.d {
         "Error in OAuth callback"
     }
-    call.respondText(
+    ctx.call.respondText(
         text = "Error",
         contentType = ContentType.Text.Html,
         status = HttpStatusCode.BadRequest

@@ -4,7 +4,6 @@ import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.SupabaseSerializer
 import io.github.jan.supabase.auth.AuthDependentPluginConfig
 import io.github.jan.supabase.exceptions.HttpRequestException
-import io.github.jan.supabase.logging.SupabaseLogger
 import io.github.jan.supabase.plugins.CustomSerializationConfig
 import io.github.jan.supabase.plugins.CustomSerializationPlugin
 import io.github.jan.supabase.plugins.MainConfig
@@ -119,7 +118,10 @@ interface Postgrest : MainPlugin<Postgrest.Config>, CustomSerializationPlugin {
 
         override val key = "rest"
 
-        override val logger: SupabaseLogger = SupabaseClient.createLogger("Supabase-PostgREST")
+        /**
+         * The tag for the PostgREST logger.
+         */
+        const val LOGGING_TAG = "Supabase-PostgREST"
 
         /**
          * The current postgrest API version

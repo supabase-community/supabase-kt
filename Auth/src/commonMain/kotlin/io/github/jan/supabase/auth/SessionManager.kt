@@ -16,7 +16,7 @@ interface SessionManager {
     /**
      * Loads the saved session from storage.
      */
-    suspend fun loadSession(): UserSession?
+    suspend fun loadSession(): UserSession
 
     /**
      * Deletes the saved session from storage.
@@ -36,8 +36,8 @@ class MemorySessionManager(session: UserSession? = null): SessionManager {
         this.session.store(session)
     }
 
-    override suspend fun loadSession(): UserSession? {
-        return session.load()
+    override suspend fun loadSession(): UserSession {
+        return session.load() ?: error("No session stored")
     }
 
     override suspend fun deleteSession() {

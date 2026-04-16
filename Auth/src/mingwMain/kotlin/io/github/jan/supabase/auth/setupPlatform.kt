@@ -5,6 +5,6 @@ import io.github.jan.supabase.logging.w
 
 @SupabaseInternal
 actual suspend fun Auth.setupPlatform() {
-    Auth.logger.w { "Windows support is experimental, please report any bugs you find!" }
+    logger.w { "Windows support is experimental, please report any bugs you find!" }
     initDone()
 }
