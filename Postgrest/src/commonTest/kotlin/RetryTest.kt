@@ -10,6 +10,7 @@ import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFails
 
 class RetryTest {
 
@@ -65,11 +66,11 @@ class RetryTest {
             respond("Service Unavailable", HttpStatusCode.ServiceUnavailable)
         }
         // POST (insert) should not retry - it will get a RestException from the error response
-        try {
+        assertFails {
             supabase.from("test").insert(buildJsonArray {
                 add(buildJsonObject { put("id", 1) })
             })
-        } catch (_: Exception) { }
+        }
         assertEquals(1, requestCount, "POST should not retry")
     }
 
@@ -82,11 +83,11 @@ class RetryTest {
             requestCount++
             respond("Service Unavailable", HttpStatusCode.ServiceUnavailable)
         }
-        try {
+        assertFails {
             supabase.from("test").select {
                 noRetry()
             }
-        } catch (_: Exception) { }
+        }
         assertEquals(1, requestCount, "Should not retry when noRetry() is set")
     }
 
@@ -101,9 +102,9 @@ class RetryTest {
         }
         // All retries fail with 503 - the last response should be returned as a result
         // (the error parsing happens in asPostgrestResult, not in the retry logic)
-        try {
+        assertFails {
             supabase.from("test").select()
-        } catch (_: Exception) { }
+        }
         assertEquals(3, requestCount, "Should attempt 1 + 2 retries = 3 total requests")
     }
 
@@ -152,9 +153,9 @@ class RetryTest {
             requestCount++
             respond("Service Unavailable", HttpStatusCode.ServiceUnavailable)
         }
-        try {
+        assertFails {
             supabase.from("test").select()
-        } catch (_: Exception) { }
+        }
         assertEquals(1, requestCount, "Should not retry when maxRetries is 0")
     }
 

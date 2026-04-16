@@ -20,6 +20,7 @@ internal data object RestRequestExecutor : RequestExecutor {
     private const val MAX_RETRY_DELAY_MS = 30_000L
     private const val BASE_DELAY_MS = 1000L
     private const val BACKOFF_MULTIPLIER = 2.0
+    private const val RETRY_COUNT_HEADER = "x-retry-count"
 
     override suspend fun execute(
         postgrest: Postgrest,
@@ -38,7 +39,7 @@ internal data object RestRequestExecutor : RequestExecutor {
                 val response = authenticatedSupabaseApi.request(path) {
                     configurePostgrestRequest(request)
                     if (attempt > 0) {
-                        headers.append("x-retry-count", attempt.toString())
+                        headers.append(RETRY_COUNT_HEADER, attempt.toString())
                     }
                 }
                 return response.asPostgrestResult(postgrest)
