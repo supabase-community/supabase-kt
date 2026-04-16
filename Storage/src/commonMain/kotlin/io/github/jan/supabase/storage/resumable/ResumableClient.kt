@@ -6,7 +6,6 @@ import io.github.jan.supabase.annotations.SupabaseInternal
 import io.github.jan.supabase.auth.Auth
 import io.github.jan.supabase.logging.d
 import io.github.jan.supabase.storage.BucketApi
-import io.github.jan.supabase.storage.Storage
 import io.github.jan.supabase.storage.UploadOptionBuilder
 import io.github.jan.supabase.storage.resumable.ResumableClient.Companion.TUS_VERSION
 import io.github.jan.supabase.storage.storage
@@ -78,11 +77,12 @@ internal class ResumableClientImpl(private val storageApi: BucketApi, private va
     private val httpClient = storageApi.supabaseClient.httpClient.httpClient
     private val url = storageApi.supabaseClient.storage.resolveUrl("upload/resumable")
     private val chunkSize = storageApi.supabaseClient.storage.config.resumable.defaultChunkSize
+    val logger = storageApi.supabaseClient.logger
 
     override suspend fun continuePreviousUploads(channelProducer: suspend (source: String, offset: Long) -> ByteReadChannel): List<Deferred<ResumableUpload>> {
         val cachedEntries = cache.entries()
         return cachedEntries.map { (fingerprint, cacheEntry) ->
-            Storage.logger.d { "Found cached upload for ${cacheEntry.path}" }
+            logger.d { "Found cached upload for ${cacheEntry.path}" }
             coroutineScope {
                 async {
                     resumeUpload({ channelProducer(fingerprint.source, it) }, cacheEntry, fingerprint.source, cacheEntry.path, fingerprint.size)
@@ -100,7 +100,7 @@ internal class ResumableClientImpl(private val storageApi: BucketApi, private va
     ): ResumableUpload {
         val cachedEntry = cache.get(Fingerprint(source, size))
         if(cachedEntry != null) {
-            Storage.logger.d { "Found cached upload for $path" }
+            logger.d { "Found cached upload for $path" }
             return resumeUpload(channel, cachedEntry, source, path, size)
         }
         return createUpload(channel, source, path, size, options)
@@ -144,7 +144,7 @@ internal class ResumableClientImpl(private val storageApi: BucketApi, private va
     private suspend fun resumeUpload(channel: suspend (Long) -> ByteReadChannel, entry: ResumableCacheEntry, source: String, path: String, size: Long): ResumableUploadImpl {
         val fingerprint = Fingerprint(source, size)
         if(Clock.System.now() > entry.expiresAt) {
-            Storage.logger.d { "Upload url for $path expired. Creating new one" }
+            logger.d { "Upload url for $path expired. Creating new one" }
             cache.remove(fingerprint)
             return createUpload(channel, source, path, size) {
                 upsert = entry.upsert
@@ -178,7 +178,7 @@ internal class ResumableClientImpl(private val storageApi: BucketApi, private va
         }
         if(!response.status.isSuccess()) error("Failed to retrieve server offset: ${response.status} ${response.bodyAsText()}")
         val offset = response.headers["Upload-Offset"]?.toLongOrNull() ?: error("No upload offset found")
-        Storage.logger.d { "Server offset for $path is $offset" }
+        logger.d { "Server offset for $path is $offset" }
         return offset
     }
 

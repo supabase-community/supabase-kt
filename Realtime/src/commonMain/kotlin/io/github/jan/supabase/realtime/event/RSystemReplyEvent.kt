@@ -1,7 +1,6 @@
 package io.github.jan.supabase.realtime.event
 
 import io.github.jan.supabase.logging.d
-import io.github.jan.supabase.realtime.Realtime
 import io.github.jan.supabase.realtime.RealtimeChannel
 import io.github.jan.supabase.realtime.RealtimeMessage
 import kotlinx.serialization.json.jsonPrimitive
@@ -12,10 +11,10 @@ import kotlinx.serialization.json.jsonPrimitive
 data object RSystemReplyEvent : RealtimeEvent {
 
     override suspend fun handle(channel: RealtimeChannel, message: RealtimeMessage) {
-        Realtime.logger.d { "Received system reply: ${message.payload}." }
+        channel.logger.d { "Received system reply: ${message.payload}." }
         if(channel.status.value == RealtimeChannel.Status.UNSUBSCRIBING) {
             channel.updateStatus(RealtimeChannel.Status.UNSUBSCRIBED)
-            Realtime.logger.d { "Unsubscribed from channel ${message.topic}" }
+            channel.logger.d { "Unsubscribed from channel ${message.topic}" }
         }
     }
 

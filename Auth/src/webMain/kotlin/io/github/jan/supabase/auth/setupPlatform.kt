@@ -27,7 +27,7 @@ private fun Auth.checkForHash(bridge: BrowserBridge): UserSession? {
     if(bridge.hash.isBlank()) return null
     val afterHash = bridge.hash.substring(1)
     if(!afterHash.contains('=')) return null
-    Auth.logger.d { "Found hash: $afterHash" }
+    logger.d { "Found hash: $afterHash" }
     return when(val result = validateHash(afterHash)) {
         is UrlValidationResult.SessionFound, UrlValidationResult.ErrorFound -> {
             cleanHash(bridge)
@@ -49,12 +49,12 @@ private fun Auth.checkForPKCECode(bridge: BrowserBridge): String? {
 }
 
 private suspend fun Auth.handlePKCECode(code: String) {
-    Auth.logger.d { "Found PCKE code: $code" }
+    logger.d { "Found PCKE code: $code" }
     try {
         val session = exchangeCodeForSession(code)
         importSession(session, source = SessionSource.External)
     } catch(e: Exception) {
-        Auth.logger.w(e) { "Failed to exchange PCKE code for session" }
+        logger.w(e) { "Failed to exchange PCKE code for session" }
     }
     initDone()
 }
@@ -70,12 +70,12 @@ actual suspend fun Auth.setupPlatform() {
     if(IS_BROWSER && !config.disableUrlChecking && config.browserBridge != null) {
         when(config.flowType) {
             FlowType.PKCE -> {
-                Auth.logger.d { "Using PCKE flow type, checking for PCKE code..." }
+                logger.d { "Using PCKE flow type, checking for PCKE code..." }
                 val code = checkForPKCECode(config.browserBridge!!) ?: return initDone()
                 handlePKCECode(code)
             }
             FlowType.IMPLICIT -> {
-                Auth.logger.d { "Using IMPLICIT flow type, checking for hash..." }
+                logger.d { "Using IMPLICIT flow type, checking for hash..." }
                 val sessionInHash = checkForHash(config.browserBridge!!) ?: return initDone()
                 handleHashSession(sessionInHash)
             }
