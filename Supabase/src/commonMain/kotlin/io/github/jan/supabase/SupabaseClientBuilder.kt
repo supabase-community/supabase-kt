@@ -65,7 +65,10 @@ class SupabaseClientBuilder @PublishedApi internal constructor(
      */
     var defaultLogLevel: LogLevel = LogLevel.INFO
 
-    var defaultLoggingProcessor: SupabaseLoggingProcessorFactory = { level -> KermitLoggingProcessor(level) }
+    /**
+     * The default logging factory. Used for creating a [SupabaseLoggingProcessor] using a specified [LogLevel]
+     */
+    var defaultLoggingFactory: SupabaseLoggingProcessorFactory = { level -> KermitLoggingProcessor(level) }
 
     /**
      * The default serializer used to serialize and deserialize custom data types.
@@ -124,7 +127,7 @@ class SupabaseClientBuilder @PublishedApi internal constructor(
             supabaseKey = supabaseKey,
             loggingConfig = SupabaseLoggingConfig(
                 defaultLogLevel,
-                defaultLoggingProcessor
+                defaultLoggingFactory
             ),
             networkConfig = SupabaseNetworkConfig(
                 useHTTPS = useHTTPS,
