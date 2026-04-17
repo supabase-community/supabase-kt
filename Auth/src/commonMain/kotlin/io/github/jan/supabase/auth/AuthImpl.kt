@@ -106,7 +106,7 @@ internal class AuthImpl(
     private val _events = MutableSharedFlow<AuthEvent>(replay = 1)
     override val events: SharedFlow<AuthEvent> = _events.asSharedFlow()
     @Suppress("DEPRECATION")
-    override val authScope = CoroutineScope((config.coroutineDispatcher ?: supabaseClient.coroutineDispatcher) + SupervisorJob())
+    override val authScope = config.authScope ?: CoroutineScope((config.coroutineDispatcher ?: supabaseClient.coroutineDispatcher) + SupervisorJob())
     override val sessionManager = config.sessionManager ?: createDefaultSessionManager()
     override val codeVerifierCache = config.codeVerifierCache ?: createDefaultCodeVerifierCache()
 
