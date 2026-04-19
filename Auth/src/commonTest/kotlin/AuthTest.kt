@@ -23,6 +23,7 @@ import io.ktor.http.Url
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.json.buildJsonObject
 import kotlin.test.AfterTest
@@ -57,7 +58,10 @@ class AuthTest {
                 }
             }
         )
-        client.auth.awaitInitialization()
+        launch {
+            client.auth.awaitInitialization()
+        }
+        advanceUntilIdle()
         assertIs<SessionStatus.Authenticated>(client.auth.sessionStatus.value)
     }
 
