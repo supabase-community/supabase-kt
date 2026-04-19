@@ -11,6 +11,7 @@ import io.github.jan.supabase.auth.user.UserSession
 import io.github.jan.supabase.plugins.CustomSerializationConfig
 import io.github.jan.supabase.plugins.MainConfig
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
@@ -59,6 +60,9 @@ open class AuthConfigDefaults : MainConfig(), AuthDependentPluginConfig, CustomS
      */
     @Deprecated("SupabaseClientBuilder.coroutineDispatcher should be used instead")
     var coroutineDispatcher: CoroutineDispatcher? = null
+
+    @SupabaseInternal
+    var authScope: CoroutineScope? = null
 
     /**
      * The type of login flow to use. Defaults to [FlowType.IMPLICIT]
