@@ -102,13 +102,15 @@ interface Postgrest : MainPlugin<Postgrest.Config>, CustomSerializationPlugin {
      * @param urlLengthLimit Maximum URL length in characters before warnings/errors are triggered. Defaults to 8000.
      * @param defaultSchema The default schema to use for the requests. Defaults to "public"
      * @param propertyConversionMethod The method to use to convert the property names to the column names in [PostgrestRequestBuilder] and [PostgrestUpdate]. Defaults to [PropertyConversionMethod.CAMEL_CASE_TO_SNAKE_CASE]
+     * @param maxRetries Maximum number of retries for idempotent requests (GET, HEAD) that fail with transient errors (network errors, HTTP 503/520). Set to 0 to disable retries. Defaults to 3.
      */
     data class Config(
         var defaultSchema: String = "public",
         var propertyConversionMethod: PropertyConversionMethod = PropertyConversionMethod.CAMEL_CASE_TO_SNAKE_CASE,
         override var requireValidSession: Boolean = false,
         var urlLengthLimit: Int = 8000,
-        var timeout: Duration = 30.seconds
+        var timeout: Duration = 30.seconds,
+        var maxRetries: Int = 3,
     ): MainConfig(), CustomSerializationConfig, AuthDependentPluginConfig {
 
         override var serializer: SupabaseSerializer? = null
