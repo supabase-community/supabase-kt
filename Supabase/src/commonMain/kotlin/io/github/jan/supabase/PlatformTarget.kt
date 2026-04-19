@@ -1,8 +1,6 @@
 @file:Suppress("UndocumentedPublicProperty")
 package io.github.jan.supabase
 
-import io.github.jan.supabase.logging.e
-
 /**
  * Represents a target platform
  */
@@ -20,9 +18,6 @@ data class OSInformation(
             try {
                 getOSInformation()
             } catch (e: Exception) {
-                SupabaseClient.LOGGER.e(e) {
-                    "Failed to get OS information, please report this issue"
-                }
                 null
             }
         }

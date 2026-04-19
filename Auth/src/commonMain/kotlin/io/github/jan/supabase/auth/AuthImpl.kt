@@ -47,6 +47,8 @@ import io.github.jan.supabase.exceptions.BadRequestRestException
 import io.github.jan.supabase.exceptions.RestException
 import io.github.jan.supabase.exceptions.UnauthorizedRestException
 import io.github.jan.supabase.exceptions.UnknownRestException
+import io.github.jan.supabase.logging.SupabaseLogger
+import io.github.jan.supabase.logging.createLogger
 import io.github.jan.supabase.logging.d
 import io.github.jan.supabase.logging.e
 import io.github.jan.supabase.logging.i
@@ -101,6 +103,7 @@ internal class AuthImpl(
     override val config: AuthConfig
 ) : Auth {
 
+    override val logger: SupabaseLogger = supabaseClient.createLogger(Auth.LOGGING_TAG, config)
     private val _sessionStatus = MutableStateFlow<SessionStatus>(SessionStatus.Initializing)
     override val sessionStatus: StateFlow<SessionStatus> = _sessionStatus.asStateFlow()
     private val _events = MutableSharedFlow<AuthEvent>(replay = 1)
@@ -135,19 +138,19 @@ internal class AuthImpl(
     }
 
     override fun init() {
-        Auth.logger.d { "Initializing Auth plugin..." }
+        logger.d { "Initializing Auth plugin..." }
         if (config.autoLoadFromStorage) {
             authScope.launch {
-                Auth.logger.i {
+                logger.i {
                     "Loading session from storage..."
                 }
                 val successful = loadFromStorage(initializing = true)
                 if (successful) {
-                    Auth.logger.i {
+                    logger.i {
                         "Successfully loaded session from storage!"
                     }
                 } else {
-                    Auth.logger.i {
+                    logger.i {
                         "No session found in storage."
                     }
                 }
@@ -156,7 +159,7 @@ internal class AuthImpl(
                 }
             }
         } else {
-            Auth.logger.d { "Skipping loading from storage (autoLoadFromStorage is set to false)" }
+            logger.d { "Skipping loading from storage (autoLoadFromStorage is set to false)" }
             if(config.autoSetupPlatform) {
                 authScope.launch {
                     setupPlatform()
@@ -164,7 +167,7 @@ internal class AuthImpl(
             }
         }
 
-        Auth.logger.d { "Initialized Auth plugin" }
+        logger.d { "Initialized Auth plugin" }
     }
 
     override suspend fun <C, R, Provider : AuthProvider<C, R>> signInWith(
@@ -351,17 +354,17 @@ internal class AuthImpl(
                 }
             } catch(e: RestException) {
                 if(e.statusCode in SIGNOUT_IGNORE_CODES) {
-                    Auth.logger.d { "Received error code ${e.statusCode} while signing out user. This can happen if the user doesn't exist anymore or the JWT is invalid/expired. Proceeding to clean up local data..." }
+                    logger.d { "Received error code ${e.statusCode} while signing out user. This can happen if the user doesn't exist anymore or the JWT is invalid/expired. Proceeding to clean up local data..." }
                 } else throw e
             }
-            Auth.logger.d { "Logged out session in Supabase" }
+            logger.d { "Logged out session in Supabase" }
         } else {
-            Auth.logger.i { "Skipping session logout as there is no session available. Proceeding to clean up local data..." }
+            logger.i { "Skipping session logout as there is no session available. Proceeding to clean up local data..." }
         }
         if (scope != SignOutScope.OTHERS) {
             clearSession()
         }
-        Auth.logger.d { "Successfully logged out" }
+        logger.d { "Successfully logged out" }
     }
 
     private suspend fun verify(
@@ -377,9 +380,9 @@ internal class AuthImpl(
             additionalData()
         }
         val response = publicApi.postJson("verify", body)
-        val session = response.bodyOrNull<UserSession>()
+        val session = supabaseClient.bodyOrNull<UserSession>(response)
         if(session == null) {
-            Auth.logger.d { "Received `verifyOtp` response without session: ${response.bodyAsText()}. This may occur if changing the email with 'Secure email change' enabled" }
+            logger.d { "Received `verifyOtp` response without session: ${response.bodyAsText()}. This may occur if changing the email with 'Secure email change' enabled" }
             return OtpVerifyResult.VerifiedNoSession
         }
         importSession(session, source = SessionSource.SignIn(OTP))
@@ -512,7 +515,7 @@ internal class AuthImpl(
     }
 
     override suspend fun refreshSession(refreshToken: String): UserSession {
-        Auth.logger.d {
+        logger.d {
             "Refreshing session"
         }
         val body = buildJsonObject {
@@ -543,29 +546,29 @@ internal class AuthImpl(
         source: SessionSource,
         initializing: Boolean
     ) {
-        Auth.logger.d { "Importing session $session from $source, auto refresh is set to $autoRefresh." }
+        logger.d { "Importing session $session from $source, auto refresh is set to $autoRefresh." }
         if (!autoRefresh) {
             if (session.refreshToken.isNotBlank() && session.expiresIn != 0L && config.autoSaveToStorage) {
                 sessionManager.saveSession(session)
-                Auth.logger.d { "Session saved to storage (no auto refresh)" }
+                logger.d { "Session saved to storage (no auto refresh)" }
             }
             setSessionStatus(SessionStatus.Authenticated(session, source))
-            Auth.logger.d { "Session imported successfully." }
+            logger.d { "Session imported successfully." }
             return
         }
         val thresholdDate = session.expiresAt - session.expiresIn.seconds * (1 - SESSION_REFRESH_THRESHOLD)
         if (thresholdDate <= Clock.System.now()) {
-            Auth.logger.d { "Session is under the threshold date. Refreshing session..." }
+            logger.d { "Session is under the threshold date. Refreshing session..." }
             recreateSessionJob(session, source, false, initializing)
         } else {
             if (config.autoSaveToStorage) {
                 sessionManager.saveSession(session)
-                Auth.logger.d { "Session saved to storage (auto refresh enabled)" }
+                logger.d { "Session saved to storage (auto refresh enabled)" }
             }
             setSessionStatus(SessionStatus.Authenticated(session, source))
-            Auth.logger.d { "Session imported successfully. Starting auto refresh..." }
+            logger.d { "Session imported successfully. Starting auto refresh..." }
             recreateSessionJob(session, source, true, initializing)
-            Auth.logger.d { "Auto refresh started." }
+            logger.d { "Auto refresh started." }
         }
     }
 
@@ -597,17 +600,17 @@ internal class AuthImpl(
             importRefreshedSession()
         } catch (e: RestException) {
             if (e.statusCode in 500..599) {
-                Auth.logger.e(e) { "Couldn't refresh session due to an internal server error. Retrying in ${config.retryDelay} (Status code ${e.statusCode})..." }
+                logger.e(e) { "Couldn't refresh session due to an internal server error. Retrying in ${config.retryDelay} (Status code ${e.statusCode})..." }
                 updateStatus(RefreshFailureCause.InternalServerError(e))
                 delay(config.retryDelay)
                 retry()
             } else {
-                Auth.logger.e(e) { "Couldn't refresh session. The refresh token may have been revoked. Clearing session (Status code ${e.statusCode})... " }
+                logger.e(e) { "Couldn't refresh session. The refresh token may have been revoked. Clearing session (Status code ${e.statusCode})... " }
                 clearSession()
             }
         } catch (e: Exception) {
             currentCoroutineContext().ensureActive()
-            Auth.logger.d(e) { "Couldn't reach Supabase. Either the address doesn't exist or the network might not be on. Retrying in ${config.retryDelay}..." }
+            logger.d(e) { "Couldn't reach Supabase. Either the address doesn't exist or the network might not be on. Retrying in ${config.retryDelay}..." }
             updateStatus(RefreshFailureCause.NetworkError(e))
             delay(config.retryDelay)
             retry()
@@ -616,7 +619,7 @@ internal class AuthImpl(
 
     private fun updateStatusIfExpired(session: UserSession, reason: RefreshFailureCause) {
         if (session.expiresAt <= Clock.System.now()) {
-            Auth.logger.d { "Session expired while trying to refresh the session. Updating status..." }
+            logger.d { "Session expired while trying to refresh the session. Updating status..." }
             setSessionStatus(SessionStatus.RefreshFailure(reason))
         }
         emitEvent(AuthEvent.RefreshFailure(reason))
@@ -631,7 +634,7 @@ internal class AuthImpl(
 
         val delayDuration = targetRefreshTime - now
         updateRefreshInformation(targetRefreshTime, null)
-        Auth.logger.d {
+        logger.d {
             "Refreshing session in $delayDuration."
         }
         // if the delayDuration is negative, delay() will not delay
@@ -651,7 +654,7 @@ internal class AuthImpl(
     }
 
     private suspend fun handleExpiredSession(session: UserSession, autoRefresh: Boolean = true) {
-        Auth.logger.d {
+        logger.d {
             "Session expired. Refreshing session..."
         }
         val newSession = refreshSession(session.refreshToken)
@@ -666,7 +669,7 @@ internal class AuthImpl(
         )
 
     override fun stopAutoRefreshForCurrentSession() {
-        Auth.logger.d { "Stopping auto refresh for current session" }
+        logger.d { "Stopping auto refresh for current session" }
         sessionJob?.cancel()
         sessionJob = null
     }
@@ -677,7 +680,11 @@ internal class AuthImpl(
     override suspend fun loadFromStorage(autoRefresh: Boolean): Boolean = loadFromStorage(autoRefresh, false)
 
     suspend fun loadFromStorage(autoRefresh: Boolean = config.alwaysAutoRefresh, initializing: Boolean): Boolean {
-        val session = sessionManager.loadSession()
+        val session = try { sessionManager.loadSession() } catch (e: Exception) {
+            currentCoroutineContext().ensureActive()
+            logger.e(e) { "Failed to load session" }
+            null
+        }
         session?.let {
             importSession(it, autoRefresh, SessionSource.Storage, initializing)
         }
@@ -690,7 +697,7 @@ internal class AuthImpl(
 
     override suspend fun parseErrorResponse(response: HttpResponse): RestException {
         val errorBody =
-            response.bodyOrNull<GoTrueErrorResponse>() ?: GoTrueErrorResponse("Unknown error", "")
+            supabaseClient.bodyOrNull<GoTrueErrorResponse>(response) ?: GoTrueErrorResponse("Unknown error", "")
         checkErrorCodes(errorBody, response)?.let { return it }
         return when (response.status) {
             HttpStatusCode.Unauthorized -> UnauthorizedRestException(
@@ -717,7 +724,7 @@ internal class AuthImpl(
             AuthWeakPasswordException.CODE -> AuthWeakPasswordException(error.description, response, error.weakPassword?.reasons ?: emptyList())
             AuthSessionMissingException.CODE -> {
                 authScope.launch {
-                    Auth.logger.e { "Received session not found api error. Clearing session..." }
+                    logger.e { "Received session not found api error. Clearing session..." }
                     clearSession()
                 }
                 AuthSessionMissingException(response)
@@ -764,12 +771,12 @@ internal class AuthImpl(
     }
 
     override fun setSessionStatus(status: SessionStatus) {
-        Auth.logger.d { "Setting session status to $status" }
+        logger.d { "Setting session status to $status" }
         _sessionStatus.value = status
     }
 
     override fun emitEvent(event: AuthEvent) {
-        Auth.logger.d { "Emitting event $event" }
+        logger.d { "Emitting event $event" }
         _events.tryEmit(event)
     }
 

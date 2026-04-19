@@ -1,16 +1,13 @@
 package io.github.jan.supabase
 
-import io.github.jan.supabase.SupabaseClient.Companion.DEFAULT_LOG_LEVEL
 import io.github.jan.supabase.annotations.SupabaseInternal
-import io.github.jan.supabase.logging.KermitSupabaseLogger
-import io.github.jan.supabase.logging.LogLevel
 import io.github.jan.supabase.logging.SupabaseLogger
+import io.github.jan.supabase.logging.createLogger
 import io.github.jan.supabase.logging.i
 import io.github.jan.supabase.network.KtorSupabaseHttpClient
 import io.github.jan.supabase.plugins.PluginManager
 import io.github.jan.supabase.plugins.SupabasePlugin
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlin.concurrent.Volatile
 
 /**
  * The main class to interact with Supabase.
@@ -71,6 +68,8 @@ interface SupabaseClient {
     @SupabaseInternal
     val coroutineDispatcher: CoroutineDispatcher
 
+    val logger: SupabaseLogger
+
     /**
      * Releases all resources held by the [httpClient] and all plugins the [pluginManager]
      */
@@ -79,21 +78,9 @@ interface SupabaseClient {
     companion object {
 
         /**
-         * The default minimum logging level used for plugins. Can be changed within the [SupabaseClientBuilder]
+         * The tag for the Supabase logger.
          */
-        @Volatile
-        var DEFAULT_LOG_LEVEL = LogLevel.INFO
-            internal set
-
-        val LOGGER: SupabaseLogger = createLogger("Supabase-Core")
-
-        /**
-         * Creates a new [SupabaseLogger] using the [KermitSupabaseLogger] implementation.
-         * @param tag The tag for the logger
-         * @param level The logging level. If set to null, the [DEFAULT_LOG_LEVEL] property will be used instead
-         */
-        fun createLogger(tag: String, level: LogLevel? = null): SupabaseLogger =
-            KermitSupabaseLogger(null, tag)
+        const val LOGGING_TAG = "Supabase-Core"
 
     }
 
@@ -109,10 +96,22 @@ internal class SupabaseClientImpl(
     override val supabaseKey: String = config.supabaseKey
     override val useHTTPS: Boolean = config.networkConfig.useHTTPS
     override val coroutineDispatcher: CoroutineDispatcher = config.coroutineDispatcher
+    override val logger: SupabaseLogger = createLogger(
+        SupabaseClient.LOGGING_TAG,
+        config.loggingConfig.defaultLogLevel,
+        config.loggingConfig.defaultLoggingFactory
+    )
 
     init {
-        SupabaseClient.LOGGER.i {
+        logger.i {
             "SupabaseClient created! Please report any bugs you find."
+        }
+        try {
+            getOSInformation()
+        } catch(e: Exception) {
+            logger.i(e) {
+                "Failed to get OS information. If this is not intentional, please report this issue."
+            }
         }
     }
 
@@ -129,14 +128,14 @@ internal class SupabaseClientImpl(
 
     override val pluginManager = PluginManager(config.plugins.toList().associate { (key, value) ->
         key to value(this)
-    })
+    }, logger.appendTag(" [PluginManager]"))
 
     init {
         pluginManager.installedPlugins.values.forEach(SupabasePlugin<*>::init)
     }
 
     override suspend fun close() {
-        SupabaseClient.LOGGER.i { "Closing SupabaseClient" }
+        logger.i { "Closing SupabaseClient" }
         httpClient.close()
         pluginManager.closeAllPlugins()
     }

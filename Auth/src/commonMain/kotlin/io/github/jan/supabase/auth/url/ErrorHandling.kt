@@ -21,7 +21,7 @@ internal fun Auth.handledUrlParameterError(parameters: (String) -> String?): Boo
     val error = checkForUrlParameterError(parameters)
     return if(error != null) {
         if(sessionStatus.value !is SessionStatus.Authenticated) {
-            Auth.logger.d { "Found error code in the URL Parameters: $error. Emitting event..." }
+            logger.d { "Found error code in the URL Parameters: $error. Emitting event..." }
             emitEvent(error)
         }
         true

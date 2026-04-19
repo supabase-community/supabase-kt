@@ -2,7 +2,9 @@ package io.github.jan.supabase
 
 import io.github.jan.supabase.annotations.SupabaseDsl
 import io.github.jan.supabase.annotations.SupabaseInternal
+import io.github.jan.supabase.logging.KermitLoggingProcessor
 import io.github.jan.supabase.logging.LogLevel
+import io.github.jan.supabase.logging.SupabaseLoggingProcessor
 import io.github.jan.supabase.plugins.PluginManager
 import io.github.jan.supabase.plugins.SupabasePlugin
 import io.github.jan.supabase.plugins.SupabasePluginProvider
@@ -17,6 +19,7 @@ import kotlin.time.Duration.Companion.seconds
 
 internal typealias PluginProvider = (SupabaseClient) -> SupabasePlugin<*>
 internal typealias HttpConfigOverride = HttpClientConfig<*>.() -> Unit
+typealias SupabaseLoggingProcessorFactory = (level: LogLevel) -> SupabaseLoggingProcessor
 
 /**
  * Creates a new [SupabaseClient] with the given options.
@@ -24,7 +27,10 @@ internal typealias HttpConfigOverride = HttpClientConfig<*>.() -> Unit
  * Use [createSupabaseClient] to create a new instance of [SupabaseClient].
  */
 @SupabaseDsl
-class SupabaseClientBuilder @PublishedApi internal constructor(private val supabaseUrl: String, private val supabaseKey: String) {
+class SupabaseClientBuilder @PublishedApi internal constructor(
+    private val supabaseUrl: String,
+    private val supabaseKey: String
+) {
 
     /**
      * Whether to use HTTPS for network requests with the [supabaseUrl]
@@ -57,11 +63,12 @@ class SupabaseClientBuilder @PublishedApi internal constructor(private val supab
      *
      * Can be overridden by the plugin's config
      */
-    var defaultLogLevel: LogLevel
-        set(value) {
-            SupabaseClient.DEFAULT_LOG_LEVEL = value
-        }
-        get() = SupabaseClient.DEFAULT_LOG_LEVEL
+    var defaultLogLevel: LogLevel = LogLevel.INFO
+
+    /**
+     * The default logging factory. Used for creating a [SupabaseLoggingProcessor] using a specified [LogLevel]
+     */
+    var defaultLoggingFactory: SupabaseLoggingProcessorFactory = { level -> KermitLoggingProcessor(level) }
 
     /**
      * The default serializer used to serialize and deserialize custom data types.
@@ -118,7 +125,10 @@ class SupabaseClientBuilder @PublishedApi internal constructor(private val supab
         val config = SupabaseClientConfig(
             supabaseUrl = supabaseUrl.split("//").last(),
             supabaseKey = supabaseKey,
-            defaultLogLevel = defaultLogLevel,
+            loggingConfig = SupabaseLoggingConfig(
+                defaultLogLevel,
+                defaultLoggingFactory
+            ),
             networkConfig = SupabaseNetworkConfig(
                 useHTTPS = useHTTPS,
                 httpEngine = httpEngine,

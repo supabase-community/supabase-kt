@@ -1,22 +1,21 @@
 package io.github.jan.supabase.logging
 
-import co.touchlab.kermit.Logger
-import co.touchlab.kermit.Severity
-import co.touchlab.kermit.loggerConfigInit
-import co.touchlab.kermit.platformLogWriter
 import io.github.jan.supabase.SupabaseClient
-import io.github.jan.supabase.annotations.SupabaseInternal
-import kotlin.concurrent.Volatile
+import io.github.jan.supabase.SupabaseLoggingProcessorFactory
+import io.github.jan.supabase.plugins.MainConfig
 
 /**
  * An interface for logging in Supabase plugins.
+ * @param level The minimum log level to handle for this logger. If null, [SupabaseClient.DEFAULT_LOG_LEVEL] will be used.
+ * @param processor The logging processor used for the actual logging
  */
-abstract class SupabaseLogger {
+class SupabaseLogger(
+    val level: LogLevel,
+    val tag: String,
+    processorFactory: SupabaseLoggingProcessorFactory
+) {
 
-    /**
-     * The minimum log level to handle for this logger. If null, [SupabaseClient.DEFAULT_LOG_LEVEL] will be used.
-     */
-    abstract val level: LogLevel?
+    val processor = processorFactory(level)
 
     /**
      * Log a message with the given [level] and [message]. An optional [throwable] can be provided.
@@ -24,7 +23,9 @@ abstract class SupabaseLogger {
      * @param throwable An optional throwable
      * @param message The message to log
      */
-    abstract fun log(level: LogLevel, throwable: Throwable? = null, message: String)
+    fun log(level: LogLevel, throwable: Throwable? = null, message: String) = processor.log(level, tag, throwable) {
+        message
+    }
 
     /**
      * Log a message with the given [level] and [message]. An optional [throwable] can be provided.
@@ -32,62 +33,19 @@ abstract class SupabaseLogger {
      * @param throwable An optional throwable
      * @param message The message to log
      */
-    inline fun log(level: LogLevel, throwable: Throwable? = null, message: () -> String) {
-        if (level >= (this.level ?: SupabaseClient.DEFAULT_LOG_LEVEL)) {
-            log(level, throwable, message())
-        }
-    }
+    inline fun log(level: LogLevel, throwable: Throwable? = null, message: () -> String) = processor.log(level, tag, throwable, message)
 
     /**
-     * Set the log level for this logger. If set to `null`, [SupabaseClient.DEFAULT_LOG_LEVEL] will be used.
-     * @param level The log level
+     * Creates a new logger with the new [tag], but with the same [processor]
+     * @param tag The new tag
      */
-    @SupabaseInternal
-    abstract fun setLevel(level: LogLevel?)
+    fun withTag(tag: String) = SupabaseLogger(level, tag, { _ -> processor })
 
-}
-
-/**
- * A logger implementation using the Kermit logger.
- * @param level The minimum log level for this logger.
- * @param tag The tag for this logger
- */
-internal class KermitSupabaseLogger(
-    initialLevel: LogLevel?,
-    tag: String,
-) : SupabaseLogger() {
-
-    @Volatile
-    override var level: LogLevel? = initialLevel
-        private set
-
-    private val logger: Logger = Logger(
-        config = loggerConfigInit(platformLogWriter(), minSeverity = Severity.Debug),
-        tag = tag,
-    )
-
-    override fun log(level: LogLevel, throwable: Throwable?, message: String) {
-        if (level >= getLevelOrDefault()) {
-            logger.processLog(level.toSeverity(), logger.tag, throwable, message)
-        }
-    }
-
-    private fun LogLevel.toSeverity() = when (this) {
-        LogLevel.DEBUG -> Severity.Debug
-        LogLevel.INFO -> Severity.Info
-        LogLevel.WARNING -> Severity.Warn
-        LogLevel.ERROR -> Severity.Error
-        LogLevel.NONE -> Severity.Assert
-    }
-
-    @SupabaseInternal
-    override fun setLevel(level: LogLevel?) {
-        this.level = level
-    }
-
-    private fun getLevelOrDefault(): LogLevel {
-        return this.level ?: SupabaseClient.DEFAULT_LOG_LEVEL
-    }
+    /**
+     * Creates a new logger and appends [tag] to the current tag
+     * @param tag The tag to append
+     */
+    fun appendTag(tag: String) = withTag(tag + this.tag)
 
 }
 
@@ -126,3 +84,14 @@ inline fun SupabaseLogger.w(throwable: Throwable? = null, message: () -> String)
 inline fun SupabaseLogger.e(throwable: Throwable? = null, message: () -> String) {
     log(LogLevel.ERROR, throwable, message)
 }
+
+fun SupabaseClient.createLogger(
+    tag: String,
+    logLevel: LogLevel?,
+    loggingFactory: SupabaseLoggingProcessorFactory?
+) = SupabaseLogger(logLevel ?: logger.level, tag, loggingFactory ?: config.loggingConfig.defaultLoggingFactory)
+
+fun SupabaseClient.createLogger(
+    tag: String,
+    config: MainConfig
+) = createLogger(tag, config.logLevel,config.loggingFactory)
