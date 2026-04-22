@@ -40,6 +40,7 @@ interface RealtimeChannel {
     @SupabaseInternal
     val callbackManager: CallbackManager
 
+    @SupabaseInternal
     val logger: SupabaseLogger
 
     /**
