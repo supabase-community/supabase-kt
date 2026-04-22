@@ -94,11 +94,11 @@ class AuthTest {
             )
             client.auth.awaitInitialization()
             assertIs<SessionStatus.NotAuthenticated>(client.auth.sessionStatus.value)
-            assertNull(sessionManager.loadSession())
+            assertNull(sessionManager.loadSessionOrNull())
             val session = userSession()
             client.auth.importSession(session)
             assertIs<SessionStatus.Authenticated>(client.auth.sessionStatus.value)
-            assertEquals(session, sessionManager.loadSession())
+            assertEquals(session, sessionManager.loadSessionOrNull())
         }
     }
 

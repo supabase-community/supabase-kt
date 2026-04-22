@@ -19,6 +19,15 @@ interface SessionManager {
     suspend fun loadSession(): UserSession
 
     /**
+     * Loads the saved session from storage.
+     */
+    suspend fun loadSessionOrNull(): UserSession? = try {
+        loadSession()
+    } catch(e: Exception) {
+        null
+    }
+
+    /**
      * Deletes the saved session from storage.
      */
     suspend fun deleteSession()
