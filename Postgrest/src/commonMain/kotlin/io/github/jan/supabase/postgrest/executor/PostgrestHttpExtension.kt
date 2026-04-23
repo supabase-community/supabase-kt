@@ -18,21 +18,30 @@ import io.ktor.http.parametersOf
 internal fun HttpRequestBuilder.configurePostgrestRequest(
     request: PostgrestRequest
 ) {
-    method = request.method
+    method = request.httpOptions.method
     contentType(ContentType.Application.Json)
-    headers.appendAll(request.headers)
-    headers[PostgrestQueryBuilder.HEADER_PREFER] = request.prefer.joinToString(",")
-    with(url.parameters) {
-        appendAll(parametersOf(request.urlParams.mapValues { (_, value) -> listOf(value) }))
-        if (request.returning is Returning.Representation) {
-            append("select", (request.returning as Returning.Representation).columns.value)
+    headers.appendAll(request.headerOptions.headers)
+    headers[PostgrestQueryBuilder.HEADER_PREFER] = request.headerOptions.prefer.joinToString(",")
+    if (request.headerOptions.stripNulls) {
+        val currentAccept = this.headers["Accept"]
+        if (currentAccept == "application/vnd.pgrst.object+json") {
+            this.headers["Accept"] = "application/vnd.pgrst.object+json;nulls=stripped"
+        } else if (currentAccept == null || currentAccept == "application/json") {
+            this.headers["Accept"] = "application/vnd.pgrst.array+json;nulls=stripped"
         }
     }
-    request.body?.let { setBody(it) }
-    if (request.schema.isNotBlank()) {
+    with(url.parameters) {
+        appendAll(parametersOf(request.urlParamOptions.urlParams.mapValues { (_, value) -> listOf(value) }))
+        val returning = request.urlParamOptions.returning
+        if (returning is Returning.Representation) {
+            append("select", (returning as Returning.Representation).columns.value)
+        }
+    }
+    request.httpOptions.body?.let { setBody(it) }
+    if (request.headerOptions.schema.isNotBlank()) {
         when (method) {
-            HttpMethod.Get, HttpMethod.Head -> header("Accept-Profile", request.schema)
-            else -> header("Content-Profile", request.schema)
+            HttpMethod.Get, HttpMethod.Head -> header("Accept-Profile", request.headerOptions.schema)
+            else -> header("Content-Profile", request.headerOptions.schema)
         }
     }
 }

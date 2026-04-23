@@ -15,14 +15,30 @@ import kotlinx.serialization.json.JsonElement
 @SupabaseInternal
 sealed interface PostgrestRequest {
 
-    val body: JsonElement? get() = null
-    val method: HttpMethod
-    val urlParams: Map<String, String>
-    val headers: Headers get() = Headers.Empty
-    val returning: Returning get() = Returning.Minimal
-    val prefer: List<String>
-    val schema: String
-    /** Whether to retry on transient errors. Only applies to idempotent methods (GET, HEAD). */
-    val retry: Boolean get() = true
+    val httpOptions: HttpOptions
+    val urlParamOptions: UrlParamOptions
+    val headerOptions: HeaderOptions
+    val metaOptions: MetaOptions get() = MetaOptions(true)
+
+    data class HttpOptions(
+        val body: JsonElement? = null,
+        val method: HttpMethod
+    )
+
+    data class UrlParamOptions(
+        val urlParams: Map<String, String> = emptyMap(),
+        val returning: Returning = Returning.Minimal
+    )
+
+    data class HeaderOptions(
+        val headers: Headers = Headers.Empty,
+        val schema: String,
+        val prefer: List<String>,
+        val stripNulls: Boolean
+    )
+
+    data class MetaOptions(
+        val retry: Boolean = true
+    )
 
 }
