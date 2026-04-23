@@ -95,7 +95,7 @@ private val JWKS_TTL = 10.minutes
 @Suppress("MagicNumber") // see #631
 private val SIGN_OUT_IGNORE_CODES = listOf(401, 403, 404)
 @Suppress("MagicNumber") // see #1260
-private val NETWORK_ERROR_CODES = listOf(502, 503, 504, 520, 521, 522, 523, 524, 530)
+private val NETWORK_ERROR_CODES = listOf(500, 502, 503, 504, 520, 521, 522, 523, 524, 530)
 
 @PublishedApi
 internal class AuthImpl(
