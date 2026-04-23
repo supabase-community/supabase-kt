@@ -178,37 +178,40 @@ interface BucketApi {
 
     /**
      * Creates a signed url to download without authentication. The url will expire after [expiresIn]
-     * @param path The path to create an url for
+     * @param path The path to create a url for
      * @param expiresIn The duration the url is valid
-     * @param transform The transformation to apply to the image
+     * @param builder Optional modifier to add a [transformation][SignedUrlBuilder.transformation],
+     * [force-download][SignedUrlBuilder.download] or [cacheNonce][BucketUrlBuilder.cacheNonce] to the created url
      * @return The url to download the file
      * @throws RestException or one of its subclasses if receiving an error response
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
-    suspend fun createSignedUrl(path: String, expiresIn: Duration, transform: ImageTransformation.() -> Unit = {}): String
+    suspend fun createSignedUrl(path: String, expiresIn: Duration, builder: SignedUrlBuilder.() -> Unit = {}): String
 
     /**
      * Creates signed urls for all specified paths. The urls will expire after [expiresIn]
      * @param expiresIn The duration the urls are valid
      * @param paths The paths to create urls for
+     * @param builder Optional modifier to add a [force-download][SignedUrlsBuilder.download] or [cacheNonce][BucketUrlBuilder.cacheNonce] to the created urls
      * @return A list of [SignedUrl]s
      * @throws RestException or one of its subclasses if receiving an error response
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
-    suspend fun createSignedUrls(expiresIn: Duration, paths: Collection<String>): List<SignedUrl>
+    suspend fun createSignedUrls(expiresIn: Duration, paths: Collection<String>, builder: SignedUrlsBuilder.() -> Unit = {}): List<SignedUrl>
 
     /**
      * Creates signed urls for all specified paths. The urls will expire after [expiresIn]
      * @param expiresIn The duration the urls are valid
      * @param paths The paths to create urls for
+     * @param builder Optional modifier to add a [force-download][SignedUrlsBuilder.download] or [cacheNonce][BucketUrlBuilder.cacheNonce] to the created urls
      * @return A list of [SignedUrl]s
      * @throws RestException or one of its subclasses if receiving an error response
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
-    suspend fun createSignedUrls(expiresIn: Duration, vararg paths: String) = createSignedUrls(expiresIn, paths.toList())
+    suspend fun createSignedUrls(expiresIn: Duration, vararg paths: String, builder: SignedUrlsBuilder.() -> Unit = {}) = createSignedUrls(expiresIn, paths.toList(), builder)
 
     /**
      * Downloads a file from [bucketId] under [path]
@@ -299,7 +302,7 @@ interface BucketApi {
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
-    fun publicUrl(path: String): String
+    fun publicUrl(path: String, builder: PublicUrlBuilder.() -> Unit = {}): String
 
     /**
      * Returns the authenticated url of [path]. Requires bearer token authentication using the user's access token
@@ -323,7 +326,10 @@ interface BucketApi {
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
-    fun publicRenderUrl(path: String, transform: ImageTransformation.() -> Unit = {}): String
+    @Deprecated("Use publicUrl instead", ReplaceWith("publicUrl"))
+    fun publicRenderUrl(path: String, transform: ImageTransformation.() -> Unit = {}): String = publicUrl(path) {
+        transform(transform)
+    }
 
     companion object {
 
