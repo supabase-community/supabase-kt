@@ -93,7 +93,9 @@ import kotlin.time.Instant
 private const val SESSION_REFRESH_THRESHOLD = 0.8
 private val JWKS_TTL = 10.minutes
 @Suppress("MagicNumber") // see #631
-private val SIGNOUT_IGNORE_CODES = listOf(401, 403, 404)
+private val SIGN_OUT_IGNORE_CODES = listOf(401, 403, 404)
+@Suppress("MagicNumber") // see #1260
+private val NETWORK_ERROR_CODES = listOf(500, 502, 503, 504, 520, 521, 522, 523, 524, 530)
 
 @PublishedApi
 internal class AuthImpl(
@@ -350,7 +352,7 @@ internal class AuthImpl(
                     parameter("scope", scope.name.lowercase())
                 }
             } catch(e: RestException) {
-                if(e.statusCode in SIGNOUT_IGNORE_CODES) {
+                if(e.statusCode in SIGN_OUT_IGNORE_CODES) {
                     Auth.logger.d { "Received error code ${e.statusCode} while signing out user. This can happen if the user doesn't exist anymore or the JWT is invalid/expired. Proceeding to clean up local data..." }
                 } else throw e
             }
@@ -596,7 +598,7 @@ internal class AuthImpl(
         try {
             importRefreshedSession()
         } catch (e: RestException) {
-            if (e.statusCode in 500..599) {
+            if (e.statusCode in NETWORK_ERROR_CODES) {
                 Auth.logger.e(e) { "Couldn't refresh session due to an internal server error. Retrying in ${config.retryDelay} (Status code ${e.statusCode})..." }
                 updateStatus(RefreshFailureCause.InternalServerError(e))
                 delay(config.retryDelay)
