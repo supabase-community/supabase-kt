@@ -37,17 +37,17 @@ private fun addLifecycleCallbacks(auth: Auth) {
 
                 override fun onStart(owner: LifecycleOwner) {
                     if(!auth.isAutoRefreshRunning && auth.config.alwaysAutoRefresh) {
-                        Auth.logger.d {
+                        auth.logger.d {
                             "Trying to re-load session from storage..."
                         }
                         scope.launch {
                             val sessionFound = auth.loadFromStorage()
                             if(!sessionFound) {
-                                Auth.logger.d {
+                                auth.logger.d {
                                     "No session found, not starting auto refresh"
                                 }
                             } else {
-                                Auth.logger.d {
+                                auth.logger.d {
                                     "Session found, auto refresh started"
                                 }
                             }
@@ -57,7 +57,7 @@ private fun addLifecycleCallbacks(auth: Auth) {
                 }
                 override fun onStop(owner: LifecycleOwner) {
                     if(auth.isAutoRefreshRunning) {
-                        Auth.logger.d { "Cancelling auto refresh because app is switching to the background" }
+                        auth.logger.d { "Cancelling auto refresh because app is switching to the background" }
                         scope.launch {
                             auth.stopAutoRefreshForCurrentSession()
                             auth.setSessionStatus(SessionStatus.Initializing)

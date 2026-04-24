@@ -29,7 +29,6 @@ import io.github.jan.supabase.auth.user.UserSession
 import io.github.jan.supabase.auth.user.UserUpdateBuilder
 import io.github.jan.supabase.exceptions.HttpRequestException
 import io.github.jan.supabase.exceptions.RestException
-import io.github.jan.supabase.logging.SupabaseLogger
 import io.github.jan.supabase.plugins.CustomSerializationPlugin
 import io.github.jan.supabase.plugins.MainPlugin
 import io.github.jan.supabase.plugins.SupabasePluginProvider
@@ -538,7 +537,10 @@ interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
 
         override val key = "auth"
 
-        override val logger: SupabaseLogger = SupabaseClient.createLogger("Supabase-Auth")
+        /**
+         * The tag for the Auth logger.
+         */
+        const val LOGGING_TAG = "Supabase-Auth"
 
         /**
          * The auth api version to use

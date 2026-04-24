@@ -27,7 +27,7 @@ internal suspend fun createServer(
     onSuccess: suspend (UserSession) -> Unit
 ) {
     auth as AuthImpl
-    Auth.logger.d { "Creating OAuth callback server" }
+    auth.logger.d { "Creating OAuth callback server" }
     val server = embeddedServer(CIO, port = auth.config.httpCallbackConfig.httpPort) {
         routing {
             configureRoutes(
@@ -39,7 +39,7 @@ internal suspend fun createServer(
     coroutineScope {
         val timeoutScope = launch {
             val port = server.engine.resolvedConnectors().first().port
-            Auth.logger.d {
+            auth.logger.d {
                 "Started OAuth callback server on port $port. Opening url in browser..."
             }
             auth.config.urlLauncher.openUrl(
@@ -50,12 +50,12 @@ internal suspend fun createServer(
             )
             delay(auth.config.httpCallbackConfig.timeout)
             if(this.isActive) {
-                Auth.logger.d {
+                auth.logger.d {
                     "Timeout reached. Shutting down callback server..."
                 }
                 server.stop()
             } else {
-                Auth.logger.d {
+                auth.logger.d {
                     "Callback server was shut down manually"
                 }
             }

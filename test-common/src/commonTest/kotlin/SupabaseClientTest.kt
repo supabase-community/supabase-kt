@@ -1,7 +1,6 @@
 import io.github.jan.supabase.BuildConfig
 import io.github.jan.supabase.OSInformation
 import io.github.jan.supabase.SupabaseClient
-import io.github.jan.supabase.logging.LogLevel
 import io.github.jan.supabase.testing.createMockedSupabaseClient
 import io.github.jan.supabase.testing.withMockedSupabaseClient
 import io.ktor.client.engine.mock.respond
@@ -77,20 +76,6 @@ class SupabaseClientTest {
             )
             assertEquals("myToken", client.accessToken?.invoke())
         }
-    }
-
-    @Test
-    fun testDefaultLogLevel() {
-        createMockedSupabaseClient(
-            configuration = {
-                defaultLogLevel = LogLevel.DEBUG
-            }
-        )
-        assertEquals(
-            LogLevel.DEBUG,
-            SupabaseClient.DEFAULT_LOG_LEVEL,
-            "Default log level should be set to ${LogLevel.DEBUG}"
-        )
     }
 
     @Test

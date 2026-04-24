@@ -14,6 +14,7 @@ import io.github.jan.supabase.exceptions.RestException
 import io.github.jan.supabase.exceptions.UnauthorizedRestException
 import io.github.jan.supabase.exceptions.UnknownRestException
 import io.github.jan.supabase.logging.SupabaseLogger
+import io.github.jan.supabase.logging.createLogger
 import io.github.jan.supabase.logging.w
 import io.github.jan.supabase.plugins.CustomSerializationConfig
 import io.github.jan.supabase.plugins.CustomSerializationPlugin
@@ -21,6 +22,7 @@ import io.github.jan.supabase.plugins.MainConfig
 import io.github.jan.supabase.plugins.MainPlugin
 import io.github.jan.supabase.plugins.SupabasePluginProvider
 import io.github.jan.supabase.safeBody
+import io.github.jan.supabase.storage.Storage.Companion.DEFAULT_CHUNK_SIZE
 import io.github.jan.supabase.storage.analytics.StorageAnalyticsClient
 import io.github.jan.supabase.storage.analytics.StorageAnalyticsClientImpl
 import io.github.jan.supabase.storage.resumable.ResumableCache
@@ -164,12 +166,6 @@ interface Storage : MainPlugin<Storage.Config>, CustomSerializationPlugin {
              * The default chunk size for resumable uploads. **Supabase currently only supports a chunk size of 6MB, so be careful when changing this value**
              */
             var defaultChunkSize: Long = DEFAULT_CHUNK_SIZE
-                set(value) {
-                    if(value != DEFAULT_CHUNK_SIZE) {
-                        logger.w { "Supabase currently only supports a chunk size of 6MB" }
-                    }
-                    field = value
-                }
 
         }
 
@@ -186,7 +182,10 @@ interface Storage : MainPlugin<Storage.Config>, CustomSerializationPlugin {
 
         override val key: String = "storage"
 
-        override val logger: SupabaseLogger = SupabaseClient.createLogger("Supabase-Storage")
+        /**
+         * The tag for the Storage logger.
+         */
+        const val LOGGING_TAG = "Supabase-Storage"
 
         /**
          * The api version of the storage plugin
@@ -216,6 +215,7 @@ internal class StorageImpl(override val supabaseClient: SupabaseClient, override
         get() = Storage.API_VERSION
 
     override val serializer: SupabaseSerializer = config.serializer ?: supabaseClient.defaultSerializer
+    override val logger: SupabaseLogger = supabaseClient.createLogger(Storage.LOGGING_TAG, config)
 
     @OptIn(SupabaseInternal::class)
     internal val api = supabaseClient.authenticatedSupabaseApi(this, defaultRequest = {
@@ -226,6 +226,12 @@ internal class StorageImpl(override val supabaseClient: SupabaseClient, override
 
     override val analytics: StorageAnalyticsClient = StorageAnalyticsClientImpl(api.resolve("iceberg"))
     override val vectors: StorageVectorsClient = StorageVectorsClientImpl(api.resolve("vector"))
+
+    init {
+        if(config.resumable.defaultChunkSize != DEFAULT_CHUNK_SIZE) {
+            logger.w { "Supabase currently only supports a chunk size of 6MB" }
+        }
+    }
 
     override suspend fun listBuckets(filter: StorageListFilter.Buckets.() -> Unit): List<Bucket> {
         val response = api.get("bucket") {
@@ -282,7 +288,7 @@ internal class StorageImpl(override val supabaseClient: SupabaseClient, override
 
     override suspend fun parseErrorResponse(response: HttpResponse): RestException {
         val statusCode = response.status
-        val error = response.bodyOrNull<StorageErrorResponse>() ?: StorageErrorResponse(
+        val error = supabaseClient.bodyOrNull<StorageErrorResponse>(response) ?: StorageErrorResponse(
             response.status.value,
             "Unknown error",
             ""

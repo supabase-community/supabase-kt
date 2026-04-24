@@ -3,6 +3,7 @@ package io.github.jan.supabase.realtime
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.annotations.SupabaseInternal
 import io.github.jan.supabase.encodeToJsonElement
+import io.github.jan.supabase.logging.SupabaseLogger
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.serialization.json.JsonObject
@@ -38,6 +39,9 @@ interface RealtimeChannel {
 
     @SupabaseInternal
     val callbackManager: CallbackManager
+
+    @SupabaseInternal
+    val logger: SupabaseLogger
 
     /**
      * Subscribes to the channel
