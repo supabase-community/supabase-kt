@@ -22,8 +22,8 @@ import io.ktor.http.HttpStatusCode
 import io.ktor.http.Url
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
-import kotlinx.coroutines.test.advanceUntilIdle
+import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.json.buildJsonObject
 import kotlin.test.AfterTest
@@ -46,11 +46,11 @@ class AuthTest {
 
     @Test
     fun testLoadingSessionFromStorage() = runTest {
-        val testDispatcher = UnconfinedTestDispatcher(testScheduler)
         val sessionManager = MemorySessionManager(userSession())
+
         client = createMockedSupabaseClient(
             configuration = {
-                coroutineDispatcher = testDispatcher
+                coroutineDispatcher = StandardTestDispatcher(testScheduler)
                 install(Auth) {
                     minimalConfig()
                     this.sessionManager = sessionManager
@@ -58,10 +58,11 @@ class AuthTest {
                 }
             }
         )
-        launch {
-            client.auth.awaitInitialization()
-        }
-        advanceUntilIdle()
+
+        client.auth.awaitInitialization()
+
+        runCurrent()
+
         assertIs<SessionStatus.Authenticated>(client.auth.sessionStatus.value)
     }
 
