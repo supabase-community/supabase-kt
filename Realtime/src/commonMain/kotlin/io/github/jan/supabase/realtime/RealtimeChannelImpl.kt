@@ -2,6 +2,7 @@ package io.github.jan.supabase.realtime
 
 import io.github.jan.supabase.annotations.SupabaseInternal
 import io.github.jan.supabase.collections.AtomicMutableList
+import io.github.jan.supabase.logging.SupabaseLogger
 import io.github.jan.supabase.logging.d
 import io.github.jan.supabase.logging.e
 import io.github.jan.supabase.putJsonObject
@@ -38,6 +39,7 @@ internal class RealtimeChannelImpl(
     private val isPrivate: Boolean,
 ) : RealtimeChannel {
 
+    override val logger: SupabaseLogger = realtime.logger.appendTag(" [$topic$]")
     private val realtimeImpl: RealtimeImpl = realtime as RealtimeImpl
     private val clientChanges = AtomicMutableList<PostgresJoinConfig>()
     @SupabaseInternal
@@ -75,7 +77,7 @@ internal class RealtimeChannelImpl(
             realtime.addChannel(this)
         }
         _status.value = RealtimeChannel.Status.SUBSCRIBING
-        Realtime.logger.d { "Subscribing to channel $topic" }
+        logger.d { "Subscribing to channel $topic" }
         val currentJwt = accessToken()
         val postgrestChanges = clientChanges.toList()
         presenceJoinConfig.enabled = shouldEnablePresence()
@@ -86,7 +88,7 @@ internal class RealtimeChannelImpl(
                 put("access_token", currentJwt)
             }
         }
-        Realtime.logger.d { "Subscribing to channel with body $joinConfigObject" }
+        logger.d { "Subscribing to channel with body $joinConfigObject" }
         realtimeImpl.send(
             RealtimeMessage(topic, RealtimeChannel.CHANNEL_EVENT_JOIN, joinConfigObject, null)
         )
@@ -99,26 +101,26 @@ internal class RealtimeChannelImpl(
     suspend fun onMessage(message: RealtimeMessage) {
         val event = RealtimeEvent.resolveEvent(message)
         if(event == null) {
-            Realtime.logger.e { "Received message without event: $message" }
+            logger.e { "Received message without event: $message" }
             return
         }
         event.handle(this, message)
     }
 
     override suspend fun scheduleRejoin() {
-        Realtime.logger.d { "Rejoining channel $topic in" }
+        logger.d { "Rejoining channel $topic in" }
         delay(realtime.config.rejoinDelay)
         resubscribe()
     }
 
     override suspend fun unsubscribe() {
         _status.value = RealtimeChannel.Status.UNSUBSCRIBING
-        Realtime.logger.d { "Unsubscribing from channel $topic" }
+        logger.d { "Unsubscribing from channel $topic" }
         realtimeImpl.send(RealtimeMessage(topic, RealtimeChannel.CHANNEL_EVENT_LEAVE, buildJsonObject {}, null))
     }
 
     override suspend fun updateAuth(jwt: String?) {
-        Realtime.logger.d { "Updating auth token for channel $topic" }
+        logger.d { "Updating auth token for channel $topic" }
         realtimeImpl.send(RealtimeMessage(topic, RealtimeChannel.CHANNEL_EVENT_ACCESS_TOKEN, buildJsonObject {
             put("access_token", jwt)
         }, (realtimeImpl.ref.incrementAndFetch()).toString()))
@@ -227,7 +229,7 @@ internal class RealtimeChannelImpl(
                 supabaseClient.realtime.serializer.decode<T>(type, it.toString())
             } catch(e: Exception) {
                 coroutineContext.ensureActive()
-                Realtime.logger.e(e) { "Couldn't decode $it as $type. The corresponding handler wasn't called" }
+                logger.e(e) { "Couldn't decode $it as $type. The corresponding handler wasn't called" }
                 null
             }
             decodedValue?.let { value -> trySend(value) }
@@ -241,7 +243,7 @@ internal class RealtimeChannelImpl(
         }
         val id = callbackManager.addPresenceCallback(callback)
         if(status.value == RealtimeChannel.Status.SUBSCRIBED && !presenceJoinConfig.enabled) {
-            Realtime.logger.d { "Resubscribing to channel $topic to enable presence..." }
+            logger.d { "Resubscribing to channel $topic to enable presence..." }
             resubscribe()
         }
         awaitClose { callbackManager.removeCallbackById(id) }

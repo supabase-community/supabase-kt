@@ -12,13 +12,13 @@ class MemorySessionManagerTest {
         runTest {
             val session = userSession()
             val sessionManager = MemorySessionManager(session)
-            assertEquals(session, sessionManager.loadSession()) //Check if the session is loaded correctly
+            assertEquals(session, sessionManager.loadSessionOrNull()) //Check if the session is loaded correctly
             val newSession = userSession(expiresIn = 200)
             sessionManager.saveSession(newSession)
-            assertEquals(newSession, sessionManager.loadSession()) //Check if the new session is saved correctly
-            assertNotEquals(session, sessionManager.loadSession()) //Check if the new session is different from the old session
+            assertEquals(newSession, sessionManager.loadSessionOrNull()) //Check if the new session is saved correctly
+            assertNotEquals(session, sessionManager.loadSessionOrNull()) //Check if the new session is different from the old session
             sessionManager.deleteSession()
-            assertNull(sessionManager.loadSession()) //Check if the session is deleted correctly
+            assertNull(sessionManager.loadSessionOrNull()) //Check if the session is deleted correctly
         }
     }
 

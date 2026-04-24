@@ -6,8 +6,6 @@ import io.github.jan.supabase.SupabaseSerializer
 import io.github.jan.supabase.annotations.SupabaseInternal
 import io.github.jan.supabase.auth.AuthDependentPluginConfig
 import io.github.jan.supabase.auth.resolveAccessToken
-import io.github.jan.supabase.logging.SupabaseLogger
-import io.github.jan.supabase.logging.w
 import io.github.jan.supabase.plugins.CustomSerializationConfig
 import io.github.jan.supabase.plugins.CustomSerializationPlugin
 import io.github.jan.supabase.plugins.MainConfig
@@ -145,13 +143,15 @@ interface Realtime : MainPlugin<Realtime.Config>, CustomSerializationPlugin {
         override var requireValidSession: Boolean = false,
     ): MainConfig(), CustomSerializationConfig, AuthDependentPluginConfig {
 
+        internal var customAccessTokenProvider = false
+
         /**
          * A custom access token provider. If this is set, the [SupabaseClient] will not be used to resolve the access token.
          */
         var accessToken: suspend SupabaseClient.() -> String? = { resolveAccessToken(realtime, keyAsFallback = false) }
             set(value) {
-                logger.w { "You are setting a custom access token provider. This can lead to unexpected behavior." }
                 field = value
+                customAccessTokenProvider = true
             }
         override var serializer: SupabaseSerializer? = null
 
@@ -161,7 +161,10 @@ interface Realtime : MainPlugin<Realtime.Config>, CustomSerializationPlugin {
 
         override val key = "realtime"
 
-        override val logger: SupabaseLogger = SupabaseClient.createLogger("Supabase-Realtime")
+        /**
+         * The tag for the Realtime logger.
+         */
+        const val LOGGING_TAG = "Supabase-Realtime"
 
         /**
          * The current realtime api version

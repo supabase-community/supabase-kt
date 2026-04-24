@@ -22,8 +22,8 @@ import io.ktor.http.HttpStatusCode
 import io.ktor.http.Url
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
-import kotlinx.coroutines.test.advanceUntilIdle
+import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.json.buildJsonObject
 import kotlin.test.AfterTest
@@ -45,23 +45,25 @@ class AuthTest {
     private lateinit var client: SupabaseClient
 
     @Test
-    fun testLoadingSessionFromStorage() = runTest {
-        val testDispatcher = UnconfinedTestDispatcher(testScheduler)
+    fun testLoadingSessionFromStorage() = runTest(timeout = 30.seconds) {
         val sessionManager = MemorySessionManager(userSession())
+
         client = createMockedSupabaseClient(
             configuration = {
-                coroutineDispatcher = testDispatcher
+                coroutineDispatcher = StandardTestDispatcher(testScheduler)
                 install(Auth) {
                     minimalConfig()
                     this.sessionManager = sessionManager
                     autoLoadFromStorage = true
+                    authScope = backgroundScope
                 }
             }
         )
-        launch {
-            client.auth.awaitInitialization()
-        }
-        advanceUntilIdle()
+
+        client.auth.awaitInitialization()
+
+        runCurrent()
+
         assertIs<SessionStatus.Authenticated>(client.auth.sessionStatus.value)
     }
 
@@ -94,11 +96,11 @@ class AuthTest {
             )
             client.auth.awaitInitialization()
             assertIs<SessionStatus.NotAuthenticated>(client.auth.sessionStatus.value)
-            assertNull(sessionManager.loadSession())
+            assertNull(sessionManager.loadSessionOrNull())
             val session = userSession()
             client.auth.importSession(session)
             assertIs<SessionStatus.Authenticated>(client.auth.sessionStatus.value)
-            assertEquals(session, sessionManager.loadSession())
+            assertEquals(session, sessionManager.loadSessionOrNull())
         }
     }
 
