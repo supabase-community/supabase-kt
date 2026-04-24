@@ -55,6 +55,7 @@ class AuthTest {
                     minimalConfig()
                     this.sessionManager = sessionManager
                     autoLoadFromStorage = true
+                    authScope = backgroundScope
                 }
             }
         )
