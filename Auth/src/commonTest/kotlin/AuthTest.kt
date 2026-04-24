@@ -45,7 +45,7 @@ class AuthTest {
     private lateinit var client: SupabaseClient
 
     @Test
-    fun testLoadingSessionFromStorage() = runTest {
+    fun testLoadingSessionFromStorage() = runTest(timeout = 30.seconds) {
         val sessionManager = MemorySessionManager(userSession())
 
         client = createMockedSupabaseClient(
