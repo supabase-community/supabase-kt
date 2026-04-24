@@ -1,6 +1,7 @@
 package io.github.jan.supabase.storage
 
 import io.github.jan.supabase.auth.api.AuthenticatedSupabaseApi
+import io.github.jan.supabase.buildUrl
 import io.github.jan.supabase.exceptions.RestException
 import io.github.jan.supabase.putJsonObject
 import io.github.jan.supabase.safeBody
@@ -21,6 +22,7 @@ import io.ktor.http.HttpStatusCode
 import io.ktor.http.Url
 import io.ktor.http.content.OutgoingContent
 import io.ktor.http.defaultForFilePath
+import io.ktor.http.formUrlEncode
 import io.ktor.http.headers
 import io.ktor.utils.io.ByteReadChannel
 import io.ktor.utils.io.ByteWriteChannel
@@ -104,7 +106,7 @@ internal class BucketApiImpl(
         )
 
     override suspend fun delete(paths: Collection<String>) {
-        api.deleteJson("$bucketId", buildJsonObject {
+        api.deleteJson(bucketId, buildJsonObject {
             putJsonArray("prefixes") {
                 paths.forEach(this::add)
             }
@@ -132,32 +134,51 @@ internal class BucketApiImpl(
     override suspend fun createSignedUrl(
         path: String,
         expiresIn: Duration,
-        transform: ImageTransformation.() -> Unit
+        builder: SignedUrlBuilder.() -> Unit
     ): String {
-        val transformation = ImageTransformation().apply(transform)
+        val modifier = SignedUrlBuilder().apply(builder)
+        val transformation = modifier.transformation
         val body = api.postJson("sign/$bucketId/$path", buildJsonObject {
             put("expiresIn", expiresIn.inWholeSeconds)
-            val transform = buildJsonObject {
-                putImageTransformation(transformation)
+            transformation?.let {
+                val transform = buildJsonObject {
+                    putImageTransformation(transformation)
+                }
+                if(transform.isNotEmpty()) {
+                    put("transform", transform)
+                }
             }
-            if(transform.isNotEmpty()) {
-                put("transform", transform)
+        }) {
+            modifier.cacheNonce?.let {
+                url.parameters.append("cacheNonce", it)
             }
-        }).safeBody<JsonObject>()
+            modifier.download?.let {
+                url.parameters.append("download", it.fileName ?: "")
+            }
+        }.safeBody<JsonObject>()
         return storage.resolveUrl(body["signedURL"]?.jsonPrimitive?.content?.substring(1)
             ?: error("Expected signed url in response"))
     }
 
     override suspend fun createSignedUrls(
         expiresIn: Duration,
-        paths: Collection<String>
+        paths: Collection<String>,
+        builder: SignedUrlsBuilder.() -> Unit
     ): List<SignedUrl> {
+        val modifier = SignedUrlsBuilder().apply(builder)
         val body = api.postJson("sign/$bucketId", buildJsonObject {
             putJsonArray("paths") {
                 paths.forEach(this::add)
             }
             put("expiresIn", expiresIn.inWholeSeconds)
-        }).safeBody<List<SignedUrl>>().map {
+        }) {
+            modifier.cacheNonce?.let {
+                url.parameters.append("cacheNonce", it)
+            }
+            modifier.download?.let {
+                url.parameters.append("download", it.fileName ?: "")
+            }
+        }.safeBody<List<SignedUrl>>().map {
             it.copy(signedURL = storage.resolveUrl(it.signedURL.substring(1)))
         }
         return body
@@ -224,13 +245,15 @@ internal class BucketApiImpl(
         public: Boolean,
         options: DownloadOptionBuilder
     ) {
-        val transformation = ImageTransformation().apply(options.transform).queryString()
+        val transformation = ImageTransformation().apply(options.transform).query()
         val url = when (public) {
-            true -> if (transformation.isBlank()) publicUrl(path) else publicRenderUrl(
-                path,
-                options.transform
-            )
-            false -> if (transformation.isBlank()) authenticatedUrl(path) else authenticatedRenderUrl(
+            true -> publicUrl(
+                path
+            ) {
+               if(!transformation.isEmpty()) transform(options.transform)
+               cacheNonce = options.cacheNonce
+            }
+            false -> if (transformation.isEmpty()) authenticatedUrl(path) else authenticatedRenderUrl(
                 path,
                 options.transform
             )
@@ -315,20 +338,23 @@ internal class BucketApiImpl(
     override fun authenticatedUrl(path: String): String =
         storage.resolveUrl("object/authenticated/$bucketId/$path")
 
-    override fun publicUrl(path: String): String =
-        storage.resolveUrl("object/public/$bucketId/$path")
+    override fun publicUrl(path: String, builder: PublicUrlBuilder.() -> Unit): String {
+        val modifier = PublicUrlBuilder().apply(builder)
+        return buildUrl(storage.resolveUrl(
+            if(modifier.transformation != null) "render/image/public/$bucketId/$path" else "object/public/$bucketId/$path"
+        )) {
+            modifier.transformation?.let { parameters.appendAll(it.query()) }
+            modifier.cacheNonce?.let { parameters.append("cacheNonce", it) }
+            modifier.download?.let { parameters.append("download", it.fileName ?: "") }
+        }
+    }
 
     override fun authenticatedRenderUrl(
         path: String,
         transform: ImageTransformation.() -> Unit
     ): String {
-        val transformation = ImageTransformation().apply(transform).queryString()
+        val transformation = ImageTransformation().apply(transform).query().formUrlEncode()
         return storage.resolveUrl("render/image/authenticated/$bucketId/$path${if (transformation.isNotBlank()) "?$transformation" else ""}")
-    }
-
-    override fun publicRenderUrl(path: String, transform: ImageTransformation.() -> Unit): String {
-        val transformation = ImageTransformation().apply(transform).queryString()
-        return storage.resolveUrl("render/image/public/$bucketId/$path${if (transformation.isNotBlank()) "?$transformation" else ""}")
     }
 
 }

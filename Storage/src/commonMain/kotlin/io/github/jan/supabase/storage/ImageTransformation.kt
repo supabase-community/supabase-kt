@@ -1,9 +1,8 @@
 package io.github.jan.supabase.storage
 
 import io.github.jan.supabase.annotations.SupabaseInternal
-import io.github.jan.supabase.storage.ImageTransformation.Resize
+import io.ktor.http.Parameters
 import io.ktor.http.ParametersBuilder
-import io.ktor.http.formUrlEncode
 
 /**
  * Represents a transformation for an image. Used for [Storage] objects
@@ -73,14 +72,14 @@ class ImageTransformation {
         resize = Resize.FILL
     }
 
-    internal fun queryString(): String {
+    internal fun query(): Parameters {
         val builder = ParametersBuilder()
         width?.let { builder.append("width", it.toString()) }
         height?.let { builder.append("height", it.toString()) }
         resize?.let { builder.append("resize", it.name.lowercase()) }
         quality?.let { builder.append("quality", it.toString()) }
         format?.let { builder.append("format", it) }
-        return builder.build().formUrlEncode()
+        return builder.build()
     }
 
     /**

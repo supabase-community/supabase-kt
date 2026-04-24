@@ -303,6 +303,8 @@ class BucketApiTest {
                 assertEquals(expectedQuality, transform?.get("quality")?.jsonPrimitive?.int, "Quality should be $expectedQuality")
                 assertEquals(expectedResize.name.lowercase(), transform?.get("resize")?.jsonPrimitive?.content, "Resize should be ${expectedResize.name.lowercase()}")
                 assertEquals(expectedFormat, transform?.get("format")?.jsonPrimitive?.content, "Format should be $expectedFormat")
+                assertEquals("myFile.png", it.url.parameters["download"])
+                assertEquals("1234", it.url.parameters["cacheNonce"])
                 respond(
                     content = """
                     { 
@@ -316,10 +318,14 @@ class BucketApiTest {
                 )
             }
             val url = client.storage[bucketId].createSignedUrl(expectedPath, expectedExpiresIn) {
-                size(expectedWidth, expectedHeight)
-                format = expectedFormat
-                quality = expectedQuality
-                resize = expectedResize
+                transform {
+                    size(expectedWidth, expectedHeight)
+                    format = expectedFormat
+                    quality = expectedQuality
+                    resize = expectedResize
+                }
+                forceDownload("myFile.png")
+                cacheNonce = "1234"
             }
             assertEquals(client.storage.resolveUrl(expectedUrl.substring(1)), url, "URL should be $expectedUrl")
         }
@@ -380,6 +386,8 @@ class BucketApiTest {
                     content["expiresIn"]?.jsonPrimitive?.long?.seconds,
                     "Expires in should be $expectedExpiresIn"
                 )
+                assertEquals("1234", it.url.parameters["cacheNonce"])
+                assertEquals("myFile.png", it.url.parameters["download"])
                 respond(
                     content = """
                     [
@@ -394,7 +402,10 @@ class BucketApiTest {
                     )
                 )
             }
-            val urls = client.storage[bucketId].createSignedUrls(expectedExpiresIn, expectedPaths)
+            val urls = client.storage[bucketId].createSignedUrls(expectedExpiresIn, expectedPaths) {
+                forceDownload("myFile.png")
+                cacheNonce = "1234"
+            }
             assertEquals(expectedUrls.map { client.storage.resolveUrl(it.substring(1)) }, urls.map { it.signedURL }, "URLs should be $expectedUrls")
         }
     }
@@ -603,6 +614,9 @@ class BucketApiTest {
                 assertEquals(expectedQuality.toString(), content["quality"], "Quality should be $expectedQuality")
                 assertEquals(expectedResize.name.lowercase(), content["resize"], "Resize should be ${expectedResize.name.lowercase()}")
                 assertEquals(expectedFormat, content["format"], "Format should be $expectedFormat")
+                if(!authenticated) {
+                    assertEquals("1234", it.url.parameters["cacheNonce"])
+                }
                 respond(expectedData)
             }
             val transform: ImageTransformation.() -> Unit = {
@@ -611,7 +625,11 @@ class BucketApiTest {
                 quality = expectedQuality
                 resize = expectedResize
             }
-            val data = if(authenticated) client.storage[bucketId].downloadAuthenticated(expectedPath) { transform(transform) } else client.storage[bucketId].downloadPublic(expectedPath) { transform(transform) }
+            val data = if(authenticated) {
+                client.storage[bucketId].downloadAuthenticated(expectedPath) { transform(transform) }
+            } else {
+                client.storage[bucketId].downloadPublic(expectedPath) { transform(transform); cacheNonce = "1234" }
+            }
             assertContentEquals(expectedData, data, "Data should be [1, 2, 3]")
         }
     }
