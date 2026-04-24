@@ -12,6 +12,9 @@ interface BucketUrlBuilder {
      */
     var cacheNonce: String?
 
+    /**
+     * Builders where you can apply a force download
+     */
     interface WithForceDownload : BucketUrlBuilder {
 
         @SupabaseInternal
@@ -26,6 +29,9 @@ interface BucketUrlBuilder {
         }
     }
 
+    /**
+     * Builders where you can apply a transformation
+     */
     interface WithTransformation : BucketUrlBuilder {
 
         @SupabaseInternal
