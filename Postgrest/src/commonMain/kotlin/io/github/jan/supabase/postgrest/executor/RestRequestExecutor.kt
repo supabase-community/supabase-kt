@@ -4,11 +4,11 @@ import io.github.jan.supabase.exceptions.HttpRequestException
 import io.github.jan.supabase.exceptions.RestException
 import io.github.jan.supabase.postgrest.Postgrest
 import io.github.jan.supabase.postgrest.PostgrestImpl
-import io.github.jan.supabase.postgrest.request.PostgrestRequest
+import io.github.jan.supabase.postgrest.query.PostgrestRequestBuilder
 import io.github.jan.supabase.postgrest.result.PostgrestResult
 import io.ktor.http.HttpMethod
-import kotlin.math.pow
 import kotlinx.coroutines.delay
+import kotlin.math.pow
 
 @PublishedApi
 internal data object RestRequestExecutor : RequestExecutor {
@@ -25,10 +25,10 @@ internal data object RestRequestExecutor : RequestExecutor {
     override suspend fun execute(
         postgrest: Postgrest,
         path: String,
-        request: PostgrestRequest
+        request: PostgrestRequestBuilder
     ): PostgrestResult {
         val maxRetries = postgrest.config.maxRetries
-        val shouldRetry = request.retry && request.method in RETRYABLE_METHODS
+        val shouldRetry = request.retry && request.httpMethod in RETRYABLE_METHODS
         val retryCount = if (shouldRetry) maxRetries else 0
 
         val authenticatedSupabaseApi = (postgrest as PostgrestImpl).api
@@ -37,7 +37,7 @@ internal data object RestRequestExecutor : RequestExecutor {
         for (attempt in 0..retryCount) {
             try {
                 val response = authenticatedSupabaseApi.request(path) {
-                    configurePostgrestRequest(request)
+                    with(request) { apply() }
                     if (attempt > 0) {
                         headers.append(RETRY_COUNT_HEADER, attempt.toString())
                     }
