@@ -18,7 +18,7 @@ class SelectRequestBuilder(defaultSchema: String, propertyConversionMethod: Prop
      */
     var head: Boolean = false
         set(value) {
-            httpMethod = if (head) HttpMethod.Head else HttpMethod.Get
+            httpMethod = if (value) HttpMethod.Head else HttpMethod.Get
             field = value
         }
 

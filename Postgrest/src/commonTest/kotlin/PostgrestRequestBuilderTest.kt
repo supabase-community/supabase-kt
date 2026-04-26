@@ -1,131 +1,297 @@
-import io.github.jan.supabase.postgrest.query.Count
+import io.github.jan.supabase.postgrest.query.Columns
 import io.github.jan.supabase.postgrest.query.Order
-import io.github.jan.supabase.postgrest.query.Returning
+import io.ktor.client.request.HttpRequestBuilder
+import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
+import io.ktor.http.HttpMethod
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertNull
+
 
 class PostgrestRequestBuilderTest {
 
     @Test
-    fun testCount() {
-        val request = postgrestRequest {
-            count(Count.ESTIMATED)
-        }
-        assertEquals(Count.ESTIMATED, request.count)
+    fun testHttpMethod() {
+        testRequestBuilder(
+            requestBuilder = {
+                httpMethod = HttpMethod.Head
+            },
+            httpRequestHandler = {
+                assertEquals(HttpMethod.Head, method)
+            }
+        )
     }
 
     @Test
-    fun testSelect() {
-        val request = postgrestRequest {
-            select()
-        }
-        assertEquals(Returning.Representation(), request.returning)
+    fun testContentType() {
+        testRequestBuilder(
+            requestBuilder = {
+
+            },
+            httpRequestHandler = {
+                assertEquals(ContentType.Application.Json.toString(), headers[HttpHeaders.ContentType])
+            }
+        )
     }
 
     @Test
-    fun testSingle() {
-        val request = postgrestRequest {
-            single()
+    fun testSchemaHeaderGetHead() {
+        for(method in listOf(HttpMethod.Get, HttpMethod.Head)) {
+            testRequestBuilder(
+                requestBuilder = {
+                    httpMethod = method
+                },
+                httpRequestHandler = {
+                    assertNull(headers["Content-Profile"])
+                    assertEquals("public", headers["Accept-Profile"])
+                }
+            )
         }
-        assertEquals("application/vnd.pgrst.object+json", request.headers[HttpHeaders.Accept])
     }
 
     @Test
-    fun testOrderWithoutReferencedTable() {
-        val request = postgrestRequest {
-            order("messages", Order.ASCENDING, true)
+    fun testSchemaHeaderOther() {
+        for(method in listOf(HttpMethod.Post, HttpMethod.Delete, HttpMethod.Patch)) {
+            testRequestBuilder(
+                requestBuilder = {
+                    httpMethod = method
+                },
+                httpRequestHandler = {
+                    assertNull(headers["Accept-Profile"])
+                    assertEquals("public", headers["Content-Profile"])
+                }
+            )
         }
-        assertEquals(listOf("messages.asc.nullsfirst"), request.params["order"])
     }
 
     @Test
-    fun testOrderWithoutReferencedTableNullsLast() {
-        val request = postgrestRequest {
-            order("messages", Order.DESCENDING, false)
-        }
-        assertEquals(listOf("messages.desc.nullslast"), request.params["order"])
+    fun testAcceptCsv() {
+        testRequestBuilder(
+            requestBuilder = {
+                csv()
+            },
+            httpRequestHandler = {
+                assertEquals("text/csv", headers[HttpHeaders.Accept])
+            }
+        )
     }
 
     @Test
-    fun testOrderWithReferencedTable() {
-        val request = postgrestRequest {
-            order("messages", Order.ASCENDING, true, "table")
-        }
-        assertEquals(listOf("messages.asc.nullsfirst"), request.params["table.order"])
+    fun testAcceptGeoJson() {
+        testRequestBuilder(
+            requestBuilder = {
+                geojson()
+            },
+            httpRequestHandler = {
+                assertEquals("application/geo+json", headers[HttpHeaders.Accept])
+            }
+        )
     }
 
     @Test
-    fun testLimitWithoutReferencedTable() {
-        val request = postgrestRequest {
-            limit(10)
-        }
-        assertEquals(listOf("10"), request.params["limit"])
+    fun testAcceptJsonNoStrip() {
+        testRequestBuilder(
+            requestBuilder = {
+
+            },
+            httpRequestHandler = {
+                assertEquals("application/json", headers[HttpHeaders.Accept])
+            }
+        )
     }
 
     @Test
-    fun testLimitWithReferencedTable() {
-        val request = postgrestRequest {
-            limit(10, "table")
-        }
-        assertEquals(listOf("10"), request.params["table.limit"])
+    fun testAcceptJsonStrip() {
+        testRequestBuilder(
+            requestBuilder = {
+                stripNulls()
+            },
+            httpRequestHandler = {
+                assertEquals("application/vnd.pgrst.array+json;nulls=stripped", headers[HttpHeaders.Accept])
+            }
+        )
     }
 
     @Test
-    fun testRangeWithoutReferencedTable() {
-        val request = postgrestRequest {
-            range(10, 20)
-        }
-        assertEquals(listOf("10"), request.params["offset"])
-        assertEquals(listOf("11"), request.params["limit"])
+    fun testAcceptSingleNoStrip() {
+        testRequestBuilder(
+            requestBuilder = {
+                single()
+            },
+            httpRequestHandler = {
+                assertEquals("application/vnd.pgrst.object+json", headers[HttpHeaders.Accept])
+            }
+        )
     }
 
     @Test
-    fun testRangeWithReferencedTable() {
-        val request = postgrestRequest {
-            range(10, 20, "table")
-        }
-        assertEquals(listOf("10"), request.params["table.offset"])
-        assertEquals(listOf("11"), request.params["table.limit"])
-    }
-
-    @Test
-    fun testGeojson() {
-        val request = postgrestRequest {
-            geojson()
-        }
-        assertEquals("application/geo+json", request.headers[HttpHeaders.Accept])
-    }
-
-    @Test
-    fun testCsv() {
-        val request = postgrestRequest {
-            csv()
-        }
-        assertEquals("text/csv", request.headers[HttpHeaders.Accept])
+    fun testAcceptSingleStrip() {
+        testRequestBuilder(
+            requestBuilder = {
+                single()
+                stripNulls()
+            },
+            httpRequestHandler = {
+                assertEquals("application/vnd.pgrst.object+json;nulls=stripped", headers[HttpHeaders.Accept])
+            }
+        )
     }
 
     @Test
     fun testExplainWithNoOptions() {
-        val request = postgrestRequest {
-            explain()
-        }
-        assertEquals("application/vnd.pgrst.plan+text; for=\"application/json\"; options=;", request.headers[HttpHeaders.Accept])
+        testRequestBuilder(
+            requestBuilder = {
+                explain()
+            },
+            httpRequestHandler = {
+                assertEquals("application/vnd.pgrst.plan+text; for=\"application/json\"; options=;", headers[HttpHeaders.Accept])
+            }
+        )
+    }
+
+    @Test
+    fun testExplainWithOtherMediaType() {
+        testRequestBuilder(
+            requestBuilder = {
+                csv()
+                explain()
+            },
+            httpRequestHandler = {
+                assertEquals("application/vnd.pgrst.plan+text; for=\"text/csv\"; options=;", headers[HttpHeaders.Accept])
+            }
+        )
     }
 
     @Test
     fun testExplainWithOptions() {
-        val request = postgrestRequest {
-            explain(
-                analyze = true,
-                verbose = true,
-                buffers = true,
-                settings = true,
-                wal = true,
-                format = "json"
-            )
+        testRequestBuilder(
+            requestBuilder = {
+                explain(
+                    analyze = true,
+                    verbose = true,
+                    buffers = true,
+                    settings = true,
+                    wal = true,
+                    format = "json"
+                )
+            },
+            httpRequestHandler = {
+                assertEquals("application/vnd.pgrst.plan+json; for=\"application/json\"; options=analyze|verbose|settings|buffers|wal;", headers[HttpHeaders.Accept])
+            }
+        )
+    }
+
+    @Test
+    fun testOrderWithoutReferencedTable() {
+        testRequestBuilder(
+            requestBuilder = {
+                order("messages", Order.ASCENDING, true)
+            },
+            httpRequestHandler = {
+                assertEquals("messages.asc.nullsfirst", url.parameters["order"])
+            }
+        )
+    }
+
+    @Test
+    fun testOrderWithoutReferencedTableNullsLast() {
+        testRequestBuilder(
+            requestBuilder = {
+                order("messages", Order.ASCENDING, false)
+            },
+            httpRequestHandler = {
+                assertEquals("messages.asc.nullslast", url.parameters["order"])
+            }
+        )
+    }
+
+    @Test
+    fun testOrderWithReferencedTable() {
+        testRequestBuilder(
+            requestBuilder = {
+                order("messages", Order.ASCENDING, true, "table")
+            },
+            httpRequestHandler = {
+                assertEquals("messages.asc.nullsfirst", url.parameters["table.order"])
+            }
+        )
+    }
+
+    @Test
+    fun testLimitWithoutReferencedTable() {
+        testRequestBuilder(
+            requestBuilder = {
+                limit(10)
+            },
+            httpRequestHandler = {
+                assertEquals("10", url.parameters["limit"])
+            }
+        )
+    }
+
+    @Test
+    fun testLimitWithReferencedTable() {
+        testRequestBuilder(
+            requestBuilder = {
+                limit(10, "table")
+            },
+            httpRequestHandler = {
+                assertEquals("10", url.parameters["table.limit"])
+            }
+        )
+    }
+
+    @Test
+    fun testRangeWithoutReferencedTable() {
+        testRequestBuilder(
+            requestBuilder = {
+                range(10, 20)
+            },
+            httpRequestHandler = {
+                assertEquals("10", url.parameters["offset"])
+                assertEquals("11", url.parameters["limit"])
+            }
+        )
+    }
+
+    @Test
+    fun testRangeWithReferencedTable() {
+        testRequestBuilder(
+            requestBuilder = {
+                range(10, 20, "table")
+            },
+            httpRequestHandler = {
+                assertEquals("10", url.parameters["table.offset"])
+                assertEquals("11", url.parameters["table.limit"])
+            }
+        )
+    }
+
+    @Test
+    fun testSelect() {
+        val myColumns = Columns.raw("id,name")
+        testRequestBuilder(
+            requestBuilder = {
+                select(myColumns)
+            },
+            httpRequestHandler = {
+                assertEquals("id,name", url.parameters["select"])
+            }
+        )
+    }
+
+    private fun testRequestBuilder(
+        schema: String = "public",
+        requestBuilder: MockPostgrestRequestBuilder.() -> Unit,
+        httpRequestHandler: HttpRequestBuilder.() -> Unit
+    ) {
+        val request = postgrestRequest(defaultSchema = schema, builder = requestBuilder)
+        val httpRequestBuilder = HttpRequestBuilder()
+        with(request) {
+            httpRequestBuilder.apply()
         }
-        assertEquals("application/vnd.pgrst.plan+json; for=\"application/json\"; options=analyze|verbose|settings|buffers|wal;", request.headers[HttpHeaders.Accept])
+        httpRequestHandler(httpRequestBuilder)
     }
 
 }

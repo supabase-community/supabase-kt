@@ -69,8 +69,8 @@ class PostgrestQueryBuilder(
         request: UpsertRequestBuilder.() -> Unit = {}
     ): PostgrestResult {
         val requestBuilder = UpsertRequestBuilder(schema, postgrest.config.propertyConversionMethod).apply {
-            request()
             this.body = body
+            request()
             val columns = body.flatMap { it.jsonObject.keys }.distinct()
             if(columns.isNotEmpty()) params["columns"] = listOf(columns.joinToString(","))
         }
@@ -134,8 +134,8 @@ class PostgrestQueryBuilder(
         request: InsertRequestBuilder.() -> Unit = {}
     ): PostgrestResult {
         val requestBuilder = InsertRequestBuilder(schema, postgrest.config.propertyConversionMethod).apply {
-            request()
             this.body = body
+            request()
             val columns = body.flatMap { it.jsonObject.keys }.distinct()
             if(columns.isNotEmpty()) params["columns"] = listOf(columns.joinToString(","))
         }

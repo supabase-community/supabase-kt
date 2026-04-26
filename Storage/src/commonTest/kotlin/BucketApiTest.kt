@@ -66,7 +66,6 @@ class BucketApiTest {
             var index = 0
             client = createMockedSupabaseClient(configuration = configureClient) {
                 assertMethodIs(HttpMethod.Delete, it.method)
-                println("helo")
                 assertPathIs("/object/$bucketId", it.url.pathAfterVersion())
                 if(index == 0) {
                     assertEquals("value", it.headers["customHeader"])

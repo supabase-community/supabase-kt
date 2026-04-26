@@ -12,7 +12,7 @@ internal sealed interface AcceptHeader {
             "application/vnd.pgrst.object+json" + if(stripNulls) ";nulls=stripped" else ""
 
         fun json(stripNulls: Boolean) =
-            if(stripNulls) "application/json" else "application/vnd.pgrst.array+json;nulls=stripped"
+            if(stripNulls) "application/vnd.pgrst.array+json;nulls=stripped" else "application/json"
 
         fun csv() = "text/csv"
 
