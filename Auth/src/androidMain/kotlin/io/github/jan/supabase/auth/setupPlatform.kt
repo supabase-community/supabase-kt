@@ -46,12 +46,21 @@ private fun addLifecycleCallbacks(auth: Auth) {
                                 auth.logger.d {
                                     "No session found, not starting auto refresh"
                                 }
+                                auth.initDone()
                             } else {
                                 auth.logger.d {
                                     "Session found, auto refresh started"
                                 }
+                                // Do NOT call initDone() here. importSession()
+                                // launched by loadFromStorage() will set the
+                                // status to Authenticated once the (possibly
+                                // async) refresh completes — or to
+                                // NotAuthenticated via clearSession() on a 4xx
+                                // refresh failure. Calling initDone() while the
+                                // refresh job is still in flight emits a spurious
+                                // NotAuthenticated(isSignOut=false) because the
+                                // status is still Initializing at that point.
                             }
-                            auth.initDone()
                         }
                     }
                 }
