@@ -1,5 +1,39 @@
 # Changelog
 
+### 3.6.0 - April 27, 2026
+
+### Core
+
+* Fix JS test by @jan-tennert in https://github.com/supabase-community/supabase-kt/pull/1255
+* Use inject-based logging approach for configurability and mocking by @jan-tennert in https://github.com/supabase-community/supabase-kt/pull/1254 - *You can now provide a custom `SupabaseLoggingProcessor` via `SupabaseClientBuilder#defaultLoggingFactory`, and also override per plugin. This processor is used to actually log the messages*
+
+
+### Realtime
+
+* Fix consecutive connects by @sproctor in https://github.com/supabase-community/supabase-kt/pull/1248
+
+### Storage
+
+* fix(storage): preserve full nested path in FileUploadResponse by @Sirelon in https://github.com/supabase-community/supabase-kt/pull/1239
+* Fix flaky testUnauthenticatedUploadDenied in CI by @thagikura in https://github.com/supabase-community/supabase-kt/pull/1240
+
+### Auth
+
+* fix(auth): Use configured httpPort instead of random port for OAuth callback server by @CristianMG in https://github.com/supabase-community/supabase-kt/pull/1237
+* feat: Add support for OAuth 2.1 client admin API by @thagikura in https://github.com/supabase-community/supabase-kt/pull/1222
+* Deprecate data property on IDToken.Config by @thagikura in https://github.com/supabase-community/supabase-kt/pull/1249
+* fix(auth): don't emit spurious NotAuthenticated on Android lifecycle onStart by @alexeysfh in https://github.com/supabase-community/supabase-kt/pull/1267
+
+### Postgrest
+
+* feat: Add automatic retries for transient Postgrest errors by @thagikura in https://github.com/supabase-community/supabase-kt/pull/1246
+* fix: expand Cloudflare error codes in retryable status codes by @jan-tennert in https://github.com/supabase-community/supabase-kt/pull/1262
+* Refactor PostgrestRequests and add `stripNulls()` by @jan-tennert in https://github.com/supabase-community/supabase-kt/pull/1264
+
+### Storage
+
+* Add url options to `download`, `publicUrl`, `createSignedUrl`... by @jan-tennert in https://github.com/supabase-community/supabase-kt/pull/1263
+
 ### 3.5.0 - April 02, 2026
 
 # Changes
