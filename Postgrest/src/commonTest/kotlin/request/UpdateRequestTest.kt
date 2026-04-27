@@ -20,7 +20,7 @@ class UpdateRequestTest {
 
         assertEquals(HttpMethod.Patch, sut.httpMethod)
         assertEquals(
-            listOf(
+            setOf(
                 "return=representation",
                 "count=exact"
             ), sut.buildPrefer()

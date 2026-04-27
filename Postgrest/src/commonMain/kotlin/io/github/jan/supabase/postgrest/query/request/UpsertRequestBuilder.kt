@@ -31,7 +31,7 @@ class UpsertRequestBuilder(defaultSchema: String, propertyConversionMethod: Prop
         httpMethod = HttpMethod.Post
     }
 
-    override fun buildPrefer(): List<String> {
+    override fun customPrefer(): List<String> {
         return buildPrefer(upsert = true, ignoreDuplicates = ignoreDuplicates)
     }
 

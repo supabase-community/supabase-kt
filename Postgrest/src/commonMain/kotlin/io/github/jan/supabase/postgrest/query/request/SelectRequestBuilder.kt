@@ -22,8 +22,4 @@ class SelectRequestBuilder(defaultSchema: String, propertyConversionMethod: Prop
             field = value
         }
 
-    override fun buildPrefer(): List<String> {
-        return if (count != null) listOf("count=${count!!.identifier}") else listOf()
-    }
-
 }

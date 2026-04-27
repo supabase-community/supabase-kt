@@ -5,7 +5,7 @@ class MockPostgrestRequestBuilder(defaultSchema: String, propertyConversionMetho
     defaultSchema,
     propertyConversionMethod
 ) {
-    override fun buildPrefer(): List<String> {
+    override fun customPrefer(): List<String> {
         return listOf("prefer=test")
     }
 }

@@ -19,7 +19,7 @@ class RpcRequestTest {
 
         assertEquals("POST", sut.httpMethod.value)
         assertEquals(
-            listOf(
+            setOf(
                 "count=exact"
             ), sut.buildPrefer()
         )
@@ -35,7 +35,7 @@ class RpcRequestTest {
 
         assertEquals("GET", sut.httpMethod.value)
         assertEquals(
-            listOf(
+            setOf(
                 "count=estimated"
             ), sut.buildPrefer()
         )

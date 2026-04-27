@@ -4,7 +4,6 @@ import io.github.jan.supabase.postgrest.PropertyConversionMethod
 import io.github.jan.supabase.postgrest.query.Count
 import io.github.jan.supabase.postgrest.query.request.InsertRequestBuilder
 import kotlin.test.Test
-import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
 
 class InsertRequestTest {
@@ -21,8 +20,8 @@ class InsertRequestTest {
 
         assertEquals("POST", sut.httpMethod.value)
         assertEquals("public", sut.schema)
-        assertContentEquals(
-            listOf(
+        assertEquals(
+            setOf(
                 "return=representation",
                 "missing=default",
                 "count=exact"
@@ -40,8 +39,8 @@ class InsertRequestTest {
 
         assertEquals("POST", sut.httpMethod.value)
         assertEquals("public", sut.schema)
-        assertContentEquals(
-            listOf(
+        assertEquals(
+            setOf(
                 "return=representation",
                 "count=exact"
             ), sut.buildPrefer()

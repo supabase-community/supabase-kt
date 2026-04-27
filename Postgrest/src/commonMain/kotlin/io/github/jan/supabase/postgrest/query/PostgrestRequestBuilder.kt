@@ -261,7 +261,14 @@ abstract class PostgrestRequestBuilder(
         filter.block()
     }
 
-    internal abstract fun buildPrefer(): List<String>
+    protected fun withReturning() = listOf("return=${returning.identifier}")
+
+    internal open fun customPrefer(): List<String> = listOf()
+
+    internal fun buildPrefer() = buildSet {
+        if (count != null) add("count=${count!!.identifier}")
+        addAll(customPrefer())
+    }
 
     internal fun HttpRequestBuilder.apply() {
 
@@ -279,10 +286,10 @@ abstract class PostgrestRequestBuilder(
         }
 
         val mediaType = when(acceptHeader) {
-            AcceptHeader.CSV -> AcceptHeader.csv()
-            AcceptHeader.GeoJson -> AcceptHeader.geojson()
-            AcceptHeader.Json -> AcceptHeader.json(shouldStripNulls)
-            AcceptHeader.Single -> AcceptHeader.single(shouldStripNulls)
+            AcceptHeader.CSV -> AcceptHeader.CSV()
+            AcceptHeader.GeoJson -> AcceptHeader.GeoJson()
+            AcceptHeader.Json -> AcceptHeader.Json(shouldStripNulls)
+            AcceptHeader.Single -> AcceptHeader.Single(shouldStripNulls)
         }
 
         // Accept header
@@ -290,6 +297,7 @@ abstract class PostgrestRequestBuilder(
             HttpHeaders.Accept,
             if(explainData != null) AcceptHeader.explain(explainData!!.options, mediaType, explainData!!.format) else mediaType
         )
+
         header(PostgrestQueryBuilder.HEADER_PREFER, buildPrefer().joinToString(","))
 
         // Url params & headers

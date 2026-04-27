@@ -5,7 +5,6 @@ import io.github.jan.supabase.postgrest.query.Count
 import io.github.jan.supabase.postgrest.query.request.InsertRequestBuilder
 import io.github.jan.supabase.postgrest.query.request.UpsertRequestBuilder
 import kotlin.test.Test
-import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 
@@ -24,7 +23,7 @@ class UpsertRequestTest {
 
         assertEquals("POST", sut.httpMethod.value)
         assertEquals(
-            listOf(
+            setOf(
                 "return=representation",
                 "resolution=ignore-duplicates",
                 "missing=default",
@@ -43,8 +42,8 @@ class UpsertRequestTest {
         }
 
         assertEquals("POST", sut.httpMethod.value)
-        assertContentEquals(
-            listOf(
+        assertEquals(
+            setOf(
                 "return=representation",
                 "resolution=merge-duplicates",
                 "count=exact"

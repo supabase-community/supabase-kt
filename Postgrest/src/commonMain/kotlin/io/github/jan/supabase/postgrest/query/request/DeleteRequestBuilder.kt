@@ -17,11 +17,6 @@ class DeleteRequestBuilder(defaultSchema: String, propertyConversionMethod: Prop
         httpMethod = HttpMethod.Delete
     }
 
-    override fun buildPrefer(): List<String> {
-        return buildList {
-            add("return=${returning.identifier}")
-            if (count != null) add("count=${count!!.identifier}")
-        }
-    }
+    override fun customPrefer(): List<String> = withReturning()
 
 }

@@ -24,8 +24,4 @@ class RpcRequestBuilder(defaultSchema: String, propertyConversionMethod: Propert
         httpMethod = HttpMethod.Post
     }
 
-    override fun buildPrefer(): List<String> {
-        return if (count != null) listOf("count=${count!!.identifier}") else listOf()
-    }
-
 }

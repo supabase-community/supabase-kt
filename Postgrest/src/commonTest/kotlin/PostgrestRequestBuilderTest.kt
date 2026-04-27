@@ -1,5 +1,7 @@
 import io.github.jan.supabase.postgrest.query.Columns
+import io.github.jan.supabase.postgrest.query.Count
 import io.github.jan.supabase.postgrest.query.Order
+import io.github.jan.supabase.postgrest.query.PostgrestQueryBuilder
 import io.ktor.client.request.HttpRequestBuilder
 import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
@@ -10,6 +12,30 @@ import kotlin.test.assertNull
 
 
 class PostgrestRequestBuilderTest {
+
+    @Test
+    fun testPreferNoCount() {
+        testRequestBuilder(
+            requestBuilder = {
+
+            },
+            httpRequestHandler = {
+                assertEquals("prefer=test", headers[PostgrestQueryBuilder.HEADER_PREFER])
+            }
+        )
+    }
+
+    @Test
+    fun testPreferCount() {
+        testRequestBuilder(
+            requestBuilder = {
+                count(Count.EXACT)
+            },
+            httpRequestHandler = {
+                assertEquals("count=exact,prefer=test", headers[PostgrestQueryBuilder.HEADER_PREFER])
+            }
+        )
+    }
 
     @Test
     fun testHttpMethod() {

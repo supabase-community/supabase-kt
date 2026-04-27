@@ -29,14 +29,12 @@ open class InsertRequestBuilder(defaultSchema: String, propertyConversionMethod:
         ignoreDuplicates: Boolean,
     ): List<String> {
         return buildList {
-            add("return=${returning.identifier}")
             if (upsert) add("resolution=${if (ignoreDuplicates) "ignore" else "merge"}-duplicates")
             if(!defaultToNull) add("missing=default")
-            if (count != null) add("count=${count!!.identifier}")
-        }
+        } + withReturning()
     }
 
-    override fun buildPrefer(): List<String> {
+    override fun customPrefer(): List<String> {
         return buildPrefer(upsert = false, ignoreDuplicates = false)
     }
 

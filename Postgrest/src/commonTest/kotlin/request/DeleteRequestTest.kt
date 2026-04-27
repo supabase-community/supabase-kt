@@ -18,7 +18,7 @@ class DeleteRequestTest {
         }
 
         assertEquals("DELETE", sut.httpMethod.value)
-        assertEquals(listOf("return=representation", "count=exact"), sut.buildPrefer())
+        assertEquals(setOf("return=representation", "count=exact"), sut.buildPrefer())
         assertEquals("public", sut.schema)
     }
 

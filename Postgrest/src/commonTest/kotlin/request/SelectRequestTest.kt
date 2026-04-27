@@ -18,7 +18,7 @@ class SelectRequestTest {
 
         assertEquals("GET", sut.httpMethod.value)
         assertEquals(
-            listOf(
+            setOf(
                 "count=exact"
             ), sut.buildPrefer()
         )
@@ -34,7 +34,7 @@ class SelectRequestTest {
 
         assertEquals("HEAD", sut.httpMethod.value)
         assertEquals(
-            listOf(
+            setOf(
                 "count=estimated"
             ), sut.buildPrefer()
         )
