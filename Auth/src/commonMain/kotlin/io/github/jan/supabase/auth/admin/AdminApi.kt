@@ -3,6 +3,7 @@ package io.github.jan.supabase.auth.admin
 import io.github.jan.supabase.annotations.SupabaseInternal
 import io.github.jan.supabase.auth.Auth
 import io.github.jan.supabase.auth.SignOutScope
+import io.github.jan.supabase.auth.admin.custom.provider.CustomProvidersApi
 import io.github.jan.supabase.auth.api.AuthenticatedSupabaseApi
 import io.github.jan.supabase.auth.user.UserInfo
 import io.github.jan.supabase.auth.admin.oauth.OAuthClientApi
@@ -25,6 +26,8 @@ import kotlinx.serialization.json.put
  * The admin interface for the supabase auth module. Service role access token is required. Import it via [Auth.importAuthToken]. Never share it publicly
  */
 interface AdminApi {
+
+    val customProviders: CustomProvidersApi
 
     /**
      * The OAuth client management API
