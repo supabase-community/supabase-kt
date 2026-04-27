@@ -14,6 +14,9 @@ class RpcRequestBuilder(defaultSchema: String, propertyConversionMethod: Propert
     propertyConversionMethod
 ) {
 
+    /**
+     * The HTTP method to use. Default is POST
+     */
     var method: RpcMethod = RpcMethod.POST
         set(value) {
             httpMethod = value.httpMethod

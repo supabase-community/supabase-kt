@@ -82,7 +82,7 @@ abstract class PostgrestRequestBuilder(
      *
      */
     fun stripNulls() {
-        require(headers[HttpHeaders.Accept] != "text/csv") {
+        require(acceptHeader != AcceptHeader.CSV) {
             "stripNulls() cannot be used with csv()"
         }
         this.shouldStripNulls = true
@@ -253,7 +253,7 @@ abstract class PostgrestRequestBuilder(
         // Accept header
         header(
             HttpHeaders.Accept,
-            if(explainData != null) AcceptHeader.explain(explainData!!.options, mediaType, explainData!!.format) else mediaType
+            if(explainData != null) explainData!!(mediaType) else mediaType
         )
 
         header(PostgrestQueryBuilder.HEADER_PREFER, buildPrefer().joinToString(","))

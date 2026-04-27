@@ -16,19 +16,15 @@ internal sealed interface AcceptHeader {
         operator fun invoke() = "application/geo+json"
     }
 
-    companion object {
-
-        fun explain(
-            options: String,
-            mediaType: String,
-            format: String
-        ) = "application/vnd.pgrst.plan+${format}; for=\"${mediaType}\"; options=${options};"
-
-    }
-
 }
 
 internal data class ExplainData(
     val options: String,
     val format: String
-)
+) {
+
+    operator fun invoke(
+        mediaType: String,
+    ) = "application/vnd.pgrst.plan+${format}; for=\"${mediaType}\"; options=${options};"
+
+}
