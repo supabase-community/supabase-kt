@@ -1,4 +1,4 @@
-package io.github.jan.supabase.integration
+package io.github.jan.supabase.integration.auth
 
 import io.github.jan.supabase.auth.Auth
 import io.github.jan.supabase.auth.admin.oauth.OAuthClientTokenEndpointAuthMethod
@@ -7,6 +7,7 @@ import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.auth.minimalConfig
 import io.github.jan.supabase.createSupabaseClient
 import io.github.jan.supabase.exceptions.RestException
+import io.github.jan.supabase.integration.IntegrationTestBase
 import io.github.jan.supabase.postgrest.Postgrest
 import io.github.jan.supabase.storage.Storage
 import kotlinx.coroutines.test.runTest

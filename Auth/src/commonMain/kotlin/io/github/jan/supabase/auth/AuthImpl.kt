@@ -29,6 +29,8 @@ import io.github.jan.supabase.auth.jwt.ecdsaRawToDer
 import io.github.jan.supabase.auth.jwt.rsaJwkToDer
 import io.github.jan.supabase.auth.mfa.MfaApi
 import io.github.jan.supabase.auth.mfa.MfaApiImpl
+import io.github.jan.supabase.auth.oauth.OAuthApi
+import io.github.jan.supabase.auth.oauth.OAuthApiImpl
 import io.github.jan.supabase.auth.providers.AuthProvider
 import io.github.jan.supabase.auth.providers.ExternalAuthConfigDefaults
 import io.github.jan.supabase.auth.providers.IDTokenProvider
@@ -122,6 +124,7 @@ internal class AuthImpl(
     internal val userApi = if(config.requireValidSession) supabaseClient.authenticatedSupabaseApi(this) else publicApi
     override val admin: AdminApi = AdminApiImpl(publicApi)
     override val mfa: MfaApi = MfaApiImpl(userApi.resolve("factors"), this)
+    override val oauth: OAuthApi = OAuthApiImpl(userApi)
     var sessionJob: Job? = null
     var refreshInformation: SessionRefreshInformation? = null
     override val isAutoRefreshRunning: Boolean
