@@ -3,26 +3,29 @@ package request
 import io.github.jan.supabase.postgrest.PropertyConversionMethod
 import io.github.jan.supabase.postgrest.query.Count
 import io.github.jan.supabase.postgrest.query.request.InsertRequestBuilder
+import io.github.jan.supabase.postgrest.query.request.UpsertRequestBuilder
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
 
-class InsertRequestTest {
+class UpsertRequestTest {
 
     private lateinit var sut: InsertRequestBuilder
 
     @Test
-    fun testInsertRequestBuilder() {
-        sut = InsertRequestBuilder("public", PropertyConversionMethod.CAMEL_CASE_TO_SNAKE_CASE).apply {
+    fun testUpsertRequestBuilder() {
+        sut = UpsertRequestBuilder("public", PropertyConversionMethod.CAMEL_CASE_TO_SNAKE_CASE).apply {
             defaultToNull = false
+            ignoreDuplicates = true
             count(Count.EXACT)
             select()
         }
 
         assertEquals("POST", sut.httpMethod.value)
-        assertEquals("public", sut.schema)
         assertEquals(
             setOf(
                 "return=representation",
+                "resolution=ignore-duplicates",
                 "missing=default",
                 "count=exact"
             ), sut.buildPrefer()
@@ -30,21 +33,24 @@ class InsertRequestTest {
     }
 
     @Test
-    fun testInsertRequestBuilderDefault() {
-        sut = InsertRequestBuilder("public", PropertyConversionMethod.CAMEL_CASE_TO_SNAKE_CASE).apply {
+    fun testUpsertRequestBuilderConflict() {
+        sut = UpsertRequestBuilder("public", PropertyConversionMethod.CAMEL_CASE_TO_SNAKE_CASE).apply {
             defaultToNull = true
+            onConflict = "something"
             count(Count.EXACT)
             select()
         }
 
         assertEquals("POST", sut.httpMethod.value)
-        assertEquals("public", sut.schema)
         assertEquals(
             setOf(
                 "return=representation",
+                "resolution=merge-duplicates",
                 "count=exact"
             ), sut.buildPrefer()
         )
+        assertNotNull(sut.params["on_conflict"])
+        assertEquals("something", sut.params["on_conflict"]!!.first())
     }
 
 }

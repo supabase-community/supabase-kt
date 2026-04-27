@@ -1,44 +1,25 @@
 package request
 
+import io.github.jan.supabase.postgrest.PropertyConversionMethod
 import io.github.jan.supabase.postgrest.query.Count
-import io.github.jan.supabase.postgrest.query.Returning
-import io.github.jan.supabase.postgrest.request.DeleteRequest
-import io.github.jan.supabase.postgrest.request.PostgrestRequest
+import io.github.jan.supabase.postgrest.query.request.DeleteRequestBuilder
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class DeleteRequestTest {
 
-    private lateinit var sut: PostgrestRequest
+    private lateinit var sut: DeleteRequestBuilder
 
     @Test
-    fun testCreateDeleteRequest_thenReturnCorrectValue() {
-        sut = DeleteRequest(
-            returning = Returning.Representation(),
-            count = Count.EXACT,
-            urlParams = mapOf("Key1" to "Value1"),
-            schema = "table"
-        )
+    fun testDeleteRequestBuilder() {
+        sut = DeleteRequestBuilder("public", PropertyConversionMethod.CAMEL_CASE_TO_SNAKE_CASE).apply {
+            select()
+            count(Count.EXACT)
+        }
 
-        assertEquals("DELETE", sut.method.value)
-        assertEquals(listOf("return=representation", "count=exact"), sut.prefer)
-        assertEquals("table", sut.schema)
-        assertEquals(mapOf("Key1" to "Value1"), sut.urlParams)
-    }
-
-    @Test
-    fun testCreateDeleteRequest_withoutCount_thenReturnCorrectValue() {
-        sut = DeleteRequest(
-            returning = Returning.Representation(),
-            count = null,
-            urlParams = mapOf("Key1" to "Value1"),
-            schema = "table"
-        )
-
-        assertEquals("DELETE", sut.method.value)
-        assertEquals(listOf("return=representation"), sut.prefer)
-        assertEquals("table", sut.schema)
-        assertEquals(mapOf("Key1" to "Value1"), sut.urlParams)
+        assertEquals("DELETE", sut.httpMethod.value)
+        assertEquals(setOf("return=representation", "count=exact"), sut.buildPrefer())
+        assertEquals("public", sut.schema)
     }
 
 }

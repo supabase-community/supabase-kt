@@ -1,126 +1,45 @@
 package request
 
+import io.github.jan.supabase.postgrest.PropertyConversionMethod
+import io.github.jan.supabase.postgrest.RpcMethod
 import io.github.jan.supabase.postgrest.query.Count
-import io.github.jan.supabase.postgrest.request.PostgrestRequest
-import io.github.jan.supabase.postgrest.request.RpcRequest
-import io.ktor.http.HttpMethod
-import kotlinx.serialization.json.JsonArray
+import io.github.jan.supabase.postgrest.query.request.RpcRequestBuilder
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertNotNull
-import kotlin.test.assertNull
 
 class RpcRequestTest {
 
-    private lateinit var sut: PostgrestRequest
+    private lateinit var sut: RpcRequestBuilder
 
     @Test
-    fun testCreateRpcRequest_isHead_thenReturnCorrectValue() {
-        sut = RpcRequest(
-            method = HttpMethod.Head,
-            count = Count.EXACT,
-            body = JsonArray(listOf()),
-            urlParams = mapOf("Key1" to "Value1"),
-            schema = "mySchema"
-        )
+    fun testRpcWithoutCustomMethod() {
+        sut = RpcRequestBuilder("public", PropertyConversionMethod.CAMEL_CASE_TO_SNAKE_CASE).apply {
+            count(Count.EXACT)
+        }
 
-        val count = (sut as RpcRequest).count
-        assertNotNull(count)
-        assertEquals("exact", count.identifier)
-
-        assertEquals("HEAD", sut.method.value)
+        assertEquals("POST", sut.httpMethod.value)
         assertEquals(
-            listOf(
+            setOf(
                 "count=exact"
-            ), sut.prefer
+            ), sut.buildPrefer()
         )
-        assertEquals("mySchema", sut.schema)
-        assertEquals(mapOf("Key1" to "Value1"), sut.urlParams)
-        assertEquals(JsonArray(listOf()), sut.body)
+        assertEquals("public", sut.schema)
     }
 
     @Test
-    fun testCreateRpcRequest_notHead_thenReturnCorrectValue() {
-        sut = RpcRequest(
-            method = HttpMethod.Post,
-            count = Count.EXACT,
-            body = JsonArray(listOf()),
-            urlParams = mapOf("Key1" to "Value1"),
-            schema = "mySchema"
-        )
-        val count = (sut as RpcRequest).count
-        assertNotNull(count)
-        assertEquals("exact", count.identifier)
-        assertEquals("POST", sut.method.value)
+    fun testRpc() {
+        sut = RpcRequestBuilder("public", PropertyConversionMethod.CAMEL_CASE_TO_SNAKE_CASE).apply {
+            count(Count.ESTIMATED)
+            method = RpcMethod.GET
+        }
+
+        assertEquals("GET", sut.httpMethod.value)
         assertEquals(
-            listOf(
-                "count=exact"
-            ), sut.prefer
+            setOf(
+                "count=estimated"
+            ), sut.buildPrefer()
         )
-        assertEquals("mySchema", sut.schema)
-        assertEquals(mapOf("Key1" to "Value1"), sut.urlParams)
-        assertEquals(JsonArray(listOf()), sut.body)
-    }
-
-    @Test
-    fun testCreateRpcRequest_withoutCount_thenReturnCorrectValue() {
-        sut = RpcRequest(
-            method = HttpMethod.Head,
-            count = null,
-            body = JsonArray(listOf()),
-            urlParams = mapOf("Key1" to "Value1"),
-            schema = "mySchema"
-        )
-
-        val count = (sut as RpcRequest).count
-        assertNull(count)
-        assertEquals("HEAD", sut.method.value)
-        assertEquals(
-            listOf(
-            ), sut.prefer
-        )
-        assertEquals("mySchema", sut.schema)
-        assertEquals(mapOf("Key1" to "Value1"), sut.urlParams)
-        assertEquals(JsonArray(listOf()), sut.body)
-    }
-
-    @Test
-    fun testCreateRpcRequest_withoutBody_thenReturnCorrectValue() {
-        sut = RpcRequest(
-            method = HttpMethod.Head,
-            count = null,
-            body = null,
-            urlParams = mapOf("Key1" to "Value1"),
-            schema = "mySchema"
-        )
-
-        assertEquals("HEAD", sut.method.value)
-        assertEquals(
-            listOf(
-            ), sut.prefer
-        )
-        assertEquals("mySchema", sut.schema)
-        assertEquals(mapOf("Key1" to "Value1"), sut.urlParams)
-        assertNull(sut.body)
-    }
-    @Test
-    fun testCreateRpcRequest_notHeadAndWithoutCount_thenReturnCorrectValue() {
-        sut = RpcRequest(
-            method = HttpMethod.Post,
-            count = null,
-            body = JsonArray(listOf()),
-            urlParams = mapOf("Key1" to "Value1"),
-            schema = "mySchema"
-        )
-
-        assertEquals("POST", sut.method.value)
-        assertEquals(
-            listOf(
-            ), sut.prefer
-        )
-        assertEquals("mySchema", sut.schema)
-        assertEquals(mapOf("Key1" to "Value1"), sut.urlParams)
-        assertEquals(JsonArray(listOf()), sut.body)
+        assertEquals("public", sut.schema)
     }
 
 }

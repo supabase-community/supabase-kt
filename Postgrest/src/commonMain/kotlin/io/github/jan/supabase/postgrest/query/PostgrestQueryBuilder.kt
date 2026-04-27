@@ -7,14 +7,11 @@ import io.github.jan.supabase.exceptions.HttpRequestException
 import io.github.jan.supabase.postgrest.Postgrest
 import io.github.jan.supabase.postgrest.exception.PostgrestRestException
 import io.github.jan.supabase.postgrest.executor.RestRequestExecutor
-import io.github.jan.supabase.postgrest.mapToFirstValue
+import io.github.jan.supabase.postgrest.query.request.DeleteRequestBuilder
 import io.github.jan.supabase.postgrest.query.request.InsertRequestBuilder
 import io.github.jan.supabase.postgrest.query.request.SelectRequestBuilder
+import io.github.jan.supabase.postgrest.query.request.UpdateRequestBuilder
 import io.github.jan.supabase.postgrest.query.request.UpsertRequestBuilder
-import io.github.jan.supabase.postgrest.request.DeleteRequest
-import io.github.jan.supabase.postgrest.request.InsertRequest
-import io.github.jan.supabase.postgrest.request.SelectRequest
-import io.github.jan.supabase.postgrest.request.UpdateRequest
 import io.github.jan.supabase.postgrest.result.PostgrestResult
 import io.ktor.client.plugins.HttpRequestTimeoutException
 import kotlinx.serialization.json.JsonArray
@@ -45,18 +42,11 @@ class PostgrestQueryBuilder(
         columns: Columns = Columns.ALL,
         request: @PostgrestFilterDSL SelectRequestBuilder.() -> Unit = {}
     ): PostgrestResult {
-        val requestBuilder = SelectRequestBuilder(postgrest.config.propertyConversionMethod).apply {
-            request(); params["select"] = listOf(columns.value)
+        val requestBuilder = SelectRequestBuilder(schema, postgrest.config.propertyConversionMethod).apply {
+            request()
+            select(columns)
         }
-        val selectRequest = SelectRequest(
-            head = requestBuilder.head,
-            count = requestBuilder.count,
-            urlParams = requestBuilder.params.mapToFirstValue(),
-            schema = schema,
-            headers = requestBuilder.headers.build(),
-            retry = requestBuilder.retry,
-        )
-        return RestRequestExecutor.execute(postgrest = postgrest,path = table, request = selectRequest)
+        return RestRequestExecutor.execute(postgrest = postgrest, path = table, request = requestBuilder)
     }
 
     /**
@@ -78,24 +68,13 @@ class PostgrestQueryBuilder(
         body: JsonArray,
         request: UpsertRequestBuilder.() -> Unit = {}
     ): PostgrestResult {
-        val requestBuilder = UpsertRequestBuilder(postgrest.config.propertyConversionMethod).apply(request)
-        val columns = body.map { it.jsonObject.keys }.flatten().distinct()
-        if(columns.isNotEmpty()) requestBuilder.params["columns"] = listOf(columns.joinToString(","))
-        requestBuilder.onConflict?.let {
-            requestBuilder.params["on_conflict"] = listOf(it)
+        val requestBuilder = UpsertRequestBuilder(schema, postgrest.config.propertyConversionMethod).apply {
+            this.body = body
+            request()
+            val columns = body.flatMap { it.jsonObject.keys }.distinct()
+            if(columns.isNotEmpty()) params["columns"] = listOf(columns.joinToString(","))
         }
-        val insertRequest = InsertRequest(
-            body = body,
-            upsert = true,
-            returning = requestBuilder.returning,
-            count = requestBuilder.count,
-            urlParams = requestBuilder.params.mapToFirstValue(),
-            defaultToNull = requestBuilder.defaultToNull,
-            ignoreDuplicates = requestBuilder.ignoreDuplicates,
-            schema = schema,
-            headers = requestBuilder.headers.build()
-        )
-        return RestRequestExecutor.execute(postgrest = postgrest, path = table, request = insertRequest)
+        return RestRequestExecutor.execute(postgrest = postgrest, path = table, request = requestBuilder)
     }
 
     /**
@@ -154,19 +133,13 @@ class PostgrestQueryBuilder(
         body: JsonArray,
         request: InsertRequestBuilder.() -> Unit = {}
     ): PostgrestResult {
-        val requestBuilder = InsertRequestBuilder(postgrest.config.propertyConversionMethod).apply(request)
-        val columns = body.map { it.jsonObject.keys }.flatten().distinct()
-        if(columns.isNotEmpty()) requestBuilder.params["columns"] = listOf(columns.joinToString(","))
-        val insertRequest = InsertRequest(
-            body = body,
-            returning = requestBuilder.returning,
-            count = requestBuilder.count,
-            urlParams = requestBuilder.params.mapToFirstValue(),
-            schema = schema,
-            headers = requestBuilder.headers.build(),
-            defaultToNull = requestBuilder.defaultToNull
-        )
-        return RestRequestExecutor.execute(postgrest = postgrest, path = table, request = insertRequest)
+        val requestBuilder = InsertRequestBuilder(schema, postgrest.config.propertyConversionMethod).apply {
+            this.body = body
+            request()
+            val columns = body.flatMap { it.jsonObject.keys }.distinct()
+            if(columns.isNotEmpty()) params["columns"] = listOf(columns.joinToString(","))
+        }
+        return RestRequestExecutor.execute(postgrest = postgrest, path = table, request = requestBuilder)
     }
 
     /**
@@ -215,16 +188,11 @@ class PostgrestQueryBuilder(
         crossinline update: PostgrestUpdate.() -> Unit = {},
         request: PostgrestRequestBuilder.() -> Unit = {}
     ): PostgrestResult {
-        val requestBuilder = PostgrestRequestBuilder(postgrest.config.propertyConversionMethod).apply(request)
-        val updateRequest = UpdateRequest(
-            body = buildPostgrestUpdate(postgrest.config.propertyConversionMethod, postgrest.serializer, update),
-            returning = requestBuilder.returning,
-            count = requestBuilder.count,
-            urlParams = requestBuilder.params.mapToFirstValue(),
-            schema = schema,
-            headers = requestBuilder.headers.build()
-        )
-        return RestRequestExecutor.execute(postgrest = postgrest,path = table, request = updateRequest)
+        val requestBuilder = UpdateRequestBuilder(schema, postgrest.config.propertyConversionMethod).apply {
+            this.body = buildPostgrestUpdate(postgrest.config.propertyConversionMethod, postgrest.serializer, update)
+            request()
+        }
+        return RestRequestExecutor.execute(postgrest = postgrest,path = table, request = requestBuilder)
     }
 
     /**
@@ -242,16 +210,11 @@ class PostgrestQueryBuilder(
         body: JsonElement,
         request: PostgrestRequestBuilder.() -> Unit = {}
     ): PostgrestResult {
-        val requestBuilder = PostgrestRequestBuilder(postgrest.config.propertyConversionMethod).apply(request)
-        val updateRequest = UpdateRequest(
-            body = body,
-            returning = requestBuilder.returning,
-            count = requestBuilder.count,
-            urlParams = requestBuilder.params.mapToFirstValue(),
-            schema = schema,
-            headers = requestBuilder.headers.build()
-        )
-        return RestRequestExecutor.execute(postgrest = postgrest, path = table, request = updateRequest)
+        val requestBuilder = UpdateRequestBuilder(schema, postgrest.config.propertyConversionMethod).apply {
+            this.body = body
+            request()
+        }
+        return RestRequestExecutor.execute(postgrest = postgrest, path = table, request = requestBuilder)
     }
 
     /**
@@ -286,15 +249,8 @@ class PostgrestQueryBuilder(
     suspend inline fun delete(
         request: PostgrestRequestBuilder.() -> Unit = {}
     ): PostgrestResult {
-        val requestBuilder = PostgrestRequestBuilder(postgrest.config.propertyConversionMethod).apply(request)
-        val deleteRequest = DeleteRequest(
-            returning = requestBuilder.returning,
-            count = requestBuilder.count,
-            urlParams = requestBuilder.params.mapToFirstValue(),
-            schema = schema,
-            headers = requestBuilder.headers.build()
-        )
-        return RestRequestExecutor.execute(postgrest = postgrest, path = table, request = deleteRequest)
+        val requestBuilder = DeleteRequestBuilder(schema, postgrest.config.propertyConversionMethod).apply(request)
+        return RestRequestExecutor.execute(postgrest = postgrest, path = table, request = requestBuilder)
     }
 
     companion object {
