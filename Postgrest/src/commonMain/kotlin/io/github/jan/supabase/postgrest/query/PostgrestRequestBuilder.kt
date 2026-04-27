@@ -80,48 +80,6 @@ abstract class PostgrestRequestBuilder(
      *
      * Requires PostgREST 11.2.0+.
      *
-     * {@link https://docs.postgrest.org/en/stable/references/api/resource_representation.html#stripped-nulls}
-     *
-     * @category Database
-     *
-     * @example With `select()`
-     * ```ts
-     * const { data, error } = await supabase
-     *   .from('characters')
-     *   .select()
-     *   .stripNulls()
-     * ```
-     *
-     * @exampleSql With `select()`
-     * ```sql
-     * create table
-     *   characters (id int8 primary key, name text, bio text);
-     *
-     * insert into
-     *   characters (id, name, bio)
-     * values
-     *   (1, 'Luke', null),
-     *   (2, 'Leia', 'Princess of Alderaan');
-     * ```
-     *
-     * @exampleResponse With `select()`
-     * ```json
-     * {
-     *   "data": [
-     *     {
-     *       "id": 1,
-     *       "name": "Luke"
-     *     },
-     *     {
-     *       "id": 2,
-     *       "name": "Leia",
-     *       "bio": "Princess of Alderaan"
-     *     }
-     *   ],
-     *   "status": 200,
-     *   "statusText": "OK"
-     * }
-     * ```
      */
     fun stripNulls() {
         require(headers[HttpHeaders.Accept] != "text/csv") {
