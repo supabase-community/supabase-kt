@@ -1,0 +1,322 @@
+public final class io/github/jan/supabase/DefaultDispatcherKt {
+	public static final fun getDefaultDispatcher ()Lkotlinx/coroutines/CoroutineDispatcher;
+}
+
+public final class io/github/jan/supabase/OSInformation {
+	public static final field Companion Lio/github/jan/supabase/OSInformation$Companion;
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Ljava/lang/String;
+	public final fun copy (Ljava/lang/String;Ljava/lang/String;)Lio/github/jan/supabase/OSInformation;
+	public static synthetic fun copy$default (Lio/github/jan/supabase/OSInformation;Ljava/lang/String;Ljava/lang/String;ILjava/lang/Object;)Lio/github/jan/supabase/OSInformation;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getName ()Ljava/lang/String;
+	public final fun getVersion ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/jan/supabase/OSInformation$Companion {
+	public final fun getCURRENT ()Lio/github/jan/supabase/OSInformation;
+}
+
+public final class io/github/jan/supabase/PlatformTarget : java/lang/Enum {
+	public static final field ANDROID Lio/github/jan/supabase/PlatformTarget;
+	public static final field IOS Lio/github/jan/supabase/PlatformTarget;
+	public static final field JS Lio/github/jan/supabase/PlatformTarget;
+	public static final field JVM Lio/github/jan/supabase/PlatformTarget;
+	public static final field LINUX Lio/github/jan/supabase/PlatformTarget;
+	public static final field MACOS Lio/github/jan/supabase/PlatformTarget;
+	public static final field TVOS Lio/github/jan/supabase/PlatformTarget;
+	public static final field WASM_JS Lio/github/jan/supabase/PlatformTarget;
+	public static final field WATCHOS Lio/github/jan/supabase/PlatformTarget;
+	public static final field WINDOWS Lio/github/jan/supabase/PlatformTarget;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public static fun valueOf (Ljava/lang/String;)Lio/github/jan/supabase/PlatformTarget;
+	public static fun values ()[Lio/github/jan/supabase/PlatformTarget;
+}
+
+public final class io/github/jan/supabase/PlatformTargetKt {
+	public static final fun getCurrentPlatformTarget ()Lio/github/jan/supabase/PlatformTarget;
+}
+
+public abstract interface class io/github/jan/supabase/SupabaseClient {
+	public static final field Companion Lio/github/jan/supabase/SupabaseClient$Companion;
+	public abstract fun close (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun getAccessToken ()Lkotlin/jvm/functions/Function1;
+	public abstract fun getConfig ()Lio/github/jan/supabase/SupabaseClientConfig;
+	public abstract fun getCoroutineDispatcher ()Lkotlinx/coroutines/CoroutineDispatcher;
+	public abstract fun getDefaultSerializer ()Lio/github/jan/supabase/SupabaseSerializer;
+	public abstract fun getHttpClient ()Lio/github/jan/supabase/network/KtorSupabaseHttpClient;
+	public abstract fun getPluginManager ()Lio/github/jan/supabase/plugins/PluginManager;
+	public abstract fun getSupabaseHttpUrl ()Ljava/lang/String;
+	public abstract fun getSupabaseKey ()Ljava/lang/String;
+	public abstract fun getSupabaseUrl ()Ljava/lang/String;
+	public abstract fun getUseHTTPS ()Z
+}
+
+public final class io/github/jan/supabase/SupabaseClient$Companion {
+	public final fun createLogger (Ljava/lang/String;Lio/github/jan/supabase/logging/LogLevel;)Lio/github/jan/supabase/logging/SupabaseLogger;
+	public static synthetic fun createLogger$default (Lio/github/jan/supabase/SupabaseClient$Companion;Ljava/lang/String;Lio/github/jan/supabase/logging/LogLevel;ILjava/lang/Object;)Lio/github/jan/supabase/logging/SupabaseLogger;
+	public final fun getDEFAULT_LOG_LEVEL ()Lio/github/jan/supabase/logging/LogLevel;
+	public final fun getLOGGER ()Lio/github/jan/supabase/logging/SupabaseLogger;
+}
+
+public final class io/github/jan/supabase/SupabaseClientBuilder {
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;)V
+	public final fun build ()Lio/github/jan/supabase/SupabaseClient;
+	public final fun getAccessToken ()Lkotlin/jvm/functions/Function1;
+	public final fun getCoroutineDispatcher ()Lkotlinx/coroutines/CoroutineDispatcher;
+	public final fun getDefaultLogLevel ()Lio/github/jan/supabase/logging/LogLevel;
+	public final fun getDefaultSerializer ()Lio/github/jan/supabase/SupabaseSerializer;
+	public final fun getHttpEngine ()Lio/ktor/client/engine/HttpClientEngine;
+	public final fun getIgnoreModulesInUrl ()Z
+	public final fun getOsInformation ()Lio/github/jan/supabase/OSInformation;
+	public final fun getRequestTimeout-UwyO8pc ()J
+	public final fun getUseHTTPS ()Z
+	public final fun install (Lio/github/jan/supabase/plugins/SupabasePluginProvider;Lkotlin/jvm/functions/Function1;)V
+	public static synthetic fun install$default (Lio/github/jan/supabase/SupabaseClientBuilder;Lio/github/jan/supabase/plugins/SupabasePluginProvider;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)V
+	public final fun setAccessToken (Lkotlin/jvm/functions/Function1;)V
+	public final fun setCoroutineDispatcher (Lkotlinx/coroutines/CoroutineDispatcher;)V
+	public final fun setDefaultLogLevel (Lio/github/jan/supabase/logging/LogLevel;)V
+	public final fun setDefaultSerializer (Lio/github/jan/supabase/SupabaseSerializer;)V
+	public final fun setHttpEngine (Lio/ktor/client/engine/HttpClientEngine;)V
+	public final fun setIgnoreModulesInUrl (Z)V
+	public final fun setOsInformation (Lio/github/jan/supabase/OSInformation;)V
+	public final fun setRequestTimeout-LRDsOJo (J)V
+	public final fun setUseHTTPS (Z)V
+}
+
+public final class io/github/jan/supabase/SupabaseClientBuilderKt {
+	public static final fun createSupabaseClient (Ljava/lang/String;Ljava/lang/String;Lkotlin/jvm/functions/Function1;)Lio/github/jan/supabase/SupabaseClient;
+}
+
+public final class io/github/jan/supabase/SupabaseClientConfig {
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;Lio/github/jan/supabase/logging/LogLevel;Lio/github/jan/supabase/SupabaseNetworkConfig;Lio/github/jan/supabase/SupabaseSerializer;Lkotlinx/coroutines/CoroutineDispatcher;Lkotlin/jvm/functions/Function1;Ljava/util/Map;Lio/github/jan/supabase/OSInformation;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Ljava/lang/String;
+	public final fun component3 ()Lio/github/jan/supabase/logging/LogLevel;
+	public final fun component4 ()Lio/github/jan/supabase/SupabaseNetworkConfig;
+	public final fun component5 ()Lio/github/jan/supabase/SupabaseSerializer;
+	public final fun component6 ()Lkotlinx/coroutines/CoroutineDispatcher;
+	public final fun component7 ()Lkotlin/jvm/functions/Function1;
+	public final fun component8 ()Ljava/util/Map;
+	public final fun component9 ()Lio/github/jan/supabase/OSInformation;
+	public final fun copy (Ljava/lang/String;Ljava/lang/String;Lio/github/jan/supabase/logging/LogLevel;Lio/github/jan/supabase/SupabaseNetworkConfig;Lio/github/jan/supabase/SupabaseSerializer;Lkotlinx/coroutines/CoroutineDispatcher;Lkotlin/jvm/functions/Function1;Ljava/util/Map;Lio/github/jan/supabase/OSInformation;)Lio/github/jan/supabase/SupabaseClientConfig;
+	public static synthetic fun copy$default (Lio/github/jan/supabase/SupabaseClientConfig;Ljava/lang/String;Ljava/lang/String;Lio/github/jan/supabase/logging/LogLevel;Lio/github/jan/supabase/SupabaseNetworkConfig;Lio/github/jan/supabase/SupabaseSerializer;Lkotlinx/coroutines/CoroutineDispatcher;Lkotlin/jvm/functions/Function1;Ljava/util/Map;Lio/github/jan/supabase/OSInformation;ILjava/lang/Object;)Lio/github/jan/supabase/SupabaseClientConfig;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getAccessToken ()Lkotlin/jvm/functions/Function1;
+	public final fun getCoroutineDispatcher ()Lkotlinx/coroutines/CoroutineDispatcher;
+	public final fun getDefaultLogLevel ()Lio/github/jan/supabase/logging/LogLevel;
+	public final fun getDefaultSerializer ()Lio/github/jan/supabase/SupabaseSerializer;
+	public final fun getNetworkConfig ()Lio/github/jan/supabase/SupabaseNetworkConfig;
+	public final fun getOsInformation ()Lio/github/jan/supabase/OSInformation;
+	public final fun getPlugins ()Ljava/util/Map;
+	public final fun getSupabaseKey ()Ljava/lang/String;
+	public final fun getSupabaseUrl ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/jan/supabase/SupabaseNetworkConfig {
+	public synthetic fun <init> (ZLio/ktor/client/engine/HttpClientEngine;Ljava/util/List;JLkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1 ()Z
+	public final fun component2 ()Lio/ktor/client/engine/HttpClientEngine;
+	public final fun component3 ()Ljava/util/List;
+	public final fun component4-UwyO8pc ()J
+	public final fun copy-Wn2Vu4Y (ZLio/ktor/client/engine/HttpClientEngine;Ljava/util/List;J)Lio/github/jan/supabase/SupabaseNetworkConfig;
+	public static synthetic fun copy-Wn2Vu4Y$default (Lio/github/jan/supabase/SupabaseNetworkConfig;ZLio/ktor/client/engine/HttpClientEngine;Ljava/util/List;JILjava/lang/Object;)Lio/github/jan/supabase/SupabaseNetworkConfig;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getHttpConfigOverrides ()Ljava/util/List;
+	public final fun getHttpEngine ()Lio/ktor/client/engine/HttpClientEngine;
+	public final fun getRequestTimeout-UwyO8pc ()J
+	public final fun getUseHTTPS ()Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public abstract interface class io/github/jan/supabase/SupabaseSerializer {
+	public abstract fun decode (Lkotlin/reflect/KType;Ljava/lang/String;)Ljava/lang/Object;
+	public abstract fun encode (Lkotlin/reflect/KType;Ljava/lang/Object;)Ljava/lang/String;
+}
+
+public abstract interface annotation class io/github/jan/supabase/annotations/SupabaseDsl : java/lang/annotation/Annotation {
+}
+
+public abstract interface annotation class io/github/jan/supabase/annotations/SupabaseExperimental : java/lang/annotation/Annotation {
+}
+
+public abstract interface annotation class io/github/jan/supabase/annotations/SupabaseInternal : java/lang/annotation/Annotation {
+}
+
+public final class io/github/jan/supabase/exceptions/BadRequestRestException : io/github/jan/supabase/exceptions/RestException {
+	public fun <init> (Ljava/lang/String;Lio/ktor/client/statement/HttpResponse;Ljava/lang/String;)V
+	public synthetic fun <init> (Ljava/lang/String;Lio/ktor/client/statement/HttpResponse;Ljava/lang/String;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+}
+
+public final class io/github/jan/supabase/exceptions/HttpRequestException : java/io/IOException {
+	public fun <init> (Ljava/lang/String;Lio/ktor/client/request/HttpRequestBuilder;)V
+}
+
+public final class io/github/jan/supabase/exceptions/NotFoundRestException : io/github/jan/supabase/exceptions/RestException {
+	public fun <init> (Ljava/lang/String;Lio/ktor/client/statement/HttpResponse;Ljava/lang/String;)V
+	public synthetic fun <init> (Ljava/lang/String;Lio/ktor/client/statement/HttpResponse;Ljava/lang/String;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+}
+
+public class io/github/jan/supabase/exceptions/RestException : java/lang/Exception {
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;Lio/ktor/client/statement/HttpResponse;)V
+	public final fun getDescription ()Ljava/lang/String;
+	public final fun getError ()Ljava/lang/String;
+	public final fun getResponse ()Lio/ktor/client/statement/HttpResponse;
+	public final fun getStatusCode ()I
+}
+
+public final class io/github/jan/supabase/exceptions/SupabaseEncodingException : java/lang/Exception {
+	public fun <init> (Ljava/lang/String;)V
+}
+
+public final class io/github/jan/supabase/exceptions/UnauthorizedRestException : io/github/jan/supabase/exceptions/RestException {
+	public fun <init> (Ljava/lang/String;Lio/ktor/client/statement/HttpResponse;Ljava/lang/String;)V
+	public synthetic fun <init> (Ljava/lang/String;Lio/ktor/client/statement/HttpResponse;Ljava/lang/String;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+}
+
+public final class io/github/jan/supabase/exceptions/UnknownRestException : io/github/jan/supabase/exceptions/RestException {
+	public fun <init> (Ljava/lang/String;Lio/ktor/client/statement/HttpResponse;Ljava/lang/String;)V
+	public synthetic fun <init> (Ljava/lang/String;Lio/ktor/client/statement/HttpResponse;Ljava/lang/String;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+}
+
+public final class io/github/jan/supabase/logging/LogLevel : java/lang/Enum {
+	public static final field DEBUG Lio/github/jan/supabase/logging/LogLevel;
+	public static final field ERROR Lio/github/jan/supabase/logging/LogLevel;
+	public static final field INFO Lio/github/jan/supabase/logging/LogLevel;
+	public static final field NONE Lio/github/jan/supabase/logging/LogLevel;
+	public static final field WARNING Lio/github/jan/supabase/logging/LogLevel;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public static fun valueOf (Ljava/lang/String;)Lio/github/jan/supabase/logging/LogLevel;
+	public static fun values ()[Lio/github/jan/supabase/logging/LogLevel;
+}
+
+public abstract class io/github/jan/supabase/logging/SupabaseLogger {
+	public fun <init> ()V
+	public abstract fun getLevel ()Lio/github/jan/supabase/logging/LogLevel;
+	public abstract fun log (Lio/github/jan/supabase/logging/LogLevel;Ljava/lang/Throwable;Ljava/lang/String;)V
+	public final fun log (Lio/github/jan/supabase/logging/LogLevel;Ljava/lang/Throwable;Lkotlin/jvm/functions/Function0;)V
+	public static synthetic fun log$default (Lio/github/jan/supabase/logging/SupabaseLogger;Lio/github/jan/supabase/logging/LogLevel;Ljava/lang/Throwable;Ljava/lang/String;ILjava/lang/Object;)V
+	public static synthetic fun log$default (Lio/github/jan/supabase/logging/SupabaseLogger;Lio/github/jan/supabase/logging/LogLevel;Ljava/lang/Throwable;Lkotlin/jvm/functions/Function0;ILjava/lang/Object;)V
+}
+
+public final class io/github/jan/supabase/logging/SupabaseLoggerKt {
+	public static final fun d (Lio/github/jan/supabase/logging/SupabaseLogger;Ljava/lang/Throwable;Lkotlin/jvm/functions/Function0;)V
+	public static synthetic fun d$default (Lio/github/jan/supabase/logging/SupabaseLogger;Ljava/lang/Throwable;Lkotlin/jvm/functions/Function0;ILjava/lang/Object;)V
+	public static final fun e (Lio/github/jan/supabase/logging/SupabaseLogger;Ljava/lang/Throwable;Lkotlin/jvm/functions/Function0;)V
+	public static synthetic fun e$default (Lio/github/jan/supabase/logging/SupabaseLogger;Ljava/lang/Throwable;Lkotlin/jvm/functions/Function0;ILjava/lang/Object;)V
+	public static final fun i (Lio/github/jan/supabase/logging/SupabaseLogger;Ljava/lang/Throwable;Lkotlin/jvm/functions/Function0;)V
+	public static synthetic fun i$default (Lio/github/jan/supabase/logging/SupabaseLogger;Ljava/lang/Throwable;Lkotlin/jvm/functions/Function0;ILjava/lang/Object;)V
+	public static final fun w (Lio/github/jan/supabase/logging/SupabaseLogger;Ljava/lang/Throwable;Lkotlin/jvm/functions/Function0;)V
+	public static synthetic fun w$default (Lio/github/jan/supabase/logging/SupabaseLogger;Ljava/lang/Throwable;Lkotlin/jvm/functions/Function0;ILjava/lang/Object;)V
+}
+
+public final class io/github/jan/supabase/network/KtorSupabaseHttpClient : io/github/jan/supabase/network/SupabaseHttpClient {
+	public final fun close ()V
+	public fun prepareRequest (Ljava/lang/String;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun request (Ljava/lang/String;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
+public class io/github/jan/supabase/network/SupabaseApi : io/github/jan/supabase/network/SupabaseHttpClient {
+	public final fun getSupabaseClient ()Lio/github/jan/supabase/SupabaseClient;
+	public fun prepareRequest (Ljava/lang/String;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public final fun prepareRequest (Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun rawRequest (Ljava/lang/String;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public final fun request (Ljava/lang/String;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
+public abstract class io/github/jan/supabase/network/SupabaseHttpClient {
+	public fun <init> ()V
+	public final fun delete (Ljava/lang/String;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static synthetic fun delete$default (Lio/github/jan/supabase/network/SupabaseHttpClient;Ljava/lang/String;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public final fun get (Ljava/lang/String;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static synthetic fun get$default (Lio/github/jan/supabase/network/SupabaseHttpClient;Ljava/lang/String;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public final fun patch (Ljava/lang/String;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static synthetic fun patch$default (Lio/github/jan/supabase/network/SupabaseHttpClient;Ljava/lang/String;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public final fun post (Ljava/lang/String;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static synthetic fun post$default (Lio/github/jan/supabase/network/SupabaseHttpClient;Ljava/lang/String;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public abstract fun prepareRequest (Ljava/lang/String;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public final fun put (Ljava/lang/String;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static synthetic fun put$default (Lio/github/jan/supabase/network/SupabaseHttpClient;Ljava/lang/String;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public abstract fun request (Ljava/lang/String;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
+public abstract interface class io/github/jan/supabase/plugins/CustomSerializationConfig {
+	public abstract fun getSerializer ()Lio/github/jan/supabase/SupabaseSerializer;
+	public abstract fun setSerializer (Lio/github/jan/supabase/SupabaseSerializer;)V
+}
+
+public abstract interface class io/github/jan/supabase/plugins/CustomSerializationPlugin {
+	public abstract fun getSerializer ()Lio/github/jan/supabase/SupabaseSerializer;
+}
+
+public class io/github/jan/supabase/plugins/MainConfig {
+	public fun <init> ()V
+	public final fun getCustomUrl ()Ljava/lang/String;
+	public final fun getJwtToken ()Ljava/lang/String;
+	public final fun setCustomUrl (Ljava/lang/String;)V
+	public final fun setJwtToken (Ljava/lang/String;)V
+}
+
+public abstract interface class io/github/jan/supabase/plugins/MainPlugin : io/github/jan/supabase/plugins/SupabasePlugin {
+	public abstract fun getApiVersion ()I
+	public abstract fun getPluginKey ()Ljava/lang/String;
+	public abstract fun parseErrorResponse (Lio/ktor/client/statement/HttpResponse;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun resolveUrl (Ljava/lang/String;)Ljava/lang/String;
+	public static synthetic fun resolveUrl$default (Lio/github/jan/supabase/plugins/MainPlugin;Ljava/lang/String;ILjava/lang/Object;)Ljava/lang/String;
+}
+
+public final class io/github/jan/supabase/plugins/MainPlugin$DefaultImpls {
+	public static fun close (Lio/github/jan/supabase/plugins/MainPlugin;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static fun init (Lio/github/jan/supabase/plugins/MainPlugin;)V
+	public static fun resolveUrl (Lio/github/jan/supabase/plugins/MainPlugin;Ljava/lang/String;)Ljava/lang/String;
+	public static synthetic fun resolveUrl$default (Lio/github/jan/supabase/plugins/MainPlugin;Ljava/lang/String;ILjava/lang/Object;)Ljava/lang/String;
+}
+
+public final class io/github/jan/supabase/plugins/PluginManager {
+	public fun <init> (Ljava/util/Map;)V
+	public final fun closeAllPlugins (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public final fun getInstalledPlugins ()Ljava/util/Map;
+}
+
+public abstract interface class io/github/jan/supabase/plugins/SerializableData {
+	public abstract fun getSerializer ()Lio/github/jan/supabase/SupabaseSerializer;
+}
+
+public abstract interface class io/github/jan/supabase/plugins/SupabasePlugin {
+	public fun close (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun getConfig ()Ljava/lang/Object;
+	public abstract fun getSupabaseClient ()Lio/github/jan/supabase/SupabaseClient;
+	public fun init ()V
+}
+
+public final class io/github/jan/supabase/plugins/SupabasePlugin$DefaultImpls {
+	public static fun close (Lio/github/jan/supabase/plugins/SupabasePlugin;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static fun init (Lio/github/jan/supabase/plugins/SupabasePlugin;)V
+}
+
+public abstract interface class io/github/jan/supabase/plugins/SupabasePluginProvider {
+	public abstract fun create (Lio/github/jan/supabase/SupabaseClient;Ljava/lang/Object;)Lio/github/jan/supabase/plugins/SupabasePlugin;
+	public abstract fun createConfig (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
+	public abstract fun getKey ()Ljava/lang/String;
+	public abstract fun getLogger ()Lio/github/jan/supabase/logging/SupabaseLogger;
+	public fun setup (Lio/github/jan/supabase/SupabaseClientBuilder;Ljava/lang/Object;)V
+}
+
+public final class io/github/jan/supabase/plugins/SupabasePluginProvider$DefaultImpls {
+	public static fun setup (Lio/github/jan/supabase/plugins/SupabasePluginProvider;Lio/github/jan/supabase/SupabaseClientBuilder;Ljava/lang/Object;)V
+}
+
+public final class io/github/jan/supabase/serializer/KotlinXSerializer : io/github/jan/supabase/SupabaseSerializer {
+	public fun <init> ()V
+	public fun <init> (Lkotlinx/serialization/json/Json;)V
+	public synthetic fun <init> (Lkotlinx/serialization/json/Json;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun decode (Lkotlin/reflect/KType;Ljava/lang/String;)Ljava/lang/Object;
+	public fun encode (Lkotlin/reflect/KType;Ljava/lang/Object;)Ljava/lang/String;
+}
+
