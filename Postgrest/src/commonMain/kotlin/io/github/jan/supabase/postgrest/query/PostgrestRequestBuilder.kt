@@ -302,7 +302,7 @@ abstract class PostgrestRequestBuilder(
 
         // Url params & headers
         url.parameters.appendAll(params.mapToFirstValue())
-        headers.appendAll(headers)
+        headers.appendAll(this@PostgrestRequestBuilder.headers)
     }
 
 }
