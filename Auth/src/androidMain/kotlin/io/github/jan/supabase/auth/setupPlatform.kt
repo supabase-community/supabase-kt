@@ -46,12 +46,12 @@ private fun addLifecycleCallbacks(auth: Auth) {
                                 auth.logger.d {
                                     "No session found, not starting auto refresh"
                                 }
+                                auth.initDone()
                             } else {
                                 auth.logger.d {
                                     "Session found, auto refresh started"
                                 }
                             }
-                            auth.initDone()
                         }
                     }
                 }
