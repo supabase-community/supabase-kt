@@ -4,6 +4,7 @@ import io.github.jan.supabase.postgrest.Postgrest
 import io.github.jan.supabase.postgrest.RpcMethod
 import io.github.jan.supabase.postgrest.from
 import io.github.jan.supabase.postgrest.postgrest
+import io.github.jan.supabase.postgrest.rpc
 import io.github.jan.supabase.postgrest.query.Columns
 import io.github.jan.supabase.postgrest.query.Count
 import io.github.jan.supabase.postgrest.result.PostgrestResult
@@ -17,6 +18,10 @@ import io.ktor.client.engine.mock.respond
 import io.ktor.client.request.HttpRequestData
 import io.ktor.client.request.HttpResponseData
 import io.ktor.http.HttpMethod
+import io.ktor.http.HttpStatusCode
+import io.ktor.http.headersOf
+import io.ktor.http.HttpHeaders
+import io.github.jan.supabase.postgrest.exception.PostgrestRestException
 import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerializationException
@@ -79,6 +84,37 @@ class PostgrestTest {
         testClient(
             request = { table ->
                 from("schema", table).select(columns)
+            },
+            requestHandler = {
+                assertEquals("schema", it.headers["Accept-Profile"])
+                assertMethodIs(HttpMethod.Get, it.method)
+                assertEquals(columns.value, it.url.parameters["select"])
+                respond("")
+            }
+        )
+    }
+
+    @Test
+    fun testOperatorGet() {
+        val columns = Columns.list("column1", "column2")
+        testClient(
+            request = { table ->
+                postgrest[table].select(columns)
+            },
+            requestHandler = {
+                assertMethodIs(HttpMethod.Get, it.method)
+                assertEquals(columns.value, it.url.parameters["select"])
+                respond("")
+            }
+        )
+    }
+
+    @Test
+    fun testOperatorGetSchema() {
+        val columns = Columns.list("column1", "column2")
+        testClient(
+            request = { table ->
+                postgrest["schema", table].select(columns)
             },
             requestHandler = {
                 assertEquals("schema", it.headers["Accept-Profile"])
@@ -557,6 +593,44 @@ class PostgrestTest {
     }
 
     @Test
+    fun testRpcGenericParameters() {
+        val mockData = TestObject.mock
+        val expectedJson = buildJsonObject { put("data", mockData.data) }
+        supabase = createMockedSupabaseClient(
+            configuration = configureClient
+        ) {
+            assertPathIs("/rpc/function", it.url.pathAfterVersion())
+            assertEquals(expectedJson, it.body.toJsonElement())
+            assertMethodIs(HttpMethod.Post, it.method)
+            assertEquals("schema", it.headers["Content-Profile"])
+            respond("")
+        }
+        runTest {
+            supabase.postgrest.rpc("function", mockData) {
+                schema = "schema"
+            }
+        }
+    }
+
+    @Test
+    fun testRpcGenericParametersDefaultRequest() {
+        val mockData = TestObject.mock
+        val expectedJson = buildJsonObject { put("data", mockData.data) }
+        supabase = createMockedSupabaseClient(
+            configuration = configureClient
+        ) {
+            assertPathIs("/rpc/function", it.url.pathAfterVersion())
+            assertEquals(expectedJson, it.body.toJsonElement())
+            assertMethodIs(HttpMethod.Post, it.method)
+            assertEquals("public", it.headers["Content-Profile"])
+            respond("")
+        }
+        runTest {
+            supabase.postgrest.rpc("function", mockData)
+        }
+    }
+
+    @Test
     fun testRpcReturnsNull() {
         supabase = createMockedSupabaseClient(
             configuration = configureClient
@@ -583,6 +657,62 @@ class PostgrestTest {
             val result = supabase.postgrest.rpc("get_text_value")
             val value = result.decodeAs<String?>()
             assertEquals("null", value)
+        }
+    }
+
+    @Test
+    fun testRpcNoParametersDefaultRequest() {
+        supabase = createMockedSupabaseClient(
+            configuration = configureClient
+        ) {
+            assertPathIs("/rpc/function", it.url.pathAfterVersion())
+            assertMethodIs(HttpMethod.Post, it.method)
+            assertEquals("public", it.headers["Content-Profile"])
+            respond("")
+        }
+        runTest {
+            supabase.postgrest.rpc("function")
+        }
+    }
+
+    @Test
+    fun testRpcParametersDefaultRequest() {
+        val mockData = buildJsonObject {
+            put("key", "value")
+        }
+        supabase = createMockedSupabaseClient(
+            configuration = configureClient
+        ) {
+            assertPathIs("/rpc/function", it.url.pathAfterVersion())
+            assertEquals(mockData, it.body.toJsonElement())
+            assertMethodIs(HttpMethod.Post, it.method)
+            assertEquals("public", it.headers["Content-Profile"])
+            respond("")
+        }
+        runTest {
+            supabase.postgrest.rpc("function", mockData)
+        }
+    }
+
+    @Test
+    fun testRpcParametersWithHeadMethod() {
+        val mockData = buildJsonObject {
+            put("key", "value")
+        }
+        supabase = createMockedSupabaseClient(
+            configuration = configureClient
+        ) {
+            assertPathIs("/rpc/function", it.url.pathAfterVersion())
+            assertEquals("\"value\"", it.url.parameters["key"])
+            assertMethodIs(HttpMethod.Head, it.method)
+            assertEquals("schema", it.headers["Accept-Profile"])
+            respond("")
+        }
+        runTest {
+            supabase.postgrest.rpc("function", mockData) {
+                schema = "schema"
+                method = RpcMethod.HEAD
+            }
         }
     }
 
@@ -645,6 +775,50 @@ class PostgrestTest {
         }
         runTest {
             supabase.request(table)
+        }
+    }
+
+    @Test
+    fun testParseErrorResponse() {
+        supabase = createMockedSupabaseClient(
+            configuration = configureClient
+        ) {
+            respond(
+                content = """{"message": "error msg", "hint": "error hint", "details": "error details", "code": "123"}""",
+                status = HttpStatusCode.BadRequest,
+                headers = headersOf(HttpHeaders.ContentType, "application/json")
+            )
+        }
+        runTest {
+            val exception = assertFailsWith<PostgrestRestException> {
+                supabase.postgrest["table"].select()
+            }
+            assertEquals("error msg", exception.error)
+            assertEquals("error hint", exception.hint)
+            assertEquals("error details", exception.details?.jsonPrimitive?.content)
+            assertEquals("123", exception.code)
+        }
+    }
+
+    @Test
+    fun testParseErrorResponseNullBody() {
+        supabase = createMockedSupabaseClient(
+            configuration = configureClient
+        ) {
+            respond(
+                content = "Internal Server Error",
+                status = HttpStatusCode.InternalServerError,
+                headers = headersOf(HttpHeaders.ContentType, "text/plain")
+            )
+        }
+        runTest {
+            val exception = assertFailsWith<PostgrestRestException> {
+                supabase.postgrest["table"].select()
+            }
+            assertEquals("Unknown error", exception.error)
+            assertNull(exception.hint)
+            assertNull(exception.details)
+            assertNull(exception.code)
         }
     }
 
