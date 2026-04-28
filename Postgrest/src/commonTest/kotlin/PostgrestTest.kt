@@ -107,6 +107,23 @@ class PostgrestTest {
     }
 
     @Test
+    fun testSelectHttpMethodHeadColumnList() {
+        val columns = Columns.list(listOf("column1", "column2"))
+        testClient(
+            request = { table ->
+                from(table).select(columns) {
+                    head = true
+                }
+            },
+            requestHandler = {
+                assertMethodIs(HttpMethod.Head, it.method)
+                assertEquals(columns.value, it.url.parameters["select"])
+                respond("")
+            }
+        )
+    }
+
+    @Test
     fun testInsert() {
         val body = JsonArray(listOf(
             buildJsonObject {
