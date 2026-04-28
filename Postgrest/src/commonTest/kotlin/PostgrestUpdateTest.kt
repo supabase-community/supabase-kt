@@ -243,4 +243,56 @@ class PostgrestUpdateTest {
         }
         assertEquals(JsonObject(mapOf("testGeneric" to JsonNull)), update)
     }
+
+    @Test
+    fun testSetColumnGenericList() {
+        val update = buildPostgrestUpdate(PropertyConversionMethod.SERIAL_NAME, serializer) {
+            set("testGenericList", listOf(TestInnerObj("hello")))
+        }
+        assertEquals(
+            JsonObject(mapOf("testGenericList" to kotlinx.serialization.json.JsonArray(listOf(JsonObject(mapOf("innerMsg" to JsonPrimitive("hello"))))))),
+            update
+        )
+    }
+
+    @Test
+    fun testSetColumnGenericListNull() {
+        val update = buildPostgrestUpdate(PropertyConversionMethod.SERIAL_NAME, serializer) {
+            set("testGenericList", null as List<TestInnerObj>?)
+        }
+        assertEquals(JsonObject(mapOf("testGenericList" to JsonNull)), update)
+    }
+
+    @Test
+    fun testSetColumnStringNull() {
+        val update = buildPostgrestUpdate(PropertyConversionMethod.SERIAL_NAME, serializer) {
+            set("testString", null as String?)
+        }
+        assertEquals(JsonObject(mapOf("testString" to JsonNull)), update)
+    }
+
+    @Test
+    fun testSetReifiedNull() {
+        val update = buildPostgrestUpdate(PropertyConversionMethod.SERIAL_NAME, serializer) {
+            this.set<TestInnerObj>("test", null)
+        }
+        assertEquals(JsonObject(mapOf("test" to JsonNull)), update)
+    }
+
+    @Test
+    fun testSetToNullGenericExplicit() {
+        val update = buildPostgrestUpdate(PropertyConversionMethod.SERIAL_NAME, serializer) {
+            TestData::testGeneric.setTo(null)
+        }
+        assertEquals(JsonObject(mapOf("testGeneric" to JsonNull)), update)
+    }
+
+    @Test
+    fun testSetColumnGenericNullExplicit() {
+        val update = buildPostgrestUpdate(PropertyConversionMethod.SERIAL_NAME, serializer) {
+            set<TestInnerObj>("testGeneric", null)
+        }
+        assertEquals(JsonObject(mapOf("testGeneric" to JsonNull)), update)
+    }
+
 }
