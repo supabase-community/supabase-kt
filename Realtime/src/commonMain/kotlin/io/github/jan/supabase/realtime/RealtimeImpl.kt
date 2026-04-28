@@ -59,6 +59,7 @@ import kotlin.time.Clock
     val accessToken get() = _accessToken.load()
     private var heartbeatJob: Job? = null
     private var messageJob: Job? = null
+    private var disconnectJob: Job? = null
     internal val ref = AtomicInt(0)
     private val heartbeatRef = AtomicInt(0)
     override val apiVersion: Int
@@ -110,6 +111,7 @@ import kotlin.time.Clock
     }
 
     override fun addChannel(channel: RealtimeChannel) {
+        cancelPendingDisconnect()
         _subscriptions[channel.topic] = channel
     }
 
@@ -184,7 +186,7 @@ import kotlin.time.Clock
         val topic = RealtimeTopic.withChannelId(channelId)
         if(subscriptions.containsKey(topic)) return subscriptions[topic]!!
         val channel = builder.build(this)
-        _subscriptions[topic] = channel
+        addChannel(channel)
         return channel
     }
 
@@ -238,9 +240,23 @@ import kotlin.time.Clock
         }
         _subscriptions.remove(channel.topic)
         if(subscriptions.isEmpty() && config.disconnectOnNoSubscriptions) {
-            logger.d { "No more subscriptions, disconnecting from realtime websocket" }
+            schedulePendingDisconnect()
+        }
+    }
+
+    private fun schedulePendingDisconnect() {
+        disconnectJob = scope.launch {
+            delay(config.disconnectDelay())
+            logger.d { "Scheduled disconnect fired. Disconnecting from realtime websocket..." }
             disconnect()
         }
+        logger.d { "Scheduling to disconnect from realtime websocket in ${config.disconnectDelay()}..." }
+    }
+
+    private fun cancelPendingDisconnect() {
+        logger.d { "Pending disconnect cancelled - channel activity detected" }
+        disconnectJob?.cancel()
+        disconnectJob = null
     }
 
     override suspend fun removeAllChannels() {
@@ -251,7 +267,7 @@ import kotlin.time.Clock
         }
         _subscriptions.clear()
         if(config.disconnectOnNoSubscriptions) {
-            logger.d { "No more subscriptions, disconnecting from realtime websocket" }
+            logger.d { "No more subscriptions, disconnecting from realtime websocket." }
             disconnect()
         }
     }
