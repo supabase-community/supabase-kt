@@ -62,13 +62,13 @@ internal class PostgrestImpl(override val supabaseClient: SupabaseClient, overri
 
     override suspend fun rpc(function: String, request: RpcRequestBuilder.() -> Unit): PostgrestResult = rpcRequest(function, null, request)
 
-    private suspend fun rpcRequest(function: String, body: JsonObject?, request: RpcRequestBuilder.() -> Unit): PostgrestResult {
+    private suspend fun rpcRequest(function: String, body: JsonObject? = null, request: RpcRequestBuilder.() -> Unit): PostgrestResult {
         val requestBuilder = RpcRequestBuilder(config.defaultSchema, config.propertyConversionMethod).apply {
             this.body = body
-            request()
             if(method != RpcMethod.POST && body != null) {
                 params.putAll(body.mapValues { listOf(it.value.toString()) })
             }
+            request()
         }
         return RestRequestExecutor.execute(postgrest = this, path = "rpc/$function", request = requestBuilder)
     }
