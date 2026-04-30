@@ -703,8 +703,9 @@ class PostgrestTest {
             configuration = configureClient
         ) {
             assertPathIs("/rpc/function", it.url.pathAfterVersion())
-            assertEquals("\"value\"", it.url.parameters["key"])
             assertMethodIs(HttpMethod.Head, it.method)
+            val body = it.body.toJsonElement().jsonObject
+            assertEquals("value", body["key"]?.jsonPrimitive?.content)
             assertEquals("schema", it.headers["Accept-Profile"])
             respond("")
         }
