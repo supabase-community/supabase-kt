@@ -41,6 +41,7 @@ import kotlin.concurrent.atomics.fetchAndIncrement
 import kotlin.concurrent.atomics.incrementAndFetch
 import kotlin.io.encoding.ExperimentalEncodingApi
 import kotlin.time.Clock
+import kotlin.time.Duration
 
 @PublishedApi internal class RealtimeImpl(override val supabaseClient: SupabaseClient, override val config: Realtime.Config) : Realtime {
 
@@ -52,7 +53,7 @@ import kotlin.time.Clock
     override val status: StateFlow<Realtime.Status> = _status.asStateFlow()
     private val _subscriptions = AtomicMutableMap<String, RealtimeChannel>()
     override val subscriptions: Map<String, RealtimeChannel> = _subscriptions
-    private val scope = CoroutineScope(supabaseClient.coroutineDispatcher + SupervisorJob())
+    private val scope = config.coroutineScope ?: CoroutineScope(supabaseClient.coroutineDispatcher + SupervisorJob())
     private val mutex = Mutex()
     private val isReconnecting = AtomicBoolean(false)
     private val _accessToken = AtomicReference<String?>(null)
@@ -245,15 +246,21 @@ import kotlin.time.Clock
     }
 
     private fun schedulePendingDisconnect() {
-        disconnectJob = scope.launch {
-            delay(config.disconnectDelay())
-            logger.d { "Scheduled disconnect fired. Disconnecting from realtime websocket..." }
+        if(config.disconnectDelay != Duration.ZERO) {
+            disconnectJob = scope.launch {
+                delay(config.disconnectDelay)
+                logger.d { "Scheduled disconnect fired. Disconnecting from realtime websocket..." }
+                disconnect()
+            }
+            logger.d { "Scheduling to disconnect from realtime websocket in ${config.disconnectDelay}..." }
+        } else {
+            logger.d { "Disconnecting immediately from realtime websocket as delay set to zero..." }
             disconnect()
         }
-        logger.d { "Scheduling to disconnect from realtime websocket in ${config.disconnectDelay()}..." }
     }
 
     private fun cancelPendingDisconnect() {
+        if(disconnectJob == null) return
         logger.d { "Pending disconnect cancelled - channel activity detected" }
         disconnectJob?.cancel()
         disconnectJob = null

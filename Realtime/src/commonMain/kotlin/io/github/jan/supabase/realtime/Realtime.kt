@@ -16,6 +16,7 @@ import io.github.jan.supabase.serializer.KotlinXSerializer
 import io.github.jan.supabase.supabaseJson
 import io.ktor.client.plugins.websocket.WebSockets
 import io.ktor.serialization.kotlinx.KotlinxWebsocketSerializationConverter
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.StateFlow
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
@@ -147,6 +148,11 @@ interface Realtime : MainPlugin<Realtime.Config>, CustomSerializationPlugin {
         override var requireValidSession: Boolean = false
 
         internal var customAccessTokenProvider = false
+        internal var coroutineScope: CoroutineScope? = null
+
+        internal val disconnectDelay by lazy {
+            disconnectOnEmptyChannelsAfter ?: (2 * heartbeatInterval)
+        }
 
         /**
          * A custom access token provider. If this is set, the [SupabaseClient] will not be used to resolve the access token.
@@ -157,8 +163,6 @@ interface Realtime : MainPlugin<Realtime.Config>, CustomSerializationPlugin {
                 customAccessTokenProvider = true
             }
         override var serializer: SupabaseSerializer? = null
-
-        internal fun disconnectDelay() = disconnectOnEmptyChannelsAfter ?: (2 * heartbeatInterval)
 
     }
 
