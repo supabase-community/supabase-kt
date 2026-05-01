@@ -18,7 +18,8 @@ internal fun openUrl(uri: Uri, action: ExternalAuthAction) {
         }
         is ExternalAuthAction.CustomTabs -> {
             val intent = CustomTabsIntent.Builder().apply(action.intentBuilder).build()
-            intent.intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+            intent.intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            intent.intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY)
             intent.launchUrl(applicationContext(), uri)
         }
     }
