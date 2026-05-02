@@ -16,9 +16,11 @@ import io.github.jan.supabase.serializer.KotlinXSerializer
 import io.github.jan.supabase.supabaseJson
 import io.ktor.client.plugins.websocket.WebSockets
 import io.ktor.serialization.kotlinx.KotlinxWebsocketSerializationConverter
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.StateFlow
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
+import kotlin.time.times
 
 /**
  * Plugin for interacting with the supabase realtime api
@@ -128,22 +130,29 @@ interface Realtime : MainPlugin<Realtime.Config>, CustomSerializationPlugin {
      * @property websocketFactory A custom websocket factory. If this is set, the [websocketConfig] will be ignored
      * @property rejoinDelay The interval between channel rejoin attempts
      * @property maxAttempts The maximum amount of connection attempts before giving up. Defaults to 5
+     * @property disconnectOnEmptyChannelsAfter Delay before disconnecting from the realtime socket after the last channel was removed. If null, it defaults to `2*heartbeatInterval`
      */
-    data class Config(
-        var websocketConfig: WebSockets.Config.() -> Unit = {},
-        var secure: Boolean? = null,
-        var heartbeatInterval: Duration = 15.seconds,
-        var reconnectDelay: Duration = 7.seconds,
-        var rejoinDelay: Duration = 2.seconds,
-        var maxAttempts: Int = 5,
-        var disconnectOnSessionLoss: Boolean = true,
-        var connectOnSubscribe: Boolean = true,
-        @property:SupabaseInternal var websocketFactory: RealtimeWebsocketFactory? = null,
-        var disconnectOnNoSubscriptions: Boolean = true,
-        override var requireValidSession: Boolean = false,
-    ): MainConfig(), CustomSerializationConfig, AuthDependentPluginConfig {
+    class Config: MainConfig(), CustomSerializationConfig, AuthDependentPluginConfig {
+
+        var websocketConfig: WebSockets.Config.() -> Unit = {}
+        var secure: Boolean? = null
+        var heartbeatInterval: Duration = 15.seconds
+        var reconnectDelay: Duration = 7.seconds
+        var rejoinDelay: Duration = 2.seconds
+        var disconnectOnEmptyChannelsAfter: Duration? = null
+        var maxAttempts: Int = 5
+        var disconnectOnSessionLoss: Boolean = true
+        var connectOnSubscribe: Boolean = true
+        @SupabaseInternal var websocketFactory: RealtimeWebsocketFactory? = null
+        var disconnectOnNoSubscriptions: Boolean = true
+        override var requireValidSession: Boolean = false
 
         internal var customAccessTokenProvider = false
+        internal var coroutineScope: CoroutineScope? = null
+
+        internal val disconnectDelay by lazy {
+            disconnectOnEmptyChannelsAfter ?: (2 * heartbeatInterval)
+        }
 
         /**
          * A custom access token provider. If this is set, the [SupabaseClient] will not be used to resolve the access token.
@@ -220,13 +229,14 @@ interface Realtime : MainPlugin<Realtime.Config>, CustomSerializationPlugin {
  */
 inline fun Realtime.channel(channelId: String, builder: RealtimeChannelBuilder.() -> Unit = {}): RealtimeChannel = channel(channelId, RealtimeChannelBuilder(RealtimeTopic.withChannelId(channelId)).apply(builder))
 
-/**
- * Supabase Realtime is a way to listen to changes in the PostgreSQL database via websockets
- */
-val SupabaseClient.realtime: Realtime
-    get() = pluginManager.getPlugin(Realtime)
 
 /**
  * Creates a new [RealtimeChannel]
  */
 inline fun SupabaseClient.channel(channelId: String, builder: RealtimeChannelBuilder.() -> Unit = {}): RealtimeChannel = realtime.channel(channelId, builder)
+
+/**
+ * Supabase Realtime is a way to listen to changes in the PostgreSQL database via websockets
+ */
+val SupabaseClient.realtime: Realtime
+    get() = pluginManager.getPlugin(Realtime)
