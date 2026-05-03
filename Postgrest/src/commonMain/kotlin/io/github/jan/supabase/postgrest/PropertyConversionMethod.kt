@@ -19,11 +19,10 @@ fun interface PropertyConversionMethod {
         /**
          * Converts a property name to a column name using the [SerialName] annotation.
          */
-        val SERIAL_NAME = PropertyConversionMethod { getSerialName(it) }
-            get() {
-                if(CurrentPlatformTarget !in listOf(PlatformTarget.JVM, PlatformTarget.ANDROID)) error("SerialName PropertyConversionMethod is only available on the JVM and ANDROID due to limited reflection on other targets. Use CAMEL_CASE_TO_SNAKE_CASE instead.")
-                return field
-            }
+        val SERIAL_NAME = PropertyConversionMethod {
+            if(CurrentPlatformTarget !in listOf(PlatformTarget.JVM, PlatformTarget.ANDROID)) error("SerialName PropertyConversionMethod is only available on the JVM and ANDROID due to limited reflection on other targets. Use CAMEL_CASE_TO_SNAKE_CASE instead.")
+            getSerialName(it)
+        }
 
         /**
          * Converts a property name to a column name by converting camel case to snake case.

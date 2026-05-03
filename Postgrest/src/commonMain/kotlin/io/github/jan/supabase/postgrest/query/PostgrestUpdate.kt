@@ -124,7 +124,7 @@ class PostgrestUpdate(@PublishedApi internal val propertyConversionMethod: Prope
 }
 
 @SupabaseInternal
-inline fun buildPostgrestUpdate(propertyConversionMethod: PropertyConversionMethod = PropertyConversionMethod.SERIAL_NAME, serializer: SupabaseSerializer, block: PostgrestUpdate.() -> Unit): JsonObject {
+inline fun buildPostgrestUpdate(propertyConversionMethod: PropertyConversionMethod = PropertyConversionMethod.CAMEL_CASE_TO_SNAKE_CASE, serializer: SupabaseSerializer, block: PostgrestUpdate.() -> Unit): JsonObject {
     val update = PostgrestUpdate(propertyConversionMethod, serializer)
     update.block()
     return update.toJson()
