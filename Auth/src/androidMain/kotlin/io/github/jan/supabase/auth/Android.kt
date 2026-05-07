@@ -17,6 +17,7 @@ import kotlinx.coroutines.launch
  * @param onError Callback invoked if an error occurs during the [Auth.exchangeCodeForSession] call.
  */
 @OptIn(SupabaseInternal::class)
+@Deprecated("No longer necessary on Android if providing the manifest placeholder in your build configuration")
 fun SupabaseClient.handleDeeplinks(
     intent: Intent,
     onSessionSuccess: (UserSession) -> Unit = {},

@@ -79,6 +79,7 @@ open class AuthConfigDefaults : MainConfig(), AuthDependentPluginConfig, CustomS
      *
      * **Note:** Deeplinks are only used as redirect urls on Android and Apple platforms. Other platforms will use their own default redirect url.
      */
+    @Deprecated("No longer necessary on Android, on iOS use `appScheme`.")
     var scheme: String? = null
 
     /**
@@ -86,6 +87,7 @@ open class AuthConfigDefaults : MainConfig(), AuthDependentPluginConfig, CustomS
      *
      * **Note:** Deeplinks are only used as redirect urls on Android and Apple platforms. Other platforms will use their own default redirect url.
      */
+    @Deprecated("No longer necessary")
     var host: String? = null
 
     /**
