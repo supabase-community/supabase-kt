@@ -16,37 +16,50 @@ import platform.Foundation.NSURLQueryItem
  * @param onSessionSuccess The callback when the session was successfully imported
  * @param onError Callback invoked if an error occurs during the [Auth.exchangeCodeForSession] call.
  */
+@Deprecated("No longer necessary for OAuth on iOS. For magic links / deeplinks coming from outside the app, use `SupabaseDeeplinkHandlerKt.handleDeeplinks(url)`")
 fun SupabaseClient.handleDeeplinks(
     url: NSURL,
     onSessionSuccess: (UserSession) -> Unit = {},
     onError: (Throwable) -> Unit = {}
+) = auth.handleDeeplinks(url, onSessionSuccess, onError)
+
+/**
+ * Handle deeplinks for authentication. Not necessary for OAuth.
+ * @param url The URL from the iOS app delegate
+ */
+fun handleDeeplinks(url: NSURL) = AuthFlowManager.handleRedirect(url)
+
+@Suppress("DEPRECATION")
+internal fun Auth.handleDeeplinks(
+    url: NSURL,
+    onSessionSuccess: (UserSession) -> Unit = {},
+    onError: (Throwable) -> Unit = {}
 ) {
-    if (url.scheme != auth.config.scheme || url.host != auth.config.host) {
-        auth.logger.d { "Received deeplink with wrong scheme or host" }
+    if (url.scheme != config.scheme || url.host != config.host) {
+        logger.d { "Received deeplink with wrong scheme or host" }
         return
     }
-    when (auth.config.flowType) {
+    when (config.flowType) {
         FlowType.IMPLICIT -> {
             val fragment = url.fragment
             if (fragment == null) {
-                auth.logger.d { "No fragment for deeplink" }
+                logger.d { "No fragment for deeplink" }
                 return
             }
-            auth.parseFragmentAndImportSession(fragment) {
+            parseFragmentAndImportSession(fragment) {
                 it?.let(onSessionSuccess)
             }
         }
         FlowType.PKCE -> {
             val components = NSURLComponents(url, false)
-            if (auth.handledUrlParameterError{ key -> getQueryItem(components, key) }) {
+            if (handledUrlParameterError{ key -> getQueryItem(components, key) }) {
                 return
             }
             val code = getQueryItem(components, "code") ?: return
-            val scope = (auth as AuthImpl).authScope
-            scope.launch {
+            authScope.launch {
                 try {
-                    this@handleDeeplinks.auth.exchangeCodeForSession(code)
-                    onSessionSuccess(this@handleDeeplinks.auth.currentSessionOrNull() ?: error("No session available"))
+                    exchangeCodeForSession(code)
+                    onSessionSuccess(currentSessionOrNull() ?: error("No session available"))
                 } catch (e: Throwable) {
                     onError(e)
                 }
