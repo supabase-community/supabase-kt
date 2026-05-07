@@ -10,6 +10,8 @@ import androidx.browser.customtabs.CustomTabsIntent
 
 class SupabaseAuthDispatcherActivity: Activity() {
 
+    private var stoppedForAuth = false
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         handleIntent(intent)
@@ -20,20 +22,27 @@ class SupabaseAuthDispatcherActivity: Activity() {
         handleIntent(intent)
     }
 
+    override fun onResume() {
+        super.onResume()
+        if (stoppedForAuth) {
+            returnToApp()
+        }
+    }
+
     private fun handleIntent(intent: Intent?) {
-        val data = intent?.data
-        val url = intent?.parcelable<Uri>("auth_url")
-        println(url)
+        val deeplinkUri = intent?.data
+        val oAuthUri = intent?.parcelable<Uri>("auth_url")
         when {
-            data != null -> {
-                AuthFlowManager.handleRedirect(data)
+            deeplinkUri != null -> {
+                AuthFlowManager.handleRedirect(deeplinkUri)
                 returnToApp()
                 finish()
             }
-            url != null -> {
+            oAuthUri != null -> {
                 val type = intent.parcelable<ExternalAuthAction>("action")
                 if (type != null) {
-                    openUrl(url, type)
+                    stoppedForAuth = true
+                    openUrl(oAuthUri, type)
                 }
             }
             else -> finish()
