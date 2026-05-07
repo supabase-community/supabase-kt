@@ -744,7 +744,6 @@ internal class AuthImpl(
         url: String,
         additionalConfig: ExternalAuthConfigDefaults.() -> Unit
     ): String {
-        println(redirectUrl)
         val config = ExternalAuthConfigDefaults().apply(additionalConfig)
         val codeChallenge = preparePKCEIfEnabled()
         codeChallenge?.let {
