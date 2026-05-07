@@ -16,8 +16,8 @@ expect fun AuthConfig.platformGoTrueConfig()
 val supabaseModule = module {
     single {
         createSupabaseClient(
-            supabaseUrl = "https://arnyfaeuskyqfxkvotgj.supabase.co",
-            supabaseKey = "sb_publishable_5YwzP-KWBn56-aIVeg1Gqg_E37hSpmh"
+            supabaseUrl = "YOUR_URL",
+            supabaseKey = "YOUR_KEY"
         ) {
             defaultLogLevel = LogLevel.DEBUG
             install(Postgrest)
@@ -27,7 +27,7 @@ val supabaseModule = module {
             }
             install(Realtime)
             install(ComposeAuth) {
-                googleNativeLogin(serverClientId = "178705897393-1o04rilnoit4a6ls84d2751a3jvibbij.apps.googleusercontent.com")
+                googleNativeLogin(serverClientId = "YOUR_WEB_CLIENT_ID")
             }
         }
     }
