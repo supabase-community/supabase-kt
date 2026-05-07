@@ -25,7 +25,6 @@ kotlin {
             }
             group("nonDesktop") {
                 //withAndroidTarget() android has its own implementation
-                withIos()
                 withTvos()
                 withWatchos()
                 //withMingw()
