@@ -2,6 +2,7 @@ plugins {
    // alias(libs.plugins.complete.kotlin)
     id(libs.plugins.kotlin.multiplatform.get().pluginId)
     id(libs.plugins.android.kotlin.multiplatform.library.get().pluginId)
+    id("kotlin-parcelize")
 }
 
 description = "Extends supabase-kt with a Auth Client"
