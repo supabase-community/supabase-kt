@@ -3,6 +3,13 @@
         xmlns:android="http://schemas.android.com/apk/res/android">
 
     <application>
+        <meta-data
+                android:name="supabase.auth.scheme"
+                android:value="${supabaseAuthScheme}" />
+
+        <meta-data
+                android:name="supabase.auth.host"
+                android:value="${supabaseAuthHost}" />
         <provider
                 android:name="androidx.startup.InitializationProvider"
                 android:authorities="${applicationId}.androidx-startup"
@@ -12,6 +19,24 @@
                     android:name="io.github.jan.supabase.auth.SupabaseInitializer"
                     android:value="androidx.startup" />
         </provider>
+
+        <activity
+                android:name="io.github.jan.supabase.auth.SupabaseAuthDispatcherActivity"
+                android:exported="true"
+                android:launchMode="singleTask"
+                android:theme="@android:style/Theme.Translucent.NoTitleBar">
+
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                        android:scheme="${supabaseAuthScheme}"
+                        android:host="${supabaseAuthHost}" />
+            </intent-filter>
+
+        </activity>
     </application>
 
 </manifest>

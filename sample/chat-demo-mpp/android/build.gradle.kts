@@ -18,6 +18,10 @@ dependencies {
 
 android {
     configureApplicationAndroidTarget(JavaVersion.VERSION_11)
+    defaultConfig {
+        manifestPlaceholders["supabaseAuthScheme"] = "io.jan.supabase"
+        manifestPlaceholders["supabaseAuthHost"] = "login"
+    }
 }
 
 kotlin {
