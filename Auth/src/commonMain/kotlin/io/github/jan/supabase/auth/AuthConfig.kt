@@ -163,22 +163,21 @@ enum class FlowType {
 /**
  * The deeplink used for the implicit and PKCE flow. Throws an [IllegalArgumentException], if either the scheme or host is not set
  */
-@Suppress("unused")
+@Suppress("unused", "DEPRECATION")
 val AuthConfig.deepLink: String
     get() {
         val scheme = scheme ?: noDeeplinkError("scheme")
-        val host = host ?: noDeeplinkError("host")
-        return "${scheme}://${host}"
+        return "${scheme}://${host ?: ""}"
     }
 
 /**
  * The deeplink used for the implicit and PKCE flow. Returns null, if either the scheme or host is not set
  */
+@Suppress("DEPRECATION")
 val AuthConfig.deepLinkOrNull: String?
     get() {
         val scheme = scheme ?: return null
-        val host = host ?: return null
-        return "${scheme}://${host}"
+        return "${scheme}://${host ?: ""}"
     }
 
 /**
