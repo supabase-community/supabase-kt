@@ -25,6 +25,15 @@ internal fun applicationContext(): Context = appContext ?: error("Application co
 @SupabaseInternal
 actual suspend fun Auth.setupPlatform() {
     addLifecycleCallbacks(this)
+    listenForDeeplinks()
+}
+
+private fun Auth.listenForDeeplinks() {
+    authScope.launch {
+        AuthFlowManager.redirectFlow.collect {
+            handleDeeplinks(it)
+        }
+    }
 }
 
 private fun addLifecycleCallbacks(auth: Auth) {
