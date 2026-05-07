@@ -11,6 +11,6 @@ internal actual fun Auth.defaultPlatformRedirectUrl(): String? {
         PackageManager.GET_META_DATA
     )
     val scheme = appInfo.metaData.getString("supabase.auth.scheme") ?: return null
-    val host = appInfo.metaData.getString("supabase.auth.host") ?: return null
-    return "${scheme}://${host}"
+    val host = appInfo.metaData.getString("supabase.auth.host")
+    return "$scheme://${host ?: ""}"
 }
