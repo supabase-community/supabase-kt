@@ -169,7 +169,7 @@ interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
-    suspend fun signInAnonymously(data: JsonObject? = null, captchaToken: String? = null)
+    suspend fun signInAnonymously(data: JsonObject? = null, captchaToken: String? = null): UserSession
 
     /**
      * Links an OAuth Identity to an existing user.

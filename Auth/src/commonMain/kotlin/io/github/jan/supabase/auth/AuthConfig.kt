@@ -46,6 +46,11 @@ open class AuthConfigDefaults : MainConfig(), AuthDependentPluginConfig, CustomS
     var autoSaveToStorage: Boolean = true
 
     /**
+     * Whether to automatically import then session. This does not mean it is saved in the [sessionManager], it is just imported into [Auth.sessionStatus].
+      */
+    var autoImportSession: Boolean = true
+
+    /**
      * The session manager used to store/load the session. When null, the default [io.github.jan.supabase.auth.SettingsSessionManager] will be used
      */
     var sessionManager: SessionManager? = null

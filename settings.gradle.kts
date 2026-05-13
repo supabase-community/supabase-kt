@@ -13,6 +13,7 @@ plugins {
 
 // Main Modules
 include("Auth")
+include("AuthNative")
 include("Postgrest")
 include("Storage")
 include("Realtime")
@@ -44,6 +45,7 @@ project(":Storage").name = "storage-kt"
 project(":Realtime").name = "realtime-kt"
 project(":Functions").name = "functions-kt"
 project(":Supabase").name = "supabase-kt"
+project(":AuthNative").name = "auth-native"
 rootProject.name = "supabase-kt"
 
 fun includeSample(name: String, vararg targets: String) {
