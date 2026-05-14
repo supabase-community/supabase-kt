@@ -1,9 +1,9 @@
-package io.github.jan.supabase.auth
+package io.github.jan.supabase.auth.oauth
 
 import android.app.Activity
 import android.content.Intent
 import android.net.Uri
-import android.os.Build.VERSION.SDK_INT
+import android.os.Build
 import android.os.Bundle
 import android.os.Parcelable
 import androidx.browser.customtabs.CustomTabsIntent
@@ -59,7 +59,7 @@ class SupabaseAuthDispatcherActivity: Activity() {
     }
 
     inline fun <reified T : Parcelable> Intent.parcelable(key: String): T? = when {
-        SDK_INT >= 33 -> getParcelableExtra(key, T::class.java)
+        Build.VERSION.SDK_INT >= 33 -> getParcelableExtra(key, T::class.java)
         else -> @Suppress("DEPRECATION") getParcelableExtra(key) as? T
     }
 

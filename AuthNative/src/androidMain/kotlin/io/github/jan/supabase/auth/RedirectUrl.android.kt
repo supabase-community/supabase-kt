@@ -2,6 +2,7 @@ package io.github.jan.supabase.auth
 
 import android.content.pm.PackageManager
 import io.github.jan.supabase.annotations.SupabaseInternal
+import io.github.jan.supabase.auth.oauth.applicationContext
 
 @SupabaseInternal
 internal actual fun Auth.defaultPlatformRedirectUrl(): String? {
