@@ -1,11 +1,12 @@
 package io.github.jan.supabase.auth.url
 
+import io.github.jan.supabase.annotations.SupabaseInternal
 import io.github.jan.supabase.auth.Auth
 import io.github.jan.supabase.auth.event.AuthEvent
 import io.github.jan.supabase.auth.status.SessionStatus
 import io.github.jan.supabase.logging.d
 
-internal fun checkForUrlParameterError(parameters: (String) -> String?): AuthEvent.OtpError? {
+@SupabaseInternal internal fun checkForUrlParameterError(parameters: (String) -> String?): AuthEvent.OtpError? {
     val error = parameters("error")
     val errorCode = parameters("error_code")
     val errorDescription = parameters("error_description")
@@ -17,7 +18,7 @@ internal fun checkForUrlParameterError(parameters: (String) -> String?): AuthEve
     } else null
 }
 
-internal fun Auth.handledUrlParameterError(parameters: (String) -> String?): Boolean {
+@SupabaseInternal fun Auth.handledUrlParameterError(parameters: (String) -> String?): Boolean {
     val error = checkForUrlParameterError(parameters)
     return if(error != null) {
         if(sessionStatus.value !is SessionStatus.Authenticated) {

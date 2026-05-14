@@ -1,4 +1,4 @@
-package io.github.jan.supabase.auth
+package io.github.jan.supabase.auth.oauth
 
 import android.net.Uri
 import kotlinx.coroutines.CoroutineScope

@@ -2,6 +2,7 @@ package io.github.jan.supabase.auth
 
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.annotations.SupabaseExperimental
+import io.github.jan.supabase.auth.oauth.openOAuthUrl
 
 /**
  * A [UrlLauncher] is used to open a URL in the system browser.
@@ -21,7 +22,7 @@ fun interface UrlLauncher {
          * Default implementation of [UrlLauncher] that opens the URL in the system browser.
          */
         val DEFAULT = UrlLauncher { supabase, url ->
-            supabase.openExternalUrl(url)
+            supabase.openOAuthUrl(url)
         }
 
     }

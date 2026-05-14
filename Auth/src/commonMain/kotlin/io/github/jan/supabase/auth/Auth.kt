@@ -14,9 +14,9 @@ import io.github.jan.supabase.auth.jwt.ClaimsRequestBuilder
 import io.github.jan.supabase.auth.jwt.ClaimsResponse
 import io.github.jan.supabase.auth.mfa.MfaApi
 import io.github.jan.supabase.auth.providers.AuthProvider
-import io.github.jan.supabase.auth.providers.ExternalAuthConfigDefaults
-import io.github.jan.supabase.auth.providers.Google
 import io.github.jan.supabase.auth.providers.IDTokenProvider
+import io.github.jan.supabase.auth.providers.IdTokenConfig
+import io.github.jan.supabase.auth.providers.LoginIdentifier
 import io.github.jan.supabase.auth.providers.OAuthProvider
 import io.github.jan.supabase.auth.providers.builtin.Email
 import io.github.jan.supabase.auth.providers.builtin.IDToken
@@ -158,6 +158,29 @@ interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
         config: (C.() -> Unit)? = null
     )
 
+    suspend fun <C : LoginIdentifier.Config> signUp(
+        identifier: LoginIdentifier<C>,
+        password: String,
+        config: C.() -> Unit = {}
+    )
+
+    suspend fun <C : LoginIdentifier.Config> signInWithPassword(
+        identifier: LoginIdentifier<C>,
+        password: String,
+        config: C.() -> Unit = {}
+    )
+
+    suspend fun signInWithIdToken(
+        provider: IDTokenProvider,
+        token: String,
+        config: IdTokenConfig.() -> Unit = {}
+    )
+
+    suspend fun <C : LoginIdentifier.Config> signInWithOtp(
+        identifier: LoginIdentifier<C>, // TODO: shouldCreateUser
+        config: C.() -> Unit
+    )
+
     /**
      * Signs in the user without any credentials. This will create a new user session with a new access token.
      *
@@ -192,7 +215,7 @@ interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
     suspend fun linkIdentity(
         provider: OAuthProvider,
         redirectUrl: String? = defaultRedirectUrl(),
-        config: ExternalAuthConfigDefaults.() -> Unit = {}
+        config: OAuthConfig.() -> Unit = {}
     ): String?
 
     /**
@@ -423,12 +446,11 @@ interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
     /**
      * Exchanges a code for a session. Used when using the [FlowType.PKCE] flow
      * @param code The code to exchange
-     * @param saveSession Whether to save the session in storage
      * @throws RestException or one of its subclasses if receiving an error response. If the error response contains a error code, an [AuthRestException] will be thrown which can be used to easier identify the problem.
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
-    suspend fun exchangeCodeForSession(code: String, saveSession: Boolean = true): UserSession
+    suspend fun exchangeCodeForSession(code: String): UserSession
 
     /**
      * Starts auto refreshing the current session
@@ -468,7 +490,7 @@ interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
      *
      * For linking identities it would be "user/identities/authorize"
      */
-    fun getOAuthUrl(provider: OAuthProvider, redirectUrl: String? = defaultRedirectUrl(), url: String = "authorize", additionalConfig: ExternalAuthConfigDefaults.() -> Unit = {}): String
+    fun getOAuthUrl(provider: OAuthProvider, redirectUrl: String? = defaultRedirectUrl(), url: String = "authorize", additionalConfig: OAuthConfig.() -> Unit = {}): String
 
     /**
      * Stops auto-refreshing the current session
@@ -504,6 +526,9 @@ interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
      * Returns the connected identities to the current user or null
      */
     fun currentIdentitiesOrNull() = currentUserOrNull()?.identities
+
+    @SupabaseInternal
+    fun defaultRedirectUrl(): String?
 
     /**
      * Blocks the current coroutine until the plugin is initialized.
