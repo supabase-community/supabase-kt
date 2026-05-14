@@ -35,7 +35,6 @@ import io.github.jan.supabase.auth.oauth.OAuthApiImpl
 import io.github.jan.supabase.auth.passkey.AuthPasskeyApi
 import io.github.jan.supabase.auth.passkey.AuthPasskeyApiImpl
 import io.github.jan.supabase.auth.providers.AuthProvider
-import io.github.jan.supabase.auth.providers.ExternalAuthConfigDefaults
 import io.github.jan.supabase.auth.providers.IDTokenProvider
 import io.github.jan.supabase.auth.providers.OAuthProvider
 import io.github.jan.supabase.auth.providers.builtin.IDToken
@@ -189,13 +188,14 @@ internal class AuthImpl(
         importSession(it, source = SessionSource.SignIn(provider))
     }, redirectUrl, config)
 
-    override suspend fun signInAnonymously(data: JsonObject?, captchaToken: String?) {
+    override suspend fun signInAnonymously(data: JsonObject?, captchaToken: String?): UserSession {
         val response = publicApi.postJson("signup", buildJsonObject {
             data?.let { put("data", it) }
             captchaToken?.let(::putCaptchaToken)
         })
         val session = response.safeBody<UserSession>()
         importSession(session, source = SessionSource.AnonymousSignIn)
+        return session
     }
 
     override suspend fun <C, R, Provider : AuthProvider<C, R>> signUpWith(
@@ -209,10 +209,11 @@ internal class AuthImpl(
     override suspend fun linkIdentity(
         provider: OAuthProvider,
         redirectUrl: String?,
-        config: ExternalAuthConfigDefaults.() -> Unit
+        config: OAuthConfig.() -> Unit
     ): String? {
-        val automaticallyOpen = ExternalAuthConfigDefaults().apply(config).automaticallyOpenUrl
+      //  val automaticallyOpen = ExternalAuthConfigDefaults().apply(config).automaticallyOpenUrl
         val flowId = generatePKCEFlowId()
+       // val automaticallyOpen = OAuthConfig().apply(config).automaticallyOpenUrl TODO: maybe also move this method
         val fetchUrl: suspend (String?) -> String = { redirectTo: String? ->
             val url = getOAuthUrl(provider, redirectTo, "user/identities/authorize") {
                 this.flowId = flowId
@@ -247,7 +248,9 @@ internal class AuthImpl(
     ) {
         val body = IDToken.Config(idToken = idToken, provider = provider, linkIdentity = true).apply(config)
         val result = userApi.postJson("token?grant_type=id_token", body)
-        importSession(result.safeBody(), source = SessionSource.UserIdentitiesChanged(result.safeBody()))
+        val session: UserSession = result.safeBody()
+        importIfEnabled(result.safeBody(), source = SessionSource.UserIdentitiesChanged(result.safeBody()))
+        return session
     }
 
     override suspend fun unlinkIdentity(identityId: String, updateLocalUser: Boolean) {
@@ -318,7 +321,7 @@ internal class AuthImpl(
         if (updateCurrentUser && sessionStatus.value is SessionStatus.Authenticated) {
             val newSession =
                 (sessionStatus.value as SessionStatus.Authenticated).session.copy(user = userInfo)
-            if (this.config.autoSaveToStorage) {
+            if (this.config.autoSaveToStorage) { // TODO: this looks sus
                 sessionManager.saveSession(newSession)
             }
             setSessionStatus(SessionStatus.Authenticated(newSession, SessionSource.UserChanged(newSession)))
@@ -438,7 +441,7 @@ internal class AuthImpl(
             logger.d { "Received `verifyOtp` response without session: ${response.bodyAsText()}. This may occur if changing the email with 'Secure email change' enabled" }
             return OtpVerifyResult.VerifiedNoSession
         }
-        importSession(session, source = SessionSource.SignIn(OTP))
+        importIfEnabled(session, source = SessionSource.SignIn(OTP))
         return OtpVerifyResult.Authenticated(session)
     }
 
@@ -551,7 +554,7 @@ internal class AuthImpl(
         return user
     }
 
-    override suspend fun exchangeCodeForSession(code: String, saveSession: Boolean, flowId: String?): UserSession {
+    override suspend fun exchangeCodeForSession(code: String): UserSession {
         try {
             val codeVerifier = codeVerifierCache.retrievePKCEVerifier(validatePKCEFlowId(flowId))
             require(codeVerifier != null) {
@@ -562,9 +565,7 @@ internal class AuthImpl(
                 put("code_verifier", codeVerifier)
             }).safeBody<UserSession>()
             codeVerifierCache.removePKCEVerifier(flowId)
-            if (saveSession) {
-                importSession(session, source = SessionSource.External)
-            }
+            importIfEnabled(session, source = SessionSource.External)
             return session
         } catch(e: RestException) {
             codeVerifierCache.removePKCEVerifier(flowId)
@@ -591,6 +592,12 @@ internal class AuthImpl(
         importSession(newSession, source = SessionSource.Refresh(currentSessionOrNull() ?: error("No session found")))
         updateRefreshInformation(null, Clock.System.now())
     }
+
+    private suspend fun importIfEnabled(
+        session: UserSession,
+        autoRefresh: Boolean = config.alwaysAutoRefresh,
+        source: SessionSource = SessionSource.Unknown
+    ) = if(config.autoImportSession) importSession(session, autoRefresh, source) else Unit
 
     override suspend fun importSession(
         session: UserSession,
@@ -804,9 +811,9 @@ internal class AuthImpl(
         provider: OAuthProvider,
         redirectUrl: String?,
         url: String,
-        additionalConfig: ExternalAuthConfigDefaults.() -> Unit
+        additionalConfig: OAuthConfig.() -> Unit
     ): String {
-        val config = ExternalAuthConfigDefaults().apply(additionalConfig)
+        val config = OAuthConfig().apply(additionalConfig)
         val (codeChallenge, flowId) = preparePKCEIfEnabled()
         codeChallenge?.let {
             config.queryParams["code_challenge"] = it
@@ -821,6 +828,10 @@ internal class AuthImpl(
                 }
             }
         })
+    }
+
+    override fun defaultRedirectUrl(): String? {
+        return config.defaultRedirectUrl ?: config.nativeAuthConfig?.defaultRedirectUrl(this)
     }
 
     override suspend fun clearSession() {
@@ -857,10 +868,11 @@ internal class AuthImpl(
         return generateCodeChallenge(codeVerifier) to flowId
     }
 
-}
+    private suspend fun setupPlatform() {
+        config.nativeAuthConfig?.setupNativePlatform(this) ?: initDone()
+    }
 
-@SupabaseInternal
-expect suspend fun Auth.setupPlatform()
+}
 
 @SupabaseInternal
 expect fun Auth.createDefaultSessionManager(): SessionManager
