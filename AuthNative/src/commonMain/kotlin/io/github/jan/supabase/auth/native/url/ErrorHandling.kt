@@ -1,0 +1,30 @@
+package io.github.jan.supabase.auth.native.native.url
+
+import io.github.jan.supabase.annotations.SupabaseInternal
+import io.github.jan.supabase.auth.Auth
+import io.github.jan.supabase.auth.event.AuthEvent
+import io.github.jan.supabase.auth.status.SessionStatus
+import io.github.jan.supabase.logging.d
+
+@SupabaseInternal internal fun checkForUrlParameterError(parameters: (String) -> String?): AuthEvent.OtpError? {
+    val error = parameters("error")
+    val errorCode = parameters("error_code")
+    val errorDescription = parameters("error_description")
+    return if(errorCode != null) {
+        AuthEvent.OtpError(
+            error = errorCode,
+            errorDescription = "$errorDescription ($error)",
+        )
+    } else null
+}
+
+@SupabaseInternal fun Auth.handledUrlParameterError(parameters: (String) -> String?): Boolean {
+    val error = checkForUrlParameterError(parameters)
+    return if(error != null) {
+        if(sessionStatus.value !is SessionStatus.Authenticated) {
+            logger.d { "Found error code in the URL Parameters: $error. Emitting event..." }
+            emitEvent(error)
+        }
+        true
+    } else false
+}

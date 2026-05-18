@@ -1,7 +1,6 @@
 package io.github.jan.supabase.auth.status
 
 import io.github.jan.supabase.auth.Auth
-import io.github.jan.supabase.auth.providers.AuthProvider
 import io.github.jan.supabase.auth.user.UserSession
 
 /**
@@ -23,13 +22,13 @@ sealed interface SessionSource {
      * The session was loaded from a sign in
      * @param provider The provider that was used to sign in
      */
-    data class SignIn(val provider: AuthProvider<*, *>) : SessionSource
+    class SignIn() : SessionSource
 
     /**
      * The session was loaded from a sign-up (only if auto-confirm is enabled)
      * @param provider The provider that was used to sign up
      */
-    data class SignUp(val provider: AuthProvider<*, *>) : SessionSource
+    class SignUp() : SessionSource // TODO: refactor
 
     /**
      * The session comes from an external source, e.g. OAuth via deep links.

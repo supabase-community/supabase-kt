@@ -16,7 +16,6 @@ kotlin {
     defaultConfig()
     applyDefaultHierarchyTemplate {
         common {
-            settingsGroup()
             group("desktop") {
                 withJvm()
                 withMacos()
@@ -30,6 +29,14 @@ kotlin {
                 //withMingw()
                 withJs()
                 withWasmJs()
+            }
+            group("noRedirect") {
+                withTvos()
+                withWatchos()
+                withMacos()
+                withLinux()
+                withMingw()
+                withJvm()
             }
         }
     }
