@@ -3,7 +3,7 @@ package io.github.jan.supabase.auth.mfa
 import io.github.jan.supabase.auth.Auth
 import io.github.jan.supabase.auth.api.AuthenticatedSupabaseApi
 import io.github.jan.supabase.auth.jwt.JWTUtils
-import io.github.jan.supabase.auth.providers.builtin.Phone
+import io.github.jan.supabase.auth.providers.Phone
 import io.github.jan.supabase.auth.status.SessionStatus
 import io.github.jan.supabase.auth.user.UserMfaFactor
 import io.github.jan.supabase.auth.user.UserSession

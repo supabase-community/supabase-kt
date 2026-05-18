@@ -21,7 +21,7 @@
         </provider>
 
         <activity
-                android:name="io.github.jan.supabase.auth.oauth.SupabaseAuthDispatcherActivity"
+                android:name="io.github.jan.supabase.auth.native.oauth.SupabaseAuthDispatcherActivity"
                 android:exported="true"
                 android:launchMode="singleTask"
                 android:theme="@android:style/Theme.Translucent.NoTitleBar">
