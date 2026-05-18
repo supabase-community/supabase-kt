@@ -1,4 +1,4 @@
-package io.github.jan.supabase.auth.native.native
+package io.github.jan.supabase.auth.native
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

@@ -1,6 +1,5 @@
 package io.github.jan.supabase.auth
 
-import io.github.jan.supabase.auth.providers.IDTokenProvider
 import io.github.jan.supabase.auth.providers.builtin.CaptchaTokenSerializer
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable

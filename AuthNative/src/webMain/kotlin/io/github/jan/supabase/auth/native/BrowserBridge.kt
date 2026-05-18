@@ -1,4 +1,4 @@
-package io.github.jan.supabase.auth.native.native
+package io.github.jan.supabase.auth.native
 
 import io.github.jan.supabase.annotations.SupabaseInternal
 import org.w3c.dom.Window

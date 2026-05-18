@@ -1,4 +1,4 @@
-package io.github.jan.supabase.auth.native.native.url
+package io.github.jan.supabase.auth.native.url
 
 import io.github.jan.supabase.buildUrl
 

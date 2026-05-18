@@ -1,4 +1,4 @@
-package io.github.jan.supabase.auth.native.native
+package io.github.jan.supabase.auth.native
 
 import io.github.jan.supabase.auth.native.oauth.ExternalAuthAction
 

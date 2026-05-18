@@ -1,4 +1,4 @@
-package io.github.jan.supabase.auth.native.native
+package io.github.jan.supabase.auth.native
 
 import io.github.jan.supabase.auth.Auth
 import io.github.jan.supabase.auth.native.deeplinks.handleDeeplinks
