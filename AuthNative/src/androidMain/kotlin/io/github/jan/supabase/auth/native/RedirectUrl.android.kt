@@ -1,4 +1,4 @@
-package io.github.jan.supabase.auth.native.native
+package io.github.jan.supabase.auth.native
 
 import android.content.pm.PackageManager
 import io.github.jan.supabase.annotations.SupabaseInternal

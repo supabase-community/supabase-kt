@@ -1,9 +1,8 @@
-package io.github.jan.supabase.auth.native.native.deeplinks
+package io.github.jan.supabase.auth.native.deeplinks
 
 import android.net.Uri
 import io.github.jan.supabase.auth.Auth
 import io.github.jan.supabase.auth.FlowType
-import io.github.jan.supabase.auth.deeplinks.AuthFlowManager
 import io.github.jan.supabase.auth.native.url.handledUrlParameterError
 import io.github.jan.supabase.auth.parseFragmentAndImportSession
 import io.github.jan.supabase.auth.user.UserSession

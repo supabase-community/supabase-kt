@@ -1,4 +1,4 @@
-package io.github.jan.supabase.auth.native.native.oauth
+package io.github.jan.supabase.auth.native.oauth
 
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.auth.Auth
@@ -32,7 +32,7 @@ internal actual suspend fun Auth.startOAuthSession(
     val url = getUrl(redirectUrl)
     val result = openIosAuthSession(
         getUrl(redirectUrl),
-        config.platformConfig()?.appScheme ?: error("No app scheme provided in the config or Auth Native not initialized")
+        config.platformConfig().appScheme ?: error("No app scheme provided")
     )
     handleDeeplinks(result)
 }

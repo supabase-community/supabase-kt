@@ -1,4 +1,4 @@
-package io.github.jan.supabase.auth.native.native.oauth
+package io.github.jan.supabase.auth.native.oauth
 
 import io.github.jan.supabase.auth.Auth
 import io.github.jan.supabase.auth.auth
@@ -16,7 +16,7 @@ internal actual suspend fun Auth.startOAuthSession(
 ) {
     withContext(Dispatchers.IO) {
         if(redirectUrl != null) {
-            config.platformConfig()?.urlLauncher?.openUrl(supabaseClient, getUrl(redirectUrl)) ?: error("Auth Native not initialized")
+            config.platformConfig().urlLauncher.openUrl(supabaseClient, getUrl(redirectUrl))
             return@withContext
         }
         createServer({

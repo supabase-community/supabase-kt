@@ -1,4 +1,4 @@
-package io.github.jan.supabase.auth.native.native
+package io.github.jan.supabase.auth.native
 
 import io.github.jan.supabase.annotations.SupabaseInternal
 import io.github.jan.supabase.auth.Auth
@@ -21,4 +21,6 @@ abstract class DefaultNativeAuthConfig: NativeAuthConfig {
 
 expect class PlatformNativeAuthConfig(): DefaultNativeAuthConfig
 
-@SupabaseInternal fun AuthConfig.platformConfig(): PlatformNativeAuthConfig? = this.nativeAuthConfig as? PlatformNativeAuthConfig
+@SupabaseInternal fun AuthConfig.platformConfigOrNull(): PlatformNativeAuthConfig? = this.nativeAuthConfig as? PlatformNativeAuthConfig
+
+@SupabaseInternal fun AuthConfig.platformConfig() = platformConfigOrNull() ?: error("Native Auth not initialized")

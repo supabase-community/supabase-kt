@@ -1,10 +1,10 @@
-package io.github.jan.supabase.auth.native.native.deeplinks
+package io.github.jan.supabase.auth.native.deeplinks
 
 import io.github.jan.supabase.auth.Auth
 import io.github.jan.supabase.auth.FlowType
 import io.github.jan.supabase.auth.native.AuthFlowManager
 import io.github.jan.supabase.auth.native.url.handledUrlParameterError
-import io.github.jan.supabase.auth.parseFragmentAndImportSession
+import io.github.jan.supabase.auth.native.url.parseFragmentAndImportSession
 import io.github.jan.supabase.auth.user.UserSession
 import io.github.jan.supabase.logging.d
 import kotlinx.coroutines.launch

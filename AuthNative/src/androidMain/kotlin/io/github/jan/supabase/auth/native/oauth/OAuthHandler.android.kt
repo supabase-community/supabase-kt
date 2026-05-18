@@ -1,4 +1,4 @@
-package io.github.jan.supabase.auth.native.native.oauth
+package io.github.jan.supabase.auth.native.oauth
 
 import android.content.Intent
 import android.net.Uri
@@ -12,7 +12,7 @@ internal actual suspend fun SupabaseClient.openExternalUrl(url: String) {
     val context = applicationContext()
     val intent = Intent(context, SupabaseAuthDispatcherActivity::class.java).apply {
         putExtra("auth_url", Uri.parse(url))
-        putExtra("action", auth.config.platformConfig()?.defaultExternalAuthAction ?: error("Auth Native not initialized"))
+        putExtra("action", auth.config.platformConfig().defaultExternalAuthAction)
         addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
     }
     context.startActivity(intent)
@@ -23,5 +23,5 @@ internal actual suspend fun Auth.startOAuthSession(
     getUrl: suspend (redirectTo: String?) -> String,
     onSessionSuccess: suspend (UserSession) -> Unit
 ) {
-    config.platformConfig()?.urlLauncher?.openUrl(supabaseClient, getUrl(redirectUrl)) ?: error("Auth Native not initialized")
+    config.platformConfig().urlLauncher.openUrl(supabaseClient, getUrl(redirectUrl))
 }

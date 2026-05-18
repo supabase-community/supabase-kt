@@ -1,4 +1,4 @@
-package io.github.jan.supabase.auth.native.native.oauth.server
+package io.github.jan.supabase.auth.native.oauth.server
 
 import io.github.jan.supabase.auth.Auth
 import io.github.jan.supabase.auth.AuthImpl

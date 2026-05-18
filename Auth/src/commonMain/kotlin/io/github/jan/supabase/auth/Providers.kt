@@ -1,11 +1,12 @@
 @file:Suppress("UndocumentedPublicClass")
-package io.github.jan.supabase.auth.providers
+
+package io.github.jan.supabase.auth
 
 typealias OAuthProvider = String
 
 typealias IDTokenProvider = OAuthProvider
 
-data object  OAuthProviders {
+data object OAuthProviders {
 
     const val GOOGLE: IDTokenProvider = "google"
     const val DISCORD: OAuthProvider = "discord"
