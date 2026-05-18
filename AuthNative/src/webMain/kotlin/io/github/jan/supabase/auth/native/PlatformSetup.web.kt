@@ -1,4 +1,4 @@
-package io.github.jan.supabase.auth.native.native
+package io.github.jan.supabase.auth.native
 
 import io.github.jan.supabase.auth.Auth
 import io.github.jan.supabase.auth.FlowType
@@ -90,16 +90,16 @@ private suspend fun Auth.handleHashSession(session: UserSession) {
 }
 
 internal actual suspend fun Auth.setupNativePlatform() {
-    if(IS_BROWSER && !config.disableUrlChecking && config.browserBridge != null) {
+    if(IS_BROWSER && !config.platformConfig().disableUrlChecking && config.platformConfig().browserBridge != null) {
         when(config.flowType) {
             FlowType.PKCE -> {
                 logger.d { "Using PCKE flow type, checking for PCKE code..." }
-                val code = checkForPKCECode(config.browserBridge!!) ?: return initDone()
+                val code = checkForPKCECode(config.platformConfig().browserBridge!!) ?: return initDone()
                 handlePKCECode(code)
             }
             FlowType.IMPLICIT -> {
                 logger.d { "Using IMPLICIT flow type, checking for hash..." }
-                val sessionInHash = checkForHash(config.browserBridge!!) ?: return initDone()
+                val sessionInHash = checkForHash(config.platformConfig().browserBridge!!) ?: return initDone()
                 handleHashSession(sessionInHash)
             }
         }

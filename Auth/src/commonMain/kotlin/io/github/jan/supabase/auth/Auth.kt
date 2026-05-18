@@ -15,9 +15,7 @@ import io.github.jan.supabase.auth.mfa.MfaApi
 import io.github.jan.supabase.auth.providers.Email
 import io.github.jan.supabase.auth.providers.EmailSignInOtpConfig
 import io.github.jan.supabase.auth.providers.EmailSignUpConfig
-import io.github.jan.supabase.auth.providers.IDTokenProvider
 import io.github.jan.supabase.auth.providers.LoginIdentifier
-import io.github.jan.supabase.auth.providers.OAuthProvider
 import io.github.jan.supabase.auth.providers.Phone
 import io.github.jan.supabase.auth.providers.PhoneSignInOtpConfig
 import io.github.jan.supabase.auth.providers.PhoneSignUpConfig
@@ -29,6 +27,7 @@ import io.github.jan.supabase.auth.user.UserSession
 import io.github.jan.supabase.auth.user.UserUpdateBuilder
 import io.github.jan.supabase.exceptions.HttpRequestException
 import io.github.jan.supabase.exceptions.RestException
+import io.github.jan.supabase.network.SupabaseApi
 import io.github.jan.supabase.plugins.CustomSerializationPlugin
 import io.github.jan.supabase.plugins.MainPlugin
 import io.github.jan.supabase.plugins.SupabasePluginProvider
@@ -99,6 +98,8 @@ interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
      */
     @SupabaseInternal
     val authScope: CoroutineScope
+
+    val userApi: SupabaseApi
 
     suspend fun signUp(
         identifier: Email,
@@ -419,7 +420,7 @@ interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
      *
      * For linking identities it would be "user/identities/authorize"
      */
-    fun getOAuthUrl(provider: OAuthProvider, redirectUrl: String? = defaultRedirectUrl(), url: String = "authorize", additionalConfig: OAuthConfig.() -> Unit = {}): String
+    fun getOAuthUrl(provider: OAuthProvider, url: String = "authorize", additionalConfig: OAuthConfig.() -> Unit = {}): String
 
     /**
      * Stops auto-refreshing the current session

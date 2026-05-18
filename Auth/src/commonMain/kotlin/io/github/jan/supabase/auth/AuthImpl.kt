@@ -32,9 +32,7 @@ import io.github.jan.supabase.auth.mfa.MfaApiImpl
 import io.github.jan.supabase.auth.providers.Email
 import io.github.jan.supabase.auth.providers.EmailSignInOtpConfig
 import io.github.jan.supabase.auth.providers.EmailSignUpConfig
-import io.github.jan.supabase.auth.providers.IDTokenProvider
 import io.github.jan.supabase.auth.providers.LoginIdentifier
-import io.github.jan.supabase.auth.providers.OAuthProvider
 import io.github.jan.supabase.auth.providers.Phone
 import io.github.jan.supabase.auth.providers.PhoneSignInOtpConfig
 import io.github.jan.supabase.auth.providers.PhoneSignUpConfig
@@ -121,7 +119,7 @@ internal class AuthImpl(
     @OptIn(SupabaseInternal::class)
     val unauthenticatedApi = supabaseClient.supabaseApi(this)
     @OptIn(SupabaseInternal::class)
-    val userApi = if(config.requireValidSession) supabaseClient.authenticatedSupabaseApi(this) else publicApi
+    override val userApi = if(config.requireValidSession) supabaseClient.authenticatedSupabaseApi(this) else publicApi
     override val admin: AdminApi = AdminApiImpl(publicApi)
     override val mfa: MfaApi = MfaApiImpl(userApi.resolve("factors"), this)
     var sessionJob: Job? = null
@@ -827,7 +825,6 @@ internal class AuthImpl(
     @OptIn(SupabaseExperimental::class)
     override fun getOAuthUrl(
         provider: OAuthProvider,
-        redirectUrl: String?,
         url: String,
         additionalConfig: OAuthConfig.() -> Unit
     ): String {
@@ -838,7 +835,7 @@ internal class AuthImpl(
             config.queryParams["code_challenge_method"] = PKCEConstants.CHALLENGE_METHOD
         }
         return resolveUrl(buildString {
-            append("$url?provider=$provider&redirect_to=${redirectUrl?.encodeURLParameter()}")
+            append("$url?provider=$provider&redirect_to=${config.redirectUrl?.encodeURLParameter()}")
             if (config.scopes.isNotEmpty()) append("&scopes=${config.scopes.joinToString("+")}")
             if (config.queryParams.isNotEmpty()) {
                 for ((key, value) in config.queryParams) {

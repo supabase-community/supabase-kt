@@ -1,4 +1,4 @@
-package io.github.jan.supabase.auth.native.native.oauth
+package io.github.jan.supabase.auth.native.oauth
 
 import android.app.Activity
 import android.content.Intent
@@ -7,7 +7,7 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Parcelable
 import androidx.browser.customtabs.CustomTabsIntent
-import io.github.jan.supabase.auth.deeplinks.AuthFlowManager
+import io.github.jan.supabase.auth.native.deeplinks.AuthFlowManager
 
 class SupabaseAuthDispatcherActivity: Activity() {
 

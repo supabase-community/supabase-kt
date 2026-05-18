@@ -1,4 +1,4 @@
-package io.github.jan.supabase.auth.native.native.oauth.server
+package io.github.jan.supabase.auth.native.oauth.server
 
 internal object HttpCallbackHtml {
 

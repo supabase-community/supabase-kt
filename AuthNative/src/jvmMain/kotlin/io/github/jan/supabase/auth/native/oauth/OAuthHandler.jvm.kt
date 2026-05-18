@@ -1,4 +1,4 @@
-package io.github.jan.supabase.auth.native.native.oauth
+package io.github.jan.supabase.auth.native.oauth
 
 import io.github.jan.supabase.SupabaseClient
 import kotlinx.coroutines.Dispatchers
