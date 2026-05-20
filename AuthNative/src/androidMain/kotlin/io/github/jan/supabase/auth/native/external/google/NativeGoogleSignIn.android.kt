@@ -3,8 +3,8 @@ package io.github.jan.supabase.auth.native.external.google
 import android.content.Intent
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import io.github.jan.supabase.auth.Auth
-import io.github.jan.supabase.auth.OAuthProviders
 import io.github.jan.supabase.auth.native.AuthFlowManager
+import io.github.jan.supabase.auth.native.external.NativeSignInCancelledException
 import io.github.jan.supabase.auth.native.external.activities.SupabaseNativeAuthActivity
 import io.github.jan.supabase.auth.native.external.applicationContext
 import io.github.jan.supabase.auth.native.platformConfig
@@ -15,7 +15,7 @@ actual class GoogleSignInResult(actual val session: UserSession, val credential:
 
 actual suspend fun Auth.signWithGoogle(config: GoogleSignInConfig.() -> Unit): GoogleSignInResult {
     val context = applicationContext()
-    var signInConfig = GoogleSignInConfig(OAuthProviders.GOOGLE, "--").apply(config)
+    var signInConfig = GoogleSignInConfig("--").apply(config)
     val googleClientId = this.config.platformConfig().nativeAuthConfig.googleClientId ?: error("No google client id set in config")
     val deferred = AuthFlowManager.prepareSignInWait()
     val intent = Intent(context, SupabaseNativeAuthActivity::class.java).apply {
@@ -31,9 +31,11 @@ actual suspend fun Auth.signWithGoogle(config: GoogleSignInConfig.() -> Unit): G
             throw exception
         }
         is GoogleCredentialResult.Success -> {
-            signInConfig = GoogleSignInConfig(OAuthProviders.GOOGLE, result.credential.idToken).apply(config)
+            signInConfig = GoogleSignInConfig(result.credential.idToken).apply(config)
             val session = signInWithIdToken(signInConfig)
             return GoogleSignInResult(session, result.credential)
         }
+
+        GoogleCredentialResult.ClosedByUser -> throw NativeSignInCancelledException()
     }
 }

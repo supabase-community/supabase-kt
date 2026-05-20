@@ -124,7 +124,7 @@ interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
         token: String,
         config: IdTokenConfig.() -> Unit = {}
     ): UserSession {
-        val config = IdTokenConfig(provider, token).apply(config)
+        val config = DefaultIdTokenConfig(provider, token).apply(config)
         return signInWithIdToken(config)
     }
 
@@ -428,6 +428,8 @@ interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
      * For linking identities it would be "user/identities/authorize"
      */
     fun getOAuthUrl(provider: OAuthProvider, url: String = "authorize", additionalConfig: OAuthConfig.() -> Unit = {}): String
+
+    fun getOAuthUrl(provider: OAuthProvider, url: String = "authorize", additionalConfig: OAuthConfig): String
 
     /**
      * Stops auto-refreshing the current session

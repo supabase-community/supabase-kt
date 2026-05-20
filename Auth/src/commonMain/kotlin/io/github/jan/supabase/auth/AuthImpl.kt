@@ -323,7 +323,7 @@ internal class AuthImpl(
         idToken: String,
         config: (IdTokenConfig) -> Unit
     ): UserSession {
-        val body = IdTokenConfig(token = idToken, provider = provider, linkIdentity = true).apply(config)
+        val body = DefaultIdTokenConfig(token = idToken, provider = provider, linkIdentity = true).apply(config)
         val result = userApi.postJson("token?grant_type=id_token", body)
         val session: UserSession = result.safeBody()
         importIfEnabled(result.safeBody(), source = SessionSource.UserIdentitiesChanged(result.safeBody()))
@@ -823,19 +823,18 @@ internal class AuthImpl(
     override fun getOAuthUrl(
         provider: OAuthProvider,
         url: String,
-        additionalConfig: OAuthConfig.() -> Unit
+        additionalConfig: OAuthConfig
     ): String {
-        val config = OAuthConfig().apply(additionalConfig)
         val codeChallenge = preparePKCEIfEnabled()
         codeChallenge?.let {
-            config.queryParams["code_challenge"] = it
-            config.queryParams["code_challenge_method"] = PKCEConstants.CHALLENGE_METHOD
+            additionalConfig.queryParams["code_challenge"] = it
+            additionalConfig.queryParams["code_challenge_method"] = PKCEConstants.CHALLENGE_METHOD
         }
         return resolveUrl(buildString {
-            append("$url?provider=$provider&redirect_to=${config.redirectUrl?.encodeURLParameter()}")
-            if (config.scopes.isNotEmpty()) append("&scopes=${config.scopes.joinToString("+")}")
-            if (config.queryParams.isNotEmpty()) {
-                for ((key, value) in config.queryParams) {
+            append("$url?provider=$provider&redirect_to=${additionalConfig.redirectUrl?.encodeURLParameter()}")
+            if (additionalConfig.scopes.isNotEmpty()) append("&scopes=${additionalConfig.scopes.joinToString("+")}")
+            if (additionalConfig.queryParams.isNotEmpty()) {
+                for ((key, value) in additionalConfig.queryParams) {
                     append("&$key=${value.encodeURLParameter()}")
                 }
             }
