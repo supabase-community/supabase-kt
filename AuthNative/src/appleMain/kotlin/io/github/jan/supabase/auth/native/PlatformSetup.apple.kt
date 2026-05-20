@@ -10,7 +10,7 @@ internal actual suspend fun Auth.setupNativePlatform() {
 
 private fun Auth.listenForDeeplinks() {
     authScope.launch {
-        AuthFlowManager.redirectFlow.collect {
+        AuthFlowManager.deeplinks.collect {
             handleDeeplinks(it)
         }
     }

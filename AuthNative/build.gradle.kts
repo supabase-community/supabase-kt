@@ -38,6 +38,16 @@ kotlin {
                 withMingw()
                 withJvm()
             }
+            group("noNative") {
+                withTvos()
+                withWatchos()
+                withLinux()
+                withMingw()
+                withJvm()
+                withWasmJs()
+                withJs()
+                withMacos()
+            }
         }
     }
     allTargets()
