@@ -4,7 +4,7 @@ import io.github.jan.supabase.auth.providers.builtin.CaptchaTokenSerializer
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
-data class IdTokenConfig(
+open class IdTokenConfig(
     @SerialName("provider")
     val provider: IDTokenProvider,
     @SerialName("id_token")

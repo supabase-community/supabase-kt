@@ -123,6 +123,13 @@ interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
         provider: IDTokenProvider,
         token: String,
         config: IdTokenConfig.() -> Unit = {}
+    ): UserSession {
+        val config = IdTokenConfig(provider, token).apply(config)
+        return signInWithIdToken(config)
+    }
+
+    suspend fun signInWithIdToken(
+        config: IdTokenConfig
     ): UserSession
 
     suspend fun signInWithOtp(

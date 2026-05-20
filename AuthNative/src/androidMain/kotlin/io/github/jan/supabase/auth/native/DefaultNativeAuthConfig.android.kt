@@ -1,6 +1,6 @@
 package io.github.jan.supabase.auth.native
 
-import io.github.jan.supabase.auth.native.oauth.ExternalAuthAction
+import io.github.jan.supabase.auth.native.external.ExternalAuthAction
 
 actual class PlatformNativeAuthConfig actual constructor(): DefaultNativeAuthConfig() {
 
@@ -9,4 +9,14 @@ actual class PlatformNativeAuthConfig actual constructor(): DefaultNativeAuthCon
      */
     var defaultExternalAuthAction: ExternalAuthAction = ExternalAuthAction.DEFAULT
 
+    @PublishedApi internal val nativeAuthConfig: NativeAuthConfig = NativeAuthConfig()
+
+    inline fun nativeAuth(config: NativeAuthConfig.() -> Unit) {
+        nativeAuthConfig.apply(config)
+    }
+
 }
+
+data class NativeAuthConfig(
+    var googleClientId: String? = null
+)

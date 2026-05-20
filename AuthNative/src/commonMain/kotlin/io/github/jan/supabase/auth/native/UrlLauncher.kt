@@ -2,7 +2,7 @@ package io.github.jan.supabase.auth.native
 
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.annotations.SupabaseExperimental
-import io.github.jan.supabase.auth.native.oauth.openExternalUrl
+import io.github.jan.supabase.auth.native.external.openExternalUrl
 
 /**
  * A [UrlLauncher] is used to open a URL in the system browser.
