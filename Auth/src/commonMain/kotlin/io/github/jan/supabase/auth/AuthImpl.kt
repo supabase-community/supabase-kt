@@ -274,11 +274,8 @@ internal class AuthImpl(
     }
 
     override suspend fun signInWithIdToken(
-        provider: IDTokenProvider,
-        token: String,
-        config: IdTokenConfig.() -> Unit
+        config: IdTokenConfig
     ): UserSession {
-        val config = IdTokenConfig(provider, token).apply(config)
         return signIn(GrantType.ID_TOKEN, null, config)
     }
 
