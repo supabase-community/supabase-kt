@@ -64,6 +64,9 @@ kotlin {
             dependencies {
                 api(libs.androidx.startup.runtime)
                 api(libs.androidx.browser)
+                api(libs.android.google.id)
+                api(libs.androidx.credentials)
+                api(libs.androidx.credentials.play.services)
             }
         }
         val webMain by getting {

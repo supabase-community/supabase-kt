@@ -1,6 +1,6 @@
 package io.github.jan.supabase.auth.native
 
-import io.github.jan.supabase.auth.native.oauth.server.HttpCallbackHtml
+import io.github.jan.supabase.auth.native.external.server.HttpCallbackHtml
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
 
