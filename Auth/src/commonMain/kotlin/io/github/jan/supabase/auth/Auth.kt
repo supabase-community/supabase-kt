@@ -427,7 +427,8 @@ interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
      *
      * For linking identities it would be "user/identities/authorize"
      */
-    fun getOAuthUrl(provider: OAuthProvider, url: String = "authorize", additionalConfig: OAuthConfig.() -> Unit = {}): String
+    fun getOAuthUrl(provider: OAuthProvider, url: String = "authorize", additionalConfig: OAuthConfig.() -> Unit = {}): String =
+        getOAuthUrl(provider, url, DefaultOAuthConfig().apply(additionalConfig))
 
     fun getOAuthUrl(provider: OAuthProvider, url: String = "authorize", additionalConfig: OAuthConfig): String
 

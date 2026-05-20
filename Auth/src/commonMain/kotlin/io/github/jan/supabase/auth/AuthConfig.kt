@@ -18,7 +18,7 @@ import kotlin.time.Duration.Companion.seconds
 /**
  * The configuration for [Auth]
  */
-expect class AuthConfig() : AuthConfigDefaults
+class AuthConfig : AuthConfigDefaults()
 
 interface NativeAuthConfig {
 
