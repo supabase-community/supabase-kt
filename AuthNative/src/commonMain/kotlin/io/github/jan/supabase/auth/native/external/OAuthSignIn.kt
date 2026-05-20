@@ -1,6 +1,7 @@
 package io.github.jan.supabase.auth.native.external
 
 import io.github.jan.supabase.auth.Auth
+import io.github.jan.supabase.auth.DefaultOAuthConfig
 import io.github.jan.supabase.auth.OAuthConfig
 import io.github.jan.supabase.auth.OAuthProvider
 import io.github.jan.supabase.auth.OAuthProviders
@@ -33,17 +34,16 @@ import io.github.jan.supabase.auth.OAuthProviders
  */
 suspend fun Auth.signInWithOAuth(
     provider: OAuthProvider,
-    config: OAuthConfig.() -> Unit = {}
+    config: OAuthConfig
 ) {
-    val createdConfig = OAuthConfig().apply {
-        redirectUrl = defaultRedirectUrl()
-    }
+    val redirectUrl = config.redirectUrl ?: defaultRedirectUrl()
     startOAuthSession(
-        createdConfig.redirectUrl,
+        redirectUrl,
         {
             getOAuthUrl(provider) {
-                config()
-                redirectUrl = it
+                this.redirectUrl = it
+                this.scopes.addAll(config.scopes)
+                this.queryParams.putAll(config.queryParams)
             }
         },
         onSessionSuccess = {
@@ -51,3 +51,8 @@ suspend fun Auth.signInWithOAuth(
         }
     )
 }
+
+suspend fun Auth.signInWithOAuth(
+    provider: OAuthProvider,
+    config: OAuthConfig.() -> Unit = {}
+) = signInWithOAuth(provider, DefaultOAuthConfig().apply(config))

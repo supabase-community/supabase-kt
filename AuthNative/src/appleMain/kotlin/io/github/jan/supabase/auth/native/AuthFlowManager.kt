@@ -1,19 +1,14 @@
 package io.github.jan.supabase.auth.native
 
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.receiveAsFlow
 import platform.Foundation.NSURL
 
 internal object AuthFlowManager {
-    private val _redirectFlow = MutableSharedFlow<NSURL>(replay = 0)
-    val redirectFlow = _redirectFlow.asSharedFlow()
+    private val _deeplinkChannel = Channel<NSURL>(Channel.BUFFERED)
+    val deeplinks = _deeplinkChannel.receiveAsFlow()
 
     fun handleRedirect(uri: NSURL) {
-        CoroutineScope(Dispatchers.Main).launch {
-            _redirectFlow.emit(uri)
-        }
+        _deeplinkChannel.trySend(uri)
     }
 }

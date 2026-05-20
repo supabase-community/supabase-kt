@@ -7,6 +7,7 @@ import androidx.credentials.CredentialManager
 import androidx.credentials.CustomCredential
 import androidx.credentials.GetCredentialRequest
 import androidx.credentials.GetCredentialResponse
+import androidx.credentials.exceptions.GetCredentialCancellationException
 import androidx.credentials.exceptions.GetCredentialException
 import androidx.lifecycle.lifecycleScope
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
@@ -50,11 +51,8 @@ class SupabaseNativeAuthActivity: SupabaseAuthActivity() {
         val type = intent.getStringExtra(EXTRA_DIALOG_TYPE)?.let { GoogleDialogType.valueOf(it) } ?: return returnWithError("No type provided")
         lifecycleScope.launch {
             val result = try {
-                parseCredential(makeRequest(
-                    googleClientId,
-                    nonce,
-                    type = type
-                ).credential)
+                val response = makeRequest(googleClientId, nonce, type = type)
+                if(response != null) parseCredential(response.credential) else GoogleCredentialResult.ClosedByUser
             } catch(e: Exception) {
                 GoogleCredentialResult.Error(e.localizedMessage ?: "Error", e)
             }
@@ -89,13 +87,15 @@ class SupabaseNativeAuthActivity: SupabaseAuthActivity() {
         clientId: String?,
         nonce: String?,
         type: GoogleDialogType
-    ): GetCredentialResponse {
+    ): GetCredentialResponse? {
         return try {
             tryRequest(clientId, nonce, true, type)
         } catch(e: GetCredentialException) {
             if(type == GoogleDialogType.BOTTOM_SHEET) {
                 tryRequest(clientId, nonce, false, type)
-            } else throw e
+            } else null
+        } catch(e: GetCredentialCancellationException) {
+            null
         }
     }
     private suspend fun parseCredential(

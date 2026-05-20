@@ -8,4 +8,6 @@ internal sealed interface GoogleCredentialResult {
 
     data class Error(val message: String, val exception: Exception? = null): GoogleCredentialResult
 
+    data object ClosedByUser: GoogleCredentialResult
+
 }
