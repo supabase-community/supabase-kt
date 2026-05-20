@@ -1,6 +1,7 @@
 package io.github.jan.supabase.auth.native.external.server
 
 import io.github.jan.supabase.auth.Auth
+import io.github.jan.supabase.auth.native.platformConfig
 import io.github.jan.supabase.auth.native.url.handledUrlParameterError
 import io.github.jan.supabase.auth.user.UserSession
 import io.github.jan.supabase.logging.d
@@ -20,14 +21,14 @@ internal fun Routing.configureRoutes(
         if (auth.handledUrlParameterError { call.parameters[it] }) {
             auth.errorResponse(this)
         } else if(code != null) {
-            val session = auth.exchangeCodeForSession(code, false)
+            val session = auth.exchangeCodeForSession(code)
             onSuccess(session)
             auth.logger.d {
                 "Successfully authenticated user with OAuth using the PKCE flow"
             }
-            shutdown(call, auth.config.httpCallbackConfig.redirectHtml)
+            shutdown(call, auth.config.platformConfig().httpCallbackConfig.redirectHtml)
         } else {
-            call.respondText(ContentType.Text.Html, HttpStatusCode.OK) { HttpCallbackHtml.landingPage(auth.config.httpCallbackConfig.htmlTitle) }
+            call.respondText(ContentType.Text.Html, HttpStatusCode.OK) { HttpCallbackHtml.landingPage(auth.config.platformConfig().httpCallbackConfig.htmlTitle) }
         }
     }
     get("/callback") {
@@ -50,7 +51,7 @@ internal fun Routing.configureRoutes(
         auth.logger.d {
             "Successfully authenticated user with OAuth using the implicit flow"
         }
-        shutdown(call, auth.config.httpCallbackConfig.redirectHtml)
+        shutdown(call, auth.config.platformConfig().httpCallbackConfig.redirectHtml)
     }
 }
 

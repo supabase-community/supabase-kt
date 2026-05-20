@@ -3,6 +3,8 @@ package io.github.jan.supabase.auth.native
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ProcessLifecycleOwner
+import io.github.jan.supabase.auth.Auth
+import io.github.jan.supabase.auth.initDone
 import io.github.jan.supabase.auth.status.SessionStatus
 import io.github.jan.supabase.logging.d
 import kotlinx.coroutines.Dispatchers

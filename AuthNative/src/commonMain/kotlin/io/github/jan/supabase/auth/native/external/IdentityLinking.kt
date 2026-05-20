@@ -1,6 +1,7 @@
 package io.github.jan.supabase.auth.native.external
 
 import io.github.jan.supabase.auth.Auth
+import io.github.jan.supabase.auth.DefaultOAuthConfig
 import io.github.jan.supabase.auth.OAuthConfig
 import io.github.jan.supabase.auth.OAuthProvider
 import io.github.jan.supabase.safeBody
@@ -29,7 +30,7 @@ suspend fun Auth.linkIdentity(
     provider: OAuthProvider,
     config: OAuthConfig.() -> Unit = {}
 ) {
-    val createdConfig = OAuthConfig().apply {
+    val createdConfig = DefaultOAuthConfig().apply {
         redirectUrl = defaultRedirectUrl()
         config()
     }
