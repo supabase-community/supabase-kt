@@ -1,5 +1,6 @@
 package io.github.jan.supabase.auth.native
 
+import io.github.jan.supabase.auth.AuthConfig
 import io.github.jan.supabase.auth.native.external.server.HttpCallbackHtml
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
@@ -11,8 +12,8 @@ actual class PlatformNativeAuthConfig actual constructor() : DefaultNativeAuthCo
     /**
      * Configures the http callback for the web server, when logging in with OAuth or SSO.
      */
-    fun httpCallbackConfig(block: HttpCallbackConfig.() -> Unit) {
-        httpCallbackConfig = HttpCallbackConfig().apply(block)
+    fun AuthConfig.httpCallbackConfig(block: HttpCallbackConfig.() -> Unit) {
+        platformConfig().httpCallbackConfig = HttpCallbackConfig().apply(block)
     }
 
 }
@@ -31,3 +32,4 @@ data class HttpCallbackConfig(
     var htmlTitle: String = "Supabase Auth",
     var redirectHtml: String = HttpCallbackHtml.redirectPage("https://supabase.com/brand-assets/supabase-logo-icon.png", "Supabase Auth", "Logged in. You may continue in your app")
 )
+

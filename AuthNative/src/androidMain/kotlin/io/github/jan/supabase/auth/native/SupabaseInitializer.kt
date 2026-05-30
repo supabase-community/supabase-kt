@@ -1,4 +1,4 @@
-package io.github.jan.supabase.auth.native.external
+package io.github.jan.supabase.auth.native
 
 import android.content.Context
 import androidx.startup.Initializer

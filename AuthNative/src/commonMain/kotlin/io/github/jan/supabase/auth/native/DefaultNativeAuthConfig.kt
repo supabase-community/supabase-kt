@@ -24,3 +24,7 @@ expect class PlatformNativeAuthConfig(): DefaultNativeAuthConfig
 @SupabaseInternal fun AuthConfig.platformConfigOrNull(): PlatformNativeAuthConfig? = this.nativeAuthConfig as? PlatformNativeAuthConfig
 
 @SupabaseInternal fun AuthConfig.platformConfig() = platformConfigOrNull() ?: error("Native Auth not initialized")
+
+inline fun AuthConfig.nativeConfig(config: PlatformNativeAuthConfig.() -> Unit) {
+    platformConfig().apply(config)
+}

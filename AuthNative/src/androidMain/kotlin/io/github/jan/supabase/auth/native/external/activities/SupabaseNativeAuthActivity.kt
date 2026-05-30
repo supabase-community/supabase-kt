@@ -17,6 +17,7 @@ import io.github.jan.supabase.auth.native.external.google.GoogleCredentialResult
 import io.github.jan.supabase.auth.native.external.google.GoogleDialogType
 import io.github.jan.supabase.auth.native.external.google.getGoogleBottomSheetOptions
 import io.github.jan.supabase.auth.native.external.google.getGoogleButtonOptions
+import io.github.jan.supabase.auth.native.hash
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.launch
@@ -47,11 +48,11 @@ class SupabaseNativeAuthActivity: SupabaseAuthActivity() {
 
     private fun handleIntent(intent: Intent) {
         val googleClientId = intent.getStringExtra(EXTRA_CLIENT_ID) ?: return returnWithError("No client id provided")
-        val nonce = intent.getStringExtra(EXTRA_NONCE) ?: return returnWithError("No nonce provided")
+        val hashedNonce = intent.getStringExtra(EXTRA_NONCE)?.hash() ?: return returnWithError("No nonce provided")
         val type = intent.getStringExtra(EXTRA_DIALOG_TYPE)?.let { GoogleDialogType.valueOf(it) } ?: return returnWithError("No type provided")
         lifecycleScope.launch {
             val result = try {
-                val response = makeRequest(googleClientId, nonce, type = type)
+                val response = makeRequest(googleClientId, hashedNonce, type = type)
                 if(response != null) parseCredential(response.credential) else GoogleCredentialResult.ClosedByUser
             } catch(e: Exception) {
                 GoogleCredentialResult.Error(e.localizedMessage ?: "Error", e)
@@ -91,10 +92,12 @@ class SupabaseNativeAuthActivity: SupabaseAuthActivity() {
         return try {
             tryRequest(clientId, nonce, true, type)
         } catch(e: GetCredentialException) {
+            e.printStackTrace()
             if(type == GoogleDialogType.BOTTOM_SHEET) {
                 tryRequest(clientId, nonce, false, type)
             } else null
         } catch(e: GetCredentialCancellationException) {
+            e.printStackTrace()
             null
         }
     }
