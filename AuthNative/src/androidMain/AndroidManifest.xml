@@ -16,7 +16,7 @@
                 android:exported="false"
                 tools:node="merge">
             <meta-data
-                    android:name="io.github.jan.supabase.auth.SupabaseInitializer"
+                    android:name="io.github.jan.supabase.auth.native.SupabaseInitializer"
                     android:value="androidx.startup" />
         </provider>
 
@@ -34,6 +34,17 @@
                 <data
                         android:scheme="${supabaseAuthScheme}"
                         android:host="${supabaseAuthHost}" />
+            </intent-filter>
+
+        </activity>
+        <activity
+                android:name="io.github.jan.supabase.auth.native.external.activities.SupabaseNativeAuthActivity"
+                android:exported="true"
+                android:theme="@android:style/Theme.Translucent.NoTitleBar">
+
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
 
         </activity>

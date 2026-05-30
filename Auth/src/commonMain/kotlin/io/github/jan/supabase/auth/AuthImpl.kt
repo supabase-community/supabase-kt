@@ -289,35 +289,6 @@ internal class AuthImpl(
         return session
     }
 
-//    override suspend fun linkIdentity(
-//        provider: OAuthProvider,
-//        redirectUrl: String?,
-//        config: OAuthConfig.() -> Unit
-//    ): String? {
-//       // val automaticallyOpen = OAuthConfig().apply(config).automaticallyOpenUrl TODO: maybe also move this method
-//        val fetchUrl: suspend (String?) -> String = { redirectTo: String? ->
-//            val url = getOAuthUrl(provider, redirectTo, "user/identities/authorize", config)
-//            val response = userApi.rawRequest(url) {
-//                method = HttpMethod.Get
-//                parameter("skip_http_redirect", true)
-//            }
-//            response.safeBody<JsonObject>()["url"]?.jsonPrimitive?.contentOrNull ?: error("No URL found in response")
-//        }
-//        if(!automaticallyOpen) {
-//            return fetchUrl(redirectUrl ?: "")
-//        }
-//        startExternalAuth(
-//            redirectUrl = redirectUrl,
-//            getUrl = {
-//                fetchUrl(it)
-//            },
-//            onSessionSuccess = {
-//                importSession(it, source = SessionSource.UserIdentitiesChanged(it))
-//            }
-//        )
-//        return null
-//    }
-
     override suspend fun linkIdentityWithIdToken(
         provider: IDTokenProvider,
         idToken: String,

@@ -1,5 +1,6 @@
 package io.github.jan.supabase.auth.native
 
+import io.github.jan.supabase.auth.AuthConfig
 import io.github.jan.supabase.auth.native.external.ExternalAuthAction
 
 actual class PlatformNativeAuthConfig actual constructor(): DefaultNativeAuthConfig() {
@@ -11,8 +12,8 @@ actual class PlatformNativeAuthConfig actual constructor(): DefaultNativeAuthCon
 
     @PublishedApi internal val nativeAuthConfig: NativeAuthConfig = NativeAuthConfig()
 
-    inline fun nativeAuth(config: NativeAuthConfig.() -> Unit) {
-        nativeAuthConfig.apply(config)
+    inline fun AuthConfig.nativeAuth(config: NativeAuthConfig.() -> Unit) {
+        platformConfig().nativeAuthConfig.apply(config)
     }
 
 }

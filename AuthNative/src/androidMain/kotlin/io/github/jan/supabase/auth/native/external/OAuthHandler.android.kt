@@ -5,6 +5,7 @@ import android.net.Uri
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.auth.Auth
 import io.github.jan.supabase.auth.auth
+import io.github.jan.supabase.auth.native.applicationContext
 import io.github.jan.supabase.auth.native.external.activities.SupabaseAuthDispatcherActivity
 import io.github.jan.supabase.auth.native.platformConfig
 import io.github.jan.supabase.auth.user.UserSession
