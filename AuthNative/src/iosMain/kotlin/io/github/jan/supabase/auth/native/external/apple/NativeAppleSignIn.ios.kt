@@ -42,7 +42,10 @@ actual suspend fun Auth.signInWithApple(config: AppleSignInConfig.() -> Unit): A
             throw exception
         }
         is AppleCredentialResult.Success -> {
-            signInConfig = AppleSignInConfig(result.idToken).apply(config)
+            signInConfig = AppleSignInConfig(result.idToken).apply {
+                config()
+                this.nonce = nonce
+            }
             val session = signInWithIdToken(signInConfig)
             AppleSignInResult(session, result.credential)
         }

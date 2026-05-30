@@ -15,6 +15,7 @@ interface IdTokenConfig {
 
 }
 
+@Serializable
 open class DefaultIdTokenConfig(
     @SerialName("provider")
     override val provider: IDTokenProvider,

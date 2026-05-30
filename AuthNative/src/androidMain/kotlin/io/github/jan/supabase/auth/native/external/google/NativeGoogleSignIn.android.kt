@@ -4,9 +4,9 @@ import android.content.Intent
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import io.github.jan.supabase.auth.Auth
 import io.github.jan.supabase.auth.native.AuthFlowManager
+import io.github.jan.supabase.auth.native.applicationContext
 import io.github.jan.supabase.auth.native.external.NativeSignInCancelledException
 import io.github.jan.supabase.auth.native.external.activities.SupabaseNativeAuthActivity
-import io.github.jan.supabase.auth.native.external.applicationContext
 import io.github.jan.supabase.auth.native.platformConfig
 import io.github.jan.supabase.auth.user.UserSession
 import io.ktor.util.generateNonce
@@ -18,10 +18,11 @@ actual suspend fun Auth.signWithGoogle(config: GoogleSignInConfig.() -> Unit): G
     var signInConfig = GoogleSignInConfig("--").apply(config)
     val googleClientId = this.config.platformConfig().nativeAuthConfig.googleClientId ?: error("No google client id set in config")
     val deferred = AuthFlowManager.prepareSignInWait()
+    if(signInConfig.nonce == null) signInConfig.nonce = generateNonce()
     val intent = Intent(context, SupabaseNativeAuthActivity::class.java).apply {
         putExtra(SupabaseNativeAuthActivity.EXTRA_CLIENT_ID, googleClientId)
         putExtra(SupabaseNativeAuthActivity.EXTRA_DIALOG_TYPE, signInConfig.type.name)
-        putExtra(SupabaseNativeAuthActivity.EXTRA_NONCE, signInConfig.nonce ?: generateNonce())
+        putExtra(SupabaseNativeAuthActivity.EXTRA_NONCE, signInConfig.nonce)
         addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
     }
     context.startActivity(intent)
@@ -31,7 +32,10 @@ actual suspend fun Auth.signWithGoogle(config: GoogleSignInConfig.() -> Unit): G
             throw exception
         }
         is GoogleCredentialResult.Success -> {
-            signInConfig = GoogleSignInConfig(result.credential.idToken).apply(config)
+            signInConfig = GoogleSignInConfig(result.credential.idToken).apply {
+                config()
+                nonce = signInConfig.nonce
+            }
             val session = signInWithIdToken(signInConfig)
             return GoogleSignInResult(session, result.credential)
         }

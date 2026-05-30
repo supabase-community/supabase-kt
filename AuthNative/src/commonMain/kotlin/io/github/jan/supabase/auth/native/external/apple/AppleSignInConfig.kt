@@ -1,4 +1,4 @@
-package io.github.jan.supabase.auth.native.external.google
+package io.github.jan.supabase.auth.native.external.apple
 
 import io.github.jan.supabase.auth.DefaultIdTokenConfig
 import io.github.jan.supabase.auth.DefaultOAuthConfig
@@ -11,27 +11,22 @@ import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 
-@Serializable(with = GoogleSignInConfigSerializer::class)
-class GoogleSignInConfig(token: String):
-    IdTokenConfig by DefaultIdTokenConfig(OAuthProviders.GOOGLE, token),
+@Serializable(with = AppleSignInConfigSerializer::class)
+class AppleSignInConfig(token: String):
+    IdTokenConfig by DefaultIdTokenConfig(OAuthProviders.APPLE, token),
     OAuthConfig by DefaultOAuthConfig()
-{
 
-    var type: GoogleDialogType = GoogleDialogType.DIALOG
-
-}
-
-object GoogleSignInConfigSerializer : KSerializer<GoogleSignInConfig> {
+object AppleSignInConfigSerializer : KSerializer<AppleSignInConfig> {
     override val descriptor: SerialDescriptor = DefaultIdTokenConfig.serializer().descriptor
 
-    override fun serialize(encoder: Encoder, value: GoogleSignInConfig) {
+    override fun serialize(encoder: Encoder, value: AppleSignInConfig) {
         val idTokenDelegate = value.toIdTokenConfig()
         encoder.encodeSerializableValue(DefaultIdTokenConfig.serializer(), idTokenDelegate)
     }
 
-    override fun deserialize(decoder: Decoder): GoogleSignInConfig {
+    override fun deserialize(decoder: Decoder): AppleSignInConfig {
         throw UnsupportedOperationException()
     }
 
-    private fun GoogleSignInConfig.toIdTokenConfig() = DefaultIdTokenConfig(provider, token, accessToken, nonce, captchaToken, linkIdentity)
+    private fun AppleSignInConfig.toIdTokenConfig() = DefaultIdTokenConfig(provider, token, accessToken, nonce, captchaToken, linkIdentity)
 }

@@ -15,9 +15,6 @@
                 android:authorities="${applicationId}.androidx-startup"
                 android:exported="false"
                 tools:node="merge">
-            <meta-data
-                    android:name="io.github.jan.supabase.auth.SupabaseInitializer"
-                    android:value="androidx.startup" />
         </provider>
 
         <activity
