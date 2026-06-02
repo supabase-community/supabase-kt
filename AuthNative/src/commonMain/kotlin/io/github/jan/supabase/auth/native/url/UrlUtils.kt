@@ -2,7 +2,6 @@ package io.github.jan.supabase.auth.native.url
 
 import io.github.jan.supabase.annotations.SupabaseInternal
 import io.github.jan.supabase.auth.Auth
-import io.github.jan.supabase.auth.status.SessionSource
 import io.github.jan.supabase.auth.tryToGetUser
 import io.github.jan.supabase.auth.user.UserSession
 import kotlinx.coroutines.launch

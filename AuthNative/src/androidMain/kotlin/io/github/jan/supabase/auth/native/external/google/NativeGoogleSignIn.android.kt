@@ -5,13 +5,11 @@ import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import io.github.jan.supabase.auth.Auth
 import io.github.jan.supabase.auth.native.AuthFlowManager
 import io.github.jan.supabase.auth.native.applicationContext
-import io.github.jan.supabase.auth.native.external.NativeSignInCancelledException
 import io.github.jan.supabase.auth.native.external.activities.SupabaseNativeAuthActivity
 import io.github.jan.supabase.auth.native.platformConfig
-import io.github.jan.supabase.auth.user.UserSession
 import io.ktor.util.generateNonce
 
-actual class GoogleSignInResult(actual val session: UserSession, val credential: GoogleIdTokenCredential)
+actual typealias GoogleCredential = GoogleIdTokenCredential
 
 actual suspend fun Auth.signWithGoogle(config: GoogleSignInConfig.() -> Unit): GoogleSignInResult {
     val context = applicationContext()
@@ -26,7 +24,7 @@ actual suspend fun Auth.signWithGoogle(config: GoogleSignInConfig.() -> Unit): G
         addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
     }
     context.startActivity(intent)
-    when(val result = deferred.await()) {
+    return when(val result = deferred.await()) {
         is GoogleCredentialResult.Error -> {
             val exception = result.exception ?: error(result.message)
             throw exception
@@ -37,9 +35,9 @@ actual suspend fun Auth.signWithGoogle(config: GoogleSignInConfig.() -> Unit): G
                 nonce = signInConfig.nonce
             }
             val session = signInWithIdToken(signInConfig)
-            return GoogleSignInResult(session, result.credential)
+            GoogleSignInResult.Success(session, result.credential)
         }
 
-        GoogleCredentialResult.ClosedByUser -> throw NativeSignInCancelledException()
+        GoogleCredentialResult.ClosedByUser -> GoogleSignInResult.Cancelled
     }
 }

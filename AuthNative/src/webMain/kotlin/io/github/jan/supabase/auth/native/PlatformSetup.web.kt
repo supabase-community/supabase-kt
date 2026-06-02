@@ -8,7 +8,6 @@ import io.github.jan.supabase.auth.native.url.consumeHashParameters
 import io.github.jan.supabase.auth.native.url.consumeUrlParameter
 import io.github.jan.supabase.auth.native.url.handledUrlParameterError
 import io.github.jan.supabase.auth.native.url.validateHash
-import io.github.jan.supabase.auth.status.SessionSource
 import io.github.jan.supabase.auth.tryToGetUser
 import io.github.jan.supabase.auth.user.UserSession
 import io.github.jan.supabase.logging.d

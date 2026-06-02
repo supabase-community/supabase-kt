@@ -1,9 +1,7 @@
 package io.github.jan.supabase.auth.native.external.apple
 
 import io.github.jan.supabase.auth.Auth
-import io.github.jan.supabase.auth.native.external.NativeSignInCancelledException
 import io.github.jan.supabase.auth.native.hash
-import io.github.jan.supabase.auth.user.UserSession
 import io.ktor.util.generateNonce
 import kotlinx.cinterop.BetaInteropApi
 import kotlinx.coroutines.CompletableDeferred
@@ -13,7 +11,7 @@ import platform.AuthenticationServices.ASAuthorizationController
 import platform.AuthenticationServices.ASAuthorizationScopeEmail
 import platform.AuthenticationServices.ASAuthorizationScopeFullName
 
-actual class AppleSignInResult(actual val session: UserSession, val credential: ASAuthorizationAppleIDCredential)
+actual typealias AppleCredential = ASAuthorizationAppleIDCredential
 
 @OptIn(BetaInteropApi::class)
 actual suspend fun Auth.signInWithApple(config: AppleSignInConfig.() -> Unit): AppleSignInResult {
@@ -47,8 +45,8 @@ actual suspend fun Auth.signInWithApple(config: AppleSignInConfig.() -> Unit): A
                 this.nonce = nonce
             }
             val session = signInWithIdToken(signInConfig)
-            AppleSignInResult(session, result.credential)
+            AppleSignInResult.Success(session, result.credential)
         }
-        AppleCredentialResult.ClosedByUser -> throw NativeSignInCancelledException()
+        AppleCredentialResult.ClosedByUser -> AppleSignInResult.Cancelled
     }
 }
