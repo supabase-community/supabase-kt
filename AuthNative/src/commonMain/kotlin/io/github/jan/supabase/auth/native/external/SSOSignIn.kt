@@ -45,7 +45,7 @@ suspend fun Auth.signInWithSSO(
     startOAuthSession(
         redirectUrl = SSOConfig(identifier).apply(config).redirectTo,
         getUrl = {
-            retrieveSSOUrl(identifier, config)
+            getSSOUrl(identifier, config)
         },
         onSessionSuccess = {
             importSession(it)

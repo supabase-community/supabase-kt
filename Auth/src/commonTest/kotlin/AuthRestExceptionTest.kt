@@ -7,7 +7,7 @@ import io.github.jan.supabase.auth.exception.AuthRestException
 import io.github.jan.supabase.auth.exception.AuthSessionMissingException
 import io.github.jan.supabase.auth.exception.AuthWeakPasswordException
 import io.github.jan.supabase.auth.minimalConfig
-import io.github.jan.supabase.auth.providers.builtin.Email
+import io.github.jan.supabase.auth.providers.Email
 import io.github.jan.supabase.exceptions.BadRequestRestException
 import io.github.jan.supabase.exceptions.UnauthorizedRestException
 import io.github.jan.supabase.exceptions.UnknownRestException
@@ -56,7 +56,7 @@ class AuthRestExceptionTest {
                 }
             )
             val exception = assertFailsWith<AuthRestException> {
-                client.signUp()
+                client.auth.signUp(Email("example@email.com"), "password")
             }
             assertEquals("error_code", exception.error)
             assertEquals("error_message", exception.errorDescription)
@@ -85,7 +85,7 @@ class AuthRestExceptionTest {
                 }
             )
             val exception = assertFailsWith<AuthWeakPasswordException> {
-                client.signUp()
+                client.auth.signUp(Email("example@email.com"), "password")
             }
             assertEquals("weak_password", exception.error)
             assertEquals("error_message", exception.errorDescription)
@@ -108,7 +108,7 @@ class AuthRestExceptionTest {
                 }
             )
             val exception = assertFails {
-                client.signUp()
+                client.auth.signUp(Email("example@email.com"), "password")
             }
             assertIsNot<AuthRestException>(exception)
             assertIs<BadRequestRestException>(exception)

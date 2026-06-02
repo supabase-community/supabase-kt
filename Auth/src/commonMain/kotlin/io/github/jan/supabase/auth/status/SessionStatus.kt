@@ -22,30 +22,17 @@ sealed interface SessionStatus {
     data object Initializing : SessionStatus
 
     /**
-     * This status means the session expired and [Auth] is trying to refresh it
-     * @param cause The cause of the error. This property will be removed in a future version. Use the new AuthEvent.RefreshFailure(cause) event to diagnose failures.
+     * This status means the session expired and [Auth] failed to refresh it. This does not mean the user is signed out, you just cannot do authenticated requests, until the refresh went through.
      */
-    data class RefreshFailure(
-        @Deprecated("This property will be removed in a future version. Use the new AuthEvent.RefreshFailure(cause) event to diagnose failures.")
-        val cause: RefreshFailureCause
-    ) : SessionStatus
+    data object SessionExpired : SessionStatus
 
     /**
      * This status means that [Auth] holds a valid session
      * @param session The session
-     * @param source The source of the session
      */
     data class Authenticated(
         val session: UserSession,
-        val source: SessionSource = SessionSource.Unknown
-    ) : SessionStatus {
-
-        /**
-         * Whether the session is new, i.e. [source] is [SessionSource.SignIn], [SessionSource.SignUp] or [SessionSource.External].
-         * Use this to determine whether this status is the result of a new sign in or sign up or just a session refresh.
-         */
-        val isNew: Boolean = source is SessionSource.SignIn || source is SessionSource.SignUp || source is SessionSource.External
-
-    }
+        val flag: SessionFlag
+    ): SessionStatus
 
 }
