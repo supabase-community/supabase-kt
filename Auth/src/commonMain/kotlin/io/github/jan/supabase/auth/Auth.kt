@@ -20,7 +20,7 @@ import io.github.jan.supabase.auth.providers.Phone
 import io.github.jan.supabase.auth.providers.PhoneSignInOtpConfig
 import io.github.jan.supabase.auth.providers.PhoneSignUpConfig
 import io.github.jan.supabase.auth.providers.SignInPasswordConfig
-import io.github.jan.supabase.auth.status.SessionSource
+import io.github.jan.supabase.auth.status.SessionFlag
 import io.github.jan.supabase.auth.status.SessionStatus
 import io.github.jan.supabase.auth.user.UserInfo
 import io.github.jan.supabase.auth.user.UserSession
@@ -200,7 +200,7 @@ interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
-    suspend fun retrieveSSOUrl(identifier: SSOIdentifier, config: SSOConfig.() -> Unit): String
+    suspend fun getSSOUrl(identifier: SSOIdentifier, config: SSOConfig.() -> Unit): String
 
     /**
      * Modifies the current user
@@ -329,7 +329,7 @@ interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
     /**
      * Imports a user session and starts auto-refreshing if [autoRefresh] is true
      */
-    suspend fun importSession(session: UserSession, autoRefresh: Boolean = config.alwaysAutoRefresh, source: SessionSource = SessionSource.Unknown)
+    suspend fun importSession(session: UserSession, autoRefresh: Boolean = config.alwaysAutoRefresh, flag: SessionFlag = SessionFlag.SIGN_IN)
 
     /**
      * Imports the jwt token and retrieves the user profile.
@@ -431,6 +431,11 @@ interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
         getOAuthUrl(provider, url, DefaultOAuthConfig().apply(additionalConfig))
 
     fun getOAuthUrl(provider: OAuthProvider, url: String = "authorize", additionalConfig: OAuthConfig): String
+
+    suspend fun getIdentityLinkingUrl(provider: OAuthProvider, additionalConfig: OAuthConfig): String
+
+    suspend fun getIdentityLinkingUrl(provider: OAuthProvider, additionalConfig: OAuthConfig.() -> Unit): String =
+        getIdentityLinkingUrl(provider, DefaultOAuthConfig().apply(additionalConfig))
 
     /**
      * Stops auto-refreshing the current session

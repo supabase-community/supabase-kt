@@ -5,7 +5,7 @@ import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.auth.exception.AuthRestException
 import io.github.jan.supabase.auth.exception.AuthWeakPasswordException
 import io.github.jan.supabase.auth.minimalConfig
-import io.github.jan.supabase.auth.providers.builtin.Email
+import io.github.jan.supabase.auth.providers.Email
 import io.github.jan.supabase.exceptions.BadRequestRestException
 import io.github.jan.supabase.testing.createMockedSupabaseClient
 import io.github.jan.supabase.testing.respondJson
@@ -49,10 +49,7 @@ class AuthRestExceptionTest {
                 }
             )
             val exception = assertFailsWith<AuthRestException> {
-                client.auth.signUpWith(Email) {
-                    email = "example@email.com"
-                    password = "password"
-                }
+                client.auth.signUp(Email("example@email.com"), "password")
             }
             assertEquals("error_code", exception.error)
             assertEquals("error_message", exception.errorDescription)
@@ -81,10 +78,7 @@ class AuthRestExceptionTest {
                 }
             )
             val exception = assertFailsWith<AuthWeakPasswordException> {
-                client.auth.signUpWith(Email) {
-                    email = "example@email.com"
-                    password = "password"
-                }
+                client.auth.signUp(Email("example@email.com"), "password")
             }
             assertEquals("weak_password", exception.error)
             assertEquals("error_message", exception.errorDescription)
@@ -107,10 +101,7 @@ class AuthRestExceptionTest {
                 }
             )
             val exception = assertFails {
-                client.auth.signUpWith(Email) {
-                    email = "example@email.com"
-                    password = "password"
-                }
+                client.auth.signUp(Email("example@email.com"), "password")
             }
             assertIsNot<AuthRestException>(exception)
             assertIs<BadRequestRestException>(exception)

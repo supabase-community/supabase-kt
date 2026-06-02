@@ -2,10 +2,10 @@ import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.auth.Auth
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.auth.minimalConfig
-import io.github.jan.supabase.auth.url.UrlValidationResult
-import io.github.jan.supabase.auth.url.consumeHashParameters
-import io.github.jan.supabase.auth.url.getFragmentParts
-import io.github.jan.supabase.auth.url.validateHash
+import io.github.jan.supabase.auth.native.url.UrlValidationResult
+import io.github.jan.supabase.auth.native.url.consumeHashParameters
+import io.github.jan.supabase.auth.native.url.getFragmentParts
+import io.github.jan.supabase.auth.native.url.validateHash
 import io.github.jan.supabase.testing.createMockedSupabaseClient
 import kotlinx.coroutines.test.runTest
 import kotlin.test.AfterTest

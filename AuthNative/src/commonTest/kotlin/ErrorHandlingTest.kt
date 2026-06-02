@@ -5,9 +5,9 @@ import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.auth.event.AuthEvent
 import io.github.jan.supabase.auth.exception.AuthErrorCode
 import io.github.jan.supabase.auth.minimalConfig
+import io.github.jan.supabase.auth.native.url.checkForUrlParameterError
+import io.github.jan.supabase.auth.native.url.handledUrlParameterError
 import io.github.jan.supabase.auth.status.SessionStatus
-import io.github.jan.supabase.auth.url.checkForUrlParameterError
-import io.github.jan.supabase.auth.url.handledUrlParameterError
 import io.github.jan.supabase.auth.user.UserSession
 import io.github.jan.supabase.testing.createMockedSupabaseClient
 import io.ktor.http.Url

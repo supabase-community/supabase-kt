@@ -51,6 +51,13 @@ kotlin {
         }
     }
     allTargets()
+   /* swiftPMDependencies {
+        swiftPackage(
+            url = url("https://github.com/google/GoogleSignIn-iOS.git"),
+            version = from("9.1.0"),
+            products = listOf(product("GoogleSignIn", platforms = setOf(iOS())))
+        )
+    }*/
     sourceSets {
         val commonMain by getting {
             dependencies {

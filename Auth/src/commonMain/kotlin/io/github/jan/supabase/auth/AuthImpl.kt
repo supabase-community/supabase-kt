@@ -38,7 +38,7 @@ import io.github.jan.supabase.auth.providers.PhoneSignInOtpConfig
 import io.github.jan.supabase.auth.providers.PhoneSignUpConfig
 import io.github.jan.supabase.auth.providers.SignInPasswordConfig
 import io.github.jan.supabase.auth.status.RefreshFailureCause
-import io.github.jan.supabase.auth.status.SessionSource
+import io.github.jan.supabase.auth.status.SessionFlag
 import io.github.jan.supabase.auth.status.SessionStatus
 import io.github.jan.supabase.auth.user.UserInfo
 import io.github.jan.supabase.auth.user.UserSession
@@ -61,6 +61,7 @@ import io.github.jan.supabase.supabaseJson
 import io.ktor.client.request.parameter
 import io.ktor.client.statement.HttpResponse
 import io.ktor.client.statement.bodyAsText
+import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.encodeURLParameter
 import kotlinx.coroutines.CoroutineScope
@@ -82,10 +83,12 @@ import kotlinx.io.bytestring.ByteString
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonObjectBuilder
 import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.contentOrNull
 import kotlinx.serialization.json.decodeFromJsonElement
 import kotlinx.serialization.json.encodeToJsonElement
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.put
 import kotlin.time.Clock
 import kotlin.time.Duration.Companion.minutes
@@ -226,7 +229,7 @@ internal class AuthImpl(
             if(identifier is Email && redirectUrl != null) redirectTo(redirectUrl)
         }.safeBody<JsonObject>()
         return decodeAuthResponse(response).also {
-            if(it.session != null) importIfEnabled(it.session)
+            if(it.session != null) importIfEnabled(it.session, flag = SessionFlag.SIGN_UP)
         }
     }
 
@@ -285,7 +288,7 @@ internal class AuthImpl(
             captchaToken?.let(::putCaptchaToken)
         })
         val session = response.safeBody<UserSession>()
-        importSession(session, source = SessionSource.AnonymousSignIn)
+        importSession(session, flag = SessionFlag.SIGN_IN)
         return session
     }
 
@@ -297,7 +300,7 @@ internal class AuthImpl(
         val body = DefaultIdTokenConfig(token = idToken, provider = provider, linkIdentity = true).apply(config)
         val result = userApi.postJson("token?grant_type=id_token", body)
         val session: UserSession = result.safeBody()
-        importIfEnabled(result.safeBody(), source = SessionSource.UserIdentitiesChanged(result.safeBody()))
+        importIfEnabled(result.safeBody(), flag = SessionFlag.IDENTITIES_CHANGED)
         return session
     }
 
@@ -307,21 +310,8 @@ internal class AuthImpl(
             val session = currentSessionOrNull() ?: return
             val newUser = session.user?.copy(identities = session.user.identities?.filter { it.identityId != identityId })
             val newSession = session.copy(user = newUser)
-            setSessionStatus(SessionStatus.Authenticated(newSession, SessionSource.UserIdentitiesChanged(session)))
+            setSessionStatus(SessionStatus.Authenticated(newSession, SessionFlag.IDENTITIES_CHANGED))
         }
-    }
-
-    override suspend fun retrieveSSOUrl(
-        identifier: SSOIdentifier,
-        config: SSOConfig.() -> Unit
-    ): String {
-        val createdConfig = SSOConfig(identifier).apply(config)
-        val codeChallenge: String? = preparePKCEIfEnabled()
-        return publicApi.postJson("sso", buildJsonObject {
-            codeChallenge?.let(::putCodeChallenge)
-            putJsonObject(createdConfig.encode())
-        })
-            .safeBody()
     }
 
     override suspend fun updateUser(
@@ -345,7 +335,7 @@ internal class AuthImpl(
             if (this.config.autoSaveToStorage) { // TODO: this looks sus
                 sessionManager.saveSession(newSession)
             }
-            setSessionStatus(SessionStatus.Authenticated(newSession, SessionSource.UserChanged(newSession)))
+            setSessionStatus(SessionStatus.Authenticated(newSession, SessionFlag.USER_CHANGED))
         }
         return userInfo
     }
@@ -542,7 +532,7 @@ internal class AuthImpl(
         val user = getUser(currentAccessTokenOrNull() ?: error("No session found"))
         if (updateSession) {
             val session = currentSessionOrNull() ?: error("No session found")
-            val newStatus = SessionStatus.Authenticated(session.copy(user = user), SessionSource.UserChanged(currentSessionOrNull() ?: error("Session shouldn't be null")))
+            val newStatus = SessionStatus.Authenticated(session.copy(user = user), SessionFlag.USER_CHANGED)
             setSessionStatus(newStatus)
             if (config.autoSaveToStorage) sessionManager.saveSession(newStatus.session)
         }
@@ -559,7 +549,7 @@ internal class AuthImpl(
             put("code_verifier", codeVerifier)
         }).safeBody<UserSession>()
         codeVerifierCache.deleteCodeVerifier()
-        importIfEnabled(session, source = SessionSource.External)
+        importIfEnabled(session, flag = SessionFlag.EXTERNAL)
         return session
     }
 
@@ -579,57 +569,57 @@ internal class AuthImpl(
             currentSessionOrNull()?.refreshToken
                 ?: error("No refresh token found in current session")
         )
-        importSession(newSession, source = SessionSource.Refresh(currentSessionOrNull() ?: error("No session found")))
+        importSession(newSession, flag = SessionFlag.REFRESH)
         updateRefreshInformation(null, Clock.System.now())
     }
 
     private suspend fun importIfEnabled(
         session: UserSession,
         autoRefresh: Boolean = config.alwaysAutoRefresh,
-        source: SessionSource = SessionSource.Unknown
-    ) = if(config.autoImportSession) importSession(session, autoRefresh, source) else Unit
+        flag: SessionFlag = SessionFlag.SIGN_IN
+    ) = if(config.autoImportSession) importSession(session, autoRefresh, flag) else Unit
 
     override suspend fun importSession(
         session: UserSession,
         autoRefresh: Boolean,
-        source: SessionSource
-    ) = importSession(session, autoRefresh, source, false)
+        flag: SessionFlag
+    ) = importSession(session, autoRefresh, flag, false)
 
     suspend fun importSession(
         session: UserSession,
         autoRefresh: Boolean,
-        source: SessionSource,
+        flag: SessionFlag,
         initializing: Boolean
     ) {
-        logger.d { "Importing session $session from $source, auto refresh is set to $autoRefresh." }
+        logger.d { "Importing session $session from $flag, auto refresh is set to $autoRefresh." }
         if (!autoRefresh) {
             if (session.refreshToken.isNotBlank() && session.expiresIn != 0L && config.autoSaveToStorage) {
                 sessionManager.saveSession(session)
                 logger.d { "Session saved to storage (no auto refresh)" }
             }
-            setSessionStatus(SessionStatus.Authenticated(session, source))
+            setSessionStatus(SessionStatus.Authenticated(session, flag))
             logger.d { "Session imported successfully." }
             return
         }
         val thresholdDate = session.expiresAt - session.expiresIn.seconds * (1 - SESSION_REFRESH_THRESHOLD)
         if (thresholdDate <= Clock.System.now()) {
             logger.d { "Session is under the threshold date. Refreshing session..." }
-            recreateSessionJob(session, source, false, initializing)
+            recreateSessionJob(session, flag, false, initializing)
         } else {
             if (config.autoSaveToStorage) {
                 sessionManager.saveSession(session)
                 logger.d { "Session saved to storage (auto refresh enabled)" }
             }
-            setSessionStatus(SessionStatus.Authenticated(session, source))
+            setSessionStatus(SessionStatus.Authenticated(session, flag))
             logger.d { "Session imported successfully. Starting auto refresh..." }
-            recreateSessionJob(session, source, true, initializing)
+            recreateSessionJob(session, flag, true, initializing)
             logger.d { "Auto refresh started." }
         }
     }
 
     private suspend fun recreateSessionJob(
         session: UserSession,
-        source: SessionSource,
+        flag: SessionFlag,
         delay: Boolean,
         initializing: Boolean
     ) {
@@ -638,7 +628,7 @@ internal class AuthImpl(
             if(delay) delayBeforeExpiry(session)
             tryImportingSession(
                 { handleExpiredSession(session, config.alwaysAutoRefresh) },
-                { importSession(session, source = source) },
+                { importSession(session, flag = flag) },
                 { updateStatusIfExpired(session, it) }
             )
         }
@@ -675,7 +665,7 @@ internal class AuthImpl(
     private fun updateStatusIfExpired(session: UserSession, reason: RefreshFailureCause) {
         if (session.expiresAt <= Clock.System.now()) {
             logger.d { "Session expired while trying to refresh the session. Updating status..." }
-            setSessionStatus(SessionStatus.RefreshFailure(reason))
+            setSessionStatus(SessionStatus.SessionExpired)
         }
         emitEvent(AuthEvent.RefreshFailure(reason))
     }
@@ -713,14 +703,14 @@ internal class AuthImpl(
             "Session expired. Refreshing session..."
         }
         val newSession = refreshSession(session.refreshToken)
-        importSession(newSession, autoRefresh, SessionSource.Refresh(session))
+        importSession(newSession, autoRefresh, SessionFlag.REFRESH)
     }
 
     override suspend fun startAutoRefreshForCurrentSession() =
         importSession(
             currentSessionOrNull() ?: error("No session found"),
             true,
-            (sessionStatus.value as SessionStatus.Authenticated).source
+            (sessionStatus.value as SessionStatus.Authenticated).flag
         )
 
     override fun stopAutoRefreshForCurrentSession() {
@@ -741,7 +731,7 @@ internal class AuthImpl(
             null
         }
         session?.let {
-            importSession(it, autoRefresh, SessionSource.Storage, initializing)
+            importSession(it, autoRefresh, SessionFlag.STORAGE, initializing)
         }
         return session != null
     }
@@ -810,6 +800,32 @@ internal class AuthImpl(
                 }
             }
         })
+    }
+
+    override suspend fun getIdentityLinkingUrl(provider: OAuthProvider, additionalConfig: OAuthConfig): String {
+        val url = getOAuthUrl(provider, "user/identities/authorize") {
+            redirectUrl = additionalConfig.redirectUrl
+            queryParams.putAll(additionalConfig.queryParams)
+            scopes.addAll(additionalConfig.scopes)
+        }
+        val response = userApi.rawRequest(url) {
+            method = HttpMethod.Get
+            parameter("skip_http_redirect", true)
+        }
+        return response.safeBody<JsonObject>()["url"]?.jsonPrimitive?.contentOrNull ?: error("No URL found in response")
+    }
+
+    override suspend fun getSSOUrl(
+        identifier: SSOIdentifier,
+        config: SSOConfig.() -> Unit
+    ): String {
+        val createdConfig = SSOConfig(identifier).apply(config)
+        val codeChallenge: String? = preparePKCEIfEnabled()
+        return publicApi.postJson("sso", buildJsonObject {
+            codeChallenge?.let(::putCodeChallenge)
+            putJsonObject(createdConfig.encode())
+        })
+            .safeBody<JsonObject>()["url"]?.jsonPrimitive?.contentOrNull ?: error("No URL found in response")
     }
 
     override fun defaultRedirectUrl(): String? {
