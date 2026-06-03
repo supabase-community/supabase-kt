@@ -18,12 +18,22 @@ import kotlin.time.Duration.Companion.seconds
 /**
  * The configuration for [Auth]
  */
-expect class AuthConfig() : AuthConfigDefaults
+class AuthConfig : AuthConfigDefaults()
+
+interface NativeAuthConfig {
+
+    suspend fun setupNativePlatform(auth: Auth)
+
+    fun defaultRedirectUrl(auth: Auth): String?
+
+}
 
 /**
  * The default values for the [AuthConfig]
  */
 open class AuthConfigDefaults : MainConfig(), AuthDependentPluginConfig, CustomSerializationConfig {
+
+    var nativeAuthConfig: NativeAuthConfig? = null
 
     /**
      * The duration after which [Auth] should retry refreshing a session, when it failed due to network issues
@@ -44,6 +54,11 @@ open class AuthConfigDefaults : MainConfig(), AuthDependentPluginConfig, CustomS
      * Whether to automatically save the session to [sessionManager], when the session changes
      */
     var autoSaveToStorage: Boolean = true
+
+    /**
+     * Whether to automatically import then session. This does not mean it is saved in the [sessionManager], it is just imported into [Auth.sessionStatus].
+      */
+    var autoImportSession: Boolean = true
 
     /**
      * The session manager used to store/load the session. When null, the default [io.github.jan.supabase.auth.SettingsSessionManager] will be used
@@ -75,20 +90,6 @@ open class AuthConfigDefaults : MainConfig(), AuthDependentPluginConfig, CustomS
     override var serializer: SupabaseSerializer? = null
 
     /**
-     * The deeplink scheme used for the implicit and PKCE flow. When null, deeplinks won't be used as redirect urls
-     *
-     * **Note:** Deeplinks are only used as redirect urls on Android and Apple platforms. Other platforms will use their own default redirect url.
-     */
-    var scheme: String? = null
-
-    /**
-     * The deeplink host used for the implicit and PKCE flow. When null, deeplinks won't be used as redirect urls
-     *
-     * **Note:** Deeplinks are only used as redirect urls on Android and Apple platforms. Other platforms will use their own default redirect url.
-     */
-    var host: String? = null
-
-    /**
      * The default redirect url used for authentication. When null, a platform specific default redirect url will be used.
      *
      * On Android and Apple platforms, the default redirect url is the deeplink.
@@ -105,12 +106,6 @@ open class AuthConfigDefaults : MainConfig(), AuthDependentPluginConfig, CustomS
      * Currently only supported on Android.
      */
     var enableLifecycleCallbacks: Boolean = true
-
-    /**
-     * The URL launcher used to open OAuth links in the system browser.
-     */
-    @SupabaseExperimental
-    var urlLauncher: UrlLauncher = UrlLauncher.DEFAULT
 
     /**
      * Whether to automatically set up the current platform. For testing.
@@ -156,53 +151,4 @@ enum class FlowType {
      * Note: OTP's via a link and sign up verification links are not supported on desktop. Replace your email template to send the token instead.
      */
     PKCE
-}
-
-/**
- * The deeplink used for the implicit and PKCE flow. Throws an [IllegalArgumentException], if either the scheme or host is not set
- */
-@Suppress("unused")
-val AuthConfig.deepLink: String
-    get() {
-        val scheme = scheme ?: noDeeplinkError("scheme")
-        val host = host ?: noDeeplinkError("host")
-        return "${scheme}://${host}"
-    }
-
-/**
- * The deeplink used for the implicit and PKCE flow. Returns null, if either the scheme or host is not set
- */
-val AuthConfig.deepLinkOrNull: String?
-    get() {
-        val scheme = scheme ?: return null
-        val host = host ?: return null
-        return "${scheme}://${host}"
-    }
-
-/**
- * Applies minimal settings to the [AuthConfig]. This is useful for server side applications, where you don't need to store the session or code verifier.
- * @param alwaysAutoRefresh Whether to always automatically refresh the session, when it expires
- * @param autoLoadFromStorage Whether to automatically load the session from [sessionManager], when [Auth] is initialized
- * @param autoSaveToStorage Whether to automatically save the session to [sessionManager], when the session changes
- * @param sessionManager The session manager used to store/load the session.
- * @param codeVerifierCache The cache used to store/load the code verifier for the [FlowType.PKCE] flow.
- * @param enableLifecycleCallbacks Whether to stop auto-refresh on focus loss, and resume it on focus again. Currently only supported on Android.
- * @see AuthConfigDefaults
- */
-@Deprecated("Use the new minimalConfig function instead", ReplaceWith("minimalConfig()"))
-@Suppress("LongParameterList", "unused")
-fun AuthConfigDefaults.minimalSettings(
-    alwaysAutoRefresh: Boolean = false,
-    autoLoadFromStorage: Boolean = false,
-    autoSaveToStorage: Boolean = false,
-    sessionManager: SessionManager? = MemorySessionManager(),
-    codeVerifierCache: CodeVerifierCache? = MemoryCodeVerifierCache(),
-    enableLifecycleCallbacks: Boolean = false
-) {
-    this.alwaysAutoRefresh = alwaysAutoRefresh
-    this.autoLoadFromStorage = autoLoadFromStorage
-    this.autoSaveToStorage = autoSaveToStorage
-    this.sessionManager = sessionManager
-    this.codeVerifierCache = codeVerifierCache
-    this.enableLifecycleCallbacks = enableLifecycleCallbacks
 }

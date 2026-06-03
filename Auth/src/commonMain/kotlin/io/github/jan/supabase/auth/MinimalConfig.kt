@@ -8,6 +8,7 @@ fun AuthConfigDefaults.minimalConfig() {
     this.alwaysAutoRefresh = false
     this.autoLoadFromStorage = false
     this.autoSaveToStorage = false
+    this.autoImportSession = false
     this.sessionManager = MemorySessionManager()
     this.codeVerifierCache = MemoryCodeVerifierCache()
     this.enableLifecycleCallbacks = false

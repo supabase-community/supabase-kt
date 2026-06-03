@@ -2,6 +2,7 @@ plugins {
    // alias(libs.plugins.complete.kotlin)
     id(libs.plugins.kotlin.multiplatform.get().pluginId)
     id(libs.plugins.android.kotlin.multiplatform.library.get().pluginId)
+    id("kotlin-parcelize")
 }
 
 description = "Extends supabase-kt with a Auth Client"
@@ -16,21 +17,6 @@ kotlin {
     applyDefaultHierarchyTemplate {
         common {
             settingsGroup()
-            group("desktop") {
-                withJvm()
-                withMacos()
-                withLinux()
-                withMingw()
-            }
-            group("nonDesktop") {
-                //withAndroidTarget() android has its own implementation
-                withIos()
-                withTvos()
-                withWatchos()
-                //withMingw()
-                withJs()
-                withWasmJs()
-            }
         }
     }
     allTargets()
@@ -46,12 +32,6 @@ kotlin {
                 implementation(libs.crypto.optimal)
             }
         }
-        val desktopMain by getting {
-            dependencies {
-                api(libs.ktor.server.core)
-                api(libs.ktor.server.cio)
-            }
-        }
         val settingsMain by getting {
             dependencies {
                 api(libs.bundles.multiplatform.settings)
@@ -64,12 +44,7 @@ kotlin {
                 implementation(project(":test-common"))
             }
         }
-        val androidMain by getting {
-            dependencies {
-                api(libs.androidx.startup.runtime)
-                api(libs.androidx.browser)
-            }
-        }
+        val androidMain by getting
         val webMain by getting {
             dependencies {
                 api(libs.kotlinx.browser)

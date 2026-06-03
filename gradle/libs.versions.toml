@@ -1,5 +1,5 @@
 [versions]
-kotlin = "2.3.21"
+kotlin = "2.4.0-RC2"
 accompanist-permissions = "0.37.3"
 ktor = "3.4.3"
 dokka = "2.2.0"
@@ -33,6 +33,8 @@ immutable-collections = "0.4.0"
 crypto = "0.6.0"
 jwt-kt = "1.2.1"
 supabase-kt-plugins = "3.6.0" # https://github.com/supabase-community/supabase-kt-plugins
+credentials = "1.6.0"
+googleid = "1.2.0"
 
 [plugins]
 kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
@@ -76,15 +78,9 @@ ktor-client-content-negotiation = { module = "io.ktor:ktor-client-content-negoti
 ktor-client-websockets = { module = "io.ktor:ktor-client-websockets", version.ref = "ktor" }
 ktor-client-mock = { module = "io.ktor:ktor-client-mock", version.ref = "ktor" }
 ktor-json = { module = "io.ktor:ktor-serialization-kotlinx-json", version.ref = "ktor" }
-ktor-server-core = { module = "io.ktor:ktor-server-core", version.ref = "ktor" }
-ktor-server-cio = { module = "io.ktor:ktor-server-cio", version.ref = "ktor" }
 
 kermit = { module = "co.touchlab:kermit", version.ref = "kermit" }
 
-android-lifecycle-process = { module = "androidx.lifecycle:lifecycle-process", version.ref = "android-lifecycle" }
-androidx-browser = { module = "androidx.browser:browser", version.ref = "browser" }
-androidx-startup-runtime = { module = "androidx.startup:startup-runtime", version.ref = "androidx-startup" }
-androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activity-compose" }
 androidx-core = { module = "androidx.core:core-ktx", version.ref = "androidx-core" }
 androidx-compat = { module = "androidx.appcompat:appcompat", version.ref = "androidx-compat" }
 androidx-lifecycle-viewmodel-ktx = { module = "androidx.lifecycle:lifecycle-viewmodel-ktx", version.ref = "androidx-lifecycle" }
@@ -121,6 +117,17 @@ coil2-svg = { module = "io.coil-kt:coil-svg", version.ref = "coil2" }
 coil2-compose = { module = "io.coil-kt:coil-compose", version.ref = "coil2" }
 compose-auth = { module = "io.github.jan-tennert.supabase:compose-auth", version.ref = "supabase-kt-plugins" }
 compose-auth-ui = { module = "io.github.jan-tennert.supabase:compose-auth-ui", version.ref = "supabase-kt-plugins" }
+
+# Auth Native
+android-google-id = { module = "com.google.android.libraries.identity.googleid:googleid", version.ref = "googleid" }
+androidx-credentials = { module = "androidx.credentials:credentials", version.ref = "credentials" }
+androidx-credentials-play-services = { module = "androidx.credentials:credentials-play-services-auth", version.ref = "credentials" }
+android-lifecycle-process = { module = "androidx.lifecycle:lifecycle-process", version.ref = "android-lifecycle" }
+androidx-browser = { module = "androidx.browser:browser", version.ref = "browser" }
+androidx-startup-runtime = { module = "androidx.startup:startup-runtime", version.ref = "androidx-startup" }
+androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activity-compose" }
+ktor-server-core = { module = "io.ktor:ktor-server-core", version.ref = "ktor" }
+ktor-server-cio = { module = "io.ktor:ktor-server-cio", version.ref = "ktor" }
 
 [bundles]
 ktor-client = ["ktor-client-core", "ktor-client-content-negotiation", "ktor-json"]

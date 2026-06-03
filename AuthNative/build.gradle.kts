@@ -1,0 +1,96 @@
+plugins {
+   // alias(libs.plugins.complete.kotlin)
+    id(libs.plugins.kotlin.multiplatform.get().pluginId)
+    id(libs.plugins.android.kotlin.multiplatform.library.get().pluginId)
+    id("kotlin-parcelize")
+}
+
+description = "Extends supabase-kt with a Native Auth, OAuth and Passkey functionality"
+
+repositories {
+    mavenCentral()
+}
+
+@OptIn(org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi::class)
+kotlin {
+    defaultConfig()
+    applyDefaultHierarchyTemplate {
+        common {
+            group("desktop") {
+                withJvm()
+                withMacos()
+                withLinux()
+                withMingw()
+            }
+            group("nonDesktop") {
+                //withAndroidTarget() android has its own implementation
+                withTvos()
+                withWatchos()
+                //withMingw()
+                withJs()
+                withWasmJs()
+            }
+            group("noRedirect") {
+                withTvos()
+                withWatchos()
+                withMacos()
+                withLinux()
+                withMingw()
+                withJvm()
+            }
+            group("noNative") {
+                withTvos()
+                withWatchos()
+                withLinux()
+                withMingw()
+                withJvm()
+                withWasmJs()
+                withJs()
+                withMacos()
+            }
+        }
+    }
+    allTargets()
+   /* swiftPMDependencies {
+        swiftPackage(
+            url = url("https://github.com/google/GoogleSignIn-iOS.git"),
+            version = from("9.1.0"),
+            products = listOf(product("GoogleSignIn", platforms = setOf(iOS())))
+        )
+    }*/
+    sourceSets {
+        val commonMain by getting {
+            dependencies {
+                addModules(SupabaseModule.AUTH)
+            }
+        }
+        val desktopMain by getting {
+            dependencies {
+                api(libs.ktor.server.core)
+                api(libs.ktor.server.cio)
+            }
+        }
+        val commonTest by getting {
+            dependencies {
+                implementation(libs.bundles.testing)
+                implementation(libs.turbine)
+                implementation(project(":test-common"))
+            }
+        }
+        val androidMain by getting {
+            dependencies {
+                api(libs.androidx.startup.runtime)
+                api(libs.androidx.browser)
+                api(libs.android.google.id)
+                api(libs.androidx.credentials)
+                api(libs.androidx.credentials.play.services)
+            }
+        }
+        val webMain by getting {
+            dependencies {
+                api(libs.kotlinx.browser)
+            }
+        }
+    }
+}
+
