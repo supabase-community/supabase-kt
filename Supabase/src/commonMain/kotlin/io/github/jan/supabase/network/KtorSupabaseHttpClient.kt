@@ -118,14 +118,16 @@ class KtorSupabaseHttpClient @SupabaseInternal constructor(
         if(supabaseKey.isNotBlank()) {
             append("apikey", supabaseKey)
         }
-        append("X-Client-Info", "supabase-kt/${BuildConfig.PROJECT_VERSION}")
-        osInformation?.let {
-            append("X-Supabase-Client-Platform", it.name)
-
-            it.version?.let { version ->
-                append("X-Supabase-Client-Platform-Version", version)
+        val metadata = buildMap {
+            osInformation?.let { os ->
+                put("platform", os.name)
+                os.version?.let { version ->
+                    put("platform-version", version)
+                }
             }
+            put("runtime", "kotlin")
         }
+        append("X-Client-Info", "supabase-kt/${BuildConfig.PROJECT_VERSION}" + metadata.toList().joinToString("; "))
     }
 
     private fun HttpClientConfig<*>.applyDefaultConfiguration(modifiers: List<HttpClientConfig<*>.() -> Unit>) {
