@@ -1,6 +1,7 @@
-package io.github.jan.supabase.integration
+package io.github.jan.supabase.integration.storage
 
 import io.github.jan.supabase.auth.auth
+import io.github.jan.supabase.integration.IntegrationTestBase
 import io.github.jan.supabase.storage.storage
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.Test
