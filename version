@@ -1,0 +1,5 @@
+<dependency>
+    <groupId>io.ktor</groupId>
+    <artifactId>ktor-client-[engine]</artifactId>
+    <version>KTOR_VERSION</version>
+</dependency>
