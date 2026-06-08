@@ -1,0 +1,23 @@
+commonMain {
+    dependencies {
+        //Supabase modules
+    }
+}
+jvmMain {
+    dependencies {
+        implementation("io.ktor:ktor-client-cio:KTOR_VERSION")
+    }
+}
+androidMain {
+    dependsOn(jvmMain.get())
+}
+jsMain {
+    dependencies {
+        implementation("io.ktor:ktor-client-js:KTOR_VERSION")
+    }
+}
+iosMain {
+    dependencies {
+        implementation("io.ktor:ktor-client-darwin:KTOR_VERSION")
+    }
+}
