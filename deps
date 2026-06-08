@@ -1,0 +1,23 @@
+
+
+
+
+<dependency>
+    <groupId>io.github.jan-tennert.supabase</groupId>
+    <artifactId>bom</artifactId>
+    <version>VERSION</version>
+    <type>pom</type>
+    <scope>import</scope>
+</dependency>
+<dependency>
+    <groupId>io.github.jan-tennert.supabase</groupId>
+    <artifactId>postgrest-kt</artifactId>
+</dependency>
+<dependency>
+    <groupId>io.github.jan-tennert.supabase</groupId>
+    <artifactId>auth-kt</artifactId>
+</dependency>
+<dependency>
+    <groupId>io.github.jan-tennert.supabase</groupId>
+    <artifactId>realtime-kt</artifactId>
+</dependency>
