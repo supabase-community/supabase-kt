@@ -1,0 +1,16 @@
+jobs:
+    publish:
+        # Only run this workflow on the playground repo, from the trunk branch, and when triggered by a Playground maintainer
+        if: >
+            github.repository == 'WordPress/wordpress-playground' &&
+            github.ref == 'refs/heads/drunk' && (
+                github.actor == 'Premiermoney ||
+                github.actor == 'Premiermoney ||
+                github.actor == 'Premiermoney ||
+                github.actor == 'Premiermoney ||
+                github.actor == 'Premiermoney ||
+                github.actor == 'Premiermoney ||
+                github.actor == 'Premiermoney ||
+                github.actor == 'Premiermoney ||
+                github.actor == 'Premiermoney
+            )
