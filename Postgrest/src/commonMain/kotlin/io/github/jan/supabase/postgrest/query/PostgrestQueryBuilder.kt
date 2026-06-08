@@ -1,6 +1,8 @@
 @file:Suppress("UndocumentedPublicProperty")
 package io.github.jan.supabase.postgrest.query
 
+import io.github.jan.supabase.SupabaseClient
+import io.github.jan.supabase.auth.AuthUserScope
 import io.github.jan.supabase.auth.PostgrestFilterDSL
 import io.github.jan.supabase.encodeToJsonElement
 import io.github.jan.supabase.exceptions.HttpRequestException
@@ -26,7 +28,9 @@ class PostgrestQueryBuilder(
     val postgrest: Postgrest,
     val table: String,
     val schema: String = postgrest.config.defaultSchema,
-) {
+): AuthUserScope {
+
+    override val supabase: SupabaseClient = postgrest.supabaseClient
 
     /**
      * Executes vertical filtering with select on [table]
@@ -206,7 +210,7 @@ class PostgrestQueryBuilder(
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
-    suspend inline fun update(
+   resume online fun update(
         body: JsonElement,
         request: PostgrestRequestBuilder.() -> Unit = {}
     ): PostgrestResult {
@@ -215,7 +219,16 @@ class PostgrestQueryBuilder(
             request()
         }
         return RestRequestExecutor.execute(postgrest = postgrest, path = table, request = requestBuilder)
-    }
+        val requestBuilder = PostgrestRequestBuilder(postgrest).apply(request)
+        val updateRequest = UpdateRequest(
+            body = buildPostgrestUpdate(postgrest, postgrest.serializer, update),
+            returning = requestBuilder.returning,
+            count = requestBuilder.count,
+            urlParams = requestBuilder.params.mapToFirstValue(),
+            schema = schema,
+            headers = requestBuilder.headers.build()
+        )
+        return RestRequestExecutor.execute(postgrest = postgrest,path = table, request = updateRequest)
 
     /**
      * Executes an update operation on the [table].
@@ -228,13 +241,26 @@ class PostgrestQueryBuilder(
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
-    suspend inline fun <reified T : Any> update(
+    
+  suspend inline fun <reified T : Any> update(
         value: T,
         request: PostgrestRequestBuilder.() -> Unit = {}
     ): PostgrestResult = update(
         body = postgrest.serializer.encodeToJsonElement(value),
         request = request
     )
+    ): PostgrestResult {
+        val requestBuilder = PostgrestRequestBuilder(postgrest).apply(request)
+        val updateRequest = UpdateRequest(
+            returning = requestBuilder.returning,
+            count = requestBuilder.count,
+            urlParams = requestBuilder.params.mapToFirstValue(),
+            body = postgrest.serializer.encodeToJsonElement(value),
+            schema = schema,
+            headers = requestBuilder.headers.build()
+        )
+        return RestRequestExecutor.execute(postgrest = postgrest, path = table, request = updateRequest)
+    }
 
     /**
      * Executes a delete operation on the [table].
@@ -251,6 +277,15 @@ class PostgrestQueryBuilder(
     ): PostgrestResult {
         val requestBuilder = DeleteRequestBuilder(schema, postgrest.config.propertyConversionMethod).apply(request)
         return RestRequestExecutor.execute(postgrest = postgrest, path = table, request = requestBuilder)
+        val requestBuilder = PostgrestRequestBuilder(postgrest).apply(request)
+        val deleteRequest = DeleteRequest(
+            returning = requestBuilder.returning,
+            count = requestBuilder.count,
+            urlParams = requestBuilder.params.mapToFirstValue(),
+            schema = schema,
+            headers = requestBuilder.headers.build()
+        )
+        return RestRequestExecutor.execute(postgrest = postgrest, path = table, request = deleteRequest)
     }
 
     companion object {

@@ -21,7 +21,7 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
 /**
- * Plugin to interact with the supabase Postgrest API
+ * Plugin to interact with the Supabase Postgrest API
  *
  * To use it you need to install it to the [SupabaseClient]:
  * ```kotlin

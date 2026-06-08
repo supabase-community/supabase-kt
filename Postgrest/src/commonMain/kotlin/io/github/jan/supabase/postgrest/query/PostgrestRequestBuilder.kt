@@ -1,10 +1,13 @@
 @file:Suppress("UndocumentedPublicProperty", "ConstructorParameterNaming")
 package io.github.jan.supabase.postgrest.query
 
+import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.annotations.SupabaseExperimental
+import io.github.jan.supabase.auth.AuthUserScope
 import io.github.jan.supabase.auth.PostgrestFilterDSL
 import io.github.jan.supabase.postgrest.PropertyConversionMethod
 import io.github.jan.supabase.postgrest.mapToFirstValue
+import io.github.jan.supabase.postgrest.Postgrest
 import io.github.jan.supabase.postgrest.query.filter.PostgrestFilterBuilder
 import io.github.jan.supabase.postgrest.result.PostgrestResult
 import io.ktor.client.request.HttpRequestBuilder
@@ -27,6 +30,11 @@ abstract class PostgrestRequestBuilder(
     defaultSchema: String,
     @PublishedApi internal val propertyConversionMethod: PropertyConversionMethod
 ) {
+open class PostgrestRequestBuilder(
+    val postgrest: Postgrest
+): AuthUserScope {
+
+    override val supabase: SupabaseClient = postgrest.supabaseClient
 
     /**
      * The [Count] algorithm to use to count rows in the table or view.
@@ -215,7 +223,7 @@ abstract class PostgrestRequestBuilder(
      * @param block The filter block
      */
     inline fun filter(block: @PostgrestFilterDSL PostgrestFilterBuilder.() -> Unit) {
-        val filter = PostgrestFilterBuilder(propertyConversionMethod, params)
+        val filter = PostgrestFilterBuilder(postgrest, params)
         filter.block()
     }
 
