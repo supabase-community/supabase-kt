@@ -1,6 +1,7 @@
 import io.github.jan.supabase.postgrest.query.Columns
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlinx.serialization.Serializable
 
 class ColumnsTest {
 
@@ -43,6 +44,15 @@ class ColumnsTest {
             """.trimIndent()
         )
         assertEquals("\"id  \",name", columns.value)
+    }
+
+    @Serializable
+    data class TestModel(val id: Int, val name: String, val age: Int)
+
+    @Test
+    fun testTypeColumns() {
+        val columns = Columns.type<TestModel>()
+        assertEquals("id,name,age", columns.value)
     }
 
 }

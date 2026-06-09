@@ -5,6 +5,7 @@ import io.github.jan.supabase.postgrest.query.Count
 import io.github.jan.supabase.postgrest.query.request.SelectRequestBuilder
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 
 class SelectRequestTest {
 
@@ -22,6 +23,8 @@ class SelectRequestTest {
                 "count=exact"
             ), sut.buildPrefer()
         )
+        assertFalse(sut.head)
+        assertEquals("EXACT", sut.count.toString())
         assertEquals("public", sut.schema)
     }
 
@@ -38,6 +41,7 @@ class SelectRequestTest {
                 "count=estimated"
             ), sut.buildPrefer()
         )
+        assertEquals("ESTIMATED", sut.count.toString())
         assertEquals("public", sut.schema)
     }
 

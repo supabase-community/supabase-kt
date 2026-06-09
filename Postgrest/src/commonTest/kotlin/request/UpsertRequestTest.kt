@@ -7,6 +7,7 @@ import io.github.jan.supabase.postgrest.query.request.UpsertRequestBuilder
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
+import kotlin.test.assertNull
 
 class UpsertRequestTest {
 
@@ -51,6 +52,16 @@ class UpsertRequestTest {
         )
         assertNotNull(sut.params["on_conflict"])
         assertEquals("something", sut.params["on_conflict"]!!.first())
+    }
+
+    @Test
+    fun testUpsertOnConflictProperty() {
+        val builder = UpsertRequestBuilder("public", PropertyConversionMethod.NONE)
+        assertNull(builder.onConflict)
+        builder.onConflict = "id"
+        assertEquals("id", builder.onConflict)
+        builder.onConflict = null
+        assertNull(builder.onConflict)
     }
 
 }

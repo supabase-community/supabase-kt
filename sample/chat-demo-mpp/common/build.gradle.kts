@@ -14,7 +14,6 @@ plugins {
 
 group = "io.github.jan.supabase"
 version = "1.0-SNAPSHOT"
-val pluginVersion = "3.3.0-beta-1"
 
 kotlin {
     @OptIn(ExperimentalKotlinGradlePluginApi::class)
@@ -53,9 +52,15 @@ kotlin {
                 api(compose.foundation)
                 api(compose.material3)
                 api(compose.materialIconsExtended)
+<<<<<<< feature/android-email-verification-sd-jwt
                 addModules(SupabaseModule.AUTH, SupabaseModule.POSTGREST, SupabaseModule.REALTIME, SupabaseModule.FUNCTIONS)
                 api("io.github.jan-tennert.supabase:compose-auth:$pluginVersion")
                 api("io.github.jan-tennert.supabase:compose-auth-ui:$pluginVersion")
+=======
+                addModules(SupabaseModule.AUTH, SupabaseModule.POSTGREST, SupabaseModule.REALTIME)
+                api(libs.compose.auth)
+                api(libs.compose.auth.ui)
+>>>>>>> master
                 api(libs.koin.core)
             }
         }

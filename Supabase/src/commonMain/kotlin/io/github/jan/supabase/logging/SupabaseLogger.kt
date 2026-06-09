@@ -45,7 +45,7 @@ class SupabaseLogger(
      * Creates a new logger and appends [tag] to the current tag
      * @param tag The tag to append
      */
-    fun appendTag(tag: String) = withTag(tag + this.tag)
+    fun appendTag(tag: String) = withTag(this.tag + tag)
 
 }
 

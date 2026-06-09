@@ -1,7 +1,10 @@
 import io.github.jan.supabase.CurrentPlatformTarget
 import io.github.jan.supabase.PlatformTarget
 import io.github.jan.supabase.postgrest.PropertyConversionMethod
+import io.github.jan.supabase.postgrest.query.filter.FilterOperation
+import io.github.jan.supabase.postgrest.query.filter.FilterOperator
 import io.github.jan.supabase.postgrest.query.filter.PostgrestFilterBuilder
+import io.github.jan.supabase.postgrest.query.filter.TextSearchType
 import io.ktor.http.decodeURLQueryComponent
 import io.ktor.http.formUrlEncode
 import io.ktor.http.parametersOf
@@ -14,6 +17,8 @@ import kotlin.time.Instant
 
 @Serializable
 data class TestData(@SerialName("created_at") val createdAt: Instant)
+
+data class KPropTest(val stringProp: String, val intProp: Int, val booleanProp: Boolean)
 
 class PostgrestFilterBuilderTest {
 
@@ -100,9 +105,89 @@ class PostgrestFilterBuilderTest {
     @Test
     fun like() {
         val filter = filterToString {
-            ilike("name", "_n*")
+            like("name", "_n*")
         }
-        assertEquals("name=ilike._n*", filter)
+        assertEquals("name=like._n*", filter)
+    }
+
+    @Test
+    fun filterNot() {
+        val filter = filterToString {
+            filterNot("id", FilterOperator.EQ, 1)
+        }
+        assertEquals("id=not.eq.1", filter)
+    }
+
+    @Test
+    fun filterNotOperation() {
+        val filter = filterToString {
+            filterNot(FilterOperation("id", FilterOperator.EQ, 1))
+        }
+        assertEquals("id=not.eq.1", filter)
+    }
+
+    @Test
+    fun likeAll() {
+        val filter = filterToString {
+            likeAll("name", listOf("a", "b"))
+        }
+        assertEquals("name=like(all).{a,b}", filter)
+    }
+
+    @Test
+    fun likeAny() {
+        val filter = filterToString {
+            likeAny("name", listOf("a", "b"))
+        }
+        assertEquals("name=like(any).{a,b}", filter)
+    }
+
+    @Test
+    fun ilikeAll() {
+        val filter = filterToString {
+            ilikeAll("name", listOf("a", "b"))
+        }
+        assertEquals("name=ilike(all).{a,b}", filter)
+    }
+
+    @Test
+    fun ilikeAny() {
+        val filter = filterToString {
+            ilikeAny("name", listOf("a", "b"))
+        }
+        assertEquals("name=ilike(any).{a,b}", filter)
+    }
+
+    @Test
+    fun rangeLte() {
+        val filter = filterToString {
+            rangeLte("id", 1L to 10L)
+        }
+        assertEquals("id=nxr.(1,10)", filter)
+    }
+
+    @Test
+    fun rangeGte() {
+        val filter = filterToString {
+            rangeGte("id", 1L to 10L)
+        }
+        assertEquals("id=nxl.(1,10)", filter)
+    }
+
+    @Test
+    fun rangeLt() {
+        val filter = filterToString {
+            rangeLt("id", 1L to 10L)
+        }
+        assertEquals("id=sl.(1,10)", filter)
+    }
+
+    @Test
+    fun rangeGt() {
+        val filter = filterToString {
+            rangeGt("id", 1L to 10L)
+        }
+        assertEquals("id=sr.(1,10)", filter)
     }
 
     @Test
@@ -308,6 +393,190 @@ class PostgrestFilterBuilderTest {
     }
 
     @Test
+    fun cs() {
+        val filter = filterToString {
+            cs("id", listOf(1, 2))
+        }
+        assertEquals("id=cs.{1,2}", filter)
+    }
+
+    @Test
+    fun cd() {
+        val filter = filterToString {
+            cd("id", listOf(1, 2))
+        }
+        assertEquals("id=cd.{1,2}", filter)
+    }
+
+    @Test
+    fun ov() {
+        val filter = filterToString {
+            ov("id", listOf(1, 2))
+        }
+        assertEquals("id=ov.{1,2}", filter)
+    }
+
+    @Test
+    fun propEq() {
+        val filter = filterToString {
+            KPropTest::intProp eq 1
+        }
+        assertEquals("intProp=eq.1", filter)
+    }
+
+    @Test
+    fun propNeq() {
+        val filter = filterToString {
+            KPropTest::intProp neq 1
+        }
+        assertEquals("intProp=neq.1", filter)
+    }
+
+    @Test
+    fun propGt() {
+        val filter = filterToString {
+            KPropTest::intProp gt 1
+        }
+        assertEquals("intProp=gt.1", filter)
+    }
+
+    @Test
+    fun propGte() {
+        val filter = filterToString {
+            KPropTest::intProp gte 1
+        }
+        assertEquals("intProp=gte.1", filter)
+    }
+
+    @Test
+    fun propLt() {
+        val filter = filterToString {
+            KPropTest::intProp lt 1
+        }
+        assertEquals("intProp=lt.1", filter)
+    }
+
+    @Test
+    fun propLte() {
+        val filter = filterToString {
+            KPropTest::intProp lte 1
+        }
+        assertEquals("intProp=lte.1", filter)
+    }
+
+    @Test
+    fun propLike() {
+        val filter = filterToString {
+            KPropTest::stringProp like "_n*"
+        }
+        assertEquals("stringProp=like._n*", filter)
+    }
+
+    @Test
+    fun propMatch() {
+        val filter = filterToString {
+            KPropTest::stringProp match "person"
+        }
+        assertEquals("stringProp=match.person", filter)
+    }
+
+    @Test
+    fun propIlike() {
+        val filter = filterToString {
+            KPropTest::stringProp ilike "_n*"
+        }
+        assertEquals("stringProp=ilike._n*", filter)
+    }
+
+    @Test
+    fun propImatch() {
+        val filter = filterToString {
+            KPropTest::stringProp imatch "person"
+        }
+        assertEquals("stringProp=imatch.person", filter)
+    }
+
+    @Test
+    fun propIsExact() {
+        val filter = filterToString {
+            KPropTest::booleanProp isExact true
+        }
+        assertEquals("booleanProp=is.true", filter)
+    }
+
+    @Test
+    fun propIsIn() {
+        val filter = filterToString {
+            KPropTest::intProp isIn listOf(1, 2)
+        }
+        assertEquals("intProp=in.(1,2)", filter)
+    }
+
+    @Test
+    fun propRangeLt() {
+        val filter = filterToString {
+            KPropTest::intProp rangeLt (1 to 10)
+        }
+        assertEquals("intProp=sl.(1,10)", filter)
+    }
+
+    @Test
+    fun propRangeLte() {
+        val filter = filterToString {
+            KPropTest::intProp rangeLte (1 to 10)
+        }
+        assertEquals("intProp=nxr.(1,10)", filter)
+    }
+
+    @Test
+    fun propRangeGt() {
+        val filter = filterToString {
+            KPropTest::intProp rangeGt (1 to 10)
+        }
+        assertEquals("intProp=sr.(1,10)", filter)
+    }
+
+    @Test
+    fun propRangeGte() {
+        val filter = filterToString {
+            KPropTest::intProp rangeGte (1 to 10)
+        }
+        assertEquals("intProp=nxl.(1,10)", filter)
+    }
+
+    @Test
+    fun propAdjacent() {
+        val filter = filterToString {
+            KPropTest::intProp adjacent (1 to 10)
+        }
+        assertEquals("intProp=adj.(1,10)", filter)
+    }
+
+    @Test
+    fun propOverlaps() {
+        val filter = filterToString {
+            KPropTest::intProp overlaps listOf(1, 2)
+        }
+        assertEquals("intProp=ov.{1,2}", filter)
+    }
+
+    @Test
+    fun propContains() {
+        val filter = filterToString {
+            KPropTest::intProp contains listOf(1, 2)
+        }
+        assertEquals("intProp=cs.{1,2}", filter)
+    }
+
+    @Test
+    fun propContained() {
+        val filter = filterToString {
+            KPropTest::intProp contained listOf(1, 2)
+        }
+        assertEquals("intProp=cd.{1,2}", filter)
+    }
+
+    @Test
     fun propertyConversionWithSnakeCase() {
         assertEquals("created_at", PropertyConversionMethod.CAMEL_CASE_TO_SNAKE_CASE(TestData::createdAt))
     }
@@ -319,6 +588,64 @@ class PostgrestFilterBuilderTest {
         } else {
             assertFails { PropertyConversionMethod.SERIAL_NAME(TestData::createdAt) }
         }
+    }
+
+    @Test
+    fun textSearchPlain() {
+        val filter = filterToString {
+            textSearch("description", "apple", TextSearchType.PLAINTO)
+        }
+        assertEquals("description=plfts.apple", filter)
+    }
+
+    @Test
+    fun textSearchConfig() {
+        val filter = filterToString {
+            textSearch("description", "apple", TextSearchType.WEBSEARCH, "english")
+        }
+        assertEquals("description=wfts(english).apple", filter)
+    }
+
+    @Test
+    fun csPair() {
+        val filter = filterToString {
+            filter("id", FilterOperator.CS, 1 to 2)
+        }
+        assertEquals("id=cs.[1,2]", filter)
+    }
+
+    @Test
+    fun csScalar() {
+        val filter = filterToString {
+            filter("id", FilterOperator.CS, "foo")
+        }
+        assertEquals("id=cs.foo", filter)
+    }
+
+    @Test
+    fun csScalarLogicalExpression() {
+        val filter = filterToString {
+            and {
+                filter("id", FilterOperator.CS, "foo,bar")
+            }
+        }
+        assertEquals("and=(id.cs.\"foo,bar\")", filter)
+    }
+
+    @Test
+    fun slList() {
+        val filter = filterToString {
+            filter("id", FilterOperator.SL, listOf(1, 2))
+        }
+        assertEquals("id=sl.(1,2)", filter)
+    }
+
+    @Test
+    fun slScalar() {
+        val filter = filterToString {
+            filter("id", FilterOperator.SL, "foo")
+        }
+        assertEquals("id=sl.foo", filter)
     }
 
     private fun filterToString(builder: PostgrestFilterBuilder.() -> Unit): String {

@@ -8,6 +8,7 @@ import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 import kotlin.test.assertNull
 
 
@@ -137,6 +138,19 @@ class PostgrestRequestBuilderTest {
                 assertEquals("application/vnd.pgrst.array+json;nulls=stripped", headers[HttpHeaders.Accept])
             }
         )
+    }
+
+    @Test
+    fun testStripNullsThrowsWithCsv() {
+        assertFailsWith<IllegalArgumentException> {
+            testRequestBuilder(
+                requestBuilder = {
+                    csv()
+                    stripNulls()
+                },
+                httpRequestHandler = {}
+            )
+        }
     }
 
     @Test
@@ -286,6 +300,32 @@ class PostgrestRequestBuilderTest {
         testRequestBuilder(
             requestBuilder = {
                 range(10, 20, "table")
+            },
+            httpRequestHandler = {
+                assertEquals("10", url.parameters["table.offset"])
+                assertEquals("11", url.parameters["table.limit"])
+            }
+        )
+    }
+
+    @Test
+    fun testLongRangeWithoutReferencedTable() {
+        testRequestBuilder(
+            requestBuilder = {
+                range(10L..20L)
+            },
+            httpRequestHandler = {
+                assertEquals("10", url.parameters["offset"])
+                assertEquals("11", url.parameters["limit"])
+            }
+        )
+    }
+
+    @Test
+    fun testLongRangeWithReferencedTable() {
+        testRequestBuilder(
+            requestBuilder = {
+                range(10L..20L, "table")
             },
             httpRequestHandler = {
                 assertEquals("10", url.parameters["table.offset"])
