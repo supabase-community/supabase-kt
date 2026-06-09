@@ -59,10 +59,10 @@ fun LoginScreen(viewModel: ChatViewModel) {
             result.fold(
                 onSuccess = { userInfo ->
                     viewModel.verifyEmail(userInfo.token)
-                    Logger.d("EmailVerifier") { "Verified SD-JWT: $userInfo" }
+                    Logger.d("LoginScreen - Verified SD-JWT: ${userInfo.token}")
                 },
                 onFailure = { error ->
-                    Logger.e("EmailVerifier", error) { "Verification failed" }
+                    Logger.d("LoginScreen - Verification failed")
                 }
             )
         }
