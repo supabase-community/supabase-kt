@@ -1,10 +1,14 @@
+import app.cash.turbine.ReceiveTurbine
 import app.cash.turbine.test
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.SupabaseClientBuilder
 import io.github.jan.supabase.storage.BucketApi
+import io.github.jan.supabase.storage.DownloadStatus
 import io.github.jan.supabase.storage.Storage
 import io.github.jan.supabase.storage.UploadData
 import io.github.jan.supabase.storage.UploadStatus
+import io.github.jan.supabase.storage.downloadAuthenticatedAsFlow
+import io.github.jan.supabase.storage.downloadPublicAsFlow
 import io.github.jan.supabase.storage.resumable.MemoryResumableCache
 import io.github.jan.supabase.storage.storage
 import io.github.jan.supabase.storage.updateAsFlow
@@ -22,8 +26,11 @@ import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
 import io.ktor.http.headersOf
+import io.ktor.utils.io.ByteChannel
 import io.ktor.utils.io.ByteReadChannel
+import io.ktor.utils.io.readRemaining
 import kotlinx.coroutines.flow.Flow
+import kotlinx.io.readByteArray
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 import kotlin.test.assertContentEquals
@@ -104,7 +111,121 @@ class BucketApiFlowTest {
         }
     }
 
-    //TODO: Add tests for downloading as flow
+    private fun testDownloadAsFlow(
+        public: Boolean,
+        downloadAction: suspend (client: SupabaseClient, path: String, expectedData: ByteArray) -> Unit
+    ) {
+        testDownloadMethod(
+            urlPath = if (public) "/object/public/$bucketId/data.png" else "/object/authenticated/$bucketId/data.png",
+            test = downloadAction
+        )
+    }
+
+    @Test
+    fun testDownloadAuthenticatedAsFlowMethodWithByteArray() {
+        testDownloadAsFlow(public = false) { client, path, data ->
+            val flow = client.storage[bucketId].downloadAuthenticatedAsFlow(path)
+            testDownloadFlowWithByteArray(flow, data)
+        }
+    }
+
+    @Test
+    fun testDownloadPublicAsFlowMethodWithByteArray() {
+        testDownloadAsFlow(public = true) { client, path, data ->
+            val flow = client.storage[bucketId].downloadPublicAsFlow(path)
+            testDownloadFlowWithByteArray(flow, data)
+        }
+    }
+
+    @Test
+    fun testDownloadAuthenticatedAsFlowMethodWithChannel() {
+        testDownloadAsFlow(public = false) { client, path, data ->
+            val channel = ByteChannel()
+            val flow = client.storage[bucketId].downloadAuthenticatedAsFlow(path, channel)
+            testDownloadFlowWithChannel(flow, channel, data)
+        }
+    }
+
+    @Test
+    fun testDownloadPublicAsFlowMethodWithChannel() {
+        testDownloadAsFlow(public = true) { client, path, data ->
+            val channel = ByteChannel()
+            val flow = client.storage[bucketId].downloadPublicAsFlow(path, channel)
+            testDownloadFlowWithChannel(flow, channel, data)
+        }
+    }
+
+    private suspend fun testDownloadFlowWithByteArray(
+        flow: Flow<DownloadStatus>,
+        expectedData: ByteArray
+    ) {
+        flow.test {
+            val (lastProgress, terminal) = awaitProgress()
+            assertEquals(expectedData.size.toLong(), lastProgress.totalBytesReceived, "Total bytes received should be 3")
+            assertEquals(expectedData.size.toLong(), lastProgress.contentLength, "Content length should be 3")
+            assertIs<DownloadStatus.Success>(terminal)
+            val dataStatus = awaitItem()
+            assertIs<DownloadStatus.ByteData>(dataStatus)
+            assertContentEquals(expectedData, dataStatus.data, "Data should be [1, 2, 3]")
+            awaitComplete()
+        }
+    }
+
+    private suspend fun testDownloadFlowWithChannel(
+        flow: Flow<DownloadStatus>,
+        channel: ByteChannel,
+        expectedData: ByteArray
+    ) {
+        flow.test {
+            //onDownload emits progress at engine-chosen points; under MockEngine the final
+            //byte count isn't guaranteed before Success, so verify the channel content below instead
+            val (_, terminal) = awaitProgress()
+            assertIs<DownloadStatus.Success>(terminal) //When streaming to a channel, no ByteData is emitted
+            awaitComplete()
+        }
+        assertContentEquals(expectedData, channel.readRemaining().readByteArray(), "Channel data should be [1, 2, 3]")
+    }
+
+    //Drains all progress statuses (a channel download may emit several) and returns the last
+    //progress together with the first non-progress status
+    private suspend fun ReceiveTurbine<DownloadStatus>.awaitProgress(): Pair<DownloadStatus.Progress, DownloadStatus> {
+        var lastProgress: DownloadStatus.Progress? = null
+        while (true) {
+            val item = awaitItem()
+            if (item is DownloadStatus.Progress) {
+                lastProgress = item
+            } else {
+                assertIs<DownloadStatus.Progress>(lastProgress, "Expected at least one progress status before $item")
+                return lastProgress to item
+            }
+        }
+    }
+
+    private fun testDownloadMethod(
+        urlPath: String,
+        expectedPath: String = "data.png",
+        test: suspend (client: SupabaseClient, path: String, data: ByteArray) -> Unit
+    ) {
+        runTest {
+            val expectedData = dummyData
+            withMockedSupabaseClient(
+                configuration = configureClient,
+                requestHandler = {
+                    assertMethodIs(HttpMethod.Get, it.method)
+                    assertPathIs(urlPath, it.url.pathAfterVersion())
+                    respond(
+                        content = expectedData,
+                        headers = headersOf(
+                            HttpHeaders.ContentType to listOf(ContentType.Image.PNG.toString()),
+                            HttpHeaders.ContentLength to listOf(expectedData.size.toString())
+                        )
+                    )
+                }
+            ) { client ->
+                test(client, expectedPath, expectedData)
+            }
+        }
+    }
 
     private fun testUpdateAsFlow(
         upsert: Boolean,
