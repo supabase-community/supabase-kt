@@ -374,6 +374,23 @@ class AuthTest {
         }
     }
 
+    /**
+     * A [SupabaseLoggingProcessor] that records every log it receives, for assertions in tests.
+     */
+    private class RecordingLoggingProcessor : SupabaseLoggingProcessor {
+
+        data class LogEntry(val level: LogLevel, val tag: String, val throwable: Throwable?, val message: String)
+
+        val logs = mutableListOf<LogEntry>()
+
+        override fun isEnabled(level: LogLevel): Boolean = true
+
+        override fun processLog(level: LogLevel, tag: String, throwable: Throwable?, message: String) {
+            logs.add(LogEntry(level, tag, throwable, message))
+        }
+
+    }
+
 }
 
 fun userSession(customToken: String = "accessToken", expiresIn: Long = 3600, user: UserInfo? = null) = UserSession(
@@ -383,20 +400,3 @@ fun userSession(customToken: String = "accessToken", expiresIn: Long = 3600, use
     tokenType = "Bearer",
     user = user
 )
-
-/**
- * A [SupabaseLoggingProcessor] that records every log it receives, for assertions in tests.
- */
-class RecordingLoggingProcessor : SupabaseLoggingProcessor {
-
-    data class LogEntry(val level: LogLevel, val tag: String, val throwable: Throwable?, val message: String)
-
-    val logs = mutableListOf<LogEntry>()
-
-    override fun isEnabled(level: LogLevel): Boolean = true
-
-    override fun processLog(level: LogLevel, tag: String, throwable: Throwable?, message: String) {
-        logs.add(LogEntry(level, tag, throwable, message))
-    }
-
-}
