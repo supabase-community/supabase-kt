@@ -14,6 +14,7 @@ import io.github.jan.supabase.auth.user.Identity
 import io.github.jan.supabase.auth.user.UserInfo
 import io.github.jan.supabase.auth.user.UserSession
 import io.github.jan.supabase.logging.LogLevel
+import io.github.jan.supabase.logging.SupabaseLoggingProcessor
 import io.github.jan.supabase.testing.createMockedSupabaseClient
 import io.github.jan.supabase.testing.pathAfterVersion
 import io.github.jan.supabase.testing.respondJson
@@ -31,8 +32,10 @@ import kotlin.test.Test
 import kotlin.test.assertContains
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
+import kotlin.test.assertFalse
 import kotlin.test.assertIs
 import kotlin.test.assertNull
+import kotlin.test.assertTrue
 import kotlin.time.Duration.Companion.seconds
 
 class AuthTest {
@@ -65,6 +68,35 @@ class AuthTest {
         runCurrent()
 
         assertIs<SessionStatus.Authenticated>(client.auth.sessionStatus.value)
+    }
+
+    @Test
+    fun testLoadingSessionFromStorageWithNoSessionDoesNotLogError() = runTest(timeout = 30.seconds) {
+        val sessionManager = MemorySessionManager() // no stored session
+        val processor = RecordingLoggingProcessor()
+
+        client = createMockedSupabaseClient(
+            configuration = {
+                coroutineDispatcher = StandardTestDispatcher(testScheduler)
+                install(Auth) {
+                    minimalConfig()
+                    this.sessionManager = sessionManager
+                    autoLoadFromStorage = true
+                    authScope = backgroundScope
+                    logLevel = LogLevel.DEBUG
+                    loggingFactory = { processor }
+                }
+            }
+        )
+
+        client.auth.awaitInitialization()
+
+        runCurrent()
+
+        assertIs<SessionStatus.NotAuthenticated>(client.auth.sessionStatus.value)
+        // The "no stored session" case is expected and must not be logged at ERROR (#1318)
+        assertFalse(processor.logs.any { it.level == LogLevel.ERROR }, "No error should be logged when there is no stored session")
+        assertTrue(processor.logs.any { it.level == LogLevel.DEBUG && it.message == "No session found in storage" }, "Missing session should be logged at debug level")
     }
 
     @Test
@@ -351,3 +383,20 @@ fun userSession(customToken: String = "accessToken", expiresIn: Long = 3600, use
     tokenType = "Bearer",
     user = user
 )
+
+/**
+ * A [SupabaseLoggingProcessor] that records every log it receives, for assertions in tests.
+ */
+class RecordingLoggingProcessor : SupabaseLoggingProcessor {
+
+    data class LogEntry(val level: LogLevel, val tag: String, val throwable: Throwable?, val message: String)
+
+    val logs = mutableListOf<LogEntry>()
+
+    override fun isEnabled(level: LogLevel): Boolean = true
+
+    override fun processLog(level: LogLevel, tag: String, throwable: Throwable?, message: String) {
+        logs.add(LogEntry(level, tag, throwable, message))
+    }
+
+}

@@ -3,6 +3,7 @@ package io.github.jan.supabase.auth
 import com.russhwolf.settings.ExperimentalSettingsApi
 import com.russhwolf.settings.Settings
 import com.russhwolf.settings.coroutines.toSuspendSettings
+import io.github.jan.supabase.auth.exception.NoSessionFoundException
 import io.github.jan.supabase.auth.user.UserSession
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonBuilder
@@ -48,7 +49,7 @@ class SettingsSessionManager(
     }
 
     override suspend fun loadSession(): UserSession {
-        val session = suspendSettings.getStringOrNull(key) ?: error("No entry with the key $key")
+        val session = suspendSettings.getStringOrNull(key) ?: throw NoSessionFoundException()
         return json.decodeFromString(session)
     }
 
