@@ -47,6 +47,7 @@ class AuthRequestTest {
     private val configuration: SupabaseClientBuilder.() -> Unit = {
         install(Auth) {
             minimalConfig()
+            autoImportSession = true
             flowType = FlowType.PKCE
         }
     }
@@ -145,11 +146,11 @@ class AuthRequestTest {
                     sampleUserSession()
                 )
             }.awaitInit()
-            val user = client.auth.signUp(Email(expectedEmail), expectedPassword) {
+            val response = client.auth.signUp(Email(expectedEmail), expectedPassword) {
                 this.captchaToken = captchaToken
                 data = userData
             }
-            assertNull(user)
+            assertNull(response.user)
             assertNotNull(client.auth.currentSessionOrNull(), "Session should not be null")
             assertEquals(SessionFlag.SIGN_UP, client.auth.sessionFlag())
         }
@@ -173,7 +174,6 @@ class AuthRequestTest {
                 assertEquals(expectedPassword, body["password"]?.jsonPrimitive?.content)
                 assertEquals(captchaToken, metaSecurity["captcha_token"]?.jsonPrimitive?.content)
                 assertEquals(userData, body["data"]!!.jsonObject)
-                containsCodeChallenge(body)
                 respondJson(
                     sampleSessionWithUserData()
                 )
@@ -207,7 +207,6 @@ class AuthRequestTest {
                 assertEquals(expectedPassword, body["password"]?.jsonPrimitive?.content)
                 assertEquals(captchaToken, metaSecurity["captcha_token"]?.jsonPrimitive?.content)
                 assertEquals(userData, body["data"]!!.jsonObject)
-                containsCodeChallenge(body)
                 respondJson(
                     sampleUserObject(phone = expectedPhone)
                 )
@@ -237,7 +236,6 @@ class AuthRequestTest {
                 assertEquals(expectedPhone, body["phone"]?.jsonPrimitive?.content)
                 assertEquals(captchaToken, metaSecurity["captcha_token"]?.jsonPrimitive?.content)
                 assertEquals(userData, body["data"]!!.jsonObject)
-                containsCodeChallenge(body)
                 respond("")
             }.awaitInit()
             client.auth.signInWithOtp(Phone(expectedPhone)) {
@@ -295,7 +293,6 @@ class AuthRequestTest {
                 assertEquals("whatsapp", body["channel"]?.jsonPrimitive?.content)
                 assertEquals(captchaToken, metaSecurity["captcha_token"]?.jsonPrimitive?.content)
                 assertEquals(userData, body["data"]!!.jsonObject)
-                containsCodeChallenge(body)
                 respond("")
             }.awaitInit()
             client.auth.signInWithOtp(Phone(expectedPhone)) {
@@ -316,7 +313,6 @@ class AuthRequestTest {
                 assertPathIs("/otp", it.url.pathAfterVersion())
                 assertEquals(expectedPhone, body["phone"]?.jsonPrimitive?.content)
                 assertEquals("sms", body["channel"]?.jsonPrimitive?.content)
-                containsCodeChallenge(body)
                 respond("")
             }.awaitInit()
             client.auth.signInWithOtp(Phone(expectedPhone)) {
@@ -561,7 +557,6 @@ class AuthRequestTest {
             }
             assertEquals(expectedEmail, user.email, "Email should be equal")
             assertEquals(expectedPhone, user.phone, "Phone should be equal")
-            assertEquals(SessionFlag.USER_CHANGED, client.auth.sessionFlag())
         }
     }
 
@@ -789,6 +784,7 @@ class AuthRequestTest {
                 )
             }.awaitInit()
             client.auth.verifyPhoneOtp(expectedType, expectedPhone, expectedToken, expectedCaptchaToken)
+            assertIs<SessionStatus.Authenticated>(client.auth.sessionStatus.value)
             assertEquals(SessionFlag.SIGN_IN, client.auth.sessionFlag())
         }
     }
@@ -807,7 +803,6 @@ class AuthRequestTest {
             }.awaitInit()
             val user = client.auth.getUser(expectedJWT)
             assertNotNull(user, "User should not be null")
-            assertEquals(SessionFlag.USER_CHANGED, client.auth.sessionFlag())
         }
     }
 

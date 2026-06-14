@@ -1,5 +1,6 @@
-package io.github.jan.supabase.auth.providers
+package io.github.jan.supabase.auth
 
+import io.github.jan.supabase.auth.providers.LoginIdentifier
 import io.github.jan.supabase.auth.providers.builtin.putCaptchaToken
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put

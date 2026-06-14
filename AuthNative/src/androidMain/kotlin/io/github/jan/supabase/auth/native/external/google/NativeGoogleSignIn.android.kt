@@ -7,14 +7,19 @@ import io.github.jan.supabase.auth.native.AuthFlowManager
 import io.github.jan.supabase.auth.native.applicationContext
 import io.github.jan.supabase.auth.native.external.activities.SupabaseNativeAuthActivity
 import io.github.jan.supabase.auth.native.platformConfig
+import io.github.jan.supabase.logging.i
 import io.ktor.util.generateNonce
 
 actual typealias GoogleCredential = GoogleIdTokenCredential
 
 actual suspend fun Auth.signWithGoogle(config: GoogleSignInConfig.() -> Unit): GoogleSignInResult {
+    val googleClientId = this.config.platformConfig().nativeAuthConfig.googleClientId
+    if(googleClientId == null) {
+        logger.i { "No Google client id set in config, proceeding to use OAuth for authentication..." }
+        return signInWithGoogleFallback(config)
+    }
     val context = applicationContext()
     var signInConfig = GoogleSignInConfig("--").apply(config)
-    val googleClientId = this.config.platformConfig().nativeAuthConfig.googleClientId ?: error("No google client id set in config")
     val deferred = AuthFlowManager.prepareSignInWait()
     if(signInConfig.nonce == null) signInConfig.nonce = generateNonce()
     val intent = Intent(context, SupabaseNativeAuthActivity::class.java).apply {
