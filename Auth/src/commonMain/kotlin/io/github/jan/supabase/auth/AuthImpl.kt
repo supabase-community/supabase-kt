@@ -686,7 +686,7 @@ internal class AuthImpl(
         val session = try {
             sessionManager.loadSession()
         } catch (e: NoSessionFoundException) {
-            logger.d { "No session found in storage" }
+            logger.d { e.message ?: "No session found in storage" }
             null
         } catch (e: Exception) {
             currentCoroutineContext().ensureActive()
