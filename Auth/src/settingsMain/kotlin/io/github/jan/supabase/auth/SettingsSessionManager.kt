@@ -52,6 +52,11 @@ class SettingsSessionManager(
         return json.decodeFromString(session)
     }
 
+    override suspend fun loadSessionOrNull(): UserSession? {
+        val session = suspendSettings.getStringOrNull(key) ?: return null
+        return json.decodeFromString(session)
+    }
+
     override suspend fun deleteSession() {
         suspendSettings.remove(key)
     }
