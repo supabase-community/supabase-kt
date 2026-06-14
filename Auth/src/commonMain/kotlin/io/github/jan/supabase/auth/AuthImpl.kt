@@ -682,7 +682,7 @@ internal class AuthImpl(
     override suspend fun loadFromStorage(autoRefresh: Boolean): Boolean = loadFromStorage(autoRefresh, false)
 
     suspend fun loadFromStorage(autoRefresh: Boolean = config.alwaysAutoRefresh, initializing: Boolean): Boolean {
-        val session = try { sessionManager.loadSession() } catch (e: Exception) {
+        val session = try { sessionManager.loadSessionOrNull() } catch (e: Exception) {
             currentCoroutineContext().ensureActive()
             logger.e(e) { "Failed to load session" }
             null
