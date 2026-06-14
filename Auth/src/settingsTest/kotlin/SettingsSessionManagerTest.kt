@@ -45,4 +45,13 @@ class SettingsSessionManagerTest {
         }
     }
 
+    @Test
+    fun testLoadSessionOrNullReturnsNullOnCorruptSession() {
+        runTest {
+            val settings = MapSettings(SettingsSessionManager.SETTINGS_KEY to "not a valid session")
+            val sessionManager = SettingsSessionManager(settings)
+            assertNull(sessionManager.loadSessionOrNull())
+        }
+    }
+
 }
