@@ -72,7 +72,7 @@ class AuthTest {
 
     @Test
     fun testLoadingSessionFromStorageWithNoSessionDoesNotLogError() = runTest(timeout = 30.seconds) {
-        val sessionManager = MemorySessionManager() // no stored session
+        val sessionManager = MemorySessionManager()
         val processor = RecordingLoggingProcessor()
 
         client = createMockedSupabaseClient(
@@ -94,7 +94,6 @@ class AuthTest {
         runCurrent()
 
         assertIs<SessionStatus.NotAuthenticated>(client.auth.sessionStatus.value)
-        // The "no stored session" case is expected and must not be logged at ERROR (#1318)
         assertFalse(processor.logs.any { it.level == LogLevel.ERROR }, "No error should be logged when there is no stored session")
         assertTrue(processor.logs.any { it.level == LogLevel.DEBUG && it.message == "No session found in storage" }, "Missing session should be logged at debug level")
     }
