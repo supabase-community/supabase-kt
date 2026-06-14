@@ -1,5 +1,7 @@
-package io.github.jan.supabase.auth.providers
+package io.github.jan.supabase.auth
 
+import io.github.jan.supabase.auth.providers.LoginIdentifier
+import io.github.jan.supabase.auth.providers.Phone
 import io.github.jan.supabase.auth.providers.builtin.putCaptchaToken
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonObjectBuilder
@@ -20,6 +22,7 @@ sealed class SignUpPasswordConfig(
         identifier.put(this)
         captchaToken?.let { putCaptchaToken(it) }
         put("password", password)
+        data?.let { put("data", it) }
         putExtraParams()
     }
 

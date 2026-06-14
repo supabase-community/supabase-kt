@@ -30,13 +30,8 @@ import io.github.jan.supabase.auth.jwt.rsaJwkToDer
 import io.github.jan.supabase.auth.mfa.MfaApi
 import io.github.jan.supabase.auth.mfa.MfaApiImpl
 import io.github.jan.supabase.auth.providers.Email
-import io.github.jan.supabase.auth.providers.EmailSignInOtpConfig
-import io.github.jan.supabase.auth.providers.EmailSignUpConfig
 import io.github.jan.supabase.auth.providers.LoginIdentifier
 import io.github.jan.supabase.auth.providers.Phone
-import io.github.jan.supabase.auth.providers.PhoneSignInOtpConfig
-import io.github.jan.supabase.auth.providers.PhoneSignUpConfig
-import io.github.jan.supabase.auth.providers.SignInPasswordConfig
 import io.github.jan.supabase.auth.status.RefreshFailureCause
 import io.github.jan.supabase.auth.status.SessionFlag
 import io.github.jan.supabase.auth.status.SessionStatus
@@ -224,7 +219,7 @@ internal class AuthImpl(
         val response = publicApi.postJson("signup", buildJsonObject {
             codeChallenge?.let(::putCodeChallenge)
             putJsonObject(config)
-        }) {
+        }.also(::println)) {
             val redirectUrl = redirectTo ?: defaultRedirectUrl()
             if(identifier is Email && redirectUrl != null) redirectTo(redirectUrl)
         }.safeBody<JsonObject>()
@@ -332,10 +327,7 @@ internal class AuthImpl(
         if (updateCurrentUser && sessionStatus.value is SessionStatus.Authenticated) {
             val newSession =
                 (sessionStatus.value as SessionStatus.Authenticated).session.copy(user = userInfo)
-            if (this.config.autoSaveToStorage) { // TODO: this looks sus
-                sessionManager.saveSession(newSession)
-            }
-            setSessionStatus(SessionStatus.Authenticated(newSession, SessionFlag.USER_CHANGED))
+            importIfEnabled(newSession, flag = SessionFlag.USER_CHANGED)
         }
         return userInfo
     }

@@ -1,15 +1,16 @@
 import app.cash.turbine.test
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.auth.Auth
-import io.github.jan.supabase.auth.AuthImpl
-import io.github.jan.supabase.auth.BrowserBridge
 import io.github.jan.supabase.auth.FlowType
 import io.github.jan.supabase.auth.MemoryCodeVerifierCache
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.auth.event.AuthEvent
-import io.github.jan.supabase.auth.setupPlatform
+import io.github.jan.supabase.auth.native.BrowserBridge
+import io.github.jan.supabase.auth.native.nativeConfig
+import io.github.jan.supabase.auth.native.setupNativePlatform
 import io.github.jan.supabase.auth.status.SessionStatus
 import io.github.jan.supabase.auth.user.UserInfo
+import io.github.jan.supabase.auth.user.UserSession
 import io.github.jan.supabase.testing.createMockedSupabaseClient
 import io.github.jan.supabase.testing.respondJson
 import io.ktor.client.engine.mock.MockRequestHandleScope
@@ -39,7 +40,7 @@ class PlatformSetupTest {
     fun testPlatformSetupTestNoHash() = runTestOnBrowser {
         val auth = createAuthClient(autoSetup = false)
         assertEquals(SessionStatus.Initializing, auth.sessionStatus.value)
-        auth.setupPlatform()
+        auth.setupNativePlatform()
         assertIs<SessionStatus.NotAuthenticated>(auth.sessionStatus.value)
     }
 
@@ -47,7 +48,7 @@ class PlatformSetupTest {
     fun testPlatformSetupTestNoCode() = runTestOnBrowser {
         val auth = createAuthClient(autoSetup = false, flowType = FlowType.PKCE)
         assertEquals(SessionStatus.Initializing, auth.sessionStatus.value)
-        auth.setupPlatform()
+        auth.setupNativePlatform()
         assertIs<SessionStatus.NotAuthenticated>(auth.sessionStatus.value)
     }
 
@@ -62,7 +63,7 @@ class PlatformSetupTest {
         )
         val auth = createAuthClient(autoSetup = false, bridge)
         assertEquals(SessionStatus.Initializing, auth.sessionStatus.value);
-        auth.setupPlatform()
+        auth.setupNativePlatform()
         assertIs<SessionStatus.NotAuthenticated>(auth.sessionStatus.value)
         assertFalse { changeUrlCalled }
     }
@@ -84,9 +85,9 @@ class PlatformSetupTest {
         )
         val auth = createAuthClient(autoSetup = false, bridge, requestHandler = {
             respondJson(session.user, Json { encodeDefaults = true })
-        }) as AuthImpl
+        })
         assertEquals(SessionStatus.Initializing, auth.sessionStatus.value)
-        auth.setupPlatform()
+        auth.setupNativePlatform()
         assertIs<SessionStatus.Authenticated>(auth.sessionStatus.value)
         assertEquals(session, (auth.sessionStatus.value as SessionStatus.Authenticated).session.copy(expiresAt = expiresAt))
         assertTrue { changedUrl }
@@ -104,7 +105,7 @@ class PlatformSetupTest {
         )
         val auth = createAuthClient(autoSetup = false, bridge)
         assertEquals(SessionStatus.Initializing, auth.sessionStatus.value)
-        auth.setupPlatform()
+        auth.setupNativePlatform()
         auth.events.test {
             val errorEvent = awaitItem()
             assertIs<AuthEvent.OtpError>(errorEvent)
@@ -138,7 +139,7 @@ class PlatformSetupTest {
             }
         )
         assertEquals(SessionStatus.Initializing, auth.sessionStatus.value)
-        auth.setupPlatform()
+        auth.setupNativePlatform()
         assertIs<SessionStatus.Authenticated>(auth.sessionStatus.value)
         assertEquals(session, (auth.sessionStatus.value as SessionStatus.Authenticated).session)
         assertTrue { changedUrl }
@@ -156,7 +157,7 @@ class PlatformSetupTest {
         )
         val auth = createAuthClient(autoSetup = false, bridge, FlowType.PKCE)
         assertEquals(SessionStatus.Initializing, auth.sessionStatus.value)
-        auth.setupPlatform()
+        auth.setupNativePlatform()
         auth.events.test {
             val errorEvent = awaitItem()
             assertIs<AuthEvent.OtpError>(errorEvent)
@@ -171,7 +172,7 @@ class PlatformSetupTest {
     fun testPlatformSetupOnNode() = runTestOnNode {
         val auth = createAuthClient(autoSetup = false)
         assertEquals(SessionStatus.Initializing, auth.sessionStatus.value)
-        auth.setupPlatform()
+        auth.setupNativePlatform()
         assertIs<SessionStatus.NotAuthenticated>(auth.sessionStatus.value)
     }
 
@@ -187,9 +188,11 @@ class PlatformSetupTest {
                     autoSetupPlatform = autoSetup
                     autoLoadFromStorage = false
                     alwaysAutoRefresh = false
-                    browserBridge = bridge
                     this.flowType = flowType
                     codeVerifierCache = MemoryCodeVerifierCache("verifier") //not important
+                    nativeConfig {
+                        browserBridge = bridge
+                    }
                 }
             },
             requestHandler = requestHandler
@@ -209,6 +212,14 @@ class PlatformSetupTest {
     private fun runTestOnBrowser(body: suspend TestScope.() -> Unit) = if(IS_BROWSER) runTest(testBody = body) else runTest {}
 
     private fun runTestOnNode(body: suspend TestScope.() -> Unit) = if(!IS_BROWSER) runTest(testBody = body) else runTest {}
+
+    fun userSession(customToken: String = "accessToken", expiresIn: Long = 3600, user: UserInfo? = null) = UserSession(
+        accessToken = customToken,
+        refreshToken = "refreshToken",
+        expiresIn = expiresIn,
+        tokenType = "Bearer",
+        user = user
+    )
 
 }
 
