@@ -11,10 +11,6 @@ actual class AuthConfig : AuthConfigDefaults() {
 
     /**
      * The current http callback configuration for the web server, when logging in with OAuth or SSO.
-     *
-     * The setter is internal; configure it via [httpCallbackConfig]. The getter is public so the
-     * active [HttpCallbackConfig] (e.g. [HttpCallbackConfig.redirectHtml]) can be read or mutated at
-     * runtime without reflection.
      */
     var httpCallbackConfig: HttpCallbackConfig = HttpCallbackConfig()
         internal set
