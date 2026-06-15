@@ -126,6 +126,7 @@ class KtorSupabaseHttpClient @SupabaseInternal constructor(
                 }
             }
             put("runtime", "kotlin")
+            put("runtime-version", KotlinVersion.CURRENT.toString())
         }
         append("X-Client-Info", "supabase-kt/${BuildConfig.PROJECT_VERSION}" + metadata.toList().joinToString("; ", prefix = "; ") { "${it.first}=${it.second}" })
     }
