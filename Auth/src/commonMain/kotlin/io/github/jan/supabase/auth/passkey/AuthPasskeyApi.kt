@@ -11,25 +11,26 @@ interface AuthPasskeyApi {
 
     /**
      * Start passkey registration for the current authenticated user.
-     * Returns WebAuthn credential creation options to pass to navigator.credentials.create().
      */
-    suspend fun startRegistration(): PasskeyRegistrationOptions
+    suspend fun startRegistration(): PasskeyRegistrationResponse
 
     /**
      * Verify passkey registration with the credential response.
-     * The credentialResponse should be the serialized output of navigator.credentials.create().
+     * @param challengeId Challenge ID from startRegistration
+     * @param credential Serialized credential
      */
-    suspend fun verifyRegistration(challengeId: String, credential: String): PasskeyMetadata
+    suspend fun verifyRegistration(challengeId: String, credential: String): PasskeyRegistrationVerifyResponse
 
     /**
      * Start passkey authentication.
-     * Returns WebAuthn credential request options to pass to navigator.credentials.get().
+     * @param builder Extra parameters like a captcha token
      */
     suspend fun startAuthentication(builder: PasskeyAuthenticationBuilder.() -> Unit = {}): PasskeyAuthenticationOptionsResponse
 
     /**
      * Verify passkey authentication and create a session.
-     * The credential should be the serialized output of navigator.credentials.get().
+     * @param challengeId Challenge ID from startAuthentication
+     * @param credential Serialized credential
      */
     suspend fun verifyAuthentication(challengeId: String, credential: String): PasskeyAuthenticationVerifyResponse
 
@@ -40,11 +41,14 @@ interface AuthPasskeyApi {
 
     /**
      * Update a passkey.
+     * @param passkeyId UUID of the passkey to delete
      */
     suspend fun delete(passkeyId: String)
 
     /**
      * Delete a passkey.
+     * @param passkeyId UUID of the passkey to update
+     * @param friendlyName New friendly name (max 120 chars)
      */
     suspend fun update(passkeyId: String, friendlyName: String): PasskeyListItem
 
@@ -54,7 +58,7 @@ internal class AuthPasskeyApiImpl(
     private val api: AuthenticatedSupabaseApi
 ): AuthPasskeyApi {
 
-    override suspend fun startRegistration(): PasskeyRegistrationOptions {
+    override suspend fun startRegistration(): PasskeyRegistrationResponse {
         val result = api.post("registration/options")
         return result.safeBody()
     }
@@ -62,7 +66,7 @@ internal class AuthPasskeyApiImpl(
     override suspend fun verifyRegistration(
         challengeId: String,
         credential: String
-    ): PasskeyMetadata {
+    ): PasskeyRegistrationVerifyResponse {
         return api.postJson("registration/verify", buildJsonObject {
             put("challenge_id", challengeId)
             put("credential", Json.decodeFromString(credential))

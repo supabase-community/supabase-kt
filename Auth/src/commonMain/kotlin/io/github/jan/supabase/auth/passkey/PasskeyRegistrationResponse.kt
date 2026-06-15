@@ -4,8 +4,14 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.json.JsonObject
 import kotlin.time.Instant
 
-data class PasskeyRegistrationOptions(
+/**
+ * Response for [AuthPasskeyApi.startRegistration]
+ * @param challengeId The challenge id
+ * @param options The server options
+ * @param expiresAt When the registration expires at
+ */
+data class PasskeyRegistrationResponse(
     @SerialName("challenge_id") val challengeId: String,
-    val options: JsonObject, // TODO: type
+    val options: JsonObject,
     @SerialName("expires_at") val expiresAt: Instant
 )

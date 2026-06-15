@@ -86,12 +86,12 @@ interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
     val admin: AdminApi
 
     /**
-     * Access to the mfa api where you can manage multi-factor authentication for the current user.
+     * Access to the [MfaApi] where you can manage multi-factor authentication for the current user.
      */
     val mfa: MfaApi
 
     /**
-     * TODO
+     * Access to the [AuthPasskeyApi] where you can manage the user's passkeys
      */
     val passkeys: AuthPasskeyApi
 
