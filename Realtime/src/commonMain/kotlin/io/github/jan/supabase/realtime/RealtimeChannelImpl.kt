@@ -9,7 +9,12 @@ import io.github.jan.supabase.putJsonObject
 import io.github.jan.supabase.realtime.data.BroadcastApiBody
 import io.github.jan.supabase.realtime.data.BroadcastApiMessage
 import io.github.jan.supabase.realtime.event.RealtimeEvent
+import io.ktor.client.request.parameter
+import io.ktor.client.request.setBody
 import io.ktor.client.statement.bodyAsText
+import io.ktor.http.ContentType
+import io.ktor.http.appendPathSegments
+import io.ktor.http.contentType
 import io.ktor.http.headers
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.delay
@@ -105,6 +110,35 @@ internal class RealtimeChannelImpl(
             return
         }
         event.handle(this, message)
+    }
+
+    override suspend fun httpSend(event: String, payload: HttpSendPayload, builder: HttpSendBuilder.() -> Unit) {
+        val token = accessToken()
+        val response = httpClient.post(
+            url = broadcastUrl,
+        ) {
+            headers {
+                append("apikey", realtimeImpl.supabaseClient.supabaseKey)
+                token?.let {
+                    set("Authorization", "Bearer $it")
+                }
+            }
+            when(payload) {
+                is HttpSendPayload.Binary -> {
+                    contentType(ContentType.Application.OctetStream)
+                    setBody(payload.buffer)
+                }
+                is HttpSendPayload.Json -> {
+                    contentType(ContentType.Application.Json)
+                    setBody(payload.value)
+                }
+            }
+            url.appendPathSegments(subTopic, "events", event)
+            if(isPrivate) {
+                parameter("private", true)
+            }
+        }
+        // handle error response
     }
 
     override suspend fun scheduleRejoin() {

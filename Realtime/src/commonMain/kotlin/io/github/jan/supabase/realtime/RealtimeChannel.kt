@@ -66,6 +66,8 @@ interface RealtimeChannel {
      */
     suspend fun broadcast(event: String, message: JsonObject)
 
+    suspend fun httpSend(event: String, payload: HttpSendPayload, builder: HttpSendBuilder.() -> Unit = {})
+
     /**
      * Store an object in your presence's state. Other clients can get this data when you either join or leave the channel.
      * Use this method again to update the state.
