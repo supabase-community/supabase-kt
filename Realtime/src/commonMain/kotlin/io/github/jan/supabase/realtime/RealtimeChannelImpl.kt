@@ -2,6 +2,7 @@ package io.github.jan.supabase.realtime
 
 import io.github.jan.supabase.annotations.SupabaseInternal
 import io.github.jan.supabase.collections.AtomicMutableList
+import io.github.jan.supabase.exceptions.RestException
 import io.github.jan.supabase.logging.SupabaseLogger
 import io.github.jan.supabase.logging.d
 import io.github.jan.supabase.logging.e
@@ -9,10 +10,13 @@ import io.github.jan.supabase.putJsonObject
 import io.github.jan.supabase.realtime.data.BroadcastApiBody
 import io.github.jan.supabase.realtime.data.BroadcastApiMessage
 import io.github.jan.supabase.realtime.event.RealtimeEvent
+import io.github.jan.supabase.safeBody
+import io.ktor.client.plugins.timeout
 import io.ktor.client.request.parameter
 import io.ktor.client.request.setBody
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.ContentType
+import io.ktor.http.HttpStatusCode
 import io.ktor.http.appendPathSegments
 import io.ktor.http.contentType
 import io.ktor.http.headers
@@ -27,8 +31,10 @@ import kotlinx.coroutines.flow.first
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.contentOrNull
 import kotlinx.serialization.json.encodeToJsonElement
 import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.put
 import kotlinx.serialization.json.putJsonObject
 import kotlin.concurrent.atomics.AtomicInt
@@ -114,6 +120,7 @@ internal class RealtimeChannelImpl(
 
     override suspend fun httpSend(event: String, payload: HttpSendPayload, builder: HttpSendBuilder.() -> Unit) {
         val token = accessToken()
+        val builder = HttpSendBuilder().apply(builder)
         val response = httpClient.post(
             url = broadcastUrl,
         ) {
@@ -137,8 +144,27 @@ internal class RealtimeChannelImpl(
             if(isPrivate) {
                 parameter("private", true)
             }
+            builder.timeout?.inWholeMilliseconds?.let {
+                timeout {
+                    requestTimeoutMillis = it
+                }
+            }
         }
-        // handle error response
+        when(response.status) {
+            HttpStatusCode.Accepted -> return
+            HttpStatusCode.NotFound -> error("""
+                httpSend() requires Realtime server v2.97.0 or newer; the endpoint returned 404. 
+                Update your Supabase CLI to a recent version, or upgrade the Realtime server in your self-hosted setup.
+            """.trimIndent())
+        }
+        val errorMessage = try {
+            val body = response.safeBody<JsonObject>()
+            body["error"]?.jsonPrimitive?.contentOrNull ?: body["message"]?.jsonPrimitive?.contentOrNull
+        } catch(e: Exception) {
+            logger.d(e) { "Exception thrown while decoding the error message from a httpSend response" }
+            null
+        } ?:  response.status.description
+        throw RestException(errorMessage, null, response)
     }
 
     override suspend fun scheduleRejoin() {
