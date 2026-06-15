@@ -16,9 +16,9 @@ interface RealtimeWebsocket {
     val hasIncomingMessages: Boolean
 
     /**
-     * Receive a message from the websocket.
+     * Receive a frame from the websocket.
      */
-    suspend fun receive(): RealtimeMessage
+    suspend fun receive(): RealtimeFrame
 
     /**
      * Send a message to the websocket.

@@ -146,6 +146,7 @@ interface Realtime : MainPlugin<Realtime.Config>, CustomSerializationPlugin {
         var connectOnSubscribe: Boolean = true
         @SupabaseInternal var websocketFactory: RealtimeWebsocketFactory? = null
         var disconnectOnNoSubscriptions: Boolean = true
+        var vsn = RealtimeProtocolVersion.V2
         override var requireValidSession: Boolean = false
 
         internal var customAccessTokenProvider = false
