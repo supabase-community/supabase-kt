@@ -127,7 +127,7 @@ class KtorSupabaseHttpClient @SupabaseInternal constructor(
             }
             put("runtime", "kotlin")
         }
-        append("X-Client-Info", "supabase-kt/${BuildConfig.PROJECT_VERSION}" + metadata.toList().joinToString("; "))
+        append("X-Client-Info", "supabase-kt/${BuildConfig.PROJECT_VERSION}" + metadata.toList().joinToString("; ", prefix = "; ") { "${it.first}=${it.second}" })
     }
 
     private fun HttpClientConfig<*>.applyDefaultConfiguration(modifiers: List<HttpClientConfig<*>.() -> Unit>) {

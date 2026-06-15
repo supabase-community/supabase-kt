@@ -23,33 +23,9 @@ class SupabaseClientTest {
                 supabaseKey = "somekey",
                 requestHandler = {
                     assertEquals(
-                        "supabase-kt/${BuildConfig.PROJECT_VERSION}",
+                        "supabase-kt/${BuildConfig.PROJECT_VERSION}; platform=TestOS; platform-version=1.0.0; runtime=kotlin",
                         it.headers["X-Client-Info"],
                         "X-Client-Info header should be set to 'supabase-kt/${BuildConfig.PROJECT_VERSION}'"
-                    )
-                    respond("")
-                },
-                clientHandler = { it.httpClient.get("") }
-            )
-        }
-    }
-
-    @Test
-    fun testOSVersionHeader() {
-        runTest {
-            withMockedSupabaseClient(
-                supabaseUrl = "https://example.supabase.co",
-                supabaseKey = "somekey",
-                requestHandler = {
-                    assertEquals(
-                        "TestOS",
-                        it.headers["X-Supabase-Client-Platform"],
-                        "X-Supabase-Client-Platform header should be set to 'TestOS'"
-                    )
-                    assertEquals(
-                        "1.0.0",
-                        it.headers["X-Supabase-Client-Platform-Version"],
-                        "X-Supabase-Client-Platform-Version header should be set to '1.0.0'"
                     )
                     respond("")
                 },
