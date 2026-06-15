@@ -308,7 +308,7 @@ import kotlin.time.Duration
     private fun realtimeWebsocketUrl(): String {
         return buildUrl(realtimeBaseUrl()) {
             parameters["apikey"] = supabaseClient.supabaseKey
-            parameters["vsn"] = "1.0.0"
+            parameters["vsn"] = config.vsn.value
             pathSegments += listOf("websocket")
         }
     }
