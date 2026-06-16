@@ -100,7 +100,7 @@ import kotlin.time.Duration
             }
         } catch(e: Exception) {
             currentCoroutineContext().ensureActive()
-            logger.e(e) { """
+            logger.w(e) { """
                 Error while trying to connect to realtime websocket. Trying again in ${config.reconnectDelay}
                 URL: $websocketUrl
                 """.trimIndent() }
@@ -153,7 +153,7 @@ import kotlin.time.Duration
                 }
             } catch(e: Exception) {
                 currentCoroutineContext().ensureActive()
-                logger.e(e) { "Error while listening for messages. Trying again in ${config.reconnectDelay}" }
+                logger.w(e) { "Error while listening for messages. Trying again in ${config.reconnectDelay}" }
                 reconnect()
             }
         }
@@ -226,7 +226,7 @@ import kotlin.time.Duration
         if (heartbeatRef.load() != 0) {
             heartbeatRef.store(0)
             ref.store(0)
-            logger.e { "Heartbeat timeout. Trying to reconnect in ${config.reconnectDelay}" }
+            logger.w { "Heartbeat timeout. Trying to reconnect in ${config.reconnectDelay}" }
             reconnect()
             return
         }
@@ -326,7 +326,7 @@ import kotlin.time.Duration
             ws?.send(message)
         } catch(e: Exception) {
             currentCoroutineContext().ensureActive()
-            logger.e(e) { "Error while sending message $message. Reconnecting in ${config.reconnectDelay}" }
+            logger.w(e) { "Error while sending message $message. Reconnecting in ${config.reconnectDelay}" }
             reconnect()
         }
     }
