@@ -129,7 +129,7 @@ interface Realtime : MainPlugin<Realtime.Config>, CustomSerializationPlugin {
      * @property serializer A serializer used for serializing/deserializing objects e.g. in [PresenceAction.decodeJoinsAs] or [RealtimeChannel.broadcast]. Defaults to [KotlinXSerializer]
      * @property websocketFactory A custom websocket factory. If this is set, the [websocketConfig] will be ignored
      * @property rejoinDelay The interval between channel rejoin attempts
-     * @property maxAttempts The maximum amount of connection attempts before giving up. Defaults to 5
+     * @property maxAttempts The maximum number of times a channel will try to rejoin after an error before giving up. Defaults to 5
      * @property disconnectOnEmptyChannelsAfter Delay before disconnecting from the realtime socket after the last channel was removed. If null, it defaults to `2*heartbeatInterval`
      */
     @Suppress("MagicNumber")
