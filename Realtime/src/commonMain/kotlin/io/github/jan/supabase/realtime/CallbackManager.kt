@@ -8,7 +8,6 @@ import kotlinx.collections.immutable.PersistentMap
 import kotlinx.collections.immutable.persistentHashMapOf
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.plus
-import kotlinx.serialization.json.JsonObject
 import kotlin.concurrent.atomics.AtomicInt
 import kotlin.concurrent.atomics.AtomicReference
 import kotlin.concurrent.atomics.fetchAndIncrement
@@ -30,7 +29,7 @@ interface CallbackManager {
 
     fun triggerPostgresChange(ids: List<Int>, data: PostgresAction)
 
-    fun triggerBroadcast(event: String, data: JsonObject)
+    fun triggerBroadcast(data: RealtimeBroadcast<*>)
 
     fun triggerPresenceDiff(joins: Map<String, Presence>, leaves: Map<String, Presence>)
 
@@ -41,7 +40,7 @@ interface CallbackManager {
      */
     fun presenceState(): Map<String, Presence>
 
-    fun addBroadcastCallback(event: String, callback: (JsonObject) -> Unit): RealtimeCallbackId.Broadcast
+    fun addBroadcastCallback(event: String, callback: (RealtimeBroadcast<*>) -> Unit): RealtimeCallbackId.Broadcast
 
     fun addPostgresCallback(filter: PostgresJoinConfig, callback: (PostgresAction) -> Unit): RealtimeCallbackId.Postgres
 
@@ -86,7 +85,7 @@ internal class CallbackManagerImpl(
         nextId.store(0)
     }
 
-    override fun addBroadcastCallback(event: String, callback: (JsonObject) -> Unit): RealtimeCallbackId.Broadcast {
+    override fun addBroadcastCallback(event: String, callback: (RealtimeBroadcast<*>) -> Unit): RealtimeCallbackId.Broadcast {
         val id = nextId.fetchAndIncrement()
         broadcastCallbacks.update {
             val current = it[event] ?: persistentListOf()
@@ -113,8 +112,8 @@ internal class CallbackManagerImpl(
         callbacks.forEach { it.callback(data) }
     }
 
-    override fun triggerBroadcast(event: String, data: JsonObject) {
-        broadcastCallbacks.load()[event]?.forEach { it.callback(data) }
+    override fun triggerBroadcast(data: RealtimeBroadcast<*>) {
+        broadcastCallbacks.load()[data.event]?.forEach { it.callback(data) }
     }
 
     override fun triggerPresenceDiff(joins: Map<String, Presence>, leaves: Map<String, Presence>) {

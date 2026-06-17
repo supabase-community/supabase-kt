@@ -1,7 +1,6 @@
 package io.github.jan.supabase.realtime
 
 import io.github.jan.supabase.annotations.SupabaseInternal
-import kotlinx.serialization.json.JsonObject
 
 @SupabaseInternal
 sealed interface RealtimeCallback <T> {
@@ -16,10 +15,10 @@ sealed interface RealtimeCallback <T> {
     ): RealtimeCallback<PostgresAction>
 
     class BroadcastCallback(
-        override val callback: (JsonObject) -> Unit,
+        override val callback: (RealtimeBroadcast<*>) -> Unit,
         val event: String,
         override val id: Int
-    ): RealtimeCallback<JsonObject>
+    ): RealtimeCallback<RealtimeBroadcast<*>>
 
     class PresenceCallback(
         override val callback: (PresenceAction) -> Unit,

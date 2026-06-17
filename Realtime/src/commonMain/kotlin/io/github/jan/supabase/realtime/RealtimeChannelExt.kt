@@ -3,7 +3,10 @@ package io.github.jan.supabase.realtime
 import io.github.jan.supabase.annotations.SupabaseInternal
 import io.github.jan.supabase.encodeToJsonElement
 import io.github.jan.supabase.exceptions.RestException
+import io.github.jan.supabase.logging.e
+import io.github.jan.supabase.logging.i
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.serialization.json.jsonObject
 import kotlin.reflect.typeOf
 
@@ -41,7 +44,23 @@ inline fun <reified T : PostgresAction> RealtimeChannel.postgresChangeFlow(
  * @param event When a message is sent by another client, it will be sent under a specific event. This is the event that you want to listen to
  */
 @OptIn(SupabaseInternal::class)
-inline fun <reified T : Any> RealtimeChannel.broadcastFlow(event: String): Flow<T> = broadcastFlowInternal(typeOf<T>(), event)
+inline fun <reified T : Any> RealtimeChannel.broadcastFlow(event: String): Flow<T> = broadcastFlow(event).mapNotNull {
+    when (it) {
+        is RealtimeBroadcast.Binary if (T::class == ByteArray::class) -> it.payload as T
+        is RealtimeBroadcast.Json -> try {
+            realtime.serializer.decode(typeOf<T>(), it.payload)
+        } catch (e: Exception) {
+            logger.e(e) { "Dropped json broadcast, because the payload could not be decoded as ${T::class}" }
+            null
+        }
+
+        else -> {
+            logger.i { "Dropped binary broadcast, because the expected type is ${T::class}" }
+            null
+        }
+    }
+}
+
 
 /**
  * Sends a message to everyone who joined the channel. Can be used even if you aren't connected to the channel.

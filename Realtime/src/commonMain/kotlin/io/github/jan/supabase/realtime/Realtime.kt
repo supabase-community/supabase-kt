@@ -98,6 +98,8 @@ interface Realtime : MainPlugin<Realtime.Config>, CustomSerializationPlugin {
     @SupabaseInternal
     suspend fun send(message: RealtimeMessage)
 
+    suspend fun send(data: ByteArray)
+
     /**
      * Sets the JWT access token used for channel subscription authorization and Realtime RLS.
      *

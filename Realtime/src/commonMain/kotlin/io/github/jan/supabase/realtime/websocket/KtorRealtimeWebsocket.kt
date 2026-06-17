@@ -1,9 +1,10 @@
 package io.github.jan.supabase.realtime.websocket
 
 import io.github.jan.supabase.realtime.RealtimeMessage
-import io.github.jan.supabase.realtime.RealtimeProtocolVersion
 import io.ktor.client.plugins.websocket.DefaultClientWebSocketSession
 import io.ktor.client.plugins.websocket.sendSerialized
+import io.ktor.websocket.Frame
+import io.ktor.websocket.send
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.job
@@ -13,18 +14,21 @@ import kotlinx.coroutines.job
  */
 class KtorRealtimeWebsocket(
     private val ws: DefaultClientWebSocketSession,
-    val vsn: RealtimeProtocolVersion
 ): RealtimeWebsocket {
 
     override val hasIncomingMessages: Boolean get() = ws.isActive
 
-    override suspend fun receive(): RealtimeFrame {
-        TODO("")
+    override suspend fun receive(): Frame {
+        return ws.incoming.receive()
     }
 
 
     override suspend fun send(message: RealtimeMessage) {
         ws.sendSerialized(message)
+    }
+
+    override suspend fun send(data: ByteArray) {
+        ws.send(data)
     }
 
     override fun disconnect() {

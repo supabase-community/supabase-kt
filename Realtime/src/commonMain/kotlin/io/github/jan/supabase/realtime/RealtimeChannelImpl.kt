@@ -22,7 +22,6 @@ import io.ktor.http.contentType
 import io.ktor.http.headers
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -40,7 +39,6 @@ import kotlinx.serialization.json.putJsonObject
 import kotlin.concurrent.atomics.AtomicInt
 import kotlin.concurrent.atomics.incrementAndFetch
 import kotlin.reflect.KClass
-import kotlin.reflect.KType
 
 internal class RealtimeChannelImpl(
     override val realtime: Realtime,
@@ -116,6 +114,10 @@ internal class RealtimeChannelImpl(
             return
         }
         event.handle(this, message)
+    }
+
+    fun onBroadcast(broadcast: RealtimeBroadcast<*>) {
+        callbackManager.triggerBroadcast(broadcast)
     }
 
     override suspend fun httpSend(event: String, payload: HttpSendPayload, builder: HttpSendBuilder.() -> Unit) {
@@ -205,14 +207,21 @@ internal class RealtimeChannelImpl(
                 error("Failed to broadcast message (${response.status}): ${response.bodyAsText()}")
             }
         } else {
-            realtimeImpl.send(
-                RealtimeMessage(topic, "broadcast", buildJsonObject {
-                    put("type", "broadcast")
-                    put("event", event)
-                    put("payload", message)
-                }, (realtimeImpl.ref.incrementAndFetch()).toString())
-            )
+            when(realtime.config.vsn) {
+                RealtimeProtocolVersion.V1 -> realtimeImpl.send(
+                    RealtimeMessage(topic, "broadcast", buildJsonObject {
+                        put("type", "broadcast")
+                        put("event", event)
+                        put("payload", message)
+                    }, (realtimeImpl.ref.incrementAndFetch()).toString())
+                )
+                RealtimeProtocolVersion.V2 -> TODO("")
+            }
         }
+    }
+
+    override suspend fun broadcast(event: String, data: ByteArray) {
+
     }
 
     @SupabaseInternal
@@ -283,10 +292,21 @@ internal class RealtimeChannelImpl(
         }
     }
 
-    override fun <T : Any> RealtimeChannel.broadcastFlowInternal(type: KType, event: String): Flow<T> = callbackFlow {
+    override fun RealtimeChannel.broadcastFlow(event: String): Flow<RealtimeBroadcast<*>> = callbackFlow {
+        val id = callbackManager.addBroadcastCallback(event) {
+            trySend(it)
+        }
+        awaitClose { callbackManager.removeCallbackById(id) }
+    }
+
+  /*  override fun <T : Any> RealtimeChannel.broadcastFlowInternal(type: KType, event: String): Flow<T> = callbackFlow {
         val id = callbackManager.addBroadcastCallback(event) {
             val decodedValue = try {
-                supabaseClient.realtime.serializer.decode<T>(type, it.toString())
+                when(it) {
+                    is RealtimeBroadcast.Binary if(type == typeOf<ByteArray>()) -> it.payload as T
+                    is RealtimeBroadcast.Json -> supabaseClient.realtime.serializer.decode<T>(type, it.payload.toString())
+                    else -> error("Received binary broadcast in event flow for $event, even though the specified type is not `ByteArray`")
+                }
             } catch(e: Exception) {
                 coroutineContext.ensureActive()
                 logger.e(e) { "Couldn't decode $it as $type. The corresponding handler wasn't called" }
@@ -295,7 +315,7 @@ internal class RealtimeChannelImpl(
             decodedValue?.let { value -> trySend(value) }
         }
         awaitClose { callbackManager.removeCallbackById(id) }
-    }
+    }*/
 
     override fun presenceChangeFlow(): Flow<PresenceAction> = callbackFlow {
         val callback: (PresenceAction) -> Unit = { action ->

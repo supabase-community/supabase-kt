@@ -14,11 +14,16 @@ import io.github.jan.supabase.logging.d
 import io.github.jan.supabase.logging.e
 import io.github.jan.supabase.logging.i
 import io.github.jan.supabase.logging.w
+import io.github.jan.supabase.realtime.broadcast.RealtimeSerializer
 import io.github.jan.supabase.realtime.websocket.KtorRealtimeWebsocketFactory
 import io.github.jan.supabase.realtime.websocket.RealtimeWebsocket
+import io.github.jan.supabase.supabaseJson
 import io.ktor.client.statement.HttpResponse
 import io.ktor.http.URLProtocol
 import io.ktor.http.path
+import io.ktor.websocket.Frame
+import io.ktor.websocket.readBytes
+import io.ktor.websocket.readText
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
@@ -148,7 +153,24 @@ import kotlin.time.Duration
             try {
                 ws?.let {
                     while(ws?.hasIncomingMessages == true) {
-                        onMessage(ws?.receive() ?: return@launch)
+                        val frame = ws?.receive() ?: return@launch
+                        when(frame) {
+                            is Frame.Binary -> {
+                                if(config.vsn == RealtimeProtocolVersion.V1) {
+                                    logger.w { "Received binary payload, but vsn is 1.0.0; binary frames are only supported in 2.0.0" }
+                                    continue;
+                                }
+                                val broadcast = RealtimeSerializer.decodeBinaryPayload(frame.readBytes())
+                                onBroadcast(broadcast)
+                            }
+                            is Frame.Text -> {
+                                when(config.vsn) {
+                                    RealtimeProtocolVersion.V1 -> onMessage(supabaseJson.decodeFromString(frame.readText()))
+                                    RealtimeProtocolVersion.V2 -> onMessage(RealtimeSerializer.decodeV2Text(frame.readText()))
+                                }
+                            }
+                            else -> Unit
+                        }
                     }
                 }
             } catch(e: Exception) {
@@ -157,6 +179,12 @@ import kotlin.time.Duration
                 reconnect()
             }
         }
+    }
+
+    private fun onBroadcast(broadcast: RealtimeBroadcast<*>) {
+        val channel = subscriptions[broadcast.payload] as? RealtimeChannelImpl
+        logger.d { "Received ${broadcast::class}" }
+        channel?.onBroadcast(broadcast)
     }
 
     private fun startHeartbeating() {
@@ -327,6 +355,16 @@ import kotlin.time.Duration
         } catch(e: Exception) {
             currentCoroutineContext().ensureActive()
             logger.w(e) { "Error while sending message $message. Reconnecting in ${config.reconnectDelay}" }
+            reconnect()
+        }
+    }
+
+    override suspend fun send(data: ByteArray) {
+        try {
+            ws?.send(data)
+        } catch(e: Exception) {
+            currentCoroutineContext().ensureActive()
+            logger.e(e) { "Error while sending binary data. Reconnecting in ${config.reconnectDelay}" }
             reconnect()
         }
     }

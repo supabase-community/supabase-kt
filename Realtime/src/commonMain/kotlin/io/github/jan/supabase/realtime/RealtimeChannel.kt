@@ -8,7 +8,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.serialization.json.JsonObject
 import kotlin.reflect.KClass
-import kotlin.reflect.KType
 
 /**
  * Represents a realtime channel
@@ -64,6 +63,8 @@ interface RealtimeChannel {
      */
     suspend fun broadcast(event: String, message: JsonObject)
 
+    suspend fun broadcast(event: String, data: ByteArray)
+
     /**
      * Sends a broadcast message explicitly via REST API.
      *
@@ -102,8 +103,7 @@ interface RealtimeChannel {
     /**
      * Non-inline variant of [broadcastFlow] for implementation and mocking purposes
      */
-    @SupabaseInternal
-    fun <T : Any> RealtimeChannel.broadcastFlowInternal(type: KType, event: String): Flow<T>
+    fun RealtimeChannel.broadcastFlow(event: String): Flow<RealtimeBroadcast<*>>
 
     /**
      * Listen for clients joining / leaving the channel using presences
