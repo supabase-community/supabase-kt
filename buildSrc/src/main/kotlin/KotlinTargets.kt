@@ -1,4 +1,5 @@
-import com.android.build.api.dsl.androidLibrary
+
+import com.android.build.api.dsl.KotlinMultiplatformAndroidLibraryTarget
 import org.gradle.kotlin.dsl.assign
 import org.gradle.kotlin.dsl.extra
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
@@ -44,15 +45,20 @@ fun KotlinMultiplatformExtension.configuredJvmTarget(jvmTarget: JvmTarget = JvmT
 fun KotlinMultiplatformExtension.configuredAndroidTarget(
     jvmTarget: JvmTarget = JvmTarget.JVM_1_8,
 ) {
-    androidLibrary {
-        compileSdk = 36
-        minSdk = 23
+    android {
+        compileSdk { version = release(37) }
+        minSdk { version = release(23) }
         this.namespace = namespace ?: "${project.extra["base-group"].toString().replace("-", ".")}.${project.name.replace("-", "")}.library"
-        compilations.configureEach {
-            compilerOptions.configure {
-                this.jvmTarget.set(jvmTarget)
-            }
+        compilerOptions {
+            this.jvmTarget.set(jvmTarget)
         }
+    }
+}
+
+// workaround because the method somehow does not exist in convention plugins
+fun KotlinMultiplatformExtension.android(configure: KotlinMultiplatformAndroidLibraryTarget.() -> Unit) {
+    (extensions.getByName("android") as KotlinMultiplatformAndroidLibraryTarget).apply {
+        configure()
     }
 }
 

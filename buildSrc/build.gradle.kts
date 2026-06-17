@@ -10,6 +10,7 @@ repositories {
 
 dependencies {
     implementation(libs.kotlin.multiplatform.gradle)
+    implementation(libs.android.library)
     implementation(libs.android.gradle.plugin)
     implementation(libs.detekt.gradle)
     implementation(libs.dokka.gradle)

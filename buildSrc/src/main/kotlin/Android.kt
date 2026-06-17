@@ -1,20 +1,30 @@
-import com.android.build.gradle.LibraryExtension
-import com.android.build.gradle.internal.dsl.BaseAppModuleExtension
+import com.android.build.api.dsl.ApplicationExtension
 import org.gradle.api.JavaVersion
 import org.gradle.api.Project
-import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.extra
-import org.gradle.kotlin.dsl.get
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 
-fun Project.configureLibraryAndroidTarget(
+fun KotlinMultiplatformExtension.configureLibraryAndroidTarget(
     namespace: String? = null,
     minSdk: Int = 23,
-    javaVersion: JavaVersion = JavaVersion.VERSION_1_8
+    javaVersion: JvmTarget = JvmTarget.JVM_1_8
 ) {
-    extensions.configure(LibraryExtension::class) {
-        compileSdk = 36
+    android {
+        this.namespace = namespace ?: "${project.extra["base-group"].toString().replace("-", ".")}.${this@configureLibraryAndroidTarget.project.name.replace("-", "")}.library"
+        compileSdk = 37
+        this.minSdk = minSdk
+        compilerOptions {
+            jvmTarget.set(javaVersion)
+        }
+        lint {
+            abortOnError = false
+        }
+    }
+    /*extensions.configure(LibraryExtension::class) {
+        compileSdk = 37
         sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
-        this.namespace = namespace ?: "${extra["base-group"].toString().replace("-", ".")}.${this@configureLibraryAndroidTarget.name.replace("-", "")}.library"
+        this.namespace =
         defaultConfig {
             this.minSdk = minSdk
         }
@@ -25,27 +35,30 @@ fun Project.configureLibraryAndroidTarget(
             sourceCompatibility = javaVersion
             targetCompatibility = javaVersion
         }
-    }
+    }*/
+
 }
 
-fun BaseAppModuleExtension.configureApplicationAndroidTarget(
+fun Project.configureApplicationAndroidTarget(
     javaVersion: JavaVersion = JavaVersion.VERSION_1_8
 ) {
-    compileSdk = 36
-    defaultConfig {
-        applicationId = "io.github.jan.supabase.android"
-        minSdk = 26
-        versionCode = 1
-        versionName = "1.0-SNAPSHOT"
-    }
-    namespace = "io.github.jan.supabase.android"
-    compileOptions {
-        sourceCompatibility = javaVersion
-        targetCompatibility = javaVersion
-    }
-    buildTypes {
-        getByName("release") {
-            isMinifyEnabled = false
+    (this as org.gradle.api.plugins.ExtensionAware).extensions.configure<ApplicationExtension>("android") {
+        compileSdk = 37
+        defaultConfig {
+            applicationId = "io.github.jan.supabase.android"
+            minSdk = 26
+            versionCode = 1
+            versionName = "1.0-SNAPSHOT"
+        }
+        namespace = "io.github.jan.supabase.android"
+        compileOptions {
+            sourceCompatibility = javaVersion
+            targetCompatibility = javaVersion
+        }
+        buildTypes {
+            getByName("release") {
+                isMinifyEnabled = false
+            }
         }
     }
 }

@@ -4,7 +4,6 @@ plugins {
     id(libs.plugins.compose.plugin.get().pluginId)
     alias(libs.plugins.compose.compiler)
     id("com.android.application")
-    id(libs.plugins.kotlin.android.get().pluginId)
     alias(libs.plugins.kotlinx.plugin.serialization)
 }
 
@@ -16,9 +15,7 @@ dependencies {
     implementation(project(":sample:multi-factor-auth:common"))
 }
 
-android {
-    configureApplicationAndroidTarget(JavaVersion.VERSION_11)
-}
+configureApplicationAndroidTarget(JavaVersion.VERSION_11)
 
 kotlin {
     compilerOptions {
