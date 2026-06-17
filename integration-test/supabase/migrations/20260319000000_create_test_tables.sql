@@ -7,6 +7,13 @@ CREATE TABLE IF NOT EXISTS public.test_items (
     user_id UUID REFERENCES auth.users(id)
 );
 
+-- Grant table privileges to the PostgREST roles. Row access is still
+-- restricted by the RLS policies below; without these grants every request
+-- fails with "permission denied for table test_items" (SQLSTATE 42501).
+GRANT SELECT ON public.test_items TO anon;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.test_items TO authenticated;
+GRANT ALL ON public.test_items TO service_role;
+
 ALTER TABLE public.test_items ENABLE ROW LEVEL SECURITY;
 
 -- Authenticated users can CRUD their own rows
