@@ -24,8 +24,7 @@ class SupabaseClientTest {
                 requestHandler = {
                     assertEquals(
                         "supabase-kt/${BuildConfig.PROJECT_VERSION}; platform=TestOS; platform-version=1.0.0; runtime=kotlin; runtime-version=${KotlinVersion.CURRENT}",
-                        it.headers["X-Client-Info"],
-                        "X-Client-Info header should be set to 'supabase-kt/${BuildConfig.PROJECT_VERSION}'"
+                        it.headers["X-Client-Info"]
                     )
                     respond("")
                 },
