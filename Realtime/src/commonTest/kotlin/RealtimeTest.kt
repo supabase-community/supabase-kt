@@ -3,6 +3,7 @@ import io.github.jan.supabase.realtime.Realtime
 import io.github.jan.supabase.realtime.RealtimeChannel
 import io.github.jan.supabase.realtime.RealtimeImpl
 import io.github.jan.supabase.realtime.RealtimeMessage
+import io.github.jan.supabase.realtime.RealtimeProtocolVersion
 import io.github.jan.supabase.realtime.channel
 import io.github.jan.supabase.realtime.realtime
 import kotlinx.coroutines.test.advanceTimeBy
@@ -243,7 +244,7 @@ class RealtimeTest {
     }
 
     @Test
-    fun testSendingRealtimeMessages() {
+    fun testSendingRealtimeMessagesV2() {
         val expectedMessage = RealtimeMessage(
             topic = "realtimeTopic",
             event = "realtimeEvent",
@@ -261,6 +262,34 @@ class RealtimeTest {
                 supabaseHandler = {
                     it.realtime.connect()
                     it.realtime.send(expectedMessage)
+                }
+            )
+        }
+    }
+
+
+    @Test
+    fun testSendingRealtimeMessagesV1() {
+        val expectedMessage = RealtimeMessage(
+            topic = "realtimeTopic",
+            event = "realtimeEvent",
+            payload = buildJsonObject {
+                put("key", "value")
+            },
+            ref = "realtimeRef"
+        )
+        runTest {
+            createTestClient(
+                wsHandler = { i, _ ->
+                    val message = i.receive().toMessage(RealtimeProtocolVersion.V1)
+                    assertEquals(expectedMessage, message)
+                },
+                supabaseHandler = {
+                    it.realtime.connect()
+                    it.realtime.send(expectedMessage)
+                },
+                realtimeConfig = {
+                    vsn = RealtimeProtocolVersion.V1
                 }
             )
         }

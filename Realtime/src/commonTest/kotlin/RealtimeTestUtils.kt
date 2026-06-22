@@ -7,6 +7,7 @@ import io.github.jan.supabase.realtime.RealtimeChannel.Companion.CHANNEL_EVENT_P
 import io.github.jan.supabase.realtime.RealtimeChannel.Companion.CHANNEL_EVENT_SYSTEM
 import io.github.jan.supabase.realtime.RealtimeJoinPayload
 import io.github.jan.supabase.realtime.RealtimeMessage
+import io.github.jan.supabase.realtime.RealtimeProtocolVersion
 import io.github.jan.supabase.realtime.RealtimeTopic
 import io.github.jan.supabase.realtime.broadcast.BinaryKind
 import io.github.jan.supabase.realtime.broadcast.BroadcastPayload
@@ -14,6 +15,7 @@ import io.github.jan.supabase.realtime.broadcast.RealtimeBroadcast
 import io.github.jan.supabase.realtime.broadcast.decodeV2Text
 import io.github.jan.supabase.realtime.broadcast.encodeBroadcast
 import io.github.jan.supabase.realtime.broadcast.encodeV2Text
+import io.github.jan.supabase.supabaseJson
 import io.ktor.websocket.Frame
 import io.ktor.websocket.readText
 import kotlinx.coroutines.channels.ReceiveChannel
@@ -72,7 +74,12 @@ suspend fun SendChannel<Frame>.sendBroadcastPayload(channelId: String, event: St
 
 internal fun RealtimeMessage.toFrame() = Frame.Text(this.encodeV2Text())
 
-internal fun Frame.toMessage() = if(this is Frame.Text) readText().decodeV2Text() else error("Not a text")
+internal fun Frame.toMessage(vsn: RealtimeProtocolVersion = RealtimeProtocolVersion.V2) = if(this is Frame.Text) {
+    when(vsn) {
+        RealtimeProtocolVersion.V1 -> supabaseJson.decodeFromString(readText())
+        RealtimeProtocolVersion.V2 -> readText().decodeV2Text()
+    }
+} else error("Not a text")
 
 suspend fun SendChannel<Frame>.sendPresence(channelId: String, joins: Map<String, Presence>, leaves: Map<String, Presence>) {
     send(RealtimeMessage(RealtimeTopic.withChannelId(channelId), CHANNEL_EVENT_PRESENCE_DIFF, buildJsonObject {

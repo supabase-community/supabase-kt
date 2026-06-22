@@ -8,6 +8,7 @@ import io.github.jan.supabase.realtime.RealtimeProtocolVersion
 import io.github.jan.supabase.realtime.broadcast.encodeV2Text
 import io.github.jan.supabase.realtime.websocket.RealtimeWebsocket
 import io.github.jan.supabase.realtime.websocket.RealtimeWebsocketFactory
+import io.github.jan.supabase.supabaseJson
 import io.ktor.client.engine.mock.MockEngine
 import io.ktor.client.engine.mock.MockRequestHandleScope
 import io.ktor.client.engine.mock.respond
@@ -48,7 +49,10 @@ class MockWS(
     }
 
     override suspend fun send(message: RealtimeMessage, vsn: RealtimeProtocolVersion) {
-        sendChannel.send(Frame.Text(message.encodeV2Text()))
+        when(vsn) {
+            RealtimeProtocolVersion.V1 -> sendChannel.send(Frame.Text(supabaseJson.encodeToString(message)))
+            RealtimeProtocolVersion.V2 -> sendChannel.send(Frame.Text(message.encodeV2Text()))
+        }
     }
 
     override suspend fun send(data: ByteArray) {
