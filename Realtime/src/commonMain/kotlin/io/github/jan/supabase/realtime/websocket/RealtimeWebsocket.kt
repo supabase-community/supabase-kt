@@ -17,6 +17,9 @@ interface RealtimeWebsocket {
      */
     val hasIncomingMessages: Boolean
 
+    /**
+     * Generates a new ref for a realtime message
+     */
     fun makeRef(): String
 
     /**

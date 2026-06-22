@@ -60,6 +60,7 @@ interface Realtime : MainPlugin<Realtime.Config>, CustomSerializationPlugin {
      */
     val subscriptions: Map<String, RealtimeChannel>
 
+    @SupabaseInternal
     val websocket: RealtimeWebsocket
 
     /**
@@ -101,6 +102,11 @@ interface Realtime : MainPlugin<Realtime.Config>, CustomSerializationPlugin {
     @SupabaseInternal
     suspend fun send(message: RealtimeMessage)
 
+    /**
+     * Sends a binary payload to the realtime websocket
+     * @param data The data to send
+     */
+    @SupabaseInternal
     suspend fun send(data: ByteArray)
 
     /**
@@ -136,6 +142,7 @@ interface Realtime : MainPlugin<Realtime.Config>, CustomSerializationPlugin {
      * @property rejoinDelay The interval between channel rejoin attempts
      * @property maxAttempts The maximum number of times a channel will try to rejoin after an error before giving up. Defaults to 5
      * @property disconnectOnEmptyChannelsAfter Delay before disconnecting from the realtime socket after the last channel was removed. If null, it defaults to `2*heartbeatInterval`
+     * @property vsn The realtime protocol version. [RealtimeProtocolVersion.V2] supports binary payloads and is more efficient.
      */
     @Suppress("MagicNumber")
     class Config: MainConfig(), CustomSerializationConfig, AuthDependentPluginConfig {

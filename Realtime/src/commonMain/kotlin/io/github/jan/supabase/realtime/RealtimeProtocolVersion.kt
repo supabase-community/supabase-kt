@@ -2,6 +2,7 @@ package io.github.jan.supabase.realtime
 
 /**
  * Phoenix protocol version used for WebSocket communication.
+ * @param value The raw value
  */
 enum class RealtimeProtocolVersion(val value: String) {
     /**

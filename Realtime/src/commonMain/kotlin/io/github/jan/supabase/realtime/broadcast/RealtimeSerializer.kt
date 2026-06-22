@@ -1,3 +1,4 @@
+@file:Suppress("MagicNumber")
 package io.github.jan.supabase.realtime.broadcast
 
 import io.github.jan.supabase.realtime.RealtimeMessage
@@ -12,12 +13,12 @@ import kotlinx.serialization.json.contentOrNull
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 
-enum class BinaryKind(val value: Byte) {
+internal enum class BinaryKind(val value: Byte) {
     USER_BROADCAST_PUSH(3),
     USER_BROADCAST(4)
 }
 
-enum class PayloadEncoding(val value: Byte) {
+internal enum class PayloadEncoding(val value: Byte) {
     BINARY(0),
     JSON(1);
 
@@ -50,6 +51,7 @@ internal fun ByteArray.decodeBinaryPayload(): RealtimeBroadcast {
     }
 }
 
+@Suppress("ComplexCondition")
 internal fun RealtimeBroadcast.encodeBroadcast(
     joinRef: String?,
     ref: String?,
@@ -61,13 +63,9 @@ internal fun RealtimeBroadcast.encodeBroadcast(
     val topicBytes = topic.encodeToByteArray()
     val eventBytes = event.encodeToByteArray()
     val metaBytes = ByteArray(0)
-    val encoding = when(payload) {
-        is BroadcastPayload.Binary -> PayloadEncoding.BINARY
-        is BroadcastPayload.Json -> PayloadEncoding.JSON
-    }
-    val payload = when(payload) {
-        is BroadcastPayload.Binary -> payload.data
-        is BroadcastPayload.Json -> payload.value.toString().encodeToByteArray()
+    val (encoding, payload) = when(payload) {
+        is BroadcastPayload.Binary -> PayloadEncoding.BINARY to payload.data
+        is BroadcastPayload.Json -> PayloadEncoding.JSON to payload.value.toString().encodeToByteArray()
     }
 
     if(joinRefBytes.size > 255 || refBytes.size > 255 || topicBytes.size > 255 || eventBytes.size > 255 || metaBytes.size > 255)
