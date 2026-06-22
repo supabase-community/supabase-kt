@@ -1,6 +1,7 @@
 package io.github.jan.supabase.auth.passkey
 
 import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 import kotlin.time.Instant
 
 /**
@@ -9,6 +10,7 @@ import kotlin.time.Instant
  * @param friendlyName The friendly name of the passkey
  * @param createdAt When the passkey was created at
  */
+@Serializable
 data class PasskeyRegistrationVerifyResponse(
     val id: String,
     @SerialName("friendly_name") val friendlyName: String? = null,

@@ -7,6 +7,9 @@ import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
 import kotlinx.serialization.json.putJsonObject
 
+/**
+ * Interface for interacting with the Supabase Passkey API
+ */
 interface AuthPasskeyApi {
 
     /**

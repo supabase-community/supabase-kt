@@ -1,6 +1,7 @@
 package io.github.jan.supabase.auth.passkey
 
 import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 import kotlin.time.Instant
 
 /**
@@ -10,6 +11,7 @@ import kotlin.time.Instant
  * @param createdAt When the passkey was created at
  * @param lastUsedAt When the passkey was last used at
  */
+@Serializable
 data class PasskeyListItem(
     val id: String,
     @SerialName("friendly_name") val friendlyName: String? = null,

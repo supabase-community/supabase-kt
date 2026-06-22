@@ -12,6 +12,7 @@ import kotlin.time.Instant
  * @param options Server options
  * @param expiresAt When the authentication session expires
  */
+@Serializable
 data class PasskeyAuthenticationOptionsResponse(
     @SerialName("challenge_id") val challengeId: String,
     val options: JsonObject,
