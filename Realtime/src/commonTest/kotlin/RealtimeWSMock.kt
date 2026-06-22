@@ -4,6 +4,8 @@ import io.github.jan.supabase.createSupabaseClient
 import io.github.jan.supabase.logging.LogLevel
 import io.github.jan.supabase.realtime.Realtime
 import io.github.jan.supabase.realtime.RealtimeMessage
+import io.github.jan.supabase.realtime.RealtimeProtocolVersion
+import io.github.jan.supabase.realtime.broadcast.encodeV2Text
 import io.github.jan.supabase.realtime.websocket.RealtimeWebsocket
 import io.github.jan.supabase.realtime.websocket.RealtimeWebsocketFactory
 import io.ktor.client.engine.mock.MockEngine
@@ -11,6 +13,7 @@ import io.ktor.client.engine.mock.MockRequestHandleScope
 import io.ktor.client.engine.mock.respond
 import io.ktor.client.request.HttpRequestData
 import io.ktor.client.request.HttpResponseData
+import io.ktor.websocket.Frame
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.ReceiveChannel
@@ -20,8 +23,8 @@ import kotlinx.coroutines.launch
 import kotlin.time.Duration.Companion.hours
 
 class MockWSFactory(
-    private val clientChannel: Channel<RealtimeMessage>,
-    private val serverChannel: Channel<RealtimeMessage>
+    private val clientChannel: Channel<Frame>,
+    private val serverChannel: Channel<Frame>
 ) : RealtimeWebsocketFactory {
 
     override suspend fun create(url: String): RealtimeWebsocket {
@@ -32,19 +35,28 @@ class MockWSFactory(
 
 @OptIn(DelicateCoroutinesApi::class)
 class MockWS(
-    private val sendChannel: SendChannel<RealtimeMessage>,
-    private val receiveChannel: ReceiveChannel<RealtimeMessage>
+    private val sendChannel: SendChannel<Frame>,
+    private val receiveChannel: ReceiveChannel<Frame>
 ) : RealtimeWebsocket {
 
     override val hasIncomingMessages: Boolean
         get() = !receiveChannel.isClosedForReceive
+    private var ref = 0
 
-    override suspend fun receive(): RealtimeMessage {
+    override suspend fun receive(): Frame {
         return receiveChannel.receive()
     }
 
-    override suspend fun send(message: RealtimeMessage) {
-        sendChannel.send(message)
+    override suspend fun send(message: RealtimeMessage, vsn: RealtimeProtocolVersion) {
+        sendChannel.send(Frame.Text(message.encodeV2Text()))
+    }
+
+    override suspend fun send(data: ByteArray) {
+        sendChannel.send(Frame.Binary(false, data))
+    }
+
+    override fun makeRef(): String {
+        return (ref++).toString()
     }
 
     override suspend fun blockUntilDisconnect() {
@@ -59,14 +71,14 @@ class MockWS(
 }
 
 suspend fun createTestClient(
-    wsHandler: suspend (incoming: ReceiveChannel<RealtimeMessage>, outgoing: SendChannel<RealtimeMessage>) -> Unit,
+    wsHandler: suspend (incoming: ReceiveChannel<Frame>, outgoing: SendChannel<Frame>) -> Unit,
     supabaseHandler: suspend (SupabaseClient) -> Unit,
     realtimeConfig: Realtime.Config.() -> Unit = {},
     supabaseConfig: SupabaseClientBuilder.() -> Unit = {},
     mockEngineHandler: suspend MockRequestHandleScope.(HttpRequestData) -> HttpResponseData = { respond("") }
 ) {
-    val serverChannel = Channel<RealtimeMessage>()
-    val clientChannel = Channel<RealtimeMessage>()
+    val serverChannel = Channel<Frame>()
+    val clientChannel = Channel<Frame>()
     val supabase = createSupabaseClient("", "") {
         defaultLogLevel = LogLevel.DEBUG
         httpEngine = MockEngine(mockEngineHandler)

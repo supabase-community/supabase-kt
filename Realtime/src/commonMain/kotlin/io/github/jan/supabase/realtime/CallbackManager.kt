@@ -2,6 +2,7 @@ package io.github.jan.supabase.realtime
 
 import io.github.jan.supabase.SupabaseSerializer
 import io.github.jan.supabase.annotations.SupabaseInternal
+import io.github.jan.supabase.realtime.broadcast.RealtimeBroadcast
 import io.github.jan.supabase.serializer.KotlinXSerializer
 import kotlinx.collections.immutable.PersistentList
 import kotlinx.collections.immutable.PersistentMap
@@ -29,7 +30,7 @@ interface CallbackManager {
 
     fun triggerPostgresChange(ids: List<Int>, data: PostgresAction)
 
-    fun triggerBroadcast(data: RealtimeBroadcast<*>)
+    fun triggerBroadcast(data: RealtimeBroadcast)
 
     fun triggerPresenceDiff(joins: Map<String, Presence>, leaves: Map<String, Presence>)
 
@@ -40,7 +41,7 @@ interface CallbackManager {
      */
     fun presenceState(): Map<String, Presence>
 
-    fun addBroadcastCallback(event: String, callback: (RealtimeBroadcast<*>) -> Unit): RealtimeCallbackId.Broadcast
+    fun addBroadcastCallback(event: String, callback: (RealtimeBroadcast) -> Unit): RealtimeCallbackId.Broadcast
 
     fun addPostgresCallback(filter: PostgresJoinConfig, callback: (PostgresAction) -> Unit): RealtimeCallbackId.Postgres
 
@@ -85,7 +86,7 @@ internal class CallbackManagerImpl(
         nextId.store(0)
     }
 
-    override fun addBroadcastCallback(event: String, callback: (RealtimeBroadcast<*>) -> Unit): RealtimeCallbackId.Broadcast {
+    override fun addBroadcastCallback(event: String, callback: (RealtimeBroadcast) -> Unit): RealtimeCallbackId.Broadcast {
         val id = nextId.fetchAndIncrement()
         broadcastCallbacks.update {
             val current = it[event] ?: persistentListOf()
@@ -112,7 +113,7 @@ internal class CallbackManagerImpl(
         callbacks.forEach { it.callback(data) }
     }
 
-    override fun triggerBroadcast(data: RealtimeBroadcast<*>) {
+    override fun triggerBroadcast(data: RealtimeBroadcast) {
         broadcastCallbacks.load()[data.event]?.forEach { it.callback(data) }
     }
 

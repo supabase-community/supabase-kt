@@ -2,6 +2,7 @@ package io.github.jan.supabase.realtime.websocket
 
 import io.github.jan.supabase.annotations.SupabaseInternal
 import io.github.jan.supabase.realtime.RealtimeMessage
+import io.github.jan.supabase.realtime.RealtimeProtocolVersion
 import io.ktor.websocket.Frame
 
 /**
@@ -16,6 +17,8 @@ interface RealtimeWebsocket {
      */
     val hasIncomingMessages: Boolean
 
+    fun makeRef(): String
+
     /**
      * Receive a frame from the websocket.
      */
@@ -23,9 +26,14 @@ interface RealtimeWebsocket {
 
     /**
      * Send a message to the websocket.
+     * @param message The message to send
+     * @param vsn Depending on the vsn, the message gets encoded differently
      */
-    suspend fun send(message: RealtimeMessage)
+    suspend fun send(message: RealtimeMessage, vsn: RealtimeProtocolVersion)
 
+    /**
+     * Sends a binary message to the websocket.
+     */
     suspend fun send(data: ByteArray)
 
     /**

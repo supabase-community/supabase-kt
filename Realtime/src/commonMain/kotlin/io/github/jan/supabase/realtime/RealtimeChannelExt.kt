@@ -5,6 +5,7 @@ import io.github.jan.supabase.encodeToJsonElement
 import io.github.jan.supabase.exceptions.RestException
 import io.github.jan.supabase.logging.e
 import io.github.jan.supabase.logging.i
+import io.github.jan.supabase.realtime.broadcast.BroadcastPayload
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.serialization.json.jsonObject
@@ -45,10 +46,10 @@ inline fun <reified T : PostgresAction> RealtimeChannel.postgresChangeFlow(
  */
 @OptIn(SupabaseInternal::class)
 inline fun <reified T : Any> RealtimeChannel.broadcastFlow(event: String): Flow<T> = broadcastFlow(event).mapNotNull {
-    when (it) {
-        is RealtimeBroadcast.Binary if (T::class == ByteArray::class) -> it.payload as T
-        is RealtimeBroadcast.Json -> try {
-            realtime.serializer.decode(typeOf<T>(), it.payload)
+    when (val payload = it.payload) {
+        is BroadcastPayload.Binary if (T::class == ByteArray::class) -> it.payload.data as T
+        is BroadcastPayload.Json -> try {
+            realtime.serializer.decode(typeOf<T>(), payload.value.toString())
         } catch (e: Exception) {
             logger.e(e) { "Dropped json broadcast, because the payload could not be decoded as ${T::class}" }
             null
@@ -65,9 +66,18 @@ inline fun <reified T : Any> RealtimeChannel.broadcastFlow(event: String): Flow<
 /**
  * Sends a message to everyone who joined the channel. Can be used even if you aren't connected to the channel.
  * @param event the broadcast event. Example: mouse_cursor
- * @param message the message to send as [T] (can only be something that can be encoded as a json object)
+ * @param message the message to send as [T] (can only be something that can be encoded as a JSON object)
  */
-suspend inline fun <reified T : Any> RealtimeChannel.broadcast(event: String, message: T) = broadcast(event, supabaseClient.realtime.serializer.encodeToJsonElement(message).jsonObject)
+suspend inline fun <reified T : Any> RealtimeChannel.broadcast(event: String, message: T) =
+    broadcast(event, BroadcastPayload.Json(supabaseClient.realtime.serializer.encodeToJsonElement(message).jsonObject))
+
+/**
+ * Sends a message to everyone who joined the channel. Can be used even if you aren't connected to the channel. Requires [Realtime.Config.vsn] to be set to [RealtimeProtocolVersion.V2]
+ * @param event the broadcast event. Example: mouse_cursor
+ * @param data the binary data to send
+ */
+suspend inline fun <reified T : Any> RealtimeChannel.broadcast(event: String, data: ByteArray) =
+    broadcast(event, BroadcastPayload.Binary(data))
 
 /**
  * Store an object in your presence's state. Other clients can get this data when you either join or leave the channel.
@@ -99,4 +109,4 @@ suspend inline fun <reified T : Any> RealtimeChannel.track(state: T) = track(sup
  *
  */
 suspend inline fun <reified T> RealtimeChannel.httpSend(event: String, payload: T, noinline builder: HttpSendBuilder.() -> Unit = {}) =
-    httpSend(event, HttpSendPayload.Json(realtime.serializer.encodeToJsonElement(payload)), builder)
+    httpSend(event, BroadcastPayload.Json(realtime.serializer.encodeToJsonElement(payload)), builder)

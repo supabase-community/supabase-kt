@@ -4,6 +4,8 @@ import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.annotations.SupabaseInternal
 import io.github.jan.supabase.exceptions.RestException
 import io.github.jan.supabase.logging.SupabaseLogger
+import io.github.jan.supabase.realtime.broadcast.BroadcastPayload
+import io.github.jan.supabase.realtime.broadcast.RealtimeBroadcast
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.serialization.json.JsonObject
@@ -59,11 +61,9 @@ interface RealtimeChannel {
     /**
      * Sends a message to everyone who joined the channel. Can be used even if you aren't connected to the channel.
      * @param event the broadcast event. Example: mouse_cursor
-     * @param message the message to send as a JsonObject
+     * @param payload the broadcast payload
      */
-    suspend fun broadcast(event: String, message: JsonObject)
-
-    suspend fun broadcast(event: String, data: ByteArray)
+    suspend fun broadcast(event: String, payload: BroadcastPayload)
 
     /**
      * Sends a broadcast message explicitly via REST API.
@@ -80,7 +80,7 @@ interface RealtimeChannel {
      * @throws IllegalStateException If the realtime version does not support sending broadcasts via HTTP
      *
      */
-    suspend fun httpSend(event: String, payload: HttpSendPayload, builder: HttpSendBuilder.() -> Unit = {})
+    suspend fun httpSend(event: String, payload: BroadcastPayload, builder: HttpSendBuilder.() -> Unit = {})
 
     /**
      * Store an object in your presence's state. Other clients can get this data when you either join or leave the channel.
@@ -101,9 +101,22 @@ interface RealtimeChannel {
     fun <T : PostgresAction> RealtimeChannel.postgresChangeFlowInternal(action: KClass<T>, schema: String, filter: PostgresChangeFilter.() -> Unit = {}): Flow<T>
 
     /**
-     * Non-inline variant of [broadcastFlow] for implementation and mocking purposes
+     * Broadcasts can be messages sent by other clients within the same channel under a specific [event].
+     *
+     * Example:
+     * ```kotlin
+     * val messageFlow = channel.broadcastFlow("message")
+     * messageFlow.collect {
+     *    when(it) {
+     *      is BroadcastPayload.Json -> println("Received message: ${it.value}")
+     *      is BroadcastPayload.Binary -> println("Received binary payload")
+     *    }
+     * }
+     * ```
+     *
+     * @param event When a message is sent by another client, it will be sent under a specific event. This is the event that you want to listen to
      */
-    fun RealtimeChannel.broadcastFlow(event: String): Flow<RealtimeBroadcast<*>>
+    fun broadcastFlow(event: String): Flow<RealtimeBroadcast>
 
     /**
      * Listen for clients joining / leaving the channel using presences

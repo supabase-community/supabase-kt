@@ -11,6 +11,7 @@ import io.github.jan.supabase.plugins.CustomSerializationPlugin
 import io.github.jan.supabase.plugins.MainConfig
 import io.github.jan.supabase.plugins.MainPlugin
 import io.github.jan.supabase.plugins.SupabasePluginProvider
+import io.github.jan.supabase.realtime.websocket.RealtimeWebsocket
 import io.github.jan.supabase.realtime.websocket.RealtimeWebsocketFactory
 import io.github.jan.supabase.serializer.KotlinXSerializer
 import io.github.jan.supabase.supabaseJson
@@ -58,6 +59,8 @@ interface Realtime : MainPlugin<Realtime.Config>, CustomSerializationPlugin {
      * A map of all active the subscriptions
      */
     val subscriptions: Map<String, RealtimeChannel>
+
+    val websocket: RealtimeWebsocket
 
     /**
      * Connects to the realtime websocket. The url will be taken from the custom provided [Realtime.Config.customUrl] or [SupabaseClient]

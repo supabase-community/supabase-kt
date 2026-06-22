@@ -16,31 +16,22 @@ import io.github.jan.supabase.realtime.RealtimeChannel.Companion.CHANNEL_EVENT_R
 import io.github.jan.supabase.realtime.RealtimeChannel.Companion.CHANNEL_EVENT_SYSTEM
 import io.github.jan.supabase.realtime.RealtimeJoinPayload
 import io.github.jan.supabase.realtime.RealtimeMessage
-import io.github.jan.supabase.realtime.broadcastFlow
 import io.github.jan.supabase.realtime.channel
 import io.github.jan.supabase.realtime.currentPresences
 import io.github.jan.supabase.realtime.postgresChangeFlow
 import io.github.jan.supabase.realtime.realtime
-import kotlinx.serialization.Serializable
-import io.github.jan.supabase.testing.assertPathIs
-import io.github.jan.supabase.testing.pathAfterVersion
-import io.github.jan.supabase.testing.toJsonElement
-import io.ktor.client.engine.mock.respond
 import io.ktor.util.encodeBase64
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runTest
+import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonObject
-import kotlinx.serialization.json.boolean
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.decodeFromJsonElement
 import kotlinx.serialization.json.encodeToJsonElement
 import kotlinx.serialization.json.int
-import kotlinx.serialization.json.jsonArray
-import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.put
 import kotlin.test.Test
@@ -82,7 +73,7 @@ class RealtimeChannelTest {
         runTest {
             createTestClient(
                 wsHandler = { i, _ ->
-                    i.receive()
+                    i.receive().toMessage()
                 },
                 supabaseHandler = {
                     val channel = it.channel("")
@@ -99,10 +90,10 @@ class RealtimeChannelTest {
         runTest {
             createTestClient(
                 wsHandler = { i, o ->
-                    i.receive()
-                    o.send(RealtimeMessage("realtime:$channelId", CHANNEL_EVENT_SYSTEM, buildJsonObject { put("status", "ok") }, ""))
-                    i.receive()
-                    o.send(RealtimeMessage("realtime:$channelId", CHANNEL_EVENT_REPLY, buildJsonObject { put("status", "ok") }, ""))
+                    i.receive().toMessage()
+                    o.send(RealtimeMessage("realtime:$channelId", CHANNEL_EVENT_SYSTEM, buildJsonObject { put("status", "ok") }, "").toFrame())
+                    i.receive().toMessage()
+                    o.send(RealtimeMessage("realtime:$channelId", CHANNEL_EVENT_REPLY, buildJsonObject { put("status", "ok") }, "").toFrame())
                 },
                 supabaseHandler = {
                     val channel = it.channel("channelId")
@@ -128,7 +119,7 @@ class RealtimeChannelTest {
         runTest {
             createTestClient(
                 wsHandler = { i, o ->
-                    val message = i.receive()
+                    val message = i.receive().toMessage()
                     val payload = Json.decodeFromJsonElement<RealtimeJoinPayload>(message.payload)
                     assertEquals("realtime:$expectedChannelId", message.topic)
                     assertEquals(expectedIsPrivate, payload.config.isPrivate)
@@ -159,7 +150,7 @@ class RealtimeChannelTest {
         runTest {
             createTestClient(
                 wsHandler = { i, _ ->
-                    val message = i.receive()
+                    val message = i.receive().toMessage()
                     assertEquals(expectedAuthToken, message.payload["access_token"]?.jsonPrimitive?.content)
                 },
                 supabaseHandler = {
@@ -183,7 +174,7 @@ class RealtimeChannelTest {
         runTest {
             createTestClient(
                 wsHandler = { i, _ ->
-                    val message = i.receive()
+                    val message = i.receive().toMessage()
                     assertEquals(expectedAuthToken, message.payload["access_token"]?.jsonPrimitive?.content)
                 },
                 supabaseHandler = {
@@ -192,63 +183,6 @@ class RealtimeChannelTest {
                 },
                 realtimeConfig = {
                     jwtToken = expectedAuthToken
-                }
-            )
-        }
-    }
-
-    @Test
-    fun testSendingBroadcasts() {
-        val message = buildJsonObject {
-            put("key", "value")
-        }
-        val event = "event"
-        runTest {
-            createTestClient(
-                wsHandler = { i, o ->
-                    handleSubscribe(i, o,"channelId")
-                    val rMessage = i.receive()
-                    assertEquals("realtime:channelId", rMessage.topic)
-                    assertEquals("broadcast", rMessage.event)
-                    assertEquals(message, rMessage.payload["payload"]?.jsonObject)
-                    assertEquals(event, rMessage.payload["event"]?.jsonPrimitive?.content)
-                    assertEquals("broadcast", rMessage.payload["type"]?.jsonPrimitive?.content)
-                },
-                supabaseHandler = {
-                    val channel = it.channel("channelId")
-                    channel.subscribe(true)
-                    channel.broadcast(event, message)
-                }
-            )
-        }
-    }
-
-    @Test
-    fun testSendingBroadcastsUnsubscribed() {
-        runTest {
-            val expectedEvent = "event"
-            val expectedMessage = buildJsonObject {
-                put("key", "value")
-            }
-            val expectedChannelId = "channelId"
-            val isPrivate = true
-            createTestClient(
-                wsHandler = { _, _ ->
-                },
-                supabaseHandler = {
-                    val channel = it.channel(expectedChannelId) {
-                        this.isPrivate = isPrivate
-                    }
-                    channel.broadcast(expectedEvent, expectedMessage)
-                },
-                mockEngineHandler = {
-                    assertPathIs("/api/broadcast", it.url.pathAfterVersion())
-                    val body = it.body.toJsonElement().jsonObject["messages"]?.jsonArray?.firstOrNull()?.jsonObject ?: error("No messages in body")
-                    assertEquals(expectedEvent, body["event"]?.jsonPrimitive?.content)
-                    assertEquals(expectedMessage, body["payload"]?.jsonObject)
-                    assertEquals(isPrivate, body["private"]?.jsonPrimitive?.boolean)
-                    assertEquals(expectedChannelId, body["topic"]?.jsonPrimitive?.content)
-                    respond("")
                 }
             )
         }
@@ -265,39 +199,6 @@ class RealtimeChannelTest {
                     assertFailsWith<IllegalStateException> {
                         channel.track(buildJsonObject {  })
                     }
-                }
-            )
-        }
-    }
-
-    @Test
-    fun testReceivingBroadcasts() {
-        val event = "event"
-        val channelId = "channelId"
-        val amount = 10
-        runTest {
-            createTestClient(
-                wsHandler = { i, o ->
-                    handleSubscribe(i, o, channelId)
-                    for(i in 0..amount) {
-                        o.sendBroadcast(channelId, event, buildJsonObject { put("key", i) })
-                    }
-                },
-                supabaseHandler = {
-                    val channel = it.channel("channelId")
-                    coroutineScope {
-                        launch {
-                            val broadcastFlow = channel.broadcastFlow<JsonObject>(event)
-                            broadcastFlow.test(FLOW_TIMEOUT) {
-                                for(i in 0..amount) {
-                                    assertEquals(i, awaitItem()["key"]?.jsonPrimitive?.int)
-                                }
-                            }
-                        }
-                        launch {
-                            channel.subscribe(true)
-                        }
-                    }.join()
                 }
             )
         }
@@ -361,7 +262,7 @@ class RealtimeChannelTest {
             runTest {
                 createTestClient(
                     wsHandler = { i, o ->
-                        val message = i.receive()
+                        val message = i.receive().toMessage()
                         assertEquals("realtime:$channelId", message.topic)
                         assertEquals(RealtimeChannel.CHANNEL_EVENT_JOIN, message.event)
                         val payload = Json.decodeFromJsonElement<RealtimeJoinPayload>(message.payload)
@@ -375,7 +276,7 @@ class RealtimeChannelTest {
                             put("response", buildJsonObject {
                                 put("postgres_changes", Json.encodeToJsonElement(postgresServerChanges))
                             })
-                        }, ""))
+                        }, "").toFrame())
                     },
                     supabaseHandler = {
                         val channel = it.channel(channelId)

@@ -9,4 +9,4 @@ import kotlinx.serialization.json.JsonObject
  */
 @Serializable
 @SupabaseInternal
-data class RealtimeMessage(val topic: String, val event: String, val payload: JsonObject, val ref: String?)
+data class RealtimeMessage(val topic: String, val event: String, val payload: JsonObject, val ref: String?, val joinRef: String? = null)

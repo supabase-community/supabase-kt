@@ -255,7 +255,7 @@ class RealtimeTest {
         runTest {
             createTestClient(
                 wsHandler = { i, _ ->
-                    val message = i.receive()
+                    val message = i.receive().toMessage()
                     assertEquals(expectedMessage, message)
                 },
                 supabaseHandler = {
