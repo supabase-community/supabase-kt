@@ -3,7 +3,6 @@ import io.github.jan.supabase.SupabaseClientBuilder
 import io.github.jan.supabase.auth.Auth
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.auth.minimalConfig
-import io.github.jan.supabase.auth.user.UserInfo
 import io.github.jan.supabase.auth.user.UserSession
 import io.github.jan.supabase.testing.assertMethodIs
 import io.github.jan.supabase.testing.assertPathIs
@@ -169,7 +168,6 @@ class AuthPasskeyApiTest {
         val challengeId = "challenge-456"
         val credential = """{"id":"test","type":"public-key","response":{"clientDataJSON":"eyJ0eXBlIjoid2ViYXV0aG4uZ2V0IiwiY2hhbGxlbmdlIjoiZEdWemRBPT0iLCJvcmlnaW4iOiJodHRwczovL2V4YW1wbGUuY29tIn0=","authenticatorData":"SZYN5OtPZAElAwgsB0AxvUSBY2BhWaOmFfHqMx7XsHcFAAAAAA==","signature":"MEQCIB..."}}"""
         val expectedSession = userSession()
-        val expectedUser = UserInfo(id = "user-123", aud = "aud")
         client = createMockedSupabaseClient(
             configuration = configuration
         ) {
@@ -177,17 +175,14 @@ class AuthPasskeyApiTest {
             assertMethodIs(HttpMethod.Post, it.method)
             val body = it.body.toJsonElement().jsonObject
             assertEquals(challengeId, body["challenge_id"]?.jsonPrimitive?.content)
-            respondJson("""
-                {
-                    "session": ${Json.encodeToString(UserSession.serializer(), expectedSession)},
-                    "user": ${Json.encodeToString(UserInfo.serializer(), expectedUser)}
-                }
-            """.trimIndent())
+            // server now returns the session directly
+            respondJson(Json.encodeToString(UserSession.serializer(), expectedSession))
         }
         client.auth.awaitInitialization()
         val response = client.auth.passkeys.verifyAuthentication(challengeId, credential)
-        assertEquals(expectedSession.accessToken, response.session?.accessToken)
-        assertEquals(expectedUser.id, response.user?.id)
+        // verify returned session and that it was saved into the auth plugin
+        assertEquals(expectedSession, response)
+        assertEquals(expectedSession, client.auth.currentSessionOrNull())
     }
 
     @Test

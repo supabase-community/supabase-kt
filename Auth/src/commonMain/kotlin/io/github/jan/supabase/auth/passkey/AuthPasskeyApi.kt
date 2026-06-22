@@ -1,6 +1,7 @@
 package io.github.jan.supabase.auth.passkey
 
 import io.github.jan.supabase.auth.api.AuthenticatedSupabaseApi
+import io.github.jan.supabase.auth.user.UserSession
 import io.github.jan.supabase.safeBody
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.buildJsonObject
@@ -35,7 +36,7 @@ interface AuthPasskeyApi {
      * @param challengeId Challenge ID from startAuthentication
      * @param credential Serialized credential
      */
-    suspend fun verifyAuthentication(challengeId: String, credential: String): PasskeyAuthenticationVerifyResponse
+    suspend fun verifyAuthentication(challengeId: String, credential: String): UserSession
 
     /**
      * List all passkeys for the current user.
@@ -58,7 +59,8 @@ interface AuthPasskeyApi {
 }
 
 internal class AuthPasskeyApiImpl(
-    private val api: AuthenticatedSupabaseApi
+    private val api: AuthenticatedSupabaseApi,
+    private val saveSession: suspend (UserSession) -> Unit,
 ): AuthPasskeyApi {
 
     override suspend fun startRegistration(): PasskeyRegistrationResponse {
@@ -90,11 +92,13 @@ internal class AuthPasskeyApiImpl(
     override suspend fun verifyAuthentication(
         challengeId: String,
         credential: String
-    ): PasskeyAuthenticationVerifyResponse {
+    ): UserSession {
         return api.postJson("authentication/verify", buildJsonObject {
             put("challenge_id", challengeId)
             put("credential", Json.decodeFromString(credential))
-        }).safeBody()
+        }).safeBody<UserSession>().also {
+            saveSession(it)
+        }
     }
 
     override suspend fun list(): List<PasskeyListItem> {

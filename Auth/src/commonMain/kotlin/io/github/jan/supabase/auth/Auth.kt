@@ -93,6 +93,7 @@ interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
     /**
      * Access to the [AuthPasskeyApi] where you can manage the user's passkeys
      */
+    @SupabaseExperimental
     val passkeys: AuthPasskeyApi
 
     /**
