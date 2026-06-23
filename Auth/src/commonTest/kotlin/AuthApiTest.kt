@@ -611,13 +611,15 @@ class AuthRequestTest {
     }
 
     @Test
-    fun testResendEmail() {
+    fun testResendEmailPKCE() {
         runTest {
             val expectedEmail = "example@email.com"
             val expectedType = OtpType.Email.SIGNUP
             val expectedCaptchaToken = "captchaToken"
             val expectedUrl = "https://example.com"
-            client = createMockedSupabaseClient(configuration = configuration) {
+            client = createMockedSupabaseClient(configuration = {
+                configuration()
+            }) {
                 assertMethodIs(HttpMethod.Post, it.method)
                 assertPathIs("/resend", it.url.pathAfterVersion())
                 val params = it.url.parameters
@@ -628,6 +630,8 @@ class AuthRequestTest {
                 assertEquals(expectedCaptchaToken, metaSecurity["captcha_token"]?.jsonPrimitive?.content)
                 assertEquals(expectedEmail, body["email"]?.jsonPrimitive?.content)
                 assertEquals(expectedType.name.lowercase(), body["type"]?.jsonPrimitive?.content)
+                assertNotNull(body["code_challenge"])
+                assertNotNull(body["code_challenge_method"])
                 respondJson(
                     sampleUserObject(email = expectedEmail)
                 )
@@ -650,6 +654,7 @@ class AuthRequestTest {
                 assertEquals(expectedCaptchaToken, metaSecurity["captcha_token"]?.jsonPrimitive?.content)
                 assertEquals(expectedPhone, body["phone"]?.jsonPrimitive?.content)
                 assertEquals(expectedType.name.lowercase(), body["type"]?.jsonPrimitive?.content)
+                assertNull(body["code_challenge"])
                 respondJson(
                     sampleUserObject(email = expectedPhone)
                 )
