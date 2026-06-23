@@ -13,6 +13,7 @@ import io.github.jan.supabase.auth.exception.TokenExpiredException
 import io.github.jan.supabase.auth.jwt.ClaimsRequestBuilder
 import io.github.jan.supabase.auth.jwt.ClaimsResponse
 import io.github.jan.supabase.auth.mfa.MfaApi
+import io.github.jan.supabase.auth.passkey.AuthPasskeyApi
 import io.github.jan.supabase.auth.providers.AuthProvider
 import io.github.jan.supabase.auth.providers.ExternalAuthConfigDefaults
 import io.github.jan.supabase.auth.providers.Google
@@ -85,9 +86,15 @@ interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
     val admin: AdminApi
 
     /**
-     * Access to the mfa api where you can manage multi-factor authentication for the current user.
+     * Access to the [MfaApi] where you can manage multi-factor authentication for the current user.
      */
     val mfa: MfaApi
+
+    /**
+     * Access to the [AuthPasskeyApi] where you can manage the user's passkeys
+     */
+    @SupabaseExperimental
+    val passkeys: AuthPasskeyApi
 
     /**
      * The cache for the code verifier. This is used for PKCE authentication. Can be customized via [AuthConfig.codeVerifierCache]
