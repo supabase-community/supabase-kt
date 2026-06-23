@@ -310,7 +310,9 @@ internal class AuthImpl(
     private suspend fun resend(type: String,  redirectUrl: String? = null, body: JsonObjectBuilder.() -> Unit) {
         userApi.postJson("resend", buildJsonObject {
             put("type", type)
-            putJsonObject(buildJsonObject(body))
+            val innerBody = buildJsonObject(body)
+            putJsonObject(innerBody)
+            if(config.flowType == FlowType.PKCE && !innerBody.containsKey("phone")) preparePKCEIfEnabled()?.let(::putCodeChallenge)
         }) {
             redirectUrl?.let { url.parameters["redirect_to"] = it }
         }
