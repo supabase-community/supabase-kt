@@ -2,6 +2,8 @@ package io.github.jan.supabase.realtime.event
 
 import io.github.jan.supabase.realtime.RealtimeChannel
 import io.github.jan.supabase.realtime.RealtimeMessage
+import io.github.jan.supabase.realtime.broadcast.BroadcastPayload
+import io.github.jan.supabase.realtime.broadcast.RealtimeBroadcast
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
@@ -13,7 +15,7 @@ data object RBroadcastEvent : RealtimeEvent {
 
     override suspend fun handle(channel: RealtimeChannel, message: RealtimeMessage) {
         val event = message.payload["event"]?.jsonPrimitive?.content ?: ""
-        channel.callbackManager.triggerBroadcast(event, message.payload["payload"]?.jsonObject ?: JsonObject(mutableMapOf()))
+        channel.callbackManager.triggerBroadcast(RealtimeBroadcast(message.topic, event, BroadcastPayload.Json(message.payload["payload"]?.jsonObject ?: JsonObject(mutableMapOf()))))
     }
 
     override fun appliesTo(message: RealtimeMessage): Boolean {

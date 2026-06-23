@@ -11,6 +11,7 @@ import io.github.jan.supabase.plugins.CustomSerializationPlugin
 import io.github.jan.supabase.plugins.MainConfig
 import io.github.jan.supabase.plugins.MainPlugin
 import io.github.jan.supabase.plugins.SupabasePluginProvider
+import io.github.jan.supabase.realtime.websocket.RealtimeWebsocket
 import io.github.jan.supabase.realtime.websocket.RealtimeWebsocketFactory
 import io.github.jan.supabase.serializer.KotlinXSerializer
 import io.github.jan.supabase.supabaseJson
@@ -59,6 +60,9 @@ interface Realtime : MainPlugin<Realtime.Config>, CustomSerializationPlugin {
      */
     val subscriptions: Map<String, RealtimeChannel>
 
+    @SupabaseInternal
+    val websocket: RealtimeWebsocket
+
     /**
      * Connects to the realtime websocket. The url will be taken from the custom provided [Realtime.Config.customUrl] or [SupabaseClient]
      */
@@ -99,6 +103,13 @@ interface Realtime : MainPlugin<Realtime.Config>, CustomSerializationPlugin {
     suspend fun send(message: RealtimeMessage)
 
     /**
+     * Sends a binary payload to the realtime websocket
+     * @param data The data to send
+     */
+    @SupabaseInternal
+    suspend fun send(data: ByteArray)
+
+    /**
      * Sets the JWT access token used for channel subscription authorization and Realtime RLS.
      *
      * If [token] is null, the token will be resolved using the [Realtime.Config.accessToken] provider.
@@ -131,6 +142,7 @@ interface Realtime : MainPlugin<Realtime.Config>, CustomSerializationPlugin {
      * @property rejoinDelay The interval between channel rejoin attempts
      * @property maxAttempts The maximum number of times a channel will try to rejoin after an error before giving up. Defaults to 5
      * @property disconnectOnEmptyChannelsAfter Delay before disconnecting from the realtime socket after the last channel was removed. If null, it defaults to `2*heartbeatInterval`
+     * @property vsn The realtime protocol version. [RealtimeProtocolVersion.V2] supports binary payloads and is more efficient.
      */
     @Suppress("MagicNumber")
     class Config: MainConfig(), CustomSerializationConfig, AuthDependentPluginConfig {
@@ -146,6 +158,7 @@ interface Realtime : MainPlugin<Realtime.Config>, CustomSerializationPlugin {
         var connectOnSubscribe: Boolean = true
         @SupabaseInternal var websocketFactory: RealtimeWebsocketFactory? = null
         var disconnectOnNoSubscriptions: Boolean = true
+        var vsn = RealtimeProtocolVersion.V2
         override var requireValidSession: Boolean = false
 
         internal var customAccessTokenProvider = false

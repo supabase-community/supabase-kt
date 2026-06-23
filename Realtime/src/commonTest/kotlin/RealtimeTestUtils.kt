@@ -7,7 +7,17 @@ import io.github.jan.supabase.realtime.RealtimeChannel.Companion.CHANNEL_EVENT_P
 import io.github.jan.supabase.realtime.RealtimeChannel.Companion.CHANNEL_EVENT_SYSTEM
 import io.github.jan.supabase.realtime.RealtimeJoinPayload
 import io.github.jan.supabase.realtime.RealtimeMessage
+import io.github.jan.supabase.realtime.RealtimeProtocolVersion
 import io.github.jan.supabase.realtime.RealtimeTopic
+import io.github.jan.supabase.realtime.broadcast.BinaryKind
+import io.github.jan.supabase.realtime.broadcast.BroadcastPayload
+import io.github.jan.supabase.realtime.broadcast.RealtimeBroadcast
+import io.github.jan.supabase.realtime.broadcast.decodeV2Text
+import io.github.jan.supabase.realtime.broadcast.encodeBroadcast
+import io.github.jan.supabase.realtime.broadcast.encodeV2Text
+import io.github.jan.supabase.supabaseJson
+import io.ktor.websocket.Frame
+import io.ktor.websocket.readText
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.channels.SendChannel
 import kotlinx.coroutines.flow.Flow
@@ -21,8 +31,8 @@ import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.decodeFromJsonElement
 import kotlinx.serialization.json.encodeToJsonElement
 import kotlinx.serialization.json.put
-import kotlin.time.Clock
 import kotlin.test.assertEquals
+import kotlin.time.Clock
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.seconds
 
@@ -33,38 +43,49 @@ suspend fun Auth.importAuthTokenValid(token: String) {
 }
 
 suspend fun handleSubscribe(
-    incoming: ReceiveChannel<RealtimeMessage>,
-    outgoing: SendChannel<RealtimeMessage>,
+    incoming: ReceiveChannel<Frame>,
+    outgoing: SendChannel<Frame>,
     channelId: String,
     expectEnabledPresence: Boolean = false
 ) {
-    val payload = Json.decodeFromJsonElement<RealtimeJoinPayload>(incoming.receive().payload)
+    val payload = Json.decodeFromJsonElement<RealtimeJoinPayload>(incoming.receive().toMessage().payload)
     assertEquals(expectEnabledPresence, payload.config.presence.enabled)
-    outgoing.send(RealtimeMessage(RealtimeTopic.withChannelId(channelId), CHANNEL_EVENT_SYSTEM, buildJsonObject { put("status", "ok") }, ""))
+    outgoing.send(RealtimeMessage(RealtimeTopic.withChannelId(channelId), CHANNEL_EVENT_SYSTEM, buildJsonObject { put("status", "ok") }, "").toFrame())
 }
 
 suspend fun handleUnsubscribe(
-    incoming: ReceiveChannel<RealtimeMessage>,
-    outgoing: SendChannel<RealtimeMessage>,
+    incoming: ReceiveChannel<Frame>,
+    outgoing: SendChannel<Frame>,
     channelId: String
 ) {
-    val message = incoming.receive()
+    val message = incoming.receive().toMessage()
     assertEquals(RealtimeTopic.withChannelId(channelId), message.topic)
-    outgoing.send(RealtimeMessage(RealtimeTopic.withChannelId(channelId), RealtimeChannel.CHANNEL_EVENT_CLOSE, buildJsonObject {  }, ""))
+    outgoing.send(RealtimeMessage(RealtimeTopic.withChannelId(channelId), RealtimeChannel.CHANNEL_EVENT_CLOSE, buildJsonObject {  }, "").toFrame())
 }
 
-suspend fun SendChannel<RealtimeMessage>.sendBroadcast(channelId: String, event: String, message: JsonObject) {
-    send(RealtimeMessage(RealtimeTopic.withChannelId(channelId), "broadcast", buildJsonObject {
-        put("event", event)
-        put("payload", message)
-    }, ""))
+suspend fun SendChannel<Frame>.sendBroadcast(channelId: String, event: String, message: JsonObject) {
+    sendBroadcastPayload(channelId, event, BroadcastPayload.Json(message))
 }
 
-suspend fun SendChannel<RealtimeMessage>.sendPresence(channelId: String, joins: Map<String, Presence>, leaves: Map<String, Presence>) {
+suspend fun SendChannel<Frame>.sendBroadcastPayload(channelId: String, event: String, payload: BroadcastPayload) {
+    send(Frame.Binary(false, RealtimeBroadcast(RealtimeTopic.withChannelId(channelId), event, payload).encodeBroadcast(null, null,
+        false, BinaryKind.USER_BROADCAST)))
+}
+
+internal fun RealtimeMessage.toFrame() = Frame.Text(this.encodeV2Text())
+
+internal fun Frame.toMessage(vsn: RealtimeProtocolVersion = RealtimeProtocolVersion.V2) = if(this is Frame.Text) {
+    when(vsn) {
+        RealtimeProtocolVersion.V1 -> supabaseJson.decodeFromString(readText())
+        RealtimeProtocolVersion.V2 -> readText().decodeV2Text()
+    }
+} else error("Not a text")
+
+suspend fun SendChannel<Frame>.sendPresence(channelId: String, joins: Map<String, Presence>, leaves: Map<String, Presence>) {
     send(RealtimeMessage(RealtimeTopic.withChannelId(channelId), CHANNEL_EVENT_PRESENCE_DIFF, buildJsonObject {
         put("joins", transformPresenceMap(joins))
         put("leaves", transformPresenceMap(leaves))
-    }, ""))
+    }, "").toFrame())
 }
 
 fun transformPresenceMap(map: Map<String, Presence>): JsonElement {
