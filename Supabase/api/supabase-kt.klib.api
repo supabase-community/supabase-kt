@@ -1,0 +1,376 @@
+// Klib ABI Dump
+// Targets: [iosArm64, iosSimulatorArm64, iosX64, js, linuxX64, macosArm64, macosX64, mingwX64, tvosArm64, tvosSimulatorArm64, tvosX64, wasmJs, watchosArm64, watchosSimulatorArm64, watchosX64]
+// Rendering settings:
+// - Signature version: 2
+// - Show manifest properties: true
+// - Show declarations: true
+
+// Library unique name: <io.github.jan-tennert.supabase:supabase-kt>
+open annotation class io.github.jan.supabase.annotations/SupabaseDsl : kotlin/Annotation { // io.github.jan.supabase.annotations/SupabaseDsl|null[0]
+    constructor <init>() // io.github.jan.supabase.annotations/SupabaseDsl.<init>|<init>(){}[0]
+}
+
+open annotation class io.github.jan.supabase.annotations/SupabaseExperimental : kotlin/Annotation { // io.github.jan.supabase.annotations/SupabaseExperimental|null[0]
+    constructor <init>() // io.github.jan.supabase.annotations/SupabaseExperimental.<init>|<init>(){}[0]
+}
+
+open annotation class io.github.jan.supabase.annotations/SupabaseInternal : kotlin/Annotation { // io.github.jan.supabase.annotations/SupabaseInternal|null[0]
+    constructor <init>() // io.github.jan.supabase.annotations/SupabaseInternal.<init>|<init>(){}[0]
+}
+
+final enum class io.github.jan.supabase.logging/LogLevel : kotlin/Enum<io.github.jan.supabase.logging/LogLevel> { // io.github.jan.supabase.logging/LogLevel|null[0]
+    enum entry DEBUG // io.github.jan.supabase.logging/LogLevel.DEBUG|null[0]
+    enum entry ERROR // io.github.jan.supabase.logging/LogLevel.ERROR|null[0]
+    enum entry INFO // io.github.jan.supabase.logging/LogLevel.INFO|null[0]
+    enum entry NONE // io.github.jan.supabase.logging/LogLevel.NONE|null[0]
+    enum entry WARNING // io.github.jan.supabase.logging/LogLevel.WARNING|null[0]
+
+    final val entries // io.github.jan.supabase.logging/LogLevel.entries|#static{}entries[0]
+        final fun <get-entries>(): kotlin.enums/EnumEntries<io.github.jan.supabase.logging/LogLevel> // io.github.jan.supabase.logging/LogLevel.entries.<get-entries>|<get-entries>#static(){}[0]
+
+    final fun valueOf(kotlin/String): io.github.jan.supabase.logging/LogLevel // io.github.jan.supabase.logging/LogLevel.valueOf|valueOf#static(kotlin.String){}[0]
+    final fun values(): kotlin/Array<io.github.jan.supabase.logging/LogLevel> // io.github.jan.supabase.logging/LogLevel.values|values#static(){}[0]
+}
+
+final enum class io.github.jan.supabase/PlatformTarget : kotlin/Enum<io.github.jan.supabase/PlatformTarget> { // io.github.jan.supabase/PlatformTarget|null[0]
+    enum entry ANDROID // io.github.jan.supabase/PlatformTarget.ANDROID|null[0]
+    enum entry IOS // io.github.jan.supabase/PlatformTarget.IOS|null[0]
+    enum entry JS // io.github.jan.supabase/PlatformTarget.JS|null[0]
+    enum entry JVM // io.github.jan.supabase/PlatformTarget.JVM|null[0]
+    enum entry LINUX // io.github.jan.supabase/PlatformTarget.LINUX|null[0]
+    enum entry MACOS // io.github.jan.supabase/PlatformTarget.MACOS|null[0]
+    enum entry TVOS // io.github.jan.supabase/PlatformTarget.TVOS|null[0]
+    enum entry WASM_JS // io.github.jan.supabase/PlatformTarget.WASM_JS|null[0]
+    enum entry WATCHOS // io.github.jan.supabase/PlatformTarget.WATCHOS|null[0]
+    enum entry WINDOWS // io.github.jan.supabase/PlatformTarget.WINDOWS|null[0]
+
+    final val entries // io.github.jan.supabase/PlatformTarget.entries|#static{}entries[0]
+        final fun <get-entries>(): kotlin.enums/EnumEntries<io.github.jan.supabase/PlatformTarget> // io.github.jan.supabase/PlatformTarget.entries.<get-entries>|<get-entries>#static(){}[0]
+
+    final fun valueOf(kotlin/String): io.github.jan.supabase/PlatformTarget // io.github.jan.supabase/PlatformTarget.valueOf|valueOf#static(kotlin.String){}[0]
+    final fun values(): kotlin/Array<io.github.jan.supabase/PlatformTarget> // io.github.jan.supabase/PlatformTarget.values|values#static(){}[0]
+}
+
+abstract interface <#A: io.github.jan.supabase.plugins/MainConfig> io.github.jan.supabase.plugins/MainPlugin : io.github.jan.supabase.plugins/SupabasePlugin<#A> { // io.github.jan.supabase.plugins/MainPlugin|null[0]
+    abstract val apiVersion // io.github.jan.supabase.plugins/MainPlugin.apiVersion|{}apiVersion[0]
+        abstract fun <get-apiVersion>(): kotlin/Int // io.github.jan.supabase.plugins/MainPlugin.apiVersion.<get-apiVersion>|<get-apiVersion>(){}[0]
+    abstract val pluginKey // io.github.jan.supabase.plugins/MainPlugin.pluginKey|{}pluginKey[0]
+        abstract fun <get-pluginKey>(): kotlin/String // io.github.jan.supabase.plugins/MainPlugin.pluginKey.<get-pluginKey>|<get-pluginKey>(){}[0]
+
+    abstract suspend fun parseErrorResponse(io.ktor.client.statement/HttpResponse): io.github.jan.supabase.exceptions/RestException // io.github.jan.supabase.plugins/MainPlugin.parseErrorResponse|parseErrorResponse(io.ktor.client.statement.HttpResponse){}[0]
+    open fun resolveUrl(kotlin/String = ...): kotlin/String // io.github.jan.supabase.plugins/MainPlugin.resolveUrl|resolveUrl(kotlin.String){}[0]
+}
+
+abstract interface <#A: kotlin/Any?, #B: io.github.jan.supabase.plugins/SupabasePlugin<#A>> io.github.jan.supabase.plugins/SupabasePluginProvider { // io.github.jan.supabase.plugins/SupabasePluginProvider|null[0]
+    abstract val key // io.github.jan.supabase.plugins/SupabasePluginProvider.key|{}key[0]
+        abstract fun <get-key>(): kotlin/String // io.github.jan.supabase.plugins/SupabasePluginProvider.key.<get-key>|<get-key>(){}[0]
+    abstract val logger // io.github.jan.supabase.plugins/SupabasePluginProvider.logger|{}logger[0]
+        abstract fun <get-logger>(): io.github.jan.supabase.logging/SupabaseLogger // io.github.jan.supabase.plugins/SupabasePluginProvider.logger.<get-logger>|<get-logger>(){}[0]
+
+    abstract fun create(io.github.jan.supabase/SupabaseClient, #A): #B // io.github.jan.supabase.plugins/SupabasePluginProvider.create|create(io.github.jan.supabase.SupabaseClient;1:0){}[0]
+    abstract fun createConfig(kotlin/Function1<#A, kotlin/Unit>): #A // io.github.jan.supabase.plugins/SupabasePluginProvider.createConfig|createConfig(kotlin.Function1<1:0,kotlin.Unit>){}[0]
+    open fun setup(io.github.jan.supabase/SupabaseClientBuilder, #A) // io.github.jan.supabase.plugins/SupabasePluginProvider.setup|setup(io.github.jan.supabase.SupabaseClientBuilder;1:0){}[0]
+}
+
+abstract interface <#A: kotlin/Any?> io.github.jan.supabase.plugins/SupabasePlugin { // io.github.jan.supabase.plugins/SupabasePlugin|null[0]
+    abstract val config // io.github.jan.supabase.plugins/SupabasePlugin.config|{}config[0]
+        abstract fun <get-config>(): #A // io.github.jan.supabase.plugins/SupabasePlugin.config.<get-config>|<get-config>(){}[0]
+    abstract val supabaseClient // io.github.jan.supabase.plugins/SupabasePlugin.supabaseClient|{}supabaseClient[0]
+        abstract fun <get-supabaseClient>(): io.github.jan.supabase/SupabaseClient // io.github.jan.supabase.plugins/SupabasePlugin.supabaseClient.<get-supabaseClient>|<get-supabaseClient>(){}[0]
+
+    open fun init() // io.github.jan.supabase.plugins/SupabasePlugin.init|init(){}[0]
+    open suspend fun close() // io.github.jan.supabase.plugins/SupabasePlugin.close|close(){}[0]
+}
+
+abstract interface io.github.jan.supabase.plugins/CustomSerializationConfig { // io.github.jan.supabase.plugins/CustomSerializationConfig|null[0]
+    abstract var serializer // io.github.jan.supabase.plugins/CustomSerializationConfig.serializer|{}serializer[0]
+        abstract fun <get-serializer>(): io.github.jan.supabase/SupabaseSerializer? // io.github.jan.supabase.plugins/CustomSerializationConfig.serializer.<get-serializer>|<get-serializer>(){}[0]
+        abstract fun <set-serializer>(io.github.jan.supabase/SupabaseSerializer?) // io.github.jan.supabase.plugins/CustomSerializationConfig.serializer.<set-serializer>|<set-serializer>(io.github.jan.supabase.SupabaseSerializer?){}[0]
+}
+
+abstract interface io.github.jan.supabase.plugins/CustomSerializationPlugin { // io.github.jan.supabase.plugins/CustomSerializationPlugin|null[0]
+    abstract val serializer // io.github.jan.supabase.plugins/CustomSerializationPlugin.serializer|{}serializer[0]
+        abstract fun <get-serializer>(): io.github.jan.supabase/SupabaseSerializer // io.github.jan.supabase.plugins/CustomSerializationPlugin.serializer.<get-serializer>|<get-serializer>(){}[0]
+}
+
+abstract interface io.github.jan.supabase.plugins/SerializableData // io.github.jan.supabase.plugins/SerializableData|null[0]
+
+abstract interface io.github.jan.supabase/SupabaseClient { // io.github.jan.supabase/SupabaseClient|null[0]
+    abstract val config // io.github.jan.supabase/SupabaseClient.config|{}config[0]
+        abstract fun <get-config>(): io.github.jan.supabase/SupabaseClientConfig // io.github.jan.supabase/SupabaseClient.config.<get-config>|<get-config>(){}[0]
+    abstract val defaultSerializer // io.github.jan.supabase/SupabaseClient.defaultSerializer|{}defaultSerializer[0]
+        abstract fun <get-defaultSerializer>(): io.github.jan.supabase/SupabaseSerializer // io.github.jan.supabase/SupabaseClient.defaultSerializer.<get-defaultSerializer>|<get-defaultSerializer>(){}[0]
+    abstract val httpClient // io.github.jan.supabase/SupabaseClient.httpClient|{}httpClient[0]
+        abstract fun <get-httpClient>(): io.github.jan.supabase.network/KtorSupabaseHttpClient // io.github.jan.supabase/SupabaseClient.httpClient.<get-httpClient>|<get-httpClient>(){}[0]
+    abstract val pluginManager // io.github.jan.supabase/SupabaseClient.pluginManager|{}pluginManager[0]
+        abstract fun <get-pluginManager>(): io.github.jan.supabase.plugins/PluginManager // io.github.jan.supabase/SupabaseClient.pluginManager.<get-pluginManager>|<get-pluginManager>(){}[0]
+    abstract val supabaseHttpUrl // io.github.jan.supabase/SupabaseClient.supabaseHttpUrl|{}supabaseHttpUrl[0]
+        abstract fun <get-supabaseHttpUrl>(): kotlin/String // io.github.jan.supabase/SupabaseClient.supabaseHttpUrl.<get-supabaseHttpUrl>|<get-supabaseHttpUrl>(){}[0]
+    abstract val supabaseKey // io.github.jan.supabase/SupabaseClient.supabaseKey|{}supabaseKey[0]
+        abstract fun <get-supabaseKey>(): kotlin/String // io.github.jan.supabase/SupabaseClient.supabaseKey.<get-supabaseKey>|<get-supabaseKey>(){}[0]
+    abstract val supabaseUrl // io.github.jan.supabase/SupabaseClient.supabaseUrl|{}supabaseUrl[0]
+        abstract fun <get-supabaseUrl>(): kotlin/String // io.github.jan.supabase/SupabaseClient.supabaseUrl.<get-supabaseUrl>|<get-supabaseUrl>(){}[0]
+    abstract val useHTTPS // io.github.jan.supabase/SupabaseClient.useHTTPS|{}useHTTPS[0]
+        abstract fun <get-useHTTPS>(): kotlin/Boolean // io.github.jan.supabase/SupabaseClient.useHTTPS.<get-useHTTPS>|<get-useHTTPS>(){}[0]
+
+    abstract suspend fun close() // io.github.jan.supabase/SupabaseClient.close|close(){}[0]
+
+    final object Companion { // io.github.jan.supabase/SupabaseClient.Companion|null[0]
+        final val LOGGER // io.github.jan.supabase/SupabaseClient.Companion.LOGGER|{}LOGGER[0]
+            final fun <get-LOGGER>(): io.github.jan.supabase.logging/SupabaseLogger // io.github.jan.supabase/SupabaseClient.Companion.LOGGER.<get-LOGGER>|<get-LOGGER>(){}[0]
+
+        final var DEFAULT_LOG_LEVEL // io.github.jan.supabase/SupabaseClient.Companion.DEFAULT_LOG_LEVEL|{}DEFAULT_LOG_LEVEL[0]
+            final fun <get-DEFAULT_LOG_LEVEL>(): io.github.jan.supabase.logging/LogLevel // io.github.jan.supabase/SupabaseClient.Companion.DEFAULT_LOG_LEVEL.<get-DEFAULT_LOG_LEVEL>|<get-DEFAULT_LOG_LEVEL>(){}[0]
+
+        final fun createLogger(kotlin/String, io.github.jan.supabase.logging/LogLevel? = ...): io.github.jan.supabase.logging/SupabaseLogger // io.github.jan.supabase/SupabaseClient.Companion.createLogger|createLogger(kotlin.String;io.github.jan.supabase.logging.LogLevel?){}[0]
+    }
+}
+
+abstract interface io.github.jan.supabase/SupabaseSerializer { // io.github.jan.supabase/SupabaseSerializer|null[0]
+    abstract fun <#A1: kotlin/Any> decode(kotlin.reflect/KType, kotlin/String): #A1 // io.github.jan.supabase/SupabaseSerializer.decode|decode(kotlin.reflect.KType;kotlin.String){0§<kotlin.Any>}[0]
+    abstract fun <#A1: kotlin/Any> encode(kotlin.reflect/KType, #A1): kotlin/String // io.github.jan.supabase/SupabaseSerializer.encode|encode(kotlin.reflect.KType;0:0){0§<kotlin.Any>}[0]
+}
+
+abstract class io.github.jan.supabase.logging/SupabaseLogger { // io.github.jan.supabase.logging/SupabaseLogger|null[0]
+    constructor <init>() // io.github.jan.supabase.logging/SupabaseLogger.<init>|<init>(){}[0]
+
+    abstract val level // io.github.jan.supabase.logging/SupabaseLogger.level|{}level[0]
+        abstract fun <get-level>(): io.github.jan.supabase.logging/LogLevel? // io.github.jan.supabase.logging/SupabaseLogger.level.<get-level>|<get-level>(){}[0]
+
+    abstract fun log(io.github.jan.supabase.logging/LogLevel, kotlin/Throwable? = ..., kotlin/String) // io.github.jan.supabase.logging/SupabaseLogger.log|log(io.github.jan.supabase.logging.LogLevel;kotlin.Throwable?;kotlin.String){}[0]
+    final inline fun log(io.github.jan.supabase.logging/LogLevel, kotlin/Throwable? = ..., kotlin/Function0<kotlin/String>) // io.github.jan.supabase.logging/SupabaseLogger.log|log(io.github.jan.supabase.logging.LogLevel;kotlin.Throwable?;kotlin.Function0<kotlin.String>){}[0]
+}
+
+abstract class io.github.jan.supabase.network/SupabaseHttpClient { // io.github.jan.supabase.network/SupabaseHttpClient|null[0]
+    constructor <init>() // io.github.jan.supabase.network/SupabaseHttpClient.<init>|<init>(){}[0]
+
+    abstract suspend fun prepareRequest(kotlin/String, kotlin/Function1<io.ktor.client.request/HttpRequestBuilder, kotlin/Unit>): io.ktor.client.statement/HttpStatement // io.github.jan.supabase.network/SupabaseHttpClient.prepareRequest|prepareRequest(kotlin.String;kotlin.Function1<io.ktor.client.request.HttpRequestBuilder,kotlin.Unit>){}[0]
+    abstract suspend fun request(kotlin/String, kotlin/Function1<io.ktor.client.request/HttpRequestBuilder, kotlin/Unit>): io.ktor.client.statement/HttpResponse // io.github.jan.supabase.network/SupabaseHttpClient.request|request(kotlin.String;kotlin.Function1<io.ktor.client.request.HttpRequestBuilder,kotlin.Unit>){}[0]
+    final suspend inline fun <#A1: reified kotlin/Any?> delete(kotlin/String, #A1, io.ktor.http/ContentType = ..., crossinline kotlin/Function1<io.ktor.client.request/HttpRequestBuilder, kotlin/Unit> = ...): io.ktor.client.statement/HttpResponse // io.github.jan.supabase.network/SupabaseHttpClient.delete|delete(kotlin.String;0:0;io.ktor.http.ContentType;kotlin.Function1<io.ktor.client.request.HttpRequestBuilder,kotlin.Unit>){0§<kotlin.Any?>}[0]
+    final suspend inline fun <#A1: reified kotlin/Any?> deleteJson(kotlin/String, #A1, crossinline kotlin/Function1<io.ktor.client.request/HttpRequestBuilder, kotlin/Unit> = ...): io.ktor.client.statement/HttpResponse // io.github.jan.supabase.network/SupabaseHttpClient.deleteJson|deleteJson(kotlin.String;0:0;kotlin.Function1<io.ktor.client.request.HttpRequestBuilder,kotlin.Unit>){0§<kotlin.Any?>}[0]
+    final suspend inline fun <#A1: reified kotlin/Any?> patch(kotlin/String, #A1, io.ktor.http/ContentType = ..., crossinline kotlin/Function1<io.ktor.client.request/HttpRequestBuilder, kotlin/Unit> = ...): io.ktor.client.statement/HttpResponse // io.github.jan.supabase.network/SupabaseHttpClient.patch|patch(kotlin.String;0:0;io.ktor.http.ContentType;kotlin.Function1<io.ktor.client.request.HttpRequestBuilder,kotlin.Unit>){0§<kotlin.Any?>}[0]
+    final suspend inline fun <#A1: reified kotlin/Any?> patchJson(kotlin/String, #A1, crossinline kotlin/Function1<io.ktor.client.request/HttpRequestBuilder, kotlin/Unit> = ...): io.ktor.client.statement/HttpResponse // io.github.jan.supabase.network/SupabaseHttpClient.patchJson|patchJson(kotlin.String;0:0;kotlin.Function1<io.ktor.client.request.HttpRequestBuilder,kotlin.Unit>){0§<kotlin.Any?>}[0]
+    final suspend inline fun <#A1: reified kotlin/Any?> post(kotlin/String, #A1, io.ktor.http/ContentType = ..., crossinline kotlin/Function1<io.ktor.client.request/HttpRequestBuilder, kotlin/Unit> = ...): io.ktor.client.statement/HttpResponse // io.github.jan.supabase.network/SupabaseHttpClient.post|post(kotlin.String;0:0;io.ktor.http.ContentType;kotlin.Function1<io.ktor.client.request.HttpRequestBuilder,kotlin.Unit>){0§<kotlin.Any?>}[0]
+    final suspend inline fun <#A1: reified kotlin/Any?> postJson(kotlin/String, #A1, crossinline kotlin/Function1<io.ktor.client.request/HttpRequestBuilder, kotlin/Unit> = ...): io.ktor.client.statement/HttpResponse // io.github.jan.supabase.network/SupabaseHttpClient.postJson|postJson(kotlin.String;0:0;kotlin.Function1<io.ktor.client.request.HttpRequestBuilder,kotlin.Unit>){0§<kotlin.Any?>}[0]
+    final suspend inline fun <#A1: reified kotlin/Any?> put(kotlin/String, #A1, io.ktor.http/ContentType = ..., crossinline kotlin/Function1<io.ktor.client.request/HttpRequestBuilder, kotlin/Unit> = ...): io.ktor.client.statement/HttpResponse // io.github.jan.supabase.network/SupabaseHttpClient.put|put(kotlin.String;0:0;io.ktor.http.ContentType;kotlin.Function1<io.ktor.client.request.HttpRequestBuilder,kotlin.Unit>){0§<kotlin.Any?>}[0]
+    final suspend inline fun <#A1: reified kotlin/Any?> putJson(kotlin/String, #A1, crossinline kotlin/Function1<io.ktor.client.request/HttpRequestBuilder, kotlin/Unit> = ...): io.ktor.client.statement/HttpResponse // io.github.jan.supabase.network/SupabaseHttpClient.putJson|putJson(kotlin.String;0:0;kotlin.Function1<io.ktor.client.request.HttpRequestBuilder,kotlin.Unit>){0§<kotlin.Any?>}[0]
+    final suspend inline fun delete(kotlin/String, crossinline kotlin/Function1<io.ktor.client.request/HttpRequestBuilder, kotlin/Unit> = ...): io.ktor.client.statement/HttpResponse // io.github.jan.supabase.network/SupabaseHttpClient.delete|delete(kotlin.String;kotlin.Function1<io.ktor.client.request.HttpRequestBuilder,kotlin.Unit>){}[0]
+    final suspend inline fun get(kotlin/String, crossinline kotlin/Function1<io.ktor.client.request/HttpRequestBuilder, kotlin/Unit> = ...): io.ktor.client.statement/HttpResponse // io.github.jan.supabase.network/SupabaseHttpClient.get|get(kotlin.String;kotlin.Function1<io.ktor.client.request.HttpRequestBuilder,kotlin.Unit>){}[0]
+    final suspend inline fun patch(kotlin/String, crossinline kotlin/Function1<io.ktor.client.request/HttpRequestBuilder, kotlin/Unit> = ...): io.ktor.client.statement/HttpResponse // io.github.jan.supabase.network/SupabaseHttpClient.patch|patch(kotlin.String;kotlin.Function1<io.ktor.client.request.HttpRequestBuilder,kotlin.Unit>){}[0]
+    final suspend inline fun post(kotlin/String, crossinline kotlin/Function1<io.ktor.client.request/HttpRequestBuilder, kotlin/Unit> = ...): io.ktor.client.statement/HttpResponse // io.github.jan.supabase.network/SupabaseHttpClient.post|post(kotlin.String;kotlin.Function1<io.ktor.client.request.HttpRequestBuilder,kotlin.Unit>){}[0]
+    final suspend inline fun put(kotlin/String, crossinline kotlin/Function1<io.ktor.client.request/HttpRequestBuilder, kotlin/Unit> = ...): io.ktor.client.statement/HttpResponse // io.github.jan.supabase.network/SupabaseHttpClient.put|put(kotlin.String;kotlin.Function1<io.ktor.client.request.HttpRequestBuilder,kotlin.Unit>){}[0]
+}
+
+final class io.github.jan.supabase.exceptions/BadRequestRestException : io.github.jan.supabase.exceptions/RestException { // io.github.jan.supabase.exceptions/BadRequestRestException|null[0]
+    constructor <init>(kotlin/String, io.ktor.client.statement/HttpResponse, kotlin/String? = ...) // io.github.jan.supabase.exceptions/BadRequestRestException.<init>|<init>(kotlin.String;io.ktor.client.statement.HttpResponse;kotlin.String?){}[0]
+}
+
+final class io.github.jan.supabase.exceptions/HttpRequestException : kotlinx.io/IOException { // io.github.jan.supabase.exceptions/HttpRequestException|null[0]
+    constructor <init>(kotlin/String, io.ktor.client.request/HttpRequestBuilder) // io.github.jan.supabase.exceptions/HttpRequestException.<init>|<init>(kotlin.String;io.ktor.client.request.HttpRequestBuilder){}[0]
+}
+
+final class io.github.jan.supabase.exceptions/NotFoundRestException : io.github.jan.supabase.exceptions/RestException { // io.github.jan.supabase.exceptions/NotFoundRestException|null[0]
+    constructor <init>(kotlin/String, io.ktor.client.statement/HttpResponse, kotlin/String? = ...) // io.github.jan.supabase.exceptions/NotFoundRestException.<init>|<init>(kotlin.String;io.ktor.client.statement.HttpResponse;kotlin.String?){}[0]
+}
+
+final class io.github.jan.supabase.exceptions/SupabaseEncodingException : kotlin/Exception { // io.github.jan.supabase.exceptions/SupabaseEncodingException|null[0]
+    constructor <init>(kotlin/String) // io.github.jan.supabase.exceptions/SupabaseEncodingException.<init>|<init>(kotlin.String){}[0]
+}
+
+final class io.github.jan.supabase.exceptions/UnauthorizedRestException : io.github.jan.supabase.exceptions/RestException { // io.github.jan.supabase.exceptions/UnauthorizedRestException|null[0]
+    constructor <init>(kotlin/String, io.ktor.client.statement/HttpResponse, kotlin/String? = ...) // io.github.jan.supabase.exceptions/UnauthorizedRestException.<init>|<init>(kotlin.String;io.ktor.client.statement.HttpResponse;kotlin.String?){}[0]
+}
+
+final class io.github.jan.supabase.exceptions/UnknownRestException : io.github.jan.supabase.exceptions/RestException { // io.github.jan.supabase.exceptions/UnknownRestException|null[0]
+    constructor <init>(kotlin/String, io.ktor.client.statement/HttpResponse, kotlin/String? = ...) // io.github.jan.supabase.exceptions/UnknownRestException.<init>|<init>(kotlin.String;io.ktor.client.statement.HttpResponse;kotlin.String?){}[0]
+}
+
+final class io.github.jan.supabase.network/KtorSupabaseHttpClient : io.github.jan.supabase.network/SupabaseHttpClient { // io.github.jan.supabase.network/KtorSupabaseHttpClient|null[0]
+    final fun close() // io.github.jan.supabase.network/KtorSupabaseHttpClient.close|close(){}[0]
+    final suspend fun prepareRequest(kotlin/String, kotlin/Function1<io.ktor.client.request/HttpRequestBuilder, kotlin/Unit>): io.ktor.client.statement/HttpStatement // io.github.jan.supabase.network/KtorSupabaseHttpClient.prepareRequest|prepareRequest(kotlin.String;kotlin.Function1<io.ktor.client.request.HttpRequestBuilder,kotlin.Unit>){}[0]
+    final suspend fun request(kotlin/String, kotlin/Function1<io.ktor.client.request/HttpRequestBuilder, kotlin/Unit>): io.ktor.client.statement/HttpResponse // io.github.jan.supabase.network/KtorSupabaseHttpClient.request|request(kotlin.String;kotlin.Function1<io.ktor.client.request.HttpRequestBuilder,kotlin.Unit>){}[0]
+}
+
+final class io.github.jan.supabase.plugins/PluginManager { // io.github.jan.supabase.plugins/PluginManager|null[0]
+    constructor <init>(kotlin.collections/Map<kotlin/String, io.github.jan.supabase.plugins/SupabasePlugin<*>>) // io.github.jan.supabase.plugins/PluginManager.<init>|<init>(kotlin.collections.Map<kotlin.String,io.github.jan.supabase.plugins.SupabasePlugin<*>>){}[0]
+
+    final val installedPlugins // io.github.jan.supabase.plugins/PluginManager.installedPlugins|{}installedPlugins[0]
+        final fun <get-installedPlugins>(): kotlin.collections/Map<kotlin/String, io.github.jan.supabase.plugins/SupabasePlugin<*>> // io.github.jan.supabase.plugins/PluginManager.installedPlugins.<get-installedPlugins>|<get-installedPlugins>(){}[0]
+
+    final inline fun <#A1: reified io.github.jan.supabase.plugins/SupabasePlugin<#B1>, #B1: kotlin/Any?, #C1: io.github.jan.supabase.plugins/SupabasePluginProvider<#B1, #A1>> getPlugin(#C1): #A1 // io.github.jan.supabase.plugins/PluginManager.getPlugin|getPlugin(0:2){0§<io.github.jan.supabase.plugins.SupabasePlugin<0:1>>;1§<kotlin.Any?>;2§<io.github.jan.supabase.plugins.SupabasePluginProvider<0:1,0:0>>}[0]
+    final inline fun <#A1: reified io.github.jan.supabase.plugins/SupabasePlugin<#B1>, #B1: kotlin/Any?, #C1: io.github.jan.supabase.plugins/SupabasePluginProvider<#B1, #A1>> getPluginOrNull(#C1): #A1? // io.github.jan.supabase.plugins/PluginManager.getPluginOrNull|getPluginOrNull(0:2){0§<io.github.jan.supabase.plugins.SupabasePlugin<0:1>>;1§<kotlin.Any?>;2§<io.github.jan.supabase.plugins.SupabasePluginProvider<0:1,0:0>>}[0]
+    final suspend inline fun closeAllPlugins() // io.github.jan.supabase.plugins/PluginManager.closeAllPlugins|closeAllPlugins(){}[0]
+}
+
+final class io.github.jan.supabase.serializer/KotlinXSerializer : io.github.jan.supabase/SupabaseSerializer { // io.github.jan.supabase.serializer/KotlinXSerializer|null[0]
+    constructor <init>(kotlinx.serialization.json/Json = ...) // io.github.jan.supabase.serializer/KotlinXSerializer.<init>|<init>(kotlinx.serialization.json.Json){}[0]
+
+    final fun <#A1: kotlin/Any> decode(kotlin.reflect/KType, kotlin/String): #A1 // io.github.jan.supabase.serializer/KotlinXSerializer.decode|decode(kotlin.reflect.KType;kotlin.String){0§<kotlin.Any>}[0]
+    final fun <#A1: kotlin/Any> encode(kotlin.reflect/KType, #A1): kotlin/String // io.github.jan.supabase.serializer/KotlinXSerializer.encode|encode(kotlin.reflect.KType;0:0){0§<kotlin.Any>}[0]
+}
+
+final class io.github.jan.supabase/OSInformation { // io.github.jan.supabase/OSInformation|null[0]
+    constructor <init>(kotlin/String, kotlin/String?) // io.github.jan.supabase/OSInformation.<init>|<init>(kotlin.String;kotlin.String?){}[0]
+
+    final val name // io.github.jan.supabase/OSInformation.name|{}name[0]
+        final fun <get-name>(): kotlin/String // io.github.jan.supabase/OSInformation.name.<get-name>|<get-name>(){}[0]
+    final val version // io.github.jan.supabase/OSInformation.version|{}version[0]
+        final fun <get-version>(): kotlin/String? // io.github.jan.supabase/OSInformation.version.<get-version>|<get-version>(){}[0]
+
+    final fun component1(): kotlin/String // io.github.jan.supabase/OSInformation.component1|component1(){}[0]
+    final fun component2(): kotlin/String? // io.github.jan.supabase/OSInformation.component2|component2(){}[0]
+    final fun copy(kotlin/String = ..., kotlin/String? = ...): io.github.jan.supabase/OSInformation // io.github.jan.supabase/OSInformation.copy|copy(kotlin.String;kotlin.String?){}[0]
+    final fun equals(kotlin/Any?): kotlin/Boolean // io.github.jan.supabase/OSInformation.equals|equals(kotlin.Any?){}[0]
+    final fun hashCode(): kotlin/Int // io.github.jan.supabase/OSInformation.hashCode|hashCode(){}[0]
+    final fun toString(): kotlin/String // io.github.jan.supabase/OSInformation.toString|toString(){}[0]
+
+    final object Companion { // io.github.jan.supabase/OSInformation.Companion|null[0]
+        final val CURRENT // io.github.jan.supabase/OSInformation.Companion.CURRENT|{}CURRENT[0]
+            final fun <get-CURRENT>(): io.github.jan.supabase/OSInformation? // io.github.jan.supabase/OSInformation.Companion.CURRENT.<get-CURRENT>|<get-CURRENT>(){}[0]
+    }
+}
+
+final class io.github.jan.supabase/SupabaseClientBuilder { // io.github.jan.supabase/SupabaseClientBuilder|null[0]
+    constructor <init>(kotlin/String, kotlin/String) // io.github.jan.supabase/SupabaseClientBuilder.<init>|<init>(kotlin.String;kotlin.String){}[0]
+
+    final var accessToken // io.github.jan.supabase/SupabaseClientBuilder.accessToken|{}accessToken[0]
+        final fun <get-accessToken>(): kotlin.coroutines/SuspendFunction0<kotlin/String?>? // io.github.jan.supabase/SupabaseClientBuilder.accessToken.<get-accessToken>|<get-accessToken>(){}[0]
+        final fun <set-accessToken>(kotlin.coroutines/SuspendFunction0<kotlin/String?>?) // io.github.jan.supabase/SupabaseClientBuilder.accessToken.<set-accessToken>|<set-accessToken>(kotlin.coroutines.SuspendFunction0<kotlin.String?>?){}[0]
+    final var coroutineDispatcher // io.github.jan.supabase/SupabaseClientBuilder.coroutineDispatcher|{}coroutineDispatcher[0]
+        final fun <get-coroutineDispatcher>(): kotlinx.coroutines/CoroutineDispatcher // io.github.jan.supabase/SupabaseClientBuilder.coroutineDispatcher.<get-coroutineDispatcher>|<get-coroutineDispatcher>(){}[0]
+        final fun <set-coroutineDispatcher>(kotlinx.coroutines/CoroutineDispatcher) // io.github.jan.supabase/SupabaseClientBuilder.coroutineDispatcher.<set-coroutineDispatcher>|<set-coroutineDispatcher>(kotlinx.coroutines.CoroutineDispatcher){}[0]
+    final var defaultLogLevel // io.github.jan.supabase/SupabaseClientBuilder.defaultLogLevel|{}defaultLogLevel[0]
+        final fun <get-defaultLogLevel>(): io.github.jan.supabase.logging/LogLevel // io.github.jan.supabase/SupabaseClientBuilder.defaultLogLevel.<get-defaultLogLevel>|<get-defaultLogLevel>(){}[0]
+        final fun <set-defaultLogLevel>(io.github.jan.supabase.logging/LogLevel) // io.github.jan.supabase/SupabaseClientBuilder.defaultLogLevel.<set-defaultLogLevel>|<set-defaultLogLevel>(io.github.jan.supabase.logging.LogLevel){}[0]
+    final var defaultSerializer // io.github.jan.supabase/SupabaseClientBuilder.defaultSerializer|{}defaultSerializer[0]
+        final fun <get-defaultSerializer>(): io.github.jan.supabase/SupabaseSerializer // io.github.jan.supabase/SupabaseClientBuilder.defaultSerializer.<get-defaultSerializer>|<get-defaultSerializer>(){}[0]
+        final fun <set-defaultSerializer>(io.github.jan.supabase/SupabaseSerializer) // io.github.jan.supabase/SupabaseClientBuilder.defaultSerializer.<set-defaultSerializer>|<set-defaultSerializer>(io.github.jan.supabase.SupabaseSerializer){}[0]
+    final var httpEngine // io.github.jan.supabase/SupabaseClientBuilder.httpEngine|{}httpEngine[0]
+        final fun <get-httpEngine>(): io.ktor.client.engine/HttpClientEngine? // io.github.jan.supabase/SupabaseClientBuilder.httpEngine.<get-httpEngine>|<get-httpEngine>(){}[0]
+        final fun <set-httpEngine>(io.ktor.client.engine/HttpClientEngine?) // io.github.jan.supabase/SupabaseClientBuilder.httpEngine.<set-httpEngine>|<set-httpEngine>(io.ktor.client.engine.HttpClientEngine?){}[0]
+    final var ignoreModulesInUrl // io.github.jan.supabase/SupabaseClientBuilder.ignoreModulesInUrl|{}ignoreModulesInUrl[0]
+        final fun <get-ignoreModulesInUrl>(): kotlin/Boolean // io.github.jan.supabase/SupabaseClientBuilder.ignoreModulesInUrl.<get-ignoreModulesInUrl>|<get-ignoreModulesInUrl>(){}[0]
+        final fun <set-ignoreModulesInUrl>(kotlin/Boolean) // io.github.jan.supabase/SupabaseClientBuilder.ignoreModulesInUrl.<set-ignoreModulesInUrl>|<set-ignoreModulesInUrl>(kotlin.Boolean){}[0]
+    final var osInformation // io.github.jan.supabase/SupabaseClientBuilder.osInformation|{}osInformation[0]
+        final fun <get-osInformation>(): io.github.jan.supabase/OSInformation? // io.github.jan.supabase/SupabaseClientBuilder.osInformation.<get-osInformation>|<get-osInformation>(){}[0]
+        final fun <set-osInformation>(io.github.jan.supabase/OSInformation?) // io.github.jan.supabase/SupabaseClientBuilder.osInformation.<set-osInformation>|<set-osInformation>(io.github.jan.supabase.OSInformation?){}[0]
+    final var requestTimeout // io.github.jan.supabase/SupabaseClientBuilder.requestTimeout|{}requestTimeout[0]
+        final fun <get-requestTimeout>(): kotlin.time/Duration // io.github.jan.supabase/SupabaseClientBuilder.requestTimeout.<get-requestTimeout>|<get-requestTimeout>(){}[0]
+        final fun <set-requestTimeout>(kotlin.time/Duration) // io.github.jan.supabase/SupabaseClientBuilder.requestTimeout.<set-requestTimeout>|<set-requestTimeout>(kotlin.time.Duration){}[0]
+    final var useHTTPS // io.github.jan.supabase/SupabaseClientBuilder.useHTTPS|{}useHTTPS[0]
+        final fun <get-useHTTPS>(): kotlin/Boolean // io.github.jan.supabase/SupabaseClientBuilder.useHTTPS.<get-useHTTPS>|<get-useHTTPS>(){}[0]
+        final fun <set-useHTTPS>(kotlin/Boolean) // io.github.jan.supabase/SupabaseClientBuilder.useHTTPS.<set-useHTTPS>|<set-useHTTPS>(kotlin.Boolean){}[0]
+
+    final fun <#A1: kotlin/Any?, #B1: io.github.jan.supabase.plugins/SupabasePlugin<#A1>, #C1: io.github.jan.supabase.plugins/SupabasePluginProvider<#A1, #B1>> install(#C1, kotlin/Function1<#A1, kotlin/Unit> = ...) // io.github.jan.supabase/SupabaseClientBuilder.install|install(0:2;kotlin.Function1<0:0,kotlin.Unit>){0§<kotlin.Any?>;1§<io.github.jan.supabase.plugins.SupabasePlugin<0:0>>;2§<io.github.jan.supabase.plugins.SupabasePluginProvider<0:0,0:1>>}[0]
+    final fun build(): io.github.jan.supabase/SupabaseClient // io.github.jan.supabase/SupabaseClientBuilder.build|build(){}[0]
+}
+
+final class io.github.jan.supabase/SupabaseClientConfig { // io.github.jan.supabase/SupabaseClientConfig|null[0]
+    constructor <init>(kotlin/String, kotlin/String, io.github.jan.supabase.logging/LogLevel, io.github.jan.supabase/SupabaseNetworkConfig, io.github.jan.supabase/SupabaseSerializer, kotlinx.coroutines/CoroutineDispatcher, kotlin.coroutines/SuspendFunction0<kotlin/String?>?, kotlin.collections/Map<kotlin/String, kotlin/Function1<io.github.jan.supabase/SupabaseClient, io.github.jan.supabase.plugins/SupabasePlugin<*>>>, io.github.jan.supabase/OSInformation?) // io.github.jan.supabase/SupabaseClientConfig.<init>|<init>(kotlin.String;kotlin.String;io.github.jan.supabase.logging.LogLevel;io.github.jan.supabase.SupabaseNetworkConfig;io.github.jan.supabase.SupabaseSerializer;kotlinx.coroutines.CoroutineDispatcher;kotlin.coroutines.SuspendFunction0<kotlin.String?>?;kotlin.collections.Map<kotlin.String,kotlin.Function1<io.github.jan.supabase.SupabaseClient,io.github.jan.supabase.plugins.SupabasePlugin<*>>>;io.github.jan.supabase.OSInformation?){}[0]
+
+    final val accessToken // io.github.jan.supabase/SupabaseClientConfig.accessToken|{}accessToken[0]
+        final fun <get-accessToken>(): kotlin.coroutines/SuspendFunction0<kotlin/String?>? // io.github.jan.supabase/SupabaseClientConfig.accessToken.<get-accessToken>|<get-accessToken>(){}[0]
+    final val coroutineDispatcher // io.github.jan.supabase/SupabaseClientConfig.coroutineDispatcher|{}coroutineDispatcher[0]
+        final fun <get-coroutineDispatcher>(): kotlinx.coroutines/CoroutineDispatcher // io.github.jan.supabase/SupabaseClientConfig.coroutineDispatcher.<get-coroutineDispatcher>|<get-coroutineDispatcher>(){}[0]
+    final val defaultLogLevel // io.github.jan.supabase/SupabaseClientConfig.defaultLogLevel|{}defaultLogLevel[0]
+        final fun <get-defaultLogLevel>(): io.github.jan.supabase.logging/LogLevel // io.github.jan.supabase/SupabaseClientConfig.defaultLogLevel.<get-defaultLogLevel>|<get-defaultLogLevel>(){}[0]
+    final val defaultSerializer // io.github.jan.supabase/SupabaseClientConfig.defaultSerializer|{}defaultSerializer[0]
+        final fun <get-defaultSerializer>(): io.github.jan.supabase/SupabaseSerializer // io.github.jan.supabase/SupabaseClientConfig.defaultSerializer.<get-defaultSerializer>|<get-defaultSerializer>(){}[0]
+    final val networkConfig // io.github.jan.supabase/SupabaseClientConfig.networkConfig|{}networkConfig[0]
+        final fun <get-networkConfig>(): io.github.jan.supabase/SupabaseNetworkConfig // io.github.jan.supabase/SupabaseClientConfig.networkConfig.<get-networkConfig>|<get-networkConfig>(){}[0]
+    final val osInformation // io.github.jan.supabase/SupabaseClientConfig.osInformation|{}osInformation[0]
+        final fun <get-osInformation>(): io.github.jan.supabase/OSInformation? // io.github.jan.supabase/SupabaseClientConfig.osInformation.<get-osInformation>|<get-osInformation>(){}[0]
+    final val plugins // io.github.jan.supabase/SupabaseClientConfig.plugins|{}plugins[0]
+        final fun <get-plugins>(): kotlin.collections/Map<kotlin/String, kotlin/Function1<io.github.jan.supabase/SupabaseClient, io.github.jan.supabase.plugins/SupabasePlugin<*>>> // io.github.jan.supabase/SupabaseClientConfig.plugins.<get-plugins>|<get-plugins>(){}[0]
+    final val supabaseKey // io.github.jan.supabase/SupabaseClientConfig.supabaseKey|{}supabaseKey[0]
+        final fun <get-supabaseKey>(): kotlin/String // io.github.jan.supabase/SupabaseClientConfig.supabaseKey.<get-supabaseKey>|<get-supabaseKey>(){}[0]
+    final val supabaseUrl // io.github.jan.supabase/SupabaseClientConfig.supabaseUrl|{}supabaseUrl[0]
+        final fun <get-supabaseUrl>(): kotlin/String // io.github.jan.supabase/SupabaseClientConfig.supabaseUrl.<get-supabaseUrl>|<get-supabaseUrl>(){}[0]
+
+    final fun component1(): kotlin/String // io.github.jan.supabase/SupabaseClientConfig.component1|component1(){}[0]
+    final fun component2(): kotlin/String // io.github.jan.supabase/SupabaseClientConfig.component2|component2(){}[0]
+    final fun component3(): io.github.jan.supabase.logging/LogLevel // io.github.jan.supabase/SupabaseClientConfig.component3|component3(){}[0]
+    final fun component4(): io.github.jan.supabase/SupabaseNetworkConfig // io.github.jan.supabase/SupabaseClientConfig.component4|component4(){}[0]
+    final fun component5(): io.github.jan.supabase/SupabaseSerializer // io.github.jan.supabase/SupabaseClientConfig.component5|component5(){}[0]
+    final fun component6(): kotlinx.coroutines/CoroutineDispatcher // io.github.jan.supabase/SupabaseClientConfig.component6|component6(){}[0]
+    final fun component7(): kotlin.coroutines/SuspendFunction0<kotlin/String?>? // io.github.jan.supabase/SupabaseClientConfig.component7|component7(){}[0]
+    final fun component8(): kotlin.collections/Map<kotlin/String, kotlin/Function1<io.github.jan.supabase/SupabaseClient, io.github.jan.supabase.plugins/SupabasePlugin<*>>> // io.github.jan.supabase/SupabaseClientConfig.component8|component8(){}[0]
+    final fun component9(): io.github.jan.supabase/OSInformation? // io.github.jan.supabase/SupabaseClientConfig.component9|component9(){}[0]
+    final fun copy(kotlin/String = ..., kotlin/String = ..., io.github.jan.supabase.logging/LogLevel = ..., io.github.jan.supabase/SupabaseNetworkConfig = ..., io.github.jan.supabase/SupabaseSerializer = ..., kotlinx.coroutines/CoroutineDispatcher = ..., kotlin.coroutines/SuspendFunction0<kotlin/String?>? = ..., kotlin.collections/Map<kotlin/String, kotlin/Function1<io.github.jan.supabase/SupabaseClient, io.github.jan.supabase.plugins/SupabasePlugin<*>>> = ..., io.github.jan.supabase/OSInformation? = ...): io.github.jan.supabase/SupabaseClientConfig // io.github.jan.supabase/SupabaseClientConfig.copy|copy(kotlin.String;kotlin.String;io.github.jan.supabase.logging.LogLevel;io.github.jan.supabase.SupabaseNetworkConfig;io.github.jan.supabase.SupabaseSerializer;kotlinx.coroutines.CoroutineDispatcher;kotlin.coroutines.SuspendFunction0<kotlin.String?>?;kotlin.collections.Map<kotlin.String,kotlin.Function1<io.github.jan.supabase.SupabaseClient,io.github.jan.supabase.plugins.SupabasePlugin<*>>>;io.github.jan.supabase.OSInformation?){}[0]
+    final fun equals(kotlin/Any?): kotlin/Boolean // io.github.jan.supabase/SupabaseClientConfig.equals|equals(kotlin.Any?){}[0]
+    final fun hashCode(): kotlin/Int // io.github.jan.supabase/SupabaseClientConfig.hashCode|hashCode(){}[0]
+    final fun toString(): kotlin/String // io.github.jan.supabase/SupabaseClientConfig.toString|toString(){}[0]
+}
+
+final class io.github.jan.supabase/SupabaseNetworkConfig { // io.github.jan.supabase/SupabaseNetworkConfig|null[0]
+    constructor <init>(kotlin/Boolean, io.ktor.client.engine/HttpClientEngine?, kotlin.collections/List<kotlin/Function1<io.ktor.client/HttpClientConfig<*>, kotlin/Unit>>, kotlin.time/Duration) // io.github.jan.supabase/SupabaseNetworkConfig.<init>|<init>(kotlin.Boolean;io.ktor.client.engine.HttpClientEngine?;kotlin.collections.List<kotlin.Function1<io.ktor.client.HttpClientConfig<*>,kotlin.Unit>>;kotlin.time.Duration){}[0]
+
+    final val httpConfigOverrides // io.github.jan.supabase/SupabaseNetworkConfig.httpConfigOverrides|{}httpConfigOverrides[0]
+        final fun <get-httpConfigOverrides>(): kotlin.collections/List<kotlin/Function1<io.ktor.client/HttpClientConfig<*>, kotlin/Unit>> // io.github.jan.supabase/SupabaseNetworkConfig.httpConfigOverrides.<get-httpConfigOverrides>|<get-httpConfigOverrides>(){}[0]
+    final val httpEngine // io.github.jan.supabase/SupabaseNetworkConfig.httpEngine|{}httpEngine[0]
+        final fun <get-httpEngine>(): io.ktor.client.engine/HttpClientEngine? // io.github.jan.supabase/SupabaseNetworkConfig.httpEngine.<get-httpEngine>|<get-httpEngine>(){}[0]
+    final val requestTimeout // io.github.jan.supabase/SupabaseNetworkConfig.requestTimeout|{}requestTimeout[0]
+        final fun <get-requestTimeout>(): kotlin.time/Duration // io.github.jan.supabase/SupabaseNetworkConfig.requestTimeout.<get-requestTimeout>|<get-requestTimeout>(){}[0]
+    final val useHTTPS // io.github.jan.supabase/SupabaseNetworkConfig.useHTTPS|{}useHTTPS[0]
+        final fun <get-useHTTPS>(): kotlin/Boolean // io.github.jan.supabase/SupabaseNetworkConfig.useHTTPS.<get-useHTTPS>|<get-useHTTPS>(){}[0]
+
+    final fun component1(): kotlin/Boolean // io.github.jan.supabase/SupabaseNetworkConfig.component1|component1(){}[0]
+    final fun component2(): io.ktor.client.engine/HttpClientEngine? // io.github.jan.supabase/SupabaseNetworkConfig.component2|component2(){}[0]
+    final fun component3(): kotlin.collections/List<kotlin/Function1<io.ktor.client/HttpClientConfig<*>, kotlin/Unit>> // io.github.jan.supabase/SupabaseNetworkConfig.component3|component3(){}[0]
+    final fun component4(): kotlin.time/Duration // io.github.jan.supabase/SupabaseNetworkConfig.component4|component4(){}[0]
+    final fun copy(kotlin/Boolean = ..., io.ktor.client.engine/HttpClientEngine? = ..., kotlin.collections/List<kotlin/Function1<io.ktor.client/HttpClientConfig<*>, kotlin/Unit>> = ..., kotlin.time/Duration = ...): io.github.jan.supabase/SupabaseNetworkConfig // io.github.jan.supabase/SupabaseNetworkConfig.copy|copy(kotlin.Boolean;io.ktor.client.engine.HttpClientEngine?;kotlin.collections.List<kotlin.Function1<io.ktor.client.HttpClientConfig<*>,kotlin.Unit>>;kotlin.time.Duration){}[0]
+    final fun equals(kotlin/Any?): kotlin/Boolean // io.github.jan.supabase/SupabaseNetworkConfig.equals|equals(kotlin.Any?){}[0]
+    final fun hashCode(): kotlin/Int // io.github.jan.supabase/SupabaseNetworkConfig.hashCode|hashCode(){}[0]
+    final fun toString(): kotlin/String // io.github.jan.supabase/SupabaseNetworkConfig.toString|toString(){}[0]
+}
+
+open class io.github.jan.supabase.exceptions/RestException : kotlin/Exception { // io.github.jan.supabase.exceptions/RestException|null[0]
+    constructor <init>(kotlin/String, kotlin/String?, io.ktor.client.statement/HttpResponse) // io.github.jan.supabase.exceptions/RestException.<init>|<init>(kotlin.String;kotlin.String?;io.ktor.client.statement.HttpResponse){}[0]
+
+    final val description // io.github.jan.supabase.exceptions/RestException.description|{}description[0]
+        final fun <get-description>(): kotlin/String? // io.github.jan.supabase.exceptions/RestException.description.<get-description>|<get-description>(){}[0]
+    final val error // io.github.jan.supabase.exceptions/RestException.error|{}error[0]
+        final fun <get-error>(): kotlin/String // io.github.jan.supabase.exceptions/RestException.error.<get-error>|<get-error>(){}[0]
+    final val response // io.github.jan.supabase.exceptions/RestException.response|{}response[0]
+        final fun <get-response>(): io.ktor.client.statement/HttpResponse // io.github.jan.supabase.exceptions/RestException.response.<get-response>|<get-response>(){}[0]
+    final val statusCode // io.github.jan.supabase.exceptions/RestException.statusCode|{}statusCode[0]
+        final fun <get-statusCode>(): kotlin/Int // io.github.jan.supabase.exceptions/RestException.statusCode.<get-statusCode>|<get-statusCode>(){}[0]
+}
+
+open class io.github.jan.supabase.network/SupabaseApi : io.github.jan.supabase.network/SupabaseHttpClient { // io.github.jan.supabase.network/SupabaseApi|null[0]
+    final val supabaseClient // io.github.jan.supabase.network/SupabaseApi.supabaseClient|{}supabaseClient[0]
+        final fun <get-supabaseClient>(): io.github.jan.supabase/SupabaseClient // io.github.jan.supabase.network/SupabaseApi.supabaseClient.<get-supabaseClient>|<get-supabaseClient>(){}[0]
+
+    final suspend fun prepareRequest(kotlin/Function1<io.ktor.client.request/HttpRequestBuilder, kotlin/Unit>): io.ktor.client.statement/HttpStatement // io.github.jan.supabase.network/SupabaseApi.prepareRequest|prepareRequest(kotlin.Function1<io.ktor.client.request.HttpRequestBuilder,kotlin.Unit>){}[0]
+    final suspend fun request(kotlin/String, kotlin/Function1<io.ktor.client.request/HttpRequestBuilder, kotlin/Unit>): io.ktor.client.statement/HttpResponse // io.github.jan.supabase.network/SupabaseApi.request|request(kotlin.String;kotlin.Function1<io.ktor.client.request.HttpRequestBuilder,kotlin.Unit>){}[0]
+    open suspend fun prepareRequest(kotlin/String, kotlin/Function1<io.ktor.client.request/HttpRequestBuilder, kotlin/Unit>): io.ktor.client.statement/HttpStatement // io.github.jan.supabase.network/SupabaseApi.prepareRequest|prepareRequest(kotlin.String;kotlin.Function1<io.ktor.client.request.HttpRequestBuilder,kotlin.Unit>){}[0]
+    open suspend fun rawRequest(kotlin/String, kotlin/Function1<io.ktor.client.request/HttpRequestBuilder, kotlin/Unit>): io.ktor.client.statement/HttpResponse // io.github.jan.supabase.network/SupabaseApi.rawRequest|rawRequest(kotlin.String;kotlin.Function1<io.ktor.client.request.HttpRequestBuilder,kotlin.Unit>){}[0]
+}
+
+open class io.github.jan.supabase.plugins/MainConfig { // io.github.jan.supabase.plugins/MainConfig|null[0]
+    constructor <init>() // io.github.jan.supabase.plugins/MainConfig.<init>|<init>(){}[0]
+
+    final var customUrl // io.github.jan.supabase.plugins/MainConfig.customUrl|{}customUrl[0]
+        final fun <get-customUrl>(): kotlin/String? // io.github.jan.supabase.plugins/MainConfig.customUrl.<get-customUrl>|<get-customUrl>(){}[0]
+        final fun <set-customUrl>(kotlin/String?) // io.github.jan.supabase.plugins/MainConfig.customUrl.<set-customUrl>|<set-customUrl>(kotlin.String?){}[0]
+    final var jwtToken // io.github.jan.supabase.plugins/MainConfig.jwtToken|{}jwtToken[0]
+        final fun <get-jwtToken>(): kotlin/String? // io.github.jan.supabase.plugins/MainConfig.jwtToken.<get-jwtToken>|<get-jwtToken>(){}[0]
+        final fun <set-jwtToken>(kotlin/String?) // io.github.jan.supabase.plugins/MainConfig.jwtToken.<set-jwtToken>|<set-jwtToken>(kotlin.String?){}[0]
+}
+
+final val io.github.jan.supabase/CurrentPlatformTarget // io.github.jan.supabase/CurrentPlatformTarget|{}CurrentPlatformTarget[0]
+    final fun <get-CurrentPlatformTarget>(): io.github.jan.supabase/PlatformTarget // io.github.jan.supabase/CurrentPlatformTarget.<get-CurrentPlatformTarget>|<get-CurrentPlatformTarget>(){}[0]
+final val io.github.jan.supabase/defaultDispatcher // io.github.jan.supabase/defaultDispatcher|{}defaultDispatcher[0]
+    final fun <get-defaultDispatcher>(): kotlinx.coroutines/CoroutineDispatcher // io.github.jan.supabase/defaultDispatcher.<get-defaultDispatcher>|<get-defaultDispatcher>(){}[0]
+
+final inline fun (io.github.jan.supabase.logging/SupabaseLogger).io.github.jan.supabase.logging/d(kotlin/Throwable? = ..., kotlin/Function0<kotlin/String>) // io.github.jan.supabase.logging/d|d@io.github.jan.supabase.logging.SupabaseLogger(kotlin.Throwable?;kotlin.Function0<kotlin.String>){}[0]
+final inline fun (io.github.jan.supabase.logging/SupabaseLogger).io.github.jan.supabase.logging/e(kotlin/Throwable? = ..., kotlin/Function0<kotlin/String>) // io.github.jan.supabase.logging/e|e@io.github.jan.supabase.logging.SupabaseLogger(kotlin.Throwable?;kotlin.Function0<kotlin.String>){}[0]
+final inline fun (io.github.jan.supabase.logging/SupabaseLogger).io.github.jan.supabase.logging/i(kotlin/Throwable? = ..., kotlin/Function0<kotlin/String>) // io.github.jan.supabase.logging/i|i@io.github.jan.supabase.logging.SupabaseLogger(kotlin.Throwable?;kotlin.Function0<kotlin.String>){}[0]
+final inline fun (io.github.jan.supabase.logging/SupabaseLogger).io.github.jan.supabase.logging/w(kotlin/Throwable? = ..., kotlin/Function0<kotlin/String>) // io.github.jan.supabase.logging/w|w@io.github.jan.supabase.logging.SupabaseLogger(kotlin.Throwable?;kotlin.Function0<kotlin.String>){}[0]
+final inline fun <#A: reified kotlin/Any> (io.github.jan.supabase/SupabaseSerializer).io.github.jan.supabase/decode(kotlin/String): #A // io.github.jan.supabase/decode|decode@io.github.jan.supabase.SupabaseSerializer(kotlin.String){0§<kotlin.Any>}[0]
+final inline fun <#A: reified kotlin/Any> (io.github.jan.supabase/SupabaseSerializer).io.github.jan.supabase/encode(#A): kotlin/String // io.github.jan.supabase/encode|encode@io.github.jan.supabase.SupabaseSerializer(0:0){0§<kotlin.Any>}[0]
+final inline fun <#A: reified kotlin/Any> (io.github.jan.supabase/SupabaseSerializer).io.github.jan.supabase/encodeToJsonElement(#A): kotlinx.serialization.json/JsonElement // io.github.jan.supabase/encodeToJsonElement|encodeToJsonElement@io.github.jan.supabase.SupabaseSerializer(0:0){0§<kotlin.Any>}[0]
+final inline fun io.github.jan.supabase/createSupabaseClient(kotlin/String, kotlin/String, kotlin/Function1<io.github.jan.supabase/SupabaseClientBuilder, kotlin/Unit>): io.github.jan.supabase/SupabaseClient // io.github.jan.supabase/createSupabaseClient|createSupabaseClient(kotlin.String;kotlin.String;kotlin.Function1<io.github.jan.supabase.SupabaseClientBuilder,kotlin.Unit>){}[0]
+
+// Targets: [linuxX64]
+final fun io.github.jan.supabase/readProcVersion(): kotlin/String? // io.github.jan.supabase/readProcVersion|readProcVersion(){}[0]
