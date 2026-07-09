@@ -24,6 +24,11 @@ import kotlinx.serialization.json.JsonObject
  * @param tokenUrl OAuth2 token URL
  * @param userinfoUrl OAuth2 userinfo URL
  * @param jwksUri JWKS URI for token verification
+ * @param customClaimsAllowlist Allowlist of raw identity provider claim keys to copy verbatim into the
+ *    user's `custom_claims` field (within `identity_data` and
+ *    `raw_user_meta_data`), e.g. `["groups", "org_id", "mail"]`. This is an
+ *    opt-in allowlist that defaults to empty (no claims captured) and operates
+ *    independently from `attribute_mapping`.
  */
 @Serializable
 data class CustomProviderUpdateBuilder(
@@ -56,5 +61,7 @@ data class CustomProviderUpdateBuilder(
     @SerialName("userinfo_url")
     var userinfoUrl: String? = null,
     @SerialName("jwks_uri")
-    var jwksUri: String? = null
+    var jwksUri: String? = null,
+    @SerialName("custom_claims_allowlist")
+    val customClaimsAllowlist: List<String>? = null
 )
