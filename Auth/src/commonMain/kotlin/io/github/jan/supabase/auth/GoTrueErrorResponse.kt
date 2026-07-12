@@ -8,8 +8,8 @@ import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonDecoder
+import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.decodeFromJsonElement
-import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 
 @Serializable(with = GoTrueErrorResponse.Companion::class)
@@ -33,10 +33,11 @@ internal data class GoTrueErrorResponse(
         override fun deserialize(decoder: Decoder): GoTrueErrorResponse {
             decoder as JsonDecoder
             val json = decoder.decodeJsonElement()
-            val error = json.jsonObject["error_code"]?.jsonPrimitive?.content
-            val description = json.jsonObject["error_description"]?.jsonPrimitive?.content ?: json.jsonObject["msg"]?.jsonPrimitive?.content ?: json.jsonObject["message"]?.jsonPrimitive?.content ?: json.toString()
-            val weakPassword = if(json.jsonObject.containsKey("weak_password")) {
-                Json.decodeFromJsonElement<WeakPassword>(json.jsonObject["weak_password"]!!)
+            val jsonObject = json as? JsonObject ?: return GoTrueErrorResponse(null, json.toString())
+            val error = jsonObject["error_code"]?.jsonPrimitive?.content
+            val description = jsonObject["error_description"]?.jsonPrimitive?.content ?: jsonObject["msg"]?.jsonPrimitive?.content ?: jsonObject["message"]?.jsonPrimitive?.content ?: json.toString()
+            val weakPassword = if(jsonObject.containsKey("weak_password")) {
+                Json.decodeFromJsonElement<WeakPassword>(jsonObject["weak_password"]!!)
             } else null
             return GoTrueErrorResponse(error, description, weakPassword)
         }
