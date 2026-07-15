@@ -28,6 +28,11 @@ import kotlin.time.Instant
  * @param discoveryDocument OIDC discovery document (OIDC providers only)
  * @param createdAt Timestamp when the provider was created
  * @param updatedAt Timestamp when the provider was last updated
+ * @param customClaimsAllowlist Allowlist of raw identity provider claim keys to copy verbatim into the
+ *    user's `custom_claims` field (within `identity_data` and
+ *    `raw_user_meta_data`), e.g. `["groups", "org_id", "mail"]`. This is an
+ *    opt-in allowlist that defaults to empty (no claims captured) and operates
+ *    independently from `attribute_mapping`.
  */
 @Serializable
 data class CustomOAuthProvider(
@@ -40,6 +45,8 @@ data class CustomOAuthProvider(
     val clientId: String,
     @SerialName("acceptable_client_ids")
     val acceptableClientIds: List<String>? = null,
+    @SerialName("custom_claims_allowlist")
+    val customClaimsAllowlist: List<String>? = null,
     val scopes: List<String>? = null,
     @SerialName("pkce_enabled")
     val pkceEnabled: Boolean? = null,

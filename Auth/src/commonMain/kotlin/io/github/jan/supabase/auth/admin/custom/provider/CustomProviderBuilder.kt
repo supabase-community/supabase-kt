@@ -45,6 +45,16 @@ class CustomProviderBuilder {
     var acceptableClientIds: List<String>? = null
 
     /**
+     * Allowlist of raw identity provider claim keys to copy verbatim into the
+     * user's `custom_claims` field (within `identity_data` and
+     * `raw_user_meta_data`), e.g. `["groups", "org_id", "mail"]`. This is an
+     * opt-in allowlist that defaults to empty (no claims captured) and operates
+     * independently from `attribute_mapping`.
+     */
+    @SerialName("custom_claims_allowlist")
+    var customClaimsAllowlist: List<String>? = null
+
+    /**
      * OAuth scopes requested during authorization
      */
     var scopes: List<String>? = null
