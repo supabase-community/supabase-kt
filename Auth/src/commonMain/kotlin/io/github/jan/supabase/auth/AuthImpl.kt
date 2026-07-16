@@ -366,6 +366,7 @@ internal class AuthImpl(
         if(currentSessionOrNull() == null) {
             logger.i { "Skipping session logout as there is no session available." }
             clearIfValidScope()
+            return
         }
         try {
             userApi.post("logout") {
