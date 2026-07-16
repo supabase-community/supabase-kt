@@ -357,27 +357,30 @@ internal class AuthImpl(
     }
 
     override suspend fun signOut(scope: SignOutScope) {
-        if (currentSessionOrNull() != null) {
-            try {
-                userApi.post("logout") {
-                    parameter("scope", scope.name.lowercase())
-                }
-            } catch(e: RestException) {
-                if(e.statusCode in SIGN_OUT_IGNORE_CODES) {
-                    logger.d { "Received error code ${e.statusCode} while signing out user. This can happen if the user doesn't exist anymore or the JWT is invalid/expired. Proceeding to clean up local data..." }
-                } else {
-                    if (scope != SignOutScope.OTHERS) clearSession()
-                    throw e
-                }
+        val clearIfValidScope = suspend {
+            if(scope != SignOutScope.OTHERS) {
+                clearSession()
+                logger.d { "Session data cleared" }
+            } else logger.d { "Skipping clearing session data as sign out scope is 'OTHERS'" }
+        }
+        if(currentSessionOrNull() == null) {
+            logger.i { "Skipping session logout as there is no session available." }
+            clearIfValidScope()
+        }
+        try {
+            userApi.post("logout") {
+                parameter("scope", scope.name.lowercase())
             }
-            logger.d { "Logged out session in Supabase" }
-        } else {
-            logger.i { "Skipping session logout as there is no session available. Proceeding to clean up local data..." }
+        } catch(e: RestException) {
+            if(e.statusCode in SIGN_OUT_IGNORE_CODES) {
+                logger.d { "Received error code ${e.statusCode} while signing out user. This can happen if the user doesn't exist anymore or the JWT is invalid/expired. Proceeding to clean up local data..." }
+            } else {
+                clearIfValidScope()
+                throw e
+            }
         }
-        if (scope != SignOutScope.OTHERS) {
-            clearSession()
-        }
-        logger.d { "Successfully logged out" }
+        logger.d { "Logged out session in Supabase" }
+        clearIfValidScope()
     }
 
     private suspend fun verify(
