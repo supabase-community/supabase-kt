@@ -365,7 +365,10 @@ internal class AuthImpl(
             } catch(e: RestException) {
                 if(e.statusCode in SIGN_OUT_IGNORE_CODES) {
                     logger.d { "Received error code ${e.statusCode} while signing out user. This can happen if the user doesn't exist anymore or the JWT is invalid/expired. Proceeding to clean up local data..." }
-                } else throw e
+                } else {
+                    if (scope != SignOutScope.OTHERS) clearSession()
+                    throw e
+                }
             }
             logger.d { "Logged out session in Supabase" }
         } else {
