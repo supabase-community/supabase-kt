@@ -4,6 +4,7 @@ import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.auth.minimalConfig
 import io.github.jan.supabase.auth.resolveAccessToken
 import io.github.jan.supabase.testing.createMockedSupabaseClient
+import io.github.jan.supabase.testing.respondJson
 import kotlinx.coroutines.test.runTest
 import kotlin.test.AfterTest
 import kotlin.test.Test
@@ -64,6 +65,24 @@ class AccessTokenTest {
         client.auth.awaitInitialization()
         client.auth.importAuthToken("myAuth")
         assertEquals("myAuth", client.resolveAccessToken())
+    }
+
+    @Test
+    fun testAccessTokenWithAuthReturnsRefreshedTokenWhenExpired() = runTest {
+        val newSession = userSession(customToken = "newToken")
+        client = createMockedSupabaseClient(
+            configuration = {
+                install(Auth) {
+                    minimalConfig()
+                    alwaysAutoRefresh = true
+                }
+            }
+        ) {
+            respondJson(newSession)
+        }
+        client.auth.awaitInitialization()
+        client.auth.importSession(userSession(expiresIn = 0), autoRefresh = false)
+        assertEquals("newToken", client.resolveAccessToken())
     }
 
     @AfterTest
