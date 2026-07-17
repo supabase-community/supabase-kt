@@ -58,6 +58,28 @@ class AuthenticatedSupabaseApiTests {
     }
 
     @Test
+    fun testRequestWithNewApiKeyFail() = runTest {
+        val httpClient = MockedHttpClient {
+            respond("")
+        }
+
+        val api = AuthenticatedSupabaseApi(
+            httpClient = httpClient,
+            config = buildAuthConfig {
+                resolveUrl = { "test.url.de/$it" }
+                requireSession = true
+                useNewApiKeyAsFallback = false
+                getAccessToken = ResolveAccessToken { _, _ -> "sb_publishable_" }
+            }
+        )
+
+        assertFailsWith<SessionRequiredException> {
+            api.get("test")
+        }
+    }
+
+
+    @Test
     fun testRequestWithoutRequiredSessionUsesFallbackResolverPath() = runTest {
         val fallbackToken = "fallback-token"
 

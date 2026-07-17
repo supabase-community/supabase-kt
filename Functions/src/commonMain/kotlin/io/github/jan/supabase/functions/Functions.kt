@@ -69,7 +69,9 @@ class Functions(override val config: Config, override val supabaseClient: Supaba
 
     @OptIn(SupabaseInternal::class)
     @PublishedApi
-    internal val api = supabaseClient.authenticatedSupabaseApi(this)
+    internal val api = supabaseClient.authenticatedSupabaseApi(this) {
+        useNewApiKeyAsFallback = false
+    }
 
     /**
      * Invokes a remote edge function. The authorization token is automatically added to the request.

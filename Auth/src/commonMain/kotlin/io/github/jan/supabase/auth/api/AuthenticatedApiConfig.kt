@@ -36,7 +36,8 @@ data class AuthenticatedApiConfig(
     data class Auth(
         val requireSession: Boolean,
         val getAccessToken: ResolveAccessToken,
-        val jwtToken: String? = null
+        val jwtToken: String? = null,
+        val useNewApiKeyAsFallback: Boolean
     )
 
     @SupabaseInternal
@@ -55,6 +56,7 @@ data class AuthenticatedApiConfig(
         var requireSession: Boolean = false
         var urlLengthLimit: Int? = null
         var getAccessToken: ResolveAccessToken? = null
+        var useNewApiKeyAsFallback: Boolean = true
 
         fun build() = AuthenticatedApiConfig(
             context = Context(
@@ -64,7 +66,8 @@ data class AuthenticatedApiConfig(
             auth = Auth(
                 requireSession = requireSession,
                 getAccessToken = getAccessToken ?: ResolveAccessToken { token, _ -> token },
-                jwtToken = jwtToken
+                jwtToken = jwtToken,
+                useNewApiKeyAsFallback = useNewApiKeyAsFallback
             ),
             request = Request(
                 defaultRequest = defaultRequest,
