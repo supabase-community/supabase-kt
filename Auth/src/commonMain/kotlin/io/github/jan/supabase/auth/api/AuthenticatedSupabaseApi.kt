@@ -3,6 +3,7 @@
 package io.github.jan.supabase.auth.api
 
 import io.github.jan.supabase.StringMasking
+import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.annotations.SupabaseInternal
 import io.github.jan.supabase.auth.exception.SessionRequiredException
 import io.github.jan.supabase.exceptions.RestException
@@ -26,9 +27,7 @@ class AuthenticatedSupabaseApi @SupabaseInternal constructor(
     private val jwtToken = config.auth.jwtToken
     private val requireSession = config.auth.requireSession
 
-    private fun checkIsNew(key: String) = key.startsWith("sb_publishable_") || key.startsWith("sb_secret_")
-
-    private fun String?.checkIsNewApiKey() = if(this != null && (config.auth.useNewApiKeyAsFallback || !checkIsNew(this))) this else null
+    private fun String?.checkIsNewApiKey() = if(this != null && (config.auth.useNewApiKeyAsFallback || !SupabaseClient.checkIsNewApiKey(this))) this else null
 
     override suspend fun getDefaultHeaders(): Headers {
         val clientHeaders = super.getDefaultHeaders()
