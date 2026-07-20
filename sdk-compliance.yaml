@@ -174,9 +174,18 @@ features:
     status: implemented
     symbols:
       - AdminApi.signOut
-  auth.admin.generate_link: not_implemented
-  auth.admin.list_mfa_factors: not_implemented
-  auth.admin.delete_mfa_factor: not_implemented
+  auth.admin.generate_link:
+    status: implemented
+    symbols:
+      - AdminApi.generateLinkFor
+  auth.admin.list_mfa_factors:
+    status: implemented
+    symbols:
+      - AdminApi.retrieveFactors
+  auth.admin.delete_mfa_factor:
+    status: implemented
+    symbols:
+      - AdminApi.deleteFactor
   auth.admin.create_provider:
     status: implemented
     symbols:
@@ -300,7 +309,7 @@ features:
   database.using_filters.regex: implemented
   database.using_filters.regex_icase: implemented
   database.using_filters.is_distinct: implemented
-  database.using_filters.not_in: not_implemented
+  database.using_filters.not_in: implemented
   database.using_filters.like_all: implemented
   database.using_filters.like_any: implemented
   database.using_filters.ilike_all: implemented
