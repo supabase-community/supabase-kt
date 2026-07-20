@@ -1,5 +1,67 @@
 # Changelog
 
+### 3.7.0 - July 20, 2026
+
+### Core
+
+* Fix append tag by @jan-tennert in https://github.com/supabase-community/supabase-kt/pull/1284
+* Add Star History section to README by @hieuwu in https://github.com/supabase-community/supabase-kt/pull/1290
+* Fix chat-demo-mpp example not compiling by @cmelchior in https://github.com/supabase-community/supabase-kt/pull/1296
+* fix(integration-test): grant table privileges on test_items to PostgREST roles by @PierreVieira in https://github.com/supabase-community/supabase-kt/pull/1333
+* implement structured X-Client-Info header by @jan-tennert in https://github.com/supabase-community/supabase-kt/pull/1300
+* add sdk compliance by @jan-tennert in https://github.com/supabase-community/supabase-kt/pull/1354
+* feat(core): check api key format when creating supabase client by @jan-tennert in https://github.com/supabase-community/supabase-kt/pull/1362
+
+### Auth
+
+* **Add support for custom OAuth provider** by @jan-tennert in https://github.com/supabase-community/supabase-kt/pull/1236
+* feat(auth): expose public getter for AuthConfig.httpCallbackConfig on Desktop by @PierreVieira in https://github.com/supabase-community/supabase-kt/pull/1322
+* fix(auth): don't throw an error when there is no stored session by @PierreVieira in https://github.com/supabase-community/supabase-kt/pull/1320
+* **Add API support for Passkeys** by @jan-tennert in https://github.com/supabase-community/supabase-kt/pull/1327 under `supabase.auth.passkeys` - Note, there is currently no sign-in method. We are still deciding how to move on with Native APIs. Compose Auth support may come as a temporary solution.
+* Add PKCE support for resend by @jan-tennert in https://github.com/supabase-community/supabase-kt/pull/1337
+* fix(auth): clear session on any rest exception by @jan-tennert in https://github.com/supabase-community/supabase-kt/pull/1359
+* fix(auth): return refreshed token from resolveAccessToken + tolerate non-object error bodies by @Merkost in https://github.com/supabase-community/supabase-kt/pull/1352
+* add `custom_claims_allowlist` to custom providers admin api by @jan-tennert in https://github.com/supabase-community/supabase-kt/pull/1349
+
+### Realtime
+
+* **Add support for binary broadcasts, httpSend and VSN 2.0.0** by @jan-tennert in https://github.com/supabase-community/supabase-kt/pull/1325
+
+  **Either use the `ByteArray` type in broadcastFlow:**
+  ```kotlin
+  channel.broadcastFlow<ByteArray>("test").collect {
+      println(it.decodeToString())
+  }
+  ```
+  **Or use `broadcastFlow` without a type to receive both types:**
+  ```kotlin
+  channel.broadcastFlow("test").collect {
+      when(it.payload) {
+          is BroadcastPayload.Binary -> println(it.payload.data.decodeToString())
+          is BroadcastPayload.Json -> println(it.payload.value)
+      }
+  }
+  ```
+  **New method to broadcast messages (the old ones are using this in the implementation if not connected)'**:
+  ```kotlin
+  channel.httpSend("myEvent", BroadcastPayload.Binary(byteArrayOf(1,2,3)))
+  ```
+* Implement deferred disconnect after removing last channel  by @jan-tennert in https://github.com/supabase-community/supabase-kt/pull/1276
+* docs(realtime): clarify that maxAttempts governs channel rejoin attempts by @PierreVieira in https://github.com/supabase-community/supabase-kt/pull/1331
+* fix(realtime): log transient websocket reconnects at WARN instead of ERROR by @PierreVieira in https://github.com/supabase-community/supabase-kt/pull/1329
+
+### Postgrest
+
+* Improve test coverage in Postgrest by @hieuwu in https://github.com/supabase-community/supabase-kt/pull/1275
+
+### Storage
+
+* test(storage): add download-as-flow tests by @Ehsanul-Hoque in https://github.com/supabase-community/supabase-kt/pull/1317
+
+### Functions
+
+* fix(functions): forbid using new api key as fallback by @jan-tennert in https://github.com/supabase-community/supabase-kt/pull/1360
+
 ### 3.6.0 - April 27, 2026
 
 ### Core
