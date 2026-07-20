@@ -64,8 +64,7 @@ features:
     status: implemented
     symbols:
       - Auth.currentSessionOrNull
-  Auth:
-    auth.session.get_user:
+  auth.session.get_user:
     status: implemented
     symbols:
       - Auth.currentUserOrNull
@@ -368,7 +367,7 @@ features:
   realtime.subscriptions.private_channel: implemented
   realtime.subscriptions.broadcast_self: implemented
   realtime.subscriptions.broadcast_ack: implemented
-  realtime.subscriptions.broadcast_replay: not-implemented
+  realtime.subscriptions.broadcast_replay: not_implemented
 
   realtime.presence.track: implemented
   realtime.presence.untrack: implemented
