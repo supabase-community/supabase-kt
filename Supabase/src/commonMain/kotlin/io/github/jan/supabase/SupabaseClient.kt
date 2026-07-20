@@ -4,6 +4,7 @@ import io.github.jan.supabase.annotations.SupabaseInternal
 import io.github.jan.supabase.logging.SupabaseLogger
 import io.github.jan.supabase.logging.createLogger
 import io.github.jan.supabase.logging.i
+import io.github.jan.supabase.logging.w
 import io.github.jan.supabase.network.KtorSupabaseHttpClient
 import io.github.jan.supabase.plugins.PluginManager
 import io.github.jan.supabase.plugins.SupabasePlugin
@@ -82,6 +83,11 @@ interface SupabaseClient {
          */
         const val LOGGING_TAG = "Supabase-Core"
 
+        internal const val TEMP_KEY_PREFIX = "sb_temp_"
+
+        @SupabaseInternal
+        fun checkIsNewApiKey(key: String) = key.startsWith("sb_publishable_") || key.startsWith("sb_secret_")
+
     }
 
 }
@@ -112,6 +118,26 @@ internal class SupabaseClientImpl(
             logger.i(e) {
                 "Failed to get OS information. If this is not intentional, please report this issue."
             }
+        }
+        checkApiKeyFormat(config.supabaseKey)
+    }
+
+    /**
+     * Warn (once per subtype) when an `sb_` key isn't a subtype this SDK version recognizes.
+     * Never throws — the server, not the SDK, decides key validity. The key value is never
+     * included in the message.
+     */
+    private fun checkApiKeyFormat(supabaseKey: String) {
+        if(!supabaseKey.startsWith("sb_") || SupabaseClient.checkIsNewApiKey(supabaseKey) || supabaseKey.startsWith(
+                SupabaseClient.TEMP_KEY_PREFIX)) {
+            return
+        }
+        logger.w {
+            """
+                Unrecognized Supabase API key format. 
+                The client will proceed and send this key as-is; 
+                if you see authentication errors you may need to upgrade supabase-kt to a version that recognizes this key type.
+            """.trimIndent()
         }
     }
 
