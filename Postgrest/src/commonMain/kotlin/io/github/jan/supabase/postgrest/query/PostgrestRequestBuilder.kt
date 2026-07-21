@@ -258,7 +258,7 @@ abstract class PostgrestRequestBuilder(
 
     internal fun buildPrefer() = buildSet {
         if (count != null) add("count=${count!!.identifier}")
-        if( dryRun) add("tx=rollback")
+        if (dryRun) add("tx=rollback")
         addAll(customPrefer())
     }
 
