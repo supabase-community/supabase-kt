@@ -1,7 +1,6 @@
 package io.github.jan.supabase.postgrest.executor
 
 import io.github.jan.supabase.exceptions.HttpRequestException
-import io.github.jan.supabase.exceptions.RestException
 import io.github.jan.supabase.postgrest.Postgrest
 import io.github.jan.supabase.postgrest.PostgrestImpl
 import io.github.jan.supabase.postgrest.exception.PostgrestRestException
@@ -47,11 +46,11 @@ internal data object RestRequestExecutor : RequestExecutor {
                     }
                 }
                 return response.asPostgrestResult(postgrest)
-            } catch (e: RestException) {
+            } catch (e: PostgrestRestException) {
                 lastException = e
                 if (attempt < retryCount && e.statusCode in RETRYABLE_STATUS_CODES) {
                     delay(getRetryDelay(attempt))
-                } else if(e is PostgrestRestException && e.code == "PGRST116" && request.acceptHeader is AcceptHeader.Single && (request.acceptHeader as AcceptHeader.Single).maybe) {
+                } else if(e.code == "PGRST116" && request.acceptHeader is AcceptHeader.Single && (request.acceptHeader as AcceptHeader.Single).maybe) {
                     return PostgrestResult("", e.response.headers, postgrest)
                 } else {
                     throw e
