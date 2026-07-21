@@ -2,12 +2,13 @@ import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.SupabaseClientBuilder
 import io.github.jan.supabase.postgrest.Postgrest
 import io.github.jan.supabase.postgrest.RpcMethod
+import io.github.jan.supabase.postgrest.exception.PostgrestRestException
 import io.github.jan.supabase.postgrest.from
 import io.github.jan.supabase.postgrest.postgrest
-import io.github.jan.supabase.postgrest.rpc
 import io.github.jan.supabase.postgrest.query.Columns
 import io.github.jan.supabase.postgrest.query.Count
 import io.github.jan.supabase.postgrest.result.PostgrestResult
+import io.github.jan.supabase.postgrest.rpc
 import io.github.jan.supabase.testing.assertMethodIs
 import io.github.jan.supabase.testing.assertPathIs
 import io.github.jan.supabase.testing.createMockedSupabaseClient
@@ -17,11 +18,10 @@ import io.ktor.client.engine.mock.MockRequestHandleScope
 import io.ktor.client.engine.mock.respond
 import io.ktor.client.request.HttpRequestData
 import io.ktor.client.request.HttpResponseData
+import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.headersOf
-import io.ktor.http.HttpHeaders
-import io.github.jan.supabase.postgrest.exception.PostgrestRestException
 import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerializationException
@@ -74,6 +74,44 @@ class PostgrestTest {
                 assertMethodIs(HttpMethod.Get, it.method)
                 assertEquals(columns.value, it.url.parameters["select"])
                 respond("")
+            }
+        )
+    }
+
+    @Test
+    fun testSingleThrowsOnErrorResponse() {
+        assertFailsWith<PostgrestRestException> {
+            testClient(
+                request = { table ->
+                    from(table).select() {
+                        single()
+                    }
+                },
+                requestHandler = {
+                    respond("""
+                    { "code": "PGRST116", "details": "The result contains 0 rows", "hint": null, "message": "JSON object requested, multiple (or no) rows returned"}
+                """.trimIndent(), HttpStatusCode.BadRequest)
+                }
+            )
+        }
+    }
+
+    @Test
+    fun testMaybeSingleDoesntThrowOnErrorResponse() {
+        testClient(
+            request = { table ->
+                val result = from(table).select() {
+                    maybeSingle()
+                }
+                assertEquals("""
+                    { "code": "PGRST116", "details": "The result contains 0 rows", "hint": null, "message": "JSON object requested, multiple (or no) rows returned"}
+                """.trimIndent(), result.data)
+                result
+            },
+            requestHandler = {
+                respond("""
+                    { "code": "PGRST116", "details": "The result contains 0 rows", "hint": null, "message": "JSON object requested, multiple (or no) rows returned"}
+                """.trimIndent(), HttpStatusCode.BadRequest)
             }
         )
     }

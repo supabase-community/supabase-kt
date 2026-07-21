@@ -1,3 +1,4 @@
+import io.github.jan.supabase.postgrest.query.AcceptHeader
 import io.github.jan.supabase.postgrest.query.Columns
 import io.github.jan.supabase.postgrest.query.Count
 import io.github.jan.supabase.postgrest.query.Order
@@ -34,6 +35,18 @@ class PostgrestRequestBuilderTest {
             },
             httpRequestHandler = {
                 assertEquals("count=exact,prefer=test", headers[PostgrestQueryBuilder.HEADER_PREFER])
+            }
+        )
+    }
+
+    @Test
+    fun testPreferDryRun() {
+        testRequestBuilder(
+            requestBuilder = {
+                dryRun()
+            },
+            httpRequestHandler = {
+                assertEquals("tx=rollback,prefer=test", headers[PostgrestQueryBuilder.HEADER_PREFER])
             }
         )
     }
@@ -171,6 +184,33 @@ class PostgrestRequestBuilderTest {
             requestBuilder = {
                 single()
                 stripNulls()
+            },
+            httpRequestHandler = {
+                assertEquals("application/vnd.pgrst.object+json;nulls=stripped", headers[HttpHeaders.Accept])
+            }
+        )
+    }
+
+    @Test
+    fun testAcceptMaybeSingleNoStrip() {
+        testRequestBuilder(
+            requestBuilder = {
+                maybeSingle()
+                assertEquals(AcceptHeader.Single(true), acceptHeader)
+            },
+            httpRequestHandler = {
+                assertEquals("application/vnd.pgrst.object+json", headers[HttpHeaders.Accept])
+            }
+        )
+    }
+
+    @Test
+    fun testAcceptMaybeSingleStrip() {
+        testRequestBuilder(
+            requestBuilder = {
+                maybeSingle()
+                stripNulls()
+                assertEquals(AcceptHeader.Single(true), acceptHeader)
             },
             httpRequestHandler = {
                 assertEquals("application/vnd.pgrst.object+json;nulls=stripped", headers[HttpHeaders.Accept])

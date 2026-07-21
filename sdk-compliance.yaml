@@ -309,7 +309,10 @@ features:
   database.using_filters.regex: implemented
   database.using_filters.regex_icase: implemented
   database.using_filters.is_distinct: implemented
-  database.using_filters.not_in: implemented
+  database.using_filters.not_in:
+    status: implemented
+    symbols:
+      - PostgrestFilterBuilder.notIn
   database.using_filters.like_all: implemented
   database.using_filters.like_any: implemented
   database.using_filters.ilike_all: implemented
@@ -319,20 +322,23 @@ features:
   database.using_modifiers.limit: implemented
   database.using_modifiers.range: implemented
   database.using_modifiers.single_row: implemented
-  database.using_modifiers.maybe_single_row: not_implemented
+  database.using_modifiers.maybe_single_row:
+    status: implemented
+    symbols:
+      - PostgrestRequestBuilder.maybeSingle
   database.using_modifiers.strip_nulls: implemented
   database.using_modifiers.format_csv: implemented
   database.using_modifiers.format_geojson: implemented
-  database.using_modifiers.explain:
-    status: implemented
-    symbols:
-      - ExplainFormat
+  database.using_modifiers.explain: implemented
   database.using_modifiers.max_affected_rows: implemented
   database.using_modifiers.request_cancellation: implemented
   database.using_modifiers.relationship_embed:
     status: partially_implemented
     note: "Supported via query-string syntax in select() (e.g. 'user(*)'); no dedicated relationship builder API."
-  database.using_modifiers.dry_run: not_implemented
+  database.using_modifiers.dry_run:
+    status: implemented
+    symbols:
+      - PostgrestRequestBuilder.dryRun
 
   database.configuration.auto_retry: implemented
   database.configuration.request_timeout: implemented

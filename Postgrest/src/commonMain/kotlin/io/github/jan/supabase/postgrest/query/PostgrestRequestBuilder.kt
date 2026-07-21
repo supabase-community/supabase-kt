@@ -51,7 +51,8 @@ abstract class PostgrestRequestBuilder(
     internal var httpMethod: HttpMethod = HttpMethod.Get
 
     private var shouldStripNulls: Boolean = false
-    private var acceptHeader: AcceptHeader = AcceptHeader.Json
+    private var dryRun: Boolean = false
+    internal var acceptHeader: AcceptHeader = AcceptHeader.Json
     private var explainData: ExplainData? = null
     @PublishedApi internal var body: JsonElement? = null
 
@@ -114,7 +115,39 @@ abstract class PostgrestRequestBuilder(
      */
     @JsName("singleValue")
     fun single() {
-        acceptHeader = AcceptHeader.Single
+        acceptHeader = AcceptHeader.Single(false)
+    }
+
+    /**
+     * Return `data` as a single object instead of an array of objects.
+     *
+     * Instructs PostgREST to return a single JSON object, returning `nil` when no row matches.
+     *
+     * Like ``single()``, this sets the `application/vnd.pgrst.object+json` accept header so the
+     * server enforces a single result. Unlike ``single()``, when the query does not match exactly
+     * one row the resulting `PGRST116` error is not thrown — ``PostgrestResponse/value`` is `null`
+     * instead.
+     *
+     * > Note: PostgREST returns `PGRST116` both when zero rows match and when more than one row
+     * > matches. This method returns `null` for either case; use ``single()`` for the strict variant
+     * > that always throws when the query does not match exactly one row.
+     */
+    @JsName("maybeSingleValue")
+    fun maybeSingle() {
+        acceptHeader = AcceptHeader.Single(true)
+    }
+
+    /**
+     * Executes the query but rolls back the transaction instead of committing it.
+     *
+     * The mutation runs and its result (including any side effects such as triggers) is returned
+     * in the response, but the transaction is rolled back afterward, so no changes are persisted.
+     * This is useful for testing mutations without touching real data.
+     *
+     * Requires PostgREST's `db-tx-end` setting to allow client-controlled transaction rollback.
+     */
+    fun dryRun() {
+        dryRun = true
     }
 
     /**
@@ -225,6 +258,7 @@ abstract class PostgrestRequestBuilder(
 
     internal fun buildPrefer() = buildSet {
         if (count != null) add("count=${count!!.identifier}")
+        if( dryRun) add("tx=rollback")
         addAll(customPrefer())
     }
 
@@ -244,16 +278,16 @@ abstract class PostgrestRequestBuilder(
         }
 
         val mediaType = when(acceptHeader) {
-            AcceptHeader.CSV -> AcceptHeader.CSV()
-            AcceptHeader.GeoJson -> AcceptHeader.GeoJson()
-            AcceptHeader.Json -> AcceptHeader.Json(shouldStripNulls)
-            AcceptHeader.Single -> AcceptHeader.Single(shouldStripNulls)
+            AcceptHeader.CSV -> AcceptHeader.CSV.headerValue()
+            AcceptHeader.GeoJson -> AcceptHeader.GeoJson.headerValue()
+            AcceptHeader.Json -> AcceptHeader.Json.headerValue(shouldStripNulls)
+            is AcceptHeader.Single -> AcceptHeader.Single.headerValue(shouldStripNulls)
         }
 
         // Accept header
         header(
             HttpHeaders.Accept,
-            if(explainData != null) explainData!!(mediaType) else mediaType
+            if(explainData != null) explainData!!.headerValue(mediaType) else mediaType
         )
 
         header(PostgrestQueryBuilder.HEADER_PREFER, buildPrefer().joinToString(","))
