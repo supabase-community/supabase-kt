@@ -1,7 +1,6 @@
-package io.github.jan.supabase.postgrest.result
-
 import io.github.jan.supabase.postgrest.Postgrest
 import io.github.jan.supabase.postgrest.postgrest
+import io.github.jan.supabase.postgrest.result.PostgrestResult
 import io.github.jan.supabase.testing.createMockedSupabaseClient
 import io.ktor.http.Headers
 import io.ktor.http.headersOf

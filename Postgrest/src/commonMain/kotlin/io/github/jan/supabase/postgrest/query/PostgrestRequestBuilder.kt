@@ -121,7 +121,7 @@ abstract class PostgrestRequestBuilder(
     /**
      * Return `data` as a single object instead of an array of objects.
      *
-     * Instructs PostgREST to return a single JSON object, returning `nil` when no row matches.
+     * Instructs PostgREST to return a single JSON object, returning `null`/blank data when no row matches.
      *
      * Like ``single()``, this sets the `application/vnd.pgrst.object+json` accept header so the
      * server enforces a single result. Unlike ``single()``, when the query does not match exactly

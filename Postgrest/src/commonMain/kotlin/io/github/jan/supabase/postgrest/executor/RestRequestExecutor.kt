@@ -8,7 +8,6 @@ import io.github.jan.supabase.postgrest.exception.PostgrestRestException
 import io.github.jan.supabase.postgrest.query.AcceptHeader
 import io.github.jan.supabase.postgrest.query.PostgrestRequestBuilder
 import io.github.jan.supabase.postgrest.result.PostgrestResult
-import io.ktor.client.statement.bodyAsText
 import io.ktor.http.HttpMethod
 import kotlinx.coroutines.delay
 import kotlin.math.pow
@@ -53,7 +52,7 @@ internal data object RestRequestExecutor : RequestExecutor {
                 if (attempt < retryCount && e.statusCode in RETRYABLE_STATUS_CODES) {
                     delay(getRetryDelay(attempt))
                 } else if(e is PostgrestRestException && e.code == "PGRST116" && request.acceptHeader is AcceptHeader.Single && (request.acceptHeader as AcceptHeader.Single).maybe) {
-                    return PostgrestResult(e.response.bodyAsText(), e.response.headers, postgrest)
+                    return PostgrestResult("", e.response.headers, postgrest)
                 } else {
                     throw e
                 }
