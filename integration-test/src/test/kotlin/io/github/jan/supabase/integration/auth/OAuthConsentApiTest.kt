@@ -78,7 +78,7 @@ class OAuthConsentApiTest : IntegrationTestBase() {
             val grants = userClient.auth.oauth.listAuthorizationGrants()
             assertTrue(grants.any { it.client.id == oauthClient.clientId })
 
-            userClient.auth.oauth.revokeOAuthGrant(oauthClient.clientId)
+            userClient.auth.oauth.revokeGrant(oauthClient.clientId)
 
             val grantsAfterRevoke = userClient.auth.oauth.listAuthorizationGrants()
             assertTrue(grantsAfterRevoke.none { it.client.id == oauthClient.clientId })

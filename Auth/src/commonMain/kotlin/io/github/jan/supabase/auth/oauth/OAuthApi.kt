@@ -21,6 +21,7 @@ interface OAuthApi {
      * If the response includes only a redirect_url field, it means consent was already given - the caller
      * should handle the redirect manually if needed, so a [OAuthRedirect] will be returned.
      * @param authorizationId The corresponding authorization id
+     * @see OAuthAuthorizationDetailResponse
      */
     suspend fun getAuthorizationDetails(
         authorizationId: String,
@@ -30,6 +31,7 @@ interface OAuthApi {
      * Approves an OAuth authorization request.
      * Only relevant when the OAuth 2.1 server is enabled in Supabase Auth.
      * @param authorizationId The corresponding authorization id
+     * @see OAuthRedirect
      */
     suspend fun approveAuthorization(
         authorizationId: String
@@ -55,7 +57,7 @@ interface OAuthApi {
      * Only relevant when the OAuth 2.1 server is enabled in Supabase Auth.
      * @param clientId The corresponding client id
      */
-    suspend fun revokeOAuthGrant(
+    suspend fun revokeGrant(
         clientId: String
     )
 
@@ -85,7 +87,7 @@ internal class OAuthApiImpl(
         return api.get("user/oauth/grants").safeBody()
     }
 
-    override suspend fun revokeOAuthGrant(clientId: String) {
+    override suspend fun revokeGrant(clientId: String) {
         api.delete("user/oauth/grants") {
             parameter("client_id", clientId)
         }

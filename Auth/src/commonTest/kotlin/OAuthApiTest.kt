@@ -177,7 +177,7 @@ class OAuthApiTest {
             }
         )
         val oauthApi = OAuthApiImpl(api)
-        oauthApi.revokeOAuthGrant(clientId)
+        oauthApi.revokeGrant(clientId)
     }
 
 }

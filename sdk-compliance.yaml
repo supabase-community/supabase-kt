@@ -241,7 +241,7 @@ features:
   auth.oauth_server.revoke_grant:
     status: implemented
     symbols:
-      - OAuthApi.revokeOAuthGrant
+      - OAuthApi.revokeGrant
 
   auth.oauth_admin.create_client:
     status: implemented
