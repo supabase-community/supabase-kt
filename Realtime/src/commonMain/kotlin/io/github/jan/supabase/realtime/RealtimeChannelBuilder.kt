@@ -11,7 +11,7 @@ class RealtimeChannelBuilder @PublishedApi internal constructor(
     private val topic: String,
 ) {
 
-    private var broadcastJoinConfig = BroadcastJoinConfig(acknowledgeBroadcasts = false, receiveOwnBroadcasts = false)
+    private var broadcastJoinConfig = BroadcastJoinConfig(acknowledgeBroadcasts = false, receiveOwnBroadcasts = false, replicationReady = false)
     private var presenceJoinConfig = PresenceJoinConfig("", false)
 
     /**
@@ -23,7 +23,7 @@ class RealtimeChannelBuilder @PublishedApi internal constructor(
      * Sets the broadcast join config
      */
     fun broadcast(block: BroadcastJoinConfig.() -> Unit) {
-        broadcastJoinConfig = BroadcastJoinConfig(acknowledgeBroadcasts = false, receiveOwnBroadcasts = false).apply(block)
+        broadcastJoinConfig = BroadcastJoinConfig(acknowledgeBroadcasts = false, receiveOwnBroadcasts = false, replicationReady = false).apply(block)
     }
 
     /**

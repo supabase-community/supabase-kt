@@ -21,6 +21,7 @@ import kotlinx.serialization.json.jsonObject
 import kotlin.test.Test
 import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 import kotlin.time.Clock
 
 @Serializable
@@ -44,7 +45,9 @@ class RealtimeExtTest {
             )
             createTestClient(
                 wsHandler = { i, o ->
-                    handleSubscribe(i, o, "channelId", true)
+                    handleSubscribe(i, o, "channelId") {
+                        assertTrue { it.config.presence.enabled }
+                    }
                 },
                 supabaseHandler = {
                     val channel = it.channel("channelId")

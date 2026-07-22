@@ -38,6 +38,8 @@ import kotlin.test.Test
 import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
+import kotlin.test.assertFalse
+import kotlin.test.assertTrue
 import kotlin.time.Clock
 
 val EXAMPLE_JWT = buildString {
@@ -211,7 +213,9 @@ class RealtimeChannelTest {
         runTest {
             createTestClient(
                 wsHandler = { i, o ->
-                    handleSubscribe(i, o, channelId, true)
+                    handleSubscribe(i, o, channelId) {
+                        assertTrue { it.config.presence.enabled }
+                    }
                     for(i in 0..amount) {
                         o.sendPresence(
                             channelId,
@@ -239,6 +243,44 @@ class RealtimeChannelTest {
                                     assertEquals(index, joins.values.first().state["key"]?.jsonPrimitive?.int)
                                     assertEquals(index-1, leaves.values.first().state["key"]?.jsonPrimitive?.int)
                                 }
+                            }
+                        }
+                        launch {
+                            channel.subscribe(true)
+                        }
+                    }.join()
+                }
+            )
+        }
+    }
+
+    @Test
+    fun testReceivingSystem() {
+        val channelId = "channelId"
+        runTest {
+            createTestClient(
+                wsHandler = { i, o ->
+                    handleSubscribe(i, o, channelId) {
+                        assertTrue { it.config.broadcast.replicationReady }
+                    }
+                    o.sendSystem("channelId", "extension", "Message!", "ok")
+                },
+                supabaseHandler = {
+                    val channel = it.channel("channelId") {
+                        broadcast {
+                            replicationReady = true
+                        }
+                    }
+                    coroutineScope {
+                        launch {
+                            val systemFlow = channel.systemFlow()
+                            systemFlow.test(FLOW_TIMEOUT) {
+                                awaitItem() // this is the join payload
+                                val payload = awaitItem()
+                                assertEquals("channelId", payload.channel)
+                                assertEquals("ok", payload.status)
+                                assertEquals("Message!", payload.message)
+                                assertEquals("extension", payload.extension)
                             }
                         }
                         launch {
@@ -296,9 +338,13 @@ class RealtimeChannelTest {
         runTest {
             createTestClient(
                 wsHandler = { i, o ->
-                    handleSubscribe(i, o, channelId, false)
+                    handleSubscribe(i, o, channelId) {
+                        assertFalse { it.config.presence.enabled }
+                    }
                     handleUnsubscribe(i, o, channelId)
-                    handleSubscribe(i, o, channelId, true)
+                    handleSubscribe(i, o, channelId) {
+                        assertTrue { it.config.presence.enabled }
+                    }
                 },
                 realtimeConfig = {
                     disconnectOnNoSubscriptions = false
@@ -331,7 +377,9 @@ class RealtimeChannelTest {
         runTest {
             createTestClient(
                 wsHandler = { i, o ->
-                    handleSubscribe(i, o, channelId, true)
+                    handleSubscribe(i, o, channelId) {
+                        assertTrue { it.config.presence.enabled }
+                    }
                     // Send presence join for user1 and user2, then leave for user1
                     o.sendPresence(
                         channelId,

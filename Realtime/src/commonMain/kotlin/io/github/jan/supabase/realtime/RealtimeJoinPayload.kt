@@ -27,9 +27,18 @@ data class RealtimeJoinConfig(
 /**
  * @param acknowledgeBroadcasts Whether the server should send an acknowledgment message for each broadcast message
  * @param receiveOwnBroadcasts Whether you should receive your own broadcasts
+ * @param replicationReady replication_ready option instructs the server to emit a `system` event once the
+ * Postgres replication connection backing this channel is established and ready to
+ * stream changes. Listen for it with `channel.on('system', {}, (payload) => ...)`; TODO: fix docs
+ * the payload's `status` is `'ok'` (`message: 'Replication connection established'`)
+ * on success or `'error'` if the connection is not ready in time.
  */
 @Serializable
-data class BroadcastJoinConfig(@SerialName("ack") var acknowledgeBroadcasts: Boolean, @SerialName("self") var receiveOwnBroadcasts: Boolean)
+data class BroadcastJoinConfig(
+    @SerialName("ack") var acknowledgeBroadcasts: Boolean,
+    @SerialName("self") var receiveOwnBroadcasts: Boolean,
+    @SerialName("replication_ready") var replicationReady: Boolean
+)
 
 /**
  * @param key Used to track presence payloads. Can be e.g. a user id
