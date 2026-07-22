@@ -21,11 +21,11 @@ interface OAuthApi {
      * If the response includes only a redirect_url field, it means consent was already given - the caller
      * should handle the redirect manually if needed, so a [OAuthRedirect] will be returned.
      * @param authorizationId The corresponding authorization id
-     * @see OAuthAuthorizationDetailResponse
+     * @see OAuthAuthorizationDetailsResponse
      */
     suspend fun getAuthorizationDetails(
         authorizationId: String,
-    ): OAuthAuthorizationDetailResponse
+    ): OAuthAuthorizationDetailsResponse
 
     /**
      * Approves an OAuth authorization request.
@@ -67,7 +67,7 @@ internal class OAuthApiImpl(
     private val api: AuthenticatedSupabaseApi
 ) : OAuthApi {
 
-    override suspend fun getAuthorizationDetails(authorizationId: String): OAuthAuthorizationDetailResponse {
+    override suspend fun getAuthorizationDetails(authorizationId: String): OAuthAuthorizationDetailsResponse {
         return api.get("oauth/authorizations/$authorizationId").safeBody()
     }
 

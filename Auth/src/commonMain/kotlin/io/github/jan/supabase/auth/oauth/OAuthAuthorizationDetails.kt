@@ -26,4 +26,4 @@ data class OAuthAuthorizationDetails(
     val client: OAuthAuthorizationClient,
     val user: OAuthAuthorizationUser,
     val scope: String
-): OAuthAuthorizationDetailResponse
+): OAuthAuthorizationDetailsResponse

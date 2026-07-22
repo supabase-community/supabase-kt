@@ -18,4 +18,4 @@ import kotlinx.serialization.Serializable
  * @param redirectUrl Complete redirect URL with authorization code and state parameters (e.g., "https://app.com/callback?code=xxx&state=yyy")
  */
 @Serializable
-data class OAuthRedirect(@SerialName("redirect_url") val redirectUrl: String) : OAuthAuthorizationDetailResponse
+data class OAuthRedirect(@SerialName("redirect_url") val redirectUrl: String) : OAuthAuthorizationDetailsResponse
