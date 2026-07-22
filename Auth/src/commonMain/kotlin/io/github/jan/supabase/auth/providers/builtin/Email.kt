@@ -22,9 +22,10 @@ data object Email : DefaultAuthProvider<Email.Config, UserInfo> {
      * The configuration for the email authentication method
      * @param email The email of the user
      * @param password The password of the user
+     * @param data Extra user metadata to include on signup
      */
     @Serializable
-    data class Config(var email: String = "", var password: String = ""): DefaultAuthProvider.Config()
+    data class Config(var email: String = "", var password: String = "", var data: JsonObject? = null): DefaultAuthProvider.Config()
 
     @OptIn(ExperimentalSerializationApi::class)
     override fun decodeResult(json: JsonObject): UserInfo = try {

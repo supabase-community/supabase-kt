@@ -1,87 +1,50 @@
 package request
 
+import io.github.jan.supabase.postgrest.PropertyConversionMethod
 import io.github.jan.supabase.postgrest.query.Count
-import io.github.jan.supabase.postgrest.query.Returning
-import io.github.jan.supabase.postgrest.request.InsertRequest
-import io.github.jan.supabase.postgrest.request.PostgrestRequest
-import kotlinx.serialization.json.JsonArray
+import io.github.jan.supabase.postgrest.query.request.InsertRequestBuilder
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class InsertRequestTest {
 
-    private lateinit var sut: PostgrestRequest
+    private lateinit var sut: InsertRequestBuilder
 
     @Test
-    fun testCreateInsertRequest_withUpsert_thenReturnCorrectValue() {
-        sut = InsertRequest(
-            returning = Returning.Representation(),
-            count = Count.EXACT,
-            upsert = true,
-            body = JsonArray(listOf()),
-            urlParams = mapOf("Key1" to "Value1"),
-            schema = "table"
-        )
+    fun testInsertRequestBuilder() {
+        sut = InsertRequestBuilder("public", PropertyConversionMethod.CAMEL_CASE_TO_SNAKE_CASE).apply {
+            defaultToNull = false
+            count(Count.EXACT)
+            select()
+        }
 
-        assertEquals("POST", sut.method.value)
+        assertEquals("POST", sut.httpMethod.value)
+        assertEquals("public", sut.schema)
         assertEquals(
-            listOf(
-                "return=representation",
-                "resolution=merge-duplicates",
-                "missing=default",
-                "count=exact"
-            ), sut.prefer
-        )
-        assertEquals("table", sut.schema)
-        assertEquals(mapOf("Key1" to "Value1"), sut.urlParams)
-        assertEquals(JsonArray(listOf()), sut.body)
-    }
-
-    @Test
-    fun testCreateInsertRequest_notUpsert_thenReturnCorrectValue() {
-        sut = InsertRequest(
-            returning = Returning.Representation(),
-            count = Count.EXACT,
-            upsert = false,
-            body = JsonArray(listOf()),
-            urlParams = mapOf("Key1" to "Value1"),
-            schema = "table"
-        )
-
-        assertEquals("POST", sut.method.value)
-        assertEquals(
-            listOf(
+            setOf(
                 "return=representation",
                 "missing=default",
                 "count=exact"
-            ), sut.prefer
+            ), sut.buildPrefer()
         )
-        assertEquals("table", sut.schema)
-        assertEquals(mapOf("Key1" to "Value1"), sut.urlParams)
-        assertEquals(JsonArray(listOf()), sut.body)
     }
 
     @Test
-    fun testCreateInsertRequest_withoutCount_thenReturnCorrectValue() {
-        sut = InsertRequest(
-            returning = Returning.Representation(),
-            count = null,
-            upsert = false,
-            body = JsonArray(listOf()),
-            urlParams = mapOf("Key1" to "Value1"),
-            schema = "table"
-        )
+    fun testInsertRequestBuilderDefault() {
+        sut = InsertRequestBuilder("public", PropertyConversionMethod.CAMEL_CASE_TO_SNAKE_CASE).apply {
+            defaultToNull = true
+            count(Count.EXACT)
+            select()
+        }
 
-        assertEquals("POST", sut.method.value)
+        assertEquals("POST", sut.httpMethod.value)
+        assertEquals("public", sut.schema)
         assertEquals(
-            listOf(
+            setOf(
                 "return=representation",
-                "missing=default"
-            ), sut.prefer
+                "count=exact"
+            ), sut.buildPrefer()
         )
-        assertEquals("table", sut.schema)
-        assertEquals(mapOf("Key1" to "Value1"), sut.urlParams)
-        assertEquals(JsonArray(listOf()), sut.body)
     }
 
 }

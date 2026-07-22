@@ -2,7 +2,6 @@ package io.github.jan.supabase.auth.providers.builtin
 
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.annotations.SupabaseInternal
-import io.github.jan.supabase.auth.Auth
 import io.github.jan.supabase.auth.AuthImpl
 import io.github.jan.supabase.auth.FlowType
 import io.github.jan.supabase.auth.auth
@@ -39,14 +38,12 @@ sealed interface DefaultAuthProvider<C, R> : AuthProvider<C, R> {
     /**
      * The default configuration for the provider.
      * @param captchaToken The captcha token when having captcha enabled
-     * @param data Extra data for the user
      */
     @Serializable
     sealed class Config(
         @Serializable(with = CaptchaTokenSerializer::class)
         @SerialName("gotrue_meta_security")
         var captchaToken: String? = null,
-        var data: JsonObject? = null,
     )
 
     override suspend fun login(
@@ -103,7 +100,7 @@ sealed interface DefaultAuthProvider<C, R> : AuthProvider<C, R> {
                 val userJson = json["user"]?.jsonObject ?: buildJsonObject { }
                 return decodeResult(userJson)
             }.onFailure { exception ->
-                Auth.logger.w(exception) { "Failed to decode user info" }
+                supabaseClient.auth.logger.w(exception) { "Failed to decode user info" }
                 return null
             }
         }

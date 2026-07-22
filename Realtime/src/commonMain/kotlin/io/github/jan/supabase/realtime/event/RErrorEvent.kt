@@ -1,7 +1,6 @@
 package io.github.jan.supabase.realtime.event
 
 import io.github.jan.supabase.logging.e
-import io.github.jan.supabase.realtime.Realtime
 import io.github.jan.supabase.realtime.RealtimeChannel
 import io.github.jan.supabase.realtime.RealtimeChannelImpl
 import io.github.jan.supabase.realtime.RealtimeMessage
@@ -17,11 +16,11 @@ data object RErrorEvent : RealtimeEvent {
         channel as RealtimeChannelImpl
         val currentAttempt = channel.joinAttempt.incrementAndFetch()
         if(currentAttempt >= channel.realtime.config.maxAttempts) {
-            Realtime.logger.e { "Failed to rejoin channel ${message.topic} after $currentAttempt attempts. Giving up. ${message.payload}" }
+            channel.logger.e { "Failed to rejoin channel ${message.topic} after $currentAttempt attempts. Giving up. ${message.payload}" }
             channel.updateStatus(RealtimeChannel.Status.UNSUBSCRIBED)
             return
         }
-        Realtime.logger.e { "Received an error in channel ${message.topic}. That could be as a result of an invalid access token. Trying to rejoin the channel...\n${message.payload}" }
+        channel.logger.e { "Received an error in channel ${message.topic}. That could be as a result of an invalid access token. Trying to rejoin the channel...\n${message.payload}" }
         channel.scheduleRejoin()
     }
 

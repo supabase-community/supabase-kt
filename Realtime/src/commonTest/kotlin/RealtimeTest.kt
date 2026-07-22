@@ -3,8 +3,10 @@ import io.github.jan.supabase.realtime.Realtime
 import io.github.jan.supabase.realtime.RealtimeChannel
 import io.github.jan.supabase.realtime.RealtimeImpl
 import io.github.jan.supabase.realtime.RealtimeMessage
+import io.github.jan.supabase.realtime.RealtimeProtocolVersion
 import io.github.jan.supabase.realtime.channel
 import io.github.jan.supabase.realtime.realtime
+import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
@@ -12,6 +14,8 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNull
 import kotlin.time.Clock
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
 
 class RealtimeTest {
 
@@ -32,6 +36,174 @@ class RealtimeTest {
             )
         }
     }
+
+    @Test
+    fun testRealtimeDisconnectDelayZero() {
+        runTest {
+            createTestClient(
+                wsHandler = { _, _ ->
+                    //Does not matter for this test
+                },
+                realtimeConfig = {
+                    disconnectOnEmptyChannelsAfter = Duration.ZERO
+                },
+                supabaseHandler = {
+                    assertEquals(Realtime.Status.DISCONNECTED, it.realtime.status.value)
+                    val channel = it.realtime.channel("test")
+                    it.realtime.connect()
+                    assertEquals(Realtime.Status.CONNECTED, it.realtime.status.value)
+                    it.realtime.removeChannel(channel)
+                    assertEquals(Realtime.Status.DISCONNECTED, it.realtime.status.value)
+                }
+            )
+        }
+    }
+
+    @Test
+    fun testRealtimeDisconnectNonEmpty() {
+        runTest {
+            createTestClient(
+                wsHandler = { _, _ ->
+                    //Does not matter for this test
+                },
+                realtimeConfig = {
+                    disconnectOnEmptyChannelsAfter = Duration.ZERO
+                },
+                supabaseHandler = {
+                    assertEquals(Realtime.Status.DISCONNECTED, it.realtime.status.value)
+                    val channel = it.realtime.channel("test")
+                    val channel2 = it.realtime.channel("test2")
+                    it.realtime.connect()
+                    assertEquals(Realtime.Status.CONNECTED, it.realtime.status.value)
+                    it.realtime.removeChannel(channel)
+                    assertEquals(Realtime.Status.CONNECTED, it.realtime.status.value)
+                }
+            )
+        }
+    }
+
+    @Test
+    fun testRealtimeDisconnectNonZero() {
+        runTest {
+            createTestClient(
+                wsHandler = { _, _ ->
+                    //Does not matter for this test
+                },
+                realtimeConfig = {
+                    coroutineScope = backgroundScope
+                    disconnectOnEmptyChannelsAfter = 15.seconds
+                },
+                supabaseHandler = {
+                    assertEquals(Realtime.Status.DISCONNECTED, it.realtime.status.value)
+                    val channel = it.realtime.channel("test")
+                    it.realtime.connect()
+                    assertEquals(Realtime.Status.CONNECTED, it.realtime.status.value)
+                    it.realtime.removeChannel(channel)
+                    assertEquals(Realtime.Status.CONNECTED, it.realtime.status.value)
+                    advanceTimeBy(10.seconds)
+                    assertEquals(Realtime.Status.CONNECTED, it.realtime.status.value)
+                    advanceTimeBy(6.seconds) // 1 seconds more because its not 100% accurate
+                    assertEquals(Realtime.Status.DISCONNECTED, it.realtime.status.value)
+                }
+            )
+        }
+    }
+
+    @Test
+    fun testRealtimeDisconnectNonZeroNonEmpty() {
+        runTest {
+            createTestClient(
+                wsHandler = { _, _ ->
+                    //Does not matter for this test
+                },
+                realtimeConfig = {
+                    coroutineScope = backgroundScope
+                    disconnectOnEmptyChannelsAfter = 2.seconds
+                },
+                supabaseHandler = {
+                    assertEquals(Realtime.Status.DISCONNECTED, it.realtime.status.value)
+                    val channel = it.realtime.channel("test")
+                    val channel2 = it.realtime.channel("test2")
+                    it.realtime.connect()
+                    assertEquals(Realtime.Status.CONNECTED, it.realtime.status.value)
+                    it.realtime.removeChannel(channel)
+                    assertEquals(Realtime.Status.CONNECTED, it.realtime.status.value)
+                    advanceTimeBy(3.seconds)
+                    assertEquals(Realtime.Status.CONNECTED, it.realtime.status.value)
+                }
+            )
+        }
+    }
+
+    @Test
+    fun testRealtimeDisconnectNonZeroDefault() {
+        runTest {
+            createTestClient(
+                wsHandler = { _, _ ->
+                    //Does not matter for this test
+                },
+                realtimeConfig = {
+                    coroutineScope = backgroundScope
+                    heartbeatInterval = 15.seconds
+                    // heartbeatInterval is 15 seconds so the disconnect delay should be 30s
+                },
+                supabaseHandler = {
+                    assertEquals(30.seconds, it.realtime.config.disconnectDelay)
+                }
+            )
+        }
+    }
+
+    @Test
+    fun testRealtimeDisconnectNonZeroCancel() {
+        runTest {
+            createTestClient(
+                wsHandler = { _, _ ->
+                    //Does not matter for this test
+                },
+                realtimeConfig = {
+                    coroutineScope = backgroundScope
+                    disconnectOnEmptyChannelsAfter = 15.seconds
+                },
+                supabaseHandler = {
+                    assertEquals(Realtime.Status.DISCONNECTED, it.realtime.status.value)
+                    val channel = it.realtime.channel("test")
+                    it.realtime.connect()
+                    assertEquals(Realtime.Status.CONNECTED, it.realtime.status.value)
+                    it.realtime.removeChannel(channel)
+                    assertEquals(Realtime.Status.CONNECTED, it.realtime.status.value)
+                    advanceTimeBy(10.seconds)
+                    assertEquals(Realtime.Status.CONNECTED, it.realtime.status.value)
+                    it.realtime.channel("test2")
+                    advanceTimeBy(6.seconds) // 1 seconds more because its not 100% accurate
+                    assertEquals(Realtime.Status.CONNECTED, it.realtime.status.value)
+                }
+            )
+        }
+    }
+
+    @Test
+    fun testRealtimeDisconnectRemoveAll() {
+        runTest {
+            createTestClient(
+                wsHandler = { _, _ ->
+                    //Does not matter for this test
+                },
+                realtimeConfig = {
+                    disconnectOnEmptyChannelsAfter = 200.seconds
+                },
+                supabaseHandler = {
+                    assertEquals(Realtime.Status.DISCONNECTED, it.realtime.status.value)
+                    val channel = it.realtime.channel("test")
+                    it.realtime.connect()
+                    assertEquals(Realtime.Status.CONNECTED, it.realtime.status.value)
+                    it.realtime.removeAllChannels()
+                    assertEquals(Realtime.Status.DISCONNECTED, it.realtime.status.value)
+                }
+            )
+        }
+    }
+
 
     @Test
     fun testTeardown() {
@@ -72,7 +244,7 @@ class RealtimeTest {
     }
 
     @Test
-    fun testSendingRealtimeMessages() {
+    fun testSendingRealtimeMessagesV2() {
         val expectedMessage = RealtimeMessage(
             topic = "realtimeTopic",
             event = "realtimeEvent",
@@ -84,12 +256,40 @@ class RealtimeTest {
         runTest {
             createTestClient(
                 wsHandler = { i, _ ->
-                    val message = i.receive()
+                    val message = i.receive().toMessage()
                     assertEquals(expectedMessage, message)
                 },
                 supabaseHandler = {
                     it.realtime.connect()
                     it.realtime.send(expectedMessage)
+                }
+            )
+        }
+    }
+
+
+    @Test
+    fun testSendingRealtimeMessagesV1() {
+        val expectedMessage = RealtimeMessage(
+            topic = "realtimeTopic",
+            event = "realtimeEvent",
+            payload = buildJsonObject {
+                put("key", "value")
+            },
+            ref = "realtimeRef"
+        )
+        runTest {
+            createTestClient(
+                wsHandler = { i, _ ->
+                    val message = i.receive().toMessage(RealtimeProtocolVersion.V1)
+                    assertEquals(expectedMessage, message)
+                },
+                supabaseHandler = {
+                    it.realtime.connect()
+                    it.realtime.send(expectedMessage)
+                },
+                realtimeConfig = {
+                    vsn = RealtimeProtocolVersion.V1
                 }
             )
         }

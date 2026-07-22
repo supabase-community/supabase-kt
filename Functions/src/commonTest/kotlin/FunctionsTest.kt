@@ -21,6 +21,7 @@ import kotlinx.serialization.json.put
 import kotlin.test.AfterTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertNull
 
 internal val configuration: SupabaseClientBuilder.() -> Unit = {
     install(Functions)
@@ -48,6 +49,29 @@ class FunctionsTest {
             )
             supabase.auth.awaitInitialization()
             supabase.auth.importAuthToken(expectedJWT)
+            supabase.functions.invoke(
+                function = ""
+            )
+        }
+    }
+
+    @Test
+    fun testNewApiKeyFallback() {
+        runTest {
+            supabase = createMockedSupabaseClient(
+                supabaseKey = "sb_publishable_",
+                configuration ={
+                    install(Auth) {
+                        minimalConfig()
+                    }
+                    configuration()
+                },
+                requestHandler = {
+                    assertNull(it.headers[HttpHeaders.Authorization])
+                    respond("")
+                }
+            )
+            supabase.auth.awaitInitialization()
             supabase.functions.invoke(
                 function = ""
             )

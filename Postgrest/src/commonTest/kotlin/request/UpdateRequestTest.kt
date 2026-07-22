@@ -1,60 +1,32 @@
 package request
 
+import io.github.jan.supabase.postgrest.PropertyConversionMethod
 import io.github.jan.supabase.postgrest.query.Count
-import io.github.jan.supabase.postgrest.query.Returning
-import io.github.jan.supabase.postgrest.request.PostgrestRequest
-import io.github.jan.supabase.postgrest.request.UpdateRequest
-import kotlinx.serialization.json.JsonArray
+import io.github.jan.supabase.postgrest.query.request.UpdateRequestBuilder
+import io.ktor.http.HttpMethod
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class UpdateRequestTest {
 
-    private lateinit var sut: PostgrestRequest
-
+    private lateinit var sut: UpdateRequestBuilder
 
     @Test
-    fun testCreateUpdateRequest_thenReturnCorrectValue() {
-        sut = UpdateRequest(
-            returning = Returning.Representation(),
-            count = Count.EXACT,
-            body = JsonArray(listOf()),
-            urlParams = mapOf("Key1" to "Value1"),
-            schema = "table"
-        )
+    fun testUpdate() {
+        sut = UpdateRequestBuilder("public", PropertyConversionMethod.CAMEL_CASE_TO_SNAKE_CASE).apply {
+            count(Count.EXACT)
+            select()
+        }
 
-
-        assertEquals("PATCH", sut.method.value)
+        assertEquals(HttpMethod.Patch, sut.httpMethod)
         assertEquals(
-            listOf(
+            setOf(
                 "return=representation",
                 "count=exact"
-            ), sut.prefer
+            ), sut.buildPrefer()
         )
-        assertEquals("table", sut.schema)
-        assertEquals(mapOf("Key1" to "Value1"), sut.urlParams)
-        assertEquals(JsonArray(listOf()), sut.body)
+        assertEquals("public", sut.schema)
     }
 
-    @Test
-    fun testCreateUpdateRequest_withoutCount_thenReturnCorrectValue() {
-        sut = UpdateRequest(
-            returning = Returning.Representation(),
-            count = null,
-            body = JsonArray(listOf()),
-            urlParams = mapOf("Key1" to "Value1"),
-            schema = "table"
-        )
-
-        assertEquals("PATCH", sut.method.value)
-        assertEquals(
-            listOf(
-                "return=representation",
-            ), sut.prefer
-        )
-        assertEquals("table", sut.schema)
-        assertEquals(mapOf("Key1" to "Value1"), sut.urlParams)
-        assertEquals(JsonArray(listOf()), sut.body)
-    }
 
 }

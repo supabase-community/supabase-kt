@@ -2,7 +2,6 @@ package io.github.jan.supabase.realtime.event
 
 import io.github.jan.supabase.logging.d
 import io.github.jan.supabase.realtime.PostgresJoinConfig
-import io.github.jan.supabase.realtime.Realtime
 import io.github.jan.supabase.realtime.RealtimeChannel
 import io.github.jan.supabase.realtime.RealtimeMessage
 import kotlinx.serialization.json.Json
@@ -19,7 +18,7 @@ data object RPostgresServerChangesEvent : RealtimeEvent {
         val serverPostgresChanges = message.payload["response"]?.jsonObject?.get("postgres_changes")?.jsonArray?.let { Json.decodeFromJsonElement<List<PostgresJoinConfig>>(it) } ?: listOf() //server postgres changes
         channel.callbackManager.setServerChanges(serverPostgresChanges)
         if(channel.status.value != RealtimeChannel.Status.SUBSCRIBED) {
-            Realtime.logger.d { "Joined channel ${message.topic}" }
+            channel.logger.d { "Joined channel ${message.topic}" }
             channel.updateStatus(RealtimeChannel.Status.SUBSCRIBED)
         }
     }

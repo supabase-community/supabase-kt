@@ -8,7 +8,9 @@ import io.github.jan.supabase.network.HttpRequestOverride
 class DownloadOptionBuilder(
     internal var transform: ImageTransformation.() -> Unit = {},
     internal val httpRequestOverrides: MutableList<HttpRequestOverride> = mutableListOf()
-) {
+): BucketUrlBuilder {
+
+    override var cacheNonce: String? = null
 
     /**
      * Transforms the image before downloading
@@ -25,5 +27,4 @@ class DownloadOptionBuilder(
     fun httpOverride(override: HttpRequestOverride) {
         httpRequestOverrides.add(override)
     }
-
 }

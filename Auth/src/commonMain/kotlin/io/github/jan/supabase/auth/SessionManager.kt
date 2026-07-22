@@ -1,5 +1,6 @@
 package io.github.jan.supabase.auth
 
+import io.github.jan.supabase.auth.exception.NoSessionFoundException
 import io.github.jan.supabase.auth.user.UserSession
 import kotlin.concurrent.atomics.AtomicReference
 
@@ -15,8 +16,18 @@ interface SessionManager {
 
     /**
      * Loads the saved session from storage.
+     * @throws NoSessionFoundException if there is no session stored.
      */
-    suspend fun loadSession(): UserSession?
+    suspend fun loadSession(): UserSession
+
+    /**
+     * Loads the saved session from storage.
+     */
+    suspend fun loadSessionOrNull(): UserSession? = try {
+        loadSession()
+    } catch(e: Exception) {
+        null
+    }
 
     /**
      * Deletes the saved session from storage.
@@ -36,8 +47,8 @@ class MemorySessionManager(session: UserSession? = null): SessionManager {
         this.session.store(session)
     }
 
-    override suspend fun loadSession(): UserSession? {
-        return session.load()
+    override suspend fun loadSession(): UserSession {
+        return session.load() ?: throw NoSessionFoundException()
     }
 
     override suspend fun deleteSession() {

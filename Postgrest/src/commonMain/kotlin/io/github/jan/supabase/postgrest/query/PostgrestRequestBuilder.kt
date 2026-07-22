@@ -4,17 +4,29 @@ package io.github.jan.supabase.postgrest.query
 import io.github.jan.supabase.annotations.SupabaseExperimental
 import io.github.jan.supabase.auth.PostgrestFilterDSL
 import io.github.jan.supabase.postgrest.PropertyConversionMethod
+import io.github.jan.supabase.postgrest.mapToFirstValue
 import io.github.jan.supabase.postgrest.query.filter.PostgrestFilterBuilder
 import io.github.jan.supabase.postgrest.result.PostgrestResult
+import io.ktor.client.request.HttpRequestBuilder
+import io.ktor.client.request.header
+import io.ktor.client.request.setBody
+import io.ktor.http.ContentType
 import io.ktor.http.HeadersBuilder
 import io.ktor.http.HttpHeaders
+import io.ktor.http.HttpMethod
+import io.ktor.http.contentType
+import io.ktor.util.appendAll
+import kotlinx.serialization.json.JsonElement
 import kotlin.js.JsName
 
 /**
  * A builder for Postgrest requests.
  */
 @PostgrestFilterDSL
-open class PostgrestRequestBuilder(@PublishedApi internal val propertyConversionMethod: PropertyConversionMethod) {
+abstract class PostgrestRequestBuilder(
+    defaultSchema: String,
+    @PublishedApi internal val propertyConversionMethod: PropertyConversionMethod
+) {
 
     /**
      * The [Count] algorithm to use to count rows in the table or view.
@@ -27,8 +39,55 @@ open class PostgrestRequestBuilder(@PublishedApi internal val propertyConversion
      */
     var returning: Returning = Returning.Minimal
         private set
+
+    /**
+     * The database schema
+     */
+    var schema: String = defaultSchema
+
+    /**
+     * The HTTP method to use.
+     */
+    internal var httpMethod: HttpMethod = HttpMethod.Get
+
+    private var shouldStripNulls: Boolean = false
+    private var dryRun: Boolean = false
+    internal var acceptHeader: AcceptHeader = AcceptHeader.Json
+    private var explainData: ExplainData? = null
+    @PublishedApi internal var body: JsonElement? = null
+
     @SupabaseExperimental val params: MutableMap<String, List<String>> = mutableMapOf()
     @SupabaseExperimental val headers: HeadersBuilder = HeadersBuilder()
+
+
+    /**
+     * Whether to retry this request on transient errors (network errors, HTTP 503/520).
+     * Only applies to idempotent requests (GET, HEAD) — non-idempotent requests are never retried.
+     * Set to `false` to disable retries for this specific request.
+     */
+    var retry: Boolean = true
+        private set
+
+    /**
+     * Disables automatic retries for this request.
+     */
+    fun noRetry() {
+        this.retry = false
+    }
+
+    /**
+     * Strip null values from the response data. Properties with `null` values
+     * will be omitted from the returned JSON objects.
+     *
+     * Requires PostgREST 11.2.0+.
+     *
+     */
+    fun stripNulls() {
+        require(acceptHeader != AcceptHeader.CSV) {
+            "stripNulls() cannot be used with csv()"
+        }
+        this.shouldStripNulls = true
+    }
 
     /**
      * Setting [count] allows to use [PostgrestResult.countOrNull] to get the total amount of items in the database.
@@ -43,7 +102,9 @@ open class PostgrestRequestBuilder(@PublishedApi internal val propertyConversion
      * @param columns The columns to return
      */
     fun select(columns: Columns = Columns.ALL) {
-        this.returning = Returning.Representation(columns)
+        this.returning = Returning.Representation(columns).also {
+            params["select"] = listOf(it.columns.value)
+        }
     }
 
     /**
@@ -54,7 +115,39 @@ open class PostgrestRequestBuilder(@PublishedApi internal val propertyConversion
      */
     @JsName("singleValue")
     fun single() {
-        headers[HttpHeaders.Accept] = "application/vnd.pgrst.object+json"
+        acceptHeader = AcceptHeader.Single(false)
+    }
+
+    /**
+     * Return `data` as a single object instead of an array of objects.
+     *
+     * Instructs PostgREST to return a single JSON object, returning `null`/blank data when no row matches.
+     *
+     * Like ``single()``, this sets the `application/vnd.pgrst.object+json` accept header so the
+     * server enforces a single result. Unlike ``single()``, when the query does not match exactly
+     * one row the resulting `PGRST116` error is not thrown — ``PostgrestResponse/value`` is `null`
+     * instead.
+     *
+     * > Note: PostgREST returns `PGRST116` both when zero rows match and when more than one row
+     * > matches. This method returns `null` for either case; use ``single()`` for the strict variant
+     * > that always throws when the query does not match exactly one row.
+     */
+    @JsName("maybeSingleValue")
+    fun maybeSingle() {
+        acceptHeader = AcceptHeader.Single(true)
+    }
+
+    /**
+     * Executes the query but rolls back the transaction instead of committing it.
+     *
+     * The mutation runs and its result (including any side effects such as triggers) is returned
+     * in the response, but the transaction is rolled back afterward, so no changes are persisted.
+     * This is useful for testing mutations without touching real data.
+     *
+     * Requires PostgREST's `db-tx-end` setting to allow client-controlled transaction rollback.
+     */
+    fun dryRun() {
+        dryRun = true
     }
 
     /**
@@ -107,14 +200,14 @@ open class PostgrestRequestBuilder(@PublishedApi internal val propertyConversion
      * Return `data` as an object in [GeoJSON](https://geojson.org) format.
      */
     fun geojson() {
-        headers[HttpHeaders.Accept] = "application/geo+json"
+        acceptHeader = AcceptHeader.GeoJson
     }
 
     /**
      * Return `data` as a string in CSV format.
      */
     fun csv() {
-        headers[HttpHeaders.Accept] = "text/csv"
+        acceptHeader = AcceptHeader.CSV
     }
 
     /**
@@ -147,8 +240,7 @@ open class PostgrestRequestBuilder(@PublishedApi internal val propertyConversion
             if (buffers) add("buffers")
             if (wal) add("wal")
         }.joinToString("|")
-        val forMediatype = headers["Accept"] ?: "application/json"
-        headers[HttpHeaders.Accept] = "application/vnd.pgrst.plan+${format}; for=\"${forMediatype}\"; options=${options};"
+        explainData = ExplainData(options, format)
     }
 
     /**
@@ -158,6 +250,51 @@ open class PostgrestRequestBuilder(@PublishedApi internal val propertyConversion
     inline fun filter(block: @PostgrestFilterDSL PostgrestFilterBuilder.() -> Unit) {
         val filter = PostgrestFilterBuilder(propertyConversionMethod, params)
         filter.block()
+    }
+
+    protected fun withReturning() = listOf("return=${returning.identifier}")
+
+    internal open fun customPrefer(): List<String> = listOf()
+
+    internal fun buildPrefer() = buildSet {
+        if (count != null) add("count=${count!!.identifier}")
+        if (dryRun) add("tx=rollback")
+        addAll(customPrefer())
+    }
+
+    internal fun HttpRequestBuilder.apply() {
+
+        //
+        this.method = httpMethod
+        contentType(ContentType.Application.Json)
+        this@PostgrestRequestBuilder.body?.let { setBody(it) }
+
+        // Schema
+        if (schema.isNotBlank()) {
+            when (httpMethod) {
+                HttpMethod.Get, HttpMethod.Head -> header("Accept-Profile", schema)
+                else -> header("Content-Profile", schema)
+            }
+        }
+
+        val mediaType = when(acceptHeader) {
+            AcceptHeader.CSV -> AcceptHeader.CSV.headerValue()
+            AcceptHeader.GeoJson -> AcceptHeader.GeoJson.headerValue()
+            AcceptHeader.Json -> AcceptHeader.Json.headerValue(shouldStripNulls)
+            is AcceptHeader.Single -> AcceptHeader.Single.headerValue(shouldStripNulls)
+        }
+
+        // Accept header
+        header(
+            HttpHeaders.Accept,
+            if(explainData != null) explainData!!.headerValue(mediaType) else mediaType
+        )
+
+        header(PostgrestQueryBuilder.HEADER_PREFER, buildPrefer().joinToString(","))
+
+        // Url params & headers
+        url.parameters.appendAll(params.mapToFirstValue())
+        headers.appendAll(this@PostgrestRequestBuilder.headers)
     }
 
 }

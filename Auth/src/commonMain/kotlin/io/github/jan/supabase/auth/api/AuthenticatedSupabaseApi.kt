@@ -3,6 +3,7 @@
 package io.github.jan.supabase.auth.api
 
 import io.github.jan.supabase.StringMasking
+import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.annotations.SupabaseInternal
 import io.github.jan.supabase.auth.exception.SessionRequiredException
 import io.github.jan.supabase.exceptions.RestException
@@ -26,26 +27,32 @@ class AuthenticatedSupabaseApi @SupabaseInternal constructor(
     private val jwtToken = config.auth.jwtToken
     private val requireSession = config.auth.requireSession
 
+    private fun String?.checkIsNewApiKey() = if(this != null && (config.auth.useNewApiKeyAsFallback || !SupabaseClient.checkIsNewApiKey(this))) this else null
+
     override suspend fun getDefaultHeaders(): Headers {
         val clientHeaders = super.getDefaultHeaders()
-        val accessToken = config.auth.getAccessToken.resolve(jwtToken, !requireSession)
-            ?: error("No access token found for default headers")
+        val accessToken = config.auth.getAccessToken.resolve(jwtToken, !requireSession).checkIsNewApiKey()
+            ?: throwIfRequired("")
         return headers {
             appendAll(clientHeaders)
-            set("Authorization", "Bearer $accessToken")
+            accessToken?.let {
+                set("Authorization", "Bearer $it")
+            }
         }
     }
 
     override suspend fun rawRequest(url: String, builder: HttpRequestBuilder.() -> Unit): HttpResponse {
-        val accessToken = config.auth.getAccessToken.resolve(jwtToken, !requireSession)
-            ?: throw SessionRequiredException(url)
+        val accessToken = config.auth.getAccessToken.resolve(jwtToken, !requireSession).checkIsNewApiKey()
+            ?: throwIfRequired(url)
         return super.rawRequest(url) {
-            bearerAuth(accessToken)
+            accessToken?.let { bearerAuth(it) }
             defaultRequest?.invoke(this)
             builder()
             checkUrlLength()
         }
     }
+
+    private fun throwIfRequired(url: String) = if(config.auth.requireSession) throw SessionRequiredException(url) else null
 
     suspend fun rawRequest(builder: HttpRequestBuilder.() -> Unit): HttpResponse = rawRequest("", builder)
 
@@ -53,10 +60,10 @@ class AuthenticatedSupabaseApi @SupabaseInternal constructor(
         url: String,
         builder: HttpRequestBuilder.() -> Unit
     ): HttpStatement {
-        val accessToken = config.auth.getAccessToken.resolve(jwtToken, !requireSession)
-            ?: throw SessionRequiredException(url)
+        val accessToken = config.auth.getAccessToken.resolve(jwtToken, !requireSession).checkIsNewApiKey()
+            ?: throwIfRequired(url)
         return super.prepareRequest(url) {
-            bearerAuth(accessToken)
+            accessToken?.let { bearerAuth(it) }
             builder()
             defaultRequest?.invoke(this)
             checkUrlLength()

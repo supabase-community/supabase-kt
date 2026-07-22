@@ -51,12 +51,12 @@ inline fun <reified T> JsonObject.decodeIfNotEmptyOrDefault(default: T): T {
 }
 
 @SupabaseInternal
-suspend inline fun <reified T> HttpResponse.bodyOrNull(): T? {
-    val text = bodyAsText()
+suspend inline fun <reified T> SupabaseClient.bodyOrNull(response: HttpResponse): T? {
+    val text = response.bodyAsText()
     return try {
         supabaseJson.decodeFromString<T>(text)
     } catch(e: SerializationException) {
-        SupabaseClient.LOGGER.i(e) { "Could not decode $text as ${T::class}." }
+        logger.i(e) { "Could not decode ${text.take(200)} as ${T::class.simpleName}." }
         null
     }
 }

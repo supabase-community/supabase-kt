@@ -13,6 +13,7 @@ import io.github.jan.supabase.auth.exception.TokenExpiredException
 import io.github.jan.supabase.auth.jwt.ClaimsRequestBuilder
 import io.github.jan.supabase.auth.jwt.ClaimsResponse
 import io.github.jan.supabase.auth.mfa.MfaApi
+import io.github.jan.supabase.auth.passkey.AuthPasskeyApi
 import io.github.jan.supabase.auth.oauth.OAuthApi
 import io.github.jan.supabase.auth.providers.AuthProvider
 import io.github.jan.supabase.auth.providers.ExternalAuthConfigDefaults
@@ -30,7 +31,6 @@ import io.github.jan.supabase.auth.user.UserSession
 import io.github.jan.supabase.auth.user.UserUpdateBuilder
 import io.github.jan.supabase.exceptions.HttpRequestException
 import io.github.jan.supabase.exceptions.RestException
-import io.github.jan.supabase.logging.SupabaseLogger
 import io.github.jan.supabase.plugins.CustomSerializationPlugin
 import io.github.jan.supabase.plugins.MainPlugin
 import io.github.jan.supabase.plugins.SupabasePluginProvider
@@ -87,9 +87,15 @@ interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
     val admin: AdminApi
 
     /**
-     * Access to the mfa api where you can manage multi-factor authentication for the current user.
+     * Access to the [MfaApi] where you can manage multi-factor authentication for the current user.
      */
     val mfa: MfaApi
+
+    /**
+     * Access to the [AuthPasskeyApi] where you can manage the user's passkeys
+     */
+    @SupabaseExperimental
+    val passkeys: AuthPasskeyApi
 
     /**
      * Namespace for the OAuth 2.1 authorization server methods.
@@ -546,7 +552,10 @@ interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
 
         override val key = "auth"
 
-        override val logger: SupabaseLogger = SupabaseClient.createLogger("Supabase-Auth")
+        /**
+         * The tag for the Auth logger.
+         */
+        const val LOGGING_TAG = "Supabase-Auth"
 
         /**
          * The auth api version to use

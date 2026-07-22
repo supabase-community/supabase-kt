@@ -42,7 +42,16 @@ data object IDToken : DefaultAuthProvider<IDToken.Config, UserInfo> {
         @SerialName("access_token") var accessToken: String? = null,
         var nonce: String? = null,
         @property:SupabaseInternal @SerialName("link_identity") var linkIdentity: Boolean = false
-    ) : DefaultAuthProvider.Config()
+    ) : DefaultAuthProvider.Config() {
+
+        /**
+         * This property is ignored by the ID token endpoint and has no effect.
+         * It exists only for backward compatibility and will be removed in a future release.
+         * Use [Email.Config.data] or [Phone.Config.data] for signup metadata instead.
+         */
+        @Deprecated("data is ignored by the ID token endpoint. It exists only for backward compatibility.", level = DeprecationLevel.WARNING)
+        var data: JsonObject? = null
+    }
 
     @OptIn(ExperimentalSerializationApi::class)
     override fun decodeResult(json: JsonObject): UserInfo = try {

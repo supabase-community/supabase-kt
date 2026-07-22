@@ -3,10 +3,8 @@ package io.github.jan.supabase.auth
 import com.russhwolf.settings.ExperimentalSettingsApi
 import com.russhwolf.settings.Settings
 import com.russhwolf.settings.coroutines.toSuspendSettings
+import io.github.jan.supabase.auth.exception.NoSessionFoundException
 import io.github.jan.supabase.auth.user.UserSession
-import io.github.jan.supabase.logging.e
-import kotlinx.coroutines.currentCoroutineContext
-import kotlinx.coroutines.ensureActive
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonBuilder
 
@@ -50,15 +48,9 @@ class SettingsSessionManager(
         suspendSettings.putString(key, json.encodeToString(session))
     }
 
-    override suspend fun loadSession(): UserSession? {
-        val session = suspendSettings.getStringOrNull(key) ?: return null
-        return try {
-            json.decodeFromString(session)
-        } catch(e: Exception) {
-            currentCoroutineContext().ensureActive()
-            Auth.logger.e(e) { "Failed to load session" }
-            null
-        }
+    override suspend fun loadSession(): UserSession {
+        val session = suspendSettings.getStringOrNull(key) ?: throw NoSessionFoundException()
+        return json.decodeFromString(session)
     }
 
     override suspend fun deleteSession() {

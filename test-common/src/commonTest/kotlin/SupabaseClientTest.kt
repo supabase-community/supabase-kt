@@ -1,7 +1,6 @@
 import io.github.jan.supabase.BuildConfig
 import io.github.jan.supabase.OSInformation
 import io.github.jan.supabase.SupabaseClient
-import io.github.jan.supabase.logging.LogLevel
 import io.github.jan.supabase.testing.createMockedSupabaseClient
 import io.github.jan.supabase.testing.withMockedSupabaseClient
 import io.ktor.client.engine.mock.respond
@@ -24,33 +23,8 @@ class SupabaseClientTest {
                 supabaseKey = "somekey",
                 requestHandler = {
                     assertEquals(
-                        "supabase-kt/${BuildConfig.PROJECT_VERSION}",
-                        it.headers["X-Client-Info"],
-                        "X-Client-Info header should be set to 'supabase-kt/${BuildConfig.PROJECT_VERSION}'"
-                    )
-                    respond("")
-                },
-                clientHandler = { it.httpClient.get("") }
-            )
-        }
-    }
-
-    @Test
-    fun testOSVersionHeader() {
-        runTest {
-            withMockedSupabaseClient(
-                supabaseUrl = "https://example.supabase.co",
-                supabaseKey = "somekey",
-                requestHandler = {
-                    assertEquals(
-                        "TestOS",
-                        it.headers["X-Supabase-Client-Platform"],
-                        "X-Supabase-Client-Platform header should be set to 'TestOS'"
-                    )
-                    assertEquals(
-                        "1.0.0",
-                        it.headers["X-Supabase-Client-Platform-Version"],
-                        "X-Supabase-Client-Platform-Version header should be set to '1.0.0'"
+                        "supabase-kt/${BuildConfig.PROJECT_VERSION}; platform=TestOS; platform-version=1.0.0; runtime=kotlin; runtime-version=${KotlinVersion.CURRENT}",
+                        it.headers["X-Client-Info"]
                     )
                     respond("")
                 },
@@ -77,20 +51,6 @@ class SupabaseClientTest {
             )
             assertEquals("myToken", client.accessToken?.invoke())
         }
-    }
-
-    @Test
-    fun testDefaultLogLevel() {
-        createMockedSupabaseClient(
-            configuration = {
-                defaultLogLevel = LogLevel.DEBUG
-            }
-        )
-        assertEquals(
-            LogLevel.DEBUG,
-            SupabaseClient.DEFAULT_LOG_LEVEL,
-            "Default log level should be set to ${LogLevel.DEBUG}"
-        )
     }
 
     @Test

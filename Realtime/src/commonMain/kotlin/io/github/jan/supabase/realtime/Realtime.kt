@@ -6,21 +6,22 @@ import io.github.jan.supabase.SupabaseSerializer
 import io.github.jan.supabase.annotations.SupabaseInternal
 import io.github.jan.supabase.auth.AuthDependentPluginConfig
 import io.github.jan.supabase.auth.resolveAccessToken
-import io.github.jan.supabase.logging.SupabaseLogger
-import io.github.jan.supabase.logging.w
 import io.github.jan.supabase.plugins.CustomSerializationConfig
 import io.github.jan.supabase.plugins.CustomSerializationPlugin
 import io.github.jan.supabase.plugins.MainConfig
 import io.github.jan.supabase.plugins.MainPlugin
 import io.github.jan.supabase.plugins.SupabasePluginProvider
+import io.github.jan.supabase.realtime.websocket.RealtimeWebsocket
 import io.github.jan.supabase.realtime.websocket.RealtimeWebsocketFactory
 import io.github.jan.supabase.serializer.KotlinXSerializer
 import io.github.jan.supabase.supabaseJson
 import io.ktor.client.plugins.websocket.WebSockets
 import io.ktor.serialization.kotlinx.KotlinxWebsocketSerializationConverter
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.StateFlow
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
+import kotlin.time.times
 
 /**
  * Plugin for interacting with the supabase realtime api
@@ -58,6 +59,9 @@ interface Realtime : MainPlugin<Realtime.Config>, CustomSerializationPlugin {
      * A map of all active the subscriptions
      */
     val subscriptions: Map<String, RealtimeChannel>
+
+    @SupabaseInternal
+    val websocket: RealtimeWebsocket
 
     /**
      * Connects to the realtime websocket. The url will be taken from the custom provided [Realtime.Config.customUrl] or [SupabaseClient]
@@ -99,6 +103,13 @@ interface Realtime : MainPlugin<Realtime.Config>, CustomSerializationPlugin {
     suspend fun send(message: RealtimeMessage)
 
     /**
+     * Sends a binary payload to the realtime websocket
+     * @param data The data to send
+     */
+    @SupabaseInternal
+    suspend fun send(data: ByteArray)
+
+    /**
      * Sets the JWT access token used for channel subscription authorization and Realtime RLS.
      *
      * If [token] is null, the token will be resolved using the [Realtime.Config.accessToken] provider.
@@ -129,29 +140,41 @@ interface Realtime : MainPlugin<Realtime.Config>, CustomSerializationPlugin {
      * @property serializer A serializer used for serializing/deserializing objects e.g. in [PresenceAction.decodeJoinsAs] or [RealtimeChannel.broadcast]. Defaults to [KotlinXSerializer]
      * @property websocketFactory A custom websocket factory. If this is set, the [websocketConfig] will be ignored
      * @property rejoinDelay The interval between channel rejoin attempts
-     * @property maxAttempts The maximum amount of connection attempts before giving up. Defaults to 5
+     * @property maxAttempts The maximum number of times a channel will try to rejoin after an error before giving up. Defaults to 5
+     * @property disconnectOnEmptyChannelsAfter Delay before disconnecting from the realtime socket after the last channel was removed. If null, it defaults to `2*heartbeatInterval`
+     * @property vsn The realtime protocol version. [RealtimeProtocolVersion.V2] supports binary payloads and is more efficient.
      */
-    data class Config(
-        var websocketConfig: WebSockets.Config.() -> Unit = {},
-        var secure: Boolean? = null,
-        var heartbeatInterval: Duration = 15.seconds,
-        var reconnectDelay: Duration = 7.seconds,
-        var rejoinDelay: Duration = 2.seconds,
-        var maxAttempts: Int = 5,
-        var disconnectOnSessionLoss: Boolean = true,
-        var connectOnSubscribe: Boolean = true,
-        @property:SupabaseInternal var websocketFactory: RealtimeWebsocketFactory? = null,
-        var disconnectOnNoSubscriptions: Boolean = true,
-        override var requireValidSession: Boolean = false,
-    ): MainConfig(), CustomSerializationConfig, AuthDependentPluginConfig {
+    @Suppress("MagicNumber")
+    class Config: MainConfig(), CustomSerializationConfig, AuthDependentPluginConfig {
+
+        var websocketConfig: WebSockets.Config.() -> Unit = {}
+        var secure: Boolean? = null
+        var heartbeatInterval: Duration = 15.seconds
+        var reconnectDelay: Duration = 7.seconds
+        var rejoinDelay: Duration = 2.seconds
+        var disconnectOnEmptyChannelsAfter: Duration? = null
+        var maxAttempts: Int = 5
+        var disconnectOnSessionLoss: Boolean = true
+        var connectOnSubscribe: Boolean = true
+        @SupabaseInternal var websocketFactory: RealtimeWebsocketFactory? = null
+        var disconnectOnNoSubscriptions: Boolean = true
+        var vsn = RealtimeProtocolVersion.V2
+        override var requireValidSession: Boolean = false
+
+        internal var customAccessTokenProvider = false
+        internal var coroutineScope: CoroutineScope? = null
+
+        internal val disconnectDelay by lazy {
+            disconnectOnEmptyChannelsAfter ?: (2 * heartbeatInterval)
+        }
 
         /**
          * A custom access token provider. If this is set, the [SupabaseClient] will not be used to resolve the access token.
          */
         var accessToken: suspend SupabaseClient.() -> String? = { resolveAccessToken(realtime, keyAsFallback = false) }
             set(value) {
-                logger.w { "You are setting a custom access token provider. This can lead to unexpected behavior." }
                 field = value
+                customAccessTokenProvider = true
             }
         override var serializer: SupabaseSerializer? = null
 
@@ -161,7 +184,10 @@ interface Realtime : MainPlugin<Realtime.Config>, CustomSerializationPlugin {
 
         override val key = "realtime"
 
-        override val logger: SupabaseLogger = SupabaseClient.createLogger("Supabase-Realtime")
+        /**
+         * The tag for the Realtime logger.
+         */
+        const val LOGGING_TAG = "Supabase-Realtime"
 
         /**
          * The current realtime api version
@@ -217,13 +243,14 @@ interface Realtime : MainPlugin<Realtime.Config>, CustomSerializationPlugin {
  */
 inline fun Realtime.channel(channelId: String, builder: RealtimeChannelBuilder.() -> Unit = {}): RealtimeChannel = channel(channelId, RealtimeChannelBuilder(RealtimeTopic.withChannelId(channelId)).apply(builder))
 
-/**
- * Supabase Realtime is a way to listen to changes in the PostgreSQL database via websockets
- */
-val SupabaseClient.realtime: Realtime
-    get() = pluginManager.getPlugin(Realtime)
 
 /**
  * Creates a new [RealtimeChannel]
  */
 inline fun SupabaseClient.channel(channelId: String, builder: RealtimeChannelBuilder.() -> Unit = {}): RealtimeChannel = realtime.channel(channelId, builder)
+
+/**
+ * Supabase Realtime is a way to listen to changes in the PostgreSQL database via websockets
+ */
+val SupabaseClient.realtime: Realtime
+    get() = pluginManager.getPlugin(Realtime)

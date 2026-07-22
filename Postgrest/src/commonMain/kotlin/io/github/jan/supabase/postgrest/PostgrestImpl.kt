@@ -5,11 +5,12 @@ import io.github.jan.supabase.annotations.SupabaseInternal
 import io.github.jan.supabase.auth.api.authenticatedSupabaseApi
 import io.github.jan.supabase.bodyOrNull
 import io.github.jan.supabase.exceptions.RestException
+import io.github.jan.supabase.logging.SupabaseLogger
+import io.github.jan.supabase.logging.createLogger
 import io.github.jan.supabase.postgrest.exception.PostgrestRestException
 import io.github.jan.supabase.postgrest.executor.RestRequestExecutor
 import io.github.jan.supabase.postgrest.query.PostgrestQueryBuilder
 import io.github.jan.supabase.postgrest.query.request.RpcRequestBuilder
-import io.github.jan.supabase.postgrest.request.RpcRequest
 import io.github.jan.supabase.postgrest.result.PostgrestResult
 import io.ktor.client.plugins.timeout
 import io.ktor.client.statement.HttpResponse
@@ -17,6 +18,7 @@ import kotlinx.serialization.json.JsonObject
 
 internal class PostgrestImpl(override val supabaseClient: SupabaseClient, override val config: Postgrest.Config) : Postgrest {
 
+    override val logger: SupabaseLogger = supabaseClient.createLogger(Postgrest.LOGGING_TAG, config)
     override val apiVersion: Int
         get() = Postgrest.API_VERSION
 
@@ -48,7 +50,7 @@ internal class PostgrestImpl(override val supabaseClient: SupabaseClient, overri
     }
 
     override suspend fun parseErrorResponse(response: HttpResponse): RestException {
-        val body = response.bodyOrNull<PostgrestErrorResponse>() ?: PostgrestErrorResponse("Unknown error")
+        val body = supabaseClient.bodyOrNull<PostgrestErrorResponse>(response) ?: PostgrestErrorResponse("Unknown error")
         return PostgrestRestException(body.message, body.hint, body.details, body.code, response)
     }
 
@@ -61,22 +63,14 @@ internal class PostgrestImpl(override val supabaseClient: SupabaseClient, overri
     override suspend fun rpc(function: String, request: RpcRequestBuilder.() -> Unit): PostgrestResult = rpcRequest(function, null, request)
 
     private suspend fun rpcRequest(function: String, body: JsonObject? = null, request: RpcRequestBuilder.() -> Unit): PostgrestResult {
-        val requestBuilder = RpcRequestBuilder(config.defaultSchema, config.propertyConversionMethod).apply(request)
-        val urlParams = buildMap {
-            putAll(requestBuilder.params.mapToFirstValue())
-            if(requestBuilder.method != RpcMethod.POST && body != null) {
-                putAll(body.mapValues { it.value.toString() })
+        val requestBuilder = RpcRequestBuilder(config.defaultSchema, config.propertyConversionMethod).apply {
+            this.body = body
+            if(method != RpcMethod.POST && body != null) {
+                params.putAll(body.mapValues { listOf(it.value.toString()) })
             }
+            request()
         }
-        val rpcRequest = RpcRequest(
-            method = requestBuilder.method.httpMethod,
-            count = requestBuilder.count,
-            urlParams = urlParams,
-            body = body,
-            schema = requestBuilder.schema,
-            headers = requestBuilder.headers.build()
-        )
-        return RestRequestExecutor.execute(postgrest = this, path = "rpc/$function", request = rpcRequest)
+        return RestRequestExecutor.execute(postgrest = this, path = "rpc/$function", request = requestBuilder)
     }
 
 }

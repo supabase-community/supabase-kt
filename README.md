@@ -10,8 +10,8 @@ For information about supported Kotlin targets, see the corresponding module REA
 
 [![](https://img.shields.io/github/release/supabase-community/supabase-kt?label=stable)](https://github.com/supabase-community/supabase-kt/releases) 
 [![](https://badgen.net/github/release/supabase-community/supabase-kt?label=prerelease)](https://central.sonatype.com/search?q=io.github.jan.supabase&smo=true) 
-[![Kotlin](https://img.shields.io/badge/kotlin-2.3.20-blue.svg?logo=kotlin)](http://kotlinlang.org) 
-[![Ktor](https://img.shields.io/badge/ktor-3.4.2-blue)](https://ktor.io/)
+[![Kotlin](https://img.shields.io/badge/kotlin-2.3.21-blue.svg?logo=kotlin)](http://kotlinlang.org) 
+[![Ktor](https://img.shields.io/badge/ktor-3.4.3-blue)](https://ktor.io/)
 [![slack](https://img.shields.io/badge/slack-%23supabase--kt-purple.svg?logo=slack)](https://kotlinlang.slack.com/archives/C06QXPC7064)
 
 [![ko-fi](https://www.ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/jantennert)
@@ -180,3 +180,13 @@ Checkout the [contribution guidelines](/CONTRIBUTING.md) for more information.
 ## Sponsoring
 
 If you like the project and want to support it, consider sponsoring me on [Ko-fi](https://ko-fi.com/jantennert) or directly on [PayPal](https://www.paypal.com/donate/?hosted_button_id=SR3YJS5CZFS9L).
+
+## Star History
+
+<a href="https://www.star-history.com/?repos=supabase-community%2Fsupabase-kt&type=date&legend=top-left">
+ <picture>
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=supabase-community/supabase-kt&type=date&theme=dark&legend=top-left" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=supabase-community/supabase-kt&type=date&legend=top-left" />
+   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=supabase-community/supabase-kt&type=date&legend=top-left" />
+ </picture>
+</a>

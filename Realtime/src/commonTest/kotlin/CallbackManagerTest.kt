@@ -4,6 +4,8 @@ import io.github.jan.supabase.realtime.HasRecord
 import io.github.jan.supabase.realtime.PostgresAction
 import io.github.jan.supabase.realtime.PostgresJoinConfig
 import io.github.jan.supabase.realtime.Presence
+import io.github.jan.supabase.realtime.broadcast.BroadcastPayload
+import io.github.jan.supabase.realtime.broadcast.RealtimeBroadcast
 import io.github.jan.supabase.serializer.KotlinXSerializer
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.buildJsonObject
@@ -11,13 +13,14 @@ import kotlinx.serialization.json.put
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
+import kotlin.test.assertIs
 import kotlin.test.assertTrue
 import kotlin.time.Clock
 
 class CallbackManagerTest {
 
     @Test
-    fun testBroadcastCallbacks() {
+    fun testBroadcastCallbackJson() {
         val cm = CallbackManagerImpl()
         val expectedEvent = "event"
         val expectedPayload = buildJsonObject {
@@ -25,14 +28,15 @@ class CallbackManagerTest {
         }
         var called = false
         val id = cm.addBroadcastCallback(expectedEvent) {
-            assertEquals(expectedPayload, it)
+            assertIs<BroadcastPayload.Json>(it.payload)
+            assertEquals(expectedPayload, it.payload.value)
             called = true
         }
-        cm.triggerBroadcast(expectedEvent, expectedPayload)
+        cm.triggerBroadcast(RealtimeBroadcast("", expectedEvent, BroadcastPayload.Json(expectedPayload)))
         assertTrue { called }
         cm.removeCallbackById(id)
         called = false
-        cm.triggerBroadcast(expectedEvent, expectedPayload)
+        cm.triggerBroadcast(RealtimeBroadcast("", expectedEvent, BroadcastPayload.Json(expectedPayload)))
         assertFalse { called }
     }
 

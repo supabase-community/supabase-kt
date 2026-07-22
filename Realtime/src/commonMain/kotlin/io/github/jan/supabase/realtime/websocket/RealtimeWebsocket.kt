@@ -2,6 +2,8 @@ package io.github.jan.supabase.realtime.websocket
 
 import io.github.jan.supabase.annotations.SupabaseInternal
 import io.github.jan.supabase.realtime.RealtimeMessage
+import io.github.jan.supabase.realtime.RealtimeProtocolVersion
+import io.ktor.websocket.Frame
 
 /**
  * Interface for a websocket connection to the Supabase Realtime service.
@@ -16,14 +18,26 @@ interface RealtimeWebsocket {
     val hasIncomingMessages: Boolean
 
     /**
-     * Receive a message from the websocket.
+     * Generates a new ref for a realtime message
      */
-    suspend fun receive(): RealtimeMessage
+    fun makeRef(): String
+
+    /**
+     * Receive a frame from the websocket.
+     */
+    suspend fun receive(): Frame
 
     /**
      * Send a message to the websocket.
+     * @param message The message to send
+     * @param vsn Depending on the vsn, the message gets encoded differently
      */
-    suspend fun send(message: RealtimeMessage)
+    suspend fun send(message: RealtimeMessage, vsn: RealtimeProtocolVersion)
+
+    /**
+     * Sends a binary message to the websocket.
+     */
+    suspend fun send(data: ByteArray)
 
     /**
      * Block the current coroutine until the websocket is disconnected.

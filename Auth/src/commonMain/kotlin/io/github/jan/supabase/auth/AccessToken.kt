@@ -15,7 +15,7 @@ import kotlin.time.Clock
  * Returns the access token used for requests. The token is resolved in the following order:
  * 1. [jwtToken] if not null
  * 2. [SupabaseClient.accessToken] if not null
- * 3. [Auth.currentAccessTokenOrNull] if the Auth plugin is installed. This method also checks if the token expired and tries to force-refresh it.
+ * 3. [Auth.currentAccessTokenOrNull] if the Auth plugin is installed. This method also checks if the token expired, tries to force-refresh it and returns the refreshed token.
  * 4. [SupabaseClient.supabaseKey] if [keyAsFallback] is true
  */
 @SupabaseInternal
@@ -24,8 +24,12 @@ suspend fun SupabaseClient.resolveAccessToken(
     keyAsFallback: Boolean = true
 ): String? {
     val key = if(keyAsFallback) supabaseKey else null
+    val auth = pluginManager.getPluginOrNull(Auth)
     return jwtToken ?: accessToken?.invoke()
-    ?: pluginManager.getPluginOrNull(Auth)?.currentAccessTokenOrNull()?.also { checkAccessToken(it) } ?: key
+    ?: auth?.currentAccessTokenOrNull()?.let { token ->
+        checkAccessToken(token)
+        auth.currentAccessTokenOrNull()
+    } ?: key
 }
 
 /**
@@ -50,7 +54,7 @@ private suspend fun SupabaseClient.checkAccessToken(token: String) {
     val autoRefreshEnabled = auth.config.alwaysAutoRefresh
     if (sessionExistsAndExpired && autoRefreshEnabled) {
         val autoRefreshRunning = auth.isAutoRefreshRunning
-        Auth.logger.e {
+        auth.logger.e {
             """
                 Authenticated request attempted with expired access token. This should not happen. Please report this issue. Trying to refresh session before...
                 Auto refresh running: $autoRefreshRunning
@@ -63,7 +67,7 @@ private suspend fun SupabaseClient.checkAccessToken(token: String) {
         try {
             auth.refreshCurrentSession()
         } catch (e: Exception) {
-            Auth.logger.d(e) { "Failed to force-refresh session before making a request with an expired access token" }
+            auth.logger.d(e) { "Failed to force-refresh session before making a request with an expired access token" }
             throw TokenExpiredException()
         }
     }

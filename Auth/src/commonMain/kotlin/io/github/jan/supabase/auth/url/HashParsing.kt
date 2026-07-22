@@ -6,7 +6,7 @@ import io.github.jan.supabase.buildUrl
 import io.github.jan.supabase.logging.d
 
 internal fun Auth.validateHash(hash: String): UrlValidationResult {
-    Auth.logger.d { "Parsing fragment/hash $hash" }
+    logger.d { "Parsing fragment/hash $hash" }
     val parameters = getFragmentParts(hash)
     if(handledUrlParameterError { parameters[it] }) {
         return UrlValidationResult.ErrorFound
@@ -14,7 +14,7 @@ internal fun Auth.validateHash(hash: String): UrlValidationResult {
     val session = try {
         parseSessionFromFragment(hash)
     } catch(e: IllegalArgumentException) {
-        Auth.logger.d(e) { "Received invalid session fragment. Ignoring." }
+        logger.d(e) { "Received invalid session fragment. Ignoring." }
         return UrlValidationResult.Skipped
     }
     return UrlValidationResult.SessionFound(session)

@@ -29,9 +29,10 @@ data object Phone : DefaultAuthProvider<Phone.Config, UserInfo> {
      * @param phone The phone number of the user
      * @param password The password of the user
      * @param channel The channel to send the confirmation to
+     * @param data Extra user metadata to include on signup
      */
     @Serializable
-    data class Config(@SerialName("phone") var phone: String = "", var password: String = "", var channel: Channel = Channel.SMS): DefaultAuthProvider.Config()
+    data class Config(@SerialName("phone") var phone: String = "", var password: String = "", var channel: Channel = Channel.SMS, var data: JsonObject? = null): DefaultAuthProvider.Config()
 
     /**
      * Represents the phone number confirmation channel

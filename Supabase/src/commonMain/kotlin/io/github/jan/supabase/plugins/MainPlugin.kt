@@ -1,9 +1,12 @@
 package io.github.jan.supabase.plugins
 
 import io.github.jan.supabase.SupabaseClient
+import io.github.jan.supabase.SupabaseLoggingProcessorFactory
 import io.github.jan.supabase.annotations.SupabaseInternal
 import io.github.jan.supabase.buildUrl
 import io.github.jan.supabase.exceptions.RestException
+import io.github.jan.supabase.logging.LogLevel
+import io.github.jan.supabase.logging.SupabaseLogger
 import io.ktor.client.statement.HttpResponse
 import io.ktor.http.appendEncodedPathSegments
 
@@ -22,6 +25,10 @@ open class MainConfig {
      */
     var jwtToken: String? = null
 
+    var logLevel: LogLevel? = null
+
+    var loggingFactory: SupabaseLoggingProcessorFactory? = null
+
 }
 
 /**
@@ -38,6 +45,8 @@ interface MainPlugin <Config : MainConfig> : SupabasePlugin<Config> {
      * The unique key for this plugin
      */
     val pluginKey: String
+
+    val logger: SupabaseLogger
 
     /**
      * Gets the auth url from either [MainConfig.customUrl] or [SupabaseClient.supabaseHttpUrl] and adds [path] to it

@@ -9,6 +9,7 @@ import io.github.jan.supabase.auth.providers.builtin.Email
 import io.github.jan.supabase.exceptions.BadRequestRestException
 import io.github.jan.supabase.testing.createMockedSupabaseClient
 import io.github.jan.supabase.testing.respondJson
+import io.ktor.client.engine.mock.respondError
 import io.ktor.http.HttpStatusCode
 import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.json.add
@@ -104,6 +105,26 @@ class AuthRestExceptionTest {
                             put("message", "error_message")
                         }
                     )
+                }
+            )
+            val exception = assertFails {
+                client.auth.signUpWith(Email) {
+                    email = "example@email.com"
+                    password = "password"
+                }
+            }
+            assertIsNot<AuthRestException>(exception)
+            assertIs<BadRequestRestException>(exception)
+        }
+    }
+
+    @Test
+    fun testErrorsWithNonObjectBody() {
+        runTest {
+            client = createMockedSupabaseClient(
+                configuration = configuration,
+                requestHandler = {
+                    respondError(HttpStatusCode.BadRequest, "maintenance")
                 }
             )
             val exception = assertFails {

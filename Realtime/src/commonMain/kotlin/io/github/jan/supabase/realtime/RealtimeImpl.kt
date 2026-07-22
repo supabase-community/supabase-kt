@@ -8,15 +8,24 @@ import io.github.jan.supabase.buildUrl
 import io.github.jan.supabase.collections.AtomicMutableMap
 import io.github.jan.supabase.exceptions.RestException
 import io.github.jan.supabase.exceptions.UnknownRestException
+import io.github.jan.supabase.logging.SupabaseLogger
+import io.github.jan.supabase.logging.createLogger
 import io.github.jan.supabase.logging.d
 import io.github.jan.supabase.logging.e
 import io.github.jan.supabase.logging.i
 import io.github.jan.supabase.logging.w
+import io.github.jan.supabase.realtime.broadcast.RealtimeBroadcast
+import io.github.jan.supabase.realtime.broadcast.decodeBinaryPayload
+import io.github.jan.supabase.realtime.broadcast.decodeV2Text
 import io.github.jan.supabase.realtime.websocket.KtorRealtimeWebsocketFactory
 import io.github.jan.supabase.realtime.websocket.RealtimeWebsocket
+import io.github.jan.supabase.supabaseJson
 import io.ktor.client.statement.HttpResponse
 import io.ktor.http.URLProtocol
 import io.ktor.http.path
+import io.ktor.websocket.Frame
+import io.ktor.websocket.readBytes
+import io.ktor.websocket.readText
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
@@ -32,29 +41,34 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.serialization.json.buildJsonObject
+import kotlin.concurrent.atomics.AtomicBoolean
 import kotlin.concurrent.atomics.AtomicInt
 import kotlin.concurrent.atomics.AtomicReference
 import kotlin.concurrent.atomics.fetchAndIncrement
-import kotlin.concurrent.atomics.incrementAndFetch
 import kotlin.io.encoding.ExperimentalEncodingApi
 import kotlin.time.Clock
+import kotlin.time.Duration
 
 @PublishedApi internal class RealtimeImpl(override val supabaseClient: SupabaseClient, override val config: Realtime.Config) : Realtime {
 
+    override val logger: SupabaseLogger = supabaseClient.createLogger(Realtime.LOGGING_TAG, config)
     private val websocketFactory = config.websocketFactory ?: KtorRealtimeWebsocketFactory(supabaseClient.httpClient.httpClient)
-    private var ws: RealtimeWebsocket? = null
+    private var _websocket: RealtimeWebsocket? = null
+    override val websocket: RealtimeWebsocket
+        get() = _websocket ?: error("Websocket not yet initialized")
     @Suppress("MagicNumber")
     private val _status = MutableStateFlow(Realtime.Status.DISCONNECTED)
     override val status: StateFlow<Realtime.Status> = _status.asStateFlow()
     private val _subscriptions = AtomicMutableMap<String, RealtimeChannel>()
     override val subscriptions: Map<String, RealtimeChannel> = _subscriptions
-    private val scope = CoroutineScope(supabaseClient.coroutineDispatcher + SupervisorJob())
+    private val scope = config.coroutineScope ?: CoroutineScope(supabaseClient.coroutineDispatcher + SupervisorJob())
     private val mutex = Mutex()
+    private val isReconnecting = AtomicBoolean(false)
     private val _accessToken = AtomicReference<String?>(null)
     val accessToken get() = _accessToken.load()
     private var heartbeatJob: Job? = null
     private var messageJob: Job? = null
-    internal val ref = AtomicInt(0)
+    private var disconnectJob: Job? = null
     private val heartbeatRef = AtomicInt(0)
     override val apiVersion: Int
         get() = Realtime.API_VERSION
@@ -66,35 +80,46 @@ import kotlin.time.Clock
     private val websocketUrl = realtimeWebsocketUrl()
     private val incrementId = AtomicInt(0)
 
+    init {
+        if(config.customAccessTokenProvider) {
+            logger.w { "You are setting a custom access token provider. This can lead to unexpected behavior." }
+        }
+    }
+
     override suspend fun connect() = connect(false)
 
-    suspend fun connect(reconnect: Boolean): Unit = mutex.withLock {
+    private suspend fun connect(reconnect: Boolean): Unit = mutex.withLock {
         if (reconnect) {
             delay(config.reconnectDelay)
-            Realtime.logger.d { "Reconnecting..." }
+            logger.d { "Reconnecting..." }
         }
         if (status.value == Realtime.Status.CONNECTED) return
         _status.value = Realtime.Status.CONNECTING
         try {
-            ws = websocketFactory.create(websocketUrl)
+            _websocket = websocketFactory.create(websocketUrl)
             _status.value = Realtime.Status.CONNECTED
-            Realtime.logger.i { "Connected to realtime websocket!" }
+            logger.i { "Connected to realtime websocket!" }
             listenForMessages()
             startHeartbeating()
             if(reconnect) {
                 rejoinChannels()
+                isReconnecting.store(false)
             }
         } catch(e: Exception) {
             currentCoroutineContext().ensureActive()
-            Realtime.logger.e(e) { """
+            logger.w(e) { """
                 Error while trying to connect to realtime websocket. Trying again in ${config.reconnectDelay}
                 URL: $websocketUrl
                 """.trimIndent() }
+            if(reconnect) {
+                isReconnecting.store(false)
+            }
             reconnect()
         }
     }
 
     override fun addChannel(channel: RealtimeChannel) {
+        cancelPendingDisconnect()
         _subscriptions[channel.topic] = channel
     }
 
@@ -106,7 +131,7 @@ import kotlin.time.Clock
                         is SessionStatus.Authenticated -> setAuth(it.session.accessToken)
                         is SessionStatus.NotAuthenticated -> {
                             if(config.disconnectOnSessionLoss) {
-                                Realtime.logger.w { "No auth session found, disconnecting from realtime websocket"}
+                                logger.w { "No auth session found, disconnecting from realtime websocket"}
                                 disconnect()
                             }
                         }
@@ -128,17 +153,40 @@ import kotlin.time.Clock
     private fun listenForMessages() {
         messageJob = scope.launch {
             try {
-                ws?.let {
-                    while(ws?.hasIncomingMessages == true) {
-                        onMessage(ws?.receive() ?: return@launch)
+                _websocket?.let {
+                    while(_websocket?.hasIncomingMessages == true) {
+                        val frame = _websocket?.receive() ?: return@launch
+                        when(frame) {
+                            is Frame.Binary -> {
+                                if(config.vsn == RealtimeProtocolVersion.V1) {
+                                    logger.w { "Received binary payload, but vsn is 1.0.0; binary frames are only supported in 2.0.0" }
+                                    continue;
+                                }
+                                val broadcast = frame.readBytes().decodeBinaryPayload()
+                                onBroadcast(broadcast)
+                            }
+                            is Frame.Text -> {
+                                when(config.vsn) {
+                                    RealtimeProtocolVersion.V1 -> onMessage(supabaseJson.decodeFromString(frame.readText()))
+                                    RealtimeProtocolVersion.V2 -> onMessage(frame.readText().decodeV2Text())
+                                }
+                            }
+                            else -> Unit
+                        }
                     }
                 }
             } catch(e: Exception) {
                 currentCoroutineContext().ensureActive()
-                Realtime.logger.e(e) { "Error while listening for messages. Trying again in ${config.reconnectDelay}" }
+                logger.w(e) { "Error while listening for messages. Trying again in ${config.reconnectDelay}" }
                 reconnect()
             }
         }
+    }
+
+    private fun onBroadcast(broadcast: RealtimeBroadcast) {
+        val channel = subscriptions[broadcast.topic] as? RealtimeChannelImpl
+        logger.d { "Received ${broadcast::class}" }
+        channel?.onBroadcast(broadcast)
     }
 
     private fun startHeartbeating() {
@@ -154,13 +202,13 @@ import kotlin.time.Clock
     }
 
     override fun disconnect() {
-        Realtime.logger.d { "Closing websocket connection" }
+        logger.d { "Closing websocket connection" }
         messageJob?.cancel()
-        ws?.disconnect()
-        ws = null
+        _websocket?.disconnect()
+        _websocket = null
         heartbeatJob?.cancel()
         for ((_, channel) in subscriptions) {
-            channel.teardown()
+            channel.updateStatus(RealtimeChannel.Status.UNSUBSCRIBED)
         }
         _status.value = Realtime.Status.DISCONNECTED
     }
@@ -169,18 +217,18 @@ import kotlin.time.Clock
         val topic = RealtimeTopic.withChannelId(channelId)
         if(subscriptions.containsKey(topic)) return subscriptions[topic]!!
         val channel = builder.build(this)
-        _subscriptions[topic] = channel
+        addChannel(channel)
         return channel
     }
 
     private suspend fun onMessage(message: RealtimeMessage) {
-        Realtime.logger.d { "Received message $message" }
+        logger.d { "Received message $message" }
         val channel = subscriptions[message.topic] as? RealtimeChannelImpl
         val ref = message.ref?.toIntOrNull()
         if(ref != null && heartbeatRef.compareAndSet(ref, 0)) {
-            Realtime.logger.d { "Heartbeat received" }
+            logger.d { "Heartbeat received" }
         } else {
-            Realtime.logger.d { "Received event ${message.event} for channel ${channel?.topic}" }
+            logger.d { "Received event ${message.event} for channel ${channel?.topic}" }
             channel?.onMessage(message)
         }
     }
@@ -194,7 +242,7 @@ import kotlin.time.Clock
             val now = Clock.System.now()
             val diff = exp - now
             if(diff.isNegative()) {
-                Realtime.logger.w { "Token is expired. Not sending it to realtime." }
+                logger.w { "Token is expired. Not sending it to realtime." }
                 return
             }
         }
@@ -207,13 +255,12 @@ import kotlin.time.Clock
     private suspend fun sendHeartbeat() {
         if (heartbeatRef.load() != 0) {
             heartbeatRef.store(0)
-            ref.store(0)
-            Realtime.logger.e { "Heartbeat timeout. Trying to reconnect in ${config.reconnectDelay}" }
+            logger.w { "Heartbeat timeout. Trying to reconnect in ${config.reconnectDelay}" }
             reconnect()
             return
         }
-        Realtime.logger.d { "Sending heartbeat" }
-        heartbeatRef.store(ref.incrementAndFetch())
+        logger.d { "Sending heartbeat" }
+        heartbeatRef.store(websocket.makeRef().toInt())
         send(RealtimeMessage("phoenix", "heartbeat", buildJsonObject { }, heartbeatRef.toString()))
     }
 
@@ -223,9 +270,29 @@ import kotlin.time.Clock
         }
         _subscriptions.remove(channel.topic)
         if(subscriptions.isEmpty() && config.disconnectOnNoSubscriptions) {
-            Realtime.logger.d { "No more subscriptions, disconnecting from realtime websocket" }
+            schedulePendingDisconnect()
+        }
+    }
+
+    private fun schedulePendingDisconnect() {
+        if(config.disconnectDelay != Duration.ZERO) {
+            disconnectJob = scope.launch {
+                delay(config.disconnectDelay)
+                logger.d { "Scheduled disconnect fired. Disconnecting from realtime websocket..." }
+                disconnect()
+            }
+            logger.d { "Scheduling to disconnect from realtime websocket in ${config.disconnectDelay}..." }
+        } else {
+            logger.d { "Disconnecting immediately from realtime websocket as delay set to zero..." }
             disconnect()
         }
+    }
+
+    private fun cancelPendingDisconnect() {
+        if(disconnectJob == null) return
+        logger.d { "Pending disconnect cancelled - channel activity detected" }
+        disconnectJob?.cancel()
+        disconnectJob = null
     }
 
     override suspend fun removeAllChannels() {
@@ -236,7 +303,7 @@ import kotlin.time.Clock
         }
         _subscriptions.clear()
         if(config.disconnectOnNoSubscriptions) {
-            Realtime.logger.d { "No more subscriptions, disconnecting from realtime websocket" }
+            logger.d { "No more subscriptions, disconnecting from realtime websocket." }
             disconnect()
         }
     }
@@ -244,10 +311,13 @@ import kotlin.time.Clock
     override suspend fun close() {
         disconnect()
         scope.cancel()
+        for ((_, channel) in subscriptions) {
+            channel.teardown()
+        }
     }
 
     override suspend fun block() {
-        ws?.blockUntilDisconnect() ?: error("No connection available")
+        _websocket?.blockUntilDisconnect() ?: error("No connection available")
     }
 
     override suspend fun parseErrorResponse(response: HttpResponse): RestException {
@@ -267,7 +337,7 @@ import kotlin.time.Clock
     private fun realtimeWebsocketUrl(): String {
         return buildUrl(realtimeBaseUrl()) {
             parameters["apikey"] = supabaseClient.supabaseKey
-            parameters["vsn"] = "1.0.0"
+            parameters["vsn"] = config.vsn.value
             pathSegments += listOf("websocket")
         }
     }
@@ -282,10 +352,20 @@ import kotlin.time.Clock
 
     override suspend fun send(message: RealtimeMessage) {
         try {
-            ws?.send(message)
+            _websocket?.send(message, config.vsn)
         } catch(e: Exception) {
             currentCoroutineContext().ensureActive()
-            Realtime.logger.e(e) { "Error while sending message $message. Reconnecting in ${config.reconnectDelay}" }
+            logger.w(e) { "Error while sending message $message. Reconnecting in ${config.reconnectDelay}" }
+            reconnect()
+        }
+    }
+
+    override suspend fun send(data: ByteArray) {
+        try {
+            _websocket?.send(data)
+        } catch(e: Exception) {
+            currentCoroutineContext().ensureActive()
+            logger.e(e) { "Error while sending binary data. Reconnecting in ${config.reconnectDelay}" }
             reconnect()
         }
     }
@@ -295,14 +375,11 @@ import kotlin.time.Clock
     }
 
     private fun reconnect() {
-        scope.launch {
-            Realtime.logger.d { "Closing websocket connection" }
-            messageJob?.cancel()
-            ws?.disconnect()
-            ws = null
-            heartbeatJob?.cancel()
-            _status.value = Realtime.Status.DISCONNECTED
-            connect(true)
+        if(isReconnecting.compareAndSet(expectedValue = false, newValue = true)) {
+            scope.launch {
+                disconnect()
+                connect(true)
+            }
         }
     }
 

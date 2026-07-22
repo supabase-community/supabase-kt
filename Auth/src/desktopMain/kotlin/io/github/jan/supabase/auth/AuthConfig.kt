@@ -9,7 +9,11 @@ import kotlin.time.Duration.Companion.minutes
  */
 actual class AuthConfig : AuthConfigDefaults() {
 
-    internal var httpCallbackConfig: HttpCallbackConfig = HttpCallbackConfig()
+    /**
+     * The current http callback configuration for the web server, when logging in with OAuth or SSO.
+     */
+    var httpCallbackConfig: HttpCallbackConfig = HttpCallbackConfig()
+        internal set
 
     /**
      * Configures the http callback for the web server, when logging in with OAuth or SSO.
