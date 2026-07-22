@@ -20,6 +20,8 @@ site_url = "http://127.0.0.1:3000"
 
 [auth.oauth_server]
 enabled = true
+authorization_url_path = "/oauth/consent"
+allow_dynamic_registration = false
 
 [auth.email]
 enable_signup = true
