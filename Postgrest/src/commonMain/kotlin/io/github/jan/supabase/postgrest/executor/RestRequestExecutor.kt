@@ -1,14 +1,17 @@
 package io.github.jan.supabase.postgrest.executor
 
 import io.github.jan.supabase.exceptions.HttpRequestException
-import io.github.jan.supabase.exceptions.RestException
 import io.github.jan.supabase.postgrest.Postgrest
 import io.github.jan.supabase.postgrest.PostgrestImpl
+import io.github.jan.supabase.postgrest.exception.PostgrestRestException
+import io.github.jan.supabase.postgrest.query.AcceptHeader
 import io.github.jan.supabase.postgrest.query.PostgrestRequestBuilder
 import io.github.jan.supabase.postgrest.result.PostgrestResult
 import io.ktor.http.HttpMethod
 import kotlinx.coroutines.delay
 import kotlin.math.pow
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
 
 @PublishedApi
 internal data object RestRequestExecutor : RequestExecutor {
@@ -43,10 +46,12 @@ internal data object RestRequestExecutor : RequestExecutor {
                     }
                 }
                 return response.asPostgrestResult(postgrest)
-            } catch (e: RestException) {
+            } catch (e: PostgrestRestException) {
                 lastException = e
                 if (attempt < retryCount && e.statusCode in RETRYABLE_STATUS_CODES) {
                     delay(getRetryDelay(attempt))
+                } else if(e.code == "PGRST116" && request.acceptHeader is AcceptHeader.Single && (request.acceptHeader as AcceptHeader.Single).maybe) {
+                    return PostgrestResult("", e.response.headers, postgrest)
                 } else {
                     throw e
                 }
@@ -62,9 +67,9 @@ internal data object RestRequestExecutor : RequestExecutor {
         throw lastException!!
     }
 
-    private fun getRetryDelay(attempt: Int): Long {
+    private fun getRetryDelay(attempt: Int): Duration {
         val exponentialDelay = BASE_DELAY_MS * BACKOFF_MULTIPLIER.pow(attempt).toLong()
-        return minOf(exponentialDelay, MAX_RETRY_DELAY_MS)
+        return minOf(exponentialDelay, MAX_RETRY_DELAY_MS).milliseconds
     }
 
 }

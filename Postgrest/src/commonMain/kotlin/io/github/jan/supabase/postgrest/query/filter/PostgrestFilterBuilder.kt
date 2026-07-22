@@ -152,6 +152,11 @@ class PostgrestFilterBuilder(
     fun isIn(column: String, values: List<Any>) = filter(column, FilterOperator.IN, values)
 
     /**
+     * Finds all rows where the value of the [column] is not a member of [values]
+     */
+    fun notIn(column: String, values: List<Any>) = filterNot(column, FilterOperator.IN, values)
+
+    /**
      * Finds all rows where the value of the [column] is strictly left of [range]
      */
     fun sl(column: String, range: Pair<Any, Any>) = filter(column, FilterOperator.SL, range)
@@ -346,6 +351,11 @@ class PostgrestFilterBuilder(
      * Finds all rows where the value of the column with the name of the [KProperty1] converted using [propertyConversionMethod] is in the specified [list]
      */
     infix fun <T, V> KProperty1<T, V>.isIn(list: List<V>) = filter(FilterOperation(propertyConversionMethod(this), FilterOperator.IN, list))
+
+    /**
+     * Finds all rows where the value of the column with the name of the [KProperty1] converted using [propertyConversionMethod] is not in the specified [list]
+     */
+    infix fun <T, V> KProperty1<T, V>.notIn(list: List<V>) = filterNot(FilterOperation(propertyConversionMethod(this), FilterOperator.IN, list))
 
     /**
      * Finds all rows where the value of the column with the name of the [KProperty1] converted using [propertyConversionMethod] is strictly left of [range]

@@ -236,6 +236,14 @@ class PostgrestFilterBuilderTest {
     }
 
     @Test
+    fun notIn() {
+        val filter = filterToString {
+            notIn("id", listOf(1, 2, 3))
+        }
+        assertEquals("id=not.in.(1,2,3)", filter)
+    }
+
+    @Test
     fun exact() {
         val filter = filterToString {
             exact("id", null)
