@@ -133,6 +133,15 @@ interface RealtimeChannel {
      */
     fun presenceChangeFlow(): Flow<PresenceAction>
 
+    /**
+     * Listen for `system` events on this channel.
+     *
+     * Opt in to the replication-ready notification with [BroadcastJoinConfig.replicationReady]: `true` when creating the channel, then
+     * watch for [RealtimeSystemPayload.status] == `"ok"` to know the Postgres replication connection is ready.
+     *
+     */
+    fun systemFlow(): Flow<RealtimeSystemPayload>
+
     @SupabaseInternal
     fun RealtimeChannel.addPostgresChange(data: PostgresJoinConfig)
 

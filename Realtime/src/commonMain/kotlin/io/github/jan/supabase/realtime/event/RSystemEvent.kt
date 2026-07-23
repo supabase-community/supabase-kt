@@ -3,6 +3,9 @@ package io.github.jan.supabase.realtime.event
 import io.github.jan.supabase.logging.d
 import io.github.jan.supabase.realtime.RealtimeChannel
 import io.github.jan.supabase.realtime.RealtimeMessage
+import io.github.jan.supabase.realtime.RealtimeSystemPayload
+import io.github.jan.supabase.supabaseJson
+import kotlinx.serialization.json.decodeFromJsonElement
 import kotlinx.serialization.json.jsonPrimitive
 
 /**
@@ -13,6 +16,8 @@ data object RSystemEvent : RealtimeEvent {
     override suspend fun handle(channel: RealtimeChannel, message: RealtimeMessage) {
         channel.logger.d { "Subscribed to channel ${message.topic}" }
         channel.updateStatus(RealtimeChannel.Status.SUBSCRIBED)
+        val payload = supabaseJson.decodeFromJsonElement<RealtimeSystemPayload>(message.payload)
+        channel.callbackManager.triggerSystem(payload)
     }
 
     override fun appliesTo(message: RealtimeMessage): Boolean {

@@ -4,6 +4,7 @@ import io.github.jan.supabase.realtime.HasRecord
 import io.github.jan.supabase.realtime.PostgresAction
 import io.github.jan.supabase.realtime.PostgresJoinConfig
 import io.github.jan.supabase.realtime.Presence
+import io.github.jan.supabase.realtime.RealtimeSystemPayload
 import io.github.jan.supabase.realtime.broadcast.BroadcastPayload
 import io.github.jan.supabase.realtime.broadcast.RealtimeBroadcast
 import io.github.jan.supabase.serializer.KotlinXSerializer
@@ -37,6 +38,26 @@ class CallbackManagerTest {
         cm.removeCallbackById(id)
         called = false
         cm.triggerBroadcast(RealtimeBroadcast("", expectedEvent, BroadcastPayload.Json(expectedPayload)))
+        assertFalse { called }
+    }
+
+    @Test
+    fun testSystemCallback() {
+        val cm = CallbackManagerImpl()
+
+        var called = false
+        val id = cm.addSystemCallback {
+            assertEquals("system", it.extension)
+            assertEquals("ok", it.status)
+            assertEquals("myChannel", it.channel)
+            assertEquals("Message!", it.message)
+            called = true
+        }
+        cm.triggerSystem(RealtimeSystemPayload("system", "ok", "Message!", "myChannel"))
+        assertTrue { called }
+        cm.removeCallbackById(id)
+        called = false
+        cm.triggerSystem(RealtimeSystemPayload("system", "ok", "Message!", "myChannel"))
         assertFalse { called }
     }
 

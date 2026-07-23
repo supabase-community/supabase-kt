@@ -26,4 +26,9 @@ sealed interface RealtimeCallback <T> {
         override val id: Int
     ): RealtimeCallback<PresenceAction>
 
+    class SystemCallback(
+        override val callback: (RealtimeSystemPayload) -> Unit,
+        override val id: Int
+    ): RealtimeCallback<RealtimeSystemPayload>
+
 }
