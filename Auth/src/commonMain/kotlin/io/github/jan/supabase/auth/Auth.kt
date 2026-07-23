@@ -14,6 +14,7 @@ import io.github.jan.supabase.auth.jwt.ClaimsRequestBuilder
 import io.github.jan.supabase.auth.jwt.ClaimsResponse
 import io.github.jan.supabase.auth.mfa.MfaApi
 import io.github.jan.supabase.auth.passkey.AuthPasskeyApi
+import io.github.jan.supabase.auth.oauth.OAuthApi
 import io.github.jan.supabase.auth.providers.AuthProvider
 import io.github.jan.supabase.auth.providers.ExternalAuthConfigDefaults
 import io.github.jan.supabase.auth.providers.Google
@@ -95,6 +96,13 @@ interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
      */
     @SupabaseExperimental
     val passkeys: AuthPasskeyApi
+
+    /**
+     * Namespace for the OAuth 2.1 authorization server methods.
+     * Only relevant when the OAuth 2.1 server is enabled in Supabase Auth.
+     * Used to implement the authorization code flow on the consent page.
+     */
+    val oauth: OAuthApi
 
     /**
      * The cache for the code verifier. This is used for PKCE authentication. Can be customized via [AuthConfig.codeVerifierCache]

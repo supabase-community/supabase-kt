@@ -222,11 +222,26 @@ features:
   auth.passkey_admin.list_passkeys: not_implemented
   auth.passkey_admin.delete_passkey: not_implemented
 
-  auth.oauth_server.approve_authorization: not_implemented
-  auth.oauth_server.deny_authorization: not_implemented
-  auth.oauth_server.get_authorization_details: not_implemented
-  auth.oauth_server.list_grants: not_implemented
-  auth.oauth_server.revoke_grant: not_implemented
+  auth.oauth_server.get_authorization_details:
+    status: implemented
+    symbols:
+      - OAuthApi.getAuthorizationDetails
+  auth.oauth_server.approve_authorization:
+    status: implemented
+    symbols:
+      - OAuthApi.approveAuthorization
+  auth.oauth_server.deny_authorization:
+    status: implemented
+    symbols:
+      - OAuthApi.denyAuthorization
+  auth.oauth_server.list_grants:
+    status: implemented
+    symbols:
+      - OAuthApi.listAuthorizationGrants
+  auth.oauth_server.revoke_grant:
+    status: implemented
+    symbols:
+      - OAuthApi.revokeGrant
 
   auth.oauth_admin.create_client:
     status: implemented

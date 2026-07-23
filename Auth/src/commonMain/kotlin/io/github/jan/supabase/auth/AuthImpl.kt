@@ -32,6 +32,8 @@ import io.github.jan.supabase.auth.mfa.MfaApi
 import io.github.jan.supabase.auth.mfa.MfaApiImpl
 import io.github.jan.supabase.auth.passkey.AuthPasskeyApi
 import io.github.jan.supabase.auth.passkey.AuthPasskeyApiImpl
+import io.github.jan.supabase.auth.oauth.OAuthApi
+import io.github.jan.supabase.auth.oauth.OAuthApiImpl
 import io.github.jan.supabase.auth.providers.AuthProvider
 import io.github.jan.supabase.auth.providers.ExternalAuthConfigDefaults
 import io.github.jan.supabase.auth.providers.IDTokenProvider
@@ -128,6 +130,7 @@ internal class AuthImpl(
     override val passkeys: AuthPasskeyApi = AuthPasskeyApiImpl(userApi.resolve("passkeys")) {
         importSession(it)
     }
+    override val oauth: OAuthApi = OAuthApiImpl(userApi)
     var sessionJob: Job? = null
     var refreshInformation: SessionRefreshInformation? = null
     override val isAutoRefreshRunning: Boolean
