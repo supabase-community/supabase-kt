@@ -103,6 +103,9 @@ fun LoginScreen(viewModel: ChatViewModel) {
             keyboardActions = KeyboardActions(onDone = {
                 authenticate(signUp, viewModel, email, password)
             }),
+            onForgotPassword = {
+                showPasswordRecoveryDialog = true
+            }
         )
 
         Button(
@@ -138,12 +141,6 @@ fun LoginScreen(viewModel: ChatViewModel) {
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.BottomCenter) {
         TextButton(onClick = { signUp = !signUp }) {
             Text(if (signUp) "Already have an account? Login" else "Not registered? Register")
-        }
-    }
-
-    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.BottomEnd) {
-        TextButton(onClick = { showPasswordRecoveryDialog = true }) {
-            Text("Forgot password?")
         }
     }
 
