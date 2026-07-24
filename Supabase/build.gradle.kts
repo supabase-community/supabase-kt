@@ -36,6 +36,15 @@ val buildConfigGenerator by tasks.registering(Sync::class) {
 kotlin {
     defaultConfig()
     allTargets()
+    @OptIn(org.jetbrains.kotlin.gradle.dsl.abi.ExperimentalAbiValidation::class)
+    abiValidation {
+        enabled = true
+        filters {
+            excluded {
+                annotatedWith.add("io.github.jan.supabase.annotations.SupabaseInternal")
+            }
+        }
+    }
     sourceSets {
         commonMain {
             kotlin.srcDir(
