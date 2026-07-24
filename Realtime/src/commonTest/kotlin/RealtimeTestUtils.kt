@@ -39,18 +39,38 @@ import kotlin.time.Duration.Companion.seconds
 val FLOW_TIMEOUT = 6.seconds
 
 suspend fun Auth.importAuthTokenValid(token: String) {
-    importSession(UserSession(token, "", expiresAt = Clock.System.now() + 1.hours, expiresIn = 1.hours.inWholeSeconds, tokenType = ""))
+    importSession(
+        UserSession(
+            token,
+            "",
+            expiresAt = Clock.System.now() + 1.hours,
+            expiresIn = 1.hours.inWholeSeconds,
+            tokenType = ""
+        )
+    )
 }
 
 suspend fun handleSubscribe(
     incoming: ReceiveChannel<Frame>,
     outgoing: SendChannel<Frame>,
     channelId: String,
-    expectEnabledPresence: Boolean = false
+    handleJoinPayload: (RealtimeJoinPayload) -> Unit = {}
 ) {
     val payload = Json.decodeFromJsonElement<RealtimeJoinPayload>(incoming.receive().toMessage().payload)
-    assertEquals(expectEnabledPresence, payload.config.presence.enabled)
-    outgoing.send(RealtimeMessage(RealtimeTopic.withChannelId(channelId), CHANNEL_EVENT_SYSTEM, buildJsonObject { put("status", "ok") }, "").toFrame())
+    handleJoinPayload(payload)
+    outgoing.send(
+        RealtimeMessage(
+            RealtimeTopic.withChannelId(channelId),
+            CHANNEL_EVENT_SYSTEM,
+            buildJsonObject {
+                put("status", "ok")
+                put("extension", "system")
+                put("channel", channelId)
+                put("message", "Subscribed")
+            },
+            ""
+        ).toFrame()
+    )
 }
 
 suspend fun handleUnsubscribe(
@@ -60,7 +80,14 @@ suspend fun handleUnsubscribe(
 ) {
     val message = incoming.receive().toMessage()
     assertEquals(RealtimeTopic.withChannelId(channelId), message.topic)
-    outgoing.send(RealtimeMessage(RealtimeTopic.withChannelId(channelId), RealtimeChannel.CHANNEL_EVENT_CLOSE, buildJsonObject {  }, "").toFrame())
+    outgoing.send(
+        RealtimeMessage(
+            RealtimeTopic.withChannelId(channelId),
+            RealtimeChannel.CHANNEL_EVENT_CLOSE,
+            buildJsonObject { },
+            ""
+        ).toFrame()
+    )
 }
 
 suspend fun SendChannel<Frame>.sendBroadcast(channelId: String, event: String, message: JsonObject) {
@@ -68,23 +95,42 @@ suspend fun SendChannel<Frame>.sendBroadcast(channelId: String, event: String, m
 }
 
 suspend fun SendChannel<Frame>.sendBroadcastPayload(channelId: String, event: String, payload: BroadcastPayload) {
-    send(Frame.Binary(false, RealtimeBroadcast(RealtimeTopic.withChannelId(channelId), event, payload).encodeBroadcast(null, null,
-        false, BinaryKind.USER_BROADCAST)))
+    send(
+        Frame.Binary(
+            false, RealtimeBroadcast(RealtimeTopic.withChannelId(channelId), event, payload).encodeBroadcast(
+                null, null,
+                false, BinaryKind.USER_BROADCAST
+            )
+        )
+    )
 }
 
 internal fun RealtimeMessage.toFrame() = Frame.Text(this.encodeV2Text())
 
-internal fun Frame.toMessage(vsn: RealtimeProtocolVersion = RealtimeProtocolVersion.V2) = if(this is Frame.Text) {
-    when(vsn) {
+internal fun Frame.toMessage(vsn: RealtimeProtocolVersion = RealtimeProtocolVersion.V2) = if (this is Frame.Text) {
+    when (vsn) {
         RealtimeProtocolVersion.V1 -> supabaseJson.decodeFromString(readText())
         RealtimeProtocolVersion.V2 -> readText().decodeV2Text()
     }
 } else error("Not a text")
 
-suspend fun SendChannel<Frame>.sendPresence(channelId: String, joins: Map<String, Presence>, leaves: Map<String, Presence>) {
+suspend fun SendChannel<Frame>.sendPresence(
+    channelId: String,
+    joins: Map<String, Presence>,
+    leaves: Map<String, Presence>
+) {
     send(RealtimeMessage(RealtimeTopic.withChannelId(channelId), CHANNEL_EVENT_PRESENCE_DIFF, buildJsonObject {
         put("joins", transformPresenceMap(joins))
         put("leaves", transformPresenceMap(leaves))
+    }, "").toFrame())
+}
+
+suspend fun SendChannel<Frame>.sendSystem(channelId: String, extension: String, message: String, status: String) {
+    send(RealtimeMessage(RealtimeTopic.withChannelId(channelId), CHANNEL_EVENT_SYSTEM, buildJsonObject {
+        put("extension", extension)
+        put("message", message)
+        put("status", status)
+        put("channel", channelId)
     }, "").toFrame())
 }
 

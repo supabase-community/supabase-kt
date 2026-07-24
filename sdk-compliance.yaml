@@ -64,8 +64,7 @@ features:
     status: implemented
     symbols:
       - Auth.currentSessionOrNull
-  Auth:
-    auth.session.get_user:
+  auth.session.get_user:
     status: implemented
     symbols:
       - Auth.currentUserOrNull
@@ -175,9 +174,18 @@ features:
     status: implemented
     symbols:
       - AdminApi.signOut
-  auth.admin.generate_link: not_implemented
-  auth.admin.list_mfa_factors: not_implemented
-  auth.admin.delete_mfa_factor: not_implemented
+  auth.admin.generate_link:
+    status: implemented
+    symbols:
+      - AdminApi.generateLinkFor
+  auth.admin.list_mfa_factors:
+    status: implemented
+    symbols:
+      - AdminApi.retrieveFactors
+  auth.admin.delete_mfa_factor:
+    status: implemented
+    symbols:
+      - AdminApi.deleteFactor
   auth.admin.create_provider:
     status: implemented
     symbols:
@@ -214,11 +222,26 @@ features:
   auth.passkey_admin.list_passkeys: not_implemented
   auth.passkey_admin.delete_passkey: not_implemented
 
-  auth.oauth_server.approve_authorization: not_implemented
-  auth.oauth_server.deny_authorization: not_implemented
-  auth.oauth_server.get_authorization_details: not_implemented
-  auth.oauth_server.list_grants: not_implemented
-  auth.oauth_server.revoke_grant: not_implemented
+  auth.oauth_server.get_authorization_details:
+    status: implemented
+    symbols:
+      - OAuthApi.getAuthorizationDetails
+  auth.oauth_server.approve_authorization:
+    status: implemented
+    symbols:
+      - OAuthApi.approveAuthorization
+  auth.oauth_server.deny_authorization:
+    status: implemented
+    symbols:
+      - OAuthApi.denyAuthorization
+  auth.oauth_server.list_grants:
+    status: implemented
+    symbols:
+      - OAuthApi.listAuthorizationGrants
+  auth.oauth_server.revoke_grant:
+    status: implemented
+    symbols:
+      - OAuthApi.revokeGrant
 
   auth.oauth_admin.create_client:
     status: implemented
@@ -301,7 +324,10 @@ features:
   database.using_filters.regex: implemented
   database.using_filters.regex_icase: implemented
   database.using_filters.is_distinct: implemented
-  database.using_filters.not_in: not_implemented
+  database.using_filters.not_in:
+    status: implemented
+    symbols:
+      - PostgrestFilterBuilder.notIn
   database.using_filters.like_all: implemented
   database.using_filters.like_any: implemented
   database.using_filters.ilike_all: implemented
@@ -311,20 +337,23 @@ features:
   database.using_modifiers.limit: implemented
   database.using_modifiers.range: implemented
   database.using_modifiers.single_row: implemented
-  database.using_modifiers.maybe_single_row: not_implemented
+  database.using_modifiers.maybe_single_row:
+    status: implemented
+    symbols:
+      - PostgrestRequestBuilder.maybeSingle
   database.using_modifiers.strip_nulls: implemented
   database.using_modifiers.format_csv: implemented
   database.using_modifiers.format_geojson: implemented
-  database.using_modifiers.explain:
-    status: implemented
-    symbols:
-      - ExplainFormat
+  database.using_modifiers.explain: implemented
   database.using_modifiers.max_affected_rows: implemented
   database.using_modifiers.request_cancellation: implemented
   database.using_modifiers.relationship_embed:
     status: partially_implemented
     note: "Supported via query-string syntax in select() (e.g. 'user(*)'); no dedicated relationship builder API."
-  database.using_modifiers.dry_run: not_implemented
+  database.using_modifiers.dry_run:
+    status: implemented
+    symbols:
+      - PostgrestRequestBuilder.dryRun
 
   database.configuration.auto_retry: implemented
   database.configuration.request_timeout: implemented
@@ -368,7 +397,7 @@ features:
   realtime.subscriptions.private_channel: implemented
   realtime.subscriptions.broadcast_self: implemented
   realtime.subscriptions.broadcast_ack: implemented
-  realtime.subscriptions.broadcast_replay: not-implemented
+  realtime.subscriptions.broadcast_replay: not_implemented
 
   realtime.presence.track: implemented
   realtime.presence.untrack: implemented
