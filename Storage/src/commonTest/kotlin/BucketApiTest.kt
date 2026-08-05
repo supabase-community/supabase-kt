@@ -237,6 +237,36 @@ class BucketApiTest {
     }
 
     @Test
+    fun testPurgeCache() {
+        runTest {
+            val expectedPath = "data.png"
+            client = createMockedSupabaseClient(configuration = configureClient) {
+                assertMethodIs(HttpMethod.Delete, it.method)
+                assertPathIs("/object/cdn/$bucketId/$expectedPath", it.url.pathAfterVersion())
+                assertEquals("true", it.url.parameters["transformations"], "Transformations should be true")
+                respond("")
+            }
+            client.storage[bucketId].purgeCache(expectedPath)
+        }
+    }
+
+    @Test
+    fun testPurgeCacheWithoutTransformations() {
+        runTest {
+            val expectedPath = "data.png"
+            client = createMockedSupabaseClient(configuration = configureClient) {
+                assertMethodIs(HttpMethod.Delete, it.method)
+                assertPathIs("/object/cdn/$bucketId/$expectedPath", it.url.pathAfterVersion())
+                assertNull(it.url.parameters["transformations"], "Transformations should not be set")
+                respond("")
+            }
+            client.storage[bucketId].purgeCache(expectedPath) {
+                transformations = false
+            }
+        }
+    }
+
+    @Test
     fun testMove() {
         runTest {
             val expectedFrom = "data.png"

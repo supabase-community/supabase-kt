@@ -24,6 +24,7 @@ import kotlinx.serialization.json.jsonPrimitive
 import kotlin.test.AfterTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertNull
 import kotlin.time.Clock
 
 class StorageTest {
@@ -109,6 +110,36 @@ class StorageTest {
                 respond("")
             }
             client.storage.emptyBucket(name)
+        }
+    }
+
+    @Test
+    fun testPurgeBucketCache() {
+        runTest {
+            val name = "test-bucket"
+            client = createMockedSupabaseClient(configuration = configureClient) {
+                assertPathIs("/cdn/$name", it.url.pathAfterVersion())
+                assertMethodIs(HttpMethod.Delete, it.method)
+                assertEquals("true", it.url.parameters["transformations"], "Transformations should be true")
+                respond("")
+            }
+            client.storage.purgeBucketCache(name)
+        }
+    }
+
+    @Test
+    fun testPurgeBucketCacheWithoutTransformations() {
+        runTest {
+            val name = "test-bucket"
+            client = createMockedSupabaseClient(configuration = configureClient) {
+                assertPathIs("/cdn/$name", it.url.pathAfterVersion())
+                assertMethodIs(HttpMethod.Delete, it.method)
+                assertNull(it.url.parameters["transformations"], "Transformations should not be set")
+                respond("")
+            }
+            client.storage.purgeBucketCache(name) {
+                transformations = false
+            }
         }
     }
 

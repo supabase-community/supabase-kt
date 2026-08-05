@@ -11,6 +11,7 @@ import io.github.jan.supabase.storage.resumable.ResumableClientImpl
 import io.ktor.client.call.body
 import io.ktor.client.request.HttpRequestBuilder
 import io.ktor.client.request.header
+import io.ktor.client.request.parameter
 import io.ktor.client.request.setBody
 import io.ktor.client.request.url
 import io.ktor.client.statement.bodyAsChannel
@@ -52,6 +53,15 @@ internal class BucketApiImpl(
     override val supabaseClient = storage.supabaseClient
 
     override val resumable = ResumableClientImpl(this, resumableCache)
+
+    override suspend fun purgeCache(path: String, options: PurgeCacheOptions.() -> Unit) {
+        val options = PurgeCacheOptions().apply(options)
+        storage.api.delete("cdn/$bucketId/$path") {
+            if(options.transformations) {
+                parameter("transformations", true)
+            }
+        }
+    }
 
     override fun setHeader(name: String, value: String): BucketApi {
         headers = headers {
