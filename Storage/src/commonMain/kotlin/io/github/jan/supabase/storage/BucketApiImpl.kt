@@ -23,7 +23,6 @@ import io.ktor.http.HttpStatusCode
 import io.ktor.http.Url
 import io.ktor.http.content.OutgoingContent
 import io.ktor.http.defaultForFilePath
-import io.ktor.http.encodeURLPath
 import io.ktor.http.formUrlEncode
 import io.ktor.http.headers
 import io.ktor.utils.io.ByteReadChannel
@@ -117,7 +116,7 @@ internal class BucketApiImpl(
         )
 
     override suspend fun delete(paths: Collection<String>) {
-        api.deleteJson(bucketId.encodeURLPath(), buildJsonObject {
+        api.deleteJson(storagePath(bucketId), buildJsonObject {
             putJsonArray("prefixes") {
                 paths.forEach(this::add)
             }
