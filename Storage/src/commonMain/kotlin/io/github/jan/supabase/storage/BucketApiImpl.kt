@@ -23,6 +23,7 @@ import io.ktor.http.HttpStatusCode
 import io.ktor.http.Url
 import io.ktor.http.content.OutgoingContent
 import io.ktor.http.defaultForFilePath
+import io.ktor.http.encodeURLPath
 import io.ktor.http.formUrlEncode
 import io.ktor.http.headers
 import io.ktor.utils.io.ByteReadChannel
@@ -56,7 +57,7 @@ internal class BucketApiImpl(
 
     override suspend fun purgeCache(path: String, options: PurgeCacheOptions.() -> Unit) {
         val options = PurgeCacheOptions().apply(options)
-        storage.api.delete("cdn/$bucketId/$path") {
+        storage.api.delete("cdn/${storagePath(bucketId, path)}") {
             if(options.transformations) {
                 parameter("transformations", true)
             }
@@ -92,7 +93,7 @@ internal class BucketApiImpl(
     }
 
     override suspend fun createSignedUploadUrl(path: String, upsert: Boolean): UploadSignedUrl {
-        val result = api.post("upload/sign/$bucketId/$path") {
+        val result = api.post("upload/sign/${storagePath(bucketId, path)}") {
             header(UPSERT_HEADER, upsert.toString())
         }
         val urlPath = result.safeBody<JsonObject>()["url"]?.jsonPrimitive?.content?.substring(1)
@@ -116,7 +117,7 @@ internal class BucketApiImpl(
         )
 
     override suspend fun delete(paths: Collection<String>) {
-        api.deleteJson(bucketId, buildJsonObject {
+        api.deleteJson(bucketId.encodeURLPath(), buildJsonObject {
             putJsonArray("prefixes") {
                 paths.forEach(this::add)
             }
@@ -148,7 +149,7 @@ internal class BucketApiImpl(
     ): String {
         val modifier = SignedUrlBuilder().apply(builder)
         val transformation = modifier.transformation
-        val body = api.postJson("sign/$bucketId/$path", buildJsonObject {
+        val body = api.postJson("sign/${storagePath(bucketId, path)}", buildJsonObject {
             put("expiresIn", expiresIn.inWholeSeconds)
             transformation?.let {
                 val transform = buildJsonObject {
@@ -176,7 +177,7 @@ internal class BucketApiImpl(
         builder: SignedUrlsBuilder.() -> Unit
     ): List<SignedUrl> {
         val modifier = SignedUrlsBuilder().apply(builder)
-        val body = api.postJson("sign/$bucketId", buildJsonObject {
+        val body = api.postJson("sign/${storagePath(bucketId)}", buildJsonObject {
             putJsonArray("paths") {
                 paths.forEach(this::add)
             }
@@ -276,20 +277,20 @@ internal class BucketApiImpl(
         prefix: String,
         filter: StorageListFilter.Files.() -> Unit
     ): List<FileObject> {
-        return api.postJson("list/$bucketId", buildJsonObject {
+        return api.postJson("list/${storagePath(bucketId)}", buildJsonObject {
             put("prefix", prefix)
             putJsonObject(StorageListFilter.Files().apply(filter).buildBody())
         }).safeBody()
     }
 
     override suspend fun info(path: String): FileObjectV2 {
-        val response = api.get("info/$bucketId/$path")
+        val response = api.get("info/${storagePath(bucketId, path)}")
         return response.safeBody<FileObjectV2>().copy(serializer = storage.serializer)
     }
 
     override suspend fun exists(path: String): Boolean {
         try {
-            api.request("$bucketId/$path") {
+            api.request(storagePath(bucketId, path)) {
                 method = HttpMethod.Head
             }
             return true
@@ -299,9 +300,9 @@ internal class BucketApiImpl(
         }
     }
 
-    private fun defaultUploadUrl(path: String) = "$bucketId/$path"
+    private fun defaultUploadUrl(path: String) = storagePath(bucketId, path)
 
-    private fun uploadToSignedUrlUrl(path: String, token: String) = "upload/sign/$bucketId/$path?token=$token"
+    private fun uploadToSignedUrlUrl(path: String, token: String) = "upload/sign/${storagePath(bucketId, path)}?token=$token"
 
     internal suspend fun uploadOrUpdate(
         method: HttpMethod,
@@ -309,7 +310,7 @@ internal class BucketApiImpl(
         data: UploadData,
         options: UploadOptionBuilder.() -> Unit,
     ): FileUploadResponse {
-        val path = url.substringAfter("$bucketId/").substringBeforeLast("?")
+        val path = url.substringAfter("${storagePath(bucketId)}/").substringBeforeLast("?")
         val optionBuilder = UploadOptionBuilder(storage.serializer).apply(options)
         val response = api.request(url) {
             this.method = method
@@ -346,12 +347,12 @@ internal class BucketApiImpl(
     }
 
     override fun authenticatedUrl(path: String): String =
-        storage.resolveUrl("object/authenticated/$bucketId/$path")
+        storage.resolveUrl("object/authenticated/${storagePath(bucketId, path)}")
 
     override fun publicUrl(path: String, builder: PublicUrlBuilder.() -> Unit): String {
         val modifier = PublicUrlBuilder().apply(builder)
         return buildUrl(storage.resolveUrl(
-            if(modifier.transformation != null) "render/image/public/$bucketId/$path" else "object/public/$bucketId/$path"
+            if(modifier.transformation != null) "render/image/public/${storagePath(bucketId, path)}" else "object/public/${storagePath(bucketId, path)}"
         )) {
             modifier.transformation?.let { parameters.appendAll(it.query()) }
             modifier.cacheNonce?.let { parameters.append("cacheNonce", it) }
@@ -364,7 +365,7 @@ internal class BucketApiImpl(
         transform: ImageTransformation.() -> Unit
     ): String {
         val transformation = ImageTransformation().apply(transform).query().formUrlEncode()
-        return storage.resolveUrl("render/image/authenticated/$bucketId/$path${if (transformation.isNotBlank()) "?$transformation" else ""}")
+        return storage.resolveUrl("render/image/authenticated/${storagePath(bucketId, path)}${if (transformation.isNotBlank()) "?$transformation" else ""}")
     }
 
 }

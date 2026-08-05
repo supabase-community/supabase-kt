@@ -315,6 +315,9 @@ interface BucketApi {
      *
      * @param path The path (relative to the bucket) of the object to purge, e.g. `folder/avatar.png`.
      * @param options Optional purge cache options.
+     * @throws RestException or one of its subclasses if receiving an error response
+     * @throws HttpRequestTimeoutException if the request timed out
+     * @throws HttpRequestException on network related issues
      */
     suspend fun purgeCache(
         path: String,

@@ -425,6 +425,14 @@ features:
   storage.file_buckets.download: implemented
   storage.file_buckets.list_files: implemented
   storage.file_buckets.move: implemented
+  storage.file_buckets.purge_bucket_cache:
+    status: implemented
+    symbols:
+      - Storage.purgeBucketCache
+  storage.file_buckets.purge_cache:
+    status: implemented
+    symbols:
+      - BucketApi.purgeCache
   storage.file_buckets.copy: implemented
   storage.file_buckets.remove: implemented
   storage.file_buckets.get_public_url: implemented

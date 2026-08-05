@@ -15,6 +15,7 @@ import io.github.jan.supabase.testing.pathAfterVersion
 import io.github.jan.supabase.testing.toJsonElement
 import io.ktor.client.engine.mock.respond
 import io.ktor.http.HttpMethod
+import io.ktor.http.encodeURLPath
 import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.boolean
@@ -116,9 +117,9 @@ class StorageTest {
     @Test
     fun testPurgeBucketCache() {
         runTest {
-            val name = "test-bucket"
+            val name = "bucket name #1"
             client = createMockedSupabaseClient(configuration = configureClient) {
-                assertPathIs("/cdn/$name", it.url.pathAfterVersion())
+                assertPathIs("/cdn/${name.encodeURLPath()}", it.url.pathAfterVersion())
                 assertMethodIs(HttpMethod.Delete, it.method)
                 assertEquals("true", it.url.parameters["transformations"], "Transformations should be true")
                 respond("")
@@ -130,9 +131,9 @@ class StorageTest {
     @Test
     fun testPurgeBucketCacheWithoutTransformations() {
         runTest {
-            val name = "test-bucket"
+            val name = "bucket name #1"
             client = createMockedSupabaseClient(configuration = configureClient) {
-                assertPathIs("/cdn/$name", it.url.pathAfterVersion())
+                assertPathIs("/cdn/${name.encodeURLPath()}", it.url.pathAfterVersion())
                 assertMethodIs(HttpMethod.Delete, it.method)
                 assertNull(it.url.parameters["transformations"], "Transformations should not be set")
                 respond("")

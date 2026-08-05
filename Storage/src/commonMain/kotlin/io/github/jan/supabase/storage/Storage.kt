@@ -270,10 +270,10 @@ internal class StorageImpl(override val supabaseClient: SupabaseClient, override
         return response.safeBody()
     }
 
-    override suspend fun getBucket(bucketId: String): Bucket? = api.get("bucket/$bucketId").safeBody()
+    override suspend fun getBucket(bucketId: String): Bucket? = api.get("bucket/${storagePath(bucketId)}").safeBody()
 
     override suspend fun deleteBucket(bucketId: String) {
-        api.delete("bucket/$bucketId")
+        api.delete("bucket/${storagePath(bucketId)}")
     }
 
     override suspend fun createBucket(id: String, builder: BucketBuilder.() -> Unit) {
@@ -307,11 +307,11 @@ internal class StorageImpl(override val supabaseClient: SupabaseClient, override
                 put("file_size_limit", it.value)
             }
         }
-        api.putJson("bucket/$id", body)
+        api.putJson("bucket/${storagePath(id)}", body)
     }
 
     override suspend fun emptyBucket(bucketId: String) {
-        api.post("bucket/$bucketId/empty")
+        api.post("bucket/${storagePath(bucketId)}/empty")
     }
 
     override fun get(bucketId: String): BucketApi = BucketApiImpl(bucketId, this, api.resolve("object"), config.resumable.cache ?: createDefaultResumableCache())
@@ -334,7 +334,7 @@ internal class StorageImpl(override val supabaseClient: SupabaseClient, override
 
     override suspend fun purgeBucketCache(id: String, options: PurgeCacheOptions.() -> Unit) {
         val options = PurgeCacheOptions().apply(options)
-        api.delete("cdn/$id") {
+        api.delete("cdn/${storagePath(id)}") {
             if(options.transformations) {
                 parameter("transformations", true)
             }
