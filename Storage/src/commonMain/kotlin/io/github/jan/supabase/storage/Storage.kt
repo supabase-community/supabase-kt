@@ -7,12 +7,8 @@ import io.github.jan.supabase.annotations.SupabaseInternal
 import io.github.jan.supabase.auth.AuthDependentPluginConfig
 import io.github.jan.supabase.auth.api.authenticatedSupabaseApi
 import io.github.jan.supabase.bodyOrNull
-import io.github.jan.supabase.exceptions.BadRequestRestException
 import io.github.jan.supabase.exceptions.HttpRequestException
-import io.github.jan.supabase.exceptions.NotFoundRestException
 import io.github.jan.supabase.exceptions.RestException
-import io.github.jan.supabase.exceptions.UnauthorizedRestException
-import io.github.jan.supabase.exceptions.UnknownRestException
 import io.github.jan.supabase.logging.SupabaseLogger
 import io.github.jan.supabase.logging.createLogger
 import io.github.jan.supabase.logging.w
@@ -32,7 +28,6 @@ import io.github.jan.supabase.storage.vectors.StorageVectorsClientImpl
 import io.ktor.client.plugins.HttpRequestTimeoutException
 import io.ktor.client.plugins.timeout
 import io.ktor.client.statement.HttpResponse
-import io.ktor.http.HttpStatusCode
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.buildJsonObject
@@ -291,15 +286,16 @@ internal class StorageImpl(override val supabaseClient: SupabaseClient, override
         val error = supabaseClient.bodyOrNull<StorageErrorResponse>(response) ?: StorageErrorResponse(
             response.status.value,
             "Unknown error",
+            "",
             ""
         )
-        if (statusCode != HttpStatusCode.BadRequest) return UnknownRestException("Unknown error response $error", response)
-        when (error.statusCode) {
-            HttpStatusCode.Unauthorized.value -> throw UnauthorizedRestException(error.error, response, error.message)
-            HttpStatusCode.BadRequest.value -> throw BadRequestRestException(error.error, response, error.message)
-            HttpStatusCode.NotFound.value -> throw NotFoundRestException(error.error, response, error.message)
-            else -> throw UnknownRestException(error.message, response)
-        }
+        throw StorageRestException(
+            error.error,
+            error.message,
+            response,
+            error.statusCode,
+            error.code
+        )
     }
 
 }
