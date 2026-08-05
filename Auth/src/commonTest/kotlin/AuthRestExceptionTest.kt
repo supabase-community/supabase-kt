@@ -2,16 +2,21 @@ import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.SupabaseClientBuilder
 import io.github.jan.supabase.auth.Auth
 import io.github.jan.supabase.auth.auth
+import io.github.jan.supabase.auth.exception.AuthErrorCode
 import io.github.jan.supabase.auth.exception.AuthRestException
+import io.github.jan.supabase.auth.exception.AuthSessionMissingException
 import io.github.jan.supabase.auth.exception.AuthWeakPasswordException
 import io.github.jan.supabase.auth.minimalConfig
 import io.github.jan.supabase.auth.providers.builtin.Email
 import io.github.jan.supabase.exceptions.BadRequestRestException
+import io.github.jan.supabase.exceptions.UnauthorizedRestException
+import io.github.jan.supabase.exceptions.UnknownRestException
 import io.github.jan.supabase.testing.createMockedSupabaseClient
 import io.github.jan.supabase.testing.respondJson
 import io.ktor.client.engine.mock.respondError
 import io.ktor.http.HttpStatusCode
 import kotlinx.coroutines.test.runTest
+import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.add
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
@@ -23,6 +28,7 @@ import kotlin.test.assertFails
 import kotlin.test.assertFailsWith
 import kotlin.test.assertIs
 import kotlin.test.assertIsNot
+import kotlin.test.assertNull
 
 class AuthRestExceptionTest {
 
@@ -50,10 +56,7 @@ class AuthRestExceptionTest {
                 }
             )
             val exception = assertFailsWith<AuthRestException> {
-                client.auth.signUpWith(Email) {
-                    email = "example@email.com"
-                    password = "password"
-                }
+                client.signUp()
             }
             assertEquals("error_code", exception.error)
             assertEquals("error_message", exception.errorDescription)
@@ -82,10 +85,7 @@ class AuthRestExceptionTest {
                 }
             )
             val exception = assertFailsWith<AuthWeakPasswordException> {
-                client.auth.signUpWith(Email) {
-                    email = "example@email.com"
-                    password = "password"
-                }
+                client.signUp()
             }
             assertEquals("weak_password", exception.error)
             assertEquals("error_message", exception.errorDescription)
@@ -108,10 +108,7 @@ class AuthRestExceptionTest {
                 }
             )
             val exception = assertFails {
-                client.auth.signUpWith(Email) {
-                    email = "example@email.com"
-                    password = "password"
-                }
+                client.signUp()
             }
             assertIsNot<AuthRestException>(exception)
             assertIs<BadRequestRestException>(exception)
@@ -128,14 +125,130 @@ class AuthRestExceptionTest {
                 }
             )
             val exception = assertFails {
-                client.auth.signUpWith(Email) {
-                    email = "example@email.com"
-                    password = "password"
-                }
+                client.signUp()
             }
             assertIsNot<AuthRestException>(exception)
             assertIs<BadRequestRestException>(exception)
         }
+    }
+
+    @Test
+    fun testKnownErrorCodeIsMappedToAuthErrorCode() {
+        runTest {
+            client = clientRespondingWith(
+                code = HttpStatusCode.BadRequest,
+                body = buildJsonObject {
+                    put("error_code", "invalid_credentials")
+                    put("message", "Invalid login credentials")
+                }
+            )
+            val exception = assertFailsWith<AuthRestException> {
+                client.signUp()
+            }
+            assertEquals(AuthErrorCode.InvalidCredentials, exception.errorCode)
+            assertEquals("invalid_credentials", exception.error)
+            assertEquals("Invalid login credentials", exception.errorDescription)
+            assertEquals(HttpStatusCode.BadRequest.value, exception.statusCode)
+        }
+    }
+
+    @Test
+    fun testUnknownErrorCodeHasNoAuthErrorCode() {
+        runTest {
+            client = clientRespondingWith(
+                code = HttpStatusCode.BadRequest,
+                body = buildJsonObject {
+                    put("error_code", "not_a_known_error_code")
+                    put("message", "error_message")
+                }
+            )
+            val exception = assertFailsWith<AuthRestException> {
+                client.signUp()
+            }
+            assertNull(exception.errorCode, "Unknown error codes should not be mapped to an AuthErrorCode")
+            assertEquals("not_a_known_error_code", exception.error)
+        }
+    }
+
+    @Test
+    fun testSessionNotFoundAuthRestException() {
+        runTest {
+            client = clientRespondingWith(
+                code = HttpStatusCode.BadRequest,
+                body = buildJsonObject {
+                    put("error_code", "session_not_found")
+                    put("message", "error_message")
+                }
+            )
+            val exception = assertFailsWith<AuthSessionMissingException> {
+                client.signUp()
+            }
+            assertEquals(AuthErrorCode.SessionNotFound, exception.errorCode)
+            assertEquals("session_not_found", exception.error)
+        }
+    }
+
+    @Test
+    fun testUnauthorizedErrorWithoutErrorCode() {
+        runTest {
+            client = clientRespondingWith(
+                code = HttpStatusCode.Unauthorized,
+                body = buildJsonObject {
+                    put("message", "error_message")
+                }
+            )
+            val exception = assertFailsWith<UnauthorizedRestException> {
+                client.signUp()
+            }
+            assertEquals("Unauthorized", exception.error)
+            assertEquals("error_message", exception.description)
+        }
+    }
+
+    @Test
+    fun testUnprocessableEntityErrorWithoutErrorCode() {
+        runTest {
+            client = clientRespondingWith(
+                code = HttpStatusCode.UnprocessableEntity,
+                body = buildJsonObject {
+                    put("message", "error_message")
+                }
+            )
+            val exception = assertFailsWith<BadRequestRestException> {
+                client.signUp()
+            }
+            assertEquals("Unprocessable Entity", exception.error)
+            assertEquals("error_message", exception.description)
+        }
+    }
+
+    @Test
+    fun testOtherStatusCodesWithoutErrorCodeAreUnknown() {
+        runTest {
+            client = clientRespondingWith(
+                code = HttpStatusCode.InternalServerError,
+                body = buildJsonObject {
+                    put("message", "error_message")
+                }
+            )
+            val exception = assertFailsWith<UnknownRestException> {
+                client.signUp()
+            }
+            assertEquals("Unknown Error", exception.error)
+            assertNull(exception.description)
+        }
+    }
+
+    private fun clientRespondingWith(code: HttpStatusCode, body: JsonObject) = createMockedSupabaseClient(
+        configuration = configuration,
+        requestHandler = {
+            respondJson(code = code, data = body)
+        }
+    )
+
+    private suspend fun SupabaseClient.signUp() = auth.signUpWith(Email) {
+        email = "example@email.com"
+        password = "password"
     }
 
     @AfterTest

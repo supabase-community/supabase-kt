@@ -672,6 +672,33 @@ class PostgrestTest {
     }
 
     @Test
+    fun testParseErrorResponseMessage() {
+        supabase = createMockedSupabaseClient(
+            configuration = configureClient
+        ) {
+            respond(
+                content = """{"message": "error msg", "hint": "error hint", "details": "error details", "code": "123"}""",
+                status = HttpStatusCode.BadRequest,
+                headers = headersOf(HttpHeaders.ContentType, "application/json")
+            )
+        }
+        runTest {
+            val exception = assertFailsWith<PostgrestRestException> {
+                supabase.postgrest["table"].select()
+            }
+            assertEquals(HttpStatusCode.BadRequest.value, exception.statusCode)
+            assertEquals(
+                """
+                    Code: 123
+                    Hint: error hint
+                    Details: "error details"
+                """.trimIndent(),
+                exception.description
+            )
+        }
+    }
+
+    @Test
     fun testParseErrorResponseNullBody() {
         supabase = createMockedSupabaseClient(
             configuration = configureClient
