@@ -245,7 +245,7 @@ class BucketApiTest {
             client = createMockedSupabaseClient(configuration = configureClient) {
                 assertMethodIs(HttpMethod.Delete, it.method)
                 assertPathIs(
-                    "/object/cdn/${specialBucketId.encodeURLPath()}/${expectedPath.encodeURLPath()}",
+                    "/cdn/${specialBucketId.encodeURLPath()}/${expectedPath.encodeURLPath()}",
                     it.url.pathAfterVersion()
                 )
                 assertEquals("true", it.url.parameters["transformations"], "Transformations should be true")
@@ -263,7 +263,7 @@ class BucketApiTest {
             client = createMockedSupabaseClient(configuration = configureClient) {
                 assertMethodIs(HttpMethod.Delete, it.method)
                 assertPathIs(
-                    "/object/cdn/${specialBucketId.encodeURLPath()}/${expectedPath.encodeURLPath()}",
+                    "/cdn/${specialBucketId.encodeURLPath()}/${expectedPath.encodeURLPath()}",
                     it.url.pathAfterVersion()
                 )
                 assertNull(it.url.parameters["transformations"], "Transformations should not be set")
