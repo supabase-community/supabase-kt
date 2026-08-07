@@ -392,8 +392,25 @@ features:
   realtime.subscriptions.postgres_changes: implemented
   realtime.subscriptions.subscribe_presence: implemented
   realtime.subscriptions.postgres_changes_filter:
-    status: partially_implemented
-    note: "Doesn't have the new filters yet"
+    realtime.subscriptions.postgres_changes:
+      status: implemented
+      symbols:
+        - RealtimePostgresFilterBuilder
+        - RealtimePostgresFilterBuilder.eq
+        - RealtimePostgresFilterBuilder.neq
+        - RealtimePostgresFilterBuilder.gt
+        - RealtimePostgresFilterBuilder.gte
+        - RealtimePostgresFilterBuilder.lt
+        - RealtimePostgresFilterBuilder.lte
+        - RealtimePostgresFilterBuilder.isIn
+        - RealtimePostgresFilterBuilder.like
+        - RealtimePostgresFilterBuilder.ilike
+        - RealtimePostgresFilterBuilder.match
+        - RealtimePostgresFilterBuilder.imatch
+        - RealtimePostgresFilterBuilder.exact
+        - RealtimePostgresFilterBuilder.isDistinct
+        - RealtimePostgresFilterBuilder.not
+        - RealtimePostgresFilterBuilder.build
   realtime.subscriptions.private_channel: implemented
   realtime.subscriptions.broadcast_self: implemented
   realtime.subscriptions.broadcast_ack: implemented

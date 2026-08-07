@@ -641,6 +641,24 @@ class PostgrestFilterBuilderTest {
     }
 
     @Test
+    fun isDistinct() {
+        val filter = filterToString {
+            filter("id", FilterOperator.ISDISTINCT, 1)
+        }
+        assertEquals("id=isdistinct.1", filter)
+    }
+
+    @Test
+    fun isDistinctLogicalExpression() {
+        val filter = filterToString {
+            and {
+                filter("id", FilterOperator.ISDISTINCT, "foo,bar")
+            }
+        }
+        assertEquals("and=(id.isdistinct.\"foo,bar\")", filter)
+    }
+
+    @Test
     fun slList() {
         val filter = filterToString {
             filter("id", FilterOperator.SL, listOf(1, 2))
