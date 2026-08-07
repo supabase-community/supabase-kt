@@ -1,5 +1,8 @@
 package io.github.jan.supabase.storage
 
+/**
+ * Options for purging the cache in Supabase Storage.
+ */
 class PurgeCacheOptions {
 
     /**
