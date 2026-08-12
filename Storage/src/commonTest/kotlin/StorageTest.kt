@@ -15,6 +15,7 @@ import io.github.jan.supabase.testing.pathAfterVersion
 import io.github.jan.supabase.testing.toJsonElement
 import io.ktor.client.engine.mock.respond
 import io.ktor.http.HttpMethod
+import io.ktor.http.encodeURLPath
 import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.boolean
@@ -24,6 +25,7 @@ import kotlinx.serialization.json.jsonPrimitive
 import kotlin.test.AfterTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertNull
 import kotlin.time.Clock
 
 class StorageTest {
@@ -109,6 +111,36 @@ class StorageTest {
                 respond("")
             }
             client.storage.emptyBucket(name)
+        }
+    }
+
+    @Test
+    fun testPurgeBucketCache() {
+        runTest {
+            val name = "bucket name #1"
+            client = createMockedSupabaseClient(configuration = configureClient) {
+                assertPathIs("/cdn/${name.encodeURLPath()}", it.url.pathAfterVersion())
+                assertMethodIs(HttpMethod.Delete, it.method)
+                assertEquals("true", it.url.parameters["transformations"], "Transformations should be true")
+                respond("")
+            }
+            client.storage.purgeBucketCache(name)
+        }
+    }
+
+    @Test
+    fun testPurgeBucketCacheWithoutTransformations() {
+        runTest {
+            val name = "bucket name #1"
+            client = createMockedSupabaseClient(configuration = configureClient) {
+                assertPathIs("/cdn/${name.encodeURLPath()}", it.url.pathAfterVersion())
+                assertMethodIs(HttpMethod.Delete, it.method)
+                assertNull(it.url.parameters["transformations"], "Transformations should not be set")
+                respond("")
+            }
+            client.storage.purgeBucketCache(name) {
+                transformations = false
+            }
         }
     }
 

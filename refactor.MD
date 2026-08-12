@@ -2,6 +2,13 @@
 
 This document holds suggested refactors that can be done in the transition of migrating the library to an official one. A lot of them come from the community. Features which are unlikely are highlighted as such.
 
+## Core
+
+### Separate ID value classes
+
+Currently, all IDs (UID, bucket id, etc.) are held as a string. This makes them hard to (1) distinguish (2) ensure type safety. 
+Also, if IDs need additional transformations (like ensuring correct URL encoding), a separate class would make this cleaner then using a helper method each time.
+
 ## Auth
 
 ### Separate `auth` and `auth-native` modules. This text is copied from #1291. This approach has been favorised by the community.

@@ -23,6 +23,7 @@ import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
+import io.ktor.http.encodeURLPath
 import io.ktor.http.headersOf
 import kotlinx.coroutines.test.runTest
 import kotlinx.serialization.json.Json
@@ -233,6 +234,44 @@ class BucketApiTest {
                 respond("")
             }
             client.storage[bucketId].delete(expectedPrefixes)
+        }
+    }
+
+    @Test
+    fun testPurgeCache() {
+        runTest {
+            val specialBucketId = "bucket name #1"
+            val expectedPath = "data #1.png"
+            client = createMockedSupabaseClient(configuration = configureClient) {
+                assertMethodIs(HttpMethod.Delete, it.method)
+                assertPathIs(
+                    "/cdn/${specialBucketId.encodeURLPath()}/${expectedPath.encodeURLPath()}",
+                    it.url.pathAfterVersion()
+                )
+                assertEquals("true", it.url.parameters["transformations"], "Transformations should be true")
+                respond("")
+            }
+            client.storage[specialBucketId].purgeCache(expectedPath)
+        }
+    }
+
+    @Test
+    fun testPurgeCacheWithoutTransformations() {
+        runTest {
+            val specialBucketId = "bucket name #1"
+            val expectedPath = "data #1.png"
+            client = createMockedSupabaseClient(configuration = configureClient) {
+                assertMethodIs(HttpMethod.Delete, it.method)
+                assertPathIs(
+                    "/cdn/${specialBucketId.encodeURLPath()}/${expectedPath.encodeURLPath()}",
+                    it.url.pathAfterVersion()
+                )
+                assertNull(it.url.parameters["transformations"], "Transformations should not be set")
+                respond("")
+            }
+            client.storage[specialBucketId].purgeCache(expectedPath) {
+                transformations = false
+            }
         }
     }
 
