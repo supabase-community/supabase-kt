@@ -1,8 +1,11 @@
 package io.github.jan.supabase.storage.analytics
 
 import io.github.jan.supabase.auth.api.AuthenticatedSupabaseApi
+import io.github.jan.supabase.exceptions.HttpRequestException
 import io.github.jan.supabase.safeBody
 import io.github.jan.supabase.storage.StorageListFilter
+import io.github.jan.supabase.storage.StorageRestException
+import io.ktor.client.plugins.HttpRequestTimeoutException
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.contentOrNull
@@ -21,6 +24,9 @@ interface StorageAnalyticsClient {
      * **Public alpha:** This API is part of a public alpha release and may not be available to your account type.
      *
      * @param name A unique name for the bucket you are creating
+     * @throws StorageRestException containing an error code, if receiving an error response
+     * @throws HttpRequestTimeoutException if the request timed out
+     * @throws HttpRequestException on network related issues
      */
     suspend fun createBucket(name: String): AnalyticBucket
 
@@ -31,6 +37,9 @@ interface StorageAnalyticsClient {
      * **Public alpha:** This API is part of a public alpha release and may not be available to your account type.
      *
      * @param filter Query parameters for listing buckets
+     * @throws StorageRestException containing an error code, if receiving an error response
+     * @throws HttpRequestTimeoutException if the request timed out
+     * @throws HttpRequestException on network related issues
      */
     suspend fun listBuckets(filter: StorageListFilter.Buckets.() -> Unit = {}): List<AnalyticBucket>
 
@@ -42,6 +51,9 @@ interface StorageAnalyticsClient {
      * **Public alpha:** This API is part of a public alpha release and may not be available to your account type.
      *
      * @param name The unique identifier of the bucket you would like to delete
+     * @throws StorageRestException containing an error code, if receiving an error response
+     * @throws HttpRequestTimeoutException if the request timed out
+     * @throws HttpRequestException on network related issues
      */
     suspend fun deleteBucket(name: String): String
 

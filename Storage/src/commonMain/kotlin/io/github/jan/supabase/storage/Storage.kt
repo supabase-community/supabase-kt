@@ -86,49 +86,46 @@ interface Storage : MainPlugin<Storage.Config>, CustomSerializationPlugin {
      * @param id the id of the bucket
      * @param builder overrides bucket config options (like whether the bucket should be public,
      * file size limit, etc.)
-     * @throws RestException or one of its subclasses if receiving an error response
+     * @throws StorageRestException containing an error code, if receiving an error response
      * @throws HttpRequestTimeoutException if the request timed out
-     * @throws HttpRequestException on network related issues
-     */
+     * @throws HttpRequestException on network related issues     */
     suspend fun createBucket(id: String, builder: BucketBuilder.() -> Unit = {})
 
     /**
      * Updates a bucket in the storage
      * @param id the id of the bucket
      * @param builder the builder for the bucket
-     */
+     * @throws StorageRestException containing an error code, if receiving an error response
+     * @throws HttpRequestTimeoutException if the request timed out
+     * @throws HttpRequestException on network related issues     */
     suspend fun updateBucket(id: String, builder: BucketBuilder.() -> Unit = {})
 
     /**
      * Returns all buckets in the storage
-     * @throws RestException or one of its subclasses if receiving an error response
+     * @throws StorageRestException containing an error code, if receiving an error response
      * @throws HttpRequestTimeoutException if the request timed out
-     * @throws HttpRequestException on network related issues
-     */
+     * @throws HttpRequestException on network related issues     */
     suspend fun listBuckets(filter: StorageListFilter.Buckets.() -> Unit = {}): List<Bucket>
 
     /**
      * Retrieves a bucket by its [bucketId]
-     * @throws RestException or one of its subclasses if receiving an error response
+     * @throws StorageRestException containing an error code, if receiving an error response
      * @throws HttpRequestTimeoutException if the request timed out
-     * @throws HttpRequestException on network related issues
-     */
+     * @throws HttpRequestException on network related issues     */
     suspend fun getBucket(bucketId: String): Bucket?
 
     /**
      * Empties a bucket by its [bucketId]
-     * @throws RestException or one of its subclasses if receiving an error response
+     * @throws StorageRestException containing an error code, if receiving an error response
      * @throws HttpRequestTimeoutException if the request timed out
-     * @throws HttpRequestException on network related issues
-     */
+     * @throws HttpRequestException on network related issues     */
     suspend fun emptyBucket(bucketId: String)
 
     /**
      * Deletes a bucket by its [bucketId]
-     * @throws RestException or one of its subclasses if receiving an error response
+     * @throws StorageRestException containing an error code, if receiving an error response
      * @throws HttpRequestTimeoutException if the request timed out
-     * @throws HttpRequestException on network related issues
-     */
+     * @throws HttpRequestException on network related issues     */
     suspend fun deleteBucket(bucketId: String)
 
     /**
