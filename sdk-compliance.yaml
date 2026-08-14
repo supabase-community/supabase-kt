@@ -411,6 +411,10 @@ features:
         - RealtimePostgresFilterBuilder.isDistinct
         - RealtimePostgresFilterBuilder.not
         - RealtimePostgresFilterBuilder.build
+  realtime.subscriptions.postgres_changes_multiple_filters:
+    status: implemented
+    symbols:
+      - RealtimePostgresFilterBuilder
   realtime.subscriptions.private_channel: implemented
   realtime.subscriptions.broadcast_self: implemented
   realtime.subscriptions.broadcast_ack: implemented
