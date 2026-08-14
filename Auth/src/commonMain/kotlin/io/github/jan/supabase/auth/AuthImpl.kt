@@ -628,7 +628,7 @@ internal class AuthImpl(
                 logger.e(e) { "Couldn't refresh session. The refresh token may have been revoked. Clearing session (Status code ${e.statusCode})... " }
                 clearSession()
             }
-        } catch (e: Exception) {
+        } catch (e: Throwable) {
             currentCoroutineContext().ensureActive()
             logger.d(e) { "Couldn't reach Supabase. Either the address doesn't exist or the network might not be on. Retrying in ${config.retryDelay}..." }
             updateStatus(RefreshFailureCause.NetworkError(e))
@@ -705,7 +705,7 @@ internal class AuthImpl(
         } catch (e: NoSessionFoundException) {
             logger.d { e.message ?: "No session found in storage" }
             null
-        } catch (e: Exception) {
+        } catch (e: Throwable) {
             currentCoroutineContext().ensureActive()
             logger.e(e) { "Failed to load session" }
             null
