@@ -297,6 +297,34 @@ interface BucketApi {
     suspend fun changePublicStatusTo(public: Boolean)
 
     /**
+     * Purges the CDN cache for a single object in this bucket.
+     *
+     * Maps to `DELETE /cdn/{bucket}/{path}` on the Storage API. The server
+     * issues a CDN invalidation for the object and returns `{ message: 'success' }`.
+     *
+     * **Requires the `service_role` key.** The underlying endpoint enforces
+     * `service_role` JWT — calls made with the anon key or a user JWT will be
+     * rejected by the server.
+     *
+     * **Hosted CDN feature.** On self-hosted Supabase, the Storage service must
+     * have `CDN_PURGE_ENDPOINT_URL` configured and the `purgeCache` tenant
+     * feature enabled, otherwise the server returns an error.
+     *
+     * Operates on a single object path. There is no wildcard or recursion: pass
+     * the exact path of the object you want invalidated.
+     *
+     * @param path The path (relative to the bucket) of the object to purge, e.g. `folder/avatar.png`.
+     * @param options Optional purge cache options.
+     * @throws RestException or one of its subclasses if receiving an error response
+     * @throws HttpRequestTimeoutException if the request timed out
+     * @throws HttpRequestException on network related issues
+     */
+    suspend fun purgeCache(
+        path: String,
+        options: PurgeCacheOptions.() -> Unit = {}
+    )
+
+    /**
      * Returns the public url of [path]
      * @throws RestException or one of its subclasses if receiving an error response
      * @throws HttpRequestTimeoutException if the request timed out

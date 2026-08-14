@@ -30,10 +30,10 @@ import io.github.jan.supabase.auth.jwt.ecdsaRawToDer
 import io.github.jan.supabase.auth.jwt.rsaJwkToDer
 import io.github.jan.supabase.auth.mfa.MfaApi
 import io.github.jan.supabase.auth.mfa.MfaApiImpl
-import io.github.jan.supabase.auth.passkey.AuthPasskeyApi
-import io.github.jan.supabase.auth.passkey.AuthPasskeyApiImpl
 import io.github.jan.supabase.auth.oauth.OAuthApi
 import io.github.jan.supabase.auth.oauth.OAuthApiImpl
+import io.github.jan.supabase.auth.passkey.AuthPasskeyApi
+import io.github.jan.supabase.auth.passkey.AuthPasskeyApiImpl
 import io.github.jan.supabase.auth.providers.AuthProvider
 import io.github.jan.supabase.auth.providers.ExternalAuthConfigDefaults
 import io.github.jan.supabase.auth.providers.IDTokenProvider
@@ -722,7 +722,7 @@ internal class AuthImpl(
 
     override suspend fun parseErrorResponse(response: HttpResponse): RestException {
         val errorBody =
-            supabaseClient.bodyOrNull<GoTrueErrorResponse>(response) ?: GoTrueErrorResponse("Unknown error", "")
+            supabaseClient.bodyOrNull<GoTrueErrorResponse>(response) ?: GoTrueErrorResponse("Unknown error", response.status.description)
         checkErrorCodes(errorBody, response)?.let { return it }
         return when (response.status) {
             HttpStatusCode.Unauthorized -> UnauthorizedRestException(

@@ -5,6 +5,7 @@ import io.github.jan.supabase.SupabaseSerializer
 import io.github.jan.supabase.annotations.SupabaseExperimental
 import io.github.jan.supabase.annotations.SupabaseInternal
 import io.github.jan.supabase.auth.AuthDependentPluginConfig
+import io.github.jan.supabase.auth.api.AuthenticatedSupabaseApi
 import io.github.jan.supabase.auth.api.authenticatedSupabaseApi
 import io.github.jan.supabase.bodyOrNull
 import io.github.jan.supabase.exceptions.HttpRequestException
@@ -27,6 +28,7 @@ import io.github.jan.supabase.storage.vectors.StorageVectorsClient
 import io.github.jan.supabase.storage.vectors.StorageVectorsClientImpl
 import io.ktor.client.plugins.HttpRequestTimeoutException
 import io.ktor.client.plugins.timeout
+import io.ktor.client.request.parameter
 import io.ktor.client.statement.HttpResponse
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonPrimitive
@@ -72,6 +74,12 @@ interface Storage : MainPlugin<Storage.Config>, CustomSerializationPlugin {
      */
     @SupabaseExperimental
     val vectors: StorageVectorsClient
+
+    /**
+     * The API used for network requests.
+     */
+    @SupabaseInternal
+    val api: AuthenticatedSupabaseApi
 
     /**
      * Creates a new bucket in the storage
@@ -132,6 +140,28 @@ interface Storage : MainPlugin<Storage.Config>, CustomSerializationPlugin {
      * Builder function for interacting with a bucket with the given [bucketId]
      */
     fun from(bucketId: String): BucketApi = get(bucketId)
+
+    /**
+     * Purges the CDN cache for an entire bucket.
+     *
+     * Maps to `DELETE /cdn/{bucket}` on the Storage API. The server
+     * issues a CDN invalidation for the bucket.
+     *
+     * **Requires the `service_role` key.** The underlying endpoint enforces
+     * `service_role` JWT — calls made with the anon key or a user JWT will be
+     * rejected by the server.
+     *
+     * **Hosted CDN feature.** On self-hosted Supabase, the Storage service must
+     * have `CDN_PURGE_ENDPOINT_URL` configured and the `purgeCache` tenant
+     * feature enabled, otherwise the server returns an error.
+     *
+     * @param id The unique identifier of the bucket you would like to purge from cache.
+     * @param options Optional purge cache options.
+     */
+    suspend fun purgeBucketCache(
+        id: String,
+        options: PurgeCacheOptions.() -> Unit = {}
+    )
 
     /**
      * Config for the storage plugin
@@ -213,7 +243,7 @@ internal class StorageImpl(override val supabaseClient: SupabaseClient, override
     override val logger: SupabaseLogger = supabaseClient.createLogger(Storage.LOGGING_TAG, config)
 
     @OptIn(SupabaseInternal::class)
-    internal val api = supabaseClient.authenticatedSupabaseApi(this, defaultRequest = {
+    override val api = supabaseClient.authenticatedSupabaseApi(this, defaultRequest = {
         timeout {
             requestTimeoutMillis = config.transferTimeout.inWholeMilliseconds
         }
@@ -235,10 +265,10 @@ internal class StorageImpl(override val supabaseClient: SupabaseClient, override
         return response.safeBody()
     }
 
-    override suspend fun getBucket(bucketId: String): Bucket? = api.get("bucket/$bucketId").safeBody()
+    override suspend fun getBucket(bucketId: String): Bucket? = api.get("bucket/${storagePath(bucketId)}").safeBody()
 
     override suspend fun deleteBucket(bucketId: String) {
-        api.delete("bucket/$bucketId")
+        api.delete("bucket/${storagePath(bucketId)}")
     }
 
     override suspend fun createBucket(id: String, builder: BucketBuilder.() -> Unit) {
@@ -272,11 +302,11 @@ internal class StorageImpl(override val supabaseClient: SupabaseClient, override
                 put("file_size_limit", it.value)
             }
         }
-        api.putJson("bucket/$id", body)
+        api.putJson("bucket/${storagePath(id)}", body)
     }
 
     override suspend fun emptyBucket(bucketId: String) {
-        api.post("bucket/$bucketId/empty")
+        api.post("bucket/${storagePath(bucketId)}/empty")
     }
 
     override fun get(bucketId: String): BucketApi = BucketApiImpl(bucketId, this, api.resolve("object"), config.resumable.cache ?: createDefaultResumableCache())
@@ -296,6 +326,15 @@ internal class StorageImpl(override val supabaseClient: SupabaseClient, override
             error.statusCode,
             error.code
         )
+    }
+
+    override suspend fun purgeBucketCache(id: String, options: PurgeCacheOptions.() -> Unit) {
+        val options = PurgeCacheOptions().apply(options)
+        api.delete("cdn/${storagePath(id)}") {
+            if(options.transformations) {
+                parameter("transformations", true)
+            }
+        }
     }
 
 }
