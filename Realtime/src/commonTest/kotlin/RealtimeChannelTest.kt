@@ -12,7 +12,6 @@ import io.github.jan.supabase.realtime.PostgresJoinConfig
 import io.github.jan.supabase.realtime.Presence
 import io.github.jan.supabase.realtime.Realtime
 import io.github.jan.supabase.realtime.RealtimeChannel
-import io.github.jan.supabase.realtime.RealtimeChannel.Companion.CHANNEL_EVENT_REPLY
 import io.github.jan.supabase.realtime.RealtimeChannel.Companion.CHANNEL_EVENT_SYSTEM
 import io.github.jan.supabase.realtime.RealtimeJoinPayload
 import io.github.jan.supabase.realtime.RealtimeMessage
@@ -21,7 +20,6 @@ import io.github.jan.supabase.realtime.currentPresences
 import io.github.jan.supabase.realtime.postgresChangeFlow
 import io.github.jan.supabase.realtime.realtime
 import io.ktor.util.encodeBase64
-import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.launchIn
@@ -90,15 +88,12 @@ class RealtimeChannelTest {
     @Test
     fun testChannelStatusWithoutPostgres() {
         val channelId = "channelId"
-        val allowUnsubscribeReply = Channel<Unit>(1)
         runTest {
             createTestClient(
                 wsHandler = { i, o ->
                     i.receive().toMessage()
                     o.send(RealtimeMessage("realtime:$channelId", CHANNEL_EVENT_SYSTEM, buildJsonObject { put("status", "ok") }, "").toFrame())
-                    i.receive().toMessage()
-                    allowUnsubscribeReply.receive()
-                    o.send(RealtimeMessage("realtime:$channelId", CHANNEL_EVENT_REPLY, buildJsonObject { put("status", "ok") }, "").toFrame())
+                    handleUnsubscribe(i, o, channelId)
                 },
                 supabaseHandler = {
                     val channel = it.channel("channelId")
@@ -108,7 +103,6 @@ class RealtimeChannelTest {
                     assertEquals(channel.status.value, RealtimeChannel.Status.SUBSCRIBED)
                     channel.unsubscribe()
                     assertEquals(channel.status.value, RealtimeChannel.Status.UNSUBSCRIBING)
-                    allowUnsubscribeReply.send(Unit)
                     assertEquals(RealtimeChannel.Status.UNSUBSCRIBED, channel.status.waitForValue(RealtimeChannel.Status.UNSUBSCRIBED))
                 },
             )
