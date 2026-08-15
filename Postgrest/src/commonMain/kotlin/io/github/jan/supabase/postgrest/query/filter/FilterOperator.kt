@@ -33,4 +33,5 @@ enum class FilterOperator(val identifier: String) {
     PLFTS("plfts"),
     PHFTS("phfts"),
     WFTS("wfts"),
+    ISDISTINCT("isdistinct");
 }

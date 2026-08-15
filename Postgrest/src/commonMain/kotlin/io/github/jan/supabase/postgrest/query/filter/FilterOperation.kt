@@ -27,6 +27,7 @@ fun FilterOperation.escapedValue(isInLogicalExpression: Boolean): String =
         FilterOperator.FTS,
         FilterOperator.WFTS,
         FilterOperator.PHFTS,
+        FilterOperator.ISDISTINCT,
         FilterOperator.PLFTS ->
             if (isInLogicalExpression)
                 escapeValue(value)
