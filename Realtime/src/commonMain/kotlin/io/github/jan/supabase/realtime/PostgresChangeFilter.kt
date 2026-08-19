@@ -4,6 +4,7 @@ import io.github.jan.supabase.annotations.SupabaseInternal
 import io.github.jan.supabase.postgrest.query.filter.FilterOperation
 import io.github.jan.supabase.postgrest.query.filter.FilterOperator
 import io.github.jan.supabase.postgrest.query.filter.escapedValue
+import io.github.jan.supabase.realtime.postgres.RealtimePostgresFilterBuilder
 
 /**
  * Used to filter postgres changes
@@ -49,6 +50,25 @@ class PostgresChangeFilter(private val event: String, private val schema: String
      */
     fun filter(column: String, operator: FilterOperator, value: Any) {
         filter(FilterOperation(column, operator, value))
+    }
+
+    /**
+     * Fluent builder for Postgres Changes `filter` strings.
+     *
+     * Each method appends a single `column=operator.value` condition. Multiple
+     * conditions are combined with commas, which the Realtime server applies as an
+     * `AND`.
+     *
+     * The builder mirrors the `postgrest-kt` filter API (`eq`, `neq`, `in`, `like`,
+     * `not`, …) for the operators that Realtime supports. Values containing reserved
+     * characters (`,`, `(`, `)`, `"`, `\`) — or surrounding whitespace — are
+     * automatically double-quoted and escaped the same way PostgREST does, so they
+     * survive the server's filter parser; all other values are sent verbatim.
+     *
+     */
+    fun filter(builder: RealtimePostgresFilterBuilder.() -> Unit) {
+        val builder = RealtimePostgresFilterBuilder().apply(builder)
+        filter = builder.build()
     }
 
     @SupabaseInternal

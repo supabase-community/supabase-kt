@@ -46,6 +46,7 @@ class RealtimeTest {
                 },
                 realtimeConfig = {
                     disconnectOnEmptyChannelsAfter = Duration.ZERO
+                    disconnectOnNoSubscriptions = true
                 },
                 supabaseHandler = {
                     assertEquals(Realtime.Status.DISCONNECTED, it.realtime.status.value)
@@ -68,6 +69,7 @@ class RealtimeTest {
                 },
                 realtimeConfig = {
                     disconnectOnEmptyChannelsAfter = Duration.ZERO
+                    disconnectOnNoSubscriptions = true
                 },
                 supabaseHandler = {
                     assertEquals(Realtime.Status.DISCONNECTED, it.realtime.status.value)
@@ -92,6 +94,7 @@ class RealtimeTest {
                 realtimeConfig = {
                     coroutineScope = backgroundScope
                     disconnectOnEmptyChannelsAfter = 15.seconds
+                    disconnectOnNoSubscriptions = true
                 },
                 supabaseHandler = {
                     assertEquals(Realtime.Status.DISCONNECTED, it.realtime.status.value)
@@ -119,6 +122,7 @@ class RealtimeTest {
                 realtimeConfig = {
                     coroutineScope = backgroundScope
                     disconnectOnEmptyChannelsAfter = 2.seconds
+                    disconnectOnNoSubscriptions = true
                 },
                 supabaseHandler = {
                     assertEquals(Realtime.Status.DISCONNECTED, it.realtime.status.value)
@@ -164,6 +168,7 @@ class RealtimeTest {
                 realtimeConfig = {
                     coroutineScope = backgroundScope
                     disconnectOnEmptyChannelsAfter = 15.seconds
+                    disconnectOnNoSubscriptions = true
                 },
                 supabaseHandler = {
                     assertEquals(Realtime.Status.DISCONNECTED, it.realtime.status.value)
@@ -191,6 +196,7 @@ class RealtimeTest {
                 },
                 realtimeConfig = {
                     disconnectOnEmptyChannelsAfter = 200.seconds
+                    disconnectOnNoSubscriptions = true
                 },
                 supabaseHandler = {
                     assertEquals(Realtime.Status.DISCONNECTED, it.realtime.status.value)
