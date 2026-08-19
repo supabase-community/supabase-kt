@@ -154,7 +154,6 @@ interface Realtime : MainPlugin<Realtime.Config>, CustomSerializationPlugin {
         var rejoinDelay: Duration = 2.seconds
         var disconnectOnEmptyChannelsAfter: Duration? = null
         var maxAttempts: Int = 5
-        @Deprecated("Use requireValidSession instead")
         var disconnectOnSessionLoss: Boolean = true
         var connectOnSubscribe: Boolean = true
         @SupabaseInternal var websocketFactory: RealtimeWebsocketFactory? = null
