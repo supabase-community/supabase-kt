@@ -21,7 +21,6 @@ class PostgresChangeFilter(private val event: String, private val schema: String
      * E.g.: "user_id=eq.1"
      */
     var filter: String? = null
-        private set
 
     /**
      * Filters the received changes in your table.
@@ -66,8 +65,26 @@ class PostgresChangeFilter(private val event: String, private val schema: String
      * survive the server's filter parser; all other values are sent verbatim.
      *
      */
-    fun filter(builder: RealtimePostgresFilterBuilder.() -> Unit) {
+    inline fun filter(builder: RealtimePostgresFilterBuilder.() -> Unit) {
         val builder = RealtimePostgresFilterBuilder().apply(builder)
+        filter = builder.build()
+    }
+
+    /**
+     * Fluent builder for Postgres Changes `filter` strings.
+     *
+     * Each method appends a single `column=operator.value` condition. Multiple
+     * conditions are combined with commas, which the Realtime server applies as an
+     * `AND`.
+     *
+     * The builder mirrors the `postgrest-kt` filter API (`eq`, `neq`, `in`, `like`,
+     * `not`, …) for the operators that Realtime supports. Values containing reserved
+     * characters (`,`, `(`, `)`, `"`, `\`) — or surrounding whitespace — are
+     * automatically double-quoted and escaped the same way PostgREST does, so they
+     * survive the server's filter parser; all other values are sent verbatim.
+     *
+     */
+    fun filter(builder: RealtimePostgresFilterBuilder) {
         filter = builder.build()
     }
 

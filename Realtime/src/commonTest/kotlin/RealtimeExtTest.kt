@@ -1,7 +1,5 @@
 import app.cash.turbine.test
 import io.github.jan.supabase.postgrest.Postgrest
-import io.github.jan.supabase.postgrest.query.filter.FilterOperation
-import io.github.jan.supabase.postgrest.query.filter.FilterOperator
 import io.github.jan.supabase.realtime.CallbackManager
 import io.github.jan.supabase.realtime.PostgresAction
 import io.github.jan.supabase.realtime.PostgresJoinConfig
@@ -69,10 +67,11 @@ class RealtimeExtTest {
     @Test
     fun testPostgresListDataFlow() { //Maybe there is a better way to test this
         runTest {
-            val filter = FilterOperation("id", FilterOperator.EQ, "0")
             createTestClient(
                 wsHandler = { i, o ->
-                    handleSubscribe(i, o, "channelId")
+                    handleSubscribe(i, o, "channelId") {
+                        assertEquals("id=eq.0,age=lt.58", it.config.postgresChanges.first().filter)
+                    }
                 },
                 supabaseHandler = {
                     val channel = it.channel("channelId")
@@ -81,7 +80,7 @@ class RealtimeExtTest {
                             PostgresJoinConfig(
                                 "public",
                                 "table",
-                                "id=eq.0",
+                                "id=eq.0,age=lt.58",
                                 "*",
                                 0
                             )
@@ -90,9 +89,11 @@ class RealtimeExtTest {
                     val dataFlow = channel.postgresListDataFlow(
                         "public",
                         "table",
-                        filter = filter,
                         primaryKey = DummyData::key
-                    )
+                    ) {
+                        eq("id", 0)
+                        lt("age", 58)
+                    }
                     dataFlow.test(FLOW_TIMEOUT) {
                         assertContentEquals(listOf(DummyData(0, "first")), awaitItem()) //1. Initial data
                         channel.subscribe(true)
@@ -108,8 +109,8 @@ class RealtimeExtTest {
                 },
                 mockEngineHandler = {
                     assertEquals("/table", it.url.pathAfterVersion())
-                    val urlFilter = it.url.parameters["id"]
-                    assertEquals("eq.0", urlFilter)
+                    val andFilter = it.url.parameters["and"]
+                    assertEquals("(id.eq.0,age.lt.58)", andFilter)
                     respond(Json.encodeToJsonElement(listOf(DummyData(0, "first"))).toString()) //1.
                 },
                 supabaseConfig = {
