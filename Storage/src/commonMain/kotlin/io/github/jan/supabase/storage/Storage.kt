@@ -8,12 +8,8 @@ import io.github.jan.supabase.auth.AuthDependentPluginConfig
 import io.github.jan.supabase.auth.api.AuthenticatedSupabaseApi
 import io.github.jan.supabase.auth.api.authenticatedSupabaseApi
 import io.github.jan.supabase.bodyOrNull
-import io.github.jan.supabase.exceptions.BadRequestRestException
 import io.github.jan.supabase.exceptions.HttpRequestException
-import io.github.jan.supabase.exceptions.NotFoundRestException
 import io.github.jan.supabase.exceptions.RestException
-import io.github.jan.supabase.exceptions.UnauthorizedRestException
-import io.github.jan.supabase.exceptions.UnknownRestException
 import io.github.jan.supabase.logging.SupabaseLogger
 import io.github.jan.supabase.logging.createLogger
 import io.github.jan.supabase.logging.w
@@ -34,7 +30,6 @@ import io.ktor.client.plugins.HttpRequestTimeoutException
 import io.ktor.client.plugins.timeout
 import io.ktor.client.request.parameter
 import io.ktor.client.statement.HttpResponse
-import io.ktor.http.HttpStatusCode
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.buildJsonObject
@@ -91,49 +86,46 @@ interface Storage : MainPlugin<Storage.Config>, CustomSerializationPlugin {
      * @param id the id of the bucket
      * @param builder overrides bucket config options (like whether the bucket should be public,
      * file size limit, etc.)
-     * @throws RestException or one of its subclasses if receiving an error response
+     * @throws StorageRestException containing an error code, if receiving an error response
      * @throws HttpRequestTimeoutException if the request timed out
-     * @throws HttpRequestException on network related issues
-     */
+     * @throws HttpRequestException on network related issues     */
     suspend fun createBucket(id: String, builder: BucketBuilder.() -> Unit = {})
 
     /**
      * Updates a bucket in the storage
      * @param id the id of the bucket
      * @param builder the builder for the bucket
-     */
+     * @throws StorageRestException containing an error code, if receiving an error response
+     * @throws HttpRequestTimeoutException if the request timed out
+     * @throws HttpRequestException on network related issues     */
     suspend fun updateBucket(id: String, builder: BucketBuilder.() -> Unit = {})
 
     /**
      * Returns all buckets in the storage
-     * @throws RestException or one of its subclasses if receiving an error response
+     * @throws StorageRestException containing an error code, if receiving an error response
      * @throws HttpRequestTimeoutException if the request timed out
-     * @throws HttpRequestException on network related issues
-     */
+     * @throws HttpRequestException on network related issues     */
     suspend fun listBuckets(filter: StorageListFilter.Buckets.() -> Unit = {}): List<Bucket>
 
     /**
      * Retrieves a bucket by its [bucketId]
-     * @throws RestException or one of its subclasses if receiving an error response
+     * @throws StorageRestException containing an error code, if receiving an error response
      * @throws HttpRequestTimeoutException if the request timed out
-     * @throws HttpRequestException on network related issues
-     */
+     * @throws HttpRequestException on network related issues     */
     suspend fun getBucket(bucketId: String): Bucket?
 
     /**
      * Empties a bucket by its [bucketId]
-     * @throws RestException or one of its subclasses if receiving an error response
+     * @throws StorageRestException containing an error code, if receiving an error response
      * @throws HttpRequestTimeoutException if the request timed out
-     * @throws HttpRequestException on network related issues
-     */
+     * @throws HttpRequestException on network related issues     */
     suspend fun emptyBucket(bucketId: String)
 
     /**
      * Deletes a bucket by its [bucketId]
-     * @throws RestException or one of its subclasses if receiving an error response
+     * @throws StorageRestException containing an error code, if receiving an error response
      * @throws HttpRequestTimeoutException if the request timed out
-     * @throws HttpRequestException on network related issues
-     */
+     * @throws HttpRequestException on network related issues     */
     suspend fun deleteBucket(bucketId: String)
 
     /**
@@ -321,15 +313,16 @@ internal class StorageImpl(override val supabaseClient: SupabaseClient, override
         val error = supabaseClient.bodyOrNull<StorageErrorResponse>(response) ?: StorageErrorResponse(
             response.status.value,
             "Unknown error",
+            "",
             ""
         )
-        if (statusCode != HttpStatusCode.BadRequest) return UnknownRestException("Unknown error response $error", response)
-        when (error.statusCode) {
-            HttpStatusCode.Unauthorized.value -> throw UnauthorizedRestException(error.error, response, error.message)
-            HttpStatusCode.BadRequest.value -> throw BadRequestRestException(error.error, response, error.message)
-            HttpStatusCode.NotFound.value -> throw NotFoundRestException(error.error, response, error.message)
-            else -> throw UnknownRestException(error.message, response)
-        }
+        throw StorageRestException(
+            error.error,
+            error.message,
+            response,
+            error.statusCode,
+            error.code
+        )
     }
 
     override suspend fun purgeBucketCache(id: String, options: PurgeCacheOptions.() -> Unit) {

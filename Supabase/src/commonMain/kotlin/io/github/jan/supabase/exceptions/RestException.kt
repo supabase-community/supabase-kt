@@ -29,7 +29,7 @@ open class RestException(val error: String, val description: String?, val respon
     /**
      * The status code of the response
      */
-    val statusCode = response.status.value
+    open val statusCode = response.status.value
 
 }
 
