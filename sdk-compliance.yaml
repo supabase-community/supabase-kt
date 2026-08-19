@@ -392,25 +392,24 @@ features:
   realtime.subscriptions.postgres_changes: implemented
   realtime.subscriptions.subscribe_presence: implemented
   realtime.subscriptions.postgres_changes_filter:
-    realtime.subscriptions.postgres_changes:
-      status: implemented
-      symbols:
-        - RealtimePostgresFilterBuilder
-        - RealtimePostgresFilterBuilder.eq
-        - RealtimePostgresFilterBuilder.neq
-        - RealtimePostgresFilterBuilder.gt
-        - RealtimePostgresFilterBuilder.gte
-        - RealtimePostgresFilterBuilder.lt
-        - RealtimePostgresFilterBuilder.lte
-        - RealtimePostgresFilterBuilder.isIn
-        - RealtimePostgresFilterBuilder.like
-        - RealtimePostgresFilterBuilder.ilike
-        - RealtimePostgresFilterBuilder.match
-        - RealtimePostgresFilterBuilder.imatch
-        - RealtimePostgresFilterBuilder.exact
-        - RealtimePostgresFilterBuilder.isDistinct
-        - RealtimePostgresFilterBuilder.not
-        - RealtimePostgresFilterBuilder.build
+    status: implemented
+    symbols:
+      - RealtimePostgresFilterBuilder
+      - RealtimePostgresFilterBuilder.eq
+      - RealtimePostgresFilterBuilder.neq
+      - RealtimePostgresFilterBuilder.gt
+      - RealtimePostgresFilterBuilder.gte
+      - RealtimePostgresFilterBuilder.lt
+      - RealtimePostgresFilterBuilder.lte
+      - RealtimePostgresFilterBuilder.isIn
+      - RealtimePostgresFilterBuilder.like
+      - RealtimePostgresFilterBuilder.ilike
+      - RealtimePostgresFilterBuilder.match
+      - RealtimePostgresFilterBuilder.imatch
+      - RealtimePostgresFilterBuilder.exact
+      - RealtimePostgresFilterBuilder.isDistinct
+      - RealtimePostgresFilterBuilder.not
+      - RealtimePostgresFilterBuilder.build
   realtime.subscriptions.postgres_changes_multiple_filters:
     status: implemented
     symbols:
@@ -422,7 +421,7 @@ features:
 
   realtime.presence.track: implemented
   realtime.presence.untrack: implemented
-  realtime.presence.presence_state: not_implemented
+  realtime.presence.presence_state: implemented
   realtime.presence.presence_key: implemented
 
   realtime.configuration.custom_websocket_transport: not_implemented
