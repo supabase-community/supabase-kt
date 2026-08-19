@@ -109,10 +109,8 @@ class RealtimeExtTest {
                 },
                 mockEngineHandler = {
                     assertEquals("/table", it.url.pathAfterVersion())
-                    val idFilter = it.url.parameters["id"]
-                    assertEquals("eq.0", idFilter)
-                    val ageFilter = it.url.parameters["age"]
-                    assertEquals("lt.58", ageFilter)
+                    val andFilter = it.url.parameters["and"]
+                    assertEquals("(id.eq.0,age.lt.58)", andFilter)
                     respond(Json.encodeToJsonElement(listOf(DummyData(0, "first"))).toString()) //1.
                 },
                 supabaseConfig = {

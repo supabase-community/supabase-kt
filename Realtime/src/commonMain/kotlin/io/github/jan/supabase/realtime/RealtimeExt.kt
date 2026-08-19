@@ -113,11 +113,13 @@ inline fun <reified Data : Any> RealtimeChannel.postgresListDataFlow(
         val initialData = try {
             val result = supabaseClient.postgrest.from(schema, table).select {
                 filter {
-                    filterBuilder.filters.forEach { (negate, operation) ->
-                        if(negate) {
-                            filterNot(operation)
-                        } else {
-                            filter(operation)
+                    and { // realtime uses AND so we have to do the same
+                        filterBuilder.filters.forEach { (negate, operation) ->
+                            if(negate) {
+                                filterNot(operation)
+                            } else {
+                                filter(operation)
+                            }
                         }
                     }
                 }
