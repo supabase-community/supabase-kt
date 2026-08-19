@@ -7,9 +7,9 @@ import io.github.jan.supabase.collections.AtomicMutableMap
 import io.github.jan.supabase.exceptions.NotFoundRestException
 import io.github.jan.supabase.exceptions.UnknownRestException
 import io.github.jan.supabase.postgrest.postgrest
-import io.github.jan.supabase.postgrest.query.filter.FilterOperation
 import io.github.jan.supabase.postgrest.query.filter.FilterOperator
 import io.github.jan.supabase.postgrest.query.filter.PostgrestFilterBuilder
+import io.github.jan.supabase.realtime.postgres.RealtimePostgresFilterBuilder
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.map
@@ -83,9 +83,9 @@ inline fun <reified Data> RealtimeChannel.presenceDataFlow(): Flow<List<Data>> {
 inline fun <reified Data : Any> RealtimeChannel.postgresListDataFlow(
     schema: String = "public",
     table: String,
-    filter: FilterOperation? = null,
-    primaryKey: PrimaryKey<Data>
-): Flow<List<Data>> = postgresListDataFlow(schema, table, filter, listOf(primaryKey))
+    primaryKey: PrimaryKey<Data>,
+    crossinline filter: RealtimePostgresFilterBuilder.() -> Unit = {}
+): Flow<List<Data>> = postgresListDataFlow(schema, table, listOf(primaryKey), filter)
 
 /**
  * This function retrieves the initial data from the table and then listens for changes. It automatically handles inserts, updates and deletes.
@@ -100,22 +100,25 @@ inline fun <reified Data : Any> RealtimeChannel.postgresListDataFlow(
 inline fun <reified Data : Any> RealtimeChannel.postgresListDataFlow(
     schema: String = "public",
     table: String,
-    filter: FilterOperation? = null,
-    primaryKeys: List<PrimaryKey<Data>>
+    primaryKeys: List<PrimaryKey<Data>>,
+    crossinline filter: RealtimePostgresFilterBuilder.() -> Unit = {}
 ): Flow<List<Data>> {
     val cache = AtomicMutableMap<String, Data>()
+    val filterBuilder = RealtimePostgresFilterBuilder().apply(filter)
     val changeFlow = postgresChangeFlow<PostgresAction>(schema) {
         this.table = table
-        filter?.let {
-            filter(it)
-        }
+        this.filter(filterBuilder)
     }
     return channelFlow {
         val initialData = try {
             val result = supabaseClient.postgrest.from(schema, table).select {
-                filter?.let {
-                    filter {
-                        this.filter(it)
+                filter {
+                    filterBuilder.filters.forEach { (negate, operation) ->
+                        if(negate) {
+                            filterNot(operation)
+                        } else {
+                            filter(operation)
+                        }
                     }
                 }
             }
@@ -171,9 +174,9 @@ inline fun <reified Data : Any> RealtimeChannel.postgresListDataFlow(
 inline fun <reified Data : Any, Value> RealtimeChannel.postgresListDataFlow(
     schema: String = "public",
     table: String,
-    filter: FilterOperation? = null,
     primaryKey: KProperty1<Data, Value>,
-): Flow<List<Data>> = postgresListDataFlow(schema, table, filter, listOf(primaryKey))
+    crossinline filter: RealtimePostgresFilterBuilder.() -> Unit = {},
+): Flow<List<Data>> = postgresListDataFlow(schema, table, listOf(primaryKey), filter)
 
 /**
  * This function retrieves the initial data from the table and then listens for changes. It automatically handles inserts, updates and deletes.
@@ -189,8 +192,8 @@ inline fun <reified Data : Any, Value> RealtimeChannel.postgresListDataFlow(
 inline fun <reified Data : Any, Value> RealtimeChannel.postgresListDataFlow(
     schema: String = "public",
     table: String,
-    filter: FilterOperation? = null,
     primaryKeys: List<KProperty1<Data, Value>>,
+    crossinline filter: RealtimePostgresFilterBuilder.() -> Unit = {},
 ): Flow<List<Data>> = postgresListDataFlow<Data>(
     filter = filter,
     table = table,

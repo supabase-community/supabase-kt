@@ -5,6 +5,8 @@ import io.github.jan.supabase.postgrest.query.filter.escapedValue
 import io.github.jan.supabase.realtime.RealtimeChannel
 import io.github.jan.supabase.realtime.postgresChangeFlow
 
+typealias NegatableFilterOperation = Pair<Boolean, FilterOperation>
+
 /**
  * Fluent builder for Postgres Changes `filter` strings.
  *
@@ -23,12 +25,12 @@ import io.github.jan.supabase.realtime.postgresChangeFlow
  */
 class RealtimePostgresFilterBuilder {
 
-    private val filters = mutableListOf<String>()
+    @PublishedApi
+    internal val filters = mutableListOf<NegatableFilterOperation>()
 
     private fun add(column: String, operator: RealtimePostgresChangesFilterOperator, value: Any, negate: Boolean = false) {
-        val prefix = if (negate) "not." else ""
         val operation = FilterOperation(column, operator.toPostgrestOperator(), value)
-        filters.add("${column}=$prefix${operator.name.lowercase()}.${operation.escapedValue(true)}")
+        filters.add(negate to operation)
     }
 
     /** Match rows where [column] equals [value] (`column=eq.value`). */
@@ -124,6 +126,9 @@ class RealtimePostgresFilterBuilder {
      * the way PostgREST does, so commas inside a value are preserved rather than
      * read as a condition boundary.
      */
-    fun build() = filters.joinToString(",")
+    fun build() = filters.joinToString(",") { (negate, operation) ->
+        val prefix = if (negate) "not." else ""
+        "${operation.column}=$prefix${operation.operator.name.lowercase()}.${operation.escapedValue(true)}"
+    }
 
 }

@@ -2,8 +2,8 @@ package io.github.jan.supabase.realtime
 
 import io.github.jan.supabase.annotations.SupabaseExperimental
 import io.github.jan.supabase.postgrest.query.PostgrestQueryBuilder
-import io.github.jan.supabase.postgrest.query.filter.FilterOperation
 import io.github.jan.supabase.postgrest.query.filter.PostgrestFilterBuilder
+import io.github.jan.supabase.realtime.postgres.RealtimePostgresFilterBuilder
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
@@ -69,7 +69,7 @@ inline fun <reified Data : Any, Value> PostgrestQueryBuilder.selectSingleValueAs
 inline fun <reified Data : Any> PostgrestQueryBuilder.selectAsFlow(
     primaryKey: PrimaryKey<Data>,
     channelName: String? = null,
-    filter: FilterOperation? = null,
+    crossinline filter: RealtimePostgresFilterBuilder.() -> Unit = {}
 ): Flow<List<Data>> = selectAsFlow(listOf(primaryKey), channelName, filter)
 
 /**
@@ -83,7 +83,7 @@ inline fun <reified Data : Any> PostgrestQueryBuilder.selectAsFlow(
 inline fun <reified Data : Any> PostgrestQueryBuilder.selectAsFlow(
     primaryKeys: List<PrimaryKey<Data>>,
     channelName: String? = null,
-    filter: FilterOperation? = null,
+    crossinline filter: RealtimePostgresFilterBuilder.() -> Unit = {}
 ): Flow<List<Data>> {
     val realtime = postgrest.supabaseClient.realtime as RealtimeImpl
     val channel = realtime.channel(channelName ?: defaultChannelName(schema, table, realtime))
@@ -112,7 +112,7 @@ inline fun <reified Data : Any> PostgrestQueryBuilder.selectAsFlow(
 inline fun <reified Data : Any, Value> PostgrestQueryBuilder.selectAsFlow(
     primaryKey: KProperty1<Data, Value>,
     channelName: String? = null,
-    filter: FilterOperation? = null,
+    crossinline filter: RealtimePostgresFilterBuilder.() -> Unit = {},
 ): Flow<List<Data>> =
     selectAsFlow(listOf(primaryKey), channelName, filter)
 
@@ -128,7 +128,7 @@ inline fun <reified Data : Any, Value> PostgrestQueryBuilder.selectAsFlow(
 inline fun <reified Data : Any, Value> PostgrestQueryBuilder.selectAsFlow(
     primaryKeys: List<KProperty1<Data, Value>>,
     channelName: String? = null,
-    filter: FilterOperation? = null,
+    crossinline filter: RealtimePostgresFilterBuilder.() -> Unit = {},
 ): Flow<List<Data>> =
     selectAsFlow(primaryKeys.map { primaryKey ->
         PrimaryKey(postgrest.config.propertyConversionMethod.invoke(primaryKey)) { primaryKey.get(it).toString() }
