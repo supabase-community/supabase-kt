@@ -89,6 +89,7 @@ suspend fun createTestClient(
         install(Realtime) {
             websocketFactory = MockWSFactory(serverChannel, clientChannel)
             heartbeatInterval = 1.hours
+            disconnectOnNoSubscriptions = false
             realtimeConfig()
         }
         supabaseConfig()
