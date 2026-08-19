@@ -159,7 +159,7 @@ interface Realtime : MainPlugin<Realtime.Config>, CustomSerializationPlugin {
         @SupabaseInternal var websocketFactory: RealtimeWebsocketFactory? = null
         var disconnectOnNoSubscriptions: Boolean = true
         var vsn = RealtimeProtocolVersion.V2
-        override var requireValidSession: Boolean = false
+        override var requireValidSession: Boolean = true
 
         internal var customAccessTokenProvider = false
         internal var coroutineScope: CoroutineScope? = null

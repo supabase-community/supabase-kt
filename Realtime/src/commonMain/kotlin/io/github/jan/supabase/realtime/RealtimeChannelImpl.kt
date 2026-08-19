@@ -22,7 +22,9 @@ import io.ktor.http.appendPathSegments
 import io.ktor.http.contentType
 import io.ktor.http.headers
 import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -90,7 +92,17 @@ internal class RealtimeChannelImpl(
         joinRef.store(realtime.websocket.makeRef())
         _status.value = RealtimeChannel.Status.SUBSCRIBING
         logger.d { "Subscribing to channel $topic" }
-        val currentJwt = accessToken()
+        val currentJwt = try {
+            accessToken()
+        } catch(t: Throwable) {
+            currentCoroutineContext().ensureActive()
+            logger.e(t) { "Error occurred while fetching access token" }
+            if(realtime.config.requireValidSession) {
+                scheduleRejoin()
+                return
+            }
+            null
+        }
         val postgrestChanges = clientChanges.toList()
         presenceJoinConfig.enabled = shouldEnablePresence()
         val joinConfig = RealtimeJoinPayload(RealtimeJoinConfig(broadcastJoinConfig, presenceJoinConfig, postgrestChanges, isPrivate))
