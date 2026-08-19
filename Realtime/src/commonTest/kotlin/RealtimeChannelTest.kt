@@ -12,7 +12,6 @@ import io.github.jan.supabase.realtime.PostgresJoinConfig
 import io.github.jan.supabase.realtime.Presence
 import io.github.jan.supabase.realtime.Realtime
 import io.github.jan.supabase.realtime.RealtimeChannel
-import io.github.jan.supabase.realtime.RealtimeChannel.Companion.CHANNEL_EVENT_SYSTEM
 import io.github.jan.supabase.realtime.RealtimeJoinPayload
 import io.github.jan.supabase.realtime.RealtimeMessage
 import io.github.jan.supabase.realtime.channel
@@ -92,7 +91,7 @@ class RealtimeChannelTest {
             createTestClient(
                 wsHandler = { i, o ->
                     i.receive().toMessage()
-                    o.send(RealtimeMessage("realtime:$channelId", CHANNEL_EVENT_SYSTEM, buildJsonObject { put("status", "ok") }, "").toFrame())
+                    o.sendSystem(channelId, "system", "Subscribed", "ok")
                     handleUnsubscribe(i, o, channelId)
                 },
                 supabaseHandler = {
