@@ -102,7 +102,7 @@ open class AuthConfigDefaults : MainConfig(), AuthDependentPluginConfig, CustomS
     /**
      * Whether to stop auto-refresh on focus loss, and resume it on focus again.
      *
-     * Currently only supported on Android.
+     * Currently only supported on Android, iOS and tvOS.
      */
     var enableLifecycleCallbacks: Boolean = true
 
@@ -186,7 +186,7 @@ val AuthConfig.deepLinkOrNull: String?
  * @param autoSaveToStorage Whether to automatically save the session to [sessionManager], when the session changes
  * @param sessionManager The session manager used to store/load the session.
  * @param codeVerifierCache The cache used to store/load the code verifier for the [FlowType.PKCE] flow.
- * @param enableLifecycleCallbacks Whether to stop auto-refresh on focus loss, and resume it on focus again. Currently only supported on Android.
+ * @param enableLifecycleCallbacks Whether to stop auto-refresh on focus loss, and resume it on focus again. Currently only supported on Android, iOS and tvOS.
  * @see AuthConfigDefaults
  */
 @Deprecated("Use the new minimalConfig function instead", ReplaceWith("minimalConfig()"))
