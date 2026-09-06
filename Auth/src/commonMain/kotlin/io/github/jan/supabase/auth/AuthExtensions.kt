@@ -1,5 +1,6 @@
 package io.github.jan.supabase.auth
 
+import io.github.jan.supabase.StringMasking
 import io.github.jan.supabase.auth.url.getFragmentParts
 import io.github.jan.supabase.auth.user.UserSession
 import io.github.jan.supabase.encodeToJsonElement
@@ -24,7 +25,7 @@ internal fun noDeeplinkError(arg: String): Nothing = error("""
 fun Auth.parseSessionFromFragment(fragment: String): UserSession {
     val sessionParts = getFragmentParts(fragment)
 
-    logger.d { "Fragment parts: $sessionParts" }
+    logger.d { "Fragment parts: ${StringMasking.maskParameters(sessionParts)}" }
 
     val accessToken = sessionParts["access_token"] ?: invalidArg("No access token found")
     val refreshToken = sessionParts["refresh_token"] ?: invalidArg("No refresh token found")
