@@ -30,6 +30,27 @@ data class UserSession(
 ) {
 
     /**
+     * Renders every field, printing each bearer credential through [renderToken].
+     *
+     * This is the single place that knows the field list, so [toString] and [unsafeToString] can
+     * never drift apart, and a credential added to this class can only ever reach the output
+     * through [renderToken] — there is no second listing left to forget about.
+     */
+    internal fun render(renderToken: (String) -> String): String = buildString {
+        append("UserSession(")
+        append("accessToken=").append(renderToken(accessToken))
+        append(", refreshToken=").append(renderToken(refreshToken))
+        append(", providerRefreshToken=").append(providerRefreshToken?.let(renderToken))
+        append(", providerToken=").append(providerToken?.let(renderToken))
+        append(", expiresIn=").append(expiresIn)
+        append(", tokenType=").append(tokenType)
+        append(", user=").append(user)
+        append(", type=").append(type)
+        append(", expiresAt=").append(expiresAt)
+        append(')')
+    }
+
+    /**
      * Renders this session with all bearer credentials masked.
      *
      * The data class default would print [accessToken], [refreshToken], [providerToken] and
@@ -41,17 +62,7 @@ data class UserSession(
      * safe by default. Use [unsafeToString] when you deliberately need the raw values.
      */
     @OptIn(SupabaseInternal::class)
-    override fun toString(): String = "UserSession(" +
-            "accessToken=${StringMasking.maskString(accessToken, showLength = true)}, " +
-            "refreshToken=${StringMasking.maskString(refreshToken, showLength = true)}, " +
-            "providerRefreshToken=${providerRefreshToken?.let { StringMasking.maskString(it, showLength = true) }}, " +
-            "providerToken=${providerToken?.let { StringMasking.maskString(it, showLength = true) }}, " +
-            "expiresIn=$expiresIn, " +
-            "tokenType=$tokenType, " +
-            "user=$user, " +
-            "type=$type, " +
-            "expiresAt=$expiresAt" +
-            ")"
+    override fun toString(): String = render { StringMasking.maskString(it, showLength = true) }
 
 }
 
@@ -62,14 +73,4 @@ data class UserSession(
  * sink that may be collected by a crash/analytics reporter.
  */
 @SupabaseInternal
-fun UserSession.unsafeToString(): String = "UserSession(" +
-        "accessToken=$accessToken, " +
-        "refreshToken=$refreshToken, " +
-        "providerRefreshToken=$providerRefreshToken, " +
-        "providerToken=$providerToken, " +
-        "expiresIn=$expiresIn, " +
-        "tokenType=$tokenType, " +
-        "user=$user, " +
-        "type=$type, " +
-        "expiresAt=$expiresAt" +
-        ")"
+fun UserSession.unsafeToString(): String = render { it }
