@@ -28,8 +28,6 @@ internal suspend fun Auth.tryToGetUser(accessToken: String) = try {
     retrieveUser(accessToken)
 } catch (e: Exception) {
     currentCoroutineContext().ensureActive()
-    // Masked: this is logged at ERROR, which is enabled under the default LogLevel.INFO,
-    // so an unmasked token here reaches the platform log in a stock configuration.
     logger.e(e) { "Couldn't retrieve user using access token ${StringMasking.maskString(accessToken, showLength = true)}.\nIf you use the project secret, ignore this message." }
     null
 }

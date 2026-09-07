@@ -30,11 +30,7 @@ data class UserSession(
 ) {
 
     /**
-     * Renders every field, printing each bearer credential through [renderToken].
-     *
-     * This is the single place that knows the field list, so [toString] and [unsafeToString] can
-     * never drift apart, and a credential added to this class can only ever reach the output
-     * through [renderToken] — there is no second listing left to forget about.
+     * Renders all fields of this session, applying [renderToken] to every token value.
      */
     internal fun render(renderToken: (String) -> String): String = buildString {
         append("UserSession(")
@@ -51,15 +47,8 @@ data class UserSession(
     }
 
     /**
-     * Renders this session with all bearer credentials masked.
-     *
-     * The data class default would print [accessToken], [refreshToken], [providerToken] and
-     * [providerRefreshToken] verbatim, which puts long-lived credentials into any log line,
-     * exception message or crash report that interpolates a session — directly, or transitively
-     * via a type that holds one (e.g. `SessionSource.Refresh`).
-     *
-     * Masking here rather than at each call site means every present and future interpolation is
-     * safe by default. Use [unsafeToString] when you deliberately need the raw values.
+     * Renders this session with [accessToken], [refreshToken], [providerToken] and
+     * [providerRefreshToken] masked. Use [unsafeToString] for the raw values.
      */
     @OptIn(SupabaseInternal::class)
     override fun toString(): String = render { StringMasking.maskString(it, showLength = true) }
@@ -67,10 +56,8 @@ data class UserSession(
 }
 
 /**
- * Renders this session with the raw, unmasked token values.
- *
- * Intended for local debugging only. Never write the result to a log, an exception message or any
- * sink that may be collected by a crash/analytics reporter.
+ * Renders this session with the raw, unmasked token values. Intended for debugging only, never log
+ * the result.
  */
 @SupabaseInternal
 fun UserSession.unsafeToString(): String = render { it }
