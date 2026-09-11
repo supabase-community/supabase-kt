@@ -1,10 +1,7 @@
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.SupabaseClientBuilder
-import io.github.jan.supabase.exceptions.BadRequestRestException
-import io.github.jan.supabase.exceptions.NotFoundRestException
-import io.github.jan.supabase.exceptions.UnauthorizedRestException
-import io.github.jan.supabase.exceptions.UnknownRestException
 import io.github.jan.supabase.storage.Storage
+import io.github.jan.supabase.storage.StorageRestException
 import io.github.jan.supabase.storage.storage
 import io.github.jan.supabase.testing.createMockedSupabaseClient
 import io.github.jan.supabase.testing.respondJson
@@ -17,7 +14,6 @@ import kotlin.test.AfterTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
-import kotlin.test.assertTrue
 
 class StorageExceptionTest {
 
@@ -29,7 +25,7 @@ class StorageExceptionTest {
     @Test
     fun testUnauthorizedError() = runTest {
         mockStorageError(statusCode = HttpStatusCode.Unauthorized.value, error = "Unauthorized", message = "Invalid jwt")
-        val exception = assertFailsWith<UnauthorizedRestException> {
+        val exception = assertFailsWith<StorageRestException> {
             client.storage.listBuckets()
         }
         assertEquals("Unauthorized", exception.error)
@@ -39,7 +35,7 @@ class StorageExceptionTest {
     @Test
     fun testBadRequestError() = runTest {
         mockStorageError(statusCode = HttpStatusCode.BadRequest.value, error = "InvalidRequest", message = "Invalid bucket id")
-        val exception = assertFailsWith<BadRequestRestException> {
+        val exception = assertFailsWith<StorageRestException> {
             client.storage.listBuckets()
         }
         assertEquals("InvalidRequest", exception.error)
@@ -49,7 +45,7 @@ class StorageExceptionTest {
     @Test
     fun testNotFoundError() = runTest {
         mockStorageError(statusCode = HttpStatusCode.NotFound.value, error = "NoSuchBucket", message = "Bucket not found")
-        val exception = assertFailsWith<NotFoundRestException> {
+        val exception = assertFailsWith<StorageRestException> {
             client.storage.listBuckets()
         }
         assertEquals("NoSuchBucket", exception.error)
@@ -57,17 +53,17 @@ class StorageExceptionTest {
     }
 
     @Test
-    fun testOtherStatusCodesInBodyAreUnknown() = runTest {
+    fun testOtherStatusCodesInBodyAreStorageRestException() = runTest {
         mockStorageError(statusCode = HttpStatusCode.Conflict.value, error = "Duplicate", message = "The resource already exists")
-        val exception = assertFailsWith<UnknownRestException> {
+        val exception = assertFailsWith<StorageRestException> {
             client.storage.listBuckets()
         }
-        assertEquals("The resource already exists", exception.error)
+        assertEquals("Duplicate", exception.error)
+        assertEquals("The resource already exists", exception.description)
     }
 
     @Test
-    fun testNonBadRequestResponsesAreUnknown() = runTest {
-        //the storage plugin only inspects the error body of responses with a 400 status code
+    fun testNonBadRequestResponsesAreStorageRestException() = runTest {
         client = createMockedSupabaseClient(
             configuration = configureClient,
             requestHandler = {
@@ -77,15 +73,17 @@ class StorageExceptionTest {
                         put("statusCode", HttpStatusCode.NotFound.value)
                         put("error", "NoSuchBucket")
                         put("message", "Bucket not found")
+                        put("code", "NoSuchBucket")
                     }
                 )
             }
         )
-        val exception = assertFailsWith<UnknownRestException> {
+        val exception = assertFailsWith<StorageRestException> {
             client.storage.listBuckets()
         }
         assertEquals(HttpStatusCode.NotFound.value, exception.statusCode)
-        assertTrue(exception.error.startsWith("Unknown error response"), "Actual error: ${exception.error}")
+        assertEquals("NoSuchBucket", exception.error)
+        assertEquals("Bucket not found", exception.description)
     }
 
     @Test
@@ -96,7 +94,7 @@ class StorageExceptionTest {
                 respond("maintenance", HttpStatusCode.BadRequest)
             }
         )
-        val exception = assertFailsWith<BadRequestRestException> {
+        val exception = assertFailsWith<StorageRestException> {
             client.storage.listBuckets()
         }
         assertEquals("Unknown error", exception.error)
@@ -112,6 +110,7 @@ class StorageExceptionTest {
                     data = buildJsonObject {
                         put("statusCode", statusCode)
                         put("error", error)
+                        put("code", error)
                         put("message", message)
                     }
                 )
