@@ -1,6 +1,8 @@
 @file:Suppress("UndocumentedPublicClass", "UndocumentedPublicFunction", "UndocumentedPublicProperty")
 package io.github.jan.supabase.auth.user
 
+import io.github.jan.supabase.StringMasking
+import io.github.jan.supabase.annotations.SupabaseInternal
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlin.time.Clock
@@ -25,4 +27,37 @@ data class UserSession(
     @SerialName("type")
     val type: String = "",
     val expiresAt: Instant = Clock.System.now() + (expiresIn.seconds),
-)
+) {
+
+    /**
+     * Renders all fields of this session, applying [renderToken] to every token value.
+     */
+    internal fun render(renderToken: (String) -> String): String = buildString {
+        append("UserSession(")
+        append("accessToken=").append(renderToken(accessToken))
+        append(", refreshToken=").append(renderToken(refreshToken))
+        append(", providerRefreshToken=").append(providerRefreshToken?.let(renderToken))
+        append(", providerToken=").append(providerToken?.let(renderToken))
+        append(", expiresIn=").append(expiresIn)
+        append(", tokenType=").append(tokenType)
+        append(", user=").append(user)
+        append(", type=").append(type)
+        append(", expiresAt=").append(expiresAt)
+        append(')')
+    }
+
+    /**
+     * Renders this session with [accessToken], [refreshToken], [providerToken] and
+     * [providerRefreshToken] masked. Use [unsafeToString] for the raw values.
+     */
+    @OptIn(SupabaseInternal::class)
+    override fun toString(): String = render { StringMasking.maskString(it, showLength = true) }
+
+}
+
+/**
+ * Renders this session with the raw, unmasked token values. Intended for debugging only, never log
+ * the result.
+ */
+@SupabaseInternal
+fun UserSession.unsafeToString(): String = render { it }
