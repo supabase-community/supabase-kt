@@ -13,37 +13,48 @@ import com.russhwolf.settings.coroutines.toSuspendSettings
 @OptIn(ExperimentalSettingsApi::class)
 class SettingsCodeVerifierCache(
     private val settings: Settings = createDefaultSettings(),
-    private val key: String = SETTINGS_KEY,
+    private val storageKey: String = SETTINGS_KEY,
 ): CodeVerifierCache {
-
-    init {
-        checkForOldCodeVerifier()
-    }
-
-    private fun checkForOldCodeVerifier() {
-        if (key == SETTINGS_KEY) return
-
-        val oldSession = settings.getStringOrNull(SETTINGS_KEY)
-        val newSession = settings.getStringOrNull(key)
-
-        if (oldSession != null && newSession == null) {
-            settings.putString(key, oldSession)
-            settings.remove(SETTINGS_KEY)
-        }
-    }
 
     private val suspendSettings = settings.toSuspendSettings()
 
-    override suspend fun saveCodeVerifier(codeVerifier: String) {
-        suspendSettings.putString(key, codeVerifier)
+    suspend fun getPKCEFlowIndex() {
+        suspendSettings.getString()
     }
 
-    override suspend fun loadCodeVerifier(): String? {
-        return suspendSettings.getStringOrNull(key)
+    override suspend fun storePKCEVerifier(flowId: String, verifier: String, onEvictFlow: (String) -> Unit = {}) {
+        val key = pkceVerifierSlotKey(storageKey, flowId)
+        suspendSettings.putString(key, verifier)
+        val index = suspendSettings
+        suspendSettings.putString(pkceLegacyKey(storageKey), verifier) // for legacy compatibility
     }
 
-    override suspend fun deleteCodeVerifier() {
-        suspendSettings.remove(key)
+    suspend fun retrievePKCEVerifier(flowId: String?): String? {
+        return if(flowId != null) {
+            suspendSettings.getString(pkceVerifierSlotKey(storageKey, flowId))
+        } else {
+            suspendSettings.getString(pkceLegacyKey(storageKey))
+        }
+    }
+
+    suspend fun removePKCEVerifier(flowId: String?) {
+        if(flowId == null) {
+            return suspendSettings.remove(pkceLegacyKey(storageKey))
+        }
+        val slotKey = pkceVerifierSlotKey(storageKey, flowId)
+        val slotValue = suspendSettings.getString(slotKey)
+        suspendSettings.remove(slotKey)
+        suspendSettings.remove(flowId)
+
+        val legacyKey = pkceLegacyKey(storageKey)
+        if(slotValue == suspendSettings.getString(legacyKey)) {
+            suspendSettings.remove(legacyKey)
+        }
+    }
+
+    suspend fun removeAllPKCEVerifiers() {
+        clearFlows()
+        removeValue(pkceLegacyKey(storageKey))
     }
 
     companion object {

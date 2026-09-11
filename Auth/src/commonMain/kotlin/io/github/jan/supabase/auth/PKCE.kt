@@ -9,7 +9,24 @@ import kotlin.io.encoding.ExperimentalEncodingApi
 internal object PKCEConstants {
     const val VERIFIER_LENGTH = 64
     const val CHALLENGE_METHOD = "s256"
+    val PKCE_FLOW_ID_PATTERN = Regex("^[a-zA-Z0-9_-]{8,64}")
 }
+
+internal fun validatePKCEFlowId(flowId: String): String? {
+    return if(PKCEConstants.PKCE_FLOW_ID_PATTERN.matches(flowId)) flowId else null
+}
+
+internal fun generatePKCEFlowId(): String {
+    val bytes = ByteArray(16)
+    CryptographyRandom.nextBytes(bytes)
+    return bytes.toHexString()
+}
+
+internal fun pkceVerifierSlotKey(storageKey: String, flowId: String) = "${storageKey}-flow-${flowId}-code-verifier"
+
+internal fun pkceFlowIndexKey(storageKey: String) = "${storageKey}-flows-code-verifier"
+
+internal fun pkceLegacyKey(storageKey: String) = "${storageKey}-code-verifier"
 
 @OptIn(ExperimentalEncodingApi::class)
 internal fun generateCodeVerifier(): String {
