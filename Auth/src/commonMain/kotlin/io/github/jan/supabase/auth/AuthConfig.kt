@@ -137,6 +137,9 @@ open class AuthConfigDefaults : MainConfig(), AuthDependentPluginConfig, CustomS
      */
     var jwkCache: JwkCache = SharedJwkCache
 
+    @SupabaseExperimental
+    var appendPkceFlowIdToRedirects: Boolean = false
+
 }
 
 /**
