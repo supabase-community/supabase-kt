@@ -9,6 +9,8 @@ import kotlin.io.encoding.ExperimentalEncodingApi
 internal object PKCEConstants {
     const val VERIFIER_LENGTH = 64
     const val CHALLENGE_METHOD = "s256"
+    const val PKCE_FLOW_ID_PARAM = "sb_flow_id"
+    const val PKCE_MAX_CONCURRENT_FLOWS = 5
     val PKCE_FLOW_ID_PATTERN = Regex("^[a-zA-Z0-9_-]{8,64}")
 }
 
