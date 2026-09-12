@@ -785,7 +785,7 @@ internal class AuthImpl(
     }
 
     override suspend fun clearSession() {
-        codeVerifierCache.deleteCodeVerifier()
+        codeVerifierCache.removeAllPKCEVerifiers()
         sessionManager.deleteSession()
         setSessionStatus(SessionStatus.NotAuthenticated(true))
         stopAutoRefreshForCurrentSession()
@@ -808,11 +808,12 @@ internal class AuthImpl(
     /**
      * Prepares PKCE if enabled and returns the code challenge.
      */
-    private fun preparePKCEIfEnabled(): String? {
+    private fun preparePKCEIfEnabled(isPasswordRecovery: Boolean = false, onEvictFlow: (String) -> Unit = {}): String? {
         if (this.config.flowType != FlowType.PKCE) return null
-        val codeVerifier = generateCodeVerifier()
+        val codeVerifier = generateCodeVerifier() + if(isPasswordRecovery) "/recovery" else ""
+        val flowId = generatePKCEFlowId()
         authScope.launch {
-            supabaseClient.auth.codeVerifierCache.saveCodeVerifier(codeVerifier)
+            supabaseClient.auth.codeVerifierCache.storePKCEVerifier(flowId, codeVerifier, onEvictFlow)
         }
         return generateCodeChallenge(codeVerifier)
     }

@@ -9,8 +9,6 @@ import kotlin.concurrent.atomics.AtomicReference
  */
 interface CodeVerifierCache {
 
-    val storageKey: String
-
     suspend fun storePKCEVerifier(flowId: String, verifier: String, onEvictFlow: (String) -> Unit = {})
 
     suspend fun retrievePKCEVerifier(flowId: String?): String?
@@ -24,7 +22,7 @@ interface CodeVerifierCache {
 /**
  * A [CodeVerifierCache] that uses the [AtomicReference] API.
  */
-class MemoryCodeVerifierCache(codeVerifier: String? = null, override val storageKey: String): CodeVerifierCache {
+class MemoryCodeVerifierCache(codeVerifier: String? = null): CodeVerifierCache {
 
     val verifiers = mutableMapOf<String, String>()
     val mutex = Mutex()
