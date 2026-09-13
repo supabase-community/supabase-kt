@@ -48,6 +48,8 @@ public final class io/github/jan/supabase/PlatformTargetKt {
 public final class io/github/jan/supabase/StringMasking {
 	public static final field INSTANCE Lio/github/jan/supabase/StringMasking;
 	public final fun maskHeaders (Lio/ktor/http/Headers;)Ljava/lang/String;
+	public final fun maskParameterString (Ljava/lang/String;)Ljava/lang/String;
+	public final fun maskParameters (Ljava/util/Map;)Ljava/lang/String;
 	public final fun maskString (Ljava/lang/String;IZ)Ljava/lang/String;
 	public static synthetic fun maskString$default (Lio/github/jan/supabase/StringMasking;Ljava/lang/String;IZILjava/lang/Object;)Ljava/lang/String;
 	public final fun maskUrl (Lio/ktor/http/Url;I)Ljava/lang/String;

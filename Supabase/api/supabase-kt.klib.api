@@ -491,6 +491,8 @@ final object io.github.jan.supabase/BuildConfig { // io.github.jan.supabase/Buil
 
 final object io.github.jan.supabase/StringMasking { // io.github.jan.supabase/StringMasking|null[0]
     final fun maskHeaders(io.ktor.http/Headers): kotlin/String // io.github.jan.supabase/StringMasking.maskHeaders|maskHeaders(io.ktor.http.Headers){}[0]
+    final fun maskParameterString(kotlin/String): kotlin/String // io.github.jan.supabase/StringMasking.maskParameterString|maskParameterString(kotlin.String){}[0]
+    final fun maskParameters(kotlin.collections/Map<kotlin/String, kotlin/String>): kotlin/String // io.github.jan.supabase/StringMasking.maskParameters|maskParameters(kotlin.collections.Map<kotlin.String,kotlin.String>){}[0]
     final fun maskString(kotlin/String, kotlin/Int = ..., kotlin/Boolean = ...): kotlin/String // io.github.jan.supabase/StringMasking.maskString|maskString(kotlin.String;kotlin.Int;kotlin.Boolean){}[0]
     final fun maskUrl(io.ktor.http/Url, kotlin/Int = ...): kotlin/String // io.github.jan.supabase/StringMasking.maskUrl|maskUrl(io.ktor.http.Url;kotlin.Int){}[0]
 }

@@ -3270,6 +3270,10 @@ public final class io/github/jan/supabase/auth/user/UserSession$Companion {
 	public final fun serializer ()Lkotlinx/serialization/KSerializer;
 }
 
+public final class io/github/jan/supabase/auth/user/UserSessionKt {
+	public static final fun unsafeToString (Lio/github/jan/supabase/auth/user/UserSession;)Ljava/lang/String;
+}
+
 public final class io/github/jan/supabase/auth/user/UserUpdateBuilder {
 	public static final field Companion Lio/github/jan/supabase/auth/user/UserUpdateBuilder$Companion;
 	public fun <init> ()V
