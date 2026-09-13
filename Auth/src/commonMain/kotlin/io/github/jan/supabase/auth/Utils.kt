@@ -1,6 +1,7 @@
 package io.github.jan.supabase.auth
 
 import io.github.jan.supabase.SupabaseClient
+import io.github.jan.supabase.StringMasking
 import io.github.jan.supabase.auth.status.SessionStatus
 import io.github.jan.supabase.auth.user.UserSession
 import io.github.jan.supabase.logging.e
@@ -27,6 +28,6 @@ internal suspend fun Auth.tryToGetUser(accessToken: String) = try {
     retrieveUser(accessToken)
 } catch (e: Exception) {
     currentCoroutineContext().ensureActive()
-    logger.e(e) { "Couldn't retrieve user using access token $accessToken.\nIf you use the project secret, ignore this message." }
+    logger.e(e) { "Couldn't retrieve user using access token ${StringMasking.maskString(accessToken, showLength = true)}.\nIf you use the project secret, ignore this message." }
     null
 }

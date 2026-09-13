@@ -1,7 +1,6 @@
 package io.github.jan.supabase.auth
 
 import io.github.jan.supabase.OSInformation
-import io.github.jan.supabase.StringMasking
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.annotations.SupabaseInternal
 import io.github.jan.supabase.auth.exception.TokenExpiredException
@@ -60,7 +59,7 @@ private suspend fun SupabaseClient.checkAccessToken(token: String) {
                 Auto refresh running: $autoRefreshRunning
                 Auto-refresher information: ${auth.autoRefreshInformation()}
                 OS: ${OSInformation.CURRENT}
-                Session: ${StringMasking.maskSession(currentSession)}
+                Session: $currentSession
             """.trimIndent()
         }
 

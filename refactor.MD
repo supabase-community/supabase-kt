@@ -1,6 +1,7 @@
 # Road to official / next major version
 
-This document holds suggested refactors that can be done in the transition of migrating the library to an official one. A lot of them come from the community. Features which are unlikely are highlighted as such.
+This document holds suggested refactors that can be done in the transition of migrating the library to an official one. A lot of them come from the community. 
+Features which are unlikely are highlighted as such.
 
 ## Core
 
@@ -9,7 +10,40 @@ This document holds suggested refactors that can be done in the transition of mi
 Currently, all IDs (UID, bucket id, etc.) are held as a string. This makes them hard to (1) distinguish (2) ensure type safety. 
 Also, if IDs need additional transformations (like ensuring correct URL encoding), a separate class would make this cleaner then using a helper method each time.
 
+### Find a better way for (rest) error/exception handling; also leaking exceptions
+
+Currently, it can be very hard to guess which exception is thrown when the API returns an error response. Some modules like Auth and Storage have specific error codes which are the most useful for devs, 
+but these are often in specific `RestException` subtypes like `AuthRestException`. Also, the whole `RestException` structure is very unclear. Generally options would be:
+1. Keep exceptions but make the hierarchy more explicit and easier to understand.
+2. Use a JS style approach with `val (result, error) = table.select(...)`, where result is null if there is an error
+3. Use a sealed-class style approach with, e.g.:
+```kotlin
+when(val result = table.select(...)) {
+    is Success -> println(result.data)
+    is RestError -> // handle
+    // maybe other types like network errors etc.    
+}
+```
+
+Second, there have been multiple instances where exceptions like serialization errors leak through the API and are even harder to handle as a dev.
+
+### Unify method/class naming and also DSL approach
+
+Specifically DSL builders are named sometimes very differently like Builder, Options, Parameter. This should be revised and maybe unified. 
+Also, a lot of them use a different approach like some builders are serializable classes, while some have a distinct `build()` method for serialization. Im
+
+### Immutable client config
+
+Currently, after creating the client, you can still modify each plugin's config, which shouldn't be done and can lead to unexpected behavior.
+
 ## Auth
+
+### Reconsider auto refresh
+
+Currently, the auto refresh works via coroutines and `delay`. This works but is not really ideal especially for lifecycle driven platforms like Android, iOS where it would be better to use alternatives.
+Also, this approach currently has rare bugs which can cause the session to expire anyway. Alternatives might be
+1. Lifecycle-driven session management / system aware work schedulers: Makes it possible to better refresh the session in the background
+2. Check the expiration dynamically before a request. This is kinda done but only if the session expired. Then the client forces a refresh.
 
 ### Separate `auth` and `auth-native` modules. This text is copied from #1291. This approach has been favorised by the community.
 **`auth-kt` really only provides:**
@@ -133,3 +167,17 @@ install(Auth) {
      appScheme = "myScheme" 
 }
 ```
+
+## PostgREST
+
+### More idiomatic column specification
+
+Currently, you have to provide a raw string (e.g. `"id,name,age"`) which is prone to errors especially if using a more complex expression. Solutions might be
+1. #761
+2. #769
+
+## Storage
+
+### More functional downloads/uploads
+
+Currently, the uploading and downloading methods are very restricted. E.g. you can listen to the progress of the upload/download.
