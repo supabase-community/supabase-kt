@@ -36,3 +36,47 @@ And add the following to your dependencies:
 ```kotlin
 implementation("io.github.jan-tennert.supabase:[module]:customVersion")
 ```
+
+## Public API changes
+
+Every published module keeps a committed dump of its public ABI (Application Binary Interface) under
+`<module>/api/` — one `.api` file per JVM/Android target and one `.klib.api` covering all Kotlin
+Native, JS and Wasm targets. CI verifies your branch against those dumps.
+
+If your change touches the public surface, the `Check public ABI` job will fail until you re-record
+the dump:
+
+```shell
+./gradlew -DLibrariesOnly=true apiDump
+```
+
+Then commit the updated files under `*/api/` **as part of the same pull request**.
+
+### Reading the diff before you commit it
+
+The dump diff is the review artefact — read it rather than accepting it blindly:
+
+- **Only `+` lines** — the change is additive. Safe in a minor release.
+- **Any `-` line, or a line replaced by a differently-shaped one** — the change is
+  binary-incompatible. Code already compiled against the previous release will fail at runtime with
+  `NoSuchMethodError` / `NoSuchFieldError` even though it still compiles from source. Per
+  [SemVer 2.0.0](https://semver.org/#spec-item-8) this requires a major version bump, or a
+  deprecation cycle first (`@Deprecated(level = WARNING, replaceWith = ...)` for at least one minor,
+  then `ERROR`, then removal).
+
+Two changes look harmless in source but are binary-breaking, and the dump is the only thing that
+catches them:
+
+- **Adding a parameter to a `data class`** rewrites `copy`, `copy$default` and adds a `componentN`.
+- **Changing the body of an `inline` function or a `@PublishedApi internal` declaration** — these are
+  inlined into consumer bytecode, so consumers keep running the *old* body until they recompile.
+
+To check without re-recording:
+
+```shell
+./gradlew -DLibrariesOnly=true apiCheck
+```
+
+Run `apiDump` on macOS where possible so the Apple targets are genuinely compiled. On other hosts the
+unbuildable targets fall back to their previously recorded declarations rather than being dropped
+(`keepLocallyUnsupportedTargets`), which keeps the dump correct but leaves those targets unverified.

@@ -1,0 +1,97 @@
+public final class io/github/jan/supabase/functions/EdgeFunction {
+	public fun <init> (Ljava/lang/String;Lio/ktor/http/Headers;Lio/github/jan/supabase/SupabaseClient;)V
+	public final fun getFunctionName ()Ljava/lang/String;
+	public final fun getHeaders ()Lio/ktor/http/Headers;
+	public final fun getSupabaseClient ()Lio/github/jan/supabase/SupabaseClient;
+	public final fun invoke (Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static synthetic fun invoke$default (Lio/github/jan/supabase/functions/EdgeFunction;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public final fun invokeSSE (Lkotlin/jvm/functions/Function1;)Lkotlinx/coroutines/flow/Flow;
+	public static synthetic fun invokeSSE$default (Lio/github/jan/supabase/functions/EdgeFunction;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Lkotlinx/coroutines/flow/Flow;
+	public final fun prepareInvoke (Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static synthetic fun prepareInvoke$default (Lio/github/jan/supabase/functions/EdgeFunction;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+}
+
+public final class io/github/jan/supabase/functions/FunctionRegion : java/lang/Enum {
+	public static final field ANY Lio/github/jan/supabase/functions/FunctionRegion;
+	public static final field AP_NORTHEAST_1 Lio/github/jan/supabase/functions/FunctionRegion;
+	public static final field AP_NORTHEAST_2 Lio/github/jan/supabase/functions/FunctionRegion;
+	public static final field AP_SOUTHEAST_1 Lio/github/jan/supabase/functions/FunctionRegion;
+	public static final field AP_SOUTHEAST_2 Lio/github/jan/supabase/functions/FunctionRegion;
+	public static final field AP_SOUTH_1 Lio/github/jan/supabase/functions/FunctionRegion;
+	public static final field CA_CENTRAL_1 Lio/github/jan/supabase/functions/FunctionRegion;
+	public static final field EU_CENTRAL_1 Lio/github/jan/supabase/functions/FunctionRegion;
+	public static final field EU_WEST_1 Lio/github/jan/supabase/functions/FunctionRegion;
+	public static final field EU_WEST_2 Lio/github/jan/supabase/functions/FunctionRegion;
+	public static final field EU_WEST_3 Lio/github/jan/supabase/functions/FunctionRegion;
+	public static final field SA_EAST_1 Lio/github/jan/supabase/functions/FunctionRegion;
+	public static final field US_EAST_1 Lio/github/jan/supabase/functions/FunctionRegion;
+	public static final field US_WEST_1 Lio/github/jan/supabase/functions/FunctionRegion;
+	public static final field US_WEST_2 Lio/github/jan/supabase/functions/FunctionRegion;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public final fun getValue ()Ljava/lang/String;
+	public static fun valueOf (Ljava/lang/String;)Lio/github/jan/supabase/functions/FunctionRegion;
+	public static fun values ()[Lio/github/jan/supabase/functions/FunctionRegion;
+}
+
+public final class io/github/jan/supabase/functions/FunctionServerSentEvent {
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Lio/github/jan/supabase/SupabaseSerializer;)V
+	public final fun getData ()Ljava/lang/String;
+	public final fun getEvent ()Ljava/lang/String;
+	public final fun getId ()Ljava/lang/String;
+	public final fun getSerializer ()Lio/github/jan/supabase/SupabaseSerializer;
+}
+
+public final class io/github/jan/supabase/functions/Functions : io/github/jan/supabase/plugins/CustomSerializationPlugin, io/github/jan/supabase/plugins/MainPlugin {
+	public static final field API_VERSION I
+	public static final field Companion Lio/github/jan/supabase/functions/Functions$Companion;
+	public static final field LOGGING_TAG Ljava/lang/String;
+	public static final field X_REGION_HEADER Ljava/lang/String;
+	public fun <init> (Lio/github/jan/supabase/functions/Functions$Config;Lio/github/jan/supabase/SupabaseClient;)V
+	public final fun buildEdgeFunction (Ljava/lang/String;Lio/github/jan/supabase/functions/FunctionRegion;Lio/ktor/http/Headers;)Lio/github/jan/supabase/functions/EdgeFunction;
+	public static synthetic fun buildEdgeFunction$default (Lio/github/jan/supabase/functions/Functions;Ljava/lang/String;Lio/github/jan/supabase/functions/FunctionRegion;Lio/ktor/http/Headers;ILjava/lang/Object;)Lio/github/jan/supabase/functions/EdgeFunction;
+	public fun close (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public final fun getApi ()Lio/github/jan/supabase/auth/api/AuthenticatedSupabaseApi;
+	public fun getApiVersion ()I
+	public fun getConfig ()Lio/github/jan/supabase/functions/Functions$Config;
+	public synthetic fun getConfig ()Ljava/lang/Object;
+	public fun getLogger ()Lio/github/jan/supabase/logging/SupabaseLogger;
+	public fun getPluginKey ()Ljava/lang/String;
+	public fun getSerializer ()Lio/github/jan/supabase/SupabaseSerializer;
+	public fun getSupabaseClient ()Lio/github/jan/supabase/SupabaseClient;
+	public fun init ()V
+	public final fun invoke (Ljava/lang/String;Lio/github/jan/supabase/functions/FunctionRegion;Lio/ktor/http/Headers;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public final fun invoke (Ljava/lang/String;Lio/github/jan/supabase/functions/FunctionRegion;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static synthetic fun invoke$default (Lio/github/jan/supabase/functions/Functions;Ljava/lang/String;Lio/github/jan/supabase/functions/FunctionRegion;Lio/ktor/http/Headers;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public static synthetic fun invoke$default (Lio/github/jan/supabase/functions/Functions;Ljava/lang/String;Lio/github/jan/supabase/functions/FunctionRegion;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public final fun invokeSSE (Ljava/lang/String;Lio/github/jan/supabase/functions/FunctionRegion;Lkotlin/jvm/functions/Function1;)Lkotlinx/coroutines/flow/Flow;
+	public static synthetic fun invokeSSE$default (Lio/github/jan/supabase/functions/Functions;Ljava/lang/String;Lio/github/jan/supabase/functions/FunctionRegion;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Lkotlinx/coroutines/flow/Flow;
+	public fun parseErrorResponse (Lio/ktor/client/statement/HttpResponse;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public final fun prepareInvoke (Ljava/lang/String;Lio/github/jan/supabase/functions/FunctionRegion;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static synthetic fun prepareInvoke$default (Lio/github/jan/supabase/functions/Functions;Ljava/lang/String;Lio/github/jan/supabase/functions/FunctionRegion;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public fun resolveUrl (Ljava/lang/String;)Ljava/lang/String;
+}
+
+public final class io/github/jan/supabase/functions/Functions$Companion : io/github/jan/supabase/plugins/SupabasePluginProvider {
+	public fun create (Lio/github/jan/supabase/SupabaseClient;Lio/github/jan/supabase/functions/Functions$Config;)Lio/github/jan/supabase/functions/Functions;
+	public synthetic fun create (Lio/github/jan/supabase/SupabaseClient;Ljava/lang/Object;)Lio/github/jan/supabase/plugins/SupabasePlugin;
+	public fun createConfig (Lkotlin/jvm/functions/Function1;)Lio/github/jan/supabase/functions/Functions$Config;
+	public synthetic fun createConfig (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
+	public fun getKey ()Ljava/lang/String;
+	public fun setup (Lio/github/jan/supabase/SupabaseClientBuilder;Lio/github/jan/supabase/functions/Functions$Config;)V
+	public synthetic fun setup (Lio/github/jan/supabase/SupabaseClientBuilder;Ljava/lang/Object;)V
+}
+
+public final class io/github/jan/supabase/functions/Functions$Config : io/github/jan/supabase/plugins/MainConfig, io/github/jan/supabase/auth/AuthDependentPluginConfig, io/github/jan/supabase/plugins/CustomSerializationConfig {
+	public fun <init> ()V
+	public final fun getDefaultRegion ()Lio/github/jan/supabase/functions/FunctionRegion;
+	public fun getRequireValidSession ()Z
+	public fun getSerializer ()Lio/github/jan/supabase/SupabaseSerializer;
+	public final fun setDefaultRegion (Lio/github/jan/supabase/functions/FunctionRegion;)V
+	public fun setRequireValidSession (Z)V
+	public fun setSerializer (Lio/github/jan/supabase/SupabaseSerializer;)V
+}
+
+public final class io/github/jan/supabase/functions/FunctionsKt {
+	public static final fun getFunctions (Lio/github/jan/supabase/SupabaseClient;)Lio/github/jan/supabase/functions/Functions;
+}
+

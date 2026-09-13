@@ -15,6 +15,24 @@ fun libraryModules(withBom: Boolean = true, init: Project.() -> Unit) = configur
     init
 )
 
+/**
+ * Every published library module, the core `supabase-kt` module included.
+ *
+ * [libraryFilter] excludes the root project by comparing `it.name != it.rootProject.name`, but the
+ * core module is *also* named `supabase-kt` (see the rename in settings.gradle.kts), so that name
+ * comparison drops the core module as collateral. Comparing project identity instead is what makes
+ * the core module reachable -- this is why `Supabase/build.gradle.kts` has to apply the detekt and
+ * dokka plugins by hand while every other module gets them from the root.
+ */
+private val publishedLibraryModules = allprojects.filter {
+    it != rootProject &&
+            it.name !in excludedModules &&
+            !it.path.contains("sample") &&
+            it.name != "bom"
+}
+
+fun publishedLibraryModules(init: Project.() -> Unit) = configure(publishedLibraryModules, init)
+
 plugins {
     id(libs.plugins.kotlin.multiplatform.get().pluginId) apply false
     id(libs.plugins.android.kotlin.multiplatform.library.get().pluginId) apply false
@@ -57,6 +75,29 @@ libraryModules(false) {
     applyDokkaWithConfiguration()
     applyPowerAssertConfiguration()
     applyDetektWithConfiguration(reportMerge)
+}
+
+publishedLibraryModules {
+    applyAbiValidation()
+}
+
+// Aggregate entry points so CI and contributors have one command each, mirroring `detektAll`.
+tasks.register("apiCheck") {
+    group = "verification"
+    description = "Verifies the public ABI of every published module against its committed dump."
+    publishedLibraryModules {
+        // Task path, not a TaskProvider: the ABI tasks are registered lazily once each module
+        // applies the KMP plugin, which happens after this block runs.
+        this@register.dependsOn("${this.path}:checkKotlinAbi")
+    }
+}
+
+tasks.register("apiDump") {
+    group = "verification"
+    description = "Re-records the committed public ABI dump of every published module."
+    publishedLibraryModules {
+        this@register.dependsOn("${this.path}:updateKotlinAbi")
+    }
 }
 
 tasks.register("detektAll") {
