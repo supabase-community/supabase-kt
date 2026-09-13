@@ -1,12 +1,13 @@
 package io.github.jan.supabase.auth.url
 
+import io.github.jan.supabase.StringMasking
 import io.github.jan.supabase.auth.Auth
 import io.github.jan.supabase.auth.parseSessionFromFragment
 import io.github.jan.supabase.buildUrl
 import io.github.jan.supabase.logging.d
 
 internal fun Auth.validateHash(hash: String): UrlValidationResult {
-    logger.d { "Parsing fragment/hash $hash" }
+    logger.d { "Parsing fragment/hash ${StringMasking.maskParameterString(hash)}" }
     val parameters = getFragmentParts(hash)
     if(handledUrlParameterError { parameters[it] }) {
         return UrlValidationResult.ErrorFound
