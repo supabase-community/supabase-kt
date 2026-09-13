@@ -36,31 +36,6 @@ And add the following to your dependencies:
 ```kotlin
 implementation("io.github.jan-tennert.supabase:[module]:customVersion")
 ```
-## Running Tests
-
-It is possible to run tests across all modules using the following commands from the root directory:
-
-```shell
-# Run tests across all available targets on the platform
-./gradlew allTests 
-
-# Run tests for a specific target. They will only run if the target is supported on the platform the command is run on.
-# The following targets are supported:
-./gradlew jvmTest
-./gradlew jsBrowserTest
-./gradlew wasmJsBrowserTest
-./gradlew iosX64Test
-./gradlew iosSimulatorArm64Test
-./gradlew tvosX64Test
-./gradlew tvosSimulatorArm64Test
-./gradlew watchosX64Test
-./gradlew watchosSimulatorArm64Test
-./gradlew mingwX64Test
-```
-Some test targets have special requirements:
-- Browser tests require that Chrome, Firefox and Safari (on macOS) are installed.
-- `ios`/`watchos`/`tvos` tests only work on Mac and require that the relevant SDK is installed in Xcode.
-- Android does not have specific tests, but are tested implicitly through the `jvmTest` task.
 
 ## Public API changes
 
@@ -105,3 +80,29 @@ To check without re-recording:
 Run `apiDump` on macOS where possible so the Apple targets are genuinely compiled. On other hosts the
 unbuildable targets fall back to their previously recorded declarations rather than being dropped
 (`keepLocallyUnsupportedTargets`), which keeps the dump correct but leaves those targets unverified.
+
+## Running Tests
+
+It is possible to run tests across all modules using the following commands from the root directory:
+
+```shell
+# Run tests across all available targets on the platform
+./gradlew allTests 
+
+# Run tests for a specific target. They will only run if the target is supported on the platform the command is run on.
+# The following targets are supported:
+./gradlew jvmTest
+./gradlew jsBrowserTest
+./gradlew wasmJsBrowserTest
+./gradlew iosX64Test
+./gradlew iosSimulatorArm64Test
+./gradlew tvosX64Test
+./gradlew tvosSimulatorArm64Test
+./gradlew watchosX64Test
+./gradlew watchosSimulatorArm64Test
+./gradlew mingwX64Test
+```
+Some test targets have special requirements:
+- Browser tests require that Chrome, Firefox and Safari (on macOS) are installed.
+- `ios`/`watchos`/`tvos` tests only work on Mac and require that the relevant SDK is installed in Xcode.
+- Android does not have specific tests, but are tested implicitly through the `jvmTest` task.
