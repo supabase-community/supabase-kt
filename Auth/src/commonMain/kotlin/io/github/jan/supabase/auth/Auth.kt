@@ -13,8 +13,8 @@ import io.github.jan.supabase.auth.exception.TokenExpiredException
 import io.github.jan.supabase.auth.jwt.ClaimsRequestBuilder
 import io.github.jan.supabase.auth.jwt.ClaimsResponse
 import io.github.jan.supabase.auth.mfa.MfaApi
-import io.github.jan.supabase.auth.passkey.AuthPasskeyApi
 import io.github.jan.supabase.auth.oauth.OAuthApi
+import io.github.jan.supabase.auth.passkey.AuthPasskeyApi
 import io.github.jan.supabase.auth.providers.AuthProvider
 import io.github.jan.supabase.auth.providers.ExternalAuthConfigDefaults
 import io.github.jan.supabase.auth.providers.Google
@@ -439,11 +439,13 @@ interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
      * Exchanges a code for a session. Used when using the [FlowType.PKCE] flow
      * @param code The code to exchange
      * @param saveSession Whether to save the session in storage
+     * @param flowId Optional flow id (for concurrent PKCE flows), and if [AuthConfig.appendPkceFlowIdToRedirects] is enabled
      * @throws RestException or one of its subclasses if receiving an error response. If the error response contains a error code, an [AuthRestException] will be thrown which can be used to easier identify the problem.
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
-    suspend fun exchangeCodeForSession(code: String, saveSession: Boolean = true): UserSession
+    // For 4.X: convert to DSL builder
+    suspend fun exchangeCodeForSession(code: String, saveSession: Boolean = true, flowId: String? = null): UserSession
 
     /**
      * Starts auto refreshing the current session

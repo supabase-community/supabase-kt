@@ -40,6 +40,11 @@ class SettingsCodeVerifierCache(
         val key = pkceVerifierSlotKey(storageKey, flowId)
         suspendSettings.putString(key, verifier)
         val index = getPKCEFlowIndex().toMutableList()
+        // Add the new flow to the index
+        if (!index.contains(flowId)) {
+            index.add(flowId)
+        }
+        // Evict oldest flows if we exceed max concurrent flows
         while(index.size > PKCEConstants.PKCE_MAX_CONCURRENT_FLOWS) {
             val evicted = index.removeFirst()
             suspendSettings.remove(pkceVerifierSlotKey(storageKey, evicted))

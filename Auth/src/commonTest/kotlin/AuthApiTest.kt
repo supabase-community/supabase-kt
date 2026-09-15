@@ -48,6 +48,7 @@ class AuthRequestTest {
         install(Auth) {
             minimalConfig()
             flowType = FlowType.PKCE
+            appendPkceFlowIdToRedirects = true
         }
     }
 
@@ -67,7 +68,9 @@ class AuthRequestTest {
                 val body = it.body.toJsonElement().jsonObject
                 val metaSecurity = body["gotrue_meta_security"]!!.jsonObject
                 val params = it.url.parameters
-                assertEquals(expectedUrl, params["redirect_to"])
+                val redirectTo = params["redirect_to"] ?: ""
+                assertContains(redirectTo, expectedUrl)
+                assertContains(redirectTo, PKCEConstants.PKCE_FLOW_ID_PARAM)
                 assertMethodIs(HttpMethod.Post, it.method)
                 assertPathIs("/signup", it.url.pathAfterVersion())
                 assertEquals(expectedEmail, body["email"]?.jsonPrimitive?.content)
@@ -209,7 +212,7 @@ class AuthRequestTest {
                 val body = it.body.toJsonElement().jsonObject
                 val metaSecurity = body["gotrue_meta_security"]!!.jsonObject
                 val params = it.url.parameters
-                assertEquals(expectedUrl, params["redirect_to"])
+                assertRedirectUrlContains(params["redirect_to"] ?: "", expectedUrl)
                 assertMethodIs(HttpMethod.Post, it.method)
                 assertPathIs("/signup", it.url.pathAfterVersion())
                 assertEquals(expectedPhone, body["phone"]?.jsonPrimitive?.content)
@@ -244,7 +247,7 @@ class AuthRequestTest {
                 val body = it.body.toJsonElement().jsonObject
                 val metaSecurity = body["gotrue_meta_security"]!!.jsonObject
                 val params = it.url.parameters
-                assertEquals(expectedUrl, params["redirect_to"])
+                assertRedirectUrlContains(params["redirect_to"] ?: "", expectedUrl)
                 assertMethodIs(HttpMethod.Post, it.method)
                 assertPathIs("/otp", it.url.pathAfterVersion())
                 assertEquals(expectedPhone, body["phone"]?.jsonPrimitive?.content)
@@ -274,7 +277,7 @@ class AuthRequestTest {
                 val body = it.body.toJsonElement().jsonObject
                 val metaSecurity = body["gotrue_meta_security"]!!.jsonObject
                 val params = it.url.parameters
-                assertEquals(expectedUrl, params["redirect_to"])
+                assertRedirectUrlContains(params["redirect_to"] ?: "", expectedUrl)
                 assertMethodIs(HttpMethod.Post, it.method)
                 assertPathIs("/otp", it.url.pathAfterVersion())
                 assertEquals(expectedEmail, body["email"]?.jsonPrimitive?.content)
@@ -304,7 +307,7 @@ class AuthRequestTest {
                 val body = it.body.toJsonElement().jsonObject
                 val metaSecurity = body["gotrue_meta_security"]!!.jsonObject
                 val params = it.url.parameters
-                assertEquals(expectedUrl, params["redirect_to"])
+                assertRedirectUrlContains(params["redirect_to"] ?: "", expectedUrl)
                 assertMethodIs(HttpMethod.Post, it.method)
                 assertPathIs("/otp", it.url.pathAfterVersion())
                 assertEquals(expectedPhone, body["phone"]?.jsonPrimitive?.content)
@@ -331,7 +334,7 @@ class AuthRequestTest {
             client = createMockedSupabaseClient(configuration = configuration) {
                 val body = it.body.toJsonElement().jsonObject
                 val params = it.url.parameters
-                assertEquals(expectedUrl, params["redirect_to"])
+                assertRedirectUrlContains(params["redirect_to"] ?: "", expectedUrl)
                 assertMethodIs(HttpMethod.Post, it.method)
                 assertPathIs("/otp", it.url.pathAfterVersion())
                 assertEquals(expectedPhone, body["phone"]?.jsonPrimitive?.content)
@@ -354,7 +357,7 @@ class AuthRequestTest {
             client = createMockedSupabaseClient(configuration = configuration) {
                 val body = it.body.toJsonElement().jsonObject
                 val params = it.url.parameters
-                assertEquals(expectedUrl, params["redirect_to"])
+                assertRedirectUrlContains(params["redirect_to"] ?: "", expectedUrl)
                 assertMethodIs(HttpMethod.Post, it.method)
                 assertPathIs("/otp", it.url.pathAfterVersion())
                 assertEquals(expectedEmail, body["email"]?.jsonPrimitive?.content)
@@ -442,7 +445,10 @@ class AuthRequestTest {
             val providerUrl = "https://example.com"
             client = createMockedSupabaseClient(configuration = configuration) {
                 val params = it.url.parameters
-                assertEquals(expectedRedirectUrl, params["redirect_to"])
+                val redirectTo = params["redirect_to"] ?: ""
+                // Verify redirect_to contains the base URL
+                assertContains(redirectTo, expectedRedirectUrl)
+                // Flow ID may or may not be present depending on config
                 assertMethodIs(HttpMethod.Get, it.method)
                 assertPathIs("/user/identities/authorize", it.url.pathAfterVersion())
                 assertEquals(expectedProvider.name, params["provider"])
@@ -524,7 +530,8 @@ class AuthRequestTest {
                 assertMethodIs(HttpMethod.Post, it.method)
                 assertPathIs("/sso", it.url.pathAfterVersion())
                 val body = it.body.toJsonElement().jsonObject
-                assertEquals(expectedRedirectUrl, body["redirect_to"]!!.jsonPrimitive.content)
+                val redirectTo = body["redirect_to"]!!.jsonPrimitive.content
+                assertRedirectUrlContains(redirectTo, expectedRedirectUrl)
                 val metaSecurity = body["gotrue_meta_security"]!!.jsonObject
                 assertEquals(expectedDomain, body["domain"]?.jsonPrimitive?.content)
                 assertEquals(expectedCaptchaToken, metaSecurity["captcha_token"]?.jsonPrimitive?.content)
@@ -555,7 +562,8 @@ class AuthRequestTest {
                 assertMethodIs(HttpMethod.Post, it.method)
                 assertPathIs("/sso", it.url.pathAfterVersion())
                 val body = it.body.toJsonElement().jsonObject
-                assertEquals(expectedRedirectUrl, body["redirect_to"]!!.jsonPrimitive.content)
+                val redirectTo = body["redirect_to"]!!.jsonPrimitive.content
+                assertRedirectUrlContains(redirectTo, expectedRedirectUrl)
                 val metaSecurity = body["gotrue_meta_security"]!!.jsonObject
                 assertEquals(expectedProviderId, body["provider_id"]?.jsonPrimitive?.content)
                 assertEquals(expectedCaptchaToken, metaSecurity["captcha_token"]?.jsonPrimitive?.content)
@@ -623,7 +631,7 @@ class AuthRequestTest {
                 assertMethodIs(HttpMethod.Post, it.method)
                 assertPathIs("/resend", it.url.pathAfterVersion())
                 val params = it.url.parameters
-                assertEquals(expectedUrl, params["redirect_to"])
+                assertRedirectUrlContains(params["redirect_to"] ?: "", expectedUrl)
 
                 val body = it.body.toJsonElement().jsonObject
                 val metaSecurity = body["gotrue_meta_security"]!!.jsonObject
@@ -682,7 +690,7 @@ class AuthRequestTest {
                 )
                 assertEquals(expectedEmail, body["email"]?.jsonPrimitive?.content)
                 assertContains(it.url.toString(), encodedRedirectUrl)
-                assertEquals(expectedRedirectUrl, params["redirect_to"])
+                assertRedirectUrlContains(params["redirect_to"] ?: "", expectedRedirectUrl)
                 containsCodeChallenge(body)
                 respondJson(
                     sampleUserObject(email = expectedEmail)
@@ -1046,6 +1054,23 @@ class AuthRequestTest {
     private fun containsCodeChallenge(body: JsonObject) {
         assertNotNull(body["code_challenge"])
         assertEquals(PKCEConstants.CHALLENGE_METHOD, body["code_challenge_method"]?.jsonPrimitive?.content)
+    }
+
+    private fun assertRedirectUrlContains(actualUrl: String, expectedUrl: String) {
+        assertContains(actualUrl, expectedUrl.substringBefore("?"))
+        if ("?" in expectedUrl) {
+            val expectedParams = expectedUrl.substringAfter("?").split("&").associate {
+                val parts = it.split("=")
+                parts[0] to parts.getOrNull(1)
+            }
+            val actualParams = actualUrl.substringAfter("?").split("&").associate {
+                val parts = it.split("=")
+                parts[0] to parts.getOrNull(1)
+            }
+            expectedParams.forEach { (key, value) ->
+                assertEquals(value, actualParams[key], "Parameter $key mismatch")
+            }
+        }
     }
 
     private suspend fun SupabaseClient.awaitInit(): SupabaseClient {

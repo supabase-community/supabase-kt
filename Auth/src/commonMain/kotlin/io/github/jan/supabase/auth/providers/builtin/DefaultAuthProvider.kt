@@ -4,17 +4,21 @@ import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.annotations.SupabaseInternal
 import io.github.jan.supabase.auth.AuthImpl
 import io.github.jan.supabase.auth.FlowType
+import io.github.jan.supabase.auth.appendFlowIdIfEnabled
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.auth.generateCodeChallenge
 import io.github.jan.supabase.auth.generateCodeVerifier
+import io.github.jan.supabase.auth.generatePKCEFlowId
 import io.github.jan.supabase.auth.providers.AuthProvider
 import io.github.jan.supabase.auth.putCodeChallenge
 import io.github.jan.supabase.auth.redirectTo
 import io.github.jan.supabase.auth.user.UserSession
+import io.github.jan.supabase.exceptions.RestException
 import io.github.jan.supabase.logging.w
 import io.github.jan.supabase.putJsonObject
 import io.github.jan.supabase.safeBody
 import io.github.jan.supabase.supabaseJson
+import io.ktor.http.encodeURLPath
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonObject
@@ -74,9 +78,11 @@ sealed interface DefaultAuthProvider<C, R> : AuthProvider<C, R> {
         val body = encodeCredentials(config)
         val gotrue = supabaseClient.auth as AuthImpl
         var codeChallenge: String? = null
+        var flowId: String? = null
         if(gotrue.config.flowType == FlowType.PKCE) {
             val codeVerifier = generateCodeVerifier()
-            gotrue.codeVerifierCache.saveCodeVerifier(codeVerifier)
+            flowId = generatePKCEFlowId()
+            gotrue.codeVerifierCache.storePKCEVerifier(flowId, codeVerifier)
             codeChallenge = generateCodeChallenge(codeVerifier)
         }
         val url = when (this) {
@@ -84,27 +90,34 @@ sealed interface DefaultAuthProvider<C, R> : AuthProvider<C, R> {
             Phone -> "signup"
             IDToken -> "token?grant_type=id_token"
         }
-        val response = gotrue.publicApi.postJson(url, buildJsonObject {
-            putJsonObject(body)
-            if (codeChallenge != null) {
-                putCodeChallenge(codeChallenge)
+        try {
+            val response = gotrue.publicApi.postJson(url, buildJsonObject {
+                putJsonObject(body)
+                if (codeChallenge != null) {
+                    putCodeChallenge(codeChallenge)
+                }
+            }) {
+                redirectUrl?.let { redirectTo(gotrue.appendFlowIdIfEnabled(it, flowId?.encodeURLPath())) }
             }
-        }) {
-            redirectUrl?.let { redirectTo(it) }
-        }
-        val json = response.safeBody<JsonObject>()
-        if (json.containsKey("access_token")) {
-            runCatching {
-                val userSession = supabaseJson.decodeFromJsonElement<UserSession>(json)
-                onSuccess(userSession)
-                val userJson = json["user"]?.jsonObject ?: buildJsonObject { }
-                return decodeResult(userJson)
-            }.onFailure { exception ->
-                supabaseClient.auth.logger.w(exception) { "Failed to decode user info" }
-                return null
+            gotrue.codeVerifierCache.removePKCEVerifier(flowId)
+            val json = response.safeBody<JsonObject>()
+            if (json.containsKey("access_token")) {
+                gotrue.codeVerifierCache.removePKCEVerifier(flowId) // then there should be no need for PKCE since we have a session
+                runCatching {
+                    val userSession = supabaseJson.decodeFromJsonElement<UserSession>(json)
+                    onSuccess(userSession)
+                    val userJson = json["user"]?.jsonObject ?: buildJsonObject { }
+                    return decodeResult(userJson)
+                }.onFailure { exception ->
+                    supabaseClient.auth.logger.w(exception) { "Failed to decode user info" }
+                    return null
+                }
             }
+            return decodeResult(json)
+        } catch(e: RestException) {
+            gotrue.codeVerifierCache.removePKCEVerifier(flowId)
+            throw e
         }
-        return decodeResult(json)
     }
 
     @SupabaseInternal

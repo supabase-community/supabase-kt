@@ -2,6 +2,7 @@
 package io.github.jan.supabase.auth
 
 import dev.whyoleg.cryptography.random.CryptographyRandom
+import io.github.jan.supabase.buildUrl
 import okio.ByteString.Companion.toByteString
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
@@ -14,8 +15,14 @@ internal object PKCEConstants {
     val PKCE_FLOW_ID_PATTERN = Regex("^[a-zA-Z0-9_-]{8,64}")
 }
 
-internal fun validatePKCEFlowId(flowId: String): String? {
-    return if(PKCEConstants.PKCE_FLOW_ID_PATTERN.matches(flowId)) flowId else null
+internal fun validatePKCEFlowId(flowId: String?): String? {
+    return if(flowId != null && PKCEConstants.PKCE_FLOW_ID_PATTERN.matches(flowId)) flowId else null
+}
+
+internal fun Auth.appendFlowIdIfEnabled(redirectUrl: String, flowId: String?): String {
+    return if(flowId == null || !config.appendPkceFlowIdToRedirects) redirectUrl else buildUrl(redirectUrl) {
+        parameters[PKCEConstants.PKCE_FLOW_ID_PARAM] = flowId
+    }
 }
 
 internal fun generatePKCEFlowId(): String {
