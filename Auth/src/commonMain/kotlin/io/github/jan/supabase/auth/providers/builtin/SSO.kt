@@ -36,7 +36,8 @@ data object SSO: AuthProvider<SSO.Config, Unit> {
      */
     @Serializable
     data class Result(
-        val url: String
+        val url: String,
+        val flowId: String? = null
     )
 
     override suspend fun login(

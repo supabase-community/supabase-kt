@@ -4,9 +4,11 @@ import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.SupabaseSerializer
 import io.github.jan.supabase.auth.AuthImpl
 import io.github.jan.supabase.auth.FlowType
+import io.github.jan.supabase.auth.appendFlowIdIfEnabled
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.auth.generateCodeChallenge
 import io.github.jan.supabase.auth.generateCodeVerifier
+import io.github.jan.supabase.auth.generatePKCEFlowId
 import io.github.jan.supabase.auth.providers.AuthProvider
 import io.github.jan.supabase.auth.putCaptchaToken
 import io.github.jan.supabase.auth.user.UserSession
@@ -83,9 +85,11 @@ data object OTP: AuthProvider<OTP.Config, Unit> {
 
         val body = buildOtpRequestBody(otpConfig)
         var codeChallenge: String? = null
+        var flowId: String? = null
         if (supabaseClient.auth.config.flowType == FlowType.PKCE) {
             val codeVerifier = generateCodeVerifier()
-            supabaseClient.auth.codeVerifierCache.saveCodeVerifier(codeVerifier)
+            flowId = generatePKCEFlowId()
+            supabaseClient.auth.codeVerifierCache.storePKCEVerifier(flowId, codeVerifier)
             codeChallenge = generateCodeChallenge(codeVerifier)
         }
         (supabaseClient.auth as AuthImpl).publicApi.postJson("otp", buildJsonObject {
@@ -96,7 +100,7 @@ data object OTP: AuthProvider<OTP.Config, Unit> {
             }
             otpConfig.captchaToken?.let { putCaptchaToken(it) }
         }) {
-            redirectUrl?.let { url.parameters.append("redirect_to", it) }
+            redirectUrl?.let { url.parameters.append("redirect_to", supabaseClient.auth.appendFlowIdIfEnabled(it, flowId)) }
         }
     }
 

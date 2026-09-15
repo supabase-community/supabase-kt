@@ -27,4 +27,9 @@ open class ExternalAuthConfigDefaults {
      */
     var automaticallyOpenUrl: Boolean = true
 
+    /**
+     * Custom flow id for concurrent PKCE flows
+      */
+    var flowId: String? = null
+
 }

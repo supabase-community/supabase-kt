@@ -212,19 +212,24 @@ internal class AuthImpl(
         config: ExternalAuthConfigDefaults.() -> Unit
     ): String? {
         val automaticallyOpen = ExternalAuthConfigDefaults().apply(config).automaticallyOpenUrl
+        val flowId = generatePKCEFlowId()
         val fetchUrl: suspend (String?) -> String = { redirectTo: String? ->
-            val url = getOAuthUrl(provider, redirectTo, "user/identities/authorize", config)
+            val url = getOAuthUrl(provider, redirectTo, "user/identities/authorize") {
+                this.flowId = flowId
+                config()
+            }
             val response = userApi.rawRequest(url) {
                 method = HttpMethod.Get
                 parameter("skip_http_redirect", true)
             }
             response.safeBody<JsonObject>()["url"]?.jsonPrimitive?.contentOrNull ?: error("No URL found in response")
         }
+        val redirectWithFlowId = if(redirectUrl != null) appendFlowIdIfEnabled(redirectUrl, flowId) else null
         if(!automaticallyOpen) {
-            return fetchUrl(redirectUrl ?: "")
+            return fetchUrl(redirectWithFlowId ?: "")
         }
         startExternalAuth(
-            redirectUrl = redirectUrl,
+            redirectUrl = redirectWithFlowId,
             getUrl = {
                 fetchUrl(it)
             },
@@ -269,19 +274,25 @@ internal class AuthImpl(
             "Either domain or providerId must be set, not both"
         }
 
-        val codeChallenge: String? = preparePKCEIfEnabled()
-        return publicApi.postJson("sso", buildJsonObject {
-            redirectUrl?.let { put("redirect_to", it) }
-            createdConfig.captchaToken?.let(::putCaptchaToken)
-            codeChallenge?.let(::putCodeChallenge)
-            createdConfig.domain?.let {
-                put("domain", it)
-            }
-            createdConfig.providerId?.let {
-                put("provider_id", it)
-            }
-        })
-            .safeBody()
+        val (codeChallenge, flowId) = preparePKCEIfEnabled()
+        return try {
+            publicApi.postJson("sso", buildJsonObject {
+                redirectUrl?.let { put("redirect_to", appendFlowIdIfEnabled(it, flowId)) }
+                createdConfig.captchaToken?.let(::putCaptchaToken)
+                codeChallenge?.let(::putCodeChallenge)
+                createdConfig.domain?.let {
+                    put("domain", it)
+                }
+                createdConfig.providerId?.let {
+                    put("provider_id", it)
+                }
+            })
+                .safeBody<SSO.Result>()
+                .copy(flowId = flowId)
+        } catch(e: RestException) {
+            codeVerifierCache.removePKCEVerifier(flowId)
+            throw e
+        }
     }
 
     override suspend fun updateUser(
@@ -290,13 +301,18 @@ internal class AuthImpl(
         config: UserUpdateBuilder.() -> Unit
     ): UserInfo {
         val updateBuilder = UserUpdateBuilder(serializer = serializer).apply(config)
-        val codeChallenge = preparePKCEIfEnabled()
+        val (codeChallenge, flowId) = preparePKCEIfEnabled()
         val body = buildJsonObject {
             putJsonObject(supabaseJson.encodeToJsonElement(updateBuilder).jsonObject)
             codeChallenge?.let(::putCodeChallenge)
         }.toString()
-        val response = userApi.putJson("user", body) {
-            redirectUrl?.let { url.parameters.append("redirect_to", it) }
+        val response = try {
+            userApi.putJson("user", body) {
+                redirectUrl?.let { url.parameters.append("redirect_to", appendFlowIdIfEnabled(it, flowId)) }
+            }
+        } catch(e: RestException) {
+            codeVerifierCache.removePKCEVerifier(flowId)
+            throw e
         }
         val userInfo = response.safeBody<UserInfo>()
         if (updateCurrentUser && sessionStatus.value is SessionStatus.Authenticated) {
@@ -311,13 +327,25 @@ internal class AuthImpl(
     }
 
     private suspend fun resend(type: String,  redirectUrl: String? = null, body: JsonObjectBuilder.() -> Unit) {
-        userApi.postJson("resend", buildJsonObject {
-            put("type", type)
-            val innerBody = buildJsonObject(body)
-            putJsonObject(innerBody)
-            if(config.flowType == FlowType.PKCE && !innerBody.containsKey("phone")) preparePKCEIfEnabled()?.let(::putCodeChallenge)
-        }) {
-            redirectUrl?.let { url.parameters["redirect_to"] = it }
+        var codeChallenge: String? = null
+        var flowId: String? = null
+        val innerBody = buildJsonObject(body)
+        if(config.flowType == FlowType.PKCE && !innerBody.containsKey("phone")) {
+            val pair = preparePKCEIfEnabled()
+            codeChallenge = pair.first
+            flowId = pair.second
+        }
+        try {
+            userApi.postJson("resend", buildJsonObject {
+                put("type", type)
+                putJsonObject(innerBody)
+                codeChallenge?.let(::putCodeChallenge)
+            }) {
+                redirectUrl?.let { url.parameters["redirect_to"] = appendFlowIdIfEnabled(it, flowId) }
+            }
+        } catch(e: RestException) {
+            codeVerifierCache.removePKCEVerifier(flowId)
+            throw e
         }
     }
 
@@ -344,14 +372,19 @@ internal class AuthImpl(
         require(email.isNotBlank()) {
             "Email must not be blank"
         }
-        val codeChallenge = preparePKCEIfEnabled()
+        val (codeChallenge, flowId) = preparePKCEIfEnabled()
         val body = buildJsonObject {
             put("email", email)
             captchaToken?.let(::putCaptchaToken)
             codeChallenge?.let(::putCodeChallenge)
         }.toString()
-        publicApi.postJson("recover", body) {
-            redirectUrl?.let { url.parameters.append("redirect_to", it) }
+        try {
+            publicApi.postJson("recover", body) {
+                redirectUrl?.let { url.parameters.append("redirect_to", appendFlowIdIfEnabled(it, flowId)) }
+            }
+        } catch(e: RestException) {
+            codeVerifierCache.removePKCEVerifier(flowId)
+            throw e
         }
     }
 
@@ -518,20 +551,25 @@ internal class AuthImpl(
         return user
     }
 
-    override suspend fun exchangeCodeForSession(code: String, saveSession: Boolean): UserSession {
-        val codeVerifier = codeVerifierCache.loadCodeVerifier()
-        require(codeVerifier != null) {
-            "No code verifier stored. Make sure to use `getOAuthUrl` for the OAuth Url to prepare the PKCE flow."
+    override suspend fun exchangeCodeForSession(code: String, saveSession: Boolean, flowId: String?): UserSession {
+        try {
+            val codeVerifier = codeVerifierCache.retrievePKCEVerifier(validatePKCEFlowId(flowId))
+            require(codeVerifier != null) {
+                "No code verifier stored. Make sure to use `getOAuthUrl` for the OAuth Url to prepare the PKCE flow."
+            }
+            val session = unauthenticatedApi.postJson("token?grant_type=pkce", buildJsonObject {
+                put("auth_code", code)
+                put("code_verifier", codeVerifier)
+            }).safeBody<UserSession>()
+            codeVerifierCache.removePKCEVerifier(flowId)
+            if (saveSession) {
+                importSession(session, source = SessionSource.External)
+            }
+            return session
+        } catch(e: RestException) {
+            codeVerifierCache.removePKCEVerifier(flowId)
+            throw e
         }
-        val session = unauthenticatedApi.postJson("token?grant_type=pkce", buildJsonObject {
-            put("auth_code", code)
-            put("code_verifier", codeVerifier)
-        }).safeBody<UserSession>()
-        codeVerifierCache.deleteCodeVerifier()
-        if (saveSession) {
-            importSession(session, source = SessionSource.External)
-        }
-        return session
     }
 
     override suspend fun refreshSession(refreshToken: String): UserSession {
@@ -760,6 +798,7 @@ internal class AuthImpl(
         }
     }
 
+    // 4.X return OAuthResponse like in supabase-js with the flow id
     @OptIn(SupabaseExperimental::class)
     override fun getOAuthUrl(
         provider: OAuthProvider,
@@ -768,13 +807,13 @@ internal class AuthImpl(
         additionalConfig: ExternalAuthConfigDefaults.() -> Unit
     ): String {
         val config = ExternalAuthConfigDefaults().apply(additionalConfig)
-        val codeChallenge = preparePKCEIfEnabled()
+        val (codeChallenge, flowId) = preparePKCEIfEnabled()
         codeChallenge?.let {
             config.queryParams["code_challenge"] = it
             config.queryParams["code_challenge_method"] = PKCEConstants.CHALLENGE_METHOD
         }
         return resolveUrl(buildString {
-            append("$url?provider=${provider.name}&redirect_to=${redirectUrl?.encodeURLParameter()}")
+            append("$url?provider=${provider.name}&redirect_to=${redirectUrl?.let { appendFlowIdIfEnabled(it, flowId) }?.encodeURLParameter()}")
             if (config.scopes.isNotEmpty()) append("&scopes=${config.scopes.joinToString("+")}")
             if (config.queryParams.isNotEmpty()) {
                 for ((key, value) in config.queryParams) {
@@ -808,14 +847,14 @@ internal class AuthImpl(
     /**
      * Prepares PKCE if enabled and returns the code challenge.
      */
-    private fun preparePKCEIfEnabled(isPasswordRecovery: Boolean = false, onEvictFlow: (String) -> Unit = {}): String? {
-        if (this.config.flowType != FlowType.PKCE) return null
+    private fun preparePKCEIfEnabled(isPasswordRecovery: Boolean = false, onEvictFlow: (String) -> Unit = {}): Pair<String?, String?> {
+        if (this.config.flowType != FlowType.PKCE) return null to null
         val codeVerifier = generateCodeVerifier() + if(isPasswordRecovery) "/recovery" else ""
         val flowId = generatePKCEFlowId()
         authScope.launch {
             supabaseClient.auth.codeVerifierCache.storePKCEVerifier(flowId, codeVerifier, onEvictFlow)
         }
-        return generateCodeChallenge(codeVerifier)
+        return generateCodeChallenge(codeVerifier) to flowId
     }
 
 }
