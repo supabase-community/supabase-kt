@@ -4,10 +4,11 @@ This document holds suggested refactors that can be done in the transition of mi
 Features which are unlikely are highlighted as such.
 
 Suggested order:
-1. Auth changes from below (because these changes are basically done) & figure out the namespace
-2. Better exceptions
-3. Other small changes & improvements
-4. ABI validation (see #1397 as an example)
+1. Auth changes from #1291 (because these changes are basically done) & figure out the namespace
+2. Potential auto refresh changes
+3. Better exceptions
+4. Other small changes & improvements
+5. ABI validation (see #1397 as an example)
 
 ## Core
 
