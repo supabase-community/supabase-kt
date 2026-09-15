@@ -29,6 +29,10 @@ import io.github.jan.supabase.auth.jwt.ecdsaRawToDer
 import io.github.jan.supabase.auth.jwt.rsaJwkToDer
 import io.github.jan.supabase.auth.mfa.MfaApi
 import io.github.jan.supabase.auth.mfa.MfaApiImpl
+import io.github.jan.supabase.auth.oauth.OAuthApi
+import io.github.jan.supabase.auth.oauth.OAuthApiImpl
+import io.github.jan.supabase.auth.passkey.AuthPasskeyApi
+import io.github.jan.supabase.auth.passkey.AuthPasskeyApiImpl
 import io.github.jan.supabase.auth.providers.Email
 import io.github.jan.supabase.auth.providers.LoginIdentifier
 import io.github.jan.supabase.auth.providers.Phone
@@ -120,6 +124,11 @@ internal class AuthImpl(
     override val userApi = if(config.requireValidSession) supabaseClient.authenticatedSupabaseApi(this) else publicApi
     override val admin: AdminApi = AdminApiImpl(publicApi)
     override val mfa: MfaApi = MfaApiImpl(userApi.resolve("factors"), this)
+
+    override val passkeys: AuthPasskeyApi = AuthPasskeyApiImpl(userApi.resolve("passkeys")) {
+        importSession(it)
+    }
+    override val oauth: OAuthApi = OAuthApiImpl(userApi)
     var sessionJob: Job? = null
     var refreshInformation: SessionRefreshInformation? = null
     override val isAutoRefreshRunning: Boolean
@@ -186,13 +195,13 @@ internal class AuthImpl(
         redirectTo: String?,
         config: JsonObject
     ) {
-        val codeChallenge: String? = if(identifier is Email) preparePKCEIfEnabled() else null
+        val (codeChallenge, flowId) = if(identifier is Email) preparePKCEIfEnabled() else null to null
         publicApi.postJson("otp", buildJsonObject {
             codeChallenge?.let(::putCodeChallenge)
             putJsonObject(config)
         }) {
             val redirectUrl = redirectTo ?: defaultRedirectUrl()
-            if(identifier is Email && redirectUrl != null) redirectTo(redirectUrl)
+            if(identifier is Email && redirectUrl != null) redirectTo(appendFlowIdIfEnabled(redirectUrl, flowId))
         }
     }
 
@@ -215,14 +224,19 @@ internal class AuthImpl(
         redirectTo: String?,
         config: JsonObject
     ): AuthResponse {
-        val codeChallenge: String? = if(identifier is Email) preparePKCEIfEnabled() else null
-        val response = publicApi.postJson("signup", buildJsonObject {
-            codeChallenge?.let(::putCodeChallenge)
-            putJsonObject(config)
-        }.also(::println)) {
-            val redirectUrl = redirectTo ?: defaultRedirectUrl()
-            if(identifier is Email && redirectUrl != null) redirectTo(redirectUrl)
-        }.safeBody<JsonObject>()
+        val (codeChallenge, flowId) = if(identifier is Email) preparePKCEIfEnabled() else null to null
+        val response = try {
+            publicApi.postJson("signup", buildJsonObject {
+                codeChallenge?.let(::putCodeChallenge)
+                putJsonObject(config)
+            }.also(::println)) {
+                val redirectUrl = redirectTo ?: defaultRedirectUrl()
+                if(identifier is Email && redirectUrl != null) redirectTo(appendFlowIdIfEnabled(redirectUrl, flowId))
+            }.safeBody<JsonObject>()
+        } catch(e: RestException) {
+            codeVerifierCache.removePKCEVerifier(flowId)
+            throw e
+        }
         return decodeAuthResponse(response).also {
             if(it.session != null) importIfEnabled(it.session, flag = SessionFlag.SIGN_UP)
         }
@@ -315,13 +329,18 @@ internal class AuthImpl(
         config: UserUpdateBuilder.() -> Unit
     ): UserInfo {
         val updateBuilder = UserUpdateBuilder(serializer = serializer).apply(config)
-        val codeChallenge = preparePKCEIfEnabled()
+        val (codeChallenge, flowId) = preparePKCEIfEnabled()
         val body = buildJsonObject {
             putJsonObject(supabaseJson.encodeToJsonElement(updateBuilder).jsonObject)
             codeChallenge?.let(::putCodeChallenge)
         }.toString()
-        val response = userApi.putJson("user", body) {
-            redirectUrl?.let { url.parameters.append("redirect_to", it) }
+        val response = try {
+            userApi.putJson("user", body) {
+                redirectUrl?.let { url.parameters.append("redirect_to", appendFlowIdIfEnabled(it, flowId)) }
+            }
+        } catch(e: RestException) {
+            codeVerifierCache.removePKCEVerifier(flowId)
+            throw e
         }
         val userInfo = response.safeBody<UserInfo>()
         if (updateCurrentUser && sessionStatus.value is SessionStatus.Authenticated) {
@@ -341,6 +360,7 @@ internal class AuthImpl(
         }
     }
 
+    // TODO combine via Email/Password and custom DSLs (for redirect URL & PKCE)
     override suspend fun resendEmail(type: OtpType.Email, email: String, captchaToken: String?,  redirectUrl: String?) =
         resend(type = type.type, redirectUrl = redirectUrl) {
             put("email", email)
@@ -364,14 +384,14 @@ internal class AuthImpl(
         require(email.isNotBlank()) {
             "Email must not be blank"
         }
-        val codeChallenge = preparePKCEIfEnabled()
+        val (codeChallenge, flowId) = preparePKCEIfEnabled()
         val body = buildJsonObject {
             put("email", email)
             captchaToken?.let(::putCaptchaToken)
             codeChallenge?.let(::putCodeChallenge)
         }.toString()
         publicApi.postJson("recover", body) {
-            redirectUrl?.let { url.parameters.append("redirect_to", it) }
+            redirectUrl?.let { url.parameters.append("redirect_to", appendFlowIdIfEnabled(it, flowId)) }
         }
     }
 
@@ -532,15 +552,16 @@ internal class AuthImpl(
     }
 
     override suspend fun exchangeCodeForSession(code: String): UserSession {
-        val codeVerifier = codeVerifierCache.loadCodeVerifier()
-        require(codeVerifier != null) {
+        // TODO fix concurrent flow stuff
+      //  val codeVerifier = codeVerifierCache.loadCodeVerifier()
+      /*  require(codeVerifier != null) {
             "No code verifier stored. Make sure to use `getOAuthUrl` for the OAuth Url to prepare the PKCE flow."
-        }
+        }*/
         val session = unauthenticatedApi.postJson("token?grant_type=pkce", buildJsonObject {
             put("auth_code", code)
-            put("code_verifier", codeVerifier)
+      //      put("code_verifier", codeVerifier)
         }).safeBody<UserSession>()
-        codeVerifierCache.deleteCodeVerifier()
+      //  codeVerifierCache.deleteCodeVerifier()
         importIfEnabled(session, flag = SessionFlag.EXTERNAL)
         return session
     }
@@ -778,13 +799,14 @@ internal class AuthImpl(
         url: String,
         additionalConfig: OAuthConfig
     ): String {
-        val codeChallenge = preparePKCEIfEnabled()
+        val (codeChallenge, flowId) = preparePKCEIfEnabled()
         codeChallenge?.let {
             additionalConfig.queryParams["code_challenge"] = it
             additionalConfig.queryParams["code_challenge_method"] = PKCEConstants.CHALLENGE_METHOD
         }
         return resolveUrl(buildString {
-            append("$url?provider=$provider&redirect_to=${additionalConfig.redirectUrl?.encodeURLParameter()}")
+            val redirectUrlWithFlowId = additionalConfig.redirectUrl?.let { appendFlowIdIfEnabled(it, flowId) }
+            append("$url?provider=$provider&redirect_to=${redirectUrlWithFlowId?.encodeURLParameter()}")
             if (additionalConfig.scopes.isNotEmpty()) append("&scopes=${additionalConfig.scopes.joinToString("+")}")
             if (additionalConfig.queryParams.isNotEmpty()) {
                 for ((key, value) in additionalConfig.queryParams) {
@@ -811,13 +833,20 @@ internal class AuthImpl(
         identifier: SSOIdentifier,
         config: SSOConfig.() -> Unit
     ): String {
-        val createdConfig = SSOConfig(identifier).apply(config)
-        val codeChallenge: String? = preparePKCEIfEnabled()
-        return publicApi.postJson("sso", buildJsonObject {
-            codeChallenge?.let(::putCodeChallenge)
-            putJsonObject(createdConfig.encode())
-        })
-            .safeBody<JsonObject>()["url"]?.jsonPrimitive?.contentOrNull ?: error("No URL found in response")
+        val (codeChallenge, flowId) = preparePKCEIfEnabled()
+        val createdConfig = SSOConfig(identifier).apply(config).apply {
+            redirectTo = this.redirectTo?.let { appendFlowIdIfEnabled(it, flowId) }
+        }
+        return try {
+            publicApi.postJson("sso", buildJsonObject {
+                codeChallenge?.let(::putCodeChallenge)
+                putJsonObject(createdConfig.encode())
+            })
+                .safeBody<JsonObject>()["url"]?.jsonPrimitive?.contentOrNull ?: error("No URL found in response")
+        } catch(e: RestException) {
+            codeVerifierCache.removePKCEVerifier(flowId)
+            throw e
+        }
     }
 
     override fun defaultRedirectUrl(): String? {
@@ -825,7 +854,7 @@ internal class AuthImpl(
     }
 
     override suspend fun clearSession() {
-        codeVerifierCache.deleteCodeVerifier()
+        codeVerifierCache.removeAllPKCEVerifiers()
         sessionManager.deleteSession()
         setSessionStatus(SessionStatus.NotAuthenticated(true))
         stopAutoRefreshForCurrentSession()
@@ -848,13 +877,14 @@ internal class AuthImpl(
     /**
      * Prepares PKCE if enabled and returns the code challenge.
      */
-    private fun preparePKCEIfEnabled(): String? {
-        if (this.config.flowType != FlowType.PKCE) return null
-        val codeVerifier = generateCodeVerifier()
+    private fun preparePKCEIfEnabled(isPasswordRecovery: Boolean = false, onEvictFlow: (String) -> Unit = {}): Pair<String?, String?> {
+        if (this.config.flowType != FlowType.PKCE) return null to null
+        val codeVerifier = generateCodeVerifier() + if(isPasswordRecovery) "/recovery" else ""
+        val flowId = generatePKCEFlowId()
         authScope.launch {
-            supabaseClient.auth.codeVerifierCache.saveCodeVerifier(codeVerifier)
+            supabaseClient.auth.codeVerifierCache.storePKCEVerifier(flowId, codeVerifier, onEvictFlow)
         }
-        return generateCodeChallenge(codeVerifier)
+        return generateCodeChallenge(codeVerifier) to flowId
     }
 
     private suspend fun setupPlatform() {
