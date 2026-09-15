@@ -3,7 +3,20 @@
 This document holds suggested refactors that can be done in the transition of migrating the library to an official one. A lot of them come from the community. 
 Features which are unlikely are highlighted as such.
 
+Suggested order:
+1. Auth changes from below (because these changes are basically done) & figure out the namespace
+2. Better exceptions
+3. Other small changes & improvements
+4. ABI validation (see #1397 as an example)
+
 ## Core
+
+### Official namespace / package name
+
+Currently, the maven repository is: **io.github.jan-tennert.supabase** \
+And the package name: **io.github.jan.tennert.supabase**
+
+This should be changed to an official one. There were talks about **io.github.supabase**
 
 ### Separate ID value classes
 
