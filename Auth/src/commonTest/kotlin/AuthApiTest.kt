@@ -204,7 +204,7 @@ class AuthRequestTest {
                 val body = it.body.toJsonElement().jsonObject
                 val metaSecurity = body["gotrue_meta_security"]!!.jsonObject
                 val params = it.url.parameters
-                assertRedirectUrlContains(params["redirect_to"] ?: "", expectedUrl)
+                assertNull(params["redirect_to"])
                 assertMethodIs(HttpMethod.Post, it.method)
                 assertPathIs("/signup", it.url.pathAfterVersion())
                 assertEquals(expectedPhone, body["phone"]?.jsonPrimitive?.content)
@@ -235,7 +235,7 @@ class AuthRequestTest {
                 val body = it.body.toJsonElement().jsonObject
                 val metaSecurity = body["gotrue_meta_security"]!!.jsonObject
                 val params = it.url.parameters
-                assertRedirectUrlContains(params["redirect_to"] ?: "", expectedUrl)
+                assertNull(params["redirect_to"])
                 assertMethodIs(HttpMethod.Post, it.method)
                 assertPathIs("/otp", it.url.pathAfterVersion())
                 assertEquals(expectedPhone, body["phone"]?.jsonPrimitive?.content)
@@ -292,7 +292,7 @@ class AuthRequestTest {
                 val body = it.body.toJsonElement().jsonObject
                 val metaSecurity = body["gotrue_meta_security"]!!.jsonObject
                 val params = it.url.parameters
-                assertRedirectUrlContains(params["redirect_to"] ?: "", expectedUrl)
+                assertNull(params["redirect_to"])
                 assertMethodIs(HttpMethod.Post, it.method)
                 assertPathIs("/otp", it.url.pathAfterVersion())
                 assertEquals(expectedPhone, body["phone"]?.jsonPrimitive?.content)
@@ -316,7 +316,7 @@ class AuthRequestTest {
             client = createMockedSupabaseClient(configuration = configuration) {
                 val body = it.body.toJsonElement().jsonObject
                 val params = it.url.parameters
-                assertRedirectUrlContains(params["redirect_to"] ?: "", expectedUrl)
+                assertNull(params["redirect_to"])
                 assertMethodIs(HttpMethod.Post, it.method)
                 assertPathIs("/otp", it.url.pathAfterVersion())
                 assertEquals(expectedPhone, body["phone"]?.jsonPrimitive?.content)

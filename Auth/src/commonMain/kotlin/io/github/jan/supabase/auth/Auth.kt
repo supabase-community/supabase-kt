@@ -12,6 +12,8 @@ import io.github.jan.supabase.auth.exception.TokenExpiredException
 import io.github.jan.supabase.auth.jwt.ClaimsRequestBuilder
 import io.github.jan.supabase.auth.jwt.ClaimsResponse
 import io.github.jan.supabase.auth.mfa.MfaApi
+import io.github.jan.supabase.auth.oauth.OAuthApi
+import io.github.jan.supabase.auth.passkey.AuthPasskeyApi
 import io.github.jan.supabase.auth.providers.Email
 import io.github.jan.supabase.auth.providers.LoginIdentifier
 import io.github.jan.supabase.auth.providers.Phone

@@ -246,10 +246,7 @@ class AuthRestExceptionTest {
         }
     )
 
-    private suspend fun SupabaseClient.signUp() = auth.signUpWith(Email) {
-        email = "example@email.com"
-        password = "password"
-    }
+    private suspend fun SupabaseClient.signUp() = auth.signUp(Email("example@email.com"), "password")
 
     @AfterTest
     fun cleanup() {
