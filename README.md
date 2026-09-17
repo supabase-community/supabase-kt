@@ -148,7 +148,7 @@ For more information, checkout [supabase-kt-plugins](https://github.com/supabase
 
 - [Groceries Store App](https://github.com/hieuwu/android-groceries-store) *(Android)* - An e-commerce app using Auth, Postgrest and Storage
 - [Supa Sketcher](https://github.com/hieuwu/supa-sketcher) *(Android)* - An real-time white board app using anonymous sign-ins Auth, Postgrest and Realtime
-- [SupaBuckt](https://github.com/hieuwu/supabase-storage-client) *(Desktop/Android/iOS/Browser)* - A client app to browse buckets and files in a Supabase project, using the Auth, Postgrest and Storage module
+- [SupaBuckt](https://github.com/hieuwu/supabase-storage-client) *(Android/iOS)* - A client app to browse buckets and files in a Supabase project
  
 ### Server-side Applications
 
