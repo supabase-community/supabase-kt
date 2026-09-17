@@ -148,6 +148,7 @@ For more information, checkout [supabase-kt-plugins](https://github.com/supabase
 
 - [Groceries Store App](https://github.com/hieuwu/android-groceries-store) *(Android)* - An e-commerce app using Auth, Postgrest and Storage
 - [Supa Sketcher](https://github.com/hieuwu/supa-sketcher) *(Android)* - An real-time white board app using anonymous sign-ins Auth, Postgrest and Realtime
+- [SupaBuckt](https://github.com/hieuwu/supabase-storage-client) *(Desktop/Android/iOS/Browser)* - A client app to browse buckets and files in a Supabase project, using the Auth, Postgrest and Storage module
  
 ### Server-side Applications
 
@@ -164,9 +165,19 @@ For more information, checkout [supabase-kt-plugins](https://github.com/supabase
 
 # Guides
 
-- [Building Secure User Sign Up With Email Confirmation with Supabase on Android](https://hieuwu.medium.com/supadroid-building-secure-user-sign-up-with-email-confirmation-with-supabase-on-android-72f3172d6049)
 - [Getting started with Android and Supabase](https://www.youtube.com/watch?v=_iXUVJ6HTHU) by the official Supabase YouTube channel
 - [Sign in with Google on Android using Credential Manager](https://www.youtube.com/watch?v=P_jZMDmodG4) by the official Supabase YouTube channel
+
+### SupaDroid series
+
+A community series on building Android features with Supabase:
+
+- [Building Secure User Sign Up With Email Confirmation with Supabase on Android](https://hieuwu.medium.com/supadroid-building-secure-user-sign-up-with-email-confirmation-with-supabase-on-android-72f3172d6049)
+- [Verify Email Directly in App with Edge Function](https://hieuwu.medium.com/supadroid-verify-email-directly-in-app-with-edge-function-7ffbee498387)
+- [Simple Password Reset feature in Android with Supabase](https://hieuwu.medium.com/supadroid-simple-password-reset-feature-in-android-with-supabase-7118d9bb98fe)
+- [In-App Purchases with Supabase & RevenueCat](https://hieuwu.medium.com/supadroid-in-app-purchases-with-supabase-revenuecat-718070c993b3)
+- [Sending Push Notifications on Supabase Database Events](https://hieuwu.medium.com/supadroid-sending-push-notifications-on-supabase-database-events-0c3cfbe190b3)
+- [Customer feedback feature with Supabase's Edge function and Slack](https://hieuwu.medium.com/supadroid-customer-feedback-feature-with-supabases-edge-function-and-slack-f55464705bc7)
 
 # Contribution
 
