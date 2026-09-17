@@ -168,8 +168,6 @@ For more information, checkout [supabase-kt-plugins](https://github.com/supabase
 - [Getting started with Android and Supabase](https://www.youtube.com/watch?v=_iXUVJ6HTHU) by the official Supabase YouTube channel
 - [Sign in with Google on Android using Credential Manager](https://www.youtube.com/watch?v=P_jZMDmodG4) by the official Supabase YouTube channel
 
-### SupaDroid series
-
 A community series on building Android features with Supabase:
 
 - [Building Secure User Sign Up With Email Confirmation with Supabase on Android](https://hieuwu.medium.com/supadroid-building-secure-user-sign-up-with-email-confirmation-with-supabase-on-android-72f3172d6049)
