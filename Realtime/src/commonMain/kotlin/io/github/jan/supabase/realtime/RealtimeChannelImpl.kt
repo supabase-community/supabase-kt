@@ -193,14 +193,14 @@ internal class RealtimeChannelImpl(
     override suspend fun unsubscribe() {
         _status.value = RealtimeChannel.Status.UNSUBSCRIBING
         logger.d { "Unsubscribing from channel $topic" }
-        realtimeImpl.send(RealtimeMessage(topic, RealtimeChannel.CHANNEL_EVENT_LEAVE, buildJsonObject {}, realtime.websocket.makeRef()))
+        realtimeImpl.send(RealtimeMessage(topic, RealtimeChannel.CHANNEL_EVENT_LEAVE, buildJsonObject {}, realtime.websocket.makeRef(), joinRef.load()))
     }
 
     override suspend fun updateAuth(jwt: String?) {
         logger.d { "Updating auth token for channel $topic" }
         realtimeImpl.send(RealtimeMessage(topic, RealtimeChannel.CHANNEL_EVENT_ACCESS_TOKEN, buildJsonObject {
             put("access_token", jwt)
-        }, realtime.websocket.makeRef()))
+        }, realtime.websocket.makeRef(), joinRef.load()))
     }
 
     override suspend fun broadcast(event: String, payload: BroadcastPayload) {

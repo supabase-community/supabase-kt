@@ -330,6 +330,51 @@ class RealtimeChannelTest {
     }
 
     @Test
+    fun testUnsubscribeIncludesJoinRef() {
+        val channelId = "channelId"
+        runTest {
+            createTestClient(
+                wsHandler = { i, o ->
+                    val joinMessage = i.receive().toMessage()
+                    assertEquals(RealtimeChannel.CHANNEL_EVENT_JOIN, joinMessage.event)
+                    val joinRef = joinMessage.joinRef
+                    o.sendSystem(channelId, "system", "Subscribed", "ok")
+                    val leaveMessage = i.receive().toMessage()
+                    assertEquals(RealtimeChannel.CHANNEL_EVENT_LEAVE, leaveMessage.event)
+                    assertEquals(joinRef, leaveMessage.joinRef)
+                },
+                supabaseHandler = {
+                    val channel = it.channel(channelId)
+                    channel.subscribe(blockUntilSubscribed = true)
+                    channel.unsubscribe()
+                }
+            )
+        }
+    }
+
+    @Test
+    fun testUpdateAuthIncludesJoinRef() {
+        val channelId = "channelId"
+        runTest {
+            createTestClient(
+                wsHandler = { i, o ->
+                    val joinMessage = i.receive().toMessage()
+                    val joinRef = joinMessage.joinRef
+                    o.sendSystem(channelId, "system", "Subscribed", "ok")
+                    val authMessage = i.receive().toMessage()
+                    assertEquals(RealtimeChannel.CHANNEL_EVENT_ACCESS_TOKEN, authMessage.event)
+                    assertEquals(joinRef, authMessage.joinRef)
+                },
+                supabaseHandler = {
+                    val channel = it.channel(channelId)
+                    channel.subscribe(blockUntilSubscribed = true)
+                    channel.updateAuth("newToken")
+                }
+            )
+        }
+    }
+
+    @Test
     fun testResubscribeOnPresenceChange() {
         val channelId = "channelId"
         runTest {
