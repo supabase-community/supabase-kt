@@ -7,6 +7,7 @@ import io.github.jan.supabase.realtime.broadcast.decodeBinaryPayload
 import io.github.jan.supabase.realtime.broadcast.decodeV2Text
 import io.github.jan.supabase.realtime.broadcast.encodeBroadcast
 import io.github.jan.supabase.realtime.broadcast.encodeV2Text
+import io.github.jan.supabase.supabaseJson
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
@@ -49,6 +50,22 @@ class RealtimeSerializerTest {
         assertEquals(message, """
             ["2","1","topic","event",{"key":"value"}]
         """.trimIndent().decodeV2Text())
+    }
+
+    @Test
+    fun testV1JoinRefUsesPhoenixSnakeCaseKey() {
+        val message = RealtimeMessage(
+            "topic",
+            "event",
+            buildJsonObject {
+                put("key", "value")
+            },
+            "1",
+            "2"
+        )
+        val json = supabaseJson.encodeToString(message)
+        assertTrue(json.contains("\"join_ref\":\"2\""))
+        assertEquals(message, supabaseJson.decodeFromString<RealtimeMessage>(json))
     }
 
     @Test
