@@ -17,7 +17,6 @@ import io.github.jan.supabase.auth.exception.AuthRestException
 import io.github.jan.supabase.auth.exception.AuthSessionMissingException
 import io.github.jan.supabase.auth.exception.AuthWeakPasswordException
 import io.github.jan.supabase.auth.exception.InvalidJwtException
-import io.github.jan.supabase.auth.exception.NoSessionFoundException
 import io.github.jan.supabase.auth.exception.TokenExpiredException
 import io.github.jan.supabase.auth.jwt.ClaimsRequestBuilder
 import io.github.jan.supabase.auth.jwt.ClaimsResponse
@@ -34,15 +33,11 @@ import io.github.jan.supabase.auth.oauth.OAuthApi
 import io.github.jan.supabase.auth.oauth.OAuthApiImpl
 import io.github.jan.supabase.auth.passkey.AuthPasskeyApi
 import io.github.jan.supabase.auth.passkey.AuthPasskeyApiImpl
-import io.github.jan.supabase.auth.providers.AuthProvider
-import io.github.jan.supabase.auth.providers.ExternalAuthConfigDefaults
-import io.github.jan.supabase.auth.providers.IDTokenProvider
-import io.github.jan.supabase.auth.providers.OAuthProvider
-import io.github.jan.supabase.auth.providers.builtin.IDToken
-import io.github.jan.supabase.auth.providers.builtin.OTP
-import io.github.jan.supabase.auth.providers.builtin.SSO
+import io.github.jan.supabase.auth.providers.Email
+import io.github.jan.supabase.auth.providers.LoginIdentifier
+import io.github.jan.supabase.auth.providers.Phone
 import io.github.jan.supabase.auth.status.RefreshFailureCause
-import io.github.jan.supabase.auth.status.SessionSource
+import io.github.jan.supabase.auth.status.SessionFlag
 import io.github.jan.supabase.auth.status.SessionStatus
 import io.github.jan.supabase.auth.user.UserInfo
 import io.github.jan.supabase.auth.user.UserSession
@@ -57,6 +52,7 @@ import io.github.jan.supabase.logging.createLogger
 import io.github.jan.supabase.logging.d
 import io.github.jan.supabase.logging.e
 import io.github.jan.supabase.logging.i
+import io.github.jan.supabase.logging.w
 import io.github.jan.supabase.network.supabaseApi
 import io.github.jan.supabase.putJsonObject
 import io.github.jan.supabase.safeBody
@@ -87,6 +83,7 @@ import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonObjectBuilder
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.contentOrNull
+import kotlinx.serialization.json.decodeFromJsonElement
 import kotlinx.serialization.json.encodeToJsonElement
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
@@ -120,13 +117,14 @@ internal class AuthImpl(
     override val sessionManager = config.sessionManager ?: createDefaultSessionManager()
     override val codeVerifierCache = config.codeVerifierCache ?: createDefaultCodeVerifierCache()
 
-    internal val publicApi = supabaseClient.authenticatedSupabaseApi(this, requireSession = false)
+    val publicApi = supabaseClient.authenticatedSupabaseApi(this, requireSession = false)
     @OptIn(SupabaseInternal::class)
-    internal val unauthenticatedApi = supabaseClient.supabaseApi(this)
+    val unauthenticatedApi = supabaseClient.supabaseApi(this)
     @OptIn(SupabaseInternal::class)
-    internal val userApi = if(config.requireValidSession) supabaseClient.authenticatedSupabaseApi(this) else publicApi
+    override val userApi = if(config.requireValidSession) supabaseClient.authenticatedSupabaseApi(this) else publicApi
     override val admin: AdminApi = AdminApiImpl(publicApi)
     override val mfa: MfaApi = MfaApiImpl(userApi.resolve("factors"), this)
+
     override val passkeys: AuthPasskeyApi = AuthPasskeyApiImpl(userApi.resolve("passkeys")) {
         importSession(it)
     }
@@ -181,107 +179,148 @@ internal class AuthImpl(
         logger.d { "Initialized Auth plugin" }
     }
 
-    override suspend fun <C, R, Provider : AuthProvider<C, R>> signInWith(
-        provider: Provider,
-        redirectUrl: String?,
-        config: (C.() -> Unit)?
-    ) = provider.login(supabaseClient, {
-        importSession(it, source = SessionSource.SignIn(provider))
-    }, redirectUrl, config)
+    // new
 
-    override suspend fun signInAnonymously(data: JsonObject?, captchaToken: String?) {
+    override suspend fun signInWithOtp(identifier: Email, config: EmailSignInOtpConfig.() -> Unit) {
+        val config = EmailSignInOtpConfig(identifier).apply(config)
+        signInWithOtp(identifier, config.redirectTo, config.encode())
+    }
+
+    override suspend fun signInWithOtp(identifier: Phone, config: PhoneSignInOtpConfig.() -> Unit) {
+        signInWithOtp(identifier, null, PhoneSignInOtpConfig(identifier).apply(config).encode())
+    }
+
+    private suspend fun signInWithOtp(
+        identifier: LoginIdentifier,
+        redirectTo: String?,
+        config: JsonObject
+    ) {
+        val (codeChallenge, flowId) = if(identifier is Email) preparePKCEIfEnabled() else null to null
+        publicApi.postJson("otp", buildJsonObject {
+            codeChallenge?.let(::putCodeChallenge)
+            putJsonObject(config)
+        }) {
+            val redirectUrl = redirectTo ?: defaultRedirectUrl()
+            if(identifier is Email && redirectUrl != null) redirectTo(appendFlowIdIfEnabled(redirectUrl, flowId))
+        }
+    }
+
+    override suspend fun signUp(identifier: Email, password: String, config: EmailSignUpConfig.() -> Unit): AuthResponse {
+        val config = EmailSignUpConfig(identifier, password).apply(config)
+        return signUp(identifier, config.redirectTo, config.encode())
+    }
+
+    override suspend fun signUp(
+        identifier: Phone,
+        password: String,
+        config: PhoneSignUpConfig.() -> Unit
+    ): AuthResponse {
+        val config = PhoneSignUpConfig(identifier, password).apply(config)
+        return signUp(identifier, null, config.encode())
+    }
+
+    private suspend fun signUp(
+        identifier: LoginIdentifier,
+        redirectTo: String?,
+        config: JsonObject
+    ): AuthResponse {
+        val (codeChallenge, flowId) = if(identifier is Email) preparePKCEIfEnabled() else null to null
+        val response = try {
+            publicApi.postJson("signup", buildJsonObject {
+                codeChallenge?.let(::putCodeChallenge)
+                putJsonObject(config)
+            }.also(::println)) {
+                val redirectUrl = redirectTo ?: defaultRedirectUrl()
+                if(identifier is Email && redirectUrl != null) redirectTo(appendFlowIdIfEnabled(redirectUrl, flowId))
+            }.safeBody<JsonObject>()
+        } catch(e: RestException) {
+            codeVerifierCache.removePKCEVerifier(flowId)
+            throw e
+        }
+        return decodeAuthResponse(response).also {
+            if(it.session != null) importIfEnabled(it.session, flag = SessionFlag.SIGN_UP)
+        }
+    }
+
+    private fun decodeAuthResponse(body: JsonObject): AuthResponse {
+        var user: UserInfo? = null
+        var session: UserSession? = null
+        if (body.containsKey("access_token")) {
+            runCatching {
+                session = supabaseJson.decodeFromJsonElement<UserSession>(body)
+                user = session.user
+            }.onFailure { exception ->
+                logger.w(exception) { "Failed to decode user session" }
+            }
+        } else {
+            runCatching {
+                user = supabaseJson.decodeFromJsonElement(body)
+            }.onFailure { exception ->
+                logger.w(exception) { "Failed to decode user info" }
+            }
+        }
+        return AuthResponse(user, session)
+    }
+
+    override suspend fun signInWithPassword(
+        identifier: LoginIdentifier,
+        password: String,
+        config: SignInPasswordConfig.() -> Unit
+    ): UserSession {
+        val config = SignInPasswordConfig(identifier, password).apply(config)
+        return signIn(GrantType.PASSWORD, null, config.encode())
+    }
+
+    private suspend inline fun <reified T> signIn(
+        grantType: String,
+        redirectUrl: String?,
+        credentials: T
+    ): UserSession {
+        val url = "token?grant_type=$grantType"
+        val response = publicApi.postJson(url, credentials) {
+            redirectUrl?.let { redirectTo(it) }
+        }
+        return response.safeBody<UserSession>().also {
+            importIfEnabled(it)
+        }
+    }
+
+    override suspend fun signInWithIdToken(
+        config: IdTokenConfig
+    ): UserSession {
+        return signIn(GrantType.ID_TOKEN, null, config)
+    }
+
+    override suspend fun signInAnonymously(data: JsonObject?, captchaToken: String?): UserSession {
         val response = publicApi.postJson("signup", buildJsonObject {
             data?.let { put("data", it) }
             captchaToken?.let(::putCaptchaToken)
         })
         val session = response.safeBody<UserSession>()
-        importSession(session, source = SessionSource.AnonymousSignIn)
-    }
-
-    override suspend fun <C, R, Provider : AuthProvider<C, R>> signUpWith(
-        provider: Provider,
-        redirectUrl: String?,
-        config: (C.() -> Unit)?
-    ): R? = provider.signUp(supabaseClient, {
-        importSession(it, source = SessionSource.SignUp(provider))
-    }, redirectUrl, config)
-
-    override suspend fun linkIdentity(
-        provider: OAuthProvider,
-        redirectUrl: String?,
-        config: ExternalAuthConfigDefaults.() -> Unit
-    ): String? {
-        val automaticallyOpen = ExternalAuthConfigDefaults().apply(config).automaticallyOpenUrl
-        val fetchUrl: suspend (String?) -> String = { redirectTo: String? ->
-            val url = getOAuthUrl(provider, redirectTo, "user/identities/authorize", config)
-            val response = userApi.rawRequest(url) {
-                method = HttpMethod.Get
-                parameter("skip_http_redirect", true)
-            }
-            response.safeBody<JsonObject>()["url"]?.jsonPrimitive?.contentOrNull ?: error("No URL found in response")
-        }
-        if(!automaticallyOpen) {
-            return fetchUrl(redirectUrl ?: "")
-        }
-        startExternalAuth(
-            redirectUrl = redirectUrl,
-            getUrl = {
-                fetchUrl(it)
-            },
-            onSessionSuccess = {
-                importSession(it, source = SessionSource.UserIdentitiesChanged(it))
-            }
-        )
-        return null
+        importSession(session, flag = SessionFlag.SIGN_IN)
+        return session
     }
 
     override suspend fun linkIdentityWithIdToken(
         provider: IDTokenProvider,
         idToken: String,
-        config: (IDToken.Config) -> Unit
-    ) {
-        val body = IDToken.Config(idToken = idToken, provider = provider, linkIdentity = true).apply(config)
+        config: (IdTokenConfig) -> Unit
+    ): UserSession {
+        val body = DefaultIdTokenConfig(token = idToken, provider = provider, linkIdentity = true).apply(config)
         val result = userApi.postJson("token?grant_type=id_token", body)
-        importSession(result.safeBody(), source = SessionSource.UserIdentitiesChanged(result.safeBody()))
+        val session: UserSession = result.safeBody()
+        importIfEnabled(result.safeBody(), flag = SessionFlag.IDENTITIES_CHANGED)
+        return session
     }
 
-    override suspend fun unlinkIdentity(identityId: String, updateLocalUser: Boolean) {
+    override suspend fun unlinkIdentity(identityId: String, updateLocalUser: Boolean) { //TODO: improve
         userApi.delete("user/identities/$identityId")
         if (updateLocalUser) {
             val session = currentSessionOrNull() ?: return
             val newUser = session.user?.copy(identities = session.user.identities?.filter { it.identityId != identityId })
             val newSession = session.copy(user = newUser)
-            setSessionStatus(SessionStatus.Authenticated(newSession, SessionSource.UserIdentitiesChanged(session)))
+            setSessionStatus(SessionStatus.Authenticated(newSession, SessionFlag.IDENTITIES_CHANGED))
         }
-    }
-
-    override suspend fun retrieveSSOUrl(
-        redirectUrl: String?,
-        config: SSO.Config.() -> Unit
-    ): SSO.Result {
-        val createdConfig = SSO.Config().apply(config)
-
-        require((createdConfig.domain != null && createdConfig.domain!!.isNotBlank()) || (createdConfig.providerId != null && createdConfig.providerId!!.isNotBlank())) {
-            "Either domain or providerId must be set"
-        }
-
-        require(createdConfig.domain == null || createdConfig.providerId == null) {
-            "Either domain or providerId must be set, not both"
-        }
-
-        val codeChallenge: String? = preparePKCEIfEnabled()
-        return publicApi.postJson("sso", buildJsonObject {
-            redirectUrl?.let { put("redirect_to", it) }
-            createdConfig.captchaToken?.let(::putCaptchaToken)
-            codeChallenge?.let(::putCodeChallenge)
-            createdConfig.domain?.let {
-                put("domain", it)
-            }
-            createdConfig.providerId?.let {
-                put("provider_id", it)
-            }
-        })
-            .safeBody()
     }
 
     override suspend fun updateUser(
@@ -290,22 +329,24 @@ internal class AuthImpl(
         config: UserUpdateBuilder.() -> Unit
     ): UserInfo {
         val updateBuilder = UserUpdateBuilder(serializer = serializer).apply(config)
-        val codeChallenge = preparePKCEIfEnabled()
+        val (codeChallenge, flowId) = preparePKCEIfEnabled()
         val body = buildJsonObject {
             putJsonObject(supabaseJson.encodeToJsonElement(updateBuilder).jsonObject)
             codeChallenge?.let(::putCodeChallenge)
         }.toString()
-        val response = userApi.putJson("user", body) {
-            redirectUrl?.let { url.parameters.append("redirect_to", it) }
+        val response = try {
+            userApi.putJson("user", body) {
+                redirectUrl?.let { url.parameters.append("redirect_to", appendFlowIdIfEnabled(it, flowId)) }
+            }
+        } catch(e: RestException) {
+            codeVerifierCache.removePKCEVerifier(flowId)
+            throw e
         }
         val userInfo = response.safeBody<UserInfo>()
         if (updateCurrentUser && sessionStatus.value is SessionStatus.Authenticated) {
             val newSession =
                 (sessionStatus.value as SessionStatus.Authenticated).session.copy(user = userInfo)
-            if (this.config.autoSaveToStorage) {
-                sessionManager.saveSession(newSession)
-            }
-            setSessionStatus(SessionStatus.Authenticated(newSession, SessionSource.UserChanged(newSession)))
+            importIfEnabled(newSession, flag = SessionFlag.USER_CHANGED)
         }
         return userInfo
     }
@@ -313,14 +354,13 @@ internal class AuthImpl(
     private suspend fun resend(type: String,  redirectUrl: String? = null, body: JsonObjectBuilder.() -> Unit) {
         userApi.postJson("resend", buildJsonObject {
             put("type", type)
-            val innerBody = buildJsonObject(body)
-            putJsonObject(innerBody)
-            if(config.flowType == FlowType.PKCE && !innerBody.containsKey("phone")) preparePKCEIfEnabled()?.let(::putCodeChallenge)
+            putJsonObject(buildJsonObject(body))
         }) {
             redirectUrl?.let { url.parameters["redirect_to"] = it }
         }
     }
 
+    // TODO combine via Email/Password and custom DSLs (for redirect URL & PKCE)
     override suspend fun resendEmail(type: OtpType.Email, email: String, captchaToken: String?,  redirectUrl: String?) =
         resend(type = type.type, redirectUrl = redirectUrl) {
             put("email", email)
@@ -344,14 +384,14 @@ internal class AuthImpl(
         require(email.isNotBlank()) {
             "Email must not be blank"
         }
-        val codeChallenge = preparePKCEIfEnabled()
+        val (codeChallenge, flowId) = preparePKCEIfEnabled()
         val body = buildJsonObject {
             put("email", email)
             captchaToken?.let(::putCaptchaToken)
             codeChallenge?.let(::putCodeChallenge)
         }.toString()
         publicApi.postJson("recover", body) {
-            redirectUrl?.let { url.parameters.append("redirect_to", it) }
+            redirectUrl?.let { url.parameters.append("redirect_to", appendFlowIdIfEnabled(it, flowId)) }
         }
     }
 
@@ -360,31 +400,24 @@ internal class AuthImpl(
     }
 
     override suspend fun signOut(scope: SignOutScope) {
-        val clearIfValidScope = suspend {
-            if(scope != SignOutScope.OTHERS) {
-                clearSession()
-                logger.d { "Session data cleared" }
-            } else logger.d { "Skipping clearing session data as sign out scope is 'OTHERS'" }
-        }
-        if(currentSessionOrNull() == null) {
-            logger.i { "Skipping session logout as there is no session available." }
-            clearIfValidScope()
-            return
-        }
-        try {
-            userApi.post("logout") {
-                parameter("scope", scope.name.lowercase())
+        if (currentSessionOrNull() != null) {
+            try {
+                userApi.post("logout") {
+                    parameter("scope", scope.name.lowercase())
+                }
+            } catch(e: RestException) {
+                if(e.statusCode in SIGN_OUT_IGNORE_CODES) {
+                    logger.d { "Received error code ${e.statusCode} while signing out user. This can happen if the user doesn't exist anymore or the JWT is invalid/expired. Proceeding to clean up local data..." }
+                } else throw e
             }
-        } catch(e: RestException) {
-            if(e.statusCode in SIGN_OUT_IGNORE_CODES) {
-                logger.d { "Received error code ${e.statusCode} while signing out user. This can happen if the user doesn't exist anymore or the JWT is invalid/expired. Proceeding to clean up local data..." }
-            } else {
-                clearIfValidScope()
-                throw e
-            }
+            logger.d { "Logged out session in Supabase" }
+        } else {
+            logger.i { "Skipping session logout as there is no session available. Proceeding to clean up local data..." }
         }
-        logger.d { "Logged out session in Supabase" }
-        clearIfValidScope()
+        if (scope != SignOutScope.OTHERS) {
+            clearSession()
+        }
+        logger.d { "Successfully logged out" }
     }
 
     private suspend fun verify(
@@ -405,7 +438,7 @@ internal class AuthImpl(
             logger.d { "Received `verifyOtp` response without session: ${response.bodyAsText()}. This may occur if changing the email with 'Secure email change' enabled" }
             return OtpVerifyResult.VerifiedNoSession
         }
-        importSession(session, source = SessionSource.SignIn(OTP))
+        importIfEnabled(session)
         return OtpVerifyResult.Authenticated(session)
     }
 
@@ -453,7 +486,7 @@ internal class AuthImpl(
         }
 
         if(signingKey == null) {
-            retrieveUser(token)
+            getUser(token)
             return claims
         } else {
             val signedData = "$rawHeader.$rawPayload".encodeToByteArray()
@@ -499,7 +532,7 @@ internal class AuthImpl(
         return key
     }
 
-    override suspend fun retrieveUser(jwt: String): UserInfo {
+    override suspend fun getUser(jwt: String): UserInfo {
         val response = userApi.get("user") {
             headers["Authorization"] = "Bearer $jwt"
         }
@@ -508,29 +541,28 @@ internal class AuthImpl(
     }
 
     override suspend fun retrieveUserForCurrentSession(updateSession: Boolean): UserInfo {
-        val user = retrieveUser(currentAccessTokenOrNull() ?: error("No session found"))
+        val user = getUser(currentAccessTokenOrNull() ?: error("No session found"))
         if (updateSession) {
             val session = currentSessionOrNull() ?: error("No session found")
-            val newStatus = SessionStatus.Authenticated(session.copy(user = user), SessionSource.UserChanged(currentSessionOrNull() ?: error("Session shouldn't be null")))
+            val newStatus = SessionStatus.Authenticated(session.copy(user = user), SessionFlag.USER_CHANGED)
             setSessionStatus(newStatus)
             if (config.autoSaveToStorage) sessionManager.saveSession(newStatus.session)
         }
         return user
     }
 
-    override suspend fun exchangeCodeForSession(code: String, saveSession: Boolean): UserSession {
-        val codeVerifier = codeVerifierCache.loadCodeVerifier()
-        require(codeVerifier != null) {
+    override suspend fun exchangeCodeForSession(code: String): UserSession {
+        // TODO fix concurrent flow stuff
+      //  val codeVerifier = codeVerifierCache.loadCodeVerifier()
+      /*  require(codeVerifier != null) {
             "No code verifier stored. Make sure to use `getOAuthUrl` for the OAuth Url to prepare the PKCE flow."
-        }
+        }*/
         val session = unauthenticatedApi.postJson("token?grant_type=pkce", buildJsonObject {
             put("auth_code", code)
-            put("code_verifier", codeVerifier)
+      //      put("code_verifier", codeVerifier)
         }).safeBody<UserSession>()
-        codeVerifierCache.deleteCodeVerifier()
-        if (saveSession) {
-            importSession(session, source = SessionSource.External)
-        }
+      //  codeVerifierCache.deleteCodeVerifier()
+        importIfEnabled(session, flag = SessionFlag.EXTERNAL)
         return session
     }
 
@@ -550,51 +582,57 @@ internal class AuthImpl(
             currentSessionOrNull()?.refreshToken
                 ?: error("No refresh token found in current session")
         )
-        importSession(newSession, source = SessionSource.Refresh(currentSessionOrNull() ?: error("No session found")))
+        importSession(newSession, flag = SessionFlag.REFRESH)
         updateRefreshInformation(null, Clock.System.now())
     }
+
+    private suspend fun importIfEnabled(
+        session: UserSession,
+        autoRefresh: Boolean = config.alwaysAutoRefresh,
+        flag: SessionFlag = SessionFlag.SIGN_IN
+    ) = if(config.autoImportSession) importSession(session, autoRefresh, flag) else Unit
 
     override suspend fun importSession(
         session: UserSession,
         autoRefresh: Boolean,
-        source: SessionSource
-    ) = importSession(session, autoRefresh, source, false)
+        flag: SessionFlag
+    ) = importSession(session, autoRefresh, flag, false)
 
     suspend fun importSession(
         session: UserSession,
         autoRefresh: Boolean,
-        source: SessionSource,
+        flag: SessionFlag,
         initializing: Boolean
     ) {
-        logger.d { "Importing session $session from $source, auto refresh is set to $autoRefresh." }
+        logger.d { "Importing session $session from $flag, auto refresh is set to $autoRefresh." }
         if (!autoRefresh) {
             if (session.refreshToken.isNotBlank() && session.expiresIn != 0L && config.autoSaveToStorage) {
                 sessionManager.saveSession(session)
                 logger.d { "Session saved to storage (no auto refresh)" }
             }
-            setSessionStatus(SessionStatus.Authenticated(session, source))
+            setSessionStatus(SessionStatus.Authenticated(session, flag))
             logger.d { "Session imported successfully." }
             return
         }
         val thresholdDate = session.expiresAt - session.expiresIn.seconds * (1 - SESSION_REFRESH_THRESHOLD)
         if (thresholdDate <= Clock.System.now()) {
             logger.d { "Session is under the threshold date. Refreshing session..." }
-            recreateSessionJob(session, source, false, initializing)
+            recreateSessionJob(session, flag, false, initializing)
         } else {
             if (config.autoSaveToStorage) {
                 sessionManager.saveSession(session)
                 logger.d { "Session saved to storage (auto refresh enabled)" }
             }
-            setSessionStatus(SessionStatus.Authenticated(session, source))
+            setSessionStatus(SessionStatus.Authenticated(session, flag))
             logger.d { "Session imported successfully. Starting auto refresh..." }
-            recreateSessionJob(session, source, true, initializing)
+            recreateSessionJob(session, flag, true, initializing)
             logger.d { "Auto refresh started." }
         }
     }
 
     private suspend fun recreateSessionJob(
         session: UserSession,
-        source: SessionSource,
+        flag: SessionFlag,
         delay: Boolean,
         initializing: Boolean
     ) {
@@ -603,7 +641,7 @@ internal class AuthImpl(
             if(delay) delayBeforeExpiry(session)
             tryImportingSession(
                 { handleExpiredSession(session, config.alwaysAutoRefresh) },
-                { importSession(session, source = source) },
+                { importSession(session, flag = flag) },
                 { updateStatusIfExpired(session, it) }
             )
         }
@@ -628,7 +666,7 @@ internal class AuthImpl(
                 logger.e(e) { "Couldn't refresh session. The refresh token may have been revoked. Clearing session (Status code ${e.statusCode})... " }
                 clearSession()
             }
-        } catch (e: Throwable) {
+        } catch (e: Exception) {
             currentCoroutineContext().ensureActive()
             logger.d(e) { "Couldn't reach Supabase. Either the address doesn't exist or the network might not be on. Retrying in ${config.retryDelay}..." }
             updateStatus(RefreshFailureCause.NetworkError(e))
@@ -640,7 +678,7 @@ internal class AuthImpl(
     private fun updateStatusIfExpired(session: UserSession, reason: RefreshFailureCause) {
         if (session.expiresAt <= Clock.System.now()) {
             logger.d { "Session expired while trying to refresh the session. Updating status..." }
-            setSessionStatus(SessionStatus.RefreshFailure(reason))
+            setSessionStatus(SessionStatus.SessionExpired)
         }
         emitEvent(AuthEvent.RefreshFailure(reason))
     }
@@ -678,14 +716,14 @@ internal class AuthImpl(
             "Session expired. Refreshing session..."
         }
         val newSession = refreshSession(session.refreshToken)
-        importSession(newSession, autoRefresh, SessionSource.Refresh(session))
+        importSession(newSession, autoRefresh, SessionFlag.REFRESH)
     }
 
     override suspend fun startAutoRefreshForCurrentSession() =
         importSession(
             currentSessionOrNull() ?: error("No session found"),
             true,
-            (sessionStatus.value as SessionStatus.Authenticated).source
+            (sessionStatus.value as SessionStatus.Authenticated).flag
         )
 
     override fun stopAutoRefreshForCurrentSession() {
@@ -700,18 +738,13 @@ internal class AuthImpl(
     override suspend fun loadFromStorage(autoRefresh: Boolean): Boolean = loadFromStorage(autoRefresh, false)
 
     suspend fun loadFromStorage(autoRefresh: Boolean = config.alwaysAutoRefresh, initializing: Boolean): Boolean {
-        val session = try {
-            sessionManager.loadSession()
-        } catch (e: NoSessionFoundException) {
-            logger.d { e.message ?: "No session found in storage" }
-            null
-        } catch (e: Throwable) {
+        val session = try { sessionManager.loadSession() } catch (e: Exception) {
             currentCoroutineContext().ensureActive()
             logger.e(e) { "Failed to load session" }
             null
         }
         session?.let {
-            importSession(it, autoRefresh, SessionSource.Storage, initializing)
+            importSession(it, autoRefresh, SessionFlag.STORAGE, initializing)
         }
         return session != null
     }
@@ -722,7 +755,7 @@ internal class AuthImpl(
 
     override suspend fun parseErrorResponse(response: HttpResponse): RestException {
         val errorBody =
-            supabaseClient.bodyOrNull<GoTrueErrorResponse>(response) ?: GoTrueErrorResponse("Unknown error", response.status.description)
+            supabaseClient.bodyOrNull<GoTrueErrorResponse>(response) ?: GoTrueErrorResponse("Unknown error", "")
         checkErrorCodes(errorBody, response)?.let { return it }
         return when (response.status) {
             HttpStatusCode.Unauthorized -> UnauthorizedRestException(
@@ -763,29 +796,65 @@ internal class AuthImpl(
     @OptIn(SupabaseExperimental::class)
     override fun getOAuthUrl(
         provider: OAuthProvider,
-        redirectUrl: String?,
         url: String,
-        additionalConfig: ExternalAuthConfigDefaults.() -> Unit
+        additionalConfig: OAuthConfig
     ): String {
-        val config = ExternalAuthConfigDefaults().apply(additionalConfig)
-        val codeChallenge = preparePKCEIfEnabled()
+        val (codeChallenge, flowId) = preparePKCEIfEnabled()
         codeChallenge?.let {
-            config.queryParams["code_challenge"] = it
-            config.queryParams["code_challenge_method"] = PKCEConstants.CHALLENGE_METHOD
+            additionalConfig.queryParams["code_challenge"] = it
+            additionalConfig.queryParams["code_challenge_method"] = PKCEConstants.CHALLENGE_METHOD
         }
         return resolveUrl(buildString {
-            append("$url?provider=${provider.name}&redirect_to=${redirectUrl?.encodeURLParameter()}")
-            if (config.scopes.isNotEmpty()) append("&scopes=${config.scopes.joinToString("+")}")
-            if (config.queryParams.isNotEmpty()) {
-                for ((key, value) in config.queryParams) {
+            val redirectUrlWithFlowId = additionalConfig.redirectUrl?.let { appendFlowIdIfEnabled(it, flowId) }
+            append("$url?provider=$provider&redirect_to=${redirectUrlWithFlowId?.encodeURLParameter()}")
+            if (additionalConfig.scopes.isNotEmpty()) append("&scopes=${additionalConfig.scopes.joinToString("+")}")
+            if (additionalConfig.queryParams.isNotEmpty()) {
+                for ((key, value) in additionalConfig.queryParams) {
                     append("&$key=${value.encodeURLParameter()}")
                 }
             }
         })
     }
 
+    override suspend fun getIdentityLinkingUrl(provider: OAuthProvider, additionalConfig: OAuthConfig): String {
+        val url = getOAuthUrl(provider, "user/identities/authorize") {
+            redirectUrl = additionalConfig.redirectUrl
+            queryParams.putAll(additionalConfig.queryParams)
+            scopes.addAll(additionalConfig.scopes)
+        }
+        val response = userApi.rawRequest(url) {
+            method = HttpMethod.Get
+            parameter("skip_http_redirect", true)
+        }
+        return response.safeBody<JsonObject>()["url"]?.jsonPrimitive?.contentOrNull ?: error("No URL found in response")
+    }
+
+    override suspend fun getSSOUrl(
+        identifier: SSOIdentifier,
+        config: SSOConfig.() -> Unit
+    ): String {
+        val (codeChallenge, flowId) = preparePKCEIfEnabled()
+        val createdConfig = SSOConfig(identifier).apply(config).apply {
+            redirectTo = this.redirectTo?.let { appendFlowIdIfEnabled(it, flowId) }
+        }
+        return try {
+            publicApi.postJson("sso", buildJsonObject {
+                codeChallenge?.let(::putCodeChallenge)
+                putJsonObject(createdConfig.encode())
+            })
+                .safeBody<JsonObject>()["url"]?.jsonPrimitive?.contentOrNull ?: error("No URL found in response")
+        } catch(e: RestException) {
+            codeVerifierCache.removePKCEVerifier(flowId)
+            throw e
+        }
+    }
+
+    override fun defaultRedirectUrl(): String? {
+        return config.defaultRedirectUrl ?: config.nativeAuthConfig?.defaultRedirectUrl(this)
+    }
+
     override suspend fun clearSession() {
-        codeVerifierCache.deleteCodeVerifier()
+        codeVerifierCache.removeAllPKCEVerifiers()
         sessionManager.deleteSession()
         setSessionStatus(SessionStatus.NotAuthenticated(true))
         stopAutoRefreshForCurrentSession()
@@ -808,19 +877,21 @@ internal class AuthImpl(
     /**
      * Prepares PKCE if enabled and returns the code challenge.
      */
-    private fun preparePKCEIfEnabled(): String? {
-        if (this.config.flowType != FlowType.PKCE) return null
-        val codeVerifier = generateCodeVerifier()
+    private fun preparePKCEIfEnabled(isPasswordRecovery: Boolean = false, onEvictFlow: (String) -> Unit = {}): Pair<String?, String?> {
+        if (this.config.flowType != FlowType.PKCE) return null to null
+        val codeVerifier = generateCodeVerifier() + if(isPasswordRecovery) "/recovery" else ""
+        val flowId = generatePKCEFlowId()
         authScope.launch {
-            supabaseClient.auth.codeVerifierCache.saveCodeVerifier(codeVerifier)
+            supabaseClient.auth.codeVerifierCache.storePKCEVerifier(flowId, codeVerifier, onEvictFlow)
         }
-        return generateCodeChallenge(codeVerifier)
+        return generateCodeChallenge(codeVerifier) to flowId
+    }
+
+    private suspend fun setupPlatform() {
+        config.nativeAuthConfig?.setupNativePlatform(this) ?: initDone()
     }
 
 }
-
-@SupabaseInternal
-expect suspend fun Auth.setupPlatform()
 
 @SupabaseInternal
 expect fun Auth.createDefaultSessionManager(): SessionManager

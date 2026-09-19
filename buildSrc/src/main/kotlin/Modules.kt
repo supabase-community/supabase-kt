@@ -5,6 +5,7 @@ import org.jetbrains.kotlin.gradle.plugin.KotlinDependencyHandler
 enum class SupabaseModule(val module: String, val extern: Boolean = false) {
     SUPABASE("supabase-kt"),
     AUTH("auth-kt"),
+    AUTH_NATIVE("auth-native"),
     STORAGE("storage-kt"),
     REALTIME("realtime-kt"),
     FUNCTIONS("functions-kt"),

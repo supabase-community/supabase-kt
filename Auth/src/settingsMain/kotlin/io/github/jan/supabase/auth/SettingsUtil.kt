@@ -27,7 +27,7 @@ actual fun Auth.createDefaultSessionManager(): SessionManager =
 actual fun Auth.createDefaultCodeVerifierCache(): CodeVerifierCache =
     if(!IS_NODE)
         SettingsCodeVerifierCache(
-            key = "${createDefaultSettingsKey(supabaseClient.supabaseUrl)}-${SettingsCodeVerifierCache.SETTINGS_KEY}",
+            storageKey = "${createDefaultSettingsKey(supabaseClient.supabaseUrl)}-${SettingsCodeVerifierCache.SETTINGS_KEY}",
         )
     else
         MemoryCodeVerifierCache()
