@@ -1,9 +1,12 @@
 package io.github.jan.supabase.storage.vectors.index
 
 import io.github.jan.supabase.auth.api.AuthenticatedSupabaseApi
+import io.github.jan.supabase.exceptions.HttpRequestException
 import io.github.jan.supabase.safeBody
+import io.github.jan.supabase.storage.StorageRestException
 import io.github.jan.supabase.storage.vectors.data.VectorDataApi
 import io.github.jan.supabase.storage.vectors.data.VectorDataApiImpl
+import io.ktor.client.plugins.HttpRequestTimeoutException
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.buildJsonObject
@@ -23,6 +26,9 @@ interface VectorIndexApi {
      * **Public alpha:** This API is part of a public alpha release and may not be available to your account type.
      *
      * @param options - Index configuration (vectorBucketName is automatically set)
+     * @throws StorageRestException containing an error code, if receiving an error response
+     * @throws HttpRequestTimeoutException if the request timed out
+     * @throws HttpRequestException on network related issues
      */
     suspend fun createIndex(options: CreateIndexOptions.() -> Unit)
 
@@ -33,6 +39,9 @@ interface VectorIndexApi {
      * **Public alpha:** This API is part of a public alpha release and may not be available to your account type.
      *
      * @param options Listing options (vectorBucketName is automatically set)
+     * @throws StorageRestException containing an error code, if receiving an error response
+     * @throws HttpRequestTimeoutException if the request timed out
+     * @throws HttpRequestException on network related issues
      */
     suspend fun listIndexes(options: ListIndexesOptions.() -> Unit = {}): ListIndexesResponse
 
@@ -43,6 +52,9 @@ interface VectorIndexApi {
      * **Public alpha:** This API is part of a public alpha release and may not be available to your account type.
      *
      * @param indexName Name of the index to retrieve
+     * @throws StorageRestException containing an error code, if receiving an error response
+     * @throws HttpRequestTimeoutException if the request timed out
+     * @throws HttpRequestException on network related issues
      */
     suspend fun getIndex(indexName: String): VectorIndex
 
@@ -53,6 +65,9 @@ interface VectorIndexApi {
      * **Public alpha:** This API is part of a public alpha release and may not be available to your account type.
      *
      * @param indexName Name of the index to delete
+     * @throws StorageRestException containing an error code, if receiving an error response
+     * @throws HttpRequestTimeoutException if the request timed out
+     * @throws HttpRequestException on network related issues
      */
     suspend fun deleteIndex(indexName: String)
 
