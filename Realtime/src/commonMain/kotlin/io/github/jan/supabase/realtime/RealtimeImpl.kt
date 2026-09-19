@@ -203,10 +203,12 @@ import kotlin.time.Duration
 
     override fun disconnect() {
         logger.d { "Closing websocket connection" }
+        // Cancel the jobs that dereference the websocket before clearing it, so a heartbeat
+        // tick that is already running on another thread cannot observe a null websocket.
         messageJob?.cancel()
+        heartbeatJob?.cancel()
         _websocket.load()?.disconnect()
         _websocket.store(null)
-        heartbeatJob?.cancel()
         for ((_, channel) in subscriptions) {
             channel.updateStatus(RealtimeChannel.Status.UNSUBSCRIBED)
         }
@@ -257,6 +259,12 @@ import kotlin.time.Duration
             heartbeatRef.store(0)
             logger.w { "Heartbeat timeout. Trying to reconnect in ${config.reconnectDelay}" }
             reconnect()
+            return
+        }
+        // Cancellation is cooperative: a tick may still be running while disconnect() clears
+        // the websocket. Skip the tick instead of throwing into the scope (no handler there).
+        val websocket = _websocket.load() ?: run {
+            logger.d { "Skipping heartbeat, websocket is not connected" }
             return
         }
         logger.d { "Sending heartbeat" }
