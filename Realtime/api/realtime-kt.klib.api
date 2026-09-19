@@ -1,0 +1,1027 @@
+// Klib ABI Dump
+// Targets: [iosArm64, iosSimulatorArm64, iosX64, js, linuxX64, macosArm64, macosX64, mingwX64, tvosArm64, tvosSimulatorArm64, tvosX64, wasmJs, watchosArm64, watchosSimulatorArm64, watchosX64]
+// Rendering settings:
+// - Signature version: 2
+// - Show manifest properties: true
+// - Show declarations: true
+
+// Library unique name: <io.github.jan-tennert.supabase:realtime-kt>
+open annotation class io.github.jan.supabase.realtime.annotations/ChannelDsl : kotlin/Annotation { // io.github.jan.supabase.realtime.annotations/ChannelDsl|null[0]
+    constructor <init>() // io.github.jan.supabase.realtime.annotations/ChannelDsl.<init>|<init>(){}[0]
+}
+
+final enum class io.github.jan.supabase.realtime.postgres/RealtimePostgresChangesFilterOperator : kotlin/Enum<io.github.jan.supabase.realtime.postgres/RealtimePostgresChangesFilterOperator> { // io.github.jan.supabase.realtime.postgres/RealtimePostgresChangesFilterOperator|null[0]
+    enum entry EQ // io.github.jan.supabase.realtime.postgres/RealtimePostgresChangesFilterOperator.EQ|null[0]
+    enum entry GT // io.github.jan.supabase.realtime.postgres/RealtimePostgresChangesFilterOperator.GT|null[0]
+    enum entry GTE // io.github.jan.supabase.realtime.postgres/RealtimePostgresChangesFilterOperator.GTE|null[0]
+    enum entry ILIKE // io.github.jan.supabase.realtime.postgres/RealtimePostgresChangesFilterOperator.ILIKE|null[0]
+    enum entry IMATCH // io.github.jan.supabase.realtime.postgres/RealtimePostgresChangesFilterOperator.IMATCH|null[0]
+    enum entry IN // io.github.jan.supabase.realtime.postgres/RealtimePostgresChangesFilterOperator.IN|null[0]
+    enum entry IS // io.github.jan.supabase.realtime.postgres/RealtimePostgresChangesFilterOperator.IS|null[0]
+    enum entry ISDISTINCT // io.github.jan.supabase.realtime.postgres/RealtimePostgresChangesFilterOperator.ISDISTINCT|null[0]
+    enum entry LIKE // io.github.jan.supabase.realtime.postgres/RealtimePostgresChangesFilterOperator.LIKE|null[0]
+    enum entry LT // io.github.jan.supabase.realtime.postgres/RealtimePostgresChangesFilterOperator.LT|null[0]
+    enum entry LTE // io.github.jan.supabase.realtime.postgres/RealtimePostgresChangesFilterOperator.LTE|null[0]
+    enum entry MATCH // io.github.jan.supabase.realtime.postgres/RealtimePostgresChangesFilterOperator.MATCH|null[0]
+    enum entry NEQ // io.github.jan.supabase.realtime.postgres/RealtimePostgresChangesFilterOperator.NEQ|null[0]
+
+    final val entries // io.github.jan.supabase.realtime.postgres/RealtimePostgresChangesFilterOperator.entries|#static{}entries[0]
+        final fun <get-entries>(): kotlin.enums/EnumEntries<io.github.jan.supabase.realtime.postgres/RealtimePostgresChangesFilterOperator> // io.github.jan.supabase.realtime.postgres/RealtimePostgresChangesFilterOperator.entries.<get-entries>|<get-entries>#static(){}[0]
+
+    final fun valueOf(kotlin/String): io.github.jan.supabase.realtime.postgres/RealtimePostgresChangesFilterOperator // io.github.jan.supabase.realtime.postgres/RealtimePostgresChangesFilterOperator.valueOf|valueOf#static(kotlin.String){}[0]
+    final fun values(): kotlin/Array<io.github.jan.supabase.realtime.postgres/RealtimePostgresChangesFilterOperator> // io.github.jan.supabase.realtime.postgres/RealtimePostgresChangesFilterOperator.values|values#static(){}[0]
+}
+
+final enum class io.github.jan.supabase.realtime/RealtimeProtocolVersion : kotlin/Enum<io.github.jan.supabase.realtime/RealtimeProtocolVersion> { // io.github.jan.supabase.realtime/RealtimeProtocolVersion|null[0]
+    enum entry V1 // io.github.jan.supabase.realtime/RealtimeProtocolVersion.V1|null[0]
+    enum entry V2 // io.github.jan.supabase.realtime/RealtimeProtocolVersion.V2|null[0]
+
+    final val entries // io.github.jan.supabase.realtime/RealtimeProtocolVersion.entries|#static{}entries[0]
+        final fun <get-entries>(): kotlin.enums/EnumEntries<io.github.jan.supabase.realtime/RealtimeProtocolVersion> // io.github.jan.supabase.realtime/RealtimeProtocolVersion.entries.<get-entries>|<get-entries>#static(){}[0]
+    final val value // io.github.jan.supabase.realtime/RealtimeProtocolVersion.value|{}value[0]
+        final fun <get-value>(): kotlin/String // io.github.jan.supabase.realtime/RealtimeProtocolVersion.value.<get-value>|<get-value>(){}[0]
+
+    final fun valueOf(kotlin/String): io.github.jan.supabase.realtime/RealtimeProtocolVersion // io.github.jan.supabase.realtime/RealtimeProtocolVersion.valueOf|valueOf#static(kotlin.String){}[0]
+    final fun values(): kotlin/Array<io.github.jan.supabase.realtime/RealtimeProtocolVersion> // io.github.jan.supabase.realtime/RealtimeProtocolVersion.values|values#static(){}[0]
+}
+
+abstract interface io.github.jan.supabase.realtime.websocket/RealtimeWebsocket { // io.github.jan.supabase.realtime.websocket/RealtimeWebsocket|null[0]
+    abstract val hasIncomingMessages // io.github.jan.supabase.realtime.websocket/RealtimeWebsocket.hasIncomingMessages|{}hasIncomingMessages[0]
+        abstract fun <get-hasIncomingMessages>(): kotlin/Boolean // io.github.jan.supabase.realtime.websocket/RealtimeWebsocket.hasIncomingMessages.<get-hasIncomingMessages>|<get-hasIncomingMessages>(){}[0]
+
+    abstract fun disconnect() // io.github.jan.supabase.realtime.websocket/RealtimeWebsocket.disconnect|disconnect(){}[0]
+    abstract fun makeRef(): kotlin/String // io.github.jan.supabase.realtime.websocket/RealtimeWebsocket.makeRef|makeRef(){}[0]
+    abstract suspend fun blockUntilDisconnect() // io.github.jan.supabase.realtime.websocket/RealtimeWebsocket.blockUntilDisconnect|blockUntilDisconnect(){}[0]
+    abstract suspend fun receive(): io.ktor.websocket/Frame // io.github.jan.supabase.realtime.websocket/RealtimeWebsocket.receive|receive(){}[0]
+    abstract suspend fun send(io.github.jan.supabase.realtime/RealtimeMessage, io.github.jan.supabase.realtime/RealtimeProtocolVersion) // io.github.jan.supabase.realtime.websocket/RealtimeWebsocket.send|send(io.github.jan.supabase.realtime.RealtimeMessage;io.github.jan.supabase.realtime.RealtimeProtocolVersion){}[0]
+    abstract suspend fun send(kotlin/ByteArray) // io.github.jan.supabase.realtime.websocket/RealtimeWebsocket.send|send(kotlin.ByteArray){}[0]
+}
+
+abstract interface io.github.jan.supabase.realtime.websocket/RealtimeWebsocketFactory { // io.github.jan.supabase.realtime.websocket/RealtimeWebsocketFactory|null[0]
+    abstract suspend fun create(kotlin/String): io.github.jan.supabase.realtime.websocket/RealtimeWebsocket // io.github.jan.supabase.realtime.websocket/RealtimeWebsocketFactory.create|create(kotlin.String){}[0]
+}
+
+abstract interface io.github.jan.supabase.realtime/CallbackManager { // io.github.jan.supabase.realtime/CallbackManager|null[0]
+    abstract fun addBroadcastCallback(kotlin/String, kotlin/Function1<io.github.jan.supabase.realtime.broadcast/RealtimeBroadcast, kotlin/Unit>): io.github.jan.supabase.realtime/RealtimeCallbackId.Broadcast // io.github.jan.supabase.realtime/CallbackManager.addBroadcastCallback|addBroadcastCallback(kotlin.String;kotlin.Function1<io.github.jan.supabase.realtime.broadcast.RealtimeBroadcast,kotlin.Unit>){}[0]
+    abstract fun addPostgresCallback(io.github.jan.supabase.realtime/PostgresJoinConfig, kotlin/Function1<io.github.jan.supabase.realtime/PostgresAction, kotlin/Unit>): io.github.jan.supabase.realtime/RealtimeCallbackId.Postgres // io.github.jan.supabase.realtime/CallbackManager.addPostgresCallback|addPostgresCallback(io.github.jan.supabase.realtime.PostgresJoinConfig;kotlin.Function1<io.github.jan.supabase.realtime.PostgresAction,kotlin.Unit>){}[0]
+    abstract fun addPresenceCallback(kotlin/Function1<io.github.jan.supabase.realtime/PresenceAction, kotlin/Unit>): io.github.jan.supabase.realtime/RealtimeCallbackId.Presence // io.github.jan.supabase.realtime/CallbackManager.addPresenceCallback|addPresenceCallback(kotlin.Function1<io.github.jan.supabase.realtime.PresenceAction,kotlin.Unit>){}[0]
+    abstract fun addSystemCallback(kotlin/Function1<io.github.jan.supabase.realtime/RealtimeSystemPayload, kotlin/Unit>): io.github.jan.supabase.realtime/RealtimeCallbackId.System // io.github.jan.supabase.realtime/CallbackManager.addSystemCallback|addSystemCallback(kotlin.Function1<io.github.jan.supabase.realtime.RealtimeSystemPayload,kotlin.Unit>){}[0]
+    abstract fun hasPresenceCallback(): kotlin/Boolean // io.github.jan.supabase.realtime/CallbackManager.hasPresenceCallback|hasPresenceCallback(){}[0]
+    abstract fun presenceState(): kotlin.collections/Map<kotlin/String, io.github.jan.supabase.realtime/Presence> // io.github.jan.supabase.realtime/CallbackManager.presenceState|presenceState(){}[0]
+    abstract fun removeCallbackById(io.github.jan.supabase.realtime/RealtimeCallbackId) // io.github.jan.supabase.realtime/CallbackManager.removeCallbackById|removeCallbackById(io.github.jan.supabase.realtime.RealtimeCallbackId){}[0]
+    abstract fun reset() // io.github.jan.supabase.realtime/CallbackManager.reset|reset(){}[0]
+    abstract fun setServerChanges(kotlin.collections/List<io.github.jan.supabase.realtime/PostgresJoinConfig>) // io.github.jan.supabase.realtime/CallbackManager.setServerChanges|setServerChanges(kotlin.collections.List<io.github.jan.supabase.realtime.PostgresJoinConfig>){}[0]
+    abstract fun triggerBroadcast(io.github.jan.supabase.realtime.broadcast/RealtimeBroadcast) // io.github.jan.supabase.realtime/CallbackManager.triggerBroadcast|triggerBroadcast(io.github.jan.supabase.realtime.broadcast.RealtimeBroadcast){}[0]
+    abstract fun triggerPostgresChange(kotlin.collections/List<kotlin/Int>, io.github.jan.supabase.realtime/PostgresAction) // io.github.jan.supabase.realtime/CallbackManager.triggerPostgresChange|triggerPostgresChange(kotlin.collections.List<kotlin.Int>;io.github.jan.supabase.realtime.PostgresAction){}[0]
+    abstract fun triggerPresenceDiff(kotlin.collections/Map<kotlin/String, io.github.jan.supabase.realtime/Presence>, kotlin.collections/Map<kotlin/String, io.github.jan.supabase.realtime/Presence>) // io.github.jan.supabase.realtime/CallbackManager.triggerPresenceDiff|triggerPresenceDiff(kotlin.collections.Map<kotlin.String,io.github.jan.supabase.realtime.Presence>;kotlin.collections.Map<kotlin.String,io.github.jan.supabase.realtime.Presence>){}[0]
+    abstract fun triggerSystem(io.github.jan.supabase.realtime/RealtimeSystemPayload) // io.github.jan.supabase.realtime/CallbackManager.triggerSystem|triggerSystem(io.github.jan.supabase.realtime.RealtimeSystemPayload){}[0]
+}
+
+abstract interface io.github.jan.supabase.realtime/HasOldRecord : io.github.jan.supabase.plugins/SerializableData { // io.github.jan.supabase.realtime/HasOldRecord|null[0]
+    abstract val oldRecord // io.github.jan.supabase.realtime/HasOldRecord.oldRecord|{}oldRecord[0]
+        abstract fun <get-oldRecord>(): kotlinx.serialization.json/JsonObject // io.github.jan.supabase.realtime/HasOldRecord.oldRecord.<get-oldRecord>|<get-oldRecord>(){}[0]
+}
+
+abstract interface io.github.jan.supabase.realtime/HasRecord : io.github.jan.supabase.plugins/SerializableData { // io.github.jan.supabase.realtime/HasRecord|null[0]
+    abstract val record // io.github.jan.supabase.realtime/HasRecord.record|{}record[0]
+        abstract fun <get-record>(): kotlinx.serialization.json/JsonObject // io.github.jan.supabase.realtime/HasRecord.record.<get-record>|<get-record>(){}[0]
+}
+
+abstract interface io.github.jan.supabase.realtime/Realtime : io.github.jan.supabase.plugins/CustomSerializationPlugin, io.github.jan.supabase.plugins/MainPlugin<io.github.jan.supabase.realtime/Realtime.Config> { // io.github.jan.supabase.realtime/Realtime|null[0]
+    abstract val status // io.github.jan.supabase.realtime/Realtime.status|{}status[0]
+        abstract fun <get-status>(): kotlinx.coroutines.flow/StateFlow<io.github.jan.supabase.realtime/Realtime.Status> // io.github.jan.supabase.realtime/Realtime.status.<get-status>|<get-status>(){}[0]
+    abstract val subscriptions // io.github.jan.supabase.realtime/Realtime.subscriptions|{}subscriptions[0]
+        abstract fun <get-subscriptions>(): kotlin.collections/Map<kotlin/String, io.github.jan.supabase.realtime/RealtimeChannel> // io.github.jan.supabase.realtime/Realtime.subscriptions.<get-subscriptions>|<get-subscriptions>(){}[0]
+    abstract val websocket // io.github.jan.supabase.realtime/Realtime.websocket|{}websocket[0]
+        abstract fun <get-websocket>(): io.github.jan.supabase.realtime.websocket/RealtimeWebsocket // io.github.jan.supabase.realtime/Realtime.websocket.<get-websocket>|<get-websocket>(){}[0]
+
+    abstract fun addChannel(io.github.jan.supabase.realtime/RealtimeChannel) // io.github.jan.supabase.realtime/Realtime.addChannel|addChannel(io.github.jan.supabase.realtime.RealtimeChannel){}[0]
+    abstract fun channel(kotlin/String, io.github.jan.supabase.realtime/RealtimeChannelBuilder): io.github.jan.supabase.realtime/RealtimeChannel // io.github.jan.supabase.realtime/Realtime.channel|channel(kotlin.String;io.github.jan.supabase.realtime.RealtimeChannelBuilder){}[0]
+    abstract fun disconnect() // io.github.jan.supabase.realtime/Realtime.disconnect|disconnect(){}[0]
+    abstract suspend fun block() // io.github.jan.supabase.realtime/Realtime.block|block(){}[0]
+    abstract suspend fun connect() // io.github.jan.supabase.realtime/Realtime.connect|connect(){}[0]
+    abstract suspend fun removeAllChannels() // io.github.jan.supabase.realtime/Realtime.removeAllChannels|removeAllChannels(){}[0]
+    abstract suspend fun removeChannel(io.github.jan.supabase.realtime/RealtimeChannel) // io.github.jan.supabase.realtime/Realtime.removeChannel|removeChannel(io.github.jan.supabase.realtime.RealtimeChannel){}[0]
+    abstract suspend fun send(io.github.jan.supabase.realtime/RealtimeMessage) // io.github.jan.supabase.realtime/Realtime.send|send(io.github.jan.supabase.realtime.RealtimeMessage){}[0]
+    abstract suspend fun send(kotlin/ByteArray) // io.github.jan.supabase.realtime/Realtime.send|send(kotlin.ByteArray){}[0]
+    abstract suspend fun setAuth(kotlin/String? = ...) // io.github.jan.supabase.realtime/Realtime.setAuth|setAuth(kotlin.String?){}[0]
+
+    final enum class Status : kotlin/Enum<io.github.jan.supabase.realtime/Realtime.Status> { // io.github.jan.supabase.realtime/Realtime.Status|null[0]
+        enum entry CONNECTED // io.github.jan.supabase.realtime/Realtime.Status.CONNECTED|null[0]
+        enum entry CONNECTING // io.github.jan.supabase.realtime/Realtime.Status.CONNECTING|null[0]
+        enum entry DISCONNECTED // io.github.jan.supabase.realtime/Realtime.Status.DISCONNECTED|null[0]
+
+        final val entries // io.github.jan.supabase.realtime/Realtime.Status.entries|#static{}entries[0]
+            final fun <get-entries>(): kotlin.enums/EnumEntries<io.github.jan.supabase.realtime/Realtime.Status> // io.github.jan.supabase.realtime/Realtime.Status.entries.<get-entries>|<get-entries>#static(){}[0]
+
+        final fun valueOf(kotlin/String): io.github.jan.supabase.realtime/Realtime.Status // io.github.jan.supabase.realtime/Realtime.Status.valueOf|valueOf#static(kotlin.String){}[0]
+        final fun values(): kotlin/Array<io.github.jan.supabase.realtime/Realtime.Status> // io.github.jan.supabase.realtime/Realtime.Status.values|values#static(){}[0]
+    }
+
+    final class Config : io.github.jan.supabase.auth/AuthDependentPluginConfig, io.github.jan.supabase.plugins/CustomSerializationConfig, io.github.jan.supabase.plugins/MainConfig { // io.github.jan.supabase.realtime/Realtime.Config|null[0]
+        constructor <init>() // io.github.jan.supabase.realtime/Realtime.Config.<init>|<init>(){}[0]
+
+        final var accessToken // io.github.jan.supabase.realtime/Realtime.Config.accessToken|{}accessToken[0]
+            final fun <get-accessToken>(): kotlin.coroutines/SuspendFunction1<io.github.jan.supabase/SupabaseClient, kotlin/String?> // io.github.jan.supabase.realtime/Realtime.Config.accessToken.<get-accessToken>|<get-accessToken>(){}[0]
+            final fun <set-accessToken>(kotlin.coroutines/SuspendFunction1<io.github.jan.supabase/SupabaseClient, kotlin/String?>) // io.github.jan.supabase.realtime/Realtime.Config.accessToken.<set-accessToken>|<set-accessToken>(kotlin.coroutines.SuspendFunction1<io.github.jan.supabase.SupabaseClient,kotlin.String?>){}[0]
+        final var connectOnSubscribe // io.github.jan.supabase.realtime/Realtime.Config.connectOnSubscribe|{}connectOnSubscribe[0]
+            final fun <get-connectOnSubscribe>(): kotlin/Boolean // io.github.jan.supabase.realtime/Realtime.Config.connectOnSubscribe.<get-connectOnSubscribe>|<get-connectOnSubscribe>(){}[0]
+            final fun <set-connectOnSubscribe>(kotlin/Boolean) // io.github.jan.supabase.realtime/Realtime.Config.connectOnSubscribe.<set-connectOnSubscribe>|<set-connectOnSubscribe>(kotlin.Boolean){}[0]
+        final var disconnectOnEmptyChannelsAfter // io.github.jan.supabase.realtime/Realtime.Config.disconnectOnEmptyChannelsAfter|{}disconnectOnEmptyChannelsAfter[0]
+            final fun <get-disconnectOnEmptyChannelsAfter>(): kotlin.time/Duration? // io.github.jan.supabase.realtime/Realtime.Config.disconnectOnEmptyChannelsAfter.<get-disconnectOnEmptyChannelsAfter>|<get-disconnectOnEmptyChannelsAfter>(){}[0]
+            final fun <set-disconnectOnEmptyChannelsAfter>(kotlin.time/Duration?) // io.github.jan.supabase.realtime/Realtime.Config.disconnectOnEmptyChannelsAfter.<set-disconnectOnEmptyChannelsAfter>|<set-disconnectOnEmptyChannelsAfter>(kotlin.time.Duration?){}[0]
+        final var disconnectOnNoSubscriptions // io.github.jan.supabase.realtime/Realtime.Config.disconnectOnNoSubscriptions|{}disconnectOnNoSubscriptions[0]
+            final fun <get-disconnectOnNoSubscriptions>(): kotlin/Boolean // io.github.jan.supabase.realtime/Realtime.Config.disconnectOnNoSubscriptions.<get-disconnectOnNoSubscriptions>|<get-disconnectOnNoSubscriptions>(){}[0]
+            final fun <set-disconnectOnNoSubscriptions>(kotlin/Boolean) // io.github.jan.supabase.realtime/Realtime.Config.disconnectOnNoSubscriptions.<set-disconnectOnNoSubscriptions>|<set-disconnectOnNoSubscriptions>(kotlin.Boolean){}[0]
+        final var disconnectOnSessionLoss // io.github.jan.supabase.realtime/Realtime.Config.disconnectOnSessionLoss|{}disconnectOnSessionLoss[0]
+            final fun <get-disconnectOnSessionLoss>(): kotlin/Boolean // io.github.jan.supabase.realtime/Realtime.Config.disconnectOnSessionLoss.<get-disconnectOnSessionLoss>|<get-disconnectOnSessionLoss>(){}[0]
+            final fun <set-disconnectOnSessionLoss>(kotlin/Boolean) // io.github.jan.supabase.realtime/Realtime.Config.disconnectOnSessionLoss.<set-disconnectOnSessionLoss>|<set-disconnectOnSessionLoss>(kotlin.Boolean){}[0]
+        final var heartbeatInterval // io.github.jan.supabase.realtime/Realtime.Config.heartbeatInterval|{}heartbeatInterval[0]
+            final fun <get-heartbeatInterval>(): kotlin.time/Duration // io.github.jan.supabase.realtime/Realtime.Config.heartbeatInterval.<get-heartbeatInterval>|<get-heartbeatInterval>(){}[0]
+            final fun <set-heartbeatInterval>(kotlin.time/Duration) // io.github.jan.supabase.realtime/Realtime.Config.heartbeatInterval.<set-heartbeatInterval>|<set-heartbeatInterval>(kotlin.time.Duration){}[0]
+        final var maxAttempts // io.github.jan.supabase.realtime/Realtime.Config.maxAttempts|{}maxAttempts[0]
+            final fun <get-maxAttempts>(): kotlin/Int // io.github.jan.supabase.realtime/Realtime.Config.maxAttempts.<get-maxAttempts>|<get-maxAttempts>(){}[0]
+            final fun <set-maxAttempts>(kotlin/Int) // io.github.jan.supabase.realtime/Realtime.Config.maxAttempts.<set-maxAttempts>|<set-maxAttempts>(kotlin.Int){}[0]
+        final var reconnectDelay // io.github.jan.supabase.realtime/Realtime.Config.reconnectDelay|{}reconnectDelay[0]
+            final fun <get-reconnectDelay>(): kotlin.time/Duration // io.github.jan.supabase.realtime/Realtime.Config.reconnectDelay.<get-reconnectDelay>|<get-reconnectDelay>(){}[0]
+            final fun <set-reconnectDelay>(kotlin.time/Duration) // io.github.jan.supabase.realtime/Realtime.Config.reconnectDelay.<set-reconnectDelay>|<set-reconnectDelay>(kotlin.time.Duration){}[0]
+        final var rejoinDelay // io.github.jan.supabase.realtime/Realtime.Config.rejoinDelay|{}rejoinDelay[0]
+            final fun <get-rejoinDelay>(): kotlin.time/Duration // io.github.jan.supabase.realtime/Realtime.Config.rejoinDelay.<get-rejoinDelay>|<get-rejoinDelay>(){}[0]
+            final fun <set-rejoinDelay>(kotlin.time/Duration) // io.github.jan.supabase.realtime/Realtime.Config.rejoinDelay.<set-rejoinDelay>|<set-rejoinDelay>(kotlin.time.Duration){}[0]
+        final var requireValidSession // io.github.jan.supabase.realtime/Realtime.Config.requireValidSession|{}requireValidSession[0]
+            final fun <get-requireValidSession>(): kotlin/Boolean // io.github.jan.supabase.realtime/Realtime.Config.requireValidSession.<get-requireValidSession>|<get-requireValidSession>(){}[0]
+            final fun <set-requireValidSession>(kotlin/Boolean) // io.github.jan.supabase.realtime/Realtime.Config.requireValidSession.<set-requireValidSession>|<set-requireValidSession>(kotlin.Boolean){}[0]
+        final var secure // io.github.jan.supabase.realtime/Realtime.Config.secure|{}secure[0]
+            final fun <get-secure>(): kotlin/Boolean? // io.github.jan.supabase.realtime/Realtime.Config.secure.<get-secure>|<get-secure>(){}[0]
+            final fun <set-secure>(kotlin/Boolean?) // io.github.jan.supabase.realtime/Realtime.Config.secure.<set-secure>|<set-secure>(kotlin.Boolean?){}[0]
+        final var serializer // io.github.jan.supabase.realtime/Realtime.Config.serializer|{}serializer[0]
+            final fun <get-serializer>(): io.github.jan.supabase/SupabaseSerializer? // io.github.jan.supabase.realtime/Realtime.Config.serializer.<get-serializer>|<get-serializer>(){}[0]
+            final fun <set-serializer>(io.github.jan.supabase/SupabaseSerializer?) // io.github.jan.supabase.realtime/Realtime.Config.serializer.<set-serializer>|<set-serializer>(io.github.jan.supabase.SupabaseSerializer?){}[0]
+        final var vsn // io.github.jan.supabase.realtime/Realtime.Config.vsn|{}vsn[0]
+            final fun <get-vsn>(): io.github.jan.supabase.realtime/RealtimeProtocolVersion // io.github.jan.supabase.realtime/Realtime.Config.vsn.<get-vsn>|<get-vsn>(){}[0]
+            final fun <set-vsn>(io.github.jan.supabase.realtime/RealtimeProtocolVersion) // io.github.jan.supabase.realtime/Realtime.Config.vsn.<set-vsn>|<set-vsn>(io.github.jan.supabase.realtime.RealtimeProtocolVersion){}[0]
+        final var websocketConfig // io.github.jan.supabase.realtime/Realtime.Config.websocketConfig|{}websocketConfig[0]
+            final fun <get-websocketConfig>(): kotlin/Function1<io.ktor.client.plugins.websocket/WebSockets.Config, kotlin/Unit> // io.github.jan.supabase.realtime/Realtime.Config.websocketConfig.<get-websocketConfig>|<get-websocketConfig>(){}[0]
+            final fun <set-websocketConfig>(kotlin/Function1<io.ktor.client.plugins.websocket/WebSockets.Config, kotlin/Unit>) // io.github.jan.supabase.realtime/Realtime.Config.websocketConfig.<set-websocketConfig>|<set-websocketConfig>(kotlin.Function1<io.ktor.client.plugins.websocket.WebSockets.Config,kotlin.Unit>){}[0]
+        final var websocketFactory // io.github.jan.supabase.realtime/Realtime.Config.websocketFactory|{}websocketFactory[0]
+            final fun <get-websocketFactory>(): io.github.jan.supabase.realtime.websocket/RealtimeWebsocketFactory? // io.github.jan.supabase.realtime/Realtime.Config.websocketFactory.<get-websocketFactory>|<get-websocketFactory>(){}[0]
+            final fun <set-websocketFactory>(io.github.jan.supabase.realtime.websocket/RealtimeWebsocketFactory?) // io.github.jan.supabase.realtime/Realtime.Config.websocketFactory.<set-websocketFactory>|<set-websocketFactory>(io.github.jan.supabase.realtime.websocket.RealtimeWebsocketFactory?){}[0]
+    }
+
+    final object Companion : io.github.jan.supabase.plugins/SupabasePluginProvider<io.github.jan.supabase.realtime/Realtime.Config, io.github.jan.supabase.realtime/Realtime> { // io.github.jan.supabase.realtime/Realtime.Companion|null[0]
+        final const val API_VERSION // io.github.jan.supabase.realtime/Realtime.Companion.API_VERSION|{}API_VERSION[0]
+            final fun <get-API_VERSION>(): kotlin/Int // io.github.jan.supabase.realtime/Realtime.Companion.API_VERSION.<get-API_VERSION>|<get-API_VERSION>(){}[0]
+        final const val LOGGING_TAG // io.github.jan.supabase.realtime/Realtime.Companion.LOGGING_TAG|{}LOGGING_TAG[0]
+            final fun <get-LOGGING_TAG>(): kotlin/String // io.github.jan.supabase.realtime/Realtime.Companion.LOGGING_TAG.<get-LOGGING_TAG>|<get-LOGGING_TAG>(){}[0]
+
+        final val key // io.github.jan.supabase.realtime/Realtime.Companion.key|{}key[0]
+            final fun <get-key>(): kotlin/String // io.github.jan.supabase.realtime/Realtime.Companion.key.<get-key>|<get-key>(){}[0]
+
+        final fun create(io.github.jan.supabase/SupabaseClient, io.github.jan.supabase.realtime/Realtime.Config): io.github.jan.supabase.realtime/Realtime // io.github.jan.supabase.realtime/Realtime.Companion.create|create(io.github.jan.supabase.SupabaseClient;io.github.jan.supabase.realtime.Realtime.Config){}[0]
+        final fun createConfig(kotlin/Function1<io.github.jan.supabase.realtime/Realtime.Config, kotlin/Unit>): io.github.jan.supabase.realtime/Realtime.Config // io.github.jan.supabase.realtime/Realtime.Companion.createConfig|createConfig(kotlin.Function1<io.github.jan.supabase.realtime.Realtime.Config,kotlin.Unit>){}[0]
+        final fun setup(io.github.jan.supabase/SupabaseClientBuilder, io.github.jan.supabase.realtime/Realtime.Config) // io.github.jan.supabase.realtime/Realtime.Companion.setup|setup(io.github.jan.supabase.SupabaseClientBuilder;io.github.jan.supabase.realtime.Realtime.Config){}[0]
+    }
+}
+
+abstract interface io.github.jan.supabase.realtime/RealtimeChannel { // io.github.jan.supabase.realtime/RealtimeChannel|null[0]
+    abstract val callbackManager // io.github.jan.supabase.realtime/RealtimeChannel.callbackManager|{}callbackManager[0]
+        abstract fun <get-callbackManager>(): io.github.jan.supabase.realtime/CallbackManager // io.github.jan.supabase.realtime/RealtimeChannel.callbackManager.<get-callbackManager>|<get-callbackManager>(){}[0]
+    abstract val logger // io.github.jan.supabase.realtime/RealtimeChannel.logger|{}logger[0]
+        abstract fun <get-logger>(): io.github.jan.supabase.logging/SupabaseLogger // io.github.jan.supabase.realtime/RealtimeChannel.logger.<get-logger>|<get-logger>(){}[0]
+    abstract val realtime // io.github.jan.supabase.realtime/RealtimeChannel.realtime|{}realtime[0]
+        abstract fun <get-realtime>(): io.github.jan.supabase.realtime/Realtime // io.github.jan.supabase.realtime/RealtimeChannel.realtime.<get-realtime>|<get-realtime>(){}[0]
+    abstract val status // io.github.jan.supabase.realtime/RealtimeChannel.status|{}status[0]
+        abstract fun <get-status>(): kotlinx.coroutines.flow/StateFlow<io.github.jan.supabase.realtime/RealtimeChannel.Status> // io.github.jan.supabase.realtime/RealtimeChannel.status.<get-status>|<get-status>(){}[0]
+    abstract val supabaseClient // io.github.jan.supabase.realtime/RealtimeChannel.supabaseClient|{}supabaseClient[0]
+        abstract fun <get-supabaseClient>(): io.github.jan.supabase/SupabaseClient // io.github.jan.supabase.realtime/RealtimeChannel.supabaseClient.<get-supabaseClient>|<get-supabaseClient>(){}[0]
+    abstract val topic // io.github.jan.supabase.realtime/RealtimeChannel.topic|{}topic[0]
+        abstract fun <get-topic>(): kotlin/String // io.github.jan.supabase.realtime/RealtimeChannel.topic.<get-topic>|<get-topic>(){}[0]
+
+    abstract fun (io.github.jan.supabase.realtime/RealtimeChannel).addPostgresChange(io.github.jan.supabase.realtime/PostgresJoinConfig) // io.github.jan.supabase.realtime/RealtimeChannel.addPostgresChange|addPostgresChange@io.github.jan.supabase.realtime.RealtimeChannel(io.github.jan.supabase.realtime.PostgresJoinConfig){}[0]
+    abstract fun (io.github.jan.supabase.realtime/RealtimeChannel).removePostgresChange(io.github.jan.supabase.realtime/PostgresJoinConfig) // io.github.jan.supabase.realtime/RealtimeChannel.removePostgresChange|removePostgresChange@io.github.jan.supabase.realtime.RealtimeChannel(io.github.jan.supabase.realtime.PostgresJoinConfig){}[0]
+    abstract fun <#A1: io.github.jan.supabase.realtime/PostgresAction> (io.github.jan.supabase.realtime/RealtimeChannel).postgresChangeFlowInternal(kotlin.reflect/KClass<#A1>, kotlin/String, kotlin/Function1<io.github.jan.supabase.realtime/PostgresChangeFilter, kotlin/Unit> = ...): kotlinx.coroutines.flow/Flow<#A1> // io.github.jan.supabase.realtime/RealtimeChannel.postgresChangeFlowInternal|postgresChangeFlowInternal@io.github.jan.supabase.realtime.RealtimeChannel(kotlin.reflect.KClass<0:0>;kotlin.String;kotlin.Function1<io.github.jan.supabase.realtime.PostgresChangeFilter,kotlin.Unit>){0§<io.github.jan.supabase.realtime.PostgresAction>}[0]
+    abstract fun broadcastFlow(kotlin/String): kotlinx.coroutines.flow/Flow<io.github.jan.supabase.realtime.broadcast/RealtimeBroadcast> // io.github.jan.supabase.realtime/RealtimeChannel.broadcastFlow|broadcastFlow(kotlin.String){}[0]
+    abstract fun presenceChangeFlow(): kotlinx.coroutines.flow/Flow<io.github.jan.supabase.realtime/PresenceAction> // io.github.jan.supabase.realtime/RealtimeChannel.presenceChangeFlow|presenceChangeFlow(){}[0]
+    abstract fun systemFlow(): kotlinx.coroutines.flow/Flow<io.github.jan.supabase.realtime/RealtimeSystemPayload> // io.github.jan.supabase.realtime/RealtimeChannel.systemFlow|systemFlow(){}[0]
+    abstract fun teardown() // io.github.jan.supabase.realtime/RealtimeChannel.teardown|teardown(){}[0]
+    abstract fun updateStatus(io.github.jan.supabase.realtime/RealtimeChannel.Status) // io.github.jan.supabase.realtime/RealtimeChannel.updateStatus|updateStatus(io.github.jan.supabase.realtime.RealtimeChannel.Status){}[0]
+    abstract suspend fun broadcast(kotlin/String, io.github.jan.supabase.realtime.broadcast/BroadcastPayload) // io.github.jan.supabase.realtime/RealtimeChannel.broadcast|broadcast(kotlin.String;io.github.jan.supabase.realtime.broadcast.BroadcastPayload){}[0]
+    abstract suspend fun httpSend(kotlin/String, io.github.jan.supabase.realtime.broadcast/BroadcastPayload, kotlin/Function1<io.github.jan.supabase.realtime/HttpSendBuilder, kotlin/Unit> = ...) // io.github.jan.supabase.realtime/RealtimeChannel.httpSend|httpSend(kotlin.String;io.github.jan.supabase.realtime.broadcast.BroadcastPayload;kotlin.Function1<io.github.jan.supabase.realtime.HttpSendBuilder,kotlin.Unit>){}[0]
+    abstract suspend fun scheduleRejoin() // io.github.jan.supabase.realtime/RealtimeChannel.scheduleRejoin|scheduleRejoin(){}[0]
+    abstract suspend fun subscribe(kotlin/Boolean = ...) // io.github.jan.supabase.realtime/RealtimeChannel.subscribe|subscribe(kotlin.Boolean){}[0]
+    abstract suspend fun track(kotlinx.serialization.json/JsonObject) // io.github.jan.supabase.realtime/RealtimeChannel.track|track(kotlinx.serialization.json.JsonObject){}[0]
+    abstract suspend fun unsubscribe() // io.github.jan.supabase.realtime/RealtimeChannel.unsubscribe|unsubscribe(){}[0]
+    abstract suspend fun untrack() // io.github.jan.supabase.realtime/RealtimeChannel.untrack|untrack(){}[0]
+    abstract suspend fun updateAuth(kotlin/String?) // io.github.jan.supabase.realtime/RealtimeChannel.updateAuth|updateAuth(kotlin.String?){}[0]
+
+    final enum class Status : kotlin/Enum<io.github.jan.supabase.realtime/RealtimeChannel.Status> { // io.github.jan.supabase.realtime/RealtimeChannel.Status|null[0]
+        enum entry SUBSCRIBED // io.github.jan.supabase.realtime/RealtimeChannel.Status.SUBSCRIBED|null[0]
+        enum entry SUBSCRIBING // io.github.jan.supabase.realtime/RealtimeChannel.Status.SUBSCRIBING|null[0]
+        enum entry UNSUBSCRIBED // io.github.jan.supabase.realtime/RealtimeChannel.Status.UNSUBSCRIBED|null[0]
+        enum entry UNSUBSCRIBING // io.github.jan.supabase.realtime/RealtimeChannel.Status.UNSUBSCRIBING|null[0]
+
+        final val entries // io.github.jan.supabase.realtime/RealtimeChannel.Status.entries|#static{}entries[0]
+            final fun <get-entries>(): kotlin.enums/EnumEntries<io.github.jan.supabase.realtime/RealtimeChannel.Status> // io.github.jan.supabase.realtime/RealtimeChannel.Status.entries.<get-entries>|<get-entries>#static(){}[0]
+
+        final fun valueOf(kotlin/String): io.github.jan.supabase.realtime/RealtimeChannel.Status // io.github.jan.supabase.realtime/RealtimeChannel.Status.valueOf|valueOf#static(kotlin.String){}[0]
+        final fun values(): kotlin/Array<io.github.jan.supabase.realtime/RealtimeChannel.Status> // io.github.jan.supabase.realtime/RealtimeChannel.Status.values|values#static(){}[0]
+    }
+
+    final object Companion { // io.github.jan.supabase.realtime/RealtimeChannel.Companion|null[0]
+        final const val CHANNEL_EVENT_ACCESS_TOKEN // io.github.jan.supabase.realtime/RealtimeChannel.Companion.CHANNEL_EVENT_ACCESS_TOKEN|{}CHANNEL_EVENT_ACCESS_TOKEN[0]
+            final fun <get-CHANNEL_EVENT_ACCESS_TOKEN>(): kotlin/String // io.github.jan.supabase.realtime/RealtimeChannel.Companion.CHANNEL_EVENT_ACCESS_TOKEN.<get-CHANNEL_EVENT_ACCESS_TOKEN>|<get-CHANNEL_EVENT_ACCESS_TOKEN>(){}[0]
+        final const val CHANNEL_EVENT_BROADCAST // io.github.jan.supabase.realtime/RealtimeChannel.Companion.CHANNEL_EVENT_BROADCAST|{}CHANNEL_EVENT_BROADCAST[0]
+            final fun <get-CHANNEL_EVENT_BROADCAST>(): kotlin/String // io.github.jan.supabase.realtime/RealtimeChannel.Companion.CHANNEL_EVENT_BROADCAST.<get-CHANNEL_EVENT_BROADCAST>|<get-CHANNEL_EVENT_BROADCAST>(){}[0]
+        final const val CHANNEL_EVENT_CLOSE // io.github.jan.supabase.realtime/RealtimeChannel.Companion.CHANNEL_EVENT_CLOSE|{}CHANNEL_EVENT_CLOSE[0]
+            final fun <get-CHANNEL_EVENT_CLOSE>(): kotlin/String // io.github.jan.supabase.realtime/RealtimeChannel.Companion.CHANNEL_EVENT_CLOSE.<get-CHANNEL_EVENT_CLOSE>|<get-CHANNEL_EVENT_CLOSE>(){}[0]
+        final const val CHANNEL_EVENT_ERROR // io.github.jan.supabase.realtime/RealtimeChannel.Companion.CHANNEL_EVENT_ERROR|{}CHANNEL_EVENT_ERROR[0]
+            final fun <get-CHANNEL_EVENT_ERROR>(): kotlin/String // io.github.jan.supabase.realtime/RealtimeChannel.Companion.CHANNEL_EVENT_ERROR.<get-CHANNEL_EVENT_ERROR>|<get-CHANNEL_EVENT_ERROR>(){}[0]
+        final const val CHANNEL_EVENT_JOIN // io.github.jan.supabase.realtime/RealtimeChannel.Companion.CHANNEL_EVENT_JOIN|{}CHANNEL_EVENT_JOIN[0]
+            final fun <get-CHANNEL_EVENT_JOIN>(): kotlin/String // io.github.jan.supabase.realtime/RealtimeChannel.Companion.CHANNEL_EVENT_JOIN.<get-CHANNEL_EVENT_JOIN>|<get-CHANNEL_EVENT_JOIN>(){}[0]
+        final const val CHANNEL_EVENT_LEAVE // io.github.jan.supabase.realtime/RealtimeChannel.Companion.CHANNEL_EVENT_LEAVE|{}CHANNEL_EVENT_LEAVE[0]
+            final fun <get-CHANNEL_EVENT_LEAVE>(): kotlin/String // io.github.jan.supabase.realtime/RealtimeChannel.Companion.CHANNEL_EVENT_LEAVE.<get-CHANNEL_EVENT_LEAVE>|<get-CHANNEL_EVENT_LEAVE>(){}[0]
+        final const val CHANNEL_EVENT_POSTGRES_CHANGES // io.github.jan.supabase.realtime/RealtimeChannel.Companion.CHANNEL_EVENT_POSTGRES_CHANGES|{}CHANNEL_EVENT_POSTGRES_CHANGES[0]
+            final fun <get-CHANNEL_EVENT_POSTGRES_CHANGES>(): kotlin/String // io.github.jan.supabase.realtime/RealtimeChannel.Companion.CHANNEL_EVENT_POSTGRES_CHANGES.<get-CHANNEL_EVENT_POSTGRES_CHANGES>|<get-CHANNEL_EVENT_POSTGRES_CHANGES>(){}[0]
+        final const val CHANNEL_EVENT_PRESENCE // io.github.jan.supabase.realtime/RealtimeChannel.Companion.CHANNEL_EVENT_PRESENCE|{}CHANNEL_EVENT_PRESENCE[0]
+            final fun <get-CHANNEL_EVENT_PRESENCE>(): kotlin/String // io.github.jan.supabase.realtime/RealtimeChannel.Companion.CHANNEL_EVENT_PRESENCE.<get-CHANNEL_EVENT_PRESENCE>|<get-CHANNEL_EVENT_PRESENCE>(){}[0]
+        final const val CHANNEL_EVENT_PRESENCE_DIFF // io.github.jan.supabase.realtime/RealtimeChannel.Companion.CHANNEL_EVENT_PRESENCE_DIFF|{}CHANNEL_EVENT_PRESENCE_DIFF[0]
+            final fun <get-CHANNEL_EVENT_PRESENCE_DIFF>(): kotlin/String // io.github.jan.supabase.realtime/RealtimeChannel.Companion.CHANNEL_EVENT_PRESENCE_DIFF.<get-CHANNEL_EVENT_PRESENCE_DIFF>|<get-CHANNEL_EVENT_PRESENCE_DIFF>(){}[0]
+        final const val CHANNEL_EVENT_PRESENCE_STATE // io.github.jan.supabase.realtime/RealtimeChannel.Companion.CHANNEL_EVENT_PRESENCE_STATE|{}CHANNEL_EVENT_PRESENCE_STATE[0]
+            final fun <get-CHANNEL_EVENT_PRESENCE_STATE>(): kotlin/String // io.github.jan.supabase.realtime/RealtimeChannel.Companion.CHANNEL_EVENT_PRESENCE_STATE.<get-CHANNEL_EVENT_PRESENCE_STATE>|<get-CHANNEL_EVENT_PRESENCE_STATE>(){}[0]
+        final const val CHANNEL_EVENT_REPLY // io.github.jan.supabase.realtime/RealtimeChannel.Companion.CHANNEL_EVENT_REPLY|{}CHANNEL_EVENT_REPLY[0]
+            final fun <get-CHANNEL_EVENT_REPLY>(): kotlin/String // io.github.jan.supabase.realtime/RealtimeChannel.Companion.CHANNEL_EVENT_REPLY.<get-CHANNEL_EVENT_REPLY>|<get-CHANNEL_EVENT_REPLY>(){}[0]
+        final const val CHANNEL_EVENT_SYSTEM // io.github.jan.supabase.realtime/RealtimeChannel.Companion.CHANNEL_EVENT_SYSTEM|{}CHANNEL_EVENT_SYSTEM[0]
+            final fun <get-CHANNEL_EVENT_SYSTEM>(): kotlin/String // io.github.jan.supabase.realtime/RealtimeChannel.Companion.CHANNEL_EVENT_SYSTEM.<get-CHANNEL_EVENT_SYSTEM>|<get-CHANNEL_EVENT_SYSTEM>(){}[0]
+    }
+}
+
+sealed interface <#A: kotlin/Any?> io.github.jan.supabase.realtime/RealtimeCallback { // io.github.jan.supabase.realtime/RealtimeCallback|null[0]
+    abstract val callback // io.github.jan.supabase.realtime/RealtimeCallback.callback|{}callback[0]
+        abstract fun <get-callback>(): kotlin/Function1<#A, kotlin/Unit> // io.github.jan.supabase.realtime/RealtimeCallback.callback.<get-callback>|<get-callback>(){}[0]
+    abstract val id // io.github.jan.supabase.realtime/RealtimeCallback.id|{}id[0]
+        abstract fun <get-id>(): kotlin/Int // io.github.jan.supabase.realtime/RealtimeCallback.id.<get-id>|<get-id>(){}[0]
+
+    final class BroadcastCallback : io.github.jan.supabase.realtime/RealtimeCallback<io.github.jan.supabase.realtime.broadcast/RealtimeBroadcast> { // io.github.jan.supabase.realtime/RealtimeCallback.BroadcastCallback|null[0]
+        constructor <init>(kotlin/Function1<io.github.jan.supabase.realtime.broadcast/RealtimeBroadcast, kotlin/Unit>, kotlin/String, kotlin/Int) // io.github.jan.supabase.realtime/RealtimeCallback.BroadcastCallback.<init>|<init>(kotlin.Function1<io.github.jan.supabase.realtime.broadcast.RealtimeBroadcast,kotlin.Unit>;kotlin.String;kotlin.Int){}[0]
+
+        final val callback // io.github.jan.supabase.realtime/RealtimeCallback.BroadcastCallback.callback|{}callback[0]
+            final fun <get-callback>(): kotlin/Function1<io.github.jan.supabase.realtime.broadcast/RealtimeBroadcast, kotlin/Unit> // io.github.jan.supabase.realtime/RealtimeCallback.BroadcastCallback.callback.<get-callback>|<get-callback>(){}[0]
+        final val event // io.github.jan.supabase.realtime/RealtimeCallback.BroadcastCallback.event|{}event[0]
+            final fun <get-event>(): kotlin/String // io.github.jan.supabase.realtime/RealtimeCallback.BroadcastCallback.event.<get-event>|<get-event>(){}[0]
+        final val id // io.github.jan.supabase.realtime/RealtimeCallback.BroadcastCallback.id|{}id[0]
+            final fun <get-id>(): kotlin/Int // io.github.jan.supabase.realtime/RealtimeCallback.BroadcastCallback.id.<get-id>|<get-id>(){}[0]
+    }
+
+    final class PostgresCallback : io.github.jan.supabase.realtime/RealtimeCallback<io.github.jan.supabase.realtime/PostgresAction> { // io.github.jan.supabase.realtime/RealtimeCallback.PostgresCallback|null[0]
+        constructor <init>(kotlin/Function1<io.github.jan.supabase.realtime/PostgresAction, kotlin/Unit>, io.github.jan.supabase.realtime/PostgresJoinConfig, kotlin/Int) // io.github.jan.supabase.realtime/RealtimeCallback.PostgresCallback.<init>|<init>(kotlin.Function1<io.github.jan.supabase.realtime.PostgresAction,kotlin.Unit>;io.github.jan.supabase.realtime.PostgresJoinConfig;kotlin.Int){}[0]
+
+        final val callback // io.github.jan.supabase.realtime/RealtimeCallback.PostgresCallback.callback|{}callback[0]
+            final fun <get-callback>(): kotlin/Function1<io.github.jan.supabase.realtime/PostgresAction, kotlin/Unit> // io.github.jan.supabase.realtime/RealtimeCallback.PostgresCallback.callback.<get-callback>|<get-callback>(){}[0]
+        final val filter // io.github.jan.supabase.realtime/RealtimeCallback.PostgresCallback.filter|{}filter[0]
+            final fun <get-filter>(): io.github.jan.supabase.realtime/PostgresJoinConfig // io.github.jan.supabase.realtime/RealtimeCallback.PostgresCallback.filter.<get-filter>|<get-filter>(){}[0]
+        final val id // io.github.jan.supabase.realtime/RealtimeCallback.PostgresCallback.id|{}id[0]
+            final fun <get-id>(): kotlin/Int // io.github.jan.supabase.realtime/RealtimeCallback.PostgresCallback.id.<get-id>|<get-id>(){}[0]
+    }
+
+    final class PresenceCallback : io.github.jan.supabase.realtime/RealtimeCallback<io.github.jan.supabase.realtime/PresenceAction> { // io.github.jan.supabase.realtime/RealtimeCallback.PresenceCallback|null[0]
+        constructor <init>(kotlin/Function1<io.github.jan.supabase.realtime/PresenceAction, kotlin/Unit>, kotlin/Int) // io.github.jan.supabase.realtime/RealtimeCallback.PresenceCallback.<init>|<init>(kotlin.Function1<io.github.jan.supabase.realtime.PresenceAction,kotlin.Unit>;kotlin.Int){}[0]
+
+        final val callback // io.github.jan.supabase.realtime/RealtimeCallback.PresenceCallback.callback|{}callback[0]
+            final fun <get-callback>(): kotlin/Function1<io.github.jan.supabase.realtime/PresenceAction, kotlin/Unit> // io.github.jan.supabase.realtime/RealtimeCallback.PresenceCallback.callback.<get-callback>|<get-callback>(){}[0]
+        final val id // io.github.jan.supabase.realtime/RealtimeCallback.PresenceCallback.id|{}id[0]
+            final fun <get-id>(): kotlin/Int // io.github.jan.supabase.realtime/RealtimeCallback.PresenceCallback.id.<get-id>|<get-id>(){}[0]
+    }
+
+    final class SystemCallback : io.github.jan.supabase.realtime/RealtimeCallback<io.github.jan.supabase.realtime/RealtimeSystemPayload> { // io.github.jan.supabase.realtime/RealtimeCallback.SystemCallback|null[0]
+        constructor <init>(kotlin/Function1<io.github.jan.supabase.realtime/RealtimeSystemPayload, kotlin/Unit>, kotlin/Int) // io.github.jan.supabase.realtime/RealtimeCallback.SystemCallback.<init>|<init>(kotlin.Function1<io.github.jan.supabase.realtime.RealtimeSystemPayload,kotlin.Unit>;kotlin.Int){}[0]
+
+        final val callback // io.github.jan.supabase.realtime/RealtimeCallback.SystemCallback.callback|{}callback[0]
+            final fun <get-callback>(): kotlin/Function1<io.github.jan.supabase.realtime/RealtimeSystemPayload, kotlin/Unit> // io.github.jan.supabase.realtime/RealtimeCallback.SystemCallback.callback.<get-callback>|<get-callback>(){}[0]
+        final val id // io.github.jan.supabase.realtime/RealtimeCallback.SystemCallback.id|{}id[0]
+            final fun <get-id>(): kotlin/Int // io.github.jan.supabase.realtime/RealtimeCallback.SystemCallback.id.<get-id>|<get-id>(){}[0]
+    }
+}
+
+sealed interface io.github.jan.supabase.realtime.broadcast/BroadcastPayload { // io.github.jan.supabase.realtime.broadcast/BroadcastPayload|null[0]
+    final class Binary : io.github.jan.supabase.realtime.broadcast/BroadcastPayload { // io.github.jan.supabase.realtime.broadcast/BroadcastPayload.Binary|null[0]
+        constructor <init>(kotlin/ByteArray) // io.github.jan.supabase.realtime.broadcast/BroadcastPayload.Binary.<init>|<init>(kotlin.ByteArray){}[0]
+
+        final val data // io.github.jan.supabase.realtime.broadcast/BroadcastPayload.Binary.data|{}data[0]
+            final fun <get-data>(): kotlin/ByteArray // io.github.jan.supabase.realtime.broadcast/BroadcastPayload.Binary.data.<get-data>|<get-data>(){}[0]
+    }
+
+    final class Json : io.github.jan.supabase.realtime.broadcast/BroadcastPayload { // io.github.jan.supabase.realtime.broadcast/BroadcastPayload.Json|null[0]
+        constructor <init>(kotlinx.serialization.json/JsonElement) // io.github.jan.supabase.realtime.broadcast/BroadcastPayload.Json.<init>|<init>(kotlinx.serialization.json.JsonElement){}[0]
+
+        final val value // io.github.jan.supabase.realtime.broadcast/BroadcastPayload.Json.value|{}value[0]
+            final fun <get-value>(): kotlinx.serialization.json/JsonElement // io.github.jan.supabase.realtime.broadcast/BroadcastPayload.Json.value.<get-value>|<get-value>(){}[0]
+
+        final fun component1(): kotlinx.serialization.json/JsonElement // io.github.jan.supabase.realtime.broadcast/BroadcastPayload.Json.component1|component1(){}[0]
+        final fun copy(kotlinx.serialization.json/JsonElement = ...): io.github.jan.supabase.realtime.broadcast/BroadcastPayload.Json // io.github.jan.supabase.realtime.broadcast/BroadcastPayload.Json.copy|copy(kotlinx.serialization.json.JsonElement){}[0]
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.jan.supabase.realtime.broadcast/BroadcastPayload.Json.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.jan.supabase.realtime.broadcast/BroadcastPayload.Json.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.jan.supabase.realtime.broadcast/BroadcastPayload.Json.toString|toString(){}[0]
+    }
+}
+
+sealed interface io.github.jan.supabase.realtime/PostgresAction : io.github.jan.supabase.plugins/SerializableData { // io.github.jan.supabase.realtime/PostgresAction|null[0]
+    abstract val columns // io.github.jan.supabase.realtime/PostgresAction.columns|{}columns[0]
+        abstract fun <get-columns>(): kotlin.collections/List<io.github.jan.supabase.realtime/Column> // io.github.jan.supabase.realtime/PostgresAction.columns.<get-columns>|<get-columns>(){}[0]
+    abstract val commitTimestamp // io.github.jan.supabase.realtime/PostgresAction.commitTimestamp|{}commitTimestamp[0]
+        abstract fun <get-commitTimestamp>(): kotlin.time/Instant // io.github.jan.supabase.realtime/PostgresAction.commitTimestamp.<get-commitTimestamp>|<get-commitTimestamp>(){}[0]
+
+    final class Delete : io.github.jan.supabase.realtime/HasOldRecord, io.github.jan.supabase.realtime/PostgresAction { // io.github.jan.supabase.realtime/PostgresAction.Delete|null[0]
+        constructor <init>(kotlinx.serialization.json/JsonObject, kotlin.collections/List<io.github.jan.supabase.realtime/Column>, kotlin.time/Instant, io.github.jan.supabase/SupabaseSerializer) // io.github.jan.supabase.realtime/PostgresAction.Delete.<init>|<init>(kotlinx.serialization.json.JsonObject;kotlin.collections.List<io.github.jan.supabase.realtime.Column>;kotlin.time.Instant;io.github.jan.supabase.SupabaseSerializer){}[0]
+
+        final val columns // io.github.jan.supabase.realtime/PostgresAction.Delete.columns|{}columns[0]
+            final fun <get-columns>(): kotlin.collections/List<io.github.jan.supabase.realtime/Column> // io.github.jan.supabase.realtime/PostgresAction.Delete.columns.<get-columns>|<get-columns>(){}[0]
+        final val commitTimestamp // io.github.jan.supabase.realtime/PostgresAction.Delete.commitTimestamp|{}commitTimestamp[0]
+            final fun <get-commitTimestamp>(): kotlin.time/Instant // io.github.jan.supabase.realtime/PostgresAction.Delete.commitTimestamp.<get-commitTimestamp>|<get-commitTimestamp>(){}[0]
+        final val oldRecord // io.github.jan.supabase.realtime/PostgresAction.Delete.oldRecord|{}oldRecord[0]
+            final fun <get-oldRecord>(): kotlinx.serialization.json/JsonObject // io.github.jan.supabase.realtime/PostgresAction.Delete.oldRecord.<get-oldRecord>|<get-oldRecord>(){}[0]
+        final val serializer // io.github.jan.supabase.realtime/PostgresAction.Delete.serializer|{}serializer[0]
+            final fun <get-serializer>(): io.github.jan.supabase/SupabaseSerializer // io.github.jan.supabase.realtime/PostgresAction.Delete.serializer.<get-serializer>|<get-serializer>(){}[0]
+
+        final fun component1(): kotlinx.serialization.json/JsonObject // io.github.jan.supabase.realtime/PostgresAction.Delete.component1|component1(){}[0]
+        final fun component2(): kotlin.collections/List<io.github.jan.supabase.realtime/Column> // io.github.jan.supabase.realtime/PostgresAction.Delete.component2|component2(){}[0]
+        final fun component3(): kotlin.time/Instant // io.github.jan.supabase.realtime/PostgresAction.Delete.component3|component3(){}[0]
+        final fun component4(): io.github.jan.supabase/SupabaseSerializer // io.github.jan.supabase.realtime/PostgresAction.Delete.component4|component4(){}[0]
+        final fun copy(kotlinx.serialization.json/JsonObject = ..., kotlin.collections/List<io.github.jan.supabase.realtime/Column> = ..., kotlin.time/Instant = ..., io.github.jan.supabase/SupabaseSerializer = ...): io.github.jan.supabase.realtime/PostgresAction.Delete // io.github.jan.supabase.realtime/PostgresAction.Delete.copy|copy(kotlinx.serialization.json.JsonObject;kotlin.collections.List<io.github.jan.supabase.realtime.Column>;kotlin.time.Instant;io.github.jan.supabase.SupabaseSerializer){}[0]
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.jan.supabase.realtime/PostgresAction.Delete.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.jan.supabase.realtime/PostgresAction.Delete.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.jan.supabase.realtime/PostgresAction.Delete.toString|toString(){}[0]
+    }
+
+    final class Insert : io.github.jan.supabase.realtime/HasRecord, io.github.jan.supabase.realtime/PostgresAction { // io.github.jan.supabase.realtime/PostgresAction.Insert|null[0]
+        constructor <init>(kotlinx.serialization.json/JsonObject, kotlin.collections/List<io.github.jan.supabase.realtime/Column>, kotlin.time/Instant, io.github.jan.supabase/SupabaseSerializer) // io.github.jan.supabase.realtime/PostgresAction.Insert.<init>|<init>(kotlinx.serialization.json.JsonObject;kotlin.collections.List<io.github.jan.supabase.realtime.Column>;kotlin.time.Instant;io.github.jan.supabase.SupabaseSerializer){}[0]
+
+        final val columns // io.github.jan.supabase.realtime/PostgresAction.Insert.columns|{}columns[0]
+            final fun <get-columns>(): kotlin.collections/List<io.github.jan.supabase.realtime/Column> // io.github.jan.supabase.realtime/PostgresAction.Insert.columns.<get-columns>|<get-columns>(){}[0]
+        final val commitTimestamp // io.github.jan.supabase.realtime/PostgresAction.Insert.commitTimestamp|{}commitTimestamp[0]
+            final fun <get-commitTimestamp>(): kotlin.time/Instant // io.github.jan.supabase.realtime/PostgresAction.Insert.commitTimestamp.<get-commitTimestamp>|<get-commitTimestamp>(){}[0]
+        final val record // io.github.jan.supabase.realtime/PostgresAction.Insert.record|{}record[0]
+            final fun <get-record>(): kotlinx.serialization.json/JsonObject // io.github.jan.supabase.realtime/PostgresAction.Insert.record.<get-record>|<get-record>(){}[0]
+        final val serializer // io.github.jan.supabase.realtime/PostgresAction.Insert.serializer|{}serializer[0]
+            final fun <get-serializer>(): io.github.jan.supabase/SupabaseSerializer // io.github.jan.supabase.realtime/PostgresAction.Insert.serializer.<get-serializer>|<get-serializer>(){}[0]
+
+        final fun component1(): kotlinx.serialization.json/JsonObject // io.github.jan.supabase.realtime/PostgresAction.Insert.component1|component1(){}[0]
+        final fun component2(): kotlin.collections/List<io.github.jan.supabase.realtime/Column> // io.github.jan.supabase.realtime/PostgresAction.Insert.component2|component2(){}[0]
+        final fun component3(): kotlin.time/Instant // io.github.jan.supabase.realtime/PostgresAction.Insert.component3|component3(){}[0]
+        final fun component4(): io.github.jan.supabase/SupabaseSerializer // io.github.jan.supabase.realtime/PostgresAction.Insert.component4|component4(){}[0]
+        final fun copy(kotlinx.serialization.json/JsonObject = ..., kotlin.collections/List<io.github.jan.supabase.realtime/Column> = ..., kotlin.time/Instant = ..., io.github.jan.supabase/SupabaseSerializer = ...): io.github.jan.supabase.realtime/PostgresAction.Insert // io.github.jan.supabase.realtime/PostgresAction.Insert.copy|copy(kotlinx.serialization.json.JsonObject;kotlin.collections.List<io.github.jan.supabase.realtime.Column>;kotlin.time.Instant;io.github.jan.supabase.SupabaseSerializer){}[0]
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.jan.supabase.realtime/PostgresAction.Insert.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.jan.supabase.realtime/PostgresAction.Insert.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.jan.supabase.realtime/PostgresAction.Insert.toString|toString(){}[0]
+    }
+
+    final class Select : io.github.jan.supabase.realtime/HasRecord, io.github.jan.supabase.realtime/PostgresAction { // io.github.jan.supabase.realtime/PostgresAction.Select|null[0]
+        constructor <init>(kotlinx.serialization.json/JsonObject, kotlin.collections/List<io.github.jan.supabase.realtime/Column>, kotlin.time/Instant, io.github.jan.supabase/SupabaseSerializer) // io.github.jan.supabase.realtime/PostgresAction.Select.<init>|<init>(kotlinx.serialization.json.JsonObject;kotlin.collections.List<io.github.jan.supabase.realtime.Column>;kotlin.time.Instant;io.github.jan.supabase.SupabaseSerializer){}[0]
+
+        final val columns // io.github.jan.supabase.realtime/PostgresAction.Select.columns|{}columns[0]
+            final fun <get-columns>(): kotlin.collections/List<io.github.jan.supabase.realtime/Column> // io.github.jan.supabase.realtime/PostgresAction.Select.columns.<get-columns>|<get-columns>(){}[0]
+        final val commitTimestamp // io.github.jan.supabase.realtime/PostgresAction.Select.commitTimestamp|{}commitTimestamp[0]
+            final fun <get-commitTimestamp>(): kotlin.time/Instant // io.github.jan.supabase.realtime/PostgresAction.Select.commitTimestamp.<get-commitTimestamp>|<get-commitTimestamp>(){}[0]
+        final val record // io.github.jan.supabase.realtime/PostgresAction.Select.record|{}record[0]
+            final fun <get-record>(): kotlinx.serialization.json/JsonObject // io.github.jan.supabase.realtime/PostgresAction.Select.record.<get-record>|<get-record>(){}[0]
+        final val serializer // io.github.jan.supabase.realtime/PostgresAction.Select.serializer|{}serializer[0]
+            final fun <get-serializer>(): io.github.jan.supabase/SupabaseSerializer // io.github.jan.supabase.realtime/PostgresAction.Select.serializer.<get-serializer>|<get-serializer>(){}[0]
+
+        final fun component1(): kotlinx.serialization.json/JsonObject // io.github.jan.supabase.realtime/PostgresAction.Select.component1|component1(){}[0]
+        final fun component2(): kotlin.collections/List<io.github.jan.supabase.realtime/Column> // io.github.jan.supabase.realtime/PostgresAction.Select.component2|component2(){}[0]
+        final fun component3(): kotlin.time/Instant // io.github.jan.supabase.realtime/PostgresAction.Select.component3|component3(){}[0]
+        final fun component4(): io.github.jan.supabase/SupabaseSerializer // io.github.jan.supabase.realtime/PostgresAction.Select.component4|component4(){}[0]
+        final fun copy(kotlinx.serialization.json/JsonObject = ..., kotlin.collections/List<io.github.jan.supabase.realtime/Column> = ..., kotlin.time/Instant = ..., io.github.jan.supabase/SupabaseSerializer = ...): io.github.jan.supabase.realtime/PostgresAction.Select // io.github.jan.supabase.realtime/PostgresAction.Select.copy|copy(kotlinx.serialization.json.JsonObject;kotlin.collections.List<io.github.jan.supabase.realtime.Column>;kotlin.time.Instant;io.github.jan.supabase.SupabaseSerializer){}[0]
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.jan.supabase.realtime/PostgresAction.Select.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.jan.supabase.realtime/PostgresAction.Select.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.jan.supabase.realtime/PostgresAction.Select.toString|toString(){}[0]
+    }
+
+    final class Update : io.github.jan.supabase.realtime/HasOldRecord, io.github.jan.supabase.realtime/HasRecord, io.github.jan.supabase.realtime/PostgresAction { // io.github.jan.supabase.realtime/PostgresAction.Update|null[0]
+        constructor <init>(kotlinx.serialization.json/JsonObject, kotlinx.serialization.json/JsonObject, kotlin.collections/List<io.github.jan.supabase.realtime/Column>, kotlin.time/Instant, io.github.jan.supabase/SupabaseSerializer) // io.github.jan.supabase.realtime/PostgresAction.Update.<init>|<init>(kotlinx.serialization.json.JsonObject;kotlinx.serialization.json.JsonObject;kotlin.collections.List<io.github.jan.supabase.realtime.Column>;kotlin.time.Instant;io.github.jan.supabase.SupabaseSerializer){}[0]
+
+        final val columns // io.github.jan.supabase.realtime/PostgresAction.Update.columns|{}columns[0]
+            final fun <get-columns>(): kotlin.collections/List<io.github.jan.supabase.realtime/Column> // io.github.jan.supabase.realtime/PostgresAction.Update.columns.<get-columns>|<get-columns>(){}[0]
+        final val commitTimestamp // io.github.jan.supabase.realtime/PostgresAction.Update.commitTimestamp|{}commitTimestamp[0]
+            final fun <get-commitTimestamp>(): kotlin.time/Instant // io.github.jan.supabase.realtime/PostgresAction.Update.commitTimestamp.<get-commitTimestamp>|<get-commitTimestamp>(){}[0]
+        final val oldRecord // io.github.jan.supabase.realtime/PostgresAction.Update.oldRecord|{}oldRecord[0]
+            final fun <get-oldRecord>(): kotlinx.serialization.json/JsonObject // io.github.jan.supabase.realtime/PostgresAction.Update.oldRecord.<get-oldRecord>|<get-oldRecord>(){}[0]
+        final val record // io.github.jan.supabase.realtime/PostgresAction.Update.record|{}record[0]
+            final fun <get-record>(): kotlinx.serialization.json/JsonObject // io.github.jan.supabase.realtime/PostgresAction.Update.record.<get-record>|<get-record>(){}[0]
+        final val serializer // io.github.jan.supabase.realtime/PostgresAction.Update.serializer|{}serializer[0]
+            final fun <get-serializer>(): io.github.jan.supabase/SupabaseSerializer // io.github.jan.supabase.realtime/PostgresAction.Update.serializer.<get-serializer>|<get-serializer>(){}[0]
+
+        final fun component1(): kotlinx.serialization.json/JsonObject // io.github.jan.supabase.realtime/PostgresAction.Update.component1|component1(){}[0]
+        final fun component2(): kotlinx.serialization.json/JsonObject // io.github.jan.supabase.realtime/PostgresAction.Update.component2|component2(){}[0]
+        final fun component3(): kotlin.collections/List<io.github.jan.supabase.realtime/Column> // io.github.jan.supabase.realtime/PostgresAction.Update.component3|component3(){}[0]
+        final fun component4(): kotlin.time/Instant // io.github.jan.supabase.realtime/PostgresAction.Update.component4|component4(){}[0]
+        final fun component5(): io.github.jan.supabase/SupabaseSerializer // io.github.jan.supabase.realtime/PostgresAction.Update.component5|component5(){}[0]
+        final fun copy(kotlinx.serialization.json/JsonObject = ..., kotlinx.serialization.json/JsonObject = ..., kotlin.collections/List<io.github.jan.supabase.realtime/Column> = ..., kotlin.time/Instant = ..., io.github.jan.supabase/SupabaseSerializer = ...): io.github.jan.supabase.realtime/PostgresAction.Update // io.github.jan.supabase.realtime/PostgresAction.Update.copy|copy(kotlinx.serialization.json.JsonObject;kotlinx.serialization.json.JsonObject;kotlin.collections.List<io.github.jan.supabase.realtime.Column>;kotlin.time.Instant;io.github.jan.supabase.SupabaseSerializer){}[0]
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.jan.supabase.realtime/PostgresAction.Update.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.jan.supabase.realtime/PostgresAction.Update.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.jan.supabase.realtime/PostgresAction.Update.toString|toString(){}[0]
+    }
+}
+
+sealed interface io.github.jan.supabase.realtime/PresenceAction { // io.github.jan.supabase.realtime/PresenceAction|null[0]
+    abstract val joins // io.github.jan.supabase.realtime/PresenceAction.joins|{}joins[0]
+        abstract fun <get-joins>(): kotlin.collections/Map<kotlin/String, io.github.jan.supabase.realtime/Presence> // io.github.jan.supabase.realtime/PresenceAction.joins.<get-joins>|<get-joins>(){}[0]
+    abstract val leaves // io.github.jan.supabase.realtime/PresenceAction.leaves|{}leaves[0]
+        abstract fun <get-leaves>(): kotlin.collections/Map<kotlin/String, io.github.jan.supabase.realtime/Presence> // io.github.jan.supabase.realtime/PresenceAction.leaves.<get-leaves>|<get-leaves>(){}[0]
+}
+
+final class <#A: kotlin/Any?> io.github.jan.supabase.realtime/PrimaryKey { // io.github.jan.supabase.realtime/PrimaryKey|null[0]
+    constructor <init>(kotlin/String, kotlin/Function1<#A, kotlin/String>) // io.github.jan.supabase.realtime/PrimaryKey.<init>|<init>(kotlin.String;kotlin.Function1<1:0,kotlin.String>){}[0]
+
+    final val columnName // io.github.jan.supabase.realtime/PrimaryKey.columnName|{}columnName[0]
+        final fun <get-columnName>(): kotlin/String // io.github.jan.supabase.realtime/PrimaryKey.columnName.<get-columnName>|<get-columnName>(){}[0]
+    final val producer // io.github.jan.supabase.realtime/PrimaryKey.producer|{}producer[0]
+        final fun <get-producer>(): kotlin/Function1<#A, kotlin/String> // io.github.jan.supabase.realtime/PrimaryKey.producer.<get-producer>|<get-producer>(){}[0]
+
+    final fun component1(): kotlin/String // io.github.jan.supabase.realtime/PrimaryKey.component1|component1(){}[0]
+    final fun component2(): kotlin/Function1<#A, kotlin/String> // io.github.jan.supabase.realtime/PrimaryKey.component2|component2(){}[0]
+    final fun copy(kotlin/String = ..., kotlin/Function1<#A, kotlin/String> = ...): io.github.jan.supabase.realtime/PrimaryKey<#A> // io.github.jan.supabase.realtime/PrimaryKey.copy|copy(kotlin.String;kotlin.Function1<1:0,kotlin.String>){}[0]
+    final fun equals(kotlin/Any?): kotlin/Boolean // io.github.jan.supabase.realtime/PrimaryKey.equals|equals(kotlin.Any?){}[0]
+    final fun hashCode(): kotlin/Int // io.github.jan.supabase.realtime/PrimaryKey.hashCode|hashCode(){}[0]
+    final fun toString(): kotlin/String // io.github.jan.supabase.realtime/PrimaryKey.toString|toString(){}[0]
+}
+
+final class io.github.jan.supabase.realtime.broadcast/RealtimeBroadcast { // io.github.jan.supabase.realtime.broadcast/RealtimeBroadcast|null[0]
+    constructor <init>(kotlin/String, kotlin/String, io.github.jan.supabase.realtime.broadcast/BroadcastPayload) // io.github.jan.supabase.realtime.broadcast/RealtimeBroadcast.<init>|<init>(kotlin.String;kotlin.String;io.github.jan.supabase.realtime.broadcast.BroadcastPayload){}[0]
+
+    final val event // io.github.jan.supabase.realtime.broadcast/RealtimeBroadcast.event|{}event[0]
+        final fun <get-event>(): kotlin/String // io.github.jan.supabase.realtime.broadcast/RealtimeBroadcast.event.<get-event>|<get-event>(){}[0]
+    final val payload // io.github.jan.supabase.realtime.broadcast/RealtimeBroadcast.payload|{}payload[0]
+        final fun <get-payload>(): io.github.jan.supabase.realtime.broadcast/BroadcastPayload // io.github.jan.supabase.realtime.broadcast/RealtimeBroadcast.payload.<get-payload>|<get-payload>(){}[0]
+    final val topic // io.github.jan.supabase.realtime.broadcast/RealtimeBroadcast.topic|{}topic[0]
+        final fun <get-topic>(): kotlin/String // io.github.jan.supabase.realtime.broadcast/RealtimeBroadcast.topic.<get-topic>|<get-topic>(){}[0]
+}
+
+final class io.github.jan.supabase.realtime.postgres/RealtimePostgresFilterBuilder { // io.github.jan.supabase.realtime.postgres/RealtimePostgresFilterBuilder|null[0]
+    constructor <init>() // io.github.jan.supabase.realtime.postgres/RealtimePostgresFilterBuilder.<init>|<init>(){}[0]
+
+    final val filters // io.github.jan.supabase.realtime.postgres/RealtimePostgresFilterBuilder.filters|{}filters[0]
+        final fun <get-filters>(): kotlin.collections/MutableList<kotlin/Pair<kotlin/Boolean, io.github.jan.supabase.postgrest.query.filter/FilterOperation>> // io.github.jan.supabase.realtime.postgres/RealtimePostgresFilterBuilder.filters.<get-filters>|<get-filters>(){}[0]
+
+    final fun build(): kotlin/String // io.github.jan.supabase.realtime.postgres/RealtimePostgresFilterBuilder.build|build(){}[0]
+    final fun eq(kotlin/String, kotlin/Any) // io.github.jan.supabase.realtime.postgres/RealtimePostgresFilterBuilder.eq|eq(kotlin.String;kotlin.Any){}[0]
+    final fun exact(kotlin/String, kotlin/Any) // io.github.jan.supabase.realtime.postgres/RealtimePostgresFilterBuilder.exact|exact(kotlin.String;kotlin.Any){}[0]
+    final fun gt(kotlin/String, kotlin/Any) // io.github.jan.supabase.realtime.postgres/RealtimePostgresFilterBuilder.gt|gt(kotlin.String;kotlin.Any){}[0]
+    final fun gte(kotlin/String, kotlin/Any) // io.github.jan.supabase.realtime.postgres/RealtimePostgresFilterBuilder.gte|gte(kotlin.String;kotlin.Any){}[0]
+    final fun ilike(kotlin/String, kotlin/String) // io.github.jan.supabase.realtime.postgres/RealtimePostgresFilterBuilder.ilike|ilike(kotlin.String;kotlin.String){}[0]
+    final fun imatch(kotlin/String, kotlin/String) // io.github.jan.supabase.realtime.postgres/RealtimePostgresFilterBuilder.imatch|imatch(kotlin.String;kotlin.String){}[0]
+    final fun isDistinct(kotlin/String, kotlin/Any) // io.github.jan.supabase.realtime.postgres/RealtimePostgresFilterBuilder.isDistinct|isDistinct(kotlin.String;kotlin.Any){}[0]
+    final fun isIn(kotlin/String, kotlin.collections/List<kotlin/Any>) // io.github.jan.supabase.realtime.postgres/RealtimePostgresFilterBuilder.isIn|isIn(kotlin.String;kotlin.collections.List<kotlin.Any>){}[0]
+    final fun like(kotlin/String, kotlin/String) // io.github.jan.supabase.realtime.postgres/RealtimePostgresFilterBuilder.like|like(kotlin.String;kotlin.String){}[0]
+    final fun lt(kotlin/String, kotlin/Any) // io.github.jan.supabase.realtime.postgres/RealtimePostgresFilterBuilder.lt|lt(kotlin.String;kotlin.Any){}[0]
+    final fun lte(kotlin/String, kotlin/Any) // io.github.jan.supabase.realtime.postgres/RealtimePostgresFilterBuilder.lte|lte(kotlin.String;kotlin.Any){}[0]
+    final fun match(kotlin/String, kotlin/String) // io.github.jan.supabase.realtime.postgres/RealtimePostgresFilterBuilder.match|match(kotlin.String;kotlin.String){}[0]
+    final fun neq(kotlin/String, kotlin/Any) // io.github.jan.supabase.realtime.postgres/RealtimePostgresFilterBuilder.neq|neq(kotlin.String;kotlin.Any){}[0]
+    final fun not(kotlin/String, io.github.jan.supabase.realtime.postgres/RealtimePostgresChangesFilterOperator, kotlin/Any) // io.github.jan.supabase.realtime.postgres/RealtimePostgresFilterBuilder.not|not(kotlin.String;io.github.jan.supabase.realtime.postgres.RealtimePostgresChangesFilterOperator;kotlin.Any){}[0]
+}
+
+final class io.github.jan.supabase.realtime.websocket/KtorRealtimeWebsocket : io.github.jan.supabase.realtime.websocket/RealtimeWebsocket { // io.github.jan.supabase.realtime.websocket/KtorRealtimeWebsocket|null[0]
+    constructor <init>(io.ktor.client.plugins.websocket/DefaultClientWebSocketSession) // io.github.jan.supabase.realtime.websocket/KtorRealtimeWebsocket.<init>|<init>(io.ktor.client.plugins.websocket.DefaultClientWebSocketSession){}[0]
+
+    final val hasIncomingMessages // io.github.jan.supabase.realtime.websocket/KtorRealtimeWebsocket.hasIncomingMessages|{}hasIncomingMessages[0]
+        final fun <get-hasIncomingMessages>(): kotlin/Boolean // io.github.jan.supabase.realtime.websocket/KtorRealtimeWebsocket.hasIncomingMessages.<get-hasIncomingMessages>|<get-hasIncomingMessages>(){}[0]
+
+    final fun disconnect() // io.github.jan.supabase.realtime.websocket/KtorRealtimeWebsocket.disconnect|disconnect(){}[0]
+    final fun makeRef(): kotlin/String // io.github.jan.supabase.realtime.websocket/KtorRealtimeWebsocket.makeRef|makeRef(){}[0]
+    final suspend fun blockUntilDisconnect() // io.github.jan.supabase.realtime.websocket/KtorRealtimeWebsocket.blockUntilDisconnect|blockUntilDisconnect(){}[0]
+    final suspend fun receive(): io.ktor.websocket/Frame // io.github.jan.supabase.realtime.websocket/KtorRealtimeWebsocket.receive|receive(){}[0]
+    final suspend fun send(io.github.jan.supabase.realtime/RealtimeMessage, io.github.jan.supabase.realtime/RealtimeProtocolVersion) // io.github.jan.supabase.realtime.websocket/KtorRealtimeWebsocket.send|send(io.github.jan.supabase.realtime.RealtimeMessage;io.github.jan.supabase.realtime.RealtimeProtocolVersion){}[0]
+    final suspend fun send(kotlin/ByteArray) // io.github.jan.supabase.realtime.websocket/KtorRealtimeWebsocket.send|send(kotlin.ByteArray){}[0]
+}
+
+final class io.github.jan.supabase.realtime.websocket/KtorRealtimeWebsocketFactory : io.github.jan.supabase.realtime.websocket/RealtimeWebsocketFactory { // io.github.jan.supabase.realtime.websocket/KtorRealtimeWebsocketFactory|null[0]
+    constructor <init>(io.ktor.client/HttpClient) // io.github.jan.supabase.realtime.websocket/KtorRealtimeWebsocketFactory.<init>|<init>(io.ktor.client.HttpClient){}[0]
+
+    final suspend fun create(kotlin/String): io.github.jan.supabase.realtime.websocket/RealtimeWebsocket // io.github.jan.supabase.realtime.websocket/KtorRealtimeWebsocketFactory.create|create(kotlin.String){}[0]
+}
+
+final class io.github.jan.supabase.realtime/BroadcastJoinConfig { // io.github.jan.supabase.realtime/BroadcastJoinConfig|null[0]
+    constructor <init>(kotlin/Boolean, kotlin/Boolean, kotlin/Boolean) // io.github.jan.supabase.realtime/BroadcastJoinConfig.<init>|<init>(kotlin.Boolean;kotlin.Boolean;kotlin.Boolean){}[0]
+
+    final var acknowledgeBroadcasts // io.github.jan.supabase.realtime/BroadcastJoinConfig.acknowledgeBroadcasts|{}acknowledgeBroadcasts[0]
+        final fun <get-acknowledgeBroadcasts>(): kotlin/Boolean // io.github.jan.supabase.realtime/BroadcastJoinConfig.acknowledgeBroadcasts.<get-acknowledgeBroadcasts>|<get-acknowledgeBroadcasts>(){}[0]
+        final fun <set-acknowledgeBroadcasts>(kotlin/Boolean) // io.github.jan.supabase.realtime/BroadcastJoinConfig.acknowledgeBroadcasts.<set-acknowledgeBroadcasts>|<set-acknowledgeBroadcasts>(kotlin.Boolean){}[0]
+    final var receiveOwnBroadcasts // io.github.jan.supabase.realtime/BroadcastJoinConfig.receiveOwnBroadcasts|{}receiveOwnBroadcasts[0]
+        final fun <get-receiveOwnBroadcasts>(): kotlin/Boolean // io.github.jan.supabase.realtime/BroadcastJoinConfig.receiveOwnBroadcasts.<get-receiveOwnBroadcasts>|<get-receiveOwnBroadcasts>(){}[0]
+        final fun <set-receiveOwnBroadcasts>(kotlin/Boolean) // io.github.jan.supabase.realtime/BroadcastJoinConfig.receiveOwnBroadcasts.<set-receiveOwnBroadcasts>|<set-receiveOwnBroadcasts>(kotlin.Boolean){}[0]
+    final var replicationReady // io.github.jan.supabase.realtime/BroadcastJoinConfig.replicationReady|{}replicationReady[0]
+        final fun <get-replicationReady>(): kotlin/Boolean // io.github.jan.supabase.realtime/BroadcastJoinConfig.replicationReady.<get-replicationReady>|<get-replicationReady>(){}[0]
+        final fun <set-replicationReady>(kotlin/Boolean) // io.github.jan.supabase.realtime/BroadcastJoinConfig.replicationReady.<set-replicationReady>|<set-replicationReady>(kotlin.Boolean){}[0]
+
+    final fun component1(): kotlin/Boolean // io.github.jan.supabase.realtime/BroadcastJoinConfig.component1|component1(){}[0]
+    final fun component2(): kotlin/Boolean // io.github.jan.supabase.realtime/BroadcastJoinConfig.component2|component2(){}[0]
+    final fun component3(): kotlin/Boolean // io.github.jan.supabase.realtime/BroadcastJoinConfig.component3|component3(){}[0]
+    final fun copy(kotlin/Boolean = ..., kotlin/Boolean = ..., kotlin/Boolean = ...): io.github.jan.supabase.realtime/BroadcastJoinConfig // io.github.jan.supabase.realtime/BroadcastJoinConfig.copy|copy(kotlin.Boolean;kotlin.Boolean;kotlin.Boolean){}[0]
+    final fun equals(kotlin/Any?): kotlin/Boolean // io.github.jan.supabase.realtime/BroadcastJoinConfig.equals|equals(kotlin.Any?){}[0]
+    final fun hashCode(): kotlin/Int // io.github.jan.supabase.realtime/BroadcastJoinConfig.hashCode|hashCode(){}[0]
+    final fun toString(): kotlin/String // io.github.jan.supabase.realtime/BroadcastJoinConfig.toString|toString(){}[0]
+
+    final object $serializer : kotlinx.serialization.internal/GeneratedSerializer<io.github.jan.supabase.realtime/BroadcastJoinConfig> { // io.github.jan.supabase.realtime/BroadcastJoinConfig.$serializer|null[0]
+        final val descriptor // io.github.jan.supabase.realtime/BroadcastJoinConfig.$serializer.descriptor|{}descriptor[0]
+            final fun <get-descriptor>(): kotlinx.serialization.descriptors/SerialDescriptor // io.github.jan.supabase.realtime/BroadcastJoinConfig.$serializer.descriptor.<get-descriptor>|<get-descriptor>(){}[0]
+
+        final fun childSerializers(): kotlin/Array<kotlinx.serialization/KSerializer<*>> // io.github.jan.supabase.realtime/BroadcastJoinConfig.$serializer.childSerializers|childSerializers(){}[0]
+        final fun deserialize(kotlinx.serialization.encoding/Decoder): io.github.jan.supabase.realtime/BroadcastJoinConfig // io.github.jan.supabase.realtime/BroadcastJoinConfig.$serializer.deserialize|deserialize(kotlinx.serialization.encoding.Decoder){}[0]
+        final fun serialize(kotlinx.serialization.encoding/Encoder, io.github.jan.supabase.realtime/BroadcastJoinConfig) // io.github.jan.supabase.realtime/BroadcastJoinConfig.$serializer.serialize|serialize(kotlinx.serialization.encoding.Encoder;io.github.jan.supabase.realtime.BroadcastJoinConfig){}[0]
+    }
+
+    final object Companion { // io.github.jan.supabase.realtime/BroadcastJoinConfig.Companion|null[0]
+        final fun serializer(): kotlinx.serialization/KSerializer<io.github.jan.supabase.realtime/BroadcastJoinConfig> // io.github.jan.supabase.realtime/BroadcastJoinConfig.Companion.serializer|serializer(){}[0]
+    }
+}
+
+final class io.github.jan.supabase.realtime/Column { // io.github.jan.supabase.realtime/Column|null[0]
+    constructor <init>(kotlin/String, kotlin/String) // io.github.jan.supabase.realtime/Column.<init>|<init>(kotlin.String;kotlin.String){}[0]
+
+    final val name // io.github.jan.supabase.realtime/Column.name|{}name[0]
+        final fun <get-name>(): kotlin/String // io.github.jan.supabase.realtime/Column.name.<get-name>|<get-name>(){}[0]
+    final val type // io.github.jan.supabase.realtime/Column.type|{}type[0]
+        final fun <get-type>(): kotlin/String // io.github.jan.supabase.realtime/Column.type.<get-type>|<get-type>(){}[0]
+
+    final fun component1(): kotlin/String // io.github.jan.supabase.realtime/Column.component1|component1(){}[0]
+    final fun component2(): kotlin/String // io.github.jan.supabase.realtime/Column.component2|component2(){}[0]
+    final fun copy(kotlin/String = ..., kotlin/String = ...): io.github.jan.supabase.realtime/Column // io.github.jan.supabase.realtime/Column.copy|copy(kotlin.String;kotlin.String){}[0]
+    final fun equals(kotlin/Any?): kotlin/Boolean // io.github.jan.supabase.realtime/Column.equals|equals(kotlin.Any?){}[0]
+    final fun hashCode(): kotlin/Int // io.github.jan.supabase.realtime/Column.hashCode|hashCode(){}[0]
+    final fun toString(): kotlin/String // io.github.jan.supabase.realtime/Column.toString|toString(){}[0]
+
+    final object $serializer : kotlinx.serialization.internal/GeneratedSerializer<io.github.jan.supabase.realtime/Column> { // io.github.jan.supabase.realtime/Column.$serializer|null[0]
+        final val descriptor // io.github.jan.supabase.realtime/Column.$serializer.descriptor|{}descriptor[0]
+            final fun <get-descriptor>(): kotlinx.serialization.descriptors/SerialDescriptor // io.github.jan.supabase.realtime/Column.$serializer.descriptor.<get-descriptor>|<get-descriptor>(){}[0]
+
+        final fun childSerializers(): kotlin/Array<kotlinx.serialization/KSerializer<*>> // io.github.jan.supabase.realtime/Column.$serializer.childSerializers|childSerializers(){}[0]
+        final fun deserialize(kotlinx.serialization.encoding/Decoder): io.github.jan.supabase.realtime/Column // io.github.jan.supabase.realtime/Column.$serializer.deserialize|deserialize(kotlinx.serialization.encoding.Decoder){}[0]
+        final fun serialize(kotlinx.serialization.encoding/Encoder, io.github.jan.supabase.realtime/Column) // io.github.jan.supabase.realtime/Column.$serializer.serialize|serialize(kotlinx.serialization.encoding.Encoder;io.github.jan.supabase.realtime.Column){}[0]
+    }
+
+    final object Companion { // io.github.jan.supabase.realtime/Column.Companion|null[0]
+        final fun serializer(): kotlinx.serialization/KSerializer<io.github.jan.supabase.realtime/Column> // io.github.jan.supabase.realtime/Column.Companion.serializer|serializer(){}[0]
+    }
+}
+
+final class io.github.jan.supabase.realtime/HttpSendBuilder { // io.github.jan.supabase.realtime/HttpSendBuilder|null[0]
+    constructor <init>() // io.github.jan.supabase.realtime/HttpSendBuilder.<init>|<init>(){}[0]
+
+    final var timeout // io.github.jan.supabase.realtime/HttpSendBuilder.timeout|{}timeout[0]
+        final fun <get-timeout>(): kotlin.time/Duration? // io.github.jan.supabase.realtime/HttpSendBuilder.timeout.<get-timeout>|<get-timeout>(){}[0]
+        final fun <set-timeout>(kotlin.time/Duration?) // io.github.jan.supabase.realtime/HttpSendBuilder.timeout.<set-timeout>|<set-timeout>(kotlin.time.Duration?){}[0]
+}
+
+final class io.github.jan.supabase.realtime/PostgresChangeFilter { // io.github.jan.supabase.realtime/PostgresChangeFilter|null[0]
+    constructor <init>(kotlin/String, kotlin/String) // io.github.jan.supabase.realtime/PostgresChangeFilter.<init>|<init>(kotlin.String;kotlin.String){}[0]
+
+    final var filter // io.github.jan.supabase.realtime/PostgresChangeFilter.filter|{}filter[0]
+        final fun <get-filter>(): kotlin/String? // io.github.jan.supabase.realtime/PostgresChangeFilter.filter.<get-filter>|<get-filter>(){}[0]
+        final fun <set-filter>(kotlin/String?) // io.github.jan.supabase.realtime/PostgresChangeFilter.filter.<set-filter>|<set-filter>(kotlin.String?){}[0]
+    final var table // io.github.jan.supabase.realtime/PostgresChangeFilter.table|{}table[0]
+        final fun <get-table>(): kotlin/String? // io.github.jan.supabase.realtime/PostgresChangeFilter.table.<get-table>|<get-table>(){}[0]
+        final fun <set-table>(kotlin/String?) // io.github.jan.supabase.realtime/PostgresChangeFilter.table.<set-table>|<set-table>(kotlin.String?){}[0]
+
+    final fun buildConfig(): io.github.jan.supabase.realtime/PostgresJoinConfig // io.github.jan.supabase.realtime/PostgresChangeFilter.buildConfig|buildConfig(){}[0]
+    final fun filter(io.github.jan.supabase.postgrest.query.filter/FilterOperation) // io.github.jan.supabase.realtime/PostgresChangeFilter.filter|filter(io.github.jan.supabase.postgrest.query.filter.FilterOperation){}[0]
+    final fun filter(io.github.jan.supabase.realtime.postgres/RealtimePostgresFilterBuilder) // io.github.jan.supabase.realtime/PostgresChangeFilter.filter|filter(io.github.jan.supabase.realtime.postgres.RealtimePostgresFilterBuilder){}[0]
+    final fun filter(kotlin/String, io.github.jan.supabase.postgrest.query.filter/FilterOperator, kotlin/Any) // io.github.jan.supabase.realtime/PostgresChangeFilter.filter|filter(kotlin.String;io.github.jan.supabase.postgrest.query.filter.FilterOperator;kotlin.Any){}[0]
+    final inline fun filter(kotlin/Function1<io.github.jan.supabase.realtime.postgres/RealtimePostgresFilterBuilder, kotlin/Unit>) // io.github.jan.supabase.realtime/PostgresChangeFilter.filter|filter(kotlin.Function1<io.github.jan.supabase.realtime.postgres.RealtimePostgresFilterBuilder,kotlin.Unit>){}[0]
+}
+
+final class io.github.jan.supabase.realtime/PostgresJoinConfig { // io.github.jan.supabase.realtime/PostgresJoinConfig|null[0]
+    constructor <init>(kotlin/String, kotlin/String? = ..., kotlin/String? = ..., kotlin/String, kotlin/Int = ...) // io.github.jan.supabase.realtime/PostgresJoinConfig.<init>|<init>(kotlin.String;kotlin.String?;kotlin.String?;kotlin.String;kotlin.Int){}[0]
+
+    final val event // io.github.jan.supabase.realtime/PostgresJoinConfig.event|{}event[0]
+        final fun <get-event>(): kotlin/String // io.github.jan.supabase.realtime/PostgresJoinConfig.event.<get-event>|<get-event>(){}[0]
+    final val filter // io.github.jan.supabase.realtime/PostgresJoinConfig.filter|{}filter[0]
+        final fun <get-filter>(): kotlin/String? // io.github.jan.supabase.realtime/PostgresJoinConfig.filter.<get-filter>|<get-filter>(){}[0]
+    final val id // io.github.jan.supabase.realtime/PostgresJoinConfig.id|{}id[0]
+        final fun <get-id>(): kotlin/Int // io.github.jan.supabase.realtime/PostgresJoinConfig.id.<get-id>|<get-id>(){}[0]
+    final val schema // io.github.jan.supabase.realtime/PostgresJoinConfig.schema|{}schema[0]
+        final fun <get-schema>(): kotlin/String // io.github.jan.supabase.realtime/PostgresJoinConfig.schema.<get-schema>|<get-schema>(){}[0]
+    final val table // io.github.jan.supabase.realtime/PostgresJoinConfig.table|{}table[0]
+        final fun <get-table>(): kotlin/String? // io.github.jan.supabase.realtime/PostgresJoinConfig.table.<get-table>|<get-table>(){}[0]
+
+    final fun component1(): kotlin/String // io.github.jan.supabase.realtime/PostgresJoinConfig.component1|component1(){}[0]
+    final fun component2(): kotlin/String? // io.github.jan.supabase.realtime/PostgresJoinConfig.component2|component2(){}[0]
+    final fun component3(): kotlin/String? // io.github.jan.supabase.realtime/PostgresJoinConfig.component3|component3(){}[0]
+    final fun component4(): kotlin/String // io.github.jan.supabase.realtime/PostgresJoinConfig.component4|component4(){}[0]
+    final fun component5(): kotlin/Int // io.github.jan.supabase.realtime/PostgresJoinConfig.component5|component5(){}[0]
+    final fun copy(kotlin/String = ..., kotlin/String? = ..., kotlin/String? = ..., kotlin/String = ..., kotlin/Int = ...): io.github.jan.supabase.realtime/PostgresJoinConfig // io.github.jan.supabase.realtime/PostgresJoinConfig.copy|copy(kotlin.String;kotlin.String?;kotlin.String?;kotlin.String;kotlin.Int){}[0]
+    final fun equals(kotlin/Any?): kotlin/Boolean // io.github.jan.supabase.realtime/PostgresJoinConfig.equals|equals(kotlin.Any?){}[0]
+    final fun hashCode(): kotlin/Int // io.github.jan.supabase.realtime/PostgresJoinConfig.hashCode|hashCode(){}[0]
+    final fun toString(): kotlin/String // io.github.jan.supabase.realtime/PostgresJoinConfig.toString|toString(){}[0]
+
+    final object $serializer : kotlinx.serialization.internal/GeneratedSerializer<io.github.jan.supabase.realtime/PostgresJoinConfig> { // io.github.jan.supabase.realtime/PostgresJoinConfig.$serializer|null[0]
+        final val descriptor // io.github.jan.supabase.realtime/PostgresJoinConfig.$serializer.descriptor|{}descriptor[0]
+            final fun <get-descriptor>(): kotlinx.serialization.descriptors/SerialDescriptor // io.github.jan.supabase.realtime/PostgresJoinConfig.$serializer.descriptor.<get-descriptor>|<get-descriptor>(){}[0]
+
+        final fun childSerializers(): kotlin/Array<kotlinx.serialization/KSerializer<*>> // io.github.jan.supabase.realtime/PostgresJoinConfig.$serializer.childSerializers|childSerializers(){}[0]
+        final fun deserialize(kotlinx.serialization.encoding/Decoder): io.github.jan.supabase.realtime/PostgresJoinConfig // io.github.jan.supabase.realtime/PostgresJoinConfig.$serializer.deserialize|deserialize(kotlinx.serialization.encoding.Decoder){}[0]
+        final fun serialize(kotlinx.serialization.encoding/Encoder, io.github.jan.supabase.realtime/PostgresJoinConfig) // io.github.jan.supabase.realtime/PostgresJoinConfig.$serializer.serialize|serialize(kotlinx.serialization.encoding.Encoder;io.github.jan.supabase.realtime.PostgresJoinConfig){}[0]
+    }
+
+    final object Companion { // io.github.jan.supabase.realtime/PostgresJoinConfig.Companion|null[0]
+        final fun serializer(): kotlinx.serialization/KSerializer<io.github.jan.supabase.realtime/PostgresJoinConfig> // io.github.jan.supabase.realtime/PostgresJoinConfig.Companion.serializer|serializer(){}[0]
+    }
+}
+
+final class io.github.jan.supabase.realtime/Presence { // io.github.jan.supabase.realtime/Presence|null[0]
+    constructor <init>(kotlin/String, kotlinx.serialization.json/JsonObject) // io.github.jan.supabase.realtime/Presence.<init>|<init>(kotlin.String;kotlinx.serialization.json.JsonObject){}[0]
+
+    final val presenceRef // io.github.jan.supabase.realtime/Presence.presenceRef|{}presenceRef[0]
+        final fun <get-presenceRef>(): kotlin/String // io.github.jan.supabase.realtime/Presence.presenceRef.<get-presenceRef>|<get-presenceRef>(){}[0]
+    final val state // io.github.jan.supabase.realtime/Presence.state|{}state[0]
+        final fun <get-state>(): kotlinx.serialization.json/JsonObject // io.github.jan.supabase.realtime/Presence.state.<get-state>|<get-state>(){}[0]
+
+    final fun component1(): kotlin/String // io.github.jan.supabase.realtime/Presence.component1|component1(){}[0]
+    final fun component2(): kotlinx.serialization.json/JsonObject // io.github.jan.supabase.realtime/Presence.component2|component2(){}[0]
+    final fun copy(kotlin/String = ..., kotlinx.serialization.json/JsonObject = ...): io.github.jan.supabase.realtime/Presence // io.github.jan.supabase.realtime/Presence.copy|copy(kotlin.String;kotlinx.serialization.json.JsonObject){}[0]
+    final fun equals(kotlin/Any?): kotlin/Boolean // io.github.jan.supabase.realtime/Presence.equals|equals(kotlin.Any?){}[0]
+    final fun hashCode(): kotlin/Int // io.github.jan.supabase.realtime/Presence.hashCode|hashCode(){}[0]
+    final fun toString(): kotlin/String // io.github.jan.supabase.realtime/Presence.toString|toString(){}[0]
+    final inline fun <#A1: reified kotlin/Any?> stateAs(io.github.jan.supabase/SupabaseSerializer): #A1 // io.github.jan.supabase.realtime/Presence.stateAs|stateAs(io.github.jan.supabase.SupabaseSerializer){0§<kotlin.Any?>}[0]
+    final inline fun <#A1: reified kotlin/Any?> stateAsOrNull(io.github.jan.supabase/SupabaseSerializer): #A1? // io.github.jan.supabase.realtime/Presence.stateAsOrNull|stateAsOrNull(io.github.jan.supabase.SupabaseSerializer){0§<kotlin.Any?>}[0]
+
+    final object Companion : kotlinx.serialization/KSerializer<io.github.jan.supabase.realtime/Presence> { // io.github.jan.supabase.realtime/Presence.Companion|null[0]
+        final val descriptor // io.github.jan.supabase.realtime/Presence.Companion.descriptor|{}descriptor[0]
+            final fun <get-descriptor>(): kotlinx.serialization.descriptors/SerialDescriptor // io.github.jan.supabase.realtime/Presence.Companion.descriptor.<get-descriptor>|<get-descriptor>(){}[0]
+
+        final fun deserialize(kotlinx.serialization.encoding/Decoder): io.github.jan.supabase.realtime/Presence // io.github.jan.supabase.realtime/Presence.Companion.deserialize|deserialize(kotlinx.serialization.encoding.Decoder){}[0]
+        final fun serialize(kotlinx.serialization.encoding/Encoder, io.github.jan.supabase.realtime/Presence) // io.github.jan.supabase.realtime/Presence.Companion.serialize|serialize(kotlinx.serialization.encoding.Encoder;io.github.jan.supabase.realtime.Presence){}[0]
+        final fun serializer(): kotlinx.serialization/KSerializer<io.github.jan.supabase.realtime/Presence> // io.github.jan.supabase.realtime/Presence.Companion.serializer|serializer(){}[0]
+    }
+}
+
+final class io.github.jan.supabase.realtime/PresenceActionImpl : io.github.jan.supabase.realtime/PresenceAction { // io.github.jan.supabase.realtime/PresenceActionImpl|null[0]
+    constructor <init>(io.github.jan.supabase/SupabaseSerializer, kotlin.collections/Map<kotlin/String, io.github.jan.supabase.realtime/Presence>, kotlin.collections/Map<kotlin/String, io.github.jan.supabase.realtime/Presence>) // io.github.jan.supabase.realtime/PresenceActionImpl.<init>|<init>(io.github.jan.supabase.SupabaseSerializer;kotlin.collections.Map<kotlin.String,io.github.jan.supabase.realtime.Presence>;kotlin.collections.Map<kotlin.String,io.github.jan.supabase.realtime.Presence>){}[0]
+
+    final val joins // io.github.jan.supabase.realtime/PresenceActionImpl.joins|{}joins[0]
+        final fun <get-joins>(): kotlin.collections/Map<kotlin/String, io.github.jan.supabase.realtime/Presence> // io.github.jan.supabase.realtime/PresenceActionImpl.joins.<get-joins>|<get-joins>(){}[0]
+    final val leaves // io.github.jan.supabase.realtime/PresenceActionImpl.leaves|{}leaves[0]
+        final fun <get-leaves>(): kotlin.collections/Map<kotlin/String, io.github.jan.supabase.realtime/Presence> // io.github.jan.supabase.realtime/PresenceActionImpl.leaves.<get-leaves>|<get-leaves>(){}[0]
+    final val serializer // io.github.jan.supabase.realtime/PresenceActionImpl.serializer|{}serializer[0]
+        final fun <get-serializer>(): io.github.jan.supabase/SupabaseSerializer // io.github.jan.supabase.realtime/PresenceActionImpl.serializer.<get-serializer>|<get-serializer>(){}[0]
+}
+
+final class io.github.jan.supabase.realtime/PresenceJoinConfig { // io.github.jan.supabase.realtime/PresenceJoinConfig|null[0]
+    constructor <init>(kotlin/String, kotlin/Boolean = ...) // io.github.jan.supabase.realtime/PresenceJoinConfig.<init>|<init>(kotlin.String;kotlin.Boolean){}[0]
+
+    final var key // io.github.jan.supabase.realtime/PresenceJoinConfig.key|{}key[0]
+        final fun <get-key>(): kotlin/String // io.github.jan.supabase.realtime/PresenceJoinConfig.key.<get-key>|<get-key>(){}[0]
+        final fun <set-key>(kotlin/String) // io.github.jan.supabase.realtime/PresenceJoinConfig.key.<set-key>|<set-key>(kotlin.String){}[0]
+
+    final fun component1(): kotlin/String // io.github.jan.supabase.realtime/PresenceJoinConfig.component1|component1(){}[0]
+    final fun copy(kotlin/String = ..., kotlin/Boolean = ...): io.github.jan.supabase.realtime/PresenceJoinConfig // io.github.jan.supabase.realtime/PresenceJoinConfig.copy|copy(kotlin.String;kotlin.Boolean){}[0]
+    final fun equals(kotlin/Any?): kotlin/Boolean // io.github.jan.supabase.realtime/PresenceJoinConfig.equals|equals(kotlin.Any?){}[0]
+    final fun hashCode(): kotlin/Int // io.github.jan.supabase.realtime/PresenceJoinConfig.hashCode|hashCode(){}[0]
+    final fun toString(): kotlin/String // io.github.jan.supabase.realtime/PresenceJoinConfig.toString|toString(){}[0]
+
+    final object $serializer : kotlinx.serialization.internal/GeneratedSerializer<io.github.jan.supabase.realtime/PresenceJoinConfig> { // io.github.jan.supabase.realtime/PresenceJoinConfig.$serializer|null[0]
+        final val descriptor // io.github.jan.supabase.realtime/PresenceJoinConfig.$serializer.descriptor|{}descriptor[0]
+            final fun <get-descriptor>(): kotlinx.serialization.descriptors/SerialDescriptor // io.github.jan.supabase.realtime/PresenceJoinConfig.$serializer.descriptor.<get-descriptor>|<get-descriptor>(){}[0]
+
+        final fun childSerializers(): kotlin/Array<kotlinx.serialization/KSerializer<*>> // io.github.jan.supabase.realtime/PresenceJoinConfig.$serializer.childSerializers|childSerializers(){}[0]
+        final fun deserialize(kotlinx.serialization.encoding/Decoder): io.github.jan.supabase.realtime/PresenceJoinConfig // io.github.jan.supabase.realtime/PresenceJoinConfig.$serializer.deserialize|deserialize(kotlinx.serialization.encoding.Decoder){}[0]
+        final fun serialize(kotlinx.serialization.encoding/Encoder, io.github.jan.supabase.realtime/PresenceJoinConfig) // io.github.jan.supabase.realtime/PresenceJoinConfig.$serializer.serialize|serialize(kotlinx.serialization.encoding.Encoder;io.github.jan.supabase.realtime.PresenceJoinConfig){}[0]
+    }
+
+    final object Companion { // io.github.jan.supabase.realtime/PresenceJoinConfig.Companion|null[0]
+        final fun serializer(): kotlinx.serialization/KSerializer<io.github.jan.supabase.realtime/PresenceJoinConfig> // io.github.jan.supabase.realtime/PresenceJoinConfig.Companion.serializer|serializer(){}[0]
+    }
+}
+
+final class io.github.jan.supabase.realtime/RealtimeChannelBuilder { // io.github.jan.supabase.realtime/RealtimeChannelBuilder|null[0]
+    constructor <init>(kotlin/String) // io.github.jan.supabase.realtime/RealtimeChannelBuilder.<init>|<init>(kotlin.String){}[0]
+
+    final var isPrivate // io.github.jan.supabase.realtime/RealtimeChannelBuilder.isPrivate|{}isPrivate[0]
+        final fun <get-isPrivate>(): kotlin/Boolean // io.github.jan.supabase.realtime/RealtimeChannelBuilder.isPrivate.<get-isPrivate>|<get-isPrivate>(){}[0]
+        final fun <set-isPrivate>(kotlin/Boolean) // io.github.jan.supabase.realtime/RealtimeChannelBuilder.isPrivate.<set-isPrivate>|<set-isPrivate>(kotlin.Boolean){}[0]
+
+    final fun broadcast(kotlin/Function1<io.github.jan.supabase.realtime/BroadcastJoinConfig, kotlin/Unit>) // io.github.jan.supabase.realtime/RealtimeChannelBuilder.broadcast|broadcast(kotlin.Function1<io.github.jan.supabase.realtime.BroadcastJoinConfig,kotlin.Unit>){}[0]
+    final fun build(io.github.jan.supabase.realtime/Realtime): io.github.jan.supabase.realtime/RealtimeChannel // io.github.jan.supabase.realtime/RealtimeChannelBuilder.build|build(io.github.jan.supabase.realtime.Realtime){}[0]
+    final fun presence(kotlin/Function1<io.github.jan.supabase.realtime/PresenceJoinConfig, kotlin/Unit>) // io.github.jan.supabase.realtime/RealtimeChannelBuilder.presence|presence(kotlin.Function1<io.github.jan.supabase.realtime.PresenceJoinConfig,kotlin.Unit>){}[0]
+}
+
+final class io.github.jan.supabase.realtime/RealtimeImpl : io.github.jan.supabase.realtime/Realtime { // io.github.jan.supabase.realtime/RealtimeImpl|null[0]
+    constructor <init>(io.github.jan.supabase/SupabaseClient, io.github.jan.supabase.realtime/Realtime.Config) // io.github.jan.supabase.realtime/RealtimeImpl.<init>|<init>(io.github.jan.supabase.SupabaseClient;io.github.jan.supabase.realtime.Realtime.Config){}[0]
+
+    final val accessToken // io.github.jan.supabase.realtime/RealtimeImpl.accessToken|{}accessToken[0]
+        final fun <get-accessToken>(): kotlin/String? // io.github.jan.supabase.realtime/RealtimeImpl.accessToken.<get-accessToken>|<get-accessToken>(){}[0]
+    final val apiVersion // io.github.jan.supabase.realtime/RealtimeImpl.apiVersion|{}apiVersion[0]
+        final fun <get-apiVersion>(): kotlin/Int // io.github.jan.supabase.realtime/RealtimeImpl.apiVersion.<get-apiVersion>|<get-apiVersion>(){}[0]
+    final val config // io.github.jan.supabase.realtime/RealtimeImpl.config|{}config[0]
+        final fun <get-config>(): io.github.jan.supabase.realtime/Realtime.Config // io.github.jan.supabase.realtime/RealtimeImpl.config.<get-config>|<get-config>(){}[0]
+    final val logger // io.github.jan.supabase.realtime/RealtimeImpl.logger|{}logger[0]
+        final fun <get-logger>(): io.github.jan.supabase.logging/SupabaseLogger // io.github.jan.supabase.realtime/RealtimeImpl.logger.<get-logger>|<get-logger>(){}[0]
+    final val pluginKey // io.github.jan.supabase.realtime/RealtimeImpl.pluginKey|{}pluginKey[0]
+        final fun <get-pluginKey>(): kotlin/String // io.github.jan.supabase.realtime/RealtimeImpl.pluginKey.<get-pluginKey>|<get-pluginKey>(){}[0]
+    final val status // io.github.jan.supabase.realtime/RealtimeImpl.status|{}status[0]
+        final fun <get-status>(): kotlinx.coroutines.flow/StateFlow<io.github.jan.supabase.realtime/Realtime.Status> // io.github.jan.supabase.realtime/RealtimeImpl.status.<get-status>|<get-status>(){}[0]
+    final val subscriptions // io.github.jan.supabase.realtime/RealtimeImpl.subscriptions|{}subscriptions[0]
+        final fun <get-subscriptions>(): kotlin.collections/Map<kotlin/String, io.github.jan.supabase.realtime/RealtimeChannel> // io.github.jan.supabase.realtime/RealtimeImpl.subscriptions.<get-subscriptions>|<get-subscriptions>(){}[0]
+    final val supabaseClient // io.github.jan.supabase.realtime/RealtimeImpl.supabaseClient|{}supabaseClient[0]
+        final fun <get-supabaseClient>(): io.github.jan.supabase/SupabaseClient // io.github.jan.supabase.realtime/RealtimeImpl.supabaseClient.<get-supabaseClient>|<get-supabaseClient>(){}[0]
+    final val websocket // io.github.jan.supabase.realtime/RealtimeImpl.websocket|{}websocket[0]
+        final fun <get-websocket>(): io.github.jan.supabase.realtime.websocket/RealtimeWebsocket // io.github.jan.supabase.realtime/RealtimeImpl.websocket.<get-websocket>|<get-websocket>(){}[0]
+
+    final var serializer // io.github.jan.supabase.realtime/RealtimeImpl.serializer|{}serializer[0]
+        final fun <get-serializer>(): io.github.jan.supabase/SupabaseSerializer // io.github.jan.supabase.realtime/RealtimeImpl.serializer.<get-serializer>|<get-serializer>(){}[0]
+        final fun <set-serializer>(io.github.jan.supabase/SupabaseSerializer) // io.github.jan.supabase.realtime/RealtimeImpl.serializer.<set-serializer>|<set-serializer>(io.github.jan.supabase.SupabaseSerializer){}[0]
+
+    final fun addChannel(io.github.jan.supabase.realtime/RealtimeChannel) // io.github.jan.supabase.realtime/RealtimeImpl.addChannel|addChannel(io.github.jan.supabase.realtime.RealtimeChannel){}[0]
+    final fun broadcastUrl(): kotlin/String // io.github.jan.supabase.realtime/RealtimeImpl.broadcastUrl|broadcastUrl(){}[0]
+    final fun channel(kotlin/String, io.github.jan.supabase.realtime/RealtimeChannelBuilder): io.github.jan.supabase.realtime/RealtimeChannel // io.github.jan.supabase.realtime/RealtimeImpl.channel|channel(kotlin.String;io.github.jan.supabase.realtime.RealtimeChannelBuilder){}[0]
+    final fun disconnect() // io.github.jan.supabase.realtime/RealtimeImpl.disconnect|disconnect(){}[0]
+    final fun init() // io.github.jan.supabase.realtime/RealtimeImpl.init|init(){}[0]
+    final fun nextIncrementId(): kotlin/Int // io.github.jan.supabase.realtime/RealtimeImpl.nextIncrementId|nextIncrementId(){}[0]
+    final suspend fun block() // io.github.jan.supabase.realtime/RealtimeImpl.block|block(){}[0]
+    final suspend fun close() // io.github.jan.supabase.realtime/RealtimeImpl.close|close(){}[0]
+    final suspend fun connect() // io.github.jan.supabase.realtime/RealtimeImpl.connect|connect(){}[0]
+    final suspend fun parseErrorResponse(io.ktor.client.statement/HttpResponse): io.github.jan.supabase.exceptions/RestException // io.github.jan.supabase.realtime/RealtimeImpl.parseErrorResponse|parseErrorResponse(io.ktor.client.statement.HttpResponse){}[0]
+    final suspend fun removeAllChannels() // io.github.jan.supabase.realtime/RealtimeImpl.removeAllChannels|removeAllChannels(){}[0]
+    final suspend fun removeChannel(io.github.jan.supabase.realtime/RealtimeChannel) // io.github.jan.supabase.realtime/RealtimeImpl.removeChannel|removeChannel(io.github.jan.supabase.realtime.RealtimeChannel){}[0]
+    final suspend fun send(io.github.jan.supabase.realtime/RealtimeMessage) // io.github.jan.supabase.realtime/RealtimeImpl.send|send(io.github.jan.supabase.realtime.RealtimeMessage){}[0]
+    final suspend fun send(kotlin/ByteArray) // io.github.jan.supabase.realtime/RealtimeImpl.send|send(kotlin.ByteArray){}[0]
+    final suspend fun setAuth(kotlin/String?) // io.github.jan.supabase.realtime/RealtimeImpl.setAuth|setAuth(kotlin.String?){}[0]
+}
+
+final class io.github.jan.supabase.realtime/RealtimeJoinConfig { // io.github.jan.supabase.realtime/RealtimeJoinConfig|null[0]
+    constructor <init>(io.github.jan.supabase.realtime/BroadcastJoinConfig, io.github.jan.supabase.realtime/PresenceJoinConfig, kotlin.collections/List<io.github.jan.supabase.realtime/PostgresJoinConfig>, kotlin/Boolean) // io.github.jan.supabase.realtime/RealtimeJoinConfig.<init>|<init>(io.github.jan.supabase.realtime.BroadcastJoinConfig;io.github.jan.supabase.realtime.PresenceJoinConfig;kotlin.collections.List<io.github.jan.supabase.realtime.PostgresJoinConfig>;kotlin.Boolean){}[0]
+
+    final val broadcast // io.github.jan.supabase.realtime/RealtimeJoinConfig.broadcast|{}broadcast[0]
+        final fun <get-broadcast>(): io.github.jan.supabase.realtime/BroadcastJoinConfig // io.github.jan.supabase.realtime/RealtimeJoinConfig.broadcast.<get-broadcast>|<get-broadcast>(){}[0]
+    final val postgresChanges // io.github.jan.supabase.realtime/RealtimeJoinConfig.postgresChanges|{}postgresChanges[0]
+        final fun <get-postgresChanges>(): kotlin.collections/List<io.github.jan.supabase.realtime/PostgresJoinConfig> // io.github.jan.supabase.realtime/RealtimeJoinConfig.postgresChanges.<get-postgresChanges>|<get-postgresChanges>(){}[0]
+    final val presence // io.github.jan.supabase.realtime/RealtimeJoinConfig.presence|{}presence[0]
+        final fun <get-presence>(): io.github.jan.supabase.realtime/PresenceJoinConfig // io.github.jan.supabase.realtime/RealtimeJoinConfig.presence.<get-presence>|<get-presence>(){}[0]
+
+    final var isPrivate // io.github.jan.supabase.realtime/RealtimeJoinConfig.isPrivate|{}isPrivate[0]
+        final fun <get-isPrivate>(): kotlin/Boolean // io.github.jan.supabase.realtime/RealtimeJoinConfig.isPrivate.<get-isPrivate>|<get-isPrivate>(){}[0]
+        final fun <set-isPrivate>(kotlin/Boolean) // io.github.jan.supabase.realtime/RealtimeJoinConfig.isPrivate.<set-isPrivate>|<set-isPrivate>(kotlin.Boolean){}[0]
+
+    final fun component1(): io.github.jan.supabase.realtime/BroadcastJoinConfig // io.github.jan.supabase.realtime/RealtimeJoinConfig.component1|component1(){}[0]
+    final fun component2(): io.github.jan.supabase.realtime/PresenceJoinConfig // io.github.jan.supabase.realtime/RealtimeJoinConfig.component2|component2(){}[0]
+    final fun component3(): kotlin.collections/List<io.github.jan.supabase.realtime/PostgresJoinConfig> // io.github.jan.supabase.realtime/RealtimeJoinConfig.component3|component3(){}[0]
+    final fun component4(): kotlin/Boolean // io.github.jan.supabase.realtime/RealtimeJoinConfig.component4|component4(){}[0]
+    final fun copy(io.github.jan.supabase.realtime/BroadcastJoinConfig = ..., io.github.jan.supabase.realtime/PresenceJoinConfig = ..., kotlin.collections/List<io.github.jan.supabase.realtime/PostgresJoinConfig> = ..., kotlin/Boolean = ...): io.github.jan.supabase.realtime/RealtimeJoinConfig // io.github.jan.supabase.realtime/RealtimeJoinConfig.copy|copy(io.github.jan.supabase.realtime.BroadcastJoinConfig;io.github.jan.supabase.realtime.PresenceJoinConfig;kotlin.collections.List<io.github.jan.supabase.realtime.PostgresJoinConfig>;kotlin.Boolean){}[0]
+    final fun equals(kotlin/Any?): kotlin/Boolean // io.github.jan.supabase.realtime/RealtimeJoinConfig.equals|equals(kotlin.Any?){}[0]
+    final fun hashCode(): kotlin/Int // io.github.jan.supabase.realtime/RealtimeJoinConfig.hashCode|hashCode(){}[0]
+    final fun toString(): kotlin/String // io.github.jan.supabase.realtime/RealtimeJoinConfig.toString|toString(){}[0]
+
+    final object $serializer : kotlinx.serialization.internal/GeneratedSerializer<io.github.jan.supabase.realtime/RealtimeJoinConfig> { // io.github.jan.supabase.realtime/RealtimeJoinConfig.$serializer|null[0]
+        final val descriptor // io.github.jan.supabase.realtime/RealtimeJoinConfig.$serializer.descriptor|{}descriptor[0]
+            final fun <get-descriptor>(): kotlinx.serialization.descriptors/SerialDescriptor // io.github.jan.supabase.realtime/RealtimeJoinConfig.$serializer.descriptor.<get-descriptor>|<get-descriptor>(){}[0]
+
+        final fun childSerializers(): kotlin/Array<kotlinx.serialization/KSerializer<*>> // io.github.jan.supabase.realtime/RealtimeJoinConfig.$serializer.childSerializers|childSerializers(){}[0]
+        final fun deserialize(kotlinx.serialization.encoding/Decoder): io.github.jan.supabase.realtime/RealtimeJoinConfig // io.github.jan.supabase.realtime/RealtimeJoinConfig.$serializer.deserialize|deserialize(kotlinx.serialization.encoding.Decoder){}[0]
+        final fun serialize(kotlinx.serialization.encoding/Encoder, io.github.jan.supabase.realtime/RealtimeJoinConfig) // io.github.jan.supabase.realtime/RealtimeJoinConfig.$serializer.serialize|serialize(kotlinx.serialization.encoding.Encoder;io.github.jan.supabase.realtime.RealtimeJoinConfig){}[0]
+    }
+
+    final object Companion { // io.github.jan.supabase.realtime/RealtimeJoinConfig.Companion|null[0]
+        final val $childSerializers // io.github.jan.supabase.realtime/RealtimeJoinConfig.Companion.$childSerializers|{}$childSerializers[0]
+
+        final fun serializer(): kotlinx.serialization/KSerializer<io.github.jan.supabase.realtime/RealtimeJoinConfig> // io.github.jan.supabase.realtime/RealtimeJoinConfig.Companion.serializer|serializer(){}[0]
+    }
+}
+
+final class io.github.jan.supabase.realtime/RealtimeJoinPayload { // io.github.jan.supabase.realtime/RealtimeJoinPayload|null[0]
+    constructor <init>(io.github.jan.supabase.realtime/RealtimeJoinConfig) // io.github.jan.supabase.realtime/RealtimeJoinPayload.<init>|<init>(io.github.jan.supabase.realtime.RealtimeJoinConfig){}[0]
+
+    final val config // io.github.jan.supabase.realtime/RealtimeJoinPayload.config|{}config[0]
+        final fun <get-config>(): io.github.jan.supabase.realtime/RealtimeJoinConfig // io.github.jan.supabase.realtime/RealtimeJoinPayload.config.<get-config>|<get-config>(){}[0]
+
+    final fun component1(): io.github.jan.supabase.realtime/RealtimeJoinConfig // io.github.jan.supabase.realtime/RealtimeJoinPayload.component1|component1(){}[0]
+    final fun copy(io.github.jan.supabase.realtime/RealtimeJoinConfig = ...): io.github.jan.supabase.realtime/RealtimeJoinPayload // io.github.jan.supabase.realtime/RealtimeJoinPayload.copy|copy(io.github.jan.supabase.realtime.RealtimeJoinConfig){}[0]
+    final fun equals(kotlin/Any?): kotlin/Boolean // io.github.jan.supabase.realtime/RealtimeJoinPayload.equals|equals(kotlin.Any?){}[0]
+    final fun hashCode(): kotlin/Int // io.github.jan.supabase.realtime/RealtimeJoinPayload.hashCode|hashCode(){}[0]
+    final fun toString(): kotlin/String // io.github.jan.supabase.realtime/RealtimeJoinPayload.toString|toString(){}[0]
+
+    final object $serializer : kotlinx.serialization.internal/GeneratedSerializer<io.github.jan.supabase.realtime/RealtimeJoinPayload> { // io.github.jan.supabase.realtime/RealtimeJoinPayload.$serializer|null[0]
+        final val descriptor // io.github.jan.supabase.realtime/RealtimeJoinPayload.$serializer.descriptor|{}descriptor[0]
+            final fun <get-descriptor>(): kotlinx.serialization.descriptors/SerialDescriptor // io.github.jan.supabase.realtime/RealtimeJoinPayload.$serializer.descriptor.<get-descriptor>|<get-descriptor>(){}[0]
+
+        final fun childSerializers(): kotlin/Array<kotlinx.serialization/KSerializer<*>> // io.github.jan.supabase.realtime/RealtimeJoinPayload.$serializer.childSerializers|childSerializers(){}[0]
+        final fun deserialize(kotlinx.serialization.encoding/Decoder): io.github.jan.supabase.realtime/RealtimeJoinPayload // io.github.jan.supabase.realtime/RealtimeJoinPayload.$serializer.deserialize|deserialize(kotlinx.serialization.encoding.Decoder){}[0]
+        final fun serialize(kotlinx.serialization.encoding/Encoder, io.github.jan.supabase.realtime/RealtimeJoinPayload) // io.github.jan.supabase.realtime/RealtimeJoinPayload.$serializer.serialize|serialize(kotlinx.serialization.encoding.Encoder;io.github.jan.supabase.realtime.RealtimeJoinPayload){}[0]
+    }
+
+    final object Companion { // io.github.jan.supabase.realtime/RealtimeJoinPayload.Companion|null[0]
+        final fun serializer(): kotlinx.serialization/KSerializer<io.github.jan.supabase.realtime/RealtimeJoinPayload> // io.github.jan.supabase.realtime/RealtimeJoinPayload.Companion.serializer|serializer(){}[0]
+    }
+}
+
+final class io.github.jan.supabase.realtime/RealtimeMessage { // io.github.jan.supabase.realtime/RealtimeMessage|null[0]
+    constructor <init>(kotlin/String, kotlin/String, kotlinx.serialization.json/JsonObject, kotlin/String?, kotlin/String? = ...) // io.github.jan.supabase.realtime/RealtimeMessage.<init>|<init>(kotlin.String;kotlin.String;kotlinx.serialization.json.JsonObject;kotlin.String?;kotlin.String?){}[0]
+
+    final val event // io.github.jan.supabase.realtime/RealtimeMessage.event|{}event[0]
+        final fun <get-event>(): kotlin/String // io.github.jan.supabase.realtime/RealtimeMessage.event.<get-event>|<get-event>(){}[0]
+    final val joinRef // io.github.jan.supabase.realtime/RealtimeMessage.joinRef|{}joinRef[0]
+        final fun <get-joinRef>(): kotlin/String? // io.github.jan.supabase.realtime/RealtimeMessage.joinRef.<get-joinRef>|<get-joinRef>(){}[0]
+    final val payload // io.github.jan.supabase.realtime/RealtimeMessage.payload|{}payload[0]
+        final fun <get-payload>(): kotlinx.serialization.json/JsonObject // io.github.jan.supabase.realtime/RealtimeMessage.payload.<get-payload>|<get-payload>(){}[0]
+    final val ref // io.github.jan.supabase.realtime/RealtimeMessage.ref|{}ref[0]
+        final fun <get-ref>(): kotlin/String? // io.github.jan.supabase.realtime/RealtimeMessage.ref.<get-ref>|<get-ref>(){}[0]
+    final val topic // io.github.jan.supabase.realtime/RealtimeMessage.topic|{}topic[0]
+        final fun <get-topic>(): kotlin/String // io.github.jan.supabase.realtime/RealtimeMessage.topic.<get-topic>|<get-topic>(){}[0]
+
+    final fun component1(): kotlin/String // io.github.jan.supabase.realtime/RealtimeMessage.component1|component1(){}[0]
+    final fun component2(): kotlin/String // io.github.jan.supabase.realtime/RealtimeMessage.component2|component2(){}[0]
+    final fun component3(): kotlinx.serialization.json/JsonObject // io.github.jan.supabase.realtime/RealtimeMessage.component3|component3(){}[0]
+    final fun component4(): kotlin/String? // io.github.jan.supabase.realtime/RealtimeMessage.component4|component4(){}[0]
+    final fun component5(): kotlin/String? // io.github.jan.supabase.realtime/RealtimeMessage.component5|component5(){}[0]
+    final fun copy(kotlin/String = ..., kotlin/String = ..., kotlinx.serialization.json/JsonObject = ..., kotlin/String? = ..., kotlin/String? = ...): io.github.jan.supabase.realtime/RealtimeMessage // io.github.jan.supabase.realtime/RealtimeMessage.copy|copy(kotlin.String;kotlin.String;kotlinx.serialization.json.JsonObject;kotlin.String?;kotlin.String?){}[0]
+    final fun equals(kotlin/Any?): kotlin/Boolean // io.github.jan.supabase.realtime/RealtimeMessage.equals|equals(kotlin.Any?){}[0]
+    final fun hashCode(): kotlin/Int // io.github.jan.supabase.realtime/RealtimeMessage.hashCode|hashCode(){}[0]
+    final fun toString(): kotlin/String // io.github.jan.supabase.realtime/RealtimeMessage.toString|toString(){}[0]
+
+    final object $serializer : kotlinx.serialization.internal/GeneratedSerializer<io.github.jan.supabase.realtime/RealtimeMessage> { // io.github.jan.supabase.realtime/RealtimeMessage.$serializer|null[0]
+        final val descriptor // io.github.jan.supabase.realtime/RealtimeMessage.$serializer.descriptor|{}descriptor[0]
+            final fun <get-descriptor>(): kotlinx.serialization.descriptors/SerialDescriptor // io.github.jan.supabase.realtime/RealtimeMessage.$serializer.descriptor.<get-descriptor>|<get-descriptor>(){}[0]
+
+        final fun childSerializers(): kotlin/Array<kotlinx.serialization/KSerializer<*>> // io.github.jan.supabase.realtime/RealtimeMessage.$serializer.childSerializers|childSerializers(){}[0]
+        final fun deserialize(kotlinx.serialization.encoding/Decoder): io.github.jan.supabase.realtime/RealtimeMessage // io.github.jan.supabase.realtime/RealtimeMessage.$serializer.deserialize|deserialize(kotlinx.serialization.encoding.Decoder){}[0]
+        final fun serialize(kotlinx.serialization.encoding/Encoder, io.github.jan.supabase.realtime/RealtimeMessage) // io.github.jan.supabase.realtime/RealtimeMessage.$serializer.serialize|serialize(kotlinx.serialization.encoding.Encoder;io.github.jan.supabase.realtime.RealtimeMessage){}[0]
+    }
+
+    final object Companion { // io.github.jan.supabase.realtime/RealtimeMessage.Companion|null[0]
+        final fun serializer(): kotlinx.serialization/KSerializer<io.github.jan.supabase.realtime/RealtimeMessage> // io.github.jan.supabase.realtime/RealtimeMessage.Companion.serializer|serializer(){}[0]
+    }
+}
+
+final class io.github.jan.supabase.realtime/RealtimeSystemPayload { // io.github.jan.supabase.realtime/RealtimeSystemPayload|null[0]
+    constructor <init>(kotlin/String, kotlin/String, kotlin/String, kotlin/String) // io.github.jan.supabase.realtime/RealtimeSystemPayload.<init>|<init>(kotlin.String;kotlin.String;kotlin.String;kotlin.String){}[0]
+
+    final val channel // io.github.jan.supabase.realtime/RealtimeSystemPayload.channel|{}channel[0]
+        final fun <get-channel>(): kotlin/String // io.github.jan.supabase.realtime/RealtimeSystemPayload.channel.<get-channel>|<get-channel>(){}[0]
+    final val extension // io.github.jan.supabase.realtime/RealtimeSystemPayload.extension|{}extension[0]
+        final fun <get-extension>(): kotlin/String // io.github.jan.supabase.realtime/RealtimeSystemPayload.extension.<get-extension>|<get-extension>(){}[0]
+    final val message // io.github.jan.supabase.realtime/RealtimeSystemPayload.message|{}message[0]
+        final fun <get-message>(): kotlin/String // io.github.jan.supabase.realtime/RealtimeSystemPayload.message.<get-message>|<get-message>(){}[0]
+    final val status // io.github.jan.supabase.realtime/RealtimeSystemPayload.status|{}status[0]
+        final fun <get-status>(): kotlin/String // io.github.jan.supabase.realtime/RealtimeSystemPayload.status.<get-status>|<get-status>(){}[0]
+
+    final fun component1(): kotlin/String // io.github.jan.supabase.realtime/RealtimeSystemPayload.component1|component1(){}[0]
+    final fun component2(): kotlin/String // io.github.jan.supabase.realtime/RealtimeSystemPayload.component2|component2(){}[0]
+    final fun component3(): kotlin/String // io.github.jan.supabase.realtime/RealtimeSystemPayload.component3|component3(){}[0]
+    final fun component4(): kotlin/String // io.github.jan.supabase.realtime/RealtimeSystemPayload.component4|component4(){}[0]
+    final fun copy(kotlin/String = ..., kotlin/String = ..., kotlin/String = ..., kotlin/String = ...): io.github.jan.supabase.realtime/RealtimeSystemPayload // io.github.jan.supabase.realtime/RealtimeSystemPayload.copy|copy(kotlin.String;kotlin.String;kotlin.String;kotlin.String){}[0]
+    final fun equals(kotlin/Any?): kotlin/Boolean // io.github.jan.supabase.realtime/RealtimeSystemPayload.equals|equals(kotlin.Any?){}[0]
+    final fun hashCode(): kotlin/Int // io.github.jan.supabase.realtime/RealtimeSystemPayload.hashCode|hashCode(){}[0]
+    final fun toString(): kotlin/String // io.github.jan.supabase.realtime/RealtimeSystemPayload.toString|toString(){}[0]
+
+    final object $serializer : kotlinx.serialization.internal/GeneratedSerializer<io.github.jan.supabase.realtime/RealtimeSystemPayload> { // io.github.jan.supabase.realtime/RealtimeSystemPayload.$serializer|null[0]
+        final val descriptor // io.github.jan.supabase.realtime/RealtimeSystemPayload.$serializer.descriptor|{}descriptor[0]
+            final fun <get-descriptor>(): kotlinx.serialization.descriptors/SerialDescriptor // io.github.jan.supabase.realtime/RealtimeSystemPayload.$serializer.descriptor.<get-descriptor>|<get-descriptor>(){}[0]
+
+        final fun childSerializers(): kotlin/Array<kotlinx.serialization/KSerializer<*>> // io.github.jan.supabase.realtime/RealtimeSystemPayload.$serializer.childSerializers|childSerializers(){}[0]
+        final fun deserialize(kotlinx.serialization.encoding/Decoder): io.github.jan.supabase.realtime/RealtimeSystemPayload // io.github.jan.supabase.realtime/RealtimeSystemPayload.$serializer.deserialize|deserialize(kotlinx.serialization.encoding.Decoder){}[0]
+        final fun serialize(kotlinx.serialization.encoding/Encoder, io.github.jan.supabase.realtime/RealtimeSystemPayload) // io.github.jan.supabase.realtime/RealtimeSystemPayload.$serializer.serialize|serialize(kotlinx.serialization.encoding.Encoder;io.github.jan.supabase.realtime.RealtimeSystemPayload){}[0]
+    }
+
+    final object Companion { // io.github.jan.supabase.realtime/RealtimeSystemPayload.Companion|null[0]
+        final fun serializer(): kotlinx.serialization/KSerializer<io.github.jan.supabase.realtime/RealtimeSystemPayload> // io.github.jan.supabase.realtime/RealtimeSystemPayload.Companion.serializer|serializer(){}[0]
+    }
+}
+
+sealed class io.github.jan.supabase.realtime/RealtimeCallbackId { // io.github.jan.supabase.realtime/RealtimeCallbackId|null[0]
+    final val value // io.github.jan.supabase.realtime/RealtimeCallbackId.value|{}value[0]
+        final fun <get-value>(): kotlin/Int // io.github.jan.supabase.realtime/RealtimeCallbackId.value.<get-value>|<get-value>(){}[0]
+
+    final class Broadcast : io.github.jan.supabase.realtime/RealtimeCallbackId { // io.github.jan.supabase.realtime/RealtimeCallbackId.Broadcast|null[0]
+        constructor <init>(kotlin/Int) // io.github.jan.supabase.realtime/RealtimeCallbackId.Broadcast.<init>|<init>(kotlin.Int){}[0]
+    }
+
+    final class Postgres : io.github.jan.supabase.realtime/RealtimeCallbackId { // io.github.jan.supabase.realtime/RealtimeCallbackId.Postgres|null[0]
+        constructor <init>(kotlin/Int) // io.github.jan.supabase.realtime/RealtimeCallbackId.Postgres.<init>|<init>(kotlin.Int){}[0]
+    }
+
+    final class Presence : io.github.jan.supabase.realtime/RealtimeCallbackId { // io.github.jan.supabase.realtime/RealtimeCallbackId.Presence|null[0]
+        constructor <init>(kotlin/Int) // io.github.jan.supabase.realtime/RealtimeCallbackId.Presence.<init>|<init>(kotlin.Int){}[0]
+    }
+
+    final class System : io.github.jan.supabase.realtime/RealtimeCallbackId { // io.github.jan.supabase.realtime/RealtimeCallbackId.System|null[0]
+        constructor <init>(kotlin/Int) // io.github.jan.supabase.realtime/RealtimeCallbackId.System.<init>|<init>(kotlin.Int){}[0]
+    }
+}
+
+final object io.github.jan.supabase.realtime.event/RBroadcastEvent : io.github.jan.supabase.realtime.event/RealtimeEvent { // io.github.jan.supabase.realtime.event/RBroadcastEvent|null[0]
+    final fun appliesTo(io.github.jan.supabase.realtime/RealtimeMessage): kotlin/Boolean // io.github.jan.supabase.realtime.event/RBroadcastEvent.appliesTo|appliesTo(io.github.jan.supabase.realtime.RealtimeMessage){}[0]
+    final fun equals(kotlin/Any?): kotlin/Boolean // io.github.jan.supabase.realtime.event/RBroadcastEvent.equals|equals(kotlin.Any?){}[0]
+    final fun hashCode(): kotlin/Int // io.github.jan.supabase.realtime.event/RBroadcastEvent.hashCode|hashCode(){}[0]
+    final fun toString(): kotlin/String // io.github.jan.supabase.realtime.event/RBroadcastEvent.toString|toString(){}[0]
+    final suspend fun handle(io.github.jan.supabase.realtime/RealtimeChannel, io.github.jan.supabase.realtime/RealtimeMessage) // io.github.jan.supabase.realtime.event/RBroadcastEvent.handle|handle(io.github.jan.supabase.realtime.RealtimeChannel;io.github.jan.supabase.realtime.RealtimeMessage){}[0]
+}
+
+final object io.github.jan.supabase.realtime.event/RCloseEvent : io.github.jan.supabase.realtime.event/RealtimeEvent { // io.github.jan.supabase.realtime.event/RCloseEvent|null[0]
+    final fun appliesTo(io.github.jan.supabase.realtime/RealtimeMessage): kotlin/Boolean // io.github.jan.supabase.realtime.event/RCloseEvent.appliesTo|appliesTo(io.github.jan.supabase.realtime.RealtimeMessage){}[0]
+    final fun equals(kotlin/Any?): kotlin/Boolean // io.github.jan.supabase.realtime.event/RCloseEvent.equals|equals(kotlin.Any?){}[0]
+    final fun hashCode(): kotlin/Int // io.github.jan.supabase.realtime.event/RCloseEvent.hashCode|hashCode(){}[0]
+    final fun toString(): kotlin/String // io.github.jan.supabase.realtime.event/RCloseEvent.toString|toString(){}[0]
+    final suspend fun handle(io.github.jan.supabase.realtime/RealtimeChannel, io.github.jan.supabase.realtime/RealtimeMessage) // io.github.jan.supabase.realtime.event/RCloseEvent.handle|handle(io.github.jan.supabase.realtime.RealtimeChannel;io.github.jan.supabase.realtime.RealtimeMessage){}[0]
+}
+
+final object io.github.jan.supabase.realtime.event/RErrorEvent : io.github.jan.supabase.realtime.event/RealtimeEvent { // io.github.jan.supabase.realtime.event/RErrorEvent|null[0]
+    final fun appliesTo(io.github.jan.supabase.realtime/RealtimeMessage): kotlin/Boolean // io.github.jan.supabase.realtime.event/RErrorEvent.appliesTo|appliesTo(io.github.jan.supabase.realtime.RealtimeMessage){}[0]
+    final fun equals(kotlin/Any?): kotlin/Boolean // io.github.jan.supabase.realtime.event/RErrorEvent.equals|equals(kotlin.Any?){}[0]
+    final fun hashCode(): kotlin/Int // io.github.jan.supabase.realtime.event/RErrorEvent.hashCode|hashCode(){}[0]
+    final fun toString(): kotlin/String // io.github.jan.supabase.realtime.event/RErrorEvent.toString|toString(){}[0]
+    final suspend fun handle(io.github.jan.supabase.realtime/RealtimeChannel, io.github.jan.supabase.realtime/RealtimeMessage) // io.github.jan.supabase.realtime.event/RErrorEvent.handle|handle(io.github.jan.supabase.realtime.RealtimeChannel;io.github.jan.supabase.realtime.RealtimeMessage){}[0]
+}
+
+final object io.github.jan.supabase.realtime.event/RPostgresChangesEvent : io.github.jan.supabase.realtime.event/RealtimeEvent { // io.github.jan.supabase.realtime.event/RPostgresChangesEvent|null[0]
+    final fun appliesTo(io.github.jan.supabase.realtime/RealtimeMessage): kotlin/Boolean // io.github.jan.supabase.realtime.event/RPostgresChangesEvent.appliesTo|appliesTo(io.github.jan.supabase.realtime.RealtimeMessage){}[0]
+    final fun equals(kotlin/Any?): kotlin/Boolean // io.github.jan.supabase.realtime.event/RPostgresChangesEvent.equals|equals(kotlin.Any?){}[0]
+    final fun hashCode(): kotlin/Int // io.github.jan.supabase.realtime.event/RPostgresChangesEvent.hashCode|hashCode(){}[0]
+    final fun toString(): kotlin/String // io.github.jan.supabase.realtime.event/RPostgresChangesEvent.toString|toString(){}[0]
+    final suspend fun handle(io.github.jan.supabase.realtime/RealtimeChannel, io.github.jan.supabase.realtime/RealtimeMessage) // io.github.jan.supabase.realtime.event/RPostgresChangesEvent.handle|handle(io.github.jan.supabase.realtime.RealtimeChannel;io.github.jan.supabase.realtime.RealtimeMessage){}[0]
+}
+
+final object io.github.jan.supabase.realtime.event/RPostgresServerChangesEvent : io.github.jan.supabase.realtime.event/RealtimeEvent { // io.github.jan.supabase.realtime.event/RPostgresServerChangesEvent|null[0]
+    final fun appliesTo(io.github.jan.supabase.realtime/RealtimeMessage): kotlin/Boolean // io.github.jan.supabase.realtime.event/RPostgresServerChangesEvent.appliesTo|appliesTo(io.github.jan.supabase.realtime.RealtimeMessage){}[0]
+    final fun equals(kotlin/Any?): kotlin/Boolean // io.github.jan.supabase.realtime.event/RPostgresServerChangesEvent.equals|equals(kotlin.Any?){}[0]
+    final fun hashCode(): kotlin/Int // io.github.jan.supabase.realtime.event/RPostgresServerChangesEvent.hashCode|hashCode(){}[0]
+    final fun toString(): kotlin/String // io.github.jan.supabase.realtime.event/RPostgresServerChangesEvent.toString|toString(){}[0]
+    final suspend fun handle(io.github.jan.supabase.realtime/RealtimeChannel, io.github.jan.supabase.realtime/RealtimeMessage) // io.github.jan.supabase.realtime.event/RPostgresServerChangesEvent.handle|handle(io.github.jan.supabase.realtime.RealtimeChannel;io.github.jan.supabase.realtime.RealtimeMessage){}[0]
+}
+
+final object io.github.jan.supabase.realtime.event/RPresenceDiffEvent : io.github.jan.supabase.realtime.event/RealtimeEvent { // io.github.jan.supabase.realtime.event/RPresenceDiffEvent|null[0]
+    final fun appliesTo(io.github.jan.supabase.realtime/RealtimeMessage): kotlin/Boolean // io.github.jan.supabase.realtime.event/RPresenceDiffEvent.appliesTo|appliesTo(io.github.jan.supabase.realtime.RealtimeMessage){}[0]
+    final fun equals(kotlin/Any?): kotlin/Boolean // io.github.jan.supabase.realtime.event/RPresenceDiffEvent.equals|equals(kotlin.Any?){}[0]
+    final fun hashCode(): kotlin/Int // io.github.jan.supabase.realtime.event/RPresenceDiffEvent.hashCode|hashCode(){}[0]
+    final fun toString(): kotlin/String // io.github.jan.supabase.realtime.event/RPresenceDiffEvent.toString|toString(){}[0]
+    final suspend fun handle(io.github.jan.supabase.realtime/RealtimeChannel, io.github.jan.supabase.realtime/RealtimeMessage) // io.github.jan.supabase.realtime.event/RPresenceDiffEvent.handle|handle(io.github.jan.supabase.realtime.RealtimeChannel;io.github.jan.supabase.realtime.RealtimeMessage){}[0]
+}
+
+final object io.github.jan.supabase.realtime.event/RPresenceStateEvent : io.github.jan.supabase.realtime.event/RealtimeEvent { // io.github.jan.supabase.realtime.event/RPresenceStateEvent|null[0]
+    final fun appliesTo(io.github.jan.supabase.realtime/RealtimeMessage): kotlin/Boolean // io.github.jan.supabase.realtime.event/RPresenceStateEvent.appliesTo|appliesTo(io.github.jan.supabase.realtime.RealtimeMessage){}[0]
+    final fun equals(kotlin/Any?): kotlin/Boolean // io.github.jan.supabase.realtime.event/RPresenceStateEvent.equals|equals(kotlin.Any?){}[0]
+    final fun hashCode(): kotlin/Int // io.github.jan.supabase.realtime.event/RPresenceStateEvent.hashCode|hashCode(){}[0]
+    final fun toString(): kotlin/String // io.github.jan.supabase.realtime.event/RPresenceStateEvent.toString|toString(){}[0]
+    final suspend fun handle(io.github.jan.supabase.realtime/RealtimeChannel, io.github.jan.supabase.realtime/RealtimeMessage) // io.github.jan.supabase.realtime.event/RPresenceStateEvent.handle|handle(io.github.jan.supabase.realtime.RealtimeChannel;io.github.jan.supabase.realtime.RealtimeMessage){}[0]
+}
+
+final object io.github.jan.supabase.realtime.event/RSystemEvent : io.github.jan.supabase.realtime.event/RealtimeEvent { // io.github.jan.supabase.realtime.event/RSystemEvent|null[0]
+    final fun appliesTo(io.github.jan.supabase.realtime/RealtimeMessage): kotlin/Boolean // io.github.jan.supabase.realtime.event/RSystemEvent.appliesTo|appliesTo(io.github.jan.supabase.realtime.RealtimeMessage){}[0]
+    final fun equals(kotlin/Any?): kotlin/Boolean // io.github.jan.supabase.realtime.event/RSystemEvent.equals|equals(kotlin.Any?){}[0]
+    final fun hashCode(): kotlin/Int // io.github.jan.supabase.realtime.event/RSystemEvent.hashCode|hashCode(){}[0]
+    final fun toString(): kotlin/String // io.github.jan.supabase.realtime.event/RSystemEvent.toString|toString(){}[0]
+    final suspend fun handle(io.github.jan.supabase.realtime/RealtimeChannel, io.github.jan.supabase.realtime/RealtimeMessage) // io.github.jan.supabase.realtime.event/RSystemEvent.handle|handle(io.github.jan.supabase.realtime.RealtimeChannel;io.github.jan.supabase.realtime.RealtimeMessage){}[0]
+}
+
+final object io.github.jan.supabase.realtime.event/RSystemReplyEvent : io.github.jan.supabase.realtime.event/RealtimeEvent { // io.github.jan.supabase.realtime.event/RSystemReplyEvent|null[0]
+    final fun appliesTo(io.github.jan.supabase.realtime/RealtimeMessage): kotlin/Boolean // io.github.jan.supabase.realtime.event/RSystemReplyEvent.appliesTo|appliesTo(io.github.jan.supabase.realtime.RealtimeMessage){}[0]
+    final fun equals(kotlin/Any?): kotlin/Boolean // io.github.jan.supabase.realtime.event/RSystemReplyEvent.equals|equals(kotlin.Any?){}[0]
+    final fun hashCode(): kotlin/Int // io.github.jan.supabase.realtime.event/RSystemReplyEvent.hashCode|hashCode(){}[0]
+    final fun toString(): kotlin/String // io.github.jan.supabase.realtime.event/RSystemReplyEvent.toString|toString(){}[0]
+    final suspend fun handle(io.github.jan.supabase.realtime/RealtimeChannel, io.github.jan.supabase.realtime/RealtimeMessage) // io.github.jan.supabase.realtime.event/RSystemReplyEvent.handle|handle(io.github.jan.supabase.realtime.RealtimeChannel;io.github.jan.supabase.realtime.RealtimeMessage){}[0]
+}
+
+final object io.github.jan.supabase.realtime.event/RTokenExpiredEvent : io.github.jan.supabase.realtime.event/RealtimeEvent { // io.github.jan.supabase.realtime.event/RTokenExpiredEvent|null[0]
+    final fun appliesTo(io.github.jan.supabase.realtime/RealtimeMessage): kotlin/Boolean // io.github.jan.supabase.realtime.event/RTokenExpiredEvent.appliesTo|appliesTo(io.github.jan.supabase.realtime.RealtimeMessage){}[0]
+    final fun equals(kotlin/Any?): kotlin/Boolean // io.github.jan.supabase.realtime.event/RTokenExpiredEvent.equals|equals(kotlin.Any?){}[0]
+    final fun hashCode(): kotlin/Int // io.github.jan.supabase.realtime.event/RTokenExpiredEvent.hashCode|hashCode(){}[0]
+    final fun toString(): kotlin/String // io.github.jan.supabase.realtime.event/RTokenExpiredEvent.toString|toString(){}[0]
+    final suspend fun handle(io.github.jan.supabase.realtime/RealtimeChannel, io.github.jan.supabase.realtime/RealtimeMessage) // io.github.jan.supabase.realtime.event/RTokenExpiredEvent.handle|handle(io.github.jan.supabase.realtime.RealtimeChannel;io.github.jan.supabase.realtime.RealtimeMessage){}[0]
+}
+
+final object io.github.jan.supabase.realtime/RealtimeTopic { // io.github.jan.supabase.realtime/RealtimeTopic|null[0]
+    final const val PREFIX // io.github.jan.supabase.realtime/RealtimeTopic.PREFIX|{}PREFIX[0]
+        final fun <get-PREFIX>(): kotlin/String // io.github.jan.supabase.realtime/RealtimeTopic.PREFIX.<get-PREFIX>|<get-PREFIX>(){}[0]
+
+    final fun withChannelId(kotlin/String): kotlin/String // io.github.jan.supabase.realtime/RealtimeTopic.withChannelId|withChannelId(kotlin.String){}[0]
+}
+
+final val io.github.jan.supabase.realtime/realtime // io.github.jan.supabase.realtime/realtime|@io.github.jan.supabase.SupabaseClient{}realtime[0]
+    final fun (io.github.jan.supabase/SupabaseClient).<get-realtime>(): io.github.jan.supabase.realtime/Realtime // io.github.jan.supabase.realtime/realtime.<get-realtime>|<get-realtime>@io.github.jan.supabase.SupabaseClient(){}[0]
+
+final fun <#A: kotlin/Any?> (kotlin.collections/List<io.github.jan.supabase.realtime/PrimaryKey<#A>>).io.github.jan.supabase.realtime/producer(#A): kotlin/String // io.github.jan.supabase.realtime/producer|producer@kotlin.collections.List<io.github.jan.supabase.realtime.PrimaryKey<0:0>>(0:0){0§<kotlin.Any?>}[0]
+final fun io.github.jan.supabase.realtime/defaultChannelName(kotlin/String, kotlin/String, io.github.jan.supabase.realtime/RealtimeImpl): kotlin/String // io.github.jan.supabase.realtime/defaultChannelName|defaultChannelName(kotlin.String;kotlin.String;io.github.jan.supabase.realtime.RealtimeImpl){}[0]
+final inline fun (io.github.jan.supabase.realtime/Realtime).io.github.jan.supabase.realtime/channel(kotlin/String, kotlin/Function1<io.github.jan.supabase.realtime/RealtimeChannelBuilder, kotlin/Unit> = ...): io.github.jan.supabase.realtime/RealtimeChannel // io.github.jan.supabase.realtime/channel|channel@io.github.jan.supabase.realtime.Realtime(kotlin.String;kotlin.Function1<io.github.jan.supabase.realtime.RealtimeChannelBuilder,kotlin.Unit>){}[0]
+final inline fun (io.github.jan.supabase/SupabaseClient).io.github.jan.supabase.realtime/channel(kotlin/String, kotlin/Function1<io.github.jan.supabase.realtime/RealtimeChannelBuilder, kotlin/Unit> = ...): io.github.jan.supabase.realtime/RealtimeChannel // io.github.jan.supabase.realtime/channel|channel@io.github.jan.supabase.SupabaseClient(kotlin.String;kotlin.Function1<io.github.jan.supabase.realtime.RealtimeChannelBuilder,kotlin.Unit>){}[0]
+final inline fun <#A: reified io.github.jan.supabase.realtime/PostgresAction> (io.github.jan.supabase.realtime/RealtimeChannel).io.github.jan.supabase.realtime/postgresChangeFlow(kotlin/String, noinline kotlin/Function1<io.github.jan.supabase.realtime/PostgresChangeFilter, kotlin/Unit> = ...): kotlinx.coroutines.flow/Flow<#A> // io.github.jan.supabase.realtime/postgresChangeFlow|postgresChangeFlow@io.github.jan.supabase.realtime.RealtimeChannel(kotlin.String;kotlin.Function1<io.github.jan.supabase.realtime.PostgresChangeFilter,kotlin.Unit>){0§<io.github.jan.supabase.realtime.PostgresAction>}[0]
+final inline fun <#A: reified kotlin/Any, #B: kotlin/Any?> (io.github.jan.supabase.postgrest.query/PostgrestQueryBuilder).io.github.jan.supabase.realtime/selectAsFlow(kotlin.collections/List<kotlin.reflect/KProperty1<#A, #B>>, kotlin/String? = ..., crossinline kotlin/Function1<io.github.jan.supabase.realtime.postgres/RealtimePostgresFilterBuilder, kotlin/Unit> = ...): kotlinx.coroutines.flow/Flow<kotlin.collections/List<#A>> // io.github.jan.supabase.realtime/selectAsFlow|selectAsFlow@io.github.jan.supabase.postgrest.query.PostgrestQueryBuilder(kotlin.collections.List<kotlin.reflect.KProperty1<0:0,0:1>>;kotlin.String?;kotlin.Function1<io.github.jan.supabase.realtime.postgres.RealtimePostgresFilterBuilder,kotlin.Unit>){0§<kotlin.Any>;1§<kotlin.Any?>}[0]
+final inline fun <#A: reified kotlin/Any, #B: kotlin/Any?> (io.github.jan.supabase.postgrest.query/PostgrestQueryBuilder).io.github.jan.supabase.realtime/selectAsFlow(kotlin.reflect/KProperty1<#A, #B>, kotlin/String? = ..., crossinline kotlin/Function1<io.github.jan.supabase.realtime.postgres/RealtimePostgresFilterBuilder, kotlin/Unit> = ...): kotlinx.coroutines.flow/Flow<kotlin.collections/List<#A>> // io.github.jan.supabase.realtime/selectAsFlow|selectAsFlow@io.github.jan.supabase.postgrest.query.PostgrestQueryBuilder(kotlin.reflect.KProperty1<0:0,0:1>;kotlin.String?;kotlin.Function1<io.github.jan.supabase.realtime.postgres.RealtimePostgresFilterBuilder,kotlin.Unit>){0§<kotlin.Any>;1§<kotlin.Any?>}[0]
+final inline fun <#A: reified kotlin/Any, #B: kotlin/Any?> (io.github.jan.supabase.postgrest.query/PostgrestQueryBuilder).io.github.jan.supabase.realtime/selectSingleValueAsFlow(kotlin.reflect/KProperty1<#A, #B>, kotlin/String? = ..., crossinline kotlin/Function1<io.github.jan.supabase.postgrest.query.filter/PostgrestFilterBuilder, kotlin/Unit>): kotlinx.coroutines.flow/Flow<#A> // io.github.jan.supabase.realtime/selectSingleValueAsFlow|selectSingleValueAsFlow@io.github.jan.supabase.postgrest.query.PostgrestQueryBuilder(kotlin.reflect.KProperty1<0:0,0:1>;kotlin.String?;kotlin.Function1<io.github.jan.supabase.postgrest.query.filter.PostgrestFilterBuilder,kotlin.Unit>){0§<kotlin.Any>;1§<kotlin.Any?>}[0]
+final inline fun <#A: reified kotlin/Any, #B: kotlin/Any?> (io.github.jan.supabase.realtime/RealtimeChannel).io.github.jan.supabase.realtime/postgresListDataFlow(kotlin/String = ..., kotlin/String, kotlin.collections/List<kotlin.reflect/KProperty1<#A, #B>>, crossinline kotlin/Function1<io.github.jan.supabase.realtime.postgres/RealtimePostgresFilterBuilder, kotlin/Unit> = ...): kotlinx.coroutines.flow/Flow<kotlin.collections/List<#A>> // io.github.jan.supabase.realtime/postgresListDataFlow|postgresListDataFlow@io.github.jan.supabase.realtime.RealtimeChannel(kotlin.String;kotlin.String;kotlin.collections.List<kotlin.reflect.KProperty1<0:0,0:1>>;kotlin.Function1<io.github.jan.supabase.realtime.postgres.RealtimePostgresFilterBuilder,kotlin.Unit>){0§<kotlin.Any>;1§<kotlin.Any?>}[0]
+final inline fun <#A: reified kotlin/Any, #B: kotlin/Any?> (io.github.jan.supabase.realtime/RealtimeChannel).io.github.jan.supabase.realtime/postgresListDataFlow(kotlin/String = ..., kotlin/String, kotlin.reflect/KProperty1<#A, #B>, crossinline kotlin/Function1<io.github.jan.supabase.realtime.postgres/RealtimePostgresFilterBuilder, kotlin/Unit> = ...): kotlinx.coroutines.flow/Flow<kotlin.collections/List<#A>> // io.github.jan.supabase.realtime/postgresListDataFlow|postgresListDataFlow@io.github.jan.supabase.realtime.RealtimeChannel(kotlin.String;kotlin.String;kotlin.reflect.KProperty1<0:0,0:1>;kotlin.Function1<io.github.jan.supabase.realtime.postgres.RealtimePostgresFilterBuilder,kotlin.Unit>){0§<kotlin.Any>;1§<kotlin.Any?>}[0]
+final inline fun <#A: reified kotlin/Any> (io.github.jan.supabase.postgrest.query/PostgrestQueryBuilder).io.github.jan.supabase.realtime/selectAsFlow(io.github.jan.supabase.realtime/PrimaryKey<#A>, kotlin/String? = ..., crossinline kotlin/Function1<io.github.jan.supabase.realtime.postgres/RealtimePostgresFilterBuilder, kotlin/Unit> = ...): kotlinx.coroutines.flow/Flow<kotlin.collections/List<#A>> // io.github.jan.supabase.realtime/selectAsFlow|selectAsFlow@io.github.jan.supabase.postgrest.query.PostgrestQueryBuilder(io.github.jan.supabase.realtime.PrimaryKey<0:0>;kotlin.String?;kotlin.Function1<io.github.jan.supabase.realtime.postgres.RealtimePostgresFilterBuilder,kotlin.Unit>){0§<kotlin.Any>}[0]
+final inline fun <#A: reified kotlin/Any> (io.github.jan.supabase.postgrest.query/PostgrestQueryBuilder).io.github.jan.supabase.realtime/selectAsFlow(kotlin.collections/List<io.github.jan.supabase.realtime/PrimaryKey<#A>>, kotlin/String? = ..., crossinline kotlin/Function1<io.github.jan.supabase.realtime.postgres/RealtimePostgresFilterBuilder, kotlin/Unit> = ...): kotlinx.coroutines.flow/Flow<kotlin.collections/List<#A>> // io.github.jan.supabase.realtime/selectAsFlow|selectAsFlow@io.github.jan.supabase.postgrest.query.PostgrestQueryBuilder(kotlin.collections.List<io.github.jan.supabase.realtime.PrimaryKey<0:0>>;kotlin.String?;kotlin.Function1<io.github.jan.supabase.realtime.postgres.RealtimePostgresFilterBuilder,kotlin.Unit>){0§<kotlin.Any>}[0]
+final inline fun <#A: reified kotlin/Any> (io.github.jan.supabase.postgrest.query/PostgrestQueryBuilder).io.github.jan.supabase.realtime/selectSingleValueAsFlow(io.github.jan.supabase.realtime/PrimaryKey<#A>, kotlin/String? = ..., crossinline kotlin/Function1<io.github.jan.supabase.postgrest.query.filter/PostgrestFilterBuilder, kotlin/Unit>): kotlinx.coroutines.flow/Flow<#A> // io.github.jan.supabase.realtime/selectSingleValueAsFlow|selectSingleValueAsFlow@io.github.jan.supabase.postgrest.query.PostgrestQueryBuilder(io.github.jan.supabase.realtime.PrimaryKey<0:0>;kotlin.String?;kotlin.Function1<io.github.jan.supabase.postgrest.query.filter.PostgrestFilterBuilder,kotlin.Unit>){0§<kotlin.Any>}[0]
+final inline fun <#A: reified kotlin/Any> (io.github.jan.supabase.realtime/HasOldRecord).io.github.jan.supabase.realtime/decodeOldRecord(): #A // io.github.jan.supabase.realtime/decodeOldRecord|decodeOldRecord@io.github.jan.supabase.realtime.HasOldRecord(){0§<kotlin.Any>}[0]
+final inline fun <#A: reified kotlin/Any> (io.github.jan.supabase.realtime/HasOldRecord).io.github.jan.supabase.realtime/decodeOldRecordOrNull(): #A? // io.github.jan.supabase.realtime/decodeOldRecordOrNull|decodeOldRecordOrNull@io.github.jan.supabase.realtime.HasOldRecord(){0§<kotlin.Any>}[0]
+final inline fun <#A: reified kotlin/Any> (io.github.jan.supabase.realtime/HasRecord).io.github.jan.supabase.realtime/decodeRecord(): #A // io.github.jan.supabase.realtime/decodeRecord|decodeRecord@io.github.jan.supabase.realtime.HasRecord(){0§<kotlin.Any>}[0]
+final inline fun <#A: reified kotlin/Any> (io.github.jan.supabase.realtime/HasRecord).io.github.jan.supabase.realtime/decodeRecordOrNull(): #A? // io.github.jan.supabase.realtime/decodeRecordOrNull|decodeRecordOrNull@io.github.jan.supabase.realtime.HasRecord(){0§<kotlin.Any>}[0]
+final inline fun <#A: reified kotlin/Any> (io.github.jan.supabase.realtime/RealtimeChannel).io.github.jan.supabase.realtime/broadcastFlow(kotlin/String): kotlinx.coroutines.flow/Flow<#A> // io.github.jan.supabase.realtime/broadcastFlow|broadcastFlow@io.github.jan.supabase.realtime.RealtimeChannel(kotlin.String){0§<kotlin.Any>}[0]
+final inline fun <#A: reified kotlin/Any> (io.github.jan.supabase.realtime/RealtimeChannel).io.github.jan.supabase.realtime/postgresListDataFlow(kotlin/String = ..., kotlin/String, io.github.jan.supabase.realtime/PrimaryKey<#A>, crossinline kotlin/Function1<io.github.jan.supabase.realtime.postgres/RealtimePostgresFilterBuilder, kotlin/Unit> = ...): kotlinx.coroutines.flow/Flow<kotlin.collections/List<#A>> // io.github.jan.supabase.realtime/postgresListDataFlow|postgresListDataFlow@io.github.jan.supabase.realtime.RealtimeChannel(kotlin.String;kotlin.String;io.github.jan.supabase.realtime.PrimaryKey<0:0>;kotlin.Function1<io.github.jan.supabase.realtime.postgres.RealtimePostgresFilterBuilder,kotlin.Unit>){0§<kotlin.Any>}[0]
+final inline fun <#A: reified kotlin/Any> (io.github.jan.supabase.realtime/RealtimeChannel).io.github.jan.supabase.realtime/postgresListDataFlow(kotlin/String = ..., kotlin/String, kotlin.collections/List<io.github.jan.supabase.realtime/PrimaryKey<#A>>, crossinline kotlin/Function1<io.github.jan.supabase.realtime.postgres/RealtimePostgresFilterBuilder, kotlin/Unit> = ...): kotlinx.coroutines.flow/Flow<kotlin.collections/List<#A>> // io.github.jan.supabase.realtime/postgresListDataFlow|postgresListDataFlow@io.github.jan.supabase.realtime.RealtimeChannel(kotlin.String;kotlin.String;kotlin.collections.List<io.github.jan.supabase.realtime.PrimaryKey<0:0>>;kotlin.Function1<io.github.jan.supabase.realtime.postgres.RealtimePostgresFilterBuilder,kotlin.Unit>){0§<kotlin.Any>}[0]
+final inline fun <#A: reified kotlin/Any?> (io.github.jan.supabase.realtime/PresenceAction).io.github.jan.supabase.realtime/decodeJoinsAs(kotlin/Boolean = ...): kotlin.collections/List<#A> // io.github.jan.supabase.realtime/decodeJoinsAs|decodeJoinsAs@io.github.jan.supabase.realtime.PresenceAction(kotlin.Boolean){0§<kotlin.Any?>}[0]
+final inline fun <#A: reified kotlin/Any?> (io.github.jan.supabase.realtime/PresenceAction).io.github.jan.supabase.realtime/decodeLeavesAs(kotlin/Boolean = ...): kotlin.collections/List<#A> // io.github.jan.supabase.realtime/decodeLeavesAs|decodeLeavesAs@io.github.jan.supabase.realtime.PresenceAction(kotlin.Boolean){0§<kotlin.Any?>}[0]
+final inline fun <#A: reified kotlin/Any?> (io.github.jan.supabase.realtime/RealtimeChannel).io.github.jan.supabase.realtime/currentPresences(kotlin/Boolean = ...): kotlin.collections/List<#A> // io.github.jan.supabase.realtime/currentPresences|currentPresences@io.github.jan.supabase.realtime.RealtimeChannel(kotlin.Boolean){0§<kotlin.Any?>}[0]
+final inline fun <#A: reified kotlin/Any?> (io.github.jan.supabase.realtime/RealtimeChannel).io.github.jan.supabase.realtime/presenceDataFlow(): kotlinx.coroutines.flow/Flow<kotlin.collections/List<#A>> // io.github.jan.supabase.realtime/presenceDataFlow|presenceDataFlow@io.github.jan.supabase.realtime.RealtimeChannel(){0§<kotlin.Any?>}[0]
+final suspend inline fun <#A: reified kotlin/Any> (io.github.jan.supabase.realtime/RealtimeChannel).io.github.jan.supabase.realtime/broadcast(kotlin/String, #A) // io.github.jan.supabase.realtime/broadcast|broadcast@io.github.jan.supabase.realtime.RealtimeChannel(kotlin.String;0:0){0§<kotlin.Any>}[0]
+final suspend inline fun <#A: reified kotlin/Any> (io.github.jan.supabase.realtime/RealtimeChannel).io.github.jan.supabase.realtime/broadcast(kotlin/String, kotlin/ByteArray) // io.github.jan.supabase.realtime/broadcast|broadcast@io.github.jan.supabase.realtime.RealtimeChannel(kotlin.String;kotlin.ByteArray){0§<kotlin.Any>}[0]
+final suspend inline fun <#A: reified kotlin/Any> (io.github.jan.supabase.realtime/RealtimeChannel).io.github.jan.supabase.realtime/postgresSingleDataFlow(kotlin/String = ..., kotlin/String, io.github.jan.supabase.realtime/PrimaryKey<#A>, crossinline kotlin/Function1<io.github.jan.supabase.postgrest.query.filter/PostgrestFilterBuilder, kotlin/Unit>): kotlinx.coroutines.flow/Flow<#A> // io.github.jan.supabase.realtime/postgresSingleDataFlow|postgresSingleDataFlow@io.github.jan.supabase.realtime.RealtimeChannel(kotlin.String;kotlin.String;io.github.jan.supabase.realtime.PrimaryKey<0:0>;kotlin.Function1<io.github.jan.supabase.postgrest.query.filter.PostgrestFilterBuilder,kotlin.Unit>){0§<kotlin.Any>}[0]
+final suspend inline fun <#A: reified kotlin/Any> (io.github.jan.supabase.realtime/RealtimeChannel).io.github.jan.supabase.realtime/track(#A) // io.github.jan.supabase.realtime/track|track@io.github.jan.supabase.realtime.RealtimeChannel(0:0){0§<kotlin.Any>}[0]
+final suspend inline fun <#A: reified kotlin/Any?, #B: kotlin/Any?> (io.github.jan.supabase.realtime/RealtimeChannel).io.github.jan.supabase.realtime/postgresSingleDataFlow(kotlin/String = ..., kotlin/String, kotlin.reflect/KProperty1<#A, #B>, crossinline kotlin/Function1<io.github.jan.supabase.postgrest.query.filter/PostgrestFilterBuilder, kotlin/Unit>): kotlinx.coroutines.flow/Flow<#A> // io.github.jan.supabase.realtime/postgresSingleDataFlow|postgresSingleDataFlow@io.github.jan.supabase.realtime.RealtimeChannel(kotlin.String;kotlin.String;kotlin.reflect.KProperty1<0:0,0:1>;kotlin.Function1<io.github.jan.supabase.postgrest.query.filter.PostgrestFilterBuilder,kotlin.Unit>){0§<kotlin.Any?>;1§<kotlin.Any?>}[0]
+final suspend inline fun <#A: reified kotlin/Any?> (io.github.jan.supabase.realtime/RealtimeChannel).io.github.jan.supabase.realtime/httpSend(kotlin/String, #A, noinline kotlin/Function1<io.github.jan.supabase.realtime/HttpSendBuilder, kotlin/Unit> = ...) // io.github.jan.supabase.realtime/httpSend|httpSend@io.github.jan.supabase.realtime.RealtimeChannel(kotlin.String;0:0;kotlin.Function1<io.github.jan.supabase.realtime.HttpSendBuilder,kotlin.Unit>){0§<kotlin.Any?>}[0]
