@@ -19,16 +19,7 @@ import kotlin.test.assertNull
 import kotlin.time.Duration.Companion.milliseconds
 
 /**
- * Regression test for the heartbeat ↔ disconnect() race.
- *
- * `startHeartbeating()` launches a child coroutine per tick that dereferences `websocket`
- * (which throws "Websocket not yet initialized" when `_websocket` is null). `disconnect()`
- * stores null *before* cancelling `heartbeatJob`, so a tick that is already running on another
- * worker thread hits the throwing getter. The scope has no CoroutineExceptionHandler, so the
- * exception escapes to the thread's uncaught handler — on Android that kills the process.
- *
- * Runs on real threads (Dispatchers.Default) because the race needs parallelism; a
- * single-threaded test dispatcher cannot interleave inside `sendHeartbeat()`.
+ * Catches potential regression, where sending heartbeats causes an uncaught exception because it was run after the websocket got cancelled
  */
 @OptIn(SupabaseInternal::class)
 class RealtimeHeartbeatDisconnectRaceTest {
