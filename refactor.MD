@@ -19,6 +19,10 @@ And the package name: **io.github.jan.tennert.supabase**
 
 This should be changed to an official one. There were talks about **io.github.supabase**
 
+### Future proof API methods
+
+Move all optional parameters to DSL builders (which make it easier to add new parameters in the future)
+
 ### Separate ID value classes
 
 Currently, all IDs (UID, bucket id, etc.) are held as a string. This makes them hard to (1) distinguish (2) ensure type safety. 
@@ -118,6 +122,44 @@ supabase.auth.signInWithOAuth(OAuthProviders.GOOGLE) {
 ```kotlin
 supabase.auth.linkIdentity(OAuthProviders.GOOGLE) {
     // ...
+}
+```
+
+**Verify OTP**
+```kotlin
+val result = supabase.auth.verifyOtp(OtpType.Email.EMAIL_CHANGE, Email("myEmail@email.com"), token) {
+    // optional config
+}
+val result = supabase.auth.verifyOtp(OtpType.Email.EMAIL_CHANGE, TokenHash("tokenHash"), token) {
+    // optional config
+}
+supabase.auth.verifyOtp(OtpType.Phone.PHONE_CHANGE, Phone("+49 12345678"), token) {
+    // optional config
+}
+```
+
+**Reset password**
+```kotlin
+supabase.auth.resetPasswordForEmail("myEmail@example.com") {
+    // optional config
+}
+```
+
+**Sign in anonymously**
+```kotlin
+supabase.auth.signInAnonymously { 
+    data(myData)
+    // ..
+}
+```
+
+**Resend email/phone confirmation**
+```kotlin
+supabase.auth.resend(OtpType.Email.EMAIL_CHANGE, Email("myEmail@example.com")) {
+    // ..
+}
+supabase.auth.resend(OtpType.Phone.PHONE_CHANGE, Phone("+49 123456789")) {
+    // ..
 }
 ```
 
