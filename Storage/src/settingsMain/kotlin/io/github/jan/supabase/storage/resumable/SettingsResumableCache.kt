@@ -32,8 +32,8 @@ class SettingsResumableCache(settings: Settings = Settings()) : ResumableCache {
     }
 
     override suspend fun clear() {
-        settings.keys().forEach {
-            if(it.split(Fingerprint.FINGERPRINT_SEPARATOR).size == Fingerprint.FINGERPRINT_PARTS) remove(Fingerprint(it) ?: error("Invalid fingerprint $it"))
+        settings.keys().forEach { key ->
+            Fingerprint(key)?.let { remove(it) }
         }
     }
 
