@@ -154,7 +154,7 @@ internal class ResumableUploadImpl(
 
     @OptIn(SupabaseInternal::class)
     private suspend fun uploadChunk(): Int {
-        val limit = min(chunkSize, size.toInt() - offset)
+        val limit = min(chunkSize, size - offset)
         val buffer = ByteArray(limit.toInt())
         dataStream.readFully(buffer, 0, limit.toInt())
         //dataStream.readFully(buffer, 0, limit.toInt())
@@ -174,14 +174,12 @@ internal class ResumableUploadImpl(
         }
         when(uploadResponse.status) {
             HttpStatusCode.NoContent -> {
+                logger.d { "Uploaded chunk" }
                 serverOffset = uploadResponse.headers["Upload-Offset"]?.toLong() ?: error("No upload offset found")
             }
             HttpStatusCode.Conflict -> {
                 logger.w { "Upload conflict, skipping chunk" }
                 serverOffset = offset + limit
-            }
-            HttpStatusCode.NoContent -> {
-                logger.d { "Uploaded chunk" }
             }
             else -> error("Upload failed with status ${uploadResponse.status}. ${uploadResponse.bodyAsText()}")
         }
