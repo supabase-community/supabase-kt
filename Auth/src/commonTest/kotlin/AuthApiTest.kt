@@ -11,6 +11,7 @@ import io.github.jan.supabase.auth.PKCEConstants
 import io.github.jan.supabase.auth.SSODomain
 import io.github.jan.supabase.auth.SSOProvider
 import io.github.jan.supabase.auth.SignOutScope
+import io.github.jan.supabase.auth.TokenHash
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.auth.minimalConfig
 import io.github.jan.supabase.auth.providers.Email
@@ -599,7 +600,10 @@ class AuthRequestTest {
                     sampleUserObject(email = expectedEmail)
                 )
             }.awaitInit()
-            client.auth.resendEmail(expectedType, expectedEmail, expectedCaptchaToken, expectedUrl)
+            client.auth.resend(expectedType, Email(expectedEmail)) {
+                captchaToken = expectedCaptchaToken
+                redirectUrl = expectedUrl
+            }
         }
     }
 
@@ -622,7 +626,9 @@ class AuthRequestTest {
                     sampleUserObject(email = expectedPhone)
                 )
             }.awaitInit()
-            client.auth.resendPhone(expectedType, expectedPhone, expectedCaptchaToken)
+            client.auth.resend(expectedType, Phone(expectedPhone)) {
+                captchaToken = expectedCaptchaToken
+            }
         }
     }
 
@@ -651,7 +657,10 @@ class AuthRequestTest {
                     sampleUserObject(email = expectedEmail)
                 )
             }.awaitInit()
-            client.auth.resetPasswordForEmail(expectedEmail, expectedRedirectUrl, expectedCaptchaToken)
+            client.auth.resetPasswordForEmail(expectedEmail) {
+                captchaToken = expectedCaptchaToken
+                redirectUrl = expectedRedirectUrl
+            }
         }
     }
 
@@ -690,7 +699,9 @@ class AuthRequestTest {
                     sampleUserSession()
                 )
             }.awaitInit()
-            assertIs<OtpVerifyResult.Authenticated>(client.auth.verifyEmailOtp(expectedType, expectedEmail, expectedToken, expectedCaptchaToken))
+            assertIs<OtpVerifyResult.Authenticated>(client.auth.verifyOtp(expectedType, Email(expectedEmail), expectedToken) {
+                captchaToken = expectedCaptchaToken
+            })
             assertEquals(SessionFlag.SIGN_IN, client.auth.sessionFlag())
         }
     }
@@ -720,7 +731,9 @@ class AuthRequestTest {
                     }
                 )
             }.awaitInit()
-            assertIs<OtpVerifyResult.VerifiedNoSession>(client.auth.verifyEmailOtp(expectedType, expectedEmail, expectedToken, expectedCaptchaToken))
+            assertIs<OtpVerifyResult.VerifiedNoSession>(client.auth.verifyOtp(expectedType, Email(expectedEmail), expectedToken) {
+                captchaToken = expectedCaptchaToken
+            })
         }
     }
 
@@ -745,7 +758,9 @@ class AuthRequestTest {
                     sampleUserSession()
                 )
             }.awaitInit()
-            val result = client.auth.verifyEmailOtp(expectedType, tokenHash = expectedTokenHash, captchaToken = expectedCaptchaToken)
+            val result = client.auth.verifyOtp(expectedType, TokenHash(expectedTokenHash)) {
+                captchaToken = expectedCaptchaToken
+            }
             assertIs<OtpVerifyResult.Authenticated>(result)
             assertEquals(SessionFlag.SIGN_IN, client.auth.sessionFlag())
         }
@@ -774,7 +789,9 @@ class AuthRequestTest {
                     }
                 )
             }.awaitInit()
-            assertIs<OtpVerifyResult.VerifiedNoSession>(client.auth.verifyEmailOtp(expectedType, tokenHash = expectedTokenHash, captchaToken = expectedCaptchaToken))
+            assertIs<OtpVerifyResult.VerifiedNoSession>(client.auth.verifyOtp(expectedType, TokenHash(expectedTokenHash)) {
+                captchaToken = expectedCaptchaToken
+            })
         }
     }
 
@@ -801,7 +818,9 @@ class AuthRequestTest {
                     sampleUserSession()
                 )
             }.awaitInit()
-            client.auth.verifyPhoneOtp(expectedType, expectedPhone, expectedToken, expectedCaptchaToken)
+            client.auth.verifyOtp(expectedType, Phone(expectedPhone), expectedToken) {
+                captchaToken = expectedCaptchaToken
+            }
             assertIs<SessionStatus.Authenticated>(client.auth.sessionStatus.value)
             assertEquals(SessionFlag.SIGN_IN, client.auth.sessionFlag())
         }

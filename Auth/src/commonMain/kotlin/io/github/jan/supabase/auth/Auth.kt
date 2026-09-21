@@ -6,8 +6,8 @@ import io.github.jan.supabase.annotations.SupabaseInternal
 import io.github.jan.supabase.auth.admin.AdminApi
 import io.github.jan.supabase.auth.api.ResolveAccessToken
 import io.github.jan.supabase.auth.event.AuthEvent
+import io.github.jan.supabase.auth.exception.AuthInvalidJwtException
 import io.github.jan.supabase.auth.exception.AuthRestException
-import io.github.jan.supabase.auth.exception.InvalidJwtException
 import io.github.jan.supabase.auth.exception.TokenExpiredException
 import io.github.jan.supabase.auth.jwt.ClaimsRequestBuilder
 import io.github.jan.supabase.auth.jwt.ClaimsResponse
@@ -21,7 +21,7 @@ import io.github.jan.supabase.auth.status.SessionFlag
 import io.github.jan.supabase.auth.status.SessionStatus
 import io.github.jan.supabase.auth.user.UserInfo
 import io.github.jan.supabase.auth.user.UserSession
-import io.github.jan.supabase.auth.user.UserUpdateBuilder
+import io.github.jan.supabase.auth.user.UserUpdateConfig
 import io.github.jan.supabase.exceptions.HttpRequestException
 import io.github.jan.supabase.exceptions.RestException
 import io.github.jan.supabase.network.SupabaseApi
@@ -32,7 +32,6 @@ import io.ktor.client.plugins.HttpRequestTimeoutException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.serialization.json.JsonObject
 
 /**
  * Plugin to interact with the Supabase Auth API
@@ -202,13 +201,12 @@ interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
      *
      * If you want to upgrade this anonymous user to a real user, use [linkIdentity] to link an OAuth identity or [updateUser] to add an email or phone.
      *
-     * @param data Extra data for the user
-     * @param captchaToken The captcha token to use
+     * @param config Extra configuration
      * @throws RestException or one of its subclasses if receiving an error response. If the error response contains a error code, an [AuthRestException] will be thrown which can be used to easier identify the problem.
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
-    suspend fun signInAnonymously(data: JsonObject? = null, captchaToken: String? = null): UserSession
+    suspend fun signInAnonymously(config: AnonymousSignInConfig.() -> Unit = {}): UserSession
 
     /**
      * Links an identity to the current user using an ID token.
@@ -268,7 +266,7 @@ interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
     suspend fun updateUser(
         updateCurrentUser: Boolean = true,
         redirectUrl: String? = defaultRedirectUrl(),
-        config: UserUpdateBuilder.() -> Unit
+        config: UserUpdateConfig.() -> Unit
     ): UserInfo
 
     /**
@@ -281,7 +279,7 @@ interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
-    suspend fun resendEmail(type: OtpType.Email, email: String, captchaToken: String? = null, redirectUrl: String? = defaultRedirectUrl())
+    suspend fun resend(type: OtpType.Email, email: Email, config: ResendConfig.Email.() -> Unit = {})
 
     /**
      * Resends an existing SMS OTP or phone change OTP.
@@ -292,17 +290,17 @@ interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
-    suspend fun resendPhone(type: OtpType.Phone, phone: String, captchaToken: String? = null)
+    suspend fun resend(type: OtpType.Phone, phone: Phone, config: ResendConfig.Phone.() -> Unit = {})
 
     /**
      * Sends a password reset email to the user with the specified [email]
      * @param email The email to send the password reset email to
-     * @param redirectUrl The redirect url to use. If you don't specify this, the platform specific will be used, like deeplinks on android.
+     * @param config The builder to configure the reset password request
      * @throws RestException or one of its subclasses if receiving an error response. If the error response contains a error code, an [AuthRestException] will be thrown which can be used to easier identify the problem.
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
-    suspend fun resetPasswordForEmail(email: String, redirectUrl: String? = defaultRedirectUrl(), captchaToken: String? = null)
+    suspend fun resetPasswordForEmail(email: String, config: ResetPasswordConfig.() -> Unit = {})
 
     /**
      * Sends a nonce to the user's email (preferred) or phone
@@ -317,6 +315,7 @@ interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
      * @param type The type of the verification
      * @param email The email to verify
      * @param token The token used to verify
+     * @param config The builder to configure the verification request
      * @throws RestException or one of its subclasses if receiving an error response. If the error response contains a error code, an [AuthRestException] will be thrown which can be used to easier identify the problem.
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
@@ -326,12 +325,13 @@ interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
      * @see OtpVerifyResult.VerifiedNoSession
      * @see OtpVerifyResult.Authenticated
      */
-    suspend fun verifyEmailOtp(type: OtpType.Email, email: String, token: String, captchaToken: String? = null): OtpVerifyResult
+    suspend fun verifyOtp(type: OtpType.Email, email: Email, token: String, config: VerifyOtpConfig.() -> Unit = {}): OtpVerifyResult
 
     /**
      * Verifies an email otp token hash received via email
      * @param type The type of the verification
      * @param tokenHash The token hash used to verify
+     * @param config The builder to configure the verification request
      * @throws RestException or one of its subclasses if receiving an error response. If the error response contains a error code, an [AuthRestException] will be thrown which can be used to easier identify the problem.
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
@@ -341,35 +341,27 @@ interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
      * @see OtpVerifyResult.VerifiedNoSession
      * @see OtpVerifyResult.Authenticated
      */
-    suspend fun verifyEmailOtp(type: OtpType.Email, tokenHash: String, captchaToken: String? = null): OtpVerifyResult
+    suspend fun verifyOtp(type: OtpType.Email, tokenHash: TokenHash, config: VerifyOtpConfig.() -> Unit = {}): OtpVerifyResult
 
     /**
      * Verifies a phone/sms otp
      * @param type The type of the verification
      * @param token The otp to verify
      * @param phone The phone number the token was sent to
+     * @param config The builder to configure the verification request
      * @throws RestException or one of its subclasses if receiving an error response. If the error response contains a error code, an [AuthRestException] will be thrown which can be used to easier identify the problem.
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
-    suspend fun verifyPhoneOtp(type: OtpType.Phone, phone: String, token: String, captchaToken: String? = null)
+    suspend fun verifyOtp(type: OtpType.Phone, phone: Phone, token: String, config: VerifyOtpConfig.() -> Unit = {})
 
     /**
-     * Retrieves the user attached to the specified [jwt]
+     * Retrieves the user attached to the specified [jwt]. If [jwt] is null, the access token from the [currentSessionOrNull] will be used.
      * @throws RestException or one of its subclasses if receiving an error response. If the error response contains a error code, an [AuthRestException] will be thrown which can be used to easier identify the problem.
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
-    suspend fun getUser(jwt: String): UserInfo
-
-    /**
-     * Retrieves the current user with the current sessioretrieveUsn
-     * @param updateSession Whether to update [sessionStatus] with the updated user, if [sessionStatus] is [SessionStatus.Authenticated]
-     * @throws RestException or one of its subclasses if receiving an error response. If the error response contains a error code, an [AuthRestException] will be thrown which can be used to easier identify the problem.
-     * @throws HttpRequestTimeoutException if the request timed out
-     * @throws HttpRequestException on network related issues
-     */
-    suspend fun retrieveUserForCurrentSession(updateSession: Boolean = false): UserInfo
+    suspend fun getUser(jwt: String? = null): UserInfo
 
     /**
      * Signs out the current user, which means [sessionStatus] will be [SessionStatus.NotAuthenticated] and the access token will be revoked
@@ -438,12 +430,13 @@ interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
     /**
      * Exchanges a code for a session. Used when using the [FlowType.PKCE] flow
      * @param code The code to exchange
+     * @param builder The builder to configure the request
+     * @see ExchangeCodeConfig.flowId
      * @throws RestException or one of its subclasses if receiving an error response. If the error response contains a error code, an [AuthRestException] will be thrown which can be used to easier identify the problem.
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
-    // TODO: add builder with flow id
-    suspend fun exchangeCodeForSession(code: String): UserSession
+    suspend fun exchangeCodeForSession(code: String, builder: ExchangeCodeConfig.() -> Unit = {}): UserSession
 
     /**
      * Starts auto refreshing the current session
@@ -465,7 +458,7 @@ interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
      * @param options Various additional options that allow you to customize the
      *                behavior of this method.
      * @throws TokenExpiredException when trying to get the claims of an expired [jwt] and [ClaimsRequestBuilder.allowExpired] is set to false
-     * @throws InvalidJwtException if the [jwt] is invalid
+     * @throws AuthInvalidJwtException if the [jwt] is invalid
      * @throws AuthRestException on any REST-related error responses during the fetching of the JWKs or retrieving of the current user data
      */
     suspend fun getClaims(

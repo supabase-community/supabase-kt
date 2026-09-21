@@ -39,7 +39,7 @@ internal class AuthApiImpl(
     }
 
     override suspend fun verifyOtp(email: String, otp: String) {
-        auth.verifyEmailOtp(OtpType.Email.EMAIL, email, otp)
+        auth.verifyOtp(OtpType.Email.EMAIL, Email(email), otp)
     }
 
     override suspend fun signInWithGoogle() {
