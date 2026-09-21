@@ -13,10 +13,11 @@ import io.github.jan.supabase.auth.admin.AdminApi
 import io.github.jan.supabase.auth.admin.AdminApiImpl
 import io.github.jan.supabase.auth.api.authenticatedSupabaseApi
 import io.github.jan.supabase.auth.event.AuthEvent
+import io.github.jan.supabase.auth.exception.AuthInvalidJwtException
+import io.github.jan.supabase.auth.exception.AuthPKCECodeVerifierMissing
 import io.github.jan.supabase.auth.exception.AuthRestException
 import io.github.jan.supabase.auth.exception.AuthSessionMissingException
 import io.github.jan.supabase.auth.exception.AuthWeakPasswordException
-import io.github.jan.supabase.auth.exception.InvalidJwtException
 import io.github.jan.supabase.auth.exception.TokenExpiredException
 import io.github.jan.supabase.auth.jwt.ClaimsRequestBuilder
 import io.github.jan.supabase.auth.jwt.ClaimsResponse
@@ -41,7 +42,7 @@ import io.github.jan.supabase.auth.status.SessionFlag
 import io.github.jan.supabase.auth.status.SessionStatus
 import io.github.jan.supabase.auth.user.UserInfo
 import io.github.jan.supabase.auth.user.UserSession
-import io.github.jan.supabase.auth.user.UserUpdateBuilder
+import io.github.jan.supabase.auth.user.UserUpdateConfig
 import io.github.jan.supabase.bodyOrNull
 import io.github.jan.supabase.exceptions.BadRequestRestException
 import io.github.jan.supabase.exceptions.RestException
@@ -291,10 +292,11 @@ internal class AuthImpl(
         return signIn(GrantType.ID_TOKEN, null, config)
     }
 
-    override suspend fun signInAnonymously(data: JsonObject?, captchaToken: String?): UserSession {
+    override suspend fun signInAnonymously(config: AnonymousSignInConfig.() -> Unit): UserSession {
+        val builder = AnonymousSignInConfig().apply(config)
         val response = publicApi.postJson("signup", buildJsonObject {
-            data?.let { put("data", it) }
-            captchaToken?.let(::putCaptchaToken)
+            builder.data?.let { put("data", it) }
+            builder.captchaToken?.let(::putCaptchaToken)
         })
         val session = response.safeBody<UserSession>()
         importSession(session, flag = SessionFlag.SIGN_IN)
@@ -326,9 +328,9 @@ internal class AuthImpl(
     override suspend fun updateUser(
         updateCurrentUser: Boolean,
         redirectUrl: String?,
-        config: UserUpdateBuilder.() -> Unit
+        config: UserUpdateConfig.() -> Unit
     ): UserInfo {
-        val updateBuilder = UserUpdateBuilder(serializer = serializer).apply(config)
+        val updateBuilder = UserUpdateConfig(serializer = serializer).apply(config)
         val (codeChallenge, flowId) = preparePKCEIfEnabled()
         val body = buildJsonObject {
             putJsonObject(supabaseJson.encodeToJsonElement(updateBuilder).jsonObject)
@@ -360,38 +362,41 @@ internal class AuthImpl(
         }
     }
 
-    // TODO combine via Email/Password and custom DSLs (for redirect URL & PKCE)
-    override suspend fun resendEmail(type: OtpType.Email, email: String, captchaToken: String?,  redirectUrl: String?) =
-        resend(type = type.type, redirectUrl = redirectUrl) {
-            put("email", email)
-            captchaToken?.let(::putCaptchaToken)
+    override suspend fun resend(type: OtpType.Email, email: Email, config: ResendConfig.Email.() -> Unit) {
+        val builder = ResendConfig.Email().apply(config)
+        val redirectUrl = builder.redirectUrl ?: defaultRedirectUrl()
+        val (codeChallenge, flowId) = preparePKCEIfEnabled()
+        resend(type = type.type, redirectUrl = redirectUrl?.let { appendFlowIdIfEnabled(it, flowId) }) {
+            put("email", email.address)
+            builder.captchaToken?.let(::putCaptchaToken)
+            codeChallenge?.let { putCodeChallenge(it) }
         }
+    }
 
-    override suspend fun resendPhone(
-        type: OtpType.Phone,
-        phone: String,
-        captchaToken: String?
-    ) = resend(type.type) {
-        put("phone", phone)
-        captchaToken?.let(::putCaptchaToken)
+    override suspend fun resend(type: OtpType.Phone, phone: Phone, config: ResendConfig.Phone.() -> Unit) {
+        val builder = ResendConfig.Phone().apply(config)
+        resend(type = type.type) {
+            put("phone", phone.number)
+            builder.captchaToken?.let(::putCaptchaToken)
+        }
     }
 
     override suspend fun resetPasswordForEmail(
         email: String,
-        redirectUrl: String?,
-        captchaToken: String?
+        config: ResetPasswordConfig.() -> Unit
     ) {
         require(email.isNotBlank()) {
             "Email must not be blank"
         }
         val (codeChallenge, flowId) = preparePKCEIfEnabled()
+        val builder = ResetPasswordConfig().apply(config)
         val body = buildJsonObject {
             put("email", email)
-            captchaToken?.let(::putCaptchaToken)
+            builder.captchaToken?.let(::putCaptchaToken)
             codeChallenge?.let(::putCodeChallenge)
         }.toString()
         publicApi.postJson("recover", body) {
-            redirectUrl?.let { url.parameters.append("redirect_to", appendFlowIdIfEnabled(it, flowId)) }
+            builder.redirectUrl?.let { redirectTo(appendFlowIdIfEnabled(it, flowId)) }
         }
     }
 
@@ -423,16 +428,20 @@ internal class AuthImpl(
     private suspend fun verify(
         type: String,
         token: String?,
-        captchaToken: String?,
+        builder: VerifyOtpConfig.() -> Unit,
         additionalData: JsonObjectBuilder.() -> Unit
     ): OtpVerifyResult {
+        val builder = VerifyOtpConfig().apply(builder)
+        val redirectUrl = builder.redirectUrl ?: defaultRedirectUrl()
         val body = buildJsonObject {
             put("type", type)
             token?.let { put("token", it) }
-            captchaToken?.let(::putCaptchaToken)
+            builder.captchaToken?.let(::putCaptchaToken)
             additionalData()
         }
-        val response = publicApi.postJson("verify", body)
+        val response = publicApi.postJson("verify", body) {
+            redirectUrl?.let { redirectTo(it) }
+        }
         val session = supabaseClient.bodyOrNull<UserSession>(response)
         if(session == null) {
             logger.d { "Received `verifyOtp` response without session: ${response.bodyAsText()}. This may occur if changing the email with 'Secure email change' enabled" }
@@ -442,31 +451,31 @@ internal class AuthImpl(
         return OtpVerifyResult.Authenticated(session)
     }
 
-    override suspend fun verifyEmailOtp(
+    override suspend fun verifyOtp(
         type: OtpType.Email,
-        email: String,
+        email: Email,
         token: String,
-        captchaToken: String?
-    ) = verify(type.type, token, captchaToken) {
-        put("email", email)
+        config: VerifyOtpConfig.() -> Unit
+    ): OtpVerifyResult = verify(type.type, token, config) {
+        put("email", email.address)
     }
 
-    override suspend fun verifyEmailOtp(
+    override suspend fun verifyOtp(
         type: OtpType.Email,
-        tokenHash: String,
-        captchaToken: String?
-    ) = verify(type.type, null, captchaToken) {
-        put("token_hash", tokenHash)
+        tokenHash: TokenHash,
+        config: VerifyOtpConfig.() -> Unit
+    ): OtpVerifyResult = verify(type.type, null, config) {
+        put("token_hash", tokenHash.tokenHash)
     }
 
-    override suspend fun verifyPhoneOtp(
+    override suspend fun verifyOtp(
         type: OtpType.Phone,
-        phone: String,
+        phone: Phone,
         token: String,
-        captchaToken: String?
-    )  {
-        verify(type.type, token, captchaToken) {
-            put("phone", phone)
+        config: VerifyOtpConfig.() -> Unit
+    ) {
+        verify(type.type, token, config) {
+            put("phone", phone.number)
         }
     }
 
@@ -508,7 +517,7 @@ internal class AuthImpl(
                 }
                 else -> error("Invalid alg claim $alg")
             }
-            if(!verified) throw InvalidJwtException()
+            if(!verified) throw AuthInvalidJwtException()
             return claims
         }
     }
@@ -532,17 +541,17 @@ internal class AuthImpl(
         return key
     }
 
-    override suspend fun getUser(jwt: String): UserInfo {
+    override suspend fun getUser(jwt: String?): UserInfo {
+        val token = jwt ?: currentAccessTokenOrNull()
+        requireNotNull(token) {
+            "jwt parameter and current session token are null"
+        }
         val response = userApi.get("user") {
             headers["Authorization"] = "Bearer $jwt"
         }
         val body = response.bodyAsText()
-        return supabaseJson.decodeFromString(body)
-    }
-
-    override suspend fun retrieveUserForCurrentSession(updateSession: Boolean): UserInfo {
-        val user = getUser(currentAccessTokenOrNull() ?: error("No session found"))
-        if (updateSession) {
+        val user: UserInfo = supabaseJson.decodeFromString(body)
+        if(jwt == null) {
             val session = currentSessionOrNull() ?: error("No session found")
             val newStatus = SessionStatus.Authenticated(session.copy(user = user), SessionFlag.USER_CHANGED)
             setSessionStatus(newStatus)
@@ -551,17 +560,14 @@ internal class AuthImpl(
         return user
     }
 
-    override suspend fun exchangeCodeForSession(code: String): UserSession {
-        // TODO fix concurrent flow stuff
-      //  val codeVerifier = codeVerifierCache.loadCodeVerifier()
-      /*  require(codeVerifier != null) {
-            "No code verifier stored. Make sure to use `getOAuthUrl` for the OAuth Url to prepare the PKCE flow."
-        }*/
+    override suspend fun exchangeCodeForSession(code: String, builder: ExchangeCodeConfig.() -> Unit): UserSession {
+        val builder = ExchangeCodeConfig().apply(builder)
+        val codeVerifier = codeVerifierCache.retrievePKCEVerifier(builder.flowId) ?: throw AuthPKCECodeVerifierMissing()
         val session = unauthenticatedApi.postJson("token?grant_type=pkce", buildJsonObject {
             put("auth_code", code)
-      //      put("code_verifier", codeVerifier)
+            put("code_verifier", codeVerifier)
         }).safeBody<UserSession>()
-      //  codeVerifierCache.deleteCodeVerifier()
+        codeVerifierCache.removePKCEVerifier(builder.flowId)
         importIfEnabled(session, flag = SessionFlag.EXTERNAL)
         return session
     }

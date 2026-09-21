@@ -23,7 +23,7 @@ import kotlinx.serialization.json.jsonObject
  * This is only ever present when the user is resetting their password and GOTRUE_SECURITY_UPDATE_PASSWORD_REQUIRE_CURRENT_PASSWORD is true.
  */
 @Serializable
-data class UserUpdateBuilder(
+data class UserUpdateConfig(
     var email: String? = null,
     var password: String? = null,
     @SerialName("phone")
