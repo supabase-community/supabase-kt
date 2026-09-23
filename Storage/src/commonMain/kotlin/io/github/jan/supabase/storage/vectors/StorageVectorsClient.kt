@@ -1,12 +1,15 @@
 package io.github.jan.supabase.storage.vectors
 
 import io.github.jan.supabase.auth.api.AuthenticatedSupabaseApi
+import io.github.jan.supabase.exceptions.HttpRequestException
 import io.github.jan.supabase.safeBody
+import io.github.jan.supabase.storage.StorageRestException
 import io.github.jan.supabase.storage.vectors.bucket.ListVectorBucketsResponse
 import io.github.jan.supabase.storage.vectors.bucket.VectorBucket
 import io.github.jan.supabase.storage.vectors.bucket.VectorBucketFilter
 import io.github.jan.supabase.storage.vectors.index.VectorIndexApi
 import io.github.jan.supabase.storage.vectors.index.VectorIndexApiImpl
+import io.ktor.client.plugins.HttpRequestTimeoutException
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.buildJsonObject
@@ -20,23 +23,35 @@ interface StorageVectorsClient {
 
     /**
      * Creates a new vector bucket with the given [name]
+     * @throws StorageRestException containing an error code, if receiving an error response
+     * @throws HttpRequestTimeoutException if the request timed out
+     * @throws HttpRequestException on network related issues
      */
     suspend fun createBucket(name: String)
 
     /**
      * Retrieves metadata for a specific vector bucket
      * @param name The unique bucket name
+     * @throws StorageRestException containing an error code, if receiving an error response
+     * @throws HttpRequestTimeoutException if the request timed out
+     * @throws HttpRequestException on network related issues
      */
     suspend fun getBucket(name: String): VectorBucket
 
     /**
      * Lists vector buckets with optional filtering and pagination
      * @param filter An optional filter
+     * @throws StorageRestException containing an error code, if receiving an error response
+     * @throws HttpRequestTimeoutException if the request timed out
+     * @throws HttpRequestException on network related issues
      */
     suspend fun listBuckets(filter: VectorBucketFilter.() -> Unit = {}): ListVectorBucketsResponse
 
     /**
      * Deletes a vector bucket (must be empty first)
+     * @throws StorageRestException containing an error code, if receiving an error response
+     * @throws HttpRequestTimeoutException if the request timed out
+     * @throws HttpRequestException on network related issues
      */
     suspend fun deleteBucket(name: String)
 

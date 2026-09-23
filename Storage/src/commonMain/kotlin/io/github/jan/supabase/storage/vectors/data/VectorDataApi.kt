@@ -1,9 +1,12 @@
 package io.github.jan.supabase.storage.vectors.data
 
 import io.github.jan.supabase.auth.api.AuthenticatedSupabaseApi
+import io.github.jan.supabase.exceptions.HttpRequestException
 import io.github.jan.supabase.safeBody
+import io.github.jan.supabase.storage.StorageRestException
 import io.github.jan.supabase.storage.vectors.data.VectorDataApi.Companion.SEGMENT_COUNT_RANGE
 import io.github.jan.supabase.storage.vectors.data.VectorDataApi.Companion.VECTOR_RANGE
+import io.ktor.client.plugins.HttpRequestTimeoutException
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.buildJsonObject
@@ -18,26 +21,41 @@ interface VectorDataApi {
 
     /**
      * Inserts or updates [vectors] in batch (1-500 per request)
+     * @throws StorageRestException containing an error code, if receiving an error response
+     * @throws HttpRequestTimeoutException if the request timed out
+     * @throws HttpRequestException on network related issues
      */
     suspend fun putVectors(vectors: List<VectorObject>)
 
     /**
      * Retrieves vectors by their keys in batch using the given [options]
+     * @throws StorageRestException containing an error code, if receiving an error response
+     * @throws HttpRequestTimeoutException if the request timed out
+     * @throws HttpRequestException on network related issues
      */
     suspend fun getVectors(options: GetVectorOptions.() -> Unit): List<VectorMatch>
 
     /**
      * Lists vectors in an index with pagination using the given [options]
+     * @throws StorageRestException containing an error code, if receiving an error response
+     * @throws HttpRequestTimeoutException if the request timed out
+     * @throws HttpRequestException on network related issues
      */
     suspend fun listVectors(options: ListVectorsOptions.() -> Unit = {}): ListVectorsResponse
 
     /**
      * Queries for similar vectors using approximate nearest neighbor search using the given [options]
+     * @throws StorageRestException containing an error code, if receiving an error response
+     * @throws HttpRequestTimeoutException if the request timed out
+     * @throws HttpRequestException on network related issues
      */
     suspend fun queryVectors(options: QueryVectorsOptions.() -> Unit): QueryVectorsResponse
 
     /**
      * Deletes vectors by their [keys] in batch (1-500 per request)
+     * @throws StorageRestException containing an error code, if receiving an error response
+     * @throws HttpRequestTimeoutException if the request timed out
+     * @throws HttpRequestException on network related issues
      */
     suspend fun deleteVectors(keys: List<String>)
 

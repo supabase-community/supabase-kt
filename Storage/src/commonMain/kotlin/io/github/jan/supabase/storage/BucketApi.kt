@@ -46,7 +46,7 @@ interface BucketApi {
      * @param options Additional options for the upload
      * @return the key to the uploaded file
      * @throws IllegalArgumentException if data to upload is empty
-     * @throws RestException or one of its subclasses if receiving an error response
+     * @throws StorageRestException containing an error code, if receiving an error response
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
@@ -61,7 +61,7 @@ interface BucketApi {
      * @param data The data to upload
      * @param options Additional options for the upload
      * @return the key to the uploaded file
-     * @throws RestException or one of its subclasses if receiving an error response
+     * @throws StorageRestException containing an error code, if receiving an error response
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
@@ -75,6 +75,9 @@ interface BucketApi {
      * @param options Additional options for the upload
      * @return the key of the uploaded file
      * @throws IllegalArgumentException if data to upload is empty
+     * @throws StorageRestException containing an error code, if receiving an error response
+     * @throws HttpRequestTimeoutException if the request timed out
+     * @throws HttpRequestException on network related issues
      */
     suspend fun uploadToSignedUrl(
         path: String,
@@ -93,7 +96,7 @@ interface BucketApi {
      * @param data The data to upload
      * @param options Additional options for the upload
      * @return the key of the uploaded file
-     * @throws RestException or one of its subclasses if receiving an error response
+     * @throws StorageRestException containing an error code, if receiving an error response
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      * @throws HttpRequestException on network related issues
@@ -107,7 +110,7 @@ interface BucketApi {
      * @param options Additional options for the upload
      * @return the key to the updated file
      * @throws IllegalArgumentException if data to upload is empty
-     * @throws RestException or one of its subclasses if receiving an error response
+     * @throws StorageRestException containing an error code, if receiving an error response
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
@@ -122,7 +125,7 @@ interface BucketApi {
      * @param data The new data
      * @param options Additional options for the upload
      * @return the key to the updated file
-     * @throws RestException or one of its subclasses if receiving an error response
+     * @throws StorageRestException containing an error code, if receiving an error response
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
@@ -131,7 +134,7 @@ interface BucketApi {
     /**
      * Deletes all files in [bucketId] with in [paths]
      * @param paths The paths to delete
-     * @throws RestException or one of its subclasses if receiving an error response
+     * @throws StorageRestException containing an error code, if receiving an error response
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
@@ -140,7 +143,7 @@ interface BucketApi {
     /**
      * Deletes all files in [bucketId] with in [paths]
      * @param paths The paths to delete
-     * @throws RestException or one of its subclasses if receiving an error response
+     * @throws StorageRestException containing an error code, if receiving an error response
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
@@ -151,7 +154,7 @@ interface BucketApi {
      * @param from The path to move from
      * @param to The path to move to
      * @param destinationBucket The bucket to move the file to. If null, the file will be moved within the same bucket
-     * @throws RestException or one of its subclasses if receiving an error response
+     * @throws StorageRestException containing an error code, if receiving an error response
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
@@ -162,7 +165,7 @@ interface BucketApi {
      * @param from The path to copy from
      * @param to The path to copy to
      * @param destinationBucket The destination bucket to copy to. If null, the current bucket is used
-     * @throws RestException or one of its subclasses if receiving an error response
+     * @throws StorageRestException containing an error code, if receiving an error response
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
@@ -183,7 +186,7 @@ interface BucketApi {
      * @param builder Optional modifier to add a [transformation][SignedUrlBuilder.transformation],
      * [force-download][SignedUrlBuilder.download] or [cacheNonce][BucketUrlBuilder.cacheNonce] to the created url
      * @return The url to download the file
-     * @throws RestException or one of its subclasses if receiving an error response
+     * @throws StorageRestException containing an error code, if receiving an error response
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
@@ -195,7 +198,7 @@ interface BucketApi {
      * @param paths The paths to create urls for
      * @param builder Optional modifier to add a [force-download][SignedUrlsBuilder.download] or [cacheNonce][BucketUrlBuilder.cacheNonce] to the created urls
      * @return A list of [SignedUrl]s
-     * @throws RestException or one of its subclasses if receiving an error response
+     * @throws StorageRestException containing an error code, if receiving an error response
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
@@ -207,7 +210,7 @@ interface BucketApi {
      * @param paths The paths to create urls for
      * @param builder Optional modifier to add a [force-download][SignedUrlsBuilder.download] or [cacheNonce][BucketUrlBuilder.cacheNonce] to the created urls
      * @return A list of [SignedUrl]s
-     * @throws RestException or one of its subclasses if receiving an error response
+     * @throws StorageRestException containing an error code, if receiving an error response
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
@@ -218,7 +221,7 @@ interface BucketApi {
      * @param path The path to download
      * @param options Additional options for the download
      * @return The file as a byte array
-     * @throws RestException or one of its subclasses if receiving an error response
+     * @throws StorageRestException containing an error code, if receiving an error response
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
@@ -229,7 +232,7 @@ interface BucketApi {
      * @param path The path to download
      * @param channel The channel to write the data to
      * @param options Additional options for the download
-     * @throws RestException or one of its subclasses if receiving an error response
+     * @throws StorageRestException containing an error code, if receiving an error response
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
@@ -240,7 +243,7 @@ interface BucketApi {
      * @param path The path to download
      * @param options Additional options for the download
      * @return The file as a byte array
-     * @throws RestException or one of its subclasses if receiving an error response
+     * @throws StorageRestException containing an error code, if receiving an error response
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
@@ -251,7 +254,7 @@ interface BucketApi {
      * @param path The path to download
      * @param channel The channel to write the data to
      * @param options Additional options for the download
-     * @throws RestException or one of its subclasses if receiving an error response
+     * @throws StorageRestException containing an error code, if receiving an error response
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
@@ -260,7 +263,7 @@ interface BucketApi {
 
     /**
      * Searches for files with the given [prefix] and [filter]
-     * @throws RestException or one of its subclasses if receiving an error response
+     * @throws StorageRestException containing an error code, if receiving an error response
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
@@ -273,7 +276,7 @@ interface BucketApi {
      * Returns information about the file under [path]
      * @param path The path to get information about
      * @return The file object
-     * @throws RestException or one of its subclasses if receiving an error response
+     * @throws StorageRestException containing an error code, if receiving an error response
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
@@ -282,7 +285,7 @@ interface BucketApi {
     /**
      * Checks if a file exists under [path]
      * @return true if the file exists, false otherwise
-     * @throws RestException or one of its subclasses if receiving an error response
+     * @throws StorageRestException containing an error code, if receiving an error response
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
@@ -290,7 +293,7 @@ interface BucketApi {
 
     /**
      * Changes the bucket's public status to [public]
-     * @throws RestException or one of its subclasses if receiving an error response
+     * @throws StorageRestException containing an error code, if receiving an error response
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
@@ -326,33 +329,21 @@ interface BucketApi {
 
     /**
      * Returns the public url of [path]
-     * @throws RestException or one of its subclasses if receiving an error response
-     * @throws HttpRequestTimeoutException if the request timed out
-     * @throws HttpRequestException on network related issues
      */
     fun publicUrl(path: String, builder: PublicUrlBuilder.() -> Unit = {}): String
 
     /**
      * Returns the authenticated url of [path]. Requires bearer token authentication using the user's access token
-     * @throws RestException or one of its subclasses if receiving an error response
-     * @throws HttpRequestTimeoutException if the request timed out
-     * @throws HttpRequestException on network related issues
      */
     fun authenticatedUrl(path: String): String
 
     /**
      * Returns the authenticated render url of [path] with the given [transform]
-     * @throws RestException or one of its subclasses if receiving an error response
-     * @throws HttpRequestTimeoutException if the request timed out
-     * @throws HttpRequestException on network related issues
      */
     fun authenticatedRenderUrl(path: String, transform: ImageTransformation.() -> Unit = {}): String
 
     /**
      * Returns the public render url of [path] with the given [transform]
-     * @throws RestException or one of its subclasses if receiving an error response
-     * @throws HttpRequestTimeoutException if the request timed out
-     * @throws HttpRequestException on network related issues
      */
     @Deprecated("Use publicUrl instead", ReplaceWith("publicUrl"))
     fun publicRenderUrl(path: String, transform: ImageTransformation.() -> Unit = {}): String = publicUrl(path) {
