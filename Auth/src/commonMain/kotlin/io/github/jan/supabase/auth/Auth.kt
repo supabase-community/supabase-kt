@@ -114,6 +114,14 @@ interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
     /**
      * Creates a new user.
      *
+     * Example:
+     * ```kotlin
+     * supabase.auth.signUp(Email("example@example.com"), "password") {
+     *     // Optional config
+     *     captchaToken = "..."
+     * }
+     * ```
+     *
      * Be aware that if a user account exists in the system you may get back an
      * error message that attempts to hide this information from the user.
      * This method has support for PKCE via email signups. The PKCE flow cannot be used when autoconfirm is enabled.
@@ -142,6 +150,14 @@ interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
     /**
      * Creates a new user.
      *
+     * Example:
+     * ```kotlin
+     * supabase.auth.signUp(Phone("+1234567890"), "password") {
+     *     // Optional config
+     *     captchaToken = "..."
+     * }
+     * ```
+     *
      * Be aware that if a user account exists in the system you may get back an
      * error message that attempts to hide this information from the user.
      * This method has support for PKCE via email signups. The PKCE flow cannot be used when autoconfirm is enabled.
@@ -167,12 +183,49 @@ interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
         config: PhoneSignUpConfig.() -> Unit = {}
     ): AuthResponse
 
+    /**
+     * Log in an existing user with an email and password or phone and password.
+     *
+     * Example:
+     * ```kotlin
+     * supabase.auth.signInWithPassword(Email("user@example.com"), "password") {
+     *     // Optional config
+     *     captchaToken = "..."
+     * }
+     * ```
+     *
+     * Be aware that you may get back an error message that will not distinguish
+     * between the cases where the account does not exist or that the
+     * email/phone and password combination is wrong or that the account can only
+     * be accessed via social login.
+     *
+     * @param identifier Either an [Email] address or a [Phone] number
+     * @param password The password for the user
+     * @param config Extra configuration
+     */
     suspend fun signInWithPassword(
         identifier: LoginIdentifier,
         password: String,
         config: SignInPasswordConfig.() -> Unit = {}
     ): UserSession
 
+    /**
+     * Allows signing in with an OIDC ID token. The authentication provider used
+     * should be enabled and configured.
+     *
+     * Example:
+     * ```kotlin
+     * supabase.auth.signInWithIdToken(OAuthProviders.GOOGLE, "id_token") {
+     *     // Optional config
+     *     captchaToken = "..."
+     *     nonce = ".."
+     * }
+     * ```
+     *
+     * @param provider The OIDC provider
+     * @param token The ID token to use
+     * @param config Extra configuration
+     */
     suspend fun signInWithIdToken(
         provider: IDTokenProvider,
         token: String,
@@ -182,17 +235,77 @@ interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
         return signInWithIdToken(config)
     }
 
+    /**
+     * Allows signing in with an OIDC ID token. The authentication provider used
+     * should be enabled and configured.
+     * @param config The configuration for the ID token
+     */
     suspend fun signInWithIdToken(
         config: IdTokenConfig
     ): UserSession
 
+    /**
+     * Log in a user using magiclink or a one-time password (OTP).
+     *
+     * Example:
+     * ```kotlin
+     * supabase.auth.signInWithOtp(Phone("+1234567890")) {
+     *     // Optional config
+     *     data(myCustomData)
+     *     shouldCreateUser = true
+     * }
+     * ```
+     *
+     * If the `{{ .ConfirmationURL }}` variable is specified in the email template, a magiclink will be sent.
+     * If the `{{ .Token }}` variable is specified in the email template, an OTP will be sent.
+     * If you're using phone sign-ins, only an OTP will be sent. You won't be able to send a magiclink for phone sign-ins.
+     *
+     * Be aware that you may get back an error message that will not distinguish
+     * between the cases where the account does not exist or, that the account
+     * can only be accessed via social login.
+     *
+     * Do note that you will need to configure a Whatsapp sender on Twilio
+     * if you are using phone sign in with the [Phone.Channel.WHATSAPP] channel. The whatsapp
+     * channel is not supported on other providers
+     * at this time.
+     * This method supports PKCE when an email is passed.
+     * @param email The email to send the magiclink or OTP to.
+     * @param config The configuration for the sign-in with OTP.
+     */
     suspend fun signInWithOtp(
-        identifier: Email,
+        email: Email,
         config: EmailSignInOtpConfig.() -> Unit
     )
 
+    /**
+     * Log in a user using magiclink or a one-time password (OTP).
+     *
+     * Example:
+     * ```kotlin
+     * supabase.auth.signInWithOtp(Phone("+1234567890")) {
+     *     // Optional config
+     *     data(myCustomData)
+     *     shouldCreateUser = true
+     * }
+     * ```
+     *
+     * If the `{{ .ConfirmationURL }}` variable is specified in the email template, a magiclink will be sent.
+     * If the `{{ .Token }}` variable is specified in the email template, an OTP will be sent.
+     * If you're using phone sign-ins, only an OTP will be sent. You won't be able to send a magiclink for phone sign-ins.
+     *
+     * Be aware that you may get back an error message that will not distinguish
+     * between the cases where the account does not exist or, that the account
+     * can only be accessed via social login.
+     *
+     * Do note that you will need to configure a Whatsapp sender on Twilio
+     * if you are using phone sign in with the [Phone.Channel.WHATSAPP] channel. The whatsapp
+     * channel is not supported on other providers
+     * at this time.
+     * This method supports PKCE when an email is passed.
+     * @param phone The phone number to send the magiclink or OTP to.
+     */
     suspend fun signInWithOtp(
-        identifier: Phone,
+        phone: Phone,
         config: PhoneSignInOtpConfig.() -> Unit
     )
 
@@ -235,19 +348,17 @@ interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
     /**
      * Unlinks an OAuth Identity from an existing user.
      * @param identityId The id of the OAuth identity
-     * @param updateLocalUser Whether to delete the identity from the local user or not
      * @throws RestException or one of its subclasses if receiving an error response. If the error response contains a error code, an [AuthRestException] will be thrown which can be used to easier identify the problem.
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
     suspend fun unlinkIdentity(
         identityId: String,
-        updateLocalUser: Boolean = true
     )
 
     /**
      * Retrieves the sso url for the given [config]
-     * @param redirectUrl The redirect url to use
+     * @param identifier The SSO identifier to use
      * @param config The configuration to use
      * @throws RestException or one of its subclasses if receiving an error response. If the error response contains a error code, an [AuthRestException] will be thrown which can be used to easier identify the problem.
      * @throws HttpRequestTimeoutException if the request timed out
@@ -273,8 +384,7 @@ interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
      * Resends an existing signup confirmation email, email change email
      * @param type The email otp type
      * @param email The email to resend the otp to
-     * @param captchaToken The captcha token to use
-     * @param redirectUrl The redirect Url
+     * @param config The configuration to use
      * @throws RestException or one of its subclasses if receiving an error response. If the error response contains a error code, an [AuthRestException] will be thrown which can be used to easier identify the problem.
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
@@ -285,7 +395,7 @@ interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
      * Resends an existing SMS OTP or phone change OTP.
      * @param type The phone otp type
      * @param phone The phone to resend the otp to
-     * @param captchaToken The captcha token to use
+     * @param config The configuration to use
      * @throws RestException or one of its subclasses if receiving an error response. If the error response contains a error code, an [AuthRestException] will be thrown which can be used to easier identify the problem.
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
