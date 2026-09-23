@@ -204,9 +204,9 @@ import kotlin.time.Duration
     override fun disconnect() {
         logger.d { "Closing websocket connection" }
         messageJob?.cancel()
+        heartbeatJob?.cancel()
         _websocket.load()?.disconnect()
         _websocket.store(null)
-        heartbeatJob?.cancel()
         for ((_, channel) in subscriptions) {
             channel.updateStatus(RealtimeChannel.Status.UNSUBSCRIBED)
         }
@@ -257,6 +257,10 @@ import kotlin.time.Duration
             heartbeatRef.store(0)
             logger.w { "Heartbeat timeout. Trying to reconnect in ${config.reconnectDelay}" }
             reconnect()
+            return
+        }
+        val websocket = _websocket.load() ?: run {
+            logger.d { "Skipping heartbeat, websocket is not connected" }
             return
         }
         logger.d { "Sending heartbeat" }
