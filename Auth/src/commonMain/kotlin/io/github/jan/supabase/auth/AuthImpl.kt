@@ -182,13 +182,13 @@ internal class AuthImpl(
 
     // new
 
-    override suspend fun signInWithOtp(identifier: Email, config: EmailSignInOtpConfig.() -> Unit) {
-        val config = EmailSignInOtpConfig(identifier).apply(config)
-        signInWithOtp(identifier, config.redirectTo, config.encode())
+    override suspend fun signInWithOtp(email: Email, config: EmailSignInOtpConfig.() -> Unit) {
+        val config = EmailSignInOtpConfig(email).apply(config)
+        signInWithOtp(email, config.redirectTo, config.encode())
     }
 
-    override suspend fun signInWithOtp(identifier: Phone, config: PhoneSignInOtpConfig.() -> Unit) {
-        signInWithOtp(identifier, null, PhoneSignInOtpConfig(identifier).apply(config).encode())
+    override suspend fun signInWithOtp(phone: Phone, config: PhoneSignInOtpConfig.() -> Unit) {
+        signInWithOtp(phone, null, PhoneSignInOtpConfig(phone).apply(config).encode())
     }
 
     private suspend fun signInWithOtp(
@@ -315,14 +315,12 @@ internal class AuthImpl(
         return session
     }
 
-    override suspend fun unlinkIdentity(identityId: String, updateLocalUser: Boolean) { //TODO: improve
+    override suspend fun unlinkIdentity(identityId: String) {
         userApi.delete("user/identities/$identityId")
-        if (updateLocalUser) {
-            val session = currentSessionOrNull() ?: return
-            val newUser = session.user?.copy(identities = session.user.identities?.filter { it.identityId != identityId })
-            val newSession = session.copy(user = newUser)
-            setSessionStatus(SessionStatus.Authenticated(newSession, SessionFlag.IDENTITIES_CHANGED))
-        }
+        val session = currentSessionOrNull() ?: return
+        val newUser = session.user?.copy(identities = session.user.identities?.filter { it.identityId != identityId })
+        val newSession = session.copy(user = newUser)
+        setSessionStatus(SessionStatus.Authenticated(newSession, SessionFlag.IDENTITIES_CHANGED))
     }
 
     override suspend fun updateUser(
