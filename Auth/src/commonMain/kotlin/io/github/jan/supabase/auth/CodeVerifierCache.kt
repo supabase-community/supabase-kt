@@ -1,5 +1,7 @@
 package io.github.jan.supabase.auth
 
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlin.concurrent.atomics.AtomicReference
 
 /**
@@ -7,20 +9,13 @@ import kotlin.concurrent.atomics.AtomicReference
  */
 interface CodeVerifierCache {
 
-    /**
-     * Saves the given code verifier.
-     */
-    suspend fun saveCodeVerifier(codeVerifier: String)
+    suspend fun storePKCEVerifier(flowId: String, verifier: String, onEvictFlow: (String) -> Unit = {})
 
-    /**
-     * Loads the saved code verifier from the cache.
-     */
-    suspend fun loadCodeVerifier(): String?
+    suspend fun retrievePKCEVerifier(flowId: String?): String?
 
-    /**
-     * Deletes the saved code verifier from the cache.
-     */
-    suspend fun deleteCodeVerifier()
+    suspend fun removePKCEVerifier(flowId: String?)
+
+    suspend fun removeAllPKCEVerifiers()
 
 }
 
@@ -29,18 +24,31 @@ interface CodeVerifierCache {
  */
 class MemoryCodeVerifierCache(codeVerifier: String? = null): CodeVerifierCache {
 
-    private val codeVerifier = AtomicReference(codeVerifier)
+    val verifiers = mutableMapOf<String, String>()
+    val mutex = Mutex()
 
-    override suspend fun saveCodeVerifier(codeVerifier: String) {
-        this.codeVerifier.store(codeVerifier)
+    override suspend fun removeAllPKCEVerifiers() {
+        mutex.withLock {
+            verifiers.clear()
+        }
     }
 
-    override suspend fun loadCodeVerifier(): String? {
-        return codeVerifier.load()
+    override suspend fun removePKCEVerifier(flowId: String?) {
+        mutex.withLock {
+            verifiers.remove(flowId)
+        }
     }
 
-    override suspend fun deleteCodeVerifier() {
-        codeVerifier.store(null)
+    override suspend fun retrievePKCEVerifier(flowId: String?): String? {
+        return mutex.withLock {
+            verifiers[flowId]
+        }
+    }
+
+    override suspend fun storePKCEVerifier(flowId: String, verifier: String, onEvictFlow: (String) -> Unit) {
+        mutex.withLock {
+            verifiers[flowId] = verifier
+        }
     }
 
 }

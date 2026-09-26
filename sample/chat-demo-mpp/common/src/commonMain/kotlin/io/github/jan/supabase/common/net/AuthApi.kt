@@ -3,8 +3,8 @@ package io.github.jan.supabase.common.net
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.auth.OtpType
 import io.github.jan.supabase.auth.auth
-import io.github.jan.supabase.auth.providers.Google
-import io.github.jan.supabase.auth.providers.builtin.Email
+import io.github.jan.supabase.auth.native.external.google.signWithGoogle
+import io.github.jan.supabase.auth.providers.Email
 import io.github.jan.supabase.auth.status.SessionStatus
 import kotlinx.coroutines.flow.Flow
 
@@ -39,25 +39,19 @@ internal class AuthApiImpl(
     }
 
     override suspend fun verifyOtp(email: String, otp: String) {
-        auth.verifyEmailOtp(OtpType.Email.EMAIL, email, otp)
+        auth.verifyOtp(OtpType.Email.EMAIL, Email(email), otp)
     }
 
     override suspend fun signInWithGoogle() {
-        auth.signInWith(Google)
+        auth.signWithGoogle()
     }
 
     override suspend fun signIn(email: String, password: String) {
-        auth.signInWith(Email) {
-            this.email = email
-            this.password = password
-        }
+        auth.signInWithPassword(Email(email), password)
     }
 
     override suspend fun signUp(email: String, password: String) {
-        auth.signUpWith(Email) {
-            this.email = email
-            this.password = password
-        }
+        auth.signUp(Email(email), password)
     }
 
     override suspend fun changePassword(newPassword: String) {
