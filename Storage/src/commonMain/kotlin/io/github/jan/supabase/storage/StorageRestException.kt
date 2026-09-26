@@ -10,7 +10,8 @@ import io.ktor.client.statement.HttpResponse
  * @param statusCode The HTTP status code returned by the API
  * @param code Service-specific error code from the Storage API response body, such as
  * `NoSuchKey`, `AccessDenied` or `ResourceAlreadyExists`. Use this to branch
- * on the specific error rather than parsing the message.
+ * on the specific error rather than parsing the message. Falls back to [error] when the
+ * server does not send a code.
  * See https://supabase.com/docs/guides/storage/debugging/error-codes for a list of codes.
  */
 class StorageRestException(
