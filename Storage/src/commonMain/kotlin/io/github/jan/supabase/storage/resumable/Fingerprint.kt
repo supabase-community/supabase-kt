@@ -9,17 +9,15 @@ import kotlin.jvm.JvmInline
 @JvmInline
 value class Fingerprint private constructor(val value: String) {
 
-    private val parts get() = value.split(FINGERPRINT_SEPARATOR)
-
     /**
      * The source of the file upload
      */
-    val source get() = parts[0]
+    val source get() = value.substringBeforeLast(FINGERPRINT_SEPARATOR)
 
     /**
      * The size of the data
      */
-    val size get() = parts[1].toLong()
+    val size get() = value.substringAfterLast(FINGERPRINT_SEPARATOR).toLong()
 
     companion object {
 
@@ -42,9 +40,9 @@ value class Fingerprint private constructor(val value: String) {
          * Creates a fingerprint from the [value]. Returns null if the [value] is not a valid fingerprint
          */
         operator fun invoke(value: String): Fingerprint? {
-            val fingerprint = Fingerprint(value)
-            val parts = fingerprint.parts
-            return if(parts.size != FINGERPRINT_PARTS) null else fingerprint
+            if(!value.contains(FINGERPRINT_SEPARATOR)) return null
+            if(value.substringAfterLast(FINGERPRINT_SEPARATOR).toLongOrNull() == null) return null
+            return Fingerprint(value)
         }
 
     }
