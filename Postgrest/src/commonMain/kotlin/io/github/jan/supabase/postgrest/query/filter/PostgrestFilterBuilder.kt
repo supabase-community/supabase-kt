@@ -86,7 +86,7 @@ class PostgrestFilterBuilder(
      */
     fun likeAll(column: String, patterns: List<String>) {
         val columnValue = params[column] ?: emptyList()
-        _params[column] = columnValue + listOf("like(all).{${patterns.joinToString(",") { escapeValue(it) }}}")
+        _params[column] = columnValue + listOf("like(all).{${patterns.joinToString(",") { escapeArrayLiteralElement(it) }}}")
     }
 
     /**
@@ -94,7 +94,7 @@ class PostgrestFilterBuilder(
      */
     fun likeAny(column: String, patterns: List<String>) {
         val columnValue = params[column] ?: emptyList()
-        _params[column] = columnValue + listOf("like(any).{${patterns.joinToString(",") { escapeValue(it) }}}")
+        _params[column] = columnValue + listOf("like(any).{${patterns.joinToString(",") { escapeArrayLiteralElement(it) }}}")
     }
 
     /**
@@ -102,7 +102,7 @@ class PostgrestFilterBuilder(
      */
     fun ilikeAll(column: String, patterns: List<String>) {
         val columnValue = params[column] ?: emptyList()
-        _params[column] = columnValue + listOf("ilike(all).{${patterns.joinToString(",") { escapeValue(it) }}}")
+        _params[column] = columnValue + listOf("ilike(all).{${patterns.joinToString(",") { escapeArrayLiteralElement(it) }}}")
     }
 
     /**
@@ -110,7 +110,7 @@ class PostgrestFilterBuilder(
      */
     fun ilikeAny(column: String, patterns: List<String>) {
         val columnValue = params[column] ?: emptyList()
-        _params[column] = columnValue + listOf("ilike(any).{${patterns.joinToString(",") { escapeValue(it) }}}")
+        _params[column] = columnValue + listOf("ilike(any).{${patterns.joinToString(",") { escapeArrayLiteralElement(it) }}}")
     }
 
     /**
