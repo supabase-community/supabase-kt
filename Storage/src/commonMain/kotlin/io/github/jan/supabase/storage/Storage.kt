@@ -321,7 +321,7 @@ internal class StorageImpl(override val supabaseClient: SupabaseClient, override
             error.message,
             response,
             error.statusCode,
-            error.code
+            error.code ?: error.error
         )
     }
 

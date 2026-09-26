@@ -49,6 +49,27 @@ class StorageRestExceptionTest {
     }
 
     @Test
+    fun testCreateBucketKeepsErrorAndMessageWhenBodyHasNoCode() {
+        runTest {
+            client = createMockedSupabaseClient(configuration = configureClient) {
+                respondJson(
+                    """{"statusCode":409,"error":"bucket_already_exists","message":"Bucket already exists"}""",
+                    HttpStatusCode.Conflict
+                )
+            }
+
+            val exception = assertFailsWith<StorageRestException> {
+                client.storage.createBucket("bucket")
+            }
+
+            assertEquals("bucket_already_exists", exception.error)
+            assertEquals("Bucket already exists", exception.description)
+            assertEquals(409, exception.statusCode)
+            assertEquals("bucket_already_exists", exception.code)
+        }
+    }
+
+    @Test
     fun testCreateBucketFallsBackToUnknownErrorWhenBodyCannotBeParsed() {
         runTest {
             client = createMockedSupabaseClient(configuration = configureClient) {
