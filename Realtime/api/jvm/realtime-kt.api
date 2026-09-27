@@ -1,0 +1,890 @@
+public final class io/github/jan/supabase/realtime/BroadcastJoinConfig {
+	public static final field Companion Lio/github/jan/supabase/realtime/BroadcastJoinConfig$Companion;
+	public fun <init> (ZZZ)V
+	public final fun component1 ()Z
+	public final fun component2 ()Z
+	public final fun component3 ()Z
+	public final fun copy (ZZZ)Lio/github/jan/supabase/realtime/BroadcastJoinConfig;
+	public static synthetic fun copy$default (Lio/github/jan/supabase/realtime/BroadcastJoinConfig;ZZZILjava/lang/Object;)Lio/github/jan/supabase/realtime/BroadcastJoinConfig;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getAcknowledgeBroadcasts ()Z
+	public final fun getReceiveOwnBroadcasts ()Z
+	public final fun getReplicationReady ()Z
+	public fun hashCode ()I
+	public final fun setAcknowledgeBroadcasts (Z)V
+	public final fun setReceiveOwnBroadcasts (Z)V
+	public final fun setReplicationReady (Z)V
+	public fun toString ()Ljava/lang/String;
+}
+
+public final synthetic class io/github/jan/supabase/realtime/BroadcastJoinConfig$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lio/github/jan/supabase/realtime/BroadcastJoinConfig$$serializer;
+	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public final fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lio/github/jan/supabase/realtime/BroadcastJoinConfig;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public final fun serialize (Lkotlinx/serialization/encoding/Encoder;Lio/github/jan/supabase/realtime/BroadcastJoinConfig;)V
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
+public final class io/github/jan/supabase/realtime/BroadcastJoinConfig$Companion {
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
+}
+
+public abstract interface class io/github/jan/supabase/realtime/CallbackManager {
+	public abstract fun addBroadcastCallback (Ljava/lang/String;Lkotlin/jvm/functions/Function1;)Lio/github/jan/supabase/realtime/RealtimeCallbackId$Broadcast;
+	public abstract fun addPostgresCallback (Lio/github/jan/supabase/realtime/PostgresJoinConfig;Lkotlin/jvm/functions/Function1;)Lio/github/jan/supabase/realtime/RealtimeCallbackId$Postgres;
+	public abstract fun addPresenceCallback (Lkotlin/jvm/functions/Function1;)Lio/github/jan/supabase/realtime/RealtimeCallbackId$Presence;
+	public abstract fun addSystemCallback (Lkotlin/jvm/functions/Function1;)Lio/github/jan/supabase/realtime/RealtimeCallbackId$System;
+	public abstract fun hasPresenceCallback ()Z
+	public abstract fun presenceState ()Ljava/util/Map;
+	public abstract fun removeCallbackById (Lio/github/jan/supabase/realtime/RealtimeCallbackId;)V
+	public abstract fun reset ()V
+	public abstract fun setServerChanges (Ljava/util/List;)V
+	public abstract fun triggerBroadcast (Lio/github/jan/supabase/realtime/broadcast/RealtimeBroadcast;)V
+	public abstract fun triggerPostgresChange (Ljava/util/List;Lio/github/jan/supabase/realtime/PostgresAction;)V
+	public abstract fun triggerPresenceDiff (Ljava/util/Map;Ljava/util/Map;)V
+	public abstract fun triggerSystem (Lio/github/jan/supabase/realtime/RealtimeSystemPayload;)V
+}
+
+public final class io/github/jan/supabase/realtime/Column {
+	public static final field Companion Lio/github/jan/supabase/realtime/Column$Companion;
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Ljava/lang/String;
+	public final fun copy (Ljava/lang/String;Ljava/lang/String;)Lio/github/jan/supabase/realtime/Column;
+	public static synthetic fun copy$default (Lio/github/jan/supabase/realtime/Column;Ljava/lang/String;Ljava/lang/String;ILjava/lang/Object;)Lio/github/jan/supabase/realtime/Column;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getName ()Ljava/lang/String;
+	public final fun getType ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final synthetic class io/github/jan/supabase/realtime/Column$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lio/github/jan/supabase/realtime/Column$$serializer;
+	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public final fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lio/github/jan/supabase/realtime/Column;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public final fun serialize (Lkotlinx/serialization/encoding/Encoder;Lio/github/jan/supabase/realtime/Column;)V
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
+public final class io/github/jan/supabase/realtime/Column$Companion {
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
+}
+
+public abstract interface class io/github/jan/supabase/realtime/HasOldRecord : io/github/jan/supabase/plugins/SerializableData {
+	public abstract fun getOldRecord ()Lkotlinx/serialization/json/JsonObject;
+}
+
+public abstract interface class io/github/jan/supabase/realtime/HasRecord : io/github/jan/supabase/plugins/SerializableData {
+	public abstract fun getRecord ()Lkotlinx/serialization/json/JsonObject;
+}
+
+public final class io/github/jan/supabase/realtime/HttpSendBuilder {
+	public fun <init> ()V
+	public final fun getTimeout-FghU774 ()Lkotlin/time/Duration;
+	public final fun setTimeout-BwNAW2A (Lkotlin/time/Duration;)V
+}
+
+public abstract interface class io/github/jan/supabase/realtime/PostgresAction : io/github/jan/supabase/plugins/SerializableData {
+	public abstract fun getColumns ()Ljava/util/List;
+	public abstract fun getCommitTimestamp ()Lkotlin/time/Instant;
+}
+
+public final class io/github/jan/supabase/realtime/PostgresAction$Delete : io/github/jan/supabase/realtime/HasOldRecord, io/github/jan/supabase/realtime/PostgresAction {
+	public fun <init> (Lkotlinx/serialization/json/JsonObject;Ljava/util/List;Lkotlin/time/Instant;Lio/github/jan/supabase/SupabaseSerializer;)V
+	public final fun component1 ()Lkotlinx/serialization/json/JsonObject;
+	public final fun component2 ()Ljava/util/List;
+	public final fun component3 ()Lkotlin/time/Instant;
+	public final fun component4 ()Lio/github/jan/supabase/SupabaseSerializer;
+	public final fun copy (Lkotlinx/serialization/json/JsonObject;Ljava/util/List;Lkotlin/time/Instant;Lio/github/jan/supabase/SupabaseSerializer;)Lio/github/jan/supabase/realtime/PostgresAction$Delete;
+	public static synthetic fun copy$default (Lio/github/jan/supabase/realtime/PostgresAction$Delete;Lkotlinx/serialization/json/JsonObject;Ljava/util/List;Lkotlin/time/Instant;Lio/github/jan/supabase/SupabaseSerializer;ILjava/lang/Object;)Lio/github/jan/supabase/realtime/PostgresAction$Delete;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun getColumns ()Ljava/util/List;
+	public fun getCommitTimestamp ()Lkotlin/time/Instant;
+	public fun getOldRecord ()Lkotlinx/serialization/json/JsonObject;
+	public fun getSerializer ()Lio/github/jan/supabase/SupabaseSerializer;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/jan/supabase/realtime/PostgresAction$Insert : io/github/jan/supabase/realtime/HasRecord, io/github/jan/supabase/realtime/PostgresAction {
+	public fun <init> (Lkotlinx/serialization/json/JsonObject;Ljava/util/List;Lkotlin/time/Instant;Lio/github/jan/supabase/SupabaseSerializer;)V
+	public final fun component1 ()Lkotlinx/serialization/json/JsonObject;
+	public final fun component2 ()Ljava/util/List;
+	public final fun component3 ()Lkotlin/time/Instant;
+	public final fun component4 ()Lio/github/jan/supabase/SupabaseSerializer;
+	public final fun copy (Lkotlinx/serialization/json/JsonObject;Ljava/util/List;Lkotlin/time/Instant;Lio/github/jan/supabase/SupabaseSerializer;)Lio/github/jan/supabase/realtime/PostgresAction$Insert;
+	public static synthetic fun copy$default (Lio/github/jan/supabase/realtime/PostgresAction$Insert;Lkotlinx/serialization/json/JsonObject;Ljava/util/List;Lkotlin/time/Instant;Lio/github/jan/supabase/SupabaseSerializer;ILjava/lang/Object;)Lio/github/jan/supabase/realtime/PostgresAction$Insert;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun getColumns ()Ljava/util/List;
+	public fun getCommitTimestamp ()Lkotlin/time/Instant;
+	public fun getRecord ()Lkotlinx/serialization/json/JsonObject;
+	public fun getSerializer ()Lio/github/jan/supabase/SupabaseSerializer;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/jan/supabase/realtime/PostgresAction$Select : io/github/jan/supabase/realtime/HasRecord, io/github/jan/supabase/realtime/PostgresAction {
+	public fun <init> (Lkotlinx/serialization/json/JsonObject;Ljava/util/List;Lkotlin/time/Instant;Lio/github/jan/supabase/SupabaseSerializer;)V
+	public final fun component1 ()Lkotlinx/serialization/json/JsonObject;
+	public final fun component2 ()Ljava/util/List;
+	public final fun component3 ()Lkotlin/time/Instant;
+	public final fun component4 ()Lio/github/jan/supabase/SupabaseSerializer;
+	public final fun copy (Lkotlinx/serialization/json/JsonObject;Ljava/util/List;Lkotlin/time/Instant;Lio/github/jan/supabase/SupabaseSerializer;)Lio/github/jan/supabase/realtime/PostgresAction$Select;
+	public static synthetic fun copy$default (Lio/github/jan/supabase/realtime/PostgresAction$Select;Lkotlinx/serialization/json/JsonObject;Ljava/util/List;Lkotlin/time/Instant;Lio/github/jan/supabase/SupabaseSerializer;ILjava/lang/Object;)Lio/github/jan/supabase/realtime/PostgresAction$Select;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun getColumns ()Ljava/util/List;
+	public fun getCommitTimestamp ()Lkotlin/time/Instant;
+	public fun getRecord ()Lkotlinx/serialization/json/JsonObject;
+	public fun getSerializer ()Lio/github/jan/supabase/SupabaseSerializer;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/jan/supabase/realtime/PostgresAction$Update : io/github/jan/supabase/realtime/HasOldRecord, io/github/jan/supabase/realtime/HasRecord, io/github/jan/supabase/realtime/PostgresAction {
+	public fun <init> (Lkotlinx/serialization/json/JsonObject;Lkotlinx/serialization/json/JsonObject;Ljava/util/List;Lkotlin/time/Instant;Lio/github/jan/supabase/SupabaseSerializer;)V
+	public final fun component1 ()Lkotlinx/serialization/json/JsonObject;
+	public final fun component2 ()Lkotlinx/serialization/json/JsonObject;
+	public final fun component3 ()Ljava/util/List;
+	public final fun component4 ()Lkotlin/time/Instant;
+	public final fun component5 ()Lio/github/jan/supabase/SupabaseSerializer;
+	public final fun copy (Lkotlinx/serialization/json/JsonObject;Lkotlinx/serialization/json/JsonObject;Ljava/util/List;Lkotlin/time/Instant;Lio/github/jan/supabase/SupabaseSerializer;)Lio/github/jan/supabase/realtime/PostgresAction$Update;
+	public static synthetic fun copy$default (Lio/github/jan/supabase/realtime/PostgresAction$Update;Lkotlinx/serialization/json/JsonObject;Lkotlinx/serialization/json/JsonObject;Ljava/util/List;Lkotlin/time/Instant;Lio/github/jan/supabase/SupabaseSerializer;ILjava/lang/Object;)Lio/github/jan/supabase/realtime/PostgresAction$Update;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun getColumns ()Ljava/util/List;
+	public fun getCommitTimestamp ()Lkotlin/time/Instant;
+	public fun getOldRecord ()Lkotlinx/serialization/json/JsonObject;
+	public fun getRecord ()Lkotlinx/serialization/json/JsonObject;
+	public fun getSerializer ()Lio/github/jan/supabase/SupabaseSerializer;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/jan/supabase/realtime/PostgresChangeFilter {
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;)V
+	public final fun buildConfig ()Lio/github/jan/supabase/realtime/PostgresJoinConfig;
+	public final fun filter (Lio/github/jan/supabase/postgrest/query/filter/FilterOperation;)V
+	public final fun filter (Lio/github/jan/supabase/realtime/postgres/RealtimePostgresFilterBuilder;)V
+	public final fun filter (Ljava/lang/String;Lio/github/jan/supabase/postgrest/query/filter/FilterOperator;Ljava/lang/Object;)V
+	public final fun filter (Lkotlin/jvm/functions/Function1;)V
+	public final fun getFilter ()Ljava/lang/String;
+	public final fun getTable ()Ljava/lang/String;
+	public final fun setFilter (Ljava/lang/String;)V
+	public final fun setTable (Ljava/lang/String;)V
+}
+
+public final class io/github/jan/supabase/realtime/PostgresJoinConfig {
+	public static final field Companion Lio/github/jan/supabase/realtime/PostgresJoinConfig$Companion;
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;I)V
+	public synthetic fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;IILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Ljava/lang/String;
+	public final fun component3 ()Ljava/lang/String;
+	public final fun component4 ()Ljava/lang/String;
+	public final fun component5 ()I
+	public final fun copy (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;I)Lio/github/jan/supabase/realtime/PostgresJoinConfig;
+	public static synthetic fun copy$default (Lio/github/jan/supabase/realtime/PostgresJoinConfig;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;IILjava/lang/Object;)Lio/github/jan/supabase/realtime/PostgresJoinConfig;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getEvent ()Ljava/lang/String;
+	public final fun getFilter ()Ljava/lang/String;
+	public final fun getId ()I
+	public final fun getSchema ()Ljava/lang/String;
+	public final fun getTable ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final synthetic class io/github/jan/supabase/realtime/PostgresJoinConfig$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lio/github/jan/supabase/realtime/PostgresJoinConfig$$serializer;
+	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public final fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lio/github/jan/supabase/realtime/PostgresJoinConfig;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public final fun serialize (Lkotlinx/serialization/encoding/Encoder;Lio/github/jan/supabase/realtime/PostgresJoinConfig;)V
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
+public final class io/github/jan/supabase/realtime/PostgresJoinConfig$Companion {
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
+}
+
+public final class io/github/jan/supabase/realtime/PostgrestExtensionsKt {
+	public static final fun defaultChannelName (Ljava/lang/String;Ljava/lang/String;Lio/github/jan/supabase/realtime/RealtimeImpl;)Ljava/lang/String;
+}
+
+public final class io/github/jan/supabase/realtime/Presence {
+	public static final field Companion Lio/github/jan/supabase/realtime/Presence$Companion;
+	public fun <init> (Ljava/lang/String;Lkotlinx/serialization/json/JsonObject;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Lkotlinx/serialization/json/JsonObject;
+	public final fun copy (Ljava/lang/String;Lkotlinx/serialization/json/JsonObject;)Lio/github/jan/supabase/realtime/Presence;
+	public static synthetic fun copy$default (Lio/github/jan/supabase/realtime/Presence;Ljava/lang/String;Lkotlinx/serialization/json/JsonObject;ILjava/lang/Object;)Lio/github/jan/supabase/realtime/Presence;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getPresenceRef ()Ljava/lang/String;
+	public final fun getState ()Lkotlinx/serialization/json/JsonObject;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/jan/supabase/realtime/Presence$Companion : kotlinx/serialization/KSerializer {
+	public fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lio/github/jan/supabase/realtime/Presence;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public fun serialize (Lkotlinx/serialization/encoding/Encoder;Lio/github/jan/supabase/realtime/Presence;)V
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
+}
+
+public abstract interface class io/github/jan/supabase/realtime/PresenceAction {
+	public abstract fun getJoins ()Ljava/util/Map;
+	public abstract fun getLeaves ()Ljava/util/Map;
+}
+
+public final class io/github/jan/supabase/realtime/PresenceActionImpl : io/github/jan/supabase/realtime/PresenceAction {
+	public fun <init> (Lio/github/jan/supabase/SupabaseSerializer;Ljava/util/Map;Ljava/util/Map;)V
+	public fun getJoins ()Ljava/util/Map;
+	public fun getLeaves ()Ljava/util/Map;
+	public final fun getSerializer ()Lio/github/jan/supabase/SupabaseSerializer;
+}
+
+public final class io/github/jan/supabase/realtime/PresenceJoinConfig {
+	public static final field Companion Lio/github/jan/supabase/realtime/PresenceJoinConfig$Companion;
+	public fun <init> (Ljava/lang/String;Z)V
+	public synthetic fun <init> (Ljava/lang/String;ZILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun copy (Ljava/lang/String;Z)Lio/github/jan/supabase/realtime/PresenceJoinConfig;
+	public static synthetic fun copy$default (Lio/github/jan/supabase/realtime/PresenceJoinConfig;Ljava/lang/String;ZILjava/lang/Object;)Lio/github/jan/supabase/realtime/PresenceJoinConfig;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getKey ()Ljava/lang/String;
+	public fun hashCode ()I
+	public final fun setKey (Ljava/lang/String;)V
+	public fun toString ()Ljava/lang/String;
+}
+
+public final synthetic class io/github/jan/supabase/realtime/PresenceJoinConfig$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lio/github/jan/supabase/realtime/PresenceJoinConfig$$serializer;
+	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public final fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lio/github/jan/supabase/realtime/PresenceJoinConfig;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public final fun serialize (Lkotlinx/serialization/encoding/Encoder;Lio/github/jan/supabase/realtime/PresenceJoinConfig;)V
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
+public final class io/github/jan/supabase/realtime/PresenceJoinConfig$Companion {
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
+}
+
+public final class io/github/jan/supabase/realtime/PrimaryKey {
+	public fun <init> (Ljava/lang/String;Lkotlin/jvm/functions/Function1;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Lkotlin/jvm/functions/Function1;
+	public final fun copy (Ljava/lang/String;Lkotlin/jvm/functions/Function1;)Lio/github/jan/supabase/realtime/PrimaryKey;
+	public static synthetic fun copy$default (Lio/github/jan/supabase/realtime/PrimaryKey;Ljava/lang/String;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Lio/github/jan/supabase/realtime/PrimaryKey;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getColumnName ()Ljava/lang/String;
+	public final fun getProducer ()Lkotlin/jvm/functions/Function1;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public abstract interface class io/github/jan/supabase/realtime/Realtime : io/github/jan/supabase/plugins/CustomSerializationPlugin, io/github/jan/supabase/plugins/MainPlugin {
+	public static final field API_VERSION I
+	public static final field Companion Lio/github/jan/supabase/realtime/Realtime$Companion;
+	public static final field LOGGING_TAG Ljava/lang/String;
+	public abstract fun addChannel (Lio/github/jan/supabase/realtime/RealtimeChannel;)V
+	public abstract fun block (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun channel (Ljava/lang/String;Lio/github/jan/supabase/realtime/RealtimeChannelBuilder;)Lio/github/jan/supabase/realtime/RealtimeChannel;
+	public abstract fun connect (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun disconnect ()V
+	public abstract fun getStatus ()Lkotlinx/coroutines/flow/StateFlow;
+	public abstract fun getSubscriptions ()Ljava/util/Map;
+	public abstract fun getWebsocket ()Lio/github/jan/supabase/realtime/websocket/RealtimeWebsocket;
+	public abstract fun removeAllChannels (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun removeChannel (Lio/github/jan/supabase/realtime/RealtimeChannel;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun send (Lio/github/jan/supabase/realtime/RealtimeMessage;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun send ([BLkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun setAuth (Ljava/lang/String;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static synthetic fun setAuth$default (Lio/github/jan/supabase/realtime/Realtime;Ljava/lang/String;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+}
+
+public final class io/github/jan/supabase/realtime/Realtime$Companion : io/github/jan/supabase/plugins/SupabasePluginProvider {
+	public static final field API_VERSION I
+	public static final field LOGGING_TAG Ljava/lang/String;
+	public fun create (Lio/github/jan/supabase/SupabaseClient;Lio/github/jan/supabase/realtime/Realtime$Config;)Lio/github/jan/supabase/realtime/Realtime;
+	public synthetic fun create (Lio/github/jan/supabase/SupabaseClient;Ljava/lang/Object;)Lio/github/jan/supabase/plugins/SupabasePlugin;
+	public fun createConfig (Lkotlin/jvm/functions/Function1;)Lio/github/jan/supabase/realtime/Realtime$Config;
+	public synthetic fun createConfig (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
+	public fun getKey ()Ljava/lang/String;
+	public fun setup (Lio/github/jan/supabase/SupabaseClientBuilder;Lio/github/jan/supabase/realtime/Realtime$Config;)V
+	public synthetic fun setup (Lio/github/jan/supabase/SupabaseClientBuilder;Ljava/lang/Object;)V
+}
+
+public final class io/github/jan/supabase/realtime/Realtime$Config : io/github/jan/supabase/plugins/MainConfig, io/github/jan/supabase/auth/AuthDependentPluginConfig, io/github/jan/supabase/plugins/CustomSerializationConfig {
+	public fun <init> ()V
+	public final fun getAccessToken ()Lkotlin/jvm/functions/Function2;
+	public final fun getConnectOnSubscribe ()Z
+	public final fun getDisconnectOnEmptyChannelsAfter-FghU774 ()Lkotlin/time/Duration;
+	public final fun getDisconnectOnNoSubscriptions ()Z
+	public final fun getDisconnectOnSessionLoss ()Z
+	public final fun getHeartbeatInterval-UwyO8pc ()J
+	public final fun getMaxAttempts ()I
+	public final fun getReconnectDelay-UwyO8pc ()J
+	public final fun getRejoinDelay-UwyO8pc ()J
+	public fun getRequireValidSession ()Z
+	public final fun getSecure ()Ljava/lang/Boolean;
+	public fun getSerializer ()Lio/github/jan/supabase/SupabaseSerializer;
+	public final fun getVsn ()Lio/github/jan/supabase/realtime/RealtimeProtocolVersion;
+	public final fun getWebsocketConfig ()Lkotlin/jvm/functions/Function1;
+	public final fun getWebsocketFactory ()Lio/github/jan/supabase/realtime/websocket/RealtimeWebsocketFactory;
+	public final fun setAccessToken (Lkotlin/jvm/functions/Function2;)V
+	public final fun setConnectOnSubscribe (Z)V
+	public final fun setDisconnectOnEmptyChannelsAfter-BwNAW2A (Lkotlin/time/Duration;)V
+	public final fun setDisconnectOnNoSubscriptions (Z)V
+	public final fun setDisconnectOnSessionLoss (Z)V
+	public final fun setHeartbeatInterval-LRDsOJo (J)V
+	public final fun setMaxAttempts (I)V
+	public final fun setReconnectDelay-LRDsOJo (J)V
+	public final fun setRejoinDelay-LRDsOJo (J)V
+	public fun setRequireValidSession (Z)V
+	public final fun setSecure (Ljava/lang/Boolean;)V
+	public fun setSerializer (Lio/github/jan/supabase/SupabaseSerializer;)V
+	public final fun setVsn (Lio/github/jan/supabase/realtime/RealtimeProtocolVersion;)V
+	public final fun setWebsocketConfig (Lkotlin/jvm/functions/Function1;)V
+	public final fun setWebsocketFactory (Lio/github/jan/supabase/realtime/websocket/RealtimeWebsocketFactory;)V
+}
+
+public final class io/github/jan/supabase/realtime/Realtime$DefaultImpls {
+	public static fun close (Lio/github/jan/supabase/realtime/Realtime;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static fun init (Lio/github/jan/supabase/realtime/Realtime;)V
+	public static fun resolveUrl (Lio/github/jan/supabase/realtime/Realtime;Ljava/lang/String;)Ljava/lang/String;
+	public static synthetic fun setAuth$default (Lio/github/jan/supabase/realtime/Realtime;Ljava/lang/String;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+}
+
+public final class io/github/jan/supabase/realtime/Realtime$Status : java/lang/Enum {
+	public static final field CONNECTED Lio/github/jan/supabase/realtime/Realtime$Status;
+	public static final field CONNECTING Lio/github/jan/supabase/realtime/Realtime$Status;
+	public static final field DISCONNECTED Lio/github/jan/supabase/realtime/Realtime$Status;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public static fun valueOf (Ljava/lang/String;)Lio/github/jan/supabase/realtime/Realtime$Status;
+	public static fun values ()[Lio/github/jan/supabase/realtime/Realtime$Status;
+}
+
+public abstract interface class io/github/jan/supabase/realtime/RealtimeCallback {
+	public abstract fun getCallback ()Lkotlin/jvm/functions/Function1;
+	public abstract fun getId ()I
+}
+
+public final class io/github/jan/supabase/realtime/RealtimeCallback$BroadcastCallback : io/github/jan/supabase/realtime/RealtimeCallback {
+	public fun <init> (Lkotlin/jvm/functions/Function1;Ljava/lang/String;I)V
+	public fun getCallback ()Lkotlin/jvm/functions/Function1;
+	public final fun getEvent ()Ljava/lang/String;
+	public fun getId ()I
+}
+
+public final class io/github/jan/supabase/realtime/RealtimeCallback$PostgresCallback : io/github/jan/supabase/realtime/RealtimeCallback {
+	public fun <init> (Lkotlin/jvm/functions/Function1;Lio/github/jan/supabase/realtime/PostgresJoinConfig;I)V
+	public fun getCallback ()Lkotlin/jvm/functions/Function1;
+	public final fun getFilter ()Lio/github/jan/supabase/realtime/PostgresJoinConfig;
+	public fun getId ()I
+}
+
+public final class io/github/jan/supabase/realtime/RealtimeCallback$PresenceCallback : io/github/jan/supabase/realtime/RealtimeCallback {
+	public fun <init> (Lkotlin/jvm/functions/Function1;I)V
+	public fun getCallback ()Lkotlin/jvm/functions/Function1;
+	public fun getId ()I
+}
+
+public final class io/github/jan/supabase/realtime/RealtimeCallback$SystemCallback : io/github/jan/supabase/realtime/RealtimeCallback {
+	public fun <init> (Lkotlin/jvm/functions/Function1;I)V
+	public fun getCallback ()Lkotlin/jvm/functions/Function1;
+	public fun getId ()I
+}
+
+public abstract class io/github/jan/supabase/realtime/RealtimeCallbackId {
+	public synthetic fun <init> (ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun getValue ()I
+}
+
+public final class io/github/jan/supabase/realtime/RealtimeCallbackId$Broadcast : io/github/jan/supabase/realtime/RealtimeCallbackId {
+	public fun <init> (I)V
+}
+
+public final class io/github/jan/supabase/realtime/RealtimeCallbackId$Postgres : io/github/jan/supabase/realtime/RealtimeCallbackId {
+	public fun <init> (I)V
+}
+
+public final class io/github/jan/supabase/realtime/RealtimeCallbackId$Presence : io/github/jan/supabase/realtime/RealtimeCallbackId {
+	public fun <init> (I)V
+}
+
+public final class io/github/jan/supabase/realtime/RealtimeCallbackId$System : io/github/jan/supabase/realtime/RealtimeCallbackId {
+	public fun <init> (I)V
+}
+
+public abstract interface class io/github/jan/supabase/realtime/RealtimeChannel {
+	public static final field CHANNEL_EVENT_ACCESS_TOKEN Ljava/lang/String;
+	public static final field CHANNEL_EVENT_BROADCAST Ljava/lang/String;
+	public static final field CHANNEL_EVENT_CLOSE Ljava/lang/String;
+	public static final field CHANNEL_EVENT_ERROR Ljava/lang/String;
+	public static final field CHANNEL_EVENT_JOIN Ljava/lang/String;
+	public static final field CHANNEL_EVENT_LEAVE Ljava/lang/String;
+	public static final field CHANNEL_EVENT_POSTGRES_CHANGES Ljava/lang/String;
+	public static final field CHANNEL_EVENT_PRESENCE Ljava/lang/String;
+	public static final field CHANNEL_EVENT_PRESENCE_DIFF Ljava/lang/String;
+	public static final field CHANNEL_EVENT_PRESENCE_STATE Ljava/lang/String;
+	public static final field CHANNEL_EVENT_REPLY Ljava/lang/String;
+	public static final field CHANNEL_EVENT_SYSTEM Ljava/lang/String;
+	public static final field Companion Lio/github/jan/supabase/realtime/RealtimeChannel$Companion;
+	public abstract fun addPostgresChange (Lio/github/jan/supabase/realtime/RealtimeChannel;Lio/github/jan/supabase/realtime/PostgresJoinConfig;)V
+	public abstract fun broadcast (Ljava/lang/String;Lio/github/jan/supabase/realtime/broadcast/BroadcastPayload;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun broadcastFlow (Ljava/lang/String;)Lkotlinx/coroutines/flow/Flow;
+	public abstract fun getCallbackManager ()Lio/github/jan/supabase/realtime/CallbackManager;
+	public abstract fun getLogger ()Lio/github/jan/supabase/logging/SupabaseLogger;
+	public abstract fun getRealtime ()Lio/github/jan/supabase/realtime/Realtime;
+	public abstract fun getStatus ()Lkotlinx/coroutines/flow/StateFlow;
+	public abstract fun getSupabaseClient ()Lio/github/jan/supabase/SupabaseClient;
+	public abstract fun getTopic ()Ljava/lang/String;
+	public abstract fun httpSend (Ljava/lang/String;Lio/github/jan/supabase/realtime/broadcast/BroadcastPayload;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static synthetic fun httpSend$default (Lio/github/jan/supabase/realtime/RealtimeChannel;Ljava/lang/String;Lio/github/jan/supabase/realtime/broadcast/BroadcastPayload;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public abstract fun postgresChangeFlowInternal (Lio/github/jan/supabase/realtime/RealtimeChannel;Lkotlin/reflect/KClass;Ljava/lang/String;Lkotlin/jvm/functions/Function1;)Lkotlinx/coroutines/flow/Flow;
+	public static synthetic fun postgresChangeFlowInternal$default (Lio/github/jan/supabase/realtime/RealtimeChannel;Lio/github/jan/supabase/realtime/RealtimeChannel;Lkotlin/reflect/KClass;Ljava/lang/String;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Lkotlinx/coroutines/flow/Flow;
+	public abstract fun presenceChangeFlow ()Lkotlinx/coroutines/flow/Flow;
+	public abstract fun removePostgresChange (Lio/github/jan/supabase/realtime/RealtimeChannel;Lio/github/jan/supabase/realtime/PostgresJoinConfig;)V
+	public abstract fun scheduleRejoin (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun subscribe (ZLkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static synthetic fun subscribe$default (Lio/github/jan/supabase/realtime/RealtimeChannel;ZLkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public abstract fun systemFlow ()Lkotlinx/coroutines/flow/Flow;
+	public abstract fun teardown ()V
+	public abstract fun track (Lkotlinx/serialization/json/JsonObject;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun unsubscribe (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun untrack (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun updateAuth (Ljava/lang/String;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun updateStatus (Lio/github/jan/supabase/realtime/RealtimeChannel$Status;)V
+}
+
+public final class io/github/jan/supabase/realtime/RealtimeChannel$Companion {
+	public static final field CHANNEL_EVENT_ACCESS_TOKEN Ljava/lang/String;
+	public static final field CHANNEL_EVENT_BROADCAST Ljava/lang/String;
+	public static final field CHANNEL_EVENT_CLOSE Ljava/lang/String;
+	public static final field CHANNEL_EVENT_ERROR Ljava/lang/String;
+	public static final field CHANNEL_EVENT_JOIN Ljava/lang/String;
+	public static final field CHANNEL_EVENT_LEAVE Ljava/lang/String;
+	public static final field CHANNEL_EVENT_POSTGRES_CHANGES Ljava/lang/String;
+	public static final field CHANNEL_EVENT_PRESENCE Ljava/lang/String;
+	public static final field CHANNEL_EVENT_PRESENCE_DIFF Ljava/lang/String;
+	public static final field CHANNEL_EVENT_PRESENCE_STATE Ljava/lang/String;
+	public static final field CHANNEL_EVENT_REPLY Ljava/lang/String;
+	public static final field CHANNEL_EVENT_SYSTEM Ljava/lang/String;
+}
+
+public final class io/github/jan/supabase/realtime/RealtimeChannel$DefaultImpls {
+	public static synthetic fun httpSend$default (Lio/github/jan/supabase/realtime/RealtimeChannel;Ljava/lang/String;Lio/github/jan/supabase/realtime/broadcast/BroadcastPayload;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public static synthetic fun postgresChangeFlowInternal$default (Lio/github/jan/supabase/realtime/RealtimeChannel;Lio/github/jan/supabase/realtime/RealtimeChannel;Lkotlin/reflect/KClass;Ljava/lang/String;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Lkotlinx/coroutines/flow/Flow;
+	public static synthetic fun subscribe$default (Lio/github/jan/supabase/realtime/RealtimeChannel;ZLkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+}
+
+public final class io/github/jan/supabase/realtime/RealtimeChannel$Status : java/lang/Enum {
+	public static final field SUBSCRIBED Lio/github/jan/supabase/realtime/RealtimeChannel$Status;
+	public static final field SUBSCRIBING Lio/github/jan/supabase/realtime/RealtimeChannel$Status;
+	public static final field UNSUBSCRIBED Lio/github/jan/supabase/realtime/RealtimeChannel$Status;
+	public static final field UNSUBSCRIBING Lio/github/jan/supabase/realtime/RealtimeChannel$Status;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public static fun valueOf (Ljava/lang/String;)Lio/github/jan/supabase/realtime/RealtimeChannel$Status;
+	public static fun values ()[Lio/github/jan/supabase/realtime/RealtimeChannel$Status;
+}
+
+public final class io/github/jan/supabase/realtime/RealtimeChannelBuilder {
+	public fun <init> (Ljava/lang/String;)V
+	public final fun broadcast (Lkotlin/jvm/functions/Function1;)V
+	public final fun build (Lio/github/jan/supabase/realtime/Realtime;)Lio/github/jan/supabase/realtime/RealtimeChannel;
+	public final fun isPrivate ()Z
+	public final fun presence (Lkotlin/jvm/functions/Function1;)V
+	public final fun setPrivate (Z)V
+}
+
+public final class io/github/jan/supabase/realtime/RealtimeExtKt {
+	public static final fun producer (Ljava/util/List;Ljava/lang/Object;)Ljava/lang/String;
+}
+
+public final class io/github/jan/supabase/realtime/RealtimeImpl : io/github/jan/supabase/realtime/Realtime {
+	public fun <init> (Lio/github/jan/supabase/SupabaseClient;Lio/github/jan/supabase/realtime/Realtime$Config;)V
+	public fun addChannel (Lio/github/jan/supabase/realtime/RealtimeChannel;)V
+	public fun block (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public final fun broadcastUrl ()Ljava/lang/String;
+	public fun channel (Ljava/lang/String;Lio/github/jan/supabase/realtime/RealtimeChannelBuilder;)Lio/github/jan/supabase/realtime/RealtimeChannel;
+	public fun close (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun connect (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun disconnect ()V
+	public final fun getAccessToken ()Ljava/lang/String;
+	public fun getApiVersion ()I
+	public fun getConfig ()Lio/github/jan/supabase/realtime/Realtime$Config;
+	public synthetic fun getConfig ()Ljava/lang/Object;
+	public fun getLogger ()Lio/github/jan/supabase/logging/SupabaseLogger;
+	public fun getPluginKey ()Ljava/lang/String;
+	public fun getSerializer ()Lio/github/jan/supabase/SupabaseSerializer;
+	public fun getStatus ()Lkotlinx/coroutines/flow/StateFlow;
+	public fun getSubscriptions ()Ljava/util/Map;
+	public fun getSupabaseClient ()Lio/github/jan/supabase/SupabaseClient;
+	public fun getWebsocket ()Lio/github/jan/supabase/realtime/websocket/RealtimeWebsocket;
+	public fun init ()V
+	public final fun nextIncrementId ()I
+	public fun parseErrorResponse (Lio/ktor/client/statement/HttpResponse;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun removeAllChannels (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun removeChannel (Lio/github/jan/supabase/realtime/RealtimeChannel;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun resolveUrl (Ljava/lang/String;)Ljava/lang/String;
+	public fun send (Lio/github/jan/supabase/realtime/RealtimeMessage;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun send ([BLkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun setAuth (Ljava/lang/String;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun setSerializer (Lio/github/jan/supabase/SupabaseSerializer;)V
+}
+
+public final class io/github/jan/supabase/realtime/RealtimeJoinConfig {
+	public static final field Companion Lio/github/jan/supabase/realtime/RealtimeJoinConfig$Companion;
+	public fun <init> (Lio/github/jan/supabase/realtime/BroadcastJoinConfig;Lio/github/jan/supabase/realtime/PresenceJoinConfig;Ljava/util/List;Z)V
+	public final fun component1 ()Lio/github/jan/supabase/realtime/BroadcastJoinConfig;
+	public final fun component2 ()Lio/github/jan/supabase/realtime/PresenceJoinConfig;
+	public final fun component3 ()Ljava/util/List;
+	public final fun component4 ()Z
+	public final fun copy (Lio/github/jan/supabase/realtime/BroadcastJoinConfig;Lio/github/jan/supabase/realtime/PresenceJoinConfig;Ljava/util/List;Z)Lio/github/jan/supabase/realtime/RealtimeJoinConfig;
+	public static synthetic fun copy$default (Lio/github/jan/supabase/realtime/RealtimeJoinConfig;Lio/github/jan/supabase/realtime/BroadcastJoinConfig;Lio/github/jan/supabase/realtime/PresenceJoinConfig;Ljava/util/List;ZILjava/lang/Object;)Lio/github/jan/supabase/realtime/RealtimeJoinConfig;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getBroadcast ()Lio/github/jan/supabase/realtime/BroadcastJoinConfig;
+	public final fun getPostgresChanges ()Ljava/util/List;
+	public final fun getPresence ()Lio/github/jan/supabase/realtime/PresenceJoinConfig;
+	public fun hashCode ()I
+	public final fun isPrivate ()Z
+	public final fun setPrivate (Z)V
+	public fun toString ()Ljava/lang/String;
+}
+
+public final synthetic class io/github/jan/supabase/realtime/RealtimeJoinConfig$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lio/github/jan/supabase/realtime/RealtimeJoinConfig$$serializer;
+	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public final fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lio/github/jan/supabase/realtime/RealtimeJoinConfig;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public final fun serialize (Lkotlinx/serialization/encoding/Encoder;Lio/github/jan/supabase/realtime/RealtimeJoinConfig;)V
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
+public final class io/github/jan/supabase/realtime/RealtimeJoinConfig$Companion {
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
+}
+
+public final class io/github/jan/supabase/realtime/RealtimeJoinPayload {
+	public static final field Companion Lio/github/jan/supabase/realtime/RealtimeJoinPayload$Companion;
+	public fun <init> (Lio/github/jan/supabase/realtime/RealtimeJoinConfig;)V
+	public final fun component1 ()Lio/github/jan/supabase/realtime/RealtimeJoinConfig;
+	public final fun copy (Lio/github/jan/supabase/realtime/RealtimeJoinConfig;)Lio/github/jan/supabase/realtime/RealtimeJoinPayload;
+	public static synthetic fun copy$default (Lio/github/jan/supabase/realtime/RealtimeJoinPayload;Lio/github/jan/supabase/realtime/RealtimeJoinConfig;ILjava/lang/Object;)Lio/github/jan/supabase/realtime/RealtimeJoinPayload;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getConfig ()Lio/github/jan/supabase/realtime/RealtimeJoinConfig;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final synthetic class io/github/jan/supabase/realtime/RealtimeJoinPayload$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lio/github/jan/supabase/realtime/RealtimeJoinPayload$$serializer;
+	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public final fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lio/github/jan/supabase/realtime/RealtimeJoinPayload;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public final fun serialize (Lkotlinx/serialization/encoding/Encoder;Lio/github/jan/supabase/realtime/RealtimeJoinPayload;)V
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
+public final class io/github/jan/supabase/realtime/RealtimeJoinPayload$Companion {
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
+}
+
+public final class io/github/jan/supabase/realtime/RealtimeKt {
+	public static final fun channel (Lio/github/jan/supabase/SupabaseClient;Ljava/lang/String;Lkotlin/jvm/functions/Function1;)Lio/github/jan/supabase/realtime/RealtimeChannel;
+	public static final fun channel (Lio/github/jan/supabase/realtime/Realtime;Ljava/lang/String;Lkotlin/jvm/functions/Function1;)Lio/github/jan/supabase/realtime/RealtimeChannel;
+	public static synthetic fun channel$default (Lio/github/jan/supabase/SupabaseClient;Ljava/lang/String;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Lio/github/jan/supabase/realtime/RealtimeChannel;
+	public static synthetic fun channel$default (Lio/github/jan/supabase/realtime/Realtime;Ljava/lang/String;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Lio/github/jan/supabase/realtime/RealtimeChannel;
+	public static final fun getRealtime (Lio/github/jan/supabase/SupabaseClient;)Lio/github/jan/supabase/realtime/Realtime;
+}
+
+public final class io/github/jan/supabase/realtime/RealtimeMessage {
+	public static final field Companion Lio/github/jan/supabase/realtime/RealtimeMessage$Companion;
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;Lkotlinx/serialization/json/JsonObject;Ljava/lang/String;Ljava/lang/String;)V
+	public synthetic fun <init> (Ljava/lang/String;Ljava/lang/String;Lkotlinx/serialization/json/JsonObject;Ljava/lang/String;Ljava/lang/String;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Ljava/lang/String;
+	public final fun component3 ()Lkotlinx/serialization/json/JsonObject;
+	public final fun component4 ()Ljava/lang/String;
+	public final fun component5 ()Ljava/lang/String;
+	public final fun copy (Ljava/lang/String;Ljava/lang/String;Lkotlinx/serialization/json/JsonObject;Ljava/lang/String;Ljava/lang/String;)Lio/github/jan/supabase/realtime/RealtimeMessage;
+	public static synthetic fun copy$default (Lio/github/jan/supabase/realtime/RealtimeMessage;Ljava/lang/String;Ljava/lang/String;Lkotlinx/serialization/json/JsonObject;Ljava/lang/String;Ljava/lang/String;ILjava/lang/Object;)Lio/github/jan/supabase/realtime/RealtimeMessage;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getEvent ()Ljava/lang/String;
+	public final fun getJoinRef ()Ljava/lang/String;
+	public final fun getPayload ()Lkotlinx/serialization/json/JsonObject;
+	public final fun getRef ()Ljava/lang/String;
+	public final fun getTopic ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final synthetic class io/github/jan/supabase/realtime/RealtimeMessage$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lio/github/jan/supabase/realtime/RealtimeMessage$$serializer;
+	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public final fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lio/github/jan/supabase/realtime/RealtimeMessage;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public final fun serialize (Lkotlinx/serialization/encoding/Encoder;Lio/github/jan/supabase/realtime/RealtimeMessage;)V
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
+public final class io/github/jan/supabase/realtime/RealtimeMessage$Companion {
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
+}
+
+public final class io/github/jan/supabase/realtime/RealtimeProtocolVersion : java/lang/Enum {
+	public static final field V1 Lio/github/jan/supabase/realtime/RealtimeProtocolVersion;
+	public static final field V2 Lio/github/jan/supabase/realtime/RealtimeProtocolVersion;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public final fun getValue ()Ljava/lang/String;
+	public static fun valueOf (Ljava/lang/String;)Lio/github/jan/supabase/realtime/RealtimeProtocolVersion;
+	public static fun values ()[Lio/github/jan/supabase/realtime/RealtimeProtocolVersion;
+}
+
+public final class io/github/jan/supabase/realtime/RealtimeSystemPayload {
+	public static final field Companion Lio/github/jan/supabase/realtime/RealtimeSystemPayload$Companion;
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Ljava/lang/String;
+	public final fun component3 ()Ljava/lang/String;
+	public final fun component4 ()Ljava/lang/String;
+	public final fun copy (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Lio/github/jan/supabase/realtime/RealtimeSystemPayload;
+	public static synthetic fun copy$default (Lio/github/jan/supabase/realtime/RealtimeSystemPayload;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;ILjava/lang/Object;)Lio/github/jan/supabase/realtime/RealtimeSystemPayload;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getChannel ()Ljava/lang/String;
+	public final fun getExtension ()Ljava/lang/String;
+	public final fun getMessage ()Ljava/lang/String;
+	public final fun getStatus ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final synthetic class io/github/jan/supabase/realtime/RealtimeSystemPayload$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lio/github/jan/supabase/realtime/RealtimeSystemPayload$$serializer;
+	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public final fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lio/github/jan/supabase/realtime/RealtimeSystemPayload;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public final fun serialize (Lkotlinx/serialization/encoding/Encoder;Lio/github/jan/supabase/realtime/RealtimeSystemPayload;)V
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
+public final class io/github/jan/supabase/realtime/RealtimeSystemPayload$Companion {
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
+}
+
+public final class io/github/jan/supabase/realtime/RealtimeTopic {
+	public static final field INSTANCE Lio/github/jan/supabase/realtime/RealtimeTopic;
+	public static final field PREFIX Ljava/lang/String;
+	public final fun withChannelId (Ljava/lang/String;)Ljava/lang/String;
+}
+
+public abstract interface annotation class io/github/jan/supabase/realtime/annotations/ChannelDsl : java/lang/annotation/Annotation {
+}
+
+public abstract interface class io/github/jan/supabase/realtime/broadcast/BroadcastPayload {
+}
+
+public final class io/github/jan/supabase/realtime/broadcast/BroadcastPayload$Binary : io/github/jan/supabase/realtime/broadcast/BroadcastPayload {
+	public fun <init> ([B)V
+	public final fun getData ()[B
+}
+
+public final class io/github/jan/supabase/realtime/broadcast/BroadcastPayload$Json : io/github/jan/supabase/realtime/broadcast/BroadcastPayload {
+	public fun <init> (Lkotlinx/serialization/json/JsonElement;)V
+	public final fun component1 ()Lkotlinx/serialization/json/JsonElement;
+	public final fun copy (Lkotlinx/serialization/json/JsonElement;)Lio/github/jan/supabase/realtime/broadcast/BroadcastPayload$Json;
+	public static synthetic fun copy$default (Lio/github/jan/supabase/realtime/broadcast/BroadcastPayload$Json;Lkotlinx/serialization/json/JsonElement;ILjava/lang/Object;)Lio/github/jan/supabase/realtime/broadcast/BroadcastPayload$Json;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getValue ()Lkotlinx/serialization/json/JsonElement;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/jan/supabase/realtime/broadcast/RealtimeBroadcast {
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;Lio/github/jan/supabase/realtime/broadcast/BroadcastPayload;)V
+	public final fun getEvent ()Ljava/lang/String;
+	public final fun getPayload ()Lio/github/jan/supabase/realtime/broadcast/BroadcastPayload;
+	public final fun getTopic ()Ljava/lang/String;
+}
+
+public final class io/github/jan/supabase/realtime/event/RBroadcastEvent : io/github/jan/supabase/realtime/event/RealtimeEvent {
+	public static final field INSTANCE Lio/github/jan/supabase/realtime/event/RBroadcastEvent;
+	public fun appliesTo (Lio/github/jan/supabase/realtime/RealtimeMessage;)Z
+	public fun equals (Ljava/lang/Object;)Z
+	public fun handle (Lio/github/jan/supabase/realtime/RealtimeChannel;Lio/github/jan/supabase/realtime/RealtimeMessage;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/jan/supabase/realtime/event/RCloseEvent : io/github/jan/supabase/realtime/event/RealtimeEvent {
+	public static final field INSTANCE Lio/github/jan/supabase/realtime/event/RCloseEvent;
+	public fun appliesTo (Lio/github/jan/supabase/realtime/RealtimeMessage;)Z
+	public fun equals (Ljava/lang/Object;)Z
+	public fun handle (Lio/github/jan/supabase/realtime/RealtimeChannel;Lio/github/jan/supabase/realtime/RealtimeMessage;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/jan/supabase/realtime/event/RErrorEvent : io/github/jan/supabase/realtime/event/RealtimeEvent {
+	public static final field INSTANCE Lio/github/jan/supabase/realtime/event/RErrorEvent;
+	public fun appliesTo (Lio/github/jan/supabase/realtime/RealtimeMessage;)Z
+	public fun equals (Ljava/lang/Object;)Z
+	public fun handle (Lio/github/jan/supabase/realtime/RealtimeChannel;Lio/github/jan/supabase/realtime/RealtimeMessage;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/jan/supabase/realtime/event/RPostgresChangesEvent : io/github/jan/supabase/realtime/event/RealtimeEvent {
+	public static final field INSTANCE Lio/github/jan/supabase/realtime/event/RPostgresChangesEvent;
+	public fun appliesTo (Lio/github/jan/supabase/realtime/RealtimeMessage;)Z
+	public fun equals (Ljava/lang/Object;)Z
+	public fun handle (Lio/github/jan/supabase/realtime/RealtimeChannel;Lio/github/jan/supabase/realtime/RealtimeMessage;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/jan/supabase/realtime/event/RPostgresServerChangesEvent : io/github/jan/supabase/realtime/event/RealtimeEvent {
+	public static final field INSTANCE Lio/github/jan/supabase/realtime/event/RPostgresServerChangesEvent;
+	public fun appliesTo (Lio/github/jan/supabase/realtime/RealtimeMessage;)Z
+	public fun equals (Ljava/lang/Object;)Z
+	public fun handle (Lio/github/jan/supabase/realtime/RealtimeChannel;Lio/github/jan/supabase/realtime/RealtimeMessage;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/jan/supabase/realtime/event/RPresenceDiffEvent : io/github/jan/supabase/realtime/event/RealtimeEvent {
+	public static final field INSTANCE Lio/github/jan/supabase/realtime/event/RPresenceDiffEvent;
+	public fun appliesTo (Lio/github/jan/supabase/realtime/RealtimeMessage;)Z
+	public fun equals (Ljava/lang/Object;)Z
+	public fun handle (Lio/github/jan/supabase/realtime/RealtimeChannel;Lio/github/jan/supabase/realtime/RealtimeMessage;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/jan/supabase/realtime/event/RPresenceStateEvent : io/github/jan/supabase/realtime/event/RealtimeEvent {
+	public static final field INSTANCE Lio/github/jan/supabase/realtime/event/RPresenceStateEvent;
+	public fun appliesTo (Lio/github/jan/supabase/realtime/RealtimeMessage;)Z
+	public fun equals (Ljava/lang/Object;)Z
+	public fun handle (Lio/github/jan/supabase/realtime/RealtimeChannel;Lio/github/jan/supabase/realtime/RealtimeMessage;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/jan/supabase/realtime/event/RSystemEvent : io/github/jan/supabase/realtime/event/RealtimeEvent {
+	public static final field INSTANCE Lio/github/jan/supabase/realtime/event/RSystemEvent;
+	public fun appliesTo (Lio/github/jan/supabase/realtime/RealtimeMessage;)Z
+	public fun equals (Ljava/lang/Object;)Z
+	public fun handle (Lio/github/jan/supabase/realtime/RealtimeChannel;Lio/github/jan/supabase/realtime/RealtimeMessage;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/jan/supabase/realtime/event/RSystemReplyEvent : io/github/jan/supabase/realtime/event/RealtimeEvent {
+	public static final field INSTANCE Lio/github/jan/supabase/realtime/event/RSystemReplyEvent;
+	public fun appliesTo (Lio/github/jan/supabase/realtime/RealtimeMessage;)Z
+	public fun equals (Ljava/lang/Object;)Z
+	public fun handle (Lio/github/jan/supabase/realtime/RealtimeChannel;Lio/github/jan/supabase/realtime/RealtimeMessage;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/jan/supabase/realtime/event/RTokenExpiredEvent : io/github/jan/supabase/realtime/event/RealtimeEvent {
+	public static final field INSTANCE Lio/github/jan/supabase/realtime/event/RTokenExpiredEvent;
+	public fun appliesTo (Lio/github/jan/supabase/realtime/RealtimeMessage;)Z
+	public fun equals (Ljava/lang/Object;)Z
+	public fun handle (Lio/github/jan/supabase/realtime/RealtimeChannel;Lio/github/jan/supabase/realtime/RealtimeMessage;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/jan/supabase/realtime/postgres/RealtimePostgresChangesFilterOperator : java/lang/Enum {
+	public static final field EQ Lio/github/jan/supabase/realtime/postgres/RealtimePostgresChangesFilterOperator;
+	public static final field GT Lio/github/jan/supabase/realtime/postgres/RealtimePostgresChangesFilterOperator;
+	public static final field GTE Lio/github/jan/supabase/realtime/postgres/RealtimePostgresChangesFilterOperator;
+	public static final field ILIKE Lio/github/jan/supabase/realtime/postgres/RealtimePostgresChangesFilterOperator;
+	public static final field IMATCH Lio/github/jan/supabase/realtime/postgres/RealtimePostgresChangesFilterOperator;
+	public static final field IN Lio/github/jan/supabase/realtime/postgres/RealtimePostgresChangesFilterOperator;
+	public static final field IS Lio/github/jan/supabase/realtime/postgres/RealtimePostgresChangesFilterOperator;
+	public static final field ISDISTINCT Lio/github/jan/supabase/realtime/postgres/RealtimePostgresChangesFilterOperator;
+	public static final field LIKE Lio/github/jan/supabase/realtime/postgres/RealtimePostgresChangesFilterOperator;
+	public static final field LT Lio/github/jan/supabase/realtime/postgres/RealtimePostgresChangesFilterOperator;
+	public static final field LTE Lio/github/jan/supabase/realtime/postgres/RealtimePostgresChangesFilterOperator;
+	public static final field MATCH Lio/github/jan/supabase/realtime/postgres/RealtimePostgresChangesFilterOperator;
+	public static final field NEQ Lio/github/jan/supabase/realtime/postgres/RealtimePostgresChangesFilterOperator;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public static fun valueOf (Ljava/lang/String;)Lio/github/jan/supabase/realtime/postgres/RealtimePostgresChangesFilterOperator;
+	public static fun values ()[Lio/github/jan/supabase/realtime/postgres/RealtimePostgresChangesFilterOperator;
+}
+
+public final class io/github/jan/supabase/realtime/postgres/RealtimePostgresFilterBuilder {
+	public fun <init> ()V
+	public final fun build ()Ljava/lang/String;
+	public final fun eq (Ljava/lang/String;Ljava/lang/Object;)V
+	public final fun exact (Ljava/lang/String;Ljava/lang/Object;)V
+	public final fun getFilters ()Ljava/util/List;
+	public final fun gt (Ljava/lang/String;Ljava/lang/Object;)V
+	public final fun gte (Ljava/lang/String;Ljava/lang/Object;)V
+	public final fun ilike (Ljava/lang/String;Ljava/lang/String;)V
+	public final fun imatch (Ljava/lang/String;Ljava/lang/String;)V
+	public final fun isDistinct (Ljava/lang/String;Ljava/lang/Object;)V
+	public final fun isIn (Ljava/lang/String;Ljava/util/List;)V
+	public final fun like (Ljava/lang/String;Ljava/lang/String;)V
+	public final fun lt (Ljava/lang/String;Ljava/lang/Object;)V
+	public final fun lte (Ljava/lang/String;Ljava/lang/Object;)V
+	public final fun match (Ljava/lang/String;Ljava/lang/String;)V
+	public final fun neq (Ljava/lang/String;Ljava/lang/Object;)V
+	public final fun not (Ljava/lang/String;Lio/github/jan/supabase/realtime/postgres/RealtimePostgresChangesFilterOperator;Ljava/lang/Object;)V
+}
+
+public final class io/github/jan/supabase/realtime/websocket/KtorRealtimeWebsocket : io/github/jan/supabase/realtime/websocket/RealtimeWebsocket {
+	public fun <init> (Lio/ktor/client/plugins/websocket/DefaultClientWebSocketSession;)V
+	public fun blockUntilDisconnect (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun disconnect ()V
+	public fun getHasIncomingMessages ()Z
+	public fun makeRef ()Ljava/lang/String;
+	public fun receive (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun send (Lio/github/jan/supabase/realtime/RealtimeMessage;Lio/github/jan/supabase/realtime/RealtimeProtocolVersion;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun send ([BLkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
+public final class io/github/jan/supabase/realtime/websocket/KtorRealtimeWebsocketFactory : io/github/jan/supabase/realtime/websocket/RealtimeWebsocketFactory {
+	public fun <init> (Lio/ktor/client/HttpClient;)V
+	public fun create (Ljava/lang/String;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
+public abstract interface class io/github/jan/supabase/realtime/websocket/RealtimeWebsocket {
+	public abstract fun blockUntilDisconnect (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun disconnect ()V
+	public abstract fun getHasIncomingMessages ()Z
+	public abstract fun makeRef ()Ljava/lang/String;
+	public abstract fun receive (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun send (Lio/github/jan/supabase/realtime/RealtimeMessage;Lio/github/jan/supabase/realtime/RealtimeProtocolVersion;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun send ([BLkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
+public abstract interface class io/github/jan/supabase/realtime/websocket/RealtimeWebsocketFactory {
+	public abstract fun create (Ljava/lang/String;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+

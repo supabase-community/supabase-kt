@@ -1,0 +1,124 @@
+// Klib ABI Dump
+// Targets: [iosArm64, iosSimulatorArm64, iosX64, js, linuxX64, macosArm64, macosX64, mingwX64, tvosArm64, tvosSimulatorArm64, tvosX64, wasmJs, watchosArm64, watchosSimulatorArm64, watchosX64]
+// Rendering settings:
+// - Signature version: 2
+// - Show manifest properties: true
+// - Show declarations: true
+
+// Library unique name: <io.github.jan-tennert.supabase:functions-kt>
+final enum class io.github.jan.supabase.functions/FunctionRegion : kotlin/Enum<io.github.jan.supabase.functions/FunctionRegion> { // io.github.jan.supabase.functions/FunctionRegion|null[0]
+    enum entry ANY // io.github.jan.supabase.functions/FunctionRegion.ANY|null[0]
+    enum entry AP_NORTHEAST_1 // io.github.jan.supabase.functions/FunctionRegion.AP_NORTHEAST_1|null[0]
+    enum entry AP_NORTHEAST_2 // io.github.jan.supabase.functions/FunctionRegion.AP_NORTHEAST_2|null[0]
+    enum entry AP_SOUTHEAST_1 // io.github.jan.supabase.functions/FunctionRegion.AP_SOUTHEAST_1|null[0]
+    enum entry AP_SOUTHEAST_2 // io.github.jan.supabase.functions/FunctionRegion.AP_SOUTHEAST_2|null[0]
+    enum entry AP_SOUTH_1 // io.github.jan.supabase.functions/FunctionRegion.AP_SOUTH_1|null[0]
+    enum entry CA_CENTRAL_1 // io.github.jan.supabase.functions/FunctionRegion.CA_CENTRAL_1|null[0]
+    enum entry EU_CENTRAL_1 // io.github.jan.supabase.functions/FunctionRegion.EU_CENTRAL_1|null[0]
+    enum entry EU_WEST_1 // io.github.jan.supabase.functions/FunctionRegion.EU_WEST_1|null[0]
+    enum entry EU_WEST_2 // io.github.jan.supabase.functions/FunctionRegion.EU_WEST_2|null[0]
+    enum entry EU_WEST_3 // io.github.jan.supabase.functions/FunctionRegion.EU_WEST_3|null[0]
+    enum entry SA_EAST_1 // io.github.jan.supabase.functions/FunctionRegion.SA_EAST_1|null[0]
+    enum entry US_EAST_1 // io.github.jan.supabase.functions/FunctionRegion.US_EAST_1|null[0]
+    enum entry US_WEST_1 // io.github.jan.supabase.functions/FunctionRegion.US_WEST_1|null[0]
+    enum entry US_WEST_2 // io.github.jan.supabase.functions/FunctionRegion.US_WEST_2|null[0]
+
+    final val entries // io.github.jan.supabase.functions/FunctionRegion.entries|#static{}entries[0]
+        final fun <get-entries>(): kotlin.enums/EnumEntries<io.github.jan.supabase.functions/FunctionRegion> // io.github.jan.supabase.functions/FunctionRegion.entries.<get-entries>|<get-entries>#static(){}[0]
+    final val value // io.github.jan.supabase.functions/FunctionRegion.value|{}value[0]
+        final fun <get-value>(): kotlin/String // io.github.jan.supabase.functions/FunctionRegion.value.<get-value>|<get-value>(){}[0]
+
+    final fun valueOf(kotlin/String): io.github.jan.supabase.functions/FunctionRegion // io.github.jan.supabase.functions/FunctionRegion.valueOf|valueOf#static(kotlin.String){}[0]
+    final fun values(): kotlin/Array<io.github.jan.supabase.functions/FunctionRegion> // io.github.jan.supabase.functions/FunctionRegion.values|values#static(){}[0]
+}
+
+final class io.github.jan.supabase.functions/EdgeFunction { // io.github.jan.supabase.functions/EdgeFunction|null[0]
+    constructor <init>(kotlin/String, io.ktor.http/Headers, io.github.jan.supabase/SupabaseClient) // io.github.jan.supabase.functions/EdgeFunction.<init>|<init>(kotlin.String;io.ktor.http.Headers;io.github.jan.supabase.SupabaseClient){}[0]
+
+    final val functionName // io.github.jan.supabase.functions/EdgeFunction.functionName|{}functionName[0]
+        final fun <get-functionName>(): kotlin/String // io.github.jan.supabase.functions/EdgeFunction.functionName.<get-functionName>|<get-functionName>(){}[0]
+    final val headers // io.github.jan.supabase.functions/EdgeFunction.headers|{}headers[0]
+        final fun <get-headers>(): io.ktor.http/Headers // io.github.jan.supabase.functions/EdgeFunction.headers.<get-headers>|<get-headers>(){}[0]
+    final val supabaseClient // io.github.jan.supabase.functions/EdgeFunction.supabaseClient|{}supabaseClient[0]
+        final fun <get-supabaseClient>(): io.github.jan.supabase/SupabaseClient // io.github.jan.supabase.functions/EdgeFunction.supabaseClient.<get-supabaseClient>|<get-supabaseClient>(){}[0]
+
+    final fun invokeSSE(kotlin/Function1<io.ktor.client.request/HttpRequestBuilder, kotlin/Unit> = ...): kotlinx.coroutines.flow/Flow<io.github.jan.supabase.functions/FunctionServerSentEvent> // io.github.jan.supabase.functions/EdgeFunction.invokeSSE|invokeSSE(kotlin.Function1<io.ktor.client.request.HttpRequestBuilder,kotlin.Unit>){}[0]
+    final suspend inline fun <#A1: reified kotlin/Any> invoke(#A1, crossinline kotlin/Function1<io.ktor.client.request/HttpRequestBuilder, kotlin/Unit> = ...): io.ktor.client.statement/HttpResponse // io.github.jan.supabase.functions/EdgeFunction.invoke|invoke(0:0;kotlin.Function1<io.ktor.client.request.HttpRequestBuilder,kotlin.Unit>){0§<kotlin.Any>}[0]
+    final suspend inline fun invoke(crossinline kotlin/Function1<io.ktor.client.request/HttpRequestBuilder, kotlin/Unit> = ...): io.ktor.client.statement/HttpResponse // io.github.jan.supabase.functions/EdgeFunction.invoke|invoke(kotlin.Function1<io.ktor.client.request.HttpRequestBuilder,kotlin.Unit>){}[0]
+    final suspend inline fun prepareInvoke(crossinline kotlin/Function1<io.ktor.client.request/HttpRequestBuilder, kotlin/Unit> = ...): io.ktor.client.statement/HttpStatement // io.github.jan.supabase.functions/EdgeFunction.prepareInvoke|prepareInvoke(kotlin.Function1<io.ktor.client.request.HttpRequestBuilder,kotlin.Unit>){}[0]
+}
+
+final class io.github.jan.supabase.functions/FunctionServerSentEvent { // io.github.jan.supabase.functions/FunctionServerSentEvent|null[0]
+    constructor <init>(kotlin/String?, kotlin/String?, kotlin/String?, io.github.jan.supabase/SupabaseSerializer) // io.github.jan.supabase.functions/FunctionServerSentEvent.<init>|<init>(kotlin.String?;kotlin.String?;kotlin.String?;io.github.jan.supabase.SupabaseSerializer){}[0]
+
+    final val data // io.github.jan.supabase.functions/FunctionServerSentEvent.data|{}data[0]
+        final fun <get-data>(): kotlin/String? // io.github.jan.supabase.functions/FunctionServerSentEvent.data.<get-data>|<get-data>(){}[0]
+    final val event // io.github.jan.supabase.functions/FunctionServerSentEvent.event|{}event[0]
+        final fun <get-event>(): kotlin/String? // io.github.jan.supabase.functions/FunctionServerSentEvent.event.<get-event>|<get-event>(){}[0]
+    final val id // io.github.jan.supabase.functions/FunctionServerSentEvent.id|{}id[0]
+        final fun <get-id>(): kotlin/String? // io.github.jan.supabase.functions/FunctionServerSentEvent.id.<get-id>|<get-id>(){}[0]
+    final val serializer // io.github.jan.supabase.functions/FunctionServerSentEvent.serializer|{}serializer[0]
+        final fun <get-serializer>(): io.github.jan.supabase/SupabaseSerializer // io.github.jan.supabase.functions/FunctionServerSentEvent.serializer.<get-serializer>|<get-serializer>(){}[0]
+
+    final inline fun <#A1: reified kotlin/Any?> decodeAs(): #A1 // io.github.jan.supabase.functions/FunctionServerSentEvent.decodeAs|decodeAs(){0§<kotlin.Any?>}[0]
+}
+
+final class io.github.jan.supabase.functions/Functions : io.github.jan.supabase.plugins/CustomSerializationPlugin, io.github.jan.supabase.plugins/MainPlugin<io.github.jan.supabase.functions/Functions.Config> { // io.github.jan.supabase.functions/Functions|null[0]
+    constructor <init>(io.github.jan.supabase.functions/Functions.Config, io.github.jan.supabase/SupabaseClient) // io.github.jan.supabase.functions/Functions.<init>|<init>(io.github.jan.supabase.functions.Functions.Config;io.github.jan.supabase.SupabaseClient){}[0]
+
+    final val api // io.github.jan.supabase.functions/Functions.api|{}api[0]
+        final fun <get-api>(): io.github.jan.supabase.auth.api/AuthenticatedSupabaseApi // io.github.jan.supabase.functions/Functions.api.<get-api>|<get-api>(){}[0]
+    final val apiVersion // io.github.jan.supabase.functions/Functions.apiVersion|{}apiVersion[0]
+        final fun <get-apiVersion>(): kotlin/Int // io.github.jan.supabase.functions/Functions.apiVersion.<get-apiVersion>|<get-apiVersion>(){}[0]
+    final val config // io.github.jan.supabase.functions/Functions.config|{}config[0]
+        final fun <get-config>(): io.github.jan.supabase.functions/Functions.Config // io.github.jan.supabase.functions/Functions.config.<get-config>|<get-config>(){}[0]
+    final val logger // io.github.jan.supabase.functions/Functions.logger|{}logger[0]
+        final fun <get-logger>(): io.github.jan.supabase.logging/SupabaseLogger // io.github.jan.supabase.functions/Functions.logger.<get-logger>|<get-logger>(){}[0]
+    final val pluginKey // io.github.jan.supabase.functions/Functions.pluginKey|{}pluginKey[0]
+        final fun <get-pluginKey>(): kotlin/String // io.github.jan.supabase.functions/Functions.pluginKey.<get-pluginKey>|<get-pluginKey>(){}[0]
+    final val serializer // io.github.jan.supabase.functions/Functions.serializer|{}serializer[0]
+        final fun <get-serializer>(): io.github.jan.supabase/SupabaseSerializer // io.github.jan.supabase.functions/Functions.serializer.<get-serializer>|<get-serializer>(){}[0]
+    final val supabaseClient // io.github.jan.supabase.functions/Functions.supabaseClient|{}supabaseClient[0]
+        final fun <get-supabaseClient>(): io.github.jan.supabase/SupabaseClient // io.github.jan.supabase.functions/Functions.supabaseClient.<get-supabaseClient>|<get-supabaseClient>(){}[0]
+
+    final fun buildEdgeFunction(kotlin/String, io.github.jan.supabase.functions/FunctionRegion = ..., io.ktor.http/Headers = ...): io.github.jan.supabase.functions/EdgeFunction // io.github.jan.supabase.functions/Functions.buildEdgeFunction|buildEdgeFunction(kotlin.String;io.github.jan.supabase.functions.FunctionRegion;io.ktor.http.Headers){}[0]
+    final fun invokeSSE(kotlin/String, io.github.jan.supabase.functions/FunctionRegion = ..., kotlin/Function1<io.ktor.client.request/HttpRequestBuilder, kotlin/Unit> = ...): kotlinx.coroutines.flow/Flow<io.github.jan.supabase.functions/FunctionServerSentEvent> // io.github.jan.supabase.functions/Functions.invokeSSE|invokeSSE(kotlin.String;io.github.jan.supabase.functions.FunctionRegion;kotlin.Function1<io.ktor.client.request.HttpRequestBuilder,kotlin.Unit>){}[0]
+    final suspend fun parseErrorResponse(io.ktor.client.statement/HttpResponse): io.github.jan.supabase.exceptions/RestException // io.github.jan.supabase.functions/Functions.parseErrorResponse|parseErrorResponse(io.ktor.client.statement.HttpResponse){}[0]
+    final suspend inline fun <#A1: reified kotlin/Any> invoke(kotlin/String, #A1, io.github.jan.supabase.functions/FunctionRegion = ..., io.ktor.http/Headers = ...): io.ktor.client.statement/HttpResponse // io.github.jan.supabase.functions/Functions.invoke|invoke(kotlin.String;0:0;io.github.jan.supabase.functions.FunctionRegion;io.ktor.http.Headers){0§<kotlin.Any>}[0]
+    final suspend inline fun invoke(kotlin/String, io.github.jan.supabase.functions/FunctionRegion = ..., crossinline kotlin/Function1<io.ktor.client.request/HttpRequestBuilder, kotlin/Unit>): io.ktor.client.statement/HttpResponse // io.github.jan.supabase.functions/Functions.invoke|invoke(kotlin.String;io.github.jan.supabase.functions.FunctionRegion;kotlin.Function1<io.ktor.client.request.HttpRequestBuilder,kotlin.Unit>){}[0]
+    final suspend inline fun invoke(kotlin/String, io.github.jan.supabase.functions/FunctionRegion = ..., io.ktor.http/Headers = ...): io.ktor.client.statement/HttpResponse // io.github.jan.supabase.functions/Functions.invoke|invoke(kotlin.String;io.github.jan.supabase.functions.FunctionRegion;io.ktor.http.Headers){}[0]
+    final suspend inline fun prepareInvoke(kotlin/String, io.github.jan.supabase.functions/FunctionRegion = ..., crossinline kotlin/Function1<io.ktor.client.request/HttpRequestBuilder, kotlin/Unit> = ...): io.ktor.client.statement/HttpStatement // io.github.jan.supabase.functions/Functions.prepareInvoke|prepareInvoke(kotlin.String;io.github.jan.supabase.functions.FunctionRegion;kotlin.Function1<io.ktor.client.request.HttpRequestBuilder,kotlin.Unit>){}[0]
+
+    final class Config : io.github.jan.supabase.auth/AuthDependentPluginConfig, io.github.jan.supabase.plugins/CustomSerializationConfig, io.github.jan.supabase.plugins/MainConfig { // io.github.jan.supabase.functions/Functions.Config|null[0]
+        constructor <init>() // io.github.jan.supabase.functions/Functions.Config.<init>|<init>(){}[0]
+
+        final var defaultRegion // io.github.jan.supabase.functions/Functions.Config.defaultRegion|{}defaultRegion[0]
+            final fun <get-defaultRegion>(): io.github.jan.supabase.functions/FunctionRegion // io.github.jan.supabase.functions/Functions.Config.defaultRegion.<get-defaultRegion>|<get-defaultRegion>(){}[0]
+            final fun <set-defaultRegion>(io.github.jan.supabase.functions/FunctionRegion) // io.github.jan.supabase.functions/Functions.Config.defaultRegion.<set-defaultRegion>|<set-defaultRegion>(io.github.jan.supabase.functions.FunctionRegion){}[0]
+        final var requireValidSession // io.github.jan.supabase.functions/Functions.Config.requireValidSession|{}requireValidSession[0]
+            final fun <get-requireValidSession>(): kotlin/Boolean // io.github.jan.supabase.functions/Functions.Config.requireValidSession.<get-requireValidSession>|<get-requireValidSession>(){}[0]
+            final fun <set-requireValidSession>(kotlin/Boolean) // io.github.jan.supabase.functions/Functions.Config.requireValidSession.<set-requireValidSession>|<set-requireValidSession>(kotlin.Boolean){}[0]
+        final var serializer // io.github.jan.supabase.functions/Functions.Config.serializer|{}serializer[0]
+            final fun <get-serializer>(): io.github.jan.supabase/SupabaseSerializer? // io.github.jan.supabase.functions/Functions.Config.serializer.<get-serializer>|<get-serializer>(){}[0]
+            final fun <set-serializer>(io.github.jan.supabase/SupabaseSerializer?) // io.github.jan.supabase.functions/Functions.Config.serializer.<set-serializer>|<set-serializer>(io.github.jan.supabase.SupabaseSerializer?){}[0]
+    }
+
+    final object Companion : io.github.jan.supabase.plugins/SupabasePluginProvider<io.github.jan.supabase.functions/Functions.Config, io.github.jan.supabase.functions/Functions> { // io.github.jan.supabase.functions/Functions.Companion|null[0]
+        final const val API_VERSION // io.github.jan.supabase.functions/Functions.Companion.API_VERSION|{}API_VERSION[0]
+            final fun <get-API_VERSION>(): kotlin/Int // io.github.jan.supabase.functions/Functions.Companion.API_VERSION.<get-API_VERSION>|<get-API_VERSION>(){}[0]
+        final const val LOGGING_TAG // io.github.jan.supabase.functions/Functions.Companion.LOGGING_TAG|{}LOGGING_TAG[0]
+            final fun <get-LOGGING_TAG>(): kotlin/String // io.github.jan.supabase.functions/Functions.Companion.LOGGING_TAG.<get-LOGGING_TAG>|<get-LOGGING_TAG>(){}[0]
+        final const val X_REGION_HEADER // io.github.jan.supabase.functions/Functions.Companion.X_REGION_HEADER|{}X_REGION_HEADER[0]
+            final fun <get-X_REGION_HEADER>(): kotlin/String // io.github.jan.supabase.functions/Functions.Companion.X_REGION_HEADER.<get-X_REGION_HEADER>|<get-X_REGION_HEADER>(){}[0]
+
+        final val key // io.github.jan.supabase.functions/Functions.Companion.key|{}key[0]
+            final fun <get-key>(): kotlin/String // io.github.jan.supabase.functions/Functions.Companion.key.<get-key>|<get-key>(){}[0]
+
+        final fun create(io.github.jan.supabase/SupabaseClient, io.github.jan.supabase.functions/Functions.Config): io.github.jan.supabase.functions/Functions // io.github.jan.supabase.functions/Functions.Companion.create|create(io.github.jan.supabase.SupabaseClient;io.github.jan.supabase.functions.Functions.Config){}[0]
+        final fun createConfig(kotlin/Function1<io.github.jan.supabase.functions/Functions.Config, kotlin/Unit>): io.github.jan.supabase.functions/Functions.Config // io.github.jan.supabase.functions/Functions.Companion.createConfig|createConfig(kotlin.Function1<io.github.jan.supabase.functions.Functions.Config,kotlin.Unit>){}[0]
+        final fun setup(io.github.jan.supabase/SupabaseClientBuilder, io.github.jan.supabase.functions/Functions.Config) // io.github.jan.supabase.functions/Functions.Companion.setup|setup(io.github.jan.supabase.SupabaseClientBuilder;io.github.jan.supabase.functions.Functions.Config){}[0]
+    }
+}
+
+final val io.github.jan.supabase.functions/functions // io.github.jan.supabase.functions/functions|@io.github.jan.supabase.SupabaseClient{}functions[0]
+    final fun (io.github.jan.supabase/SupabaseClient).<get-functions>(): io.github.jan.supabase.functions/Functions // io.github.jan.supabase.functions/functions.<get-functions>|<get-functions>@io.github.jan.supabase.SupabaseClient(){}[0]

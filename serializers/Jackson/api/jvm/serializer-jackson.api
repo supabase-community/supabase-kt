@@ -1,0 +1,8 @@
+public final class io/github/jan/supabase/serializer/JacksonSerializer : io/github/jan/supabase/SupabaseSerializer {
+	public fun <init> ()V
+	public fun <init> (Lcom/fasterxml/jackson/databind/ObjectMapper;)V
+	public synthetic fun <init> (Lcom/fasterxml/jackson/databind/ObjectMapper;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun decode (Lkotlin/reflect/KType;Ljava/lang/String;)Ljava/lang/Object;
+	public fun encode (Lkotlin/reflect/KType;Ljava/lang/Object;)Ljava/lang/String;
+}
+
