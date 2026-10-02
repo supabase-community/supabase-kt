@@ -31,6 +31,12 @@ kotlin {
                 withJs()
                 withWasmJs()
             }
+            group("apple") {
+                group("uikit") {
+                    withIos()
+                    withTvos()
+                }
+            }
         }
     }
     allTargets()
