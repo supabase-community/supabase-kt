@@ -55,6 +55,30 @@ class StorageAnalyticsClientTest {
     }
 
     @Test
+    fun testCreateBucketWithServerResponseShape() = runTest {
+        // The storage server only returns id, name and timestamps for analytics buckets
+        val responseJson = buildJsonObject {
+            put("id", "my-analytics-bucket")
+            put("name", "my-analytics-bucket")
+            put("created_at", "2024-01-01T00:00:00Z")
+            put("updated_at", "2024-01-01T00:00:00Z")
+        }
+        val api = AuthenticatedSupabaseApi.minimalAuthenticatedApi(
+            httpClient = MockedHttpClient {
+                respond(
+                    content = responseJson.toString(),
+                    headers = headersOf("Content-Type" to listOf(ContentType.Application.Json.toString()))
+                )
+            }
+        )
+        val result = StorageAnalyticsClientImpl(api).createBucket("my-analytics-bucket")
+
+        assertEquals("my-analytics-bucket", result.name)
+        assertEquals("ANALYTICS", result.type)
+        assertEquals("iceberg", result.format)
+    }
+
+    @Test
     fun testListBuckets() = runTest {
         val responseJson = buildJsonArray {
             add(buildJsonObject {

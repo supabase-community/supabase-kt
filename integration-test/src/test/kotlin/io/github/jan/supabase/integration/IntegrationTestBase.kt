@@ -4,6 +4,7 @@ import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.SupabaseClientBuilder
 import io.github.jan.supabase.auth.Auth
 import io.github.jan.supabase.auth.auth
+import io.github.jan.supabase.auth.minimalConfig
 import io.github.jan.supabase.auth.providers.builtin.Email
 import io.github.jan.supabase.createSupabaseClient
 import io.github.jan.supabase.functions.Functions
@@ -34,6 +35,25 @@ abstract class IntegrationTestBase {
             }
             install(Functions)
             install(Postgrest)
+            install(Storage)
+            configure()
+        }
+        clients.add(client)
+        return client
+    }
+
+    /**
+     * Creates a client that always sends [key] (by default the `service_role` key) as its bearer token.
+     * Session persistence is disabled, so a session saved by another test can't replace the key.
+     */
+    fun createStatelessClient(
+        key: String = supabaseServiceRoleKey,
+        configure: SupabaseClientBuilder.() -> Unit = {}
+    ): SupabaseClient {
+        val client = createSupabaseClient(supabaseUrl, key) {
+            install(Auth) {
+                minimalConfig()
+            }
             install(Storage)
             configure()
         }

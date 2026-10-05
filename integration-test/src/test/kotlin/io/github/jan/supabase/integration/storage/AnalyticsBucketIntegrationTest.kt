@@ -1,0 +1,126 @@
+package io.github.jan.supabase.integration.storage
+
+import io.github.jan.supabase.integration.IntegrationTestBase
+import io.github.jan.supabase.storage.BucketSortColumn
+import io.github.jan.supabase.storage.SortOrder
+import io.github.jan.supabase.storage.StorageRestException
+import io.github.jan.supabase.storage.analytics.StorageAnalyticsClient
+import io.github.jan.supabase.storage.storage
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.Assumptions.assumeTrue
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
+import kotlin.test.assertFalse
+import kotlin.test.assertTrue
+
+/**
+ * The Supabase CLI never sets `ICEBERG_ENABLED` on the local storage container, so `/storage/v1/iceberg`
+ * returns 404 after a plain `supabase start`. Run `script/enable-analytics.sh` to enable it,
+ * or point `SUPABASE_URL` and the keys at a hosted project with analytics buckets enabled.
+ * The tests are skipped when the analytics bucket API is not available.
+ */
+class AnalyticsBucketIntegrationTest : IntegrationTestBase() {
+
+    private val analytics: StorageAnalyticsClient by lazy {
+        createStatelessClient().storage.analytics
+    }
+
+    private val createdBuckets = mutableListOf<String>()
+
+    private fun uniqueName(prefix: String) = "$prefix-${System.nanoTime()}"
+
+    private suspend fun createBucket(name: String = uniqueName("it-analytics")): String {
+        // Registered first so the bucket is cleaned up even if decoding the response fails
+        createdBuckets += name
+        analytics.createBucket(name)
+        return name
+    }
+
+    @BeforeEach
+    fun requireAnalyticsBuckets() = runBlocking {
+        val available = try {
+            analytics.listBuckets { limit = 1 }
+            true
+        } catch (e: StorageRestException) {
+            // 404: route not registered, 403/409: FeatureNotEnabled
+            if (e.statusCode !in setOf(403, 404, 409)) throw e
+            false
+        }
+        assumeTrue(available, "Analytics buckets are not enabled on $supabaseUrl")
+    }
+
+    @AfterEach
+    fun deleteBuckets() = runBlocking {
+        createdBuckets.forEach { runCatching { analytics.deleteBucket(it) } }
+        createdBuckets.clear()
+    }
+
+    @Test
+    fun testCreateBucket() = runTest {
+        val name = uniqueName("it-analytics")
+
+        createdBuckets += name
+        val bucket = analytics.createBucket(name)
+
+        assertEquals(name, bucket.name)
+    }
+
+    @Test
+    fun testCreateDuplicateBucketFails() = runTest {
+        val name = createBucket()
+
+        assertFailsWith<StorageRestException> {
+            analytics.createBucket(name)
+        }
+    }
+
+    @Test
+    fun testListBucketsWithSearchAndSort() = runTest {
+        val prefix = uniqueName("it-analytics-list")
+        val names = listOf("$prefix-a", "$prefix-b").onEach { createBucket(it) }
+
+        val ascending = analytics.listBuckets {
+            search = prefix
+            sortBy(BucketSortColumn.NAME, SortOrder.ASC)
+        }
+        assertEquals(names, ascending.map { it.name })
+
+        val descending = analytics.listBuckets {
+            search = prefix
+            sortBy(BucketSortColumn.NAME, SortOrder.DESC)
+        }
+        assertEquals(names.reversed(), descending.map { it.name })
+
+        val limited = analytics.listBuckets {
+            search = prefix
+            limit = 1
+            offset = 1
+            sortBy(BucketSortColumn.NAME, SortOrder.ASC)
+        }
+        assertEquals(names.drop(1), limited.map { it.name })
+    }
+
+    @Test
+    fun testDeleteBucket() = runTest {
+        val name = createBucket(uniqueName("it-analytics-delete"))
+
+        val message = analytics.deleteBucket(name)
+
+        assertTrue(message.isNotBlank())
+        assertFalse(name in analytics.listBuckets { search = name }.map { it.name })
+    }
+
+    @Test
+    fun testIcebergClientConfiguration() = runTest {
+        val config = analytics.getIcebergClientConfiguration()
+
+        assertTrue(config.baseUrl.trimEnd('/').endsWith("/storage/v1/iceberg"), config.baseUrl)
+        val headers = config.defaultHeaders()
+        assertEquals(supabaseServiceRoleKey, headers["apikey"])
+    }
+
+}
