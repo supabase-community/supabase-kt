@@ -119,4 +119,37 @@ If that doesn't help, enable logging and check for errors.
 
 </details>
 
+<details><summary>I wrote my own SessionManager and the restored session is incomplete or wrong</summary>
+
+You may want your own `SessionManager` when the default storage does not fit:
+to keep the token somewhere else (Keychain, encrypted preferences, DataStore),
+to plug in a storage layer you already have in common code, or to keep more
+than one session at the same time. The interface is three methods:
+`saveSession`, `loadSession` and `deleteSession`. Pass it in the Auth config:
+
+```kotlin
+install(Auth) {
+    sessionManager = MySessionManager()
+}
+```
+
+Two things to know when writing one:
+
+- **If you serialize `UserSession` with kotlinx.serialization, the `Json`
+  instance needs `encodeDefaults = true`.** The default `Json` skips fields
+  that hold their default value, so the saved JSON looks fine but the session
+  restored on the next launch is missing fields. The built-in
+  `SettingsSessionManager` uses its own `Json` with `encodeDefaults = true`
+  for this reason.
+- **`SettingsSessionManager` is not available in `commonMain`.** It lives in
+  an intermediate source set, so you cannot extend it or reference it from
+  common code; write your own against the interface, or create it from
+  platform code.
+
+If all you need is several sessions stored side by side, you do not need
+your own implementation: `SettingsSessionManager` takes a `key` parameter,
+so each `SupabaseClient` can keep its session under its own key.
+
+</details>
+
 **If your problem does not occur here, feel free to create an [issue](https://github.com/supabase-community/supabase-kt/issues/new/choose) or a [discussion](https://github.com/supabase-community/supabase-kt/discussions/new/choose).**
