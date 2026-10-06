@@ -276,6 +276,70 @@ class PostgrestFilterBuilderTest {
     }
 
     @Test
+    fun contains_escaped() {
+        val filter = filterToString {
+            contains("tags", listOf("a,b", "c"))
+        }
+        assertEquals("tags=cs.{\"a,b\",c}", filter)
+    }
+
+    @Test
+    fun contains_escaped_braces_quotes_and_backslashes() {
+        val filter = filterToString {
+            contains("tags", listOf("a{b", "c}d", "e\"f", "g\\h"))
+        }
+        assertEquals("tags=cs.{\"a{b\",\"c}d\",\"e\\\"f\",\"g\\\\h\"}", filter)
+    }
+
+    @Test
+    fun contains_quoted_empty_and_null_lookalikes() {
+        val filter = filterToString {
+            contains("tags", listOf("", "NULL", "null"))
+        }
+        assertEquals("tags=cs.{\"\",\"NULL\",\"null\"}", filter)
+    }
+
+    @Test
+    fun contains_quoted_surrounding_whitespace() {
+        val filter = filterToString {
+            contains("tags", listOf(" a "))
+        }
+        assertEquals("tags=cs.{\"+a+\"}", filter)
+    }
+
+    @Test
+    fun contains_null_element() {
+        val filter = filterToString {
+            filter("tags", FilterOperator.CS, listOf("a", null))
+        }
+        assertEquals("tags=cs.{a,NULL}", filter)
+    }
+
+    @Test
+    fun contained_escaped() {
+        val filter = filterToString {
+            contained("tags", listOf("a,b"))
+        }
+        assertEquals("tags=cd.{\"a,b\"}", filter)
+    }
+
+    @Test
+    fun overlaps_escaped() {
+        val filter = filterToString {
+            overlaps("tags", listOf("a,b"))
+        }
+        assertEquals("tags=ov.{\"a,b\"}", filter)
+    }
+
+    @Test
+    fun likeAll_escaped() {
+        val filter = filterToString {
+            likeAll("name", listOf("a{b", "c,d"))
+        }
+        assertEquals("name=like(all).{\"a{b\",\"c,d\"}", filter)
+    }
+
+    @Test
     fun and_or() {
         val filter = filterToString {
             and {
