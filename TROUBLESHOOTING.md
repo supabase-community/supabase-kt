@@ -12,6 +12,33 @@ val supabase = createSupabaseClient(supabaseUrl, supabaseKey) {
 ```
     
 
+### Reading the logs on iOS
+
+On iOS the library logs through the unified logging system (`os_log`),
+not through stdout. Setting `defaultLogLevel = LogLevel.DEBUG` is not
+enough to see them: they will not show up in the console that
+`xcrun devicectl ... --console` attaches to a physical device, so it
+looks as if the library is not logging at all.
+
+**Physical device.** Launch the app with these two environment
+variables, and the logs appear in the same console, including the
+debug level:
+
+```bash
+DEVICECTL_CHILD_OS_ACTIVITY_DT_MODE=YES DEVICECTL_CHILD_OS_ACTIVITY_MODE=debug \
+  xcrun devicectl device process launch --console --terminate-existing \
+  --device <device-id> <bundle-id>
+```
+
+**Simulator.** Stream the log of the booted simulator, filtered by
+your process name:
+
+```bash
+xcrun simctl spawn booted log stream --level debug --predicate 'process == "<AppName>"'
+```
+
+Remember to set the log level back before shipping.
+
 ## Frequent problems
 
 ### General
