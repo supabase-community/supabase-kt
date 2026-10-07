@@ -73,9 +73,10 @@ class AnalyticsBucketIntegrationTest : IntegrationTestBase() {
     fun testCreateDuplicateBucketFails() = runTest {
         val name = createBucket()
 
-        assertFailsWith<StorageRestException> {
+        val exception = assertFailsWith<StorageRestException> {
             analytics.createBucket(name)
         }
+        assertEquals(409, exception.statusCode, "Unexpected status code: ${exception.message}")
     }
 
     @Test
@@ -112,15 +113,6 @@ class AnalyticsBucketIntegrationTest : IntegrationTestBase() {
 
         assertTrue(message.isNotBlank())
         assertFalse(name in analytics.listBuckets { search = name }.map { it.name })
-    }
-
-    @Test
-    fun testIcebergClientConfiguration() = runTest {
-        val config = analytics.getIcebergClientConfiguration()
-
-        assertTrue(config.baseUrl.trimEnd('/').endsWith("/storage/v1/iceberg"), config.baseUrl)
-        val headers = config.defaultHeaders()
-        assertEquals(supabaseServiceRoleKey, headers["apikey"])
     }
 
 }

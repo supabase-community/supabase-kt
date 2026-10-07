@@ -13,28 +13,22 @@ import kotlin.test.assertTrue
 class VectorIndexIntegrationTest : VectorIntegrationTestBase() {
 
     @Test
-    fun testCreateAndGetCosineIndex() = runTest {
+    fun testCreateAndGetIndexForEachMetric() = runTest {
         val bucket = createBucket()
-        val name = createIndex(bucket, dimension = 3, metric = DistanceMetric.COSINE)
+        val api = vectors.from(bucket)
 
-        val index = vectors.from(bucket).getIndex(name)
+        listOf(DistanceMetric.COSINE, DistanceMetric.EUCLIDEAN).forEach { metric ->
+            val dimension = if (metric == DistanceMetric.EUCLIDEAN) 1536 else 3
+            val name = createIndex(bucket, uniqueName("idx-${metric.value}"), dimension, metric)
 
-        assertEquals(name, index.indexName)
-        assertEquals(bucket, index.vectorBucketName)
-        assertEquals(VectorDataType.FLOAT32, index.dataType)
-        assertEquals(3, index.dimension)
-        assertEquals(DistanceMetric.COSINE, index.distanceMetric)
-    }
+            val index = api.getIndex(name)
 
-    @Test
-    fun testCreateAndGetEuclideanIndex() = runTest {
-        val bucket = createBucket()
-        val name = createIndex(bucket, dimension = 1536, metric = DistanceMetric.EUCLIDEAN)
-
-        val index = vectors.from(bucket).getIndex(name)
-
-        assertEquals(1536, index.dimension)
-        assertEquals(DistanceMetric.EUCLIDEAN, index.distanceMetric)
+            assertEquals(name, index.indexName, "metric=$metric")
+            assertEquals(bucket, index.vectorBucketName, "metric=$metric")
+            assertEquals(VectorDataType.FLOAT32, index.dataType, "metric=$metric")
+            assertEquals(dimension, index.dimension, "metric=$metric")
+            assertEquals(metric, index.distanceMetric, "metric=$metric")
+        }
     }
 
     @Test

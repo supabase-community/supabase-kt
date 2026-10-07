@@ -1,8 +1,11 @@
 package analytics
 
 import io.github.jan.supabase.auth.api.AuthenticatedSupabaseApi
+import io.github.jan.supabase.storage.Storage
+import io.github.jan.supabase.storage.storage
 import io.github.jan.supabase.storage.analytics.StorageAnalyticsClientImpl
 import io.github.jan.supabase.testing.MockedHttpClient
+import io.github.jan.supabase.testing.createMockedSupabaseClient
 import io.ktor.client.engine.mock.respond
 import io.ktor.http.ContentType
 import io.ktor.http.HttpMethod
@@ -16,6 +19,7 @@ import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.put
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 
 class StorageAnalyticsClientTest {
 
@@ -161,6 +165,20 @@ class StorageAnalyticsClientTest {
         val result = client.deleteBucket("bucket-to-delete")
 
         assertEquals("Bucket deleted successfully", result)
+    }
+
+    @Test
+    fun testIcebergClientConfiguration() = runTest {
+        val client = createMockedSupabaseClient(
+            supabaseUrl = "https://projectref.supabase.co",
+            supabaseKey = "project-anon-key",
+            configuration = { install(Storage) }
+        ) { error("getIcebergClientConfiguration must not make a request") }
+
+        val config = client.storage.analytics.getIcebergClientConfiguration()
+
+        assertTrue(config.baseUrl.trimEnd('/').endsWith("/storage/v1/iceberg"), config.baseUrl)
+        assertEquals("project-anon-key", config.defaultHeaders()["apikey"])
     }
 
 }

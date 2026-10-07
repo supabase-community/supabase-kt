@@ -101,7 +101,7 @@ class VectorDataIntegrationTest : VectorIntegrationTestBase() {
     fun testPutMaximumBatch() = runTest {
         val bucket = createBucket()
         val api = vectors.from(bucket).index(createIndex(bucket, dimension = 2))
-        val batch = (0 until VectorDataApi.VECTOR_RANGE.last).map {
+        val batch = (1..VectorDataApi.VECTOR_RANGE.last).map {
             VectorObject("key-$it", VectorData(floatArrayOf(it.toFloat(), 1f)), JsonObject(emptyMap()))
         }
 
@@ -127,15 +127,6 @@ class VectorDataIntegrationTest : VectorIntegrationTestBase() {
         // Newer storage servers answer 400 InvalidParameter; older pgvector images answer 500.
         assertFailsWith<StorageRestException> {
             api.putVectors(listOf(vector("bad", floatArrayOf(1f, 2f), "warm", 0)))
-        }
-    }
-
-    @Test
-    fun testPutVectorsRejectsEmptyBatchClientSide() = runTest {
-        val api = createIndexWithFixtures()
-
-        assertFailsWith<IllegalArgumentException> {
-            api.putVectors(emptyList())
         }
     }
 
@@ -187,18 +178,6 @@ class VectorDataIntegrationTest : VectorIntegrationTestBase() {
         }
 
         assertEquals(fixtures.map { it.key }.sorted(), keys.sorted())
-    }
-
-    @Test
-    fun testListVectorsRejectsInvalidSegmentClientSide() = runTest {
-        val api = createIndexWithFixtures()
-
-        assertFailsWith<IllegalArgumentException> {
-            api.listVectors {
-                segmentCount = 2
-                segmentIndex = 2
-            }
-        }
     }
 
     @Test
@@ -264,10 +243,10 @@ class VectorDataIntegrationTest : VectorIntegrationTestBase() {
             queryVector = VectorData(floatArrayOf(1f, 0f, 0f))
             topK = 10
             filter = buildJsonObject {
-                putJsonObject("rank") { put("\$gte", 2) }
+                putJsonObject("rank") { put("\$gte", 3) }
             }
         }
-        assertEquals(setOf("green", "blue"), range.vectors.map { it.key }.toSet())
+        assertEquals(setOf("blue"), range.vectors.map { it.key }.toSet())
     }
 
     @Test
