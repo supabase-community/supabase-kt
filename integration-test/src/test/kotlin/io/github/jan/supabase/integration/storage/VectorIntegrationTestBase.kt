@@ -11,13 +11,6 @@ import org.junit.jupiter.api.AfterEach
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 
-/**
- * Base class for vector bucket tests.
- *
- * The vector API only accepts the `service_role` key. Locally it runs on pgvector,
- * which needs `[storage.vector] enabled = true` in `supabase/config.toml`.
- * Every bucket made through [createBucket] is deleted after the test, including its indexes and vectors.
- */
 abstract class VectorIntegrationTestBase : IntegrationTestBase() {
 
     protected val vectors: StorageVectorsClient by lazy {
@@ -29,7 +22,6 @@ abstract class VectorIntegrationTestBase : IntegrationTestBase() {
     protected fun uniqueName(prefix: String) = "$prefix-${System.nanoTime()}"
 
     protected suspend fun createBucket(name: String = uniqueName("it-vec")): String {
-        // Registered first so the bucket is cleaned up even if the test fails right after creating it
         createdBuckets += name
         vectors.createBucket(name)
         return name

@@ -17,12 +17,6 @@ import kotlin.test.assertFailsWith
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
-/**
- * The Supabase CLI never sets `ICEBERG_ENABLED` on the local storage container, so `/storage/v1/iceberg`
- * returns 404 after a plain `supabase start`. Run `script/enable-analytics.sh` to enable it,
- * or point `SUPABASE_URL` and the keys at a hosted project with analytics buckets enabled.
- * The tests are skipped when the analytics bucket API is not available.
- */
 class AnalyticsBucketIntegrationTest : IntegrationTestBase() {
 
     private val analytics: StorageAnalyticsClient by lazy {
@@ -46,7 +40,6 @@ class AnalyticsBucketIntegrationTest : IntegrationTestBase() {
             analytics.listBuckets { limit = 1 }
             true
         } catch (e: StorageRestException) {
-            // 404: route not registered, 403/409: FeatureNotEnabled
             if (e.statusCode !in setOf(403, 404, 409)) throw e
             false
         }

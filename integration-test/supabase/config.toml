@@ -32,14 +32,11 @@ enable_confirmations = false
 enabled = true
 file_size_limit = "50MiB"
 
-# Vector buckets are backed by pgvector in the local stack.
 [storage.vector]
 enabled = true
 max_buckets = 10
 max_indexes = 10
 
-# The CLI only applies this to linked hosted projects and never enables analytics (Iceberg) buckets locally.
-# Run ./script/enable-analytics.sh from the repository root after `supabase start` to enable the bucket API for the integration tests.
 [storage.analytics]
 enabled = false
 

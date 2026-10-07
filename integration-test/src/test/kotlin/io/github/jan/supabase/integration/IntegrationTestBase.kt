@@ -42,10 +42,6 @@ abstract class IntegrationTestBase {
         return client
     }
 
-    /**
-     * Creates a client that always sends [key] (by default the `service_role` key) as its bearer token.
-     * Session persistence is disabled, so a session saved by another test can't replace the key.
-     */
     fun createStatelessClient(
         key: String = supabaseServiceRoleKey,
         configure: SupabaseClientBuilder.() -> Unit = {}
