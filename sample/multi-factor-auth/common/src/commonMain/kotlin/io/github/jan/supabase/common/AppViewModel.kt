@@ -5,8 +5,8 @@ import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.auth.mfa.FactorType
 import io.github.jan.supabase.auth.mfa.MfaFactor
-import io.github.jan.supabase.auth.providers.Google
-import io.github.jan.supabase.auth.providers.builtin.Email
+import io.github.jan.supabase.auth.native.external.google.signWithGoogle
+import io.github.jan.supabase.auth.providers.Email
 import io.github.jan.supabase.exceptions.RestException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -32,10 +32,7 @@ class AppViewModel(
     fun signUp(email: String, password: String) {
         coroutineScope.launch {
             kotlin.runCatching {
-                supabaseClient.auth.signUpWith(Email) {
-                    this.email = email
-                    this.password = password
-                }
+                supabaseClient.auth.signUp(Email(email), password)
             }.onSuccess {
                 loginAlert.value = "Successfully registered! Check your E-Mail to verify your account."
             }.onFailure {
@@ -47,10 +44,7 @@ class AppViewModel(
     fun login(email: String, password: String) {
         coroutineScope.launch {
             kotlin.runCatching {
-                supabaseClient.auth.signInWith(Email) {
-                    this.email = email
-                    this.password = password
-                }
+                supabaseClient.auth.signInWithPassword(Email(email), password)
             }.onFailure {
                 it.printStackTrace()
                 loginAlert.value = "There was an error while logging in. Check your credentials and try again."
@@ -61,7 +55,7 @@ class AppViewModel(
     fun loginWithGoogle() {
         coroutineScope.launch {
             kotlin.runCatching {
-                supabaseClient.auth.signInWith(Google)
+                supabaseClient.auth.signWithGoogle()
             }
         }
     }

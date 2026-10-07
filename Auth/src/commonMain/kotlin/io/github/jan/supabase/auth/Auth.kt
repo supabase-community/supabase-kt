@@ -6,31 +6,25 @@ import io.github.jan.supabase.annotations.SupabaseInternal
 import io.github.jan.supabase.auth.admin.AdminApi
 import io.github.jan.supabase.auth.api.ResolveAccessToken
 import io.github.jan.supabase.auth.event.AuthEvent
+import io.github.jan.supabase.auth.exception.AuthInvalidJwtException
 import io.github.jan.supabase.auth.exception.AuthRestException
-import io.github.jan.supabase.auth.exception.AuthWeakPasswordException
-import io.github.jan.supabase.auth.exception.InvalidJwtException
 import io.github.jan.supabase.auth.exception.TokenExpiredException
 import io.github.jan.supabase.auth.jwt.ClaimsRequestBuilder
 import io.github.jan.supabase.auth.jwt.ClaimsResponse
 import io.github.jan.supabase.auth.mfa.MfaApi
-import io.github.jan.supabase.auth.passkey.AuthPasskeyApi
 import io.github.jan.supabase.auth.oauth.OAuthApi
-import io.github.jan.supabase.auth.providers.AuthProvider
-import io.github.jan.supabase.auth.providers.ExternalAuthConfigDefaults
-import io.github.jan.supabase.auth.providers.Google
-import io.github.jan.supabase.auth.providers.IDTokenProvider
-import io.github.jan.supabase.auth.providers.OAuthProvider
-import io.github.jan.supabase.auth.providers.builtin.Email
-import io.github.jan.supabase.auth.providers.builtin.IDToken
-import io.github.jan.supabase.auth.providers.builtin.Phone
-import io.github.jan.supabase.auth.providers.builtin.SSO
-import io.github.jan.supabase.auth.status.SessionSource
+import io.github.jan.supabase.auth.passkey.AuthPasskeyApi
+import io.github.jan.supabase.auth.providers.Email
+import io.github.jan.supabase.auth.providers.LoginIdentifier
+import io.github.jan.supabase.auth.providers.Phone
+import io.github.jan.supabase.auth.status.SessionFlag
 import io.github.jan.supabase.auth.status.SessionStatus
 import io.github.jan.supabase.auth.user.UserInfo
 import io.github.jan.supabase.auth.user.UserSession
-import io.github.jan.supabase.auth.user.UserUpdateBuilder
+import io.github.jan.supabase.auth.user.UserUpdateConfig
 import io.github.jan.supabase.exceptions.HttpRequestException
 import io.github.jan.supabase.exceptions.RestException
+import io.github.jan.supabase.network.SupabaseApi
 import io.github.jan.supabase.plugins.CustomSerializationPlugin
 import io.github.jan.supabase.plugins.MainPlugin
 import io.github.jan.supabase.plugins.SupabasePluginProvider
@@ -38,7 +32,6 @@ import io.ktor.client.plugins.HttpRequestTimeoutException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.serialization.json.JsonObject
 
 /**
  * Plugin to interact with the Supabase Auth API
@@ -115,62 +108,205 @@ interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
     @SupabaseInternal
     val authScope: CoroutineScope
 
-    /**
-     * Signs up a new user with the specified [provider]
-     *
-     * Example:
-     * ```kotlin
-     * val result = auth.signUpWith(Email) {
-     *    email = "example@email.com"
-     *    password = "password"
-     * }
-     * ```
-     * or
-     * ```kotlin
-     * auth.signUpWith(Google) // Opens the browser to login with google
-     * ```
-     *
-     * @param provider the provider to use for signing up. E.g. [Email], [Phone] or [Google]
-     * @param redirectUrl The redirect url to use. If you don't specify this, the platform specific will be used, like deeplinks on android.
-     * @param config The configuration to use for the sign-up.
-     * @return The result of the sign-up (e.g. the user id) or null if auto-confirm is enabled (resulting in a login)
-     * @throws RestException or one of its subclasses if receiving an error response. If the error response contains a error code, an [AuthRestException] will be thrown which can be used to easier identify the problem.
-     * @throws HttpRequestTimeoutException if the request timed out
-     * @throws HttpRequestException on network related issues
-     * @throws AuthWeakPasswordException if using the [Email] or [Phone] provider and the password is too weak. You can get the reasons via [AuthWeakPasswordException.reasons]
-     */
-    suspend fun <C, R, Provider : AuthProvider<C, R>> signUpWith(
-        provider: Provider,
-        redirectUrl: String? = defaultRedirectUrl(),
-        config: (C.() -> Unit)? = null
-    ): R?
+    @SupabaseInternal
+    val userApi: SupabaseApi
 
     /**
-     * Signs in the user with the specified [provider]
+     * Creates a new user.
      *
      * Example:
      * ```kotlin
-     * val result = auth.signInWith(Email) {
-     *    email = "example@email.com"
-     *    password = "password"
+     * supabase.auth.signUp(Email("example@example.com"), "password") {
+     *     // Optional config
+     *     captchaToken = "..."
      * }
      * ```
-     * or
+     *
+     * Be aware that if a user account exists in the system you may get back an
+     * error message that attempts to hide this information from the user.
+     * This method has support for PKCE via email signups. The PKCE flow cannot be used when autoconfirm is enabled.
+     *
+     * - By default, the user needs to verify their email address before logging in. To turn this off, disable **Confirm email** in [your project](/dashboard/project/_/auth/providers).
+     * - **Confirm email** determines if users need to confirm their email address after signing up.
+     *    - If **Confirm email** is enabled, a `user` is returned but `session` is null.
+     *    - If **Confirm email** is disabled, both a `user` and a `session` are returned.
+     * - When the user confirms their email address, they are redirected to the [`SITE_URL`](/docs/guides/auth/redirect-urls#use-wildcards-in-redirect-urls) by default. You can modify your `SITE_URL` or add additional redirect URLs in [your project](/dashboard/project/_/auth/url-configuration).
+     * Note that, if using the Native Auth module, the redirect url automatically gets set. See [defaultRedirectUrl] for more information.
+     * - If signUp() is called for an existing confirmed user:
+     *    - When both **Confirm email** and **Confirm phone** (even when phone provider is disabled) are enabled in [your project](/dashboard/project/_/auth/providers), an obfuscated/fake user object is returned.
+     *    - When either **Confirm email** or **Confirm phone** (even when phone provider is disabled) is disabled, the error message, `User already registered` is returned.
+     * - To fetch the currently logged-in user, refer to [`getUser()`](/docs/reference/javascript/auth-getuser).
+     *
+     * @param identifier The email for the new user
+     * @param password The password for the new user
+     * @return A logged-in session if the server has "autoconfirm" ON, or only the user, if "autoconfirm" is OFF.
+     */
+    suspend fun signUp(
+        identifier: Email,
+        password: String,
+        config: EmailSignUpConfig.() -> Unit = {}
+    ): AuthResponse
+
+    /**
+     * Creates a new user.
+     *
+     * Example:
      * ```kotlin
-     * auth.signInWith(Google) // Opens the browser to login with google
+     * supabase.auth.signUp(Phone("+1234567890"), "password") {
+     *     // Optional config
+     *     captchaToken = "..."
+     * }
      * ```
      *
-     * @param provider the provider to use for signing in. E.g. [Email], [Phone] or [Google]
-     * @param redirectUrl The redirect url to use. If you don't specify this, the platform specific will be used, like deeplinks on android.
-     * @param config The configuration to use for the sign-in.
-     * @throws RestException or one of its subclasses if receiving an error response. If the error response contains a error code, an [AuthRestException] will be thrown which can be used to easier identify the problem.
-     * @throws HttpRequestTimeoutException if the request timed out
-     * @throws HttpRequestException on network related issues
+     * Be aware that if a user account exists in the system you may get back an
+     * error message that attempts to hide this information from the user.
+     * This method has support for PKCE via email signups. The PKCE flow cannot be used when autoconfirm is enabled.
+     *
+     * - By default, the user needs to verify their email address before logging in. To turn this off, disable **Confirm email** in [your project](/dashboard/project/_/auth/providers).
+     * - **Confirm email** determines if users need to confirm their email address after signing up.
+     *    - If **Confirm email** is enabled, a `user` is returned but `session` is null.
+     *    - If **Confirm email** is disabled, both a `user` and a `session` are returned.
+     * - When the user confirms their email address, they are redirected to the [`SITE_URL`](/docs/guides/auth/redirect-urls#use-wildcards-in-redirect-urls) by default. You can modify your `SITE_URL` or add additional redirect URLs in [your project](/dashboard/project/_/auth/url-configuration).
+     * Note that, if using the Native Auth module, the redirect url automatically gets set. See [defaultRedirectUrl] for more information.
+     * - If signUp() is called for an existing confirmed user:
+     *    - When both **Confirm email** and **Confirm phone** (even when phone provider is disabled) are enabled in [your project](/dashboard/project/_/auth/providers), an obfuscated/fake user object is returned.
+     *    - When either **Confirm email** or **Confirm phone** (even when phone provider is disabled) is disabled, the error message, `User already registered` is returned.
+     * - To fetch the currently logged-in user, refer to [`getUser()`](/docs/reference/javascript/auth-getuser).
+     *
+     * @param identifier The phone number for the new user
+     * @param password The password for the new user
+     * @return A logged-in session if the server has "autoconfirm" ON, or only the user, if "autoconfirm" is OFF.
      */
-    suspend fun <C, R, Provider : AuthProvider<C, R>> signInWith(
-        provider: Provider,
-        redirectUrl: String? = defaultRedirectUrl(),
-        config: (C.() -> Unit)? = null
+    suspend fun signUp(
+        identifier: Phone,
+        password: String,
+        config: PhoneSignUpConfig.() -> Unit = {}
+    ): AuthResponse
+
+    /**
+     * Log in an existing user with an email and password or phone and password.
+     *
+     * Example:
+     * ```kotlin
+     * supabase.auth.signInWithPassword(Email("user@example.com"), "password") {
+     *     // Optional config
+     *     captchaToken = "..."
+     * }
+     * ```
+     *
+     * Be aware that you may get back an error message that will not distinguish
+     * between the cases where the account does not exist or that the
+     * email/phone and password combination is wrong or that the account can only
+     * be accessed via social login.
+     *
+     * @param identifier Either an [Email] address or a [Phone] number
+     * @param password The password for the user
+     * @param config Extra configuration
+     */
+    suspend fun signInWithPassword(
+        identifier: LoginIdentifier,
+        password: String,
+        config: SignInPasswordConfig.() -> Unit = {}
+    ): UserSession
+
+    /**
+     * Allows signing in with an OIDC ID token. The authentication provider used
+     * should be enabled and configured.
+     *
+     * Example:
+     * ```kotlin
+     * supabase.auth.signInWithIdToken(OAuthProviders.GOOGLE, "id_token") {
+     *     // Optional config
+     *     captchaToken = "..."
+     *     nonce = ".."
+     * }
+     * ```
+     *
+     * @param provider The OIDC provider
+     * @param token The ID token to use
+     * @param config Extra configuration
+     */
+    suspend fun signInWithIdToken(
+        provider: IDTokenProvider,
+        token: String,
+        config: IdTokenConfig.() -> Unit = {}
+    ): UserSession {
+        val config = DefaultIdTokenConfig(provider, token).apply(config)
+        return signInWithIdToken(config)
+    }
+
+    /**
+     * Allows signing in with an OIDC ID token. The authentication provider used
+     * should be enabled and configured.
+     * @param config The configuration for the ID token
+     */
+    suspend fun signInWithIdToken(
+        config: IdTokenConfig
+    ): UserSession
+
+    /**
+     * Log in a user using magiclink or a one-time password (OTP).
+     *
+     * Example:
+     * ```kotlin
+     * supabase.auth.signInWithOtp(Phone("+1234567890")) {
+     *     // Optional config
+     *     data(myCustomData)
+     *     shouldCreateUser = true
+     * }
+     * ```
+     *
+     * If the `{{ .ConfirmationURL }}` variable is specified in the email template, a magiclink will be sent.
+     * If the `{{ .Token }}` variable is specified in the email template, an OTP will be sent.
+     * If you're using phone sign-ins, only an OTP will be sent. You won't be able to send a magiclink for phone sign-ins.
+     *
+     * Be aware that you may get back an error message that will not distinguish
+     * between the cases where the account does not exist or, that the account
+     * can only be accessed via social login.
+     *
+     * Do note that you will need to configure a Whatsapp sender on Twilio
+     * if you are using phone sign in with the [Phone.Channel.WHATSAPP] channel. The whatsapp
+     * channel is not supported on other providers
+     * at this time.
+     * This method supports PKCE when an email is passed.
+     * @param email The email to send the magiclink or OTP to.
+     * @param config The configuration for the sign-in with OTP.
+     */
+    suspend fun signInWithOtp(
+        email: Email,
+        config: EmailSignInOtpConfig.() -> Unit
+    )
+
+    /**
+     * Log in a user using magiclink or a one-time password (OTP).
+     *
+     * Example:
+     * ```kotlin
+     * supabase.auth.signInWithOtp(Phone("+1234567890")) {
+     *     // Optional config
+     *     data(myCustomData)
+     *     shouldCreateUser = true
+     * }
+     * ```
+     *
+     * If the `{{ .ConfirmationURL }}` variable is specified in the email template, a magiclink will be sent.
+     * If the `{{ .Token }}` variable is specified in the email template, an OTP will be sent.
+     * If you're using phone sign-ins, only an OTP will be sent. You won't be able to send a magiclink for phone sign-ins.
+     *
+     * Be aware that you may get back an error message that will not distinguish
+     * between the cases where the account does not exist or, that the account
+     * can only be accessed via social login.
+     *
+     * Do note that you will need to configure a Whatsapp sender on Twilio
+     * if you are using phone sign in with the [Phone.Channel.WHATSAPP] channel. The whatsapp
+     * channel is not supported on other providers
+     * at this time.
+     * This method supports PKCE when an email is passed.
+     * @param phone The phone number to send the magiclink or OTP to.
+     */
+    suspend fun signInWithOtp(
+        phone: Phone,
+        config: PhoneSignInOtpConfig.() -> Unit
     )
 
     /**
@@ -178,37 +314,12 @@ interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
      *
      * If you want to upgrade this anonymous user to a real user, use [linkIdentity] to link an OAuth identity or [updateUser] to add an email or phone.
      *
-     * @param data Extra data for the user
-     * @param captchaToken The captcha token to use
-     * @throws RestException or one of its subclasses if receiving an error response. If the error response contains a error code, an [AuthRestException] will be thrown which can be used to easier identify the problem.
-     * @throws HttpRequestTimeoutException if the request timed out
-     * @throws HttpRequestException on network related issues
-     */
-    suspend fun signInAnonymously(data: JsonObject? = null, captchaToken: String? = null)
-
-    /**
-     * Links an OAuth Identity to an existing user.
-     *
-     * Example:
-     * ```kotlin
-     * val url = supabase.auth.linkIdentity(Google)
-     * // Open the url in the browser, but this will happen automatically if [ExternalAuthConfigDefaults.automaticallyOpenUrl] is true (which it is by default)
-     * ```
-     *
-     * This method works similar to signing in with OAuth providers. Refer to the [documentation](https://supabase.com/docs/reference/kotlin/initializing) to learn how to handle OAuth and OTP links.
-     * @param provider The OAuth provider
-     * @param redirectUrl The redirect url to use. If you don't specify this, the platform specific will be used, like deeplinks on android.
      * @param config Extra configuration
-     * @return The OAuth url to open in the browser if [ExternalAuthConfigDefaults.automaticallyOpenUrl] is false, otherwise null.
      * @throws RestException or one of its subclasses if receiving an error response. If the error response contains a error code, an [AuthRestException] will be thrown which can be used to easier identify the problem.
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
-    suspend fun linkIdentity(
-        provider: OAuthProvider,
-        redirectUrl: String? = defaultRedirectUrl(),
-        config: ExternalAuthConfigDefaults.() -> Unit = {}
-    ): String?
+    suspend fun signInAnonymously(config: AnonymousSignInConfig.() -> Unit = {}): UserSession
 
     /**
      * Links an identity to the current user using an ID token.
@@ -231,31 +342,29 @@ interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
     suspend fun linkIdentityWithIdToken(
         provider: IDTokenProvider,
         idToken: String,
-        config: (IDToken.Config).() -> Unit = {}
-    )
+        config: (IdTokenConfig).() -> Unit = {}
+    ): UserSession
 
     /**
      * Unlinks an OAuth Identity from an existing user.
      * @param identityId The id of the OAuth identity
-     * @param updateLocalUser Whether to delete the identity from the local user or not
      * @throws RestException or one of its subclasses if receiving an error response. If the error response contains a error code, an [AuthRestException] will be thrown which can be used to easier identify the problem.
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
     suspend fun unlinkIdentity(
         identityId: String,
-        updateLocalUser: Boolean = true
     )
 
     /**
      * Retrieves the sso url for the given [config]
-     * @param redirectUrl The redirect url to use
+     * @param identifier The SSO identifier to use
      * @param config The configuration to use
      * @throws RestException or one of its subclasses if receiving an error response. If the error response contains a error code, an [AuthRestException] will be thrown which can be used to easier identify the problem.
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
-    suspend fun retrieveSSOUrl(redirectUrl: String? = defaultRedirectUrl(), config: SSO.Config.() -> Unit): SSO.Result
+    suspend fun getSSOUrl(identifier: SSOIdentifier, config: SSOConfig.() -> Unit): String
 
     /**
      * Modifies the current user
@@ -268,41 +377,40 @@ interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
     suspend fun updateUser(
         updateCurrentUser: Boolean = true,
         redirectUrl: String? = defaultRedirectUrl(),
-        config: UserUpdateBuilder.() -> Unit
+        config: UserUpdateConfig.() -> Unit
     ): UserInfo
 
     /**
      * Resends an existing signup confirmation email, email change email
      * @param type The email otp type
      * @param email The email to resend the otp to
-     * @param captchaToken The captcha token to use
-     * @param redirectUrl The redirect Url
+     * @param config The configuration to use
      * @throws RestException or one of its subclasses if receiving an error response. If the error response contains a error code, an [AuthRestException] will be thrown which can be used to easier identify the problem.
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
-    suspend fun resendEmail(type: OtpType.Email, email: String, captchaToken: String? = null, redirectUrl: String? = defaultRedirectUrl())
+    suspend fun resend(type: OtpType.Email, email: Email, config: ResendConfig.Email.() -> Unit = {})
 
     /**
      * Resends an existing SMS OTP or phone change OTP.
      * @param type The phone otp type
      * @param phone The phone to resend the otp to
-     * @param captchaToken The captcha token to use
+     * @param config The configuration to use
      * @throws RestException or one of its subclasses if receiving an error response. If the error response contains a error code, an [AuthRestException] will be thrown which can be used to easier identify the problem.
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
-    suspend fun resendPhone(type: OtpType.Phone, phone: String, captchaToken: String? = null)
+    suspend fun resend(type: OtpType.Phone, phone: Phone, config: ResendConfig.Phone.() -> Unit = {})
 
     /**
      * Sends a password reset email to the user with the specified [email]
      * @param email The email to send the password reset email to
-     * @param redirectUrl The redirect url to use. If you don't specify this, the platform specific will be used, like deeplinks on android.
+     * @param config The builder to configure the reset password request
      * @throws RestException or one of its subclasses if receiving an error response. If the error response contains a error code, an [AuthRestException] will be thrown which can be used to easier identify the problem.
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
-    suspend fun resetPasswordForEmail(email: String, redirectUrl: String? = defaultRedirectUrl(), captchaToken: String? = null)
+    suspend fun resetPasswordForEmail(email: String, config: ResetPasswordConfig.() -> Unit = {})
 
     /**
      * Sends a nonce to the user's email (preferred) or phone
@@ -317,6 +425,7 @@ interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
      * @param type The type of the verification
      * @param email The email to verify
      * @param token The token used to verify
+     * @param config The builder to configure the verification request
      * @throws RestException or one of its subclasses if receiving an error response. If the error response contains a error code, an [AuthRestException] will be thrown which can be used to easier identify the problem.
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
@@ -326,12 +435,13 @@ interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
      * @see OtpVerifyResult.VerifiedNoSession
      * @see OtpVerifyResult.Authenticated
      */
-    suspend fun verifyEmailOtp(type: OtpType.Email, email: String, token: String, captchaToken: String? = null): OtpVerifyResult
+    suspend fun verifyOtp(type: OtpType.Email, email: Email, token: String, config: VerifyOtpConfig.() -> Unit = {}): OtpVerifyResult
 
     /**
      * Verifies an email otp token hash received via email
      * @param type The type of the verification
      * @param tokenHash The token hash used to verify
+     * @param config The builder to configure the verification request
      * @throws RestException or one of its subclasses if receiving an error response. If the error response contains a error code, an [AuthRestException] will be thrown which can be used to easier identify the problem.
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
@@ -341,35 +451,27 @@ interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
      * @see OtpVerifyResult.VerifiedNoSession
      * @see OtpVerifyResult.Authenticated
      */
-    suspend fun verifyEmailOtp(type: OtpType.Email, tokenHash: String, captchaToken: String? = null): OtpVerifyResult
+    suspend fun verifyOtp(type: OtpType.Email, tokenHash: TokenHash, config: VerifyOtpConfig.() -> Unit = {}): OtpVerifyResult
 
     /**
      * Verifies a phone/sms otp
      * @param type The type of the verification
      * @param token The otp to verify
      * @param phone The phone number the token was sent to
+     * @param config The builder to configure the verification request
      * @throws RestException or one of its subclasses if receiving an error response. If the error response contains a error code, an [AuthRestException] will be thrown which can be used to easier identify the problem.
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
-    suspend fun verifyPhoneOtp(type: OtpType.Phone, phone: String, token: String, captchaToken: String? = null)
+    suspend fun verifyOtp(type: OtpType.Phone, phone: Phone, token: String, config: VerifyOtpConfig.() -> Unit = {})
 
     /**
-     * Retrieves the user attached to the specified [jwt]
+     * Retrieves the user attached to the specified [jwt]. If [jwt] is null, the access token from the [currentSessionOrNull] will be used.
      * @throws RestException or one of its subclasses if receiving an error response. If the error response contains a error code, an [AuthRestException] will be thrown which can be used to easier identify the problem.
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
-    suspend fun retrieveUser(jwt: String): UserInfo
-
-    /**
-     * Retrieves the current user with the current session
-     * @param updateSession Whether to update [sessionStatus] with the updated user, if [sessionStatus] is [SessionStatus.Authenticated]
-     * @throws RestException or one of its subclasses if receiving an error response. If the error response contains a error code, an [AuthRestException] will be thrown which can be used to easier identify the problem.
-     * @throws HttpRequestTimeoutException if the request timed out
-     * @throws HttpRequestException on network related issues
-     */
-    suspend fun retrieveUserForCurrentSession(updateSession: Boolean = false): UserInfo
+    suspend fun getUser(jwt: String? = null): UserInfo
 
     /**
      * Signs out the current user, which means [sessionStatus] will be [SessionStatus.NotAuthenticated] and the access token will be revoked
@@ -384,7 +486,7 @@ interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
     /**
      * Imports a user session and starts auto-refreshing if [autoRefresh] is true
      */
-    suspend fun importSession(session: UserSession, autoRefresh: Boolean = config.alwaysAutoRefresh, source: SessionSource = SessionSource.Unknown)
+    suspend fun importSession(session: UserSession, autoRefresh: Boolean = config.alwaysAutoRefresh, flag: SessionFlag = SessionFlag.SIGN_IN)
 
     /**
      * Imports the jwt token and retrieves the user profile.
@@ -438,12 +540,13 @@ interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
     /**
      * Exchanges a code for a session. Used when using the [FlowType.PKCE] flow
      * @param code The code to exchange
-     * @param saveSession Whether to save the session in storage
+     * @param builder The builder to configure the request
+     * @see ExchangeCodeConfig.flowId
      * @throws RestException or one of its subclasses if receiving an error response. If the error response contains a error code, an [AuthRestException] will be thrown which can be used to easier identify the problem.
      * @throws HttpRequestTimeoutException if the request timed out
      * @throws HttpRequestException on network related issues
      */
-    suspend fun exchangeCodeForSession(code: String, saveSession: Boolean = true): UserSession
+    suspend fun exchangeCodeForSession(code: String, builder: ExchangeCodeConfig.() -> Unit = {}): UserSession
 
     /**
      * Starts auto refreshing the current session
@@ -454,18 +557,18 @@ interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
      * Extracts the JWT claims present in the access token by first verifying the
      * JWT against the server's JSON Web Key Set endpoint
      * `/.well-known/jwks.json` which is often cached, resulting in significantly
-     * faster responses. Prefer this method over [retrieveUser] which always
+     * faster responses. Prefer this method over [getUser] which always
      * sends a request to the Auth server for each JWT.
      *
      * If the project is not using an asymmetric JWT signing key (like ECC or
-     * RSA) it always sends a request to the Auth server (similar to [retrieveUser]) to verify the JWT.
+     * RSA) it always sends a request to the Auth server (similar to [getUser]) to verify the JWT.
      *
      * @param jwt An optional specific JWT you wish to verify, not the one you
      *            can obtain from [currentSessionOrNull].
      * @param options Various additional options that allow you to customize the
      *                behavior of this method.
      * @throws TokenExpiredException when trying to get the claims of an expired [jwt] and [ClaimsRequestBuilder.allowExpired] is set to false
-     * @throws InvalidJwtException if the [jwt] is invalid
+     * @throws AuthInvalidJwtException if the [jwt] is invalid
      * @throws AuthRestException on any REST-related error responses during the fetching of the JWKs or retrieving of the current user data
      */
     suspend fun getClaims(
@@ -483,7 +586,15 @@ interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
      *
      * For linking identities it would be "user/identities/authorize"
      */
-    fun getOAuthUrl(provider: OAuthProvider, redirectUrl: String? = defaultRedirectUrl(), url: String = "authorize", additionalConfig: ExternalAuthConfigDefaults.() -> Unit = {}): String
+    fun getOAuthUrl(provider: OAuthProvider, url: String = "authorize", additionalConfig: OAuthConfig.() -> Unit = {}): String =
+        getOAuthUrl(provider, url, DefaultOAuthConfig().apply(additionalConfig))
+
+    fun getOAuthUrl(provider: OAuthProvider, url: String = "authorize", additionalConfig: OAuthConfig): String
+
+    suspend fun getIdentityLinkingUrl(provider: OAuthProvider, additionalConfig: OAuthConfig): String
+
+    suspend fun getIdentityLinkingUrl(provider: OAuthProvider, additionalConfig: OAuthConfig.() -> Unit): String =
+        getIdentityLinkingUrl(provider, DefaultOAuthConfig().apply(additionalConfig))
 
     /**
      * Stops auto-refreshing the current session
@@ -520,6 +631,9 @@ interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
      */
     fun currentIdentitiesOrNull() = currentUserOrNull()?.identities
 
+    @SupabaseInternal
+    fun defaultRedirectUrl(): String?
+
     /**
      * Blocks the current coroutine until the plugin is initialized.
      *
@@ -528,27 +642,6 @@ interface Auth : MainPlugin<AuthConfig>, CustomSerializationPlugin {
     suspend fun awaitInitialization()
 
     companion object : SupabasePluginProvider<AuthConfig, Auth> {
-
-        internal val HASH_PARAMETERS = listOf(
-            "access_token",
-            "refresh_token",
-            "expires_in",
-            "expires_at",
-            "token_type",
-            "type",
-            "provider_refresh_token",
-            "provider_token",
-            "error",
-            "error_code",
-            "error_description",
-        )
-
-        internal val QUERY_PARAMETERS = listOf(
-            "code",
-            "error_code",
-            "error",
-            "error_description",
-        )
 
         override val key = "auth"
 

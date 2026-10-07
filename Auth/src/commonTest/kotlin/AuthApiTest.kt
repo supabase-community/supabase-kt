@@ -4,18 +4,19 @@ import io.github.jan.supabase.auth.Auth
 import io.github.jan.supabase.auth.AuthConfig
 import io.github.jan.supabase.auth.FlowType
 import io.github.jan.supabase.auth.MemorySessionManager
+import io.github.jan.supabase.auth.OAuthProviders
 import io.github.jan.supabase.auth.OtpType
 import io.github.jan.supabase.auth.OtpVerifyResult
 import io.github.jan.supabase.auth.PKCEConstants
+import io.github.jan.supabase.auth.SSODomain
+import io.github.jan.supabase.auth.SSOProvider
 import io.github.jan.supabase.auth.SignOutScope
+import io.github.jan.supabase.auth.TokenHash
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.auth.minimalConfig
-import io.github.jan.supabase.auth.providers.Google
-import io.github.jan.supabase.auth.providers.builtin.Email
-import io.github.jan.supabase.auth.providers.builtin.IDToken
-import io.github.jan.supabase.auth.providers.builtin.OTP
-import io.github.jan.supabase.auth.providers.builtin.Phone
-import io.github.jan.supabase.auth.status.SessionSource
+import io.github.jan.supabase.auth.providers.Email
+import io.github.jan.supabase.auth.providers.Phone
+import io.github.jan.supabase.auth.status.SessionFlag
 import io.github.jan.supabase.auth.status.SessionStatus
 import io.github.jan.supabase.testing.assertMethodIs
 import io.github.jan.supabase.testing.assertPathIs
@@ -47,7 +48,9 @@ class AuthRequestTest {
     private val configuration: SupabaseClientBuilder.() -> Unit = {
         install(Auth) {
             minimalConfig()
+            autoImportSession = true
             flowType = FlowType.PKCE
+            appendPkceFlowIdToRedirects = true
         }
     }
 
@@ -67,7 +70,9 @@ class AuthRequestTest {
                 val body = it.body.toJsonElement().jsonObject
                 val metaSecurity = body["gotrue_meta_security"]!!.jsonObject
                 val params = it.url.parameters
-                assertEquals(expectedUrl, params["redirect_to"])
+                val redirectTo = params["redirect_to"] ?: ""
+                assertContains(redirectTo, expectedUrl)
+                assertContains(redirectTo, PKCEConstants.PKCE_FLOW_ID_PARAM)
                 assertMethodIs(HttpMethod.Post, it.method)
                 assertPathIs("/signup", it.url.pathAfterVersion())
                 assertEquals(expectedEmail, body["email"]?.jsonPrimitive?.content)
@@ -79,13 +84,12 @@ class AuthRequestTest {
                     sampleUserObject(email = expectedEmail)
                 )
             }.awaitInit()
-            val user = client.auth.signUpWith(Email, redirectUrl = expectedUrl) {
-                email = expectedEmail
-                password = expectedPassword
+            val response = client.auth.signUp(Email(expectedEmail), expectedPassword) {
                 this.captchaToken = captchaToken
                 data = userData
+                redirectTo = expectedUrl
             }
-            assertEquals(expectedEmail, user?.email, "Email should be equal")
+            assertEquals(expectedEmail, response.user?.email, "Email should be equal")
         }
     }
 
@@ -112,16 +116,14 @@ class AuthRequestTest {
                     sampleSessionWithUserData(email = "example@email.com", phone = "+1234567890")
                 )
             }.awaitInit()
-            val user = client.auth.signUpWith(Email) {
-                email = expectedEmail
-                password = expectedPassword
+            val response = client.auth.signUp(Email(expectedEmail), expectedPassword) {
                 this.captchaToken = captchaToken
                 data = userData
             }
-            assertNotNull(user)
-            assertEquals(expectedEmail, user.email, "Email should be equal")
+            assertNotNull(response.user)
+            assertEquals(expectedEmail, response.user.email, "Email should be equal")
             assertNotNull(client.auth.currentSessionOrNull(), "Session should not be null")
-            assertEquals(client.auth.sessionSource(), SessionSource.SignUp(Email))
+            assertEquals(SessionFlag.SIGN_UP, client.auth.sessionFlag())
         }
     }
 
@@ -148,15 +150,13 @@ class AuthRequestTest {
                     sampleUserSession()
                 )
             }.awaitInit()
-            val user = client.auth.signUpWith(Email) {
-                email = expectedEmail
-                password = expectedPassword
+            val response = client.auth.signUp(Email(expectedEmail), expectedPassword) {
                 this.captchaToken = captchaToken
                 data = userData
             }
-            assertNull(user)
+            assertNull(response.user)
             assertNotNull(client.auth.currentSessionOrNull(), "Session should not be null")
-            assertEquals(client.auth.sessionSource(), SessionSource.SignUp(Email))
+            assertEquals(SessionFlag.SIGN_UP, client.auth.sessionFlag())
         }
     }
 
@@ -178,20 +178,17 @@ class AuthRequestTest {
                 assertEquals(expectedPassword, body["password"]?.jsonPrimitive?.content)
                 assertEquals(captchaToken, metaSecurity["captcha_token"]?.jsonPrimitive?.content)
                 assertEquals(userData, body["data"]!!.jsonObject)
-                containsCodeChallenge(body)
                 respondJson(
                     sampleSessionWithUserData()
                 )
             }.awaitInit()
-            val user = client.auth.signUpWith(Phone) {
-                phone = expectedPhone
-                password = expectedPassword
+            val user = client.auth.signUp(Phone(expectedPhone), expectedPassword) {
                 this.captchaToken = captchaToken
                 data = userData
             }
             assertNotNull(user)
             assertNotNull(client.auth.currentSessionOrNull(), "Session should not be null")
-            assertEquals(client.auth.sessionSource(), SessionSource.SignUp(Phone))
+            assertEquals(SessionFlag.SIGN_UP, client.auth.sessionFlag())
         }
     }
 
@@ -204,30 +201,26 @@ class AuthRequestTest {
             val userData = buildJsonObject {
                 put("key", "value")
             }
-            val expectedUrl = "https://example.com"
             client = createMockedSupabaseClient(configuration = configuration) {
                 val body = it.body.toJsonElement().jsonObject
                 val metaSecurity = body["gotrue_meta_security"]!!.jsonObject
                 val params = it.url.parameters
-                assertEquals(expectedUrl, params["redirect_to"])
+                assertNull(params["redirect_to"])
                 assertMethodIs(HttpMethod.Post, it.method)
                 assertPathIs("/signup", it.url.pathAfterVersion())
                 assertEquals(expectedPhone, body["phone"]?.jsonPrimitive?.content)
                 assertEquals(expectedPassword, body["password"]?.jsonPrimitive?.content)
                 assertEquals(captchaToken, metaSecurity["captcha_token"]?.jsonPrimitive?.content)
                 assertEquals(userData, body["data"]!!.jsonObject)
-                containsCodeChallenge(body)
                 respondJson(
                     sampleUserObject(phone = expectedPhone)
                 )
             }.awaitInit()
-            val user = client.auth.signUpWith(Phone, redirectUrl = expectedUrl) {
-                phone = expectedPhone
-                password = expectedPassword
+            val response = client.auth.signUp(Phone(expectedPhone), expectedPassword) {
                 this.captchaToken = captchaToken
                 data = userData
             }
-            assertEquals(expectedPhone, user?.phone, "Phone should be equal")
+            assertEquals(expectedPhone, response.user?.phone, "Phone should be equal")
         }
     }
 
@@ -239,22 +232,19 @@ class AuthRequestTest {
             val userData = buildJsonObject {
                 put("key", "value")
             }
-            val expectedUrl = "https://example.com"
             client = createMockedSupabaseClient(configuration = configuration) {
                 val body = it.body.toJsonElement().jsonObject
                 val metaSecurity = body["gotrue_meta_security"]!!.jsonObject
                 val params = it.url.parameters
-                assertEquals(expectedUrl, params["redirect_to"])
+                assertNull(params["redirect_to"])
                 assertMethodIs(HttpMethod.Post, it.method)
                 assertPathIs("/otp", it.url.pathAfterVersion())
                 assertEquals(expectedPhone, body["phone"]?.jsonPrimitive?.content)
                 assertEquals(captchaToken, metaSecurity["captcha_token"]?.jsonPrimitive?.content)
                 assertEquals(userData, body["data"]!!.jsonObject)
-                containsCodeChallenge(body)
                 respond("")
             }.awaitInit()
-            client.auth.signUpWith(OTP, redirectUrl = expectedUrl) {
-                phone = expectedPhone
+            client.auth.signInWithOtp(Phone(expectedPhone)) {
                 this.captchaToken = captchaToken
                 data = userData
             }
@@ -274,7 +264,7 @@ class AuthRequestTest {
                 val body = it.body.toJsonElement().jsonObject
                 val metaSecurity = body["gotrue_meta_security"]!!.jsonObject
                 val params = it.url.parameters
-                assertEquals(expectedUrl, params["redirect_to"])
+                assertRedirectUrlContains(params["redirect_to"] ?: "", expectedUrl)
                 assertMethodIs(HttpMethod.Post, it.method)
                 assertPathIs("/otp", it.url.pathAfterVersion())
                 assertEquals(expectedEmail, body["email"]?.jsonPrimitive?.content)
@@ -283,8 +273,8 @@ class AuthRequestTest {
                 containsCodeChallenge(body)
                 respond("")
             }.awaitInit()
-            client.auth.signUpWith(OTP, redirectUrl = expectedUrl) {
-                email = expectedEmail
+            client.auth.signInWithOtp(Email(expectedEmail)) {
+                redirectTo = expectedUrl
                 this.captchaToken = captchaToken
                 data = userData
             }
@@ -299,23 +289,20 @@ class AuthRequestTest {
             val userData = buildJsonObject {
                 put("key", "value")
             }
-            val expectedUrl = "https://example.com"
             client = createMockedSupabaseClient(configuration = configuration) {
                 val body = it.body.toJsonElement().jsonObject
                 val metaSecurity = body["gotrue_meta_security"]!!.jsonObject
                 val params = it.url.parameters
-                assertEquals(expectedUrl, params["redirect_to"])
+                assertNull(params["redirect_to"])
                 assertMethodIs(HttpMethod.Post, it.method)
                 assertPathIs("/otp", it.url.pathAfterVersion())
                 assertEquals(expectedPhone, body["phone"]?.jsonPrimitive?.content)
                 assertEquals("whatsapp", body["channel"]?.jsonPrimitive?.content)
                 assertEquals(captchaToken, metaSecurity["captcha_token"]?.jsonPrimitive?.content)
                 assertEquals(userData, body["data"]!!.jsonObject)
-                containsCodeChallenge(body)
                 respond("")
             }.awaitInit()
-            client.auth.signUpWith(OTP, redirectUrl = expectedUrl) {
-                phone = expectedPhone
+            client.auth.signInWithOtp(Phone(expectedPhone)) {
                 channel = Phone.Channel.WHATSAPP
                 this.captchaToken = captchaToken
                 data = userData
@@ -327,44 +314,18 @@ class AuthRequestTest {
     fun testSignUpOtpWithPhoneSmsChannel() {
         runTest {
             val expectedPhone = "+1234567890"
-            val expectedUrl = "https://example.com"
             client = createMockedSupabaseClient(configuration = configuration) {
                 val body = it.body.toJsonElement().jsonObject
                 val params = it.url.parameters
-                assertEquals(expectedUrl, params["redirect_to"])
+                assertNull(params["redirect_to"])
                 assertMethodIs(HttpMethod.Post, it.method)
                 assertPathIs("/otp", it.url.pathAfterVersion())
                 assertEquals(expectedPhone, body["phone"]?.jsonPrimitive?.content)
                 assertEquals("sms", body["channel"]?.jsonPrimitive?.content)
-                containsCodeChallenge(body)
                 respond("")
             }.awaitInit()
-            client.auth.signUpWith(OTP, redirectUrl = expectedUrl) {
-                phone = expectedPhone
+            client.auth.signInWithOtp(Phone(expectedPhone)) {
                 channel = Phone.Channel.SMS
-            }
-        }
-    }
-
-    @Test
-    fun testSignUpOtpWithEmailIgnoresChannel() {
-        runTest {
-            val expectedEmail = "example@email.com"
-            val expectedUrl = "https://example.com"
-            client = createMockedSupabaseClient(configuration = configuration) {
-                val body = it.body.toJsonElement().jsonObject
-                val params = it.url.parameters
-                assertEquals(expectedUrl, params["redirect_to"])
-                assertMethodIs(HttpMethod.Post, it.method)
-                assertPathIs("/otp", it.url.pathAfterVersion())
-                assertEquals(expectedEmail, body["email"]?.jsonPrimitive?.content)
-                assertNull(body["channel"], "Channel should not be present for email OTP")
-                containsCodeChallenge(body)
-                respond("")
-            }.awaitInit()
-            client.auth.signUpWith(OTP, redirectUrl = expectedUrl) {
-                email = expectedEmail
-                channel = Phone.Channel.WHATSAPP // This should be ignored for email
             }
         }
     }
@@ -374,7 +335,7 @@ class AuthRequestTest {
         runTest {
             val captchaToken = "captchaToken"
             val expectedIdToken = "idToken"
-            val expectedProvider = Google
+            val expectedProvider = OAuthProviders.GOOGLE
             val expectedAccessToken = "accessToken"
             val expectedNonce = "nonce"
             client = createMockedSupabaseClient(configuration = configuration) {
@@ -386,22 +347,20 @@ class AuthRequestTest {
                 assertEquals("id_token", params["grant_type"])
                 assertEquals(captchaToken, metaSecurity["captcha_token"]?.jsonPrimitive?.content)
                 assertEquals(expectedIdToken, body["id_token"]?.jsonPrimitive?.content)
-                assertEquals(expectedProvider.name, body["provider"]?.jsonPrimitive?.content)
+                assertEquals(expectedProvider, body["provider"]?.jsonPrimitive?.content)
                 assertEquals(expectedAccessToken, body["access_token"]?.jsonPrimitive?.content)
                 assertEquals(expectedNonce, body["nonce"]?.jsonPrimitive?.content)
                 respondJson(
                     sampleUserSession()
                 )
             }.awaitInit()
-            client.auth.signInWith(IDToken) {
+            client.auth.signInWithIdToken(expectedProvider, expectedIdToken) {
                 this.captchaToken = captchaToken
-                this.idToken = expectedIdToken
-                provider = expectedProvider
                 this.nonce = expectedNonce
                 accessToken = expectedAccessToken
             }
             assertNotNull(client.auth.currentSessionOrNull(), "Session should not be null")
-            assertEquals(client.auth.sessionSource(), SessionSource.SignIn(IDToken))
+            assertEquals(SessionFlag.SIGN_IN, client.auth.sessionFlag())
         }
     }
 
@@ -428,24 +387,27 @@ class AuthRequestTest {
                 data = userData
             )
             assertNotNull(client.auth.currentSessionOrNull(), "Session should not be null")
-            assertEquals(client.auth.sessionSource(), SessionSource.AnonymousSignIn)
+            assertEquals(SessionFlag.SIGN_IN, client.auth.sessionFlag())
         }
     }
 
     @Test
-    fun testLinkIdentity() {
+    fun testLinkIdentityUrl() {
         runTest {
-            val expectedProvider = Google
+            val expectedProvider = OAuthProviders.GOOGLE
             val expectedRedirectUrl = "https://example.com"
             val expectedScopes = listOf("scope1", "scope2")
             val expectedUrlParams = mapOf("key" to "value")
             val providerUrl = "https://example.com"
             client = createMockedSupabaseClient(configuration = configuration) {
                 val params = it.url.parameters
-                assertEquals(expectedRedirectUrl, params["redirect_to"])
+                val redirectTo = params["redirect_to"] ?: ""
+                // Verify redirect_to contains the base URL
+                assertContains(redirectTo, expectedRedirectUrl)
+                // Flow ID may or may not be present depending on config
                 assertMethodIs(HttpMethod.Get, it.method)
                 assertPathIs("/user/identities/authorize", it.url.pathAfterVersion())
-                assertEquals(expectedProvider.name, params["provider"])
+                assertEquals(expectedProvider, params["provider"])
                 assertNotNull(params["code_challenge"])
                 assertEquals(PKCEConstants.CHALLENGE_METHOD, params["code_challenge_method"])
                 assertEquals(expectedScopes.joinToString(" "), params["scopes"])
@@ -458,10 +420,10 @@ class AuthRequestTest {
                     """.trimIndent()
                 )
             }.awaitInit()
-            val url = client.auth.linkIdentity(expectedProvider, redirectUrl = expectedRedirectUrl) {
+            val url = client.auth.getIdentityLinkingUrl(expectedProvider) {
                 scopes.addAll(expectedScopes)
                 queryParams.putAll(expectedUrlParams)
-                automaticallyOpenUrl = false
+                redirectUrl = expectedRedirectUrl
             }
             assertEquals(providerUrl, url)
         }
@@ -470,7 +432,7 @@ class AuthRequestTest {
     @Test
     fun testLinkIdentityWithIdToken() {
         runTest {
-            val expectedProvider = Google
+            val expectedProvider = OAuthProviders.GOOGLE
             val expectedIdToken = "idToken"
             val expectedAccessToken = "accessToken"
             val expectedNonce = "nonce"
@@ -481,7 +443,7 @@ class AuthRequestTest {
                 assertPathIs("/token", it.url.pathAfterVersion())
                 assertEquals("id_token", params["grant_type"])
                 assertEquals(expectedIdToken, body["id_token"]?.jsonPrimitive?.content)
-                assertEquals(expectedProvider.name, body["provider"]?.jsonPrimitive?.content)
+                assertEquals(expectedProvider, body["provider"]?.jsonPrimitive?.content)
                 assertEquals(expectedAccessToken, body["access_token"]?.jsonPrimitive?.content)
                 assertEquals(expectedNonce, body["nonce"]?.jsonPrimitive?.content)
                 // ensure we signal linking
@@ -524,7 +486,8 @@ class AuthRequestTest {
                 assertMethodIs(HttpMethod.Post, it.method)
                 assertPathIs("/sso", it.url.pathAfterVersion())
                 val body = it.body.toJsonElement().jsonObject
-                assertEquals(expectedRedirectUrl, body["redirect_to"]!!.jsonPrimitive.content)
+                val redirectTo = body["redirect_to"]!!.jsonPrimitive.content
+                assertRedirectUrlContains(redirectTo, expectedRedirectUrl)
                 val metaSecurity = body["gotrue_meta_security"]!!.jsonObject
                 assertEquals(expectedDomain, body["domain"]?.jsonPrimitive?.content)
                 assertEquals(expectedCaptchaToken, metaSecurity["captcha_token"]?.jsonPrimitive?.content)
@@ -536,11 +499,11 @@ class AuthRequestTest {
                     """.trimIndent()
                 )
             }.awaitInit()
-            val result = client.auth.retrieveSSOUrl(redirectUrl = expectedRedirectUrl) {
-                this.domain = expectedDomain
+            val result = client.auth.getSSOUrl(SSODomain(expectedDomain)) {
+                redirectTo = expectedRedirectUrl
                 this.captchaToken = expectedCaptchaToken
             }
-            assertEquals(expectedUrl, result.url)
+            assertEquals(expectedUrl, result)
         }
     }
 
@@ -555,7 +518,8 @@ class AuthRequestTest {
                 assertMethodIs(HttpMethod.Post, it.method)
                 assertPathIs("/sso", it.url.pathAfterVersion())
                 val body = it.body.toJsonElement().jsonObject
-                assertEquals(expectedRedirectUrl, body["redirect_to"]!!.jsonPrimitive.content)
+                val redirectTo = body["redirect_to"]!!.jsonPrimitive.content
+                assertRedirectUrlContains(redirectTo, expectedRedirectUrl)
                 val metaSecurity = body["gotrue_meta_security"]!!.jsonObject
                 assertEquals(expectedProviderId, body["provider_id"]?.jsonPrimitive?.content)
                 assertEquals(expectedCaptchaToken, metaSecurity["captcha_token"]?.jsonPrimitive?.content)
@@ -567,11 +531,11 @@ class AuthRequestTest {
                     """.trimIndent()
                 )
             }.awaitInit()
-            val result = client.auth.retrieveSSOUrl(redirectUrl = expectedRedirectUrl) {
-                this.providerId = expectedProviderId
+            val result = client.auth.getSSOUrl(SSOProvider(expectedProviderId)) {
+                redirectTo = expectedRedirectUrl
                 this.captchaToken = expectedCaptchaToken
             }
-            assertEquals(expectedUrl, result.url)
+            assertEquals(expectedUrl, result)
         }
     }
 
@@ -623,7 +587,7 @@ class AuthRequestTest {
                 assertMethodIs(HttpMethod.Post, it.method)
                 assertPathIs("/resend", it.url.pathAfterVersion())
                 val params = it.url.parameters
-                assertEquals(expectedUrl, params["redirect_to"])
+                assertRedirectUrlContains(params["redirect_to"] ?: "", expectedUrl)
 
                 val body = it.body.toJsonElement().jsonObject
                 val metaSecurity = body["gotrue_meta_security"]!!.jsonObject
@@ -636,7 +600,10 @@ class AuthRequestTest {
                     sampleUserObject(email = expectedEmail)
                 )
             }.awaitInit()
-            client.auth.resendEmail(expectedType, expectedEmail, expectedCaptchaToken, expectedUrl)
+            client.auth.resend(expectedType, Email(expectedEmail)) {
+                captchaToken = expectedCaptchaToken
+                redirectUrl = expectedUrl
+            }
         }
     }
 
@@ -659,7 +626,9 @@ class AuthRequestTest {
                     sampleUserObject(email = expectedPhone)
                 )
             }.awaitInit()
-            client.auth.resendPhone(expectedType, expectedPhone, expectedCaptchaToken)
+            client.auth.resend(expectedType, Phone(expectedPhone)) {
+                captchaToken = expectedCaptchaToken
+            }
         }
     }
 
@@ -682,13 +651,16 @@ class AuthRequestTest {
                 )
                 assertEquals(expectedEmail, body["email"]?.jsonPrimitive?.content)
                 assertContains(it.url.toString(), encodedRedirectUrl)
-                assertEquals(expectedRedirectUrl, params["redirect_to"])
+                assertRedirectUrlContains(params["redirect_to"] ?: "", expectedRedirectUrl)
                 containsCodeChallenge(body)
                 respondJson(
                     sampleUserObject(email = expectedEmail)
                 )
             }.awaitInit()
-            client.auth.resetPasswordForEmail(expectedEmail, expectedRedirectUrl, expectedCaptchaToken)
+            client.auth.resetPasswordForEmail(expectedEmail) {
+                captchaToken = expectedCaptchaToken
+                redirectUrl = expectedRedirectUrl
+            }
         }
     }
 
@@ -727,7 +699,10 @@ class AuthRequestTest {
                     sampleUserSession()
                 )
             }.awaitInit()
-            assertIs<OtpVerifyResult.Authenticated>(client.auth.verifyEmailOtp(expectedType, expectedEmail, expectedToken, expectedCaptchaToken))
+            assertIs<OtpVerifyResult.Authenticated>(client.auth.verifyOtp(expectedType, Email(expectedEmail), expectedToken) {
+                captchaToken = expectedCaptchaToken
+            })
+            assertEquals(SessionFlag.SIGN_IN, client.auth.sessionFlag())
         }
     }
 
@@ -756,7 +731,9 @@ class AuthRequestTest {
                     }
                 )
             }.awaitInit()
-            assertIs<OtpVerifyResult.VerifiedNoSession>(client.auth.verifyEmailOtp(expectedType, expectedEmail, expectedToken, expectedCaptchaToken))
+            assertIs<OtpVerifyResult.VerifiedNoSession>(client.auth.verifyOtp(expectedType, Email(expectedEmail), expectedToken) {
+                captchaToken = expectedCaptchaToken
+            })
         }
     }
 
@@ -781,8 +758,11 @@ class AuthRequestTest {
                     sampleUserSession()
                 )
             }.awaitInit()
-            val result = client.auth.verifyEmailOtp(expectedType, tokenHash = expectedTokenHash, captchaToken = expectedCaptchaToken)
+            val result = client.auth.verifyOtp(expectedType, TokenHash(expectedTokenHash)) {
+                captchaToken = expectedCaptchaToken
+            }
             assertIs<OtpVerifyResult.Authenticated>(result)
+            assertEquals(SessionFlag.SIGN_IN, client.auth.sessionFlag())
         }
     }
 
@@ -809,7 +789,9 @@ class AuthRequestTest {
                     }
                 )
             }.awaitInit()
-            assertIs<OtpVerifyResult.VerifiedNoSession>(client.auth.verifyEmailOtp(expectedType, tokenHash = expectedTokenHash, captchaToken = expectedCaptchaToken))
+            assertIs<OtpVerifyResult.VerifiedNoSession>(client.auth.verifyOtp(expectedType, TokenHash(expectedTokenHash)) {
+                captchaToken = expectedCaptchaToken
+            })
         }
     }
 
@@ -836,12 +818,16 @@ class AuthRequestTest {
                     sampleUserSession()
                 )
             }.awaitInit()
-            client.auth.verifyPhoneOtp(expectedType, expectedPhone, expectedToken, expectedCaptchaToken)
+            client.auth.verifyOtp(expectedType, Phone(expectedPhone), expectedToken) {
+                captchaToken = expectedCaptchaToken
+            }
+            assertIs<SessionStatus.Authenticated>(client.auth.sessionStatus.value)
+            assertEquals(SessionFlag.SIGN_IN, client.auth.sessionFlag())
         }
     }
 
     @Test
-    fun testRetrieveUser() {
+    fun testGetUser() {
         runTest {
             val expectedJWT = "token"
             client = createMockedSupabaseClient(configuration = configuration) {
@@ -852,7 +838,7 @@ class AuthRequestTest {
                     sampleUserObject()
                 )
             }.awaitInit()
-            val user = client.auth.retrieveUser(expectedJWT)
+            val user = client.auth.getUser(expectedJWT)
             assertNotNull(user, "User should not be null")
         }
     }
@@ -937,7 +923,7 @@ class AuthRequestTest {
             client.auth.refreshCurrentSession()
             assertIs<SessionStatus.Authenticated>(client.auth.sessionStatus.value)
             val status = client.auth.sessionStatus.value as SessionStatus.Authenticated
-            assertIs<SessionSource.Refresh>(status.source)
+            assertEquals(SessionFlag.REFRESH, client.auth.sessionFlag())
             assertEquals(expectedSession, status.session)
         }
     }
@@ -1046,6 +1032,23 @@ class AuthRequestTest {
     private fun containsCodeChallenge(body: JsonObject) {
         assertNotNull(body["code_challenge"])
         assertEquals(PKCEConstants.CHALLENGE_METHOD, body["code_challenge_method"]?.jsonPrimitive?.content)
+    }
+
+    private fun assertRedirectUrlContains(actualUrl: String, expectedUrl: String) {
+        assertContains(actualUrl, expectedUrl.substringBefore("?"))
+        if ("?" in expectedUrl) {
+            val expectedParams = expectedUrl.substringAfter("?").split("&").associate {
+                val parts = it.split("=")
+                parts[0] to parts.getOrNull(1)
+            }
+            val actualParams = actualUrl.substringAfter("?").split("&").associate {
+                val parts = it.split("=")
+                parts[0] to parts.getOrNull(1)
+            }
+            expectedParams.forEach { (key, value) ->
+                assertEquals(value, actualParams[key], "Parameter $key mismatch")
+            }
+        }
     }
 
     private suspend fun SupabaseClient.awaitInit(): SupabaseClient {

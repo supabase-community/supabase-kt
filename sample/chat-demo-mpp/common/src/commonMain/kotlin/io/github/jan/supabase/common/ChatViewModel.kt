@@ -61,6 +61,8 @@ class ChatViewModel(
         coroutineScope.launch {
             kotlin.runCatching {
                 authApi.signInWithGoogle()
+            }.onFailure {
+                it.printStackTrace()
             }
         }
     }

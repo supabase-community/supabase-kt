@@ -20,7 +20,6 @@ import io.github.jan.supabase.common.ui.screen.MfaScreen
 fun App(viewModel: AppViewModel) {
     val loginAlert by viewModel.loginAlert.collectAsState()
     val sessionStatus by viewModel.sessionStatus.collectAsState()
-    println(sessionStatus)
     Surface {
         when(sessionStatus) {
             is SessionStatus.Authenticated -> {
