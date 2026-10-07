@@ -12,6 +12,33 @@ val supabase = createSupabaseClient(supabaseUrl, supabaseKey) {
 ```
     
 
+### Reading the logs on iOS
+
+On iOS the library logs through the unified logging system (`os_log`),
+not through stdout. Setting `defaultLogLevel = LogLevel.DEBUG` is not
+enough to see them: they will not show up in the console that
+`xcrun devicectl ... --console` attaches to a physical device, so it
+looks as if the library is not logging at all.
+
+**Physical device.** Launch the app with these two environment
+variables, and the logs appear in the same console, including the
+debug level:
+
+```bash
+DEVICECTL_CHILD_OS_ACTIVITY_DT_MODE=YES DEVICECTL_CHILD_OS_ACTIVITY_MODE=debug \
+  xcrun devicectl device process launch --console --terminate-existing \
+  --device <device-id> <bundle-id>
+```
+
+**Simulator.** Stream the log of the booted simulator, filtered by
+your process name:
+
+```bash
+xcrun simctl spawn booted log stream --level debug --predicate 'process == "<AppName>"'
+```
+
+Remember to set the log level back before shipping.
+
 ## Frequent problems
 
 ### General
@@ -89,6 +116,39 @@ On Android and iOS, you can use deeplinking to automatically sign-in when the us
 Make sure you call the `handleDeeplinks` method in your activity/fragment. This method will check if the deeplink is valid and if so, it will initialize a session.
 Also make sure you specified the right **schema** and **host** in the Auth plugin.
 If that doesn't help, enable logging and check for errors.
+
+</details>
+
+<details><summary>I wrote my own SessionManager and the restored session is incomplete or wrong</summary>
+
+You may want your own `SessionManager` when the default storage does not fit:
+to keep the token somewhere else (Keychain, encrypted preferences, DataStore),
+to plug in a storage layer you already have in common code, or to keep more
+than one session at the same time. The interface is three methods:
+`saveSession`, `loadSession` and `deleteSession`. Pass it in the Auth config:
+
+```kotlin
+install(Auth) {
+    sessionManager = MySessionManager()
+}
+```
+
+Two things to know when writing one:
+
+- **If you serialize `UserSession` with kotlinx.serialization, the `Json`
+  instance needs `encodeDefaults = true`.** The default `Json` skips fields
+  that hold their default value, so the saved JSON looks fine but the session
+  restored on the next launch is missing fields. The built-in
+  `SettingsSessionManager` uses its own `Json` with `encodeDefaults = true`
+  for this reason.
+- **`SettingsSessionManager` is not available in `commonMain`.** It lives in
+  an intermediate source set, so you cannot extend it or reference it from
+  common code; write your own against the interface, or create it from
+  platform code.
+
+If all you need is several sessions stored side by side, you do not need
+your own implementation: `SettingsSessionManager` takes a `key` parameter,
+so each `SupabaseClient` can keep its session under its own key.
 
 </details>
 
