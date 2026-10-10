@@ -32,5 +32,13 @@ enable_confirmations = false
 enabled = true
 file_size_limit = "50MiB"
 
+[storage.vector]
+enabled = true
+max_buckets = 10
+max_indexes = 10
+
+[storage.analytics]
+enabled = false
+
 [edge_runtime]
 enabled = true
