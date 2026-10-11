@@ -82,8 +82,6 @@ private fun encodeOverlapAsArray(values: List<*>): String =
 
 private val quotedCharacters = listOf(",", ".", ":", "(", ")")
 
-private val arrayLiteralQuotedCharacters = listOf(",", "{", "}", "\"", "\\")
-
 internal fun escapeValue(value: Any?): String {
     val asString = value.toString()
         .replace("\\", "\\\\")
@@ -100,8 +98,8 @@ internal fun escapeArrayLiteralElement(value: Any?): String {
     val asString = value.toString()
     val needsQuoting = asString.isEmpty() ||
         asString.equals("NULL", ignoreCase = true) ||
-        arrayLiteralQuotedCharacters.any { asString.contains(it) } ||
-        asString != asString.trim()
+        asString.first().isWhitespace() || asString.last().isWhitespace() ||
+        asString.any { it == ',' || it == '{' || it == '}' || it == '"' || it == '\\' }
     if (!needsQuoting) return asString
     val escaped = asString
         .replace("\\", "\\\\")

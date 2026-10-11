@@ -321,6 +321,24 @@ class PostgrestTest {
     }
 
     @Test
+    fun testDeleteWithEmptyLikeAllPattern() {
+        testClient(
+            request = { table ->
+                from("schema", table).delete {
+                    filter {
+                        likeAll("code", listOf(""))
+                    }
+                }
+            },
+            requestHandler = {
+                assertMethodIs(HttpMethod.Delete, it.method)
+                assertEquals("like(all).{\"\"}", it.url.parameters["code"])
+                respond("")
+            }
+        )
+    }
+
+    @Test
     fun testUpdateWithRequest() {
         testClient(
             request = { table ->

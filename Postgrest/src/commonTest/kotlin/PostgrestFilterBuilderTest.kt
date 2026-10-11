@@ -340,6 +340,14 @@ class PostgrestFilterBuilderTest {
     }
 
     @Test
+    fun likeAll_emptyPattern() {
+        val filter = filterToString {
+            likeAll("name", listOf(""))
+        }
+        assertEquals("name=like(all).{\"\"}", filter)
+    }
+
+    @Test
     fun and_or() {
         val filter = filterToString {
             and {
