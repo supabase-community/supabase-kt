@@ -254,7 +254,7 @@ import kotlin.time.Duration
             }
         }
         this._accessToken.store(newToken)
-        if(status.value != Realtime.Status.CONNECTED) return;
+        if(status.value != Realtime.Status.CONNECTED) return
         scope.launch {
             subscriptions.values.filter { it.status.value == RealtimeChannel.Status.SUBSCRIBED }.forEach { it.updateAuth(accessToken) }
         }
