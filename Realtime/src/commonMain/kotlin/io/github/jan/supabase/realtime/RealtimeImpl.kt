@@ -279,6 +279,7 @@ import kotlin.time.Duration
     }
 
     private fun schedulePendingDisconnect() {
+        disconnectJob?.cancel()
         if(config.disconnectDelay != Duration.ZERO) {
             disconnectJob = scope.launch {
                 delay(config.disconnectDelay)
