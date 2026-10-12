@@ -4,7 +4,6 @@ package io.github.jan.supabase.postgrest.query
 import io.github.jan.supabase.annotations.SupabaseExperimental
 import io.github.jan.supabase.auth.PostgrestFilterDSL
 import io.github.jan.supabase.postgrest.PropertyConversionMethod
-import io.github.jan.supabase.postgrest.mapToFirstValue
 import io.github.jan.supabase.postgrest.query.filter.PostgrestFilterBuilder
 import io.github.jan.supabase.postgrest.result.PostgrestResult
 import io.ktor.client.request.HttpRequestBuilder
@@ -293,7 +292,7 @@ abstract class PostgrestRequestBuilder(
         header(PostgrestQueryBuilder.HEADER_PREFER, buildPrefer().joinToString(","))
 
         // Url params & headers
-        url.parameters.appendAll(params.mapToFirstValue())
+        params.forEach { (name, values) -> url.parameters.appendAll(name, values) }
         headers.appendAll(this@PostgrestRequestBuilder.headers)
     }
 
