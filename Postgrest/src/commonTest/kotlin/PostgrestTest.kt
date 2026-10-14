@@ -1,5 +1,6 @@
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.SupabaseClientBuilder
+import io.github.jan.supabase.createSupabaseClient
 import io.github.jan.supabase.postgrest.Postgrest
 import io.github.jan.supabase.postgrest.RpcMethod
 import io.github.jan.supabase.postgrest.exception.PostgrestRestException
@@ -14,6 +15,7 @@ import io.github.jan.supabase.testing.assertPathIs
 import io.github.jan.supabase.testing.createMockedSupabaseClient
 import io.github.jan.supabase.testing.pathAfterVersion
 import io.github.jan.supabase.testing.toJsonElement
+import io.ktor.client.engine.mock.MockEngine
 import io.ktor.client.engine.mock.MockRequestHandleScope
 import io.ktor.client.engine.mock.respond
 import io.ktor.client.request.HttpRequestData
@@ -45,6 +47,26 @@ class PostgrestTest {
     
     private lateinit var supabase: SupabaseClient
 
+    @Test
+    fun testMultipleFiltersOnOneColumn() = runTest {
+        var sent: List<String>? = null
+        val supabase = createSupabaseClient("https://example.supabase.co", "anon-key") {
+            httpEngine = MockEngine { request ->
+                sent = request.url.parameters.getAll("age")
+                respond("[]", HttpStatusCode.OK, headersOf(HttpHeaders.ContentType, "application/json"))
+            }
+            install(Postgrest)
+        }
+
+        supabase.from("people").select {
+            filter {
+                gte("age", 1)
+                lte("age", 10)
+            }
+        }
+
+        assertEquals(listOf("gte.1", "lte.10"), sent) // fails: sent is ["gte.1"]
+    }
     @Test
     fun testUrlLengthLimit() {
         supabase = createMockedSupabaseClient(
