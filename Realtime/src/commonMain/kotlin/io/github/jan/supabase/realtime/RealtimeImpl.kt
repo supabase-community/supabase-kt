@@ -36,6 +36,7 @@ import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
@@ -124,19 +125,20 @@ import kotlin.time.Duration
     }
 
     override fun init() {
+        if(config.customAccessTokenProvider) return
         scope.launch {
-            supabaseClient.pluginManager.getPluginOrNull(Auth)?.sessionStatus?.collect {
-                if(status.value == Realtime.Status.CONNECTED) {
-                    when(it) {
-                        is SessionStatus.Authenticated -> setAuth(it.session.accessToken)
-                        is SessionStatus.NotAuthenticated -> {
-                            if(config.disconnectOnSessionLoss) {
-                                logger.w { "No auth session found, disconnecting from realtime websocket"}
-                                disconnect()
-                            }
-                        }
-                        else -> {}
+            supabaseClient.pluginManager.getPluginOrNull(Auth)?.sessionStatus?.collect { sessionStatus ->
+                when (sessionStatus) {
+                    is SessionStatus.Authenticated -> {
+                        setAuth(sessionStatus.session.accessToken)
                     }
+                    is SessionStatus.NotAuthenticated -> {
+                        if (config.disconnectOnSessionLoss && status.value == Realtime.Status.CONNECTED) {
+                            logger.w { "No auth session found, disconnecting from realtime websocket" }
+                            disconnect()
+                        }
+                    }
+                    else -> {}
                 }
             }
         }
@@ -144,6 +146,11 @@ import kotlin.time.Duration
 
     private fun rejoinChannels() {
         scope.launch {
+            val auth = supabaseClient.pluginManager.getPluginOrNull(Auth)
+
+            // Wait for Auth to be initialized (so realtime doesn't think there is no token because its called earlier)
+            if (auth != null && !config.customAccessTokenProvider) auth.sessionStatus.first { it !is SessionStatus.Initializing }
+            setAuth()
             for (channel in _subscriptions.values) {
                 channel.subscribe()
             }
@@ -247,6 +254,7 @@ import kotlin.time.Duration
             }
         }
         this._accessToken.store(newToken)
+        if(status.value != Realtime.Status.CONNECTED) return
         scope.launch {
             subscriptions.values.filter { it.status.value == RealtimeChannel.Status.SUBSCRIBED }.forEach { it.updateAuth(accessToken) }
         }
