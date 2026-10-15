@@ -1,5 +1,6 @@
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.SupabaseClientBuilder
+import io.github.jan.supabase.exceptions.RestException
 import io.github.jan.supabase.storage.BucketApi
 import io.github.jan.supabase.storage.FileObjectV2
 import io.github.jan.supabase.storage.FileUploadResponse
@@ -25,7 +26,10 @@ import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.encodeURLPath
 import io.ktor.http.headersOf
+import io.ktor.utils.io.ByteChannel
+import io.ktor.utils.io.readRemaining
 import kotlinx.coroutines.test.runTest
+import kotlinx.io.readByteArray
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.buildJsonObject
@@ -42,6 +46,7 @@ import kotlin.test.Test
 import kotlin.test.assertContentEquals
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
+import kotlin.test.assertIs
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
@@ -508,6 +513,33 @@ class BucketApiTest {
             val data = client.storage[bucketId].downloadPublic(expectedPath)
             assertContentEquals(expectedData, data, "Data should be [1, 2, 3]")
         }
+    }
+
+    @Test
+    fun testDownloadThrowsExceptionForBothVariants() = runTest {
+        val supabase = createMockedSupabaseClient(configuration = {
+            install(Storage)
+        }) {
+            respond(
+                content = """{"statusCode":404,"error":"not_found","message":"Object not found"}""",
+                status = HttpStatusCode.BadRequest,
+                headers = headersOf(HttpHeaders.ContentType, "application/json"),
+            )
+        }
+        val bucket = supabase.storage.from("photos")
+
+        // The ByteArray overload throws a RestException
+        val bytesFailure = runCatching { bucket.downloadAuthenticated("missing.jpg") {} }.exceptionOrNull()
+        assertIs<RestException>(bytesFailure)
+
+        // The channel overload should throw too, and write nothing
+        val channel = ByteChannel(autoFlush = true)
+        val channelFailure = runCatching { bucket.downloadAuthenticated("missing.jpg", channel) {} }.exceptionOrNull()
+        runCatching { channel.flushAndClose() } // a failing download may leave the channel open
+        val written = channel.readRemaining().readByteArray()
+
+        assertNotNull(channelFailure)
+        assertEquals(0, written.size)
     }
 
     @Test

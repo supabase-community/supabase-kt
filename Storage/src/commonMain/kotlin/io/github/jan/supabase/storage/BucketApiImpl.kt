@@ -25,6 +25,7 @@ import io.ktor.http.content.OutgoingContent
 import io.ktor.http.defaultForFilePath
 import io.ktor.http.formUrlEncode
 import io.ktor.http.headers
+import io.ktor.http.isSuccess
 import io.ktor.utils.io.ByteReadChannel
 import io.ktor.utils.io.ByteWriteChannel
 import io.ktor.utils.io.copyTo
@@ -245,6 +246,7 @@ internal class BucketApiImpl(
             prepareDownloadRequest(path, public, downloadOptions)
             downloadOptions.httpRequestOverrides.forEach { it() }
         }.execute {
+            if (!it.status.isSuccess()) throw storage.parseErrorResponse(it)
             it.bodyAsChannel().copyTo(channel)
         }
         channel.flushAndClose()
