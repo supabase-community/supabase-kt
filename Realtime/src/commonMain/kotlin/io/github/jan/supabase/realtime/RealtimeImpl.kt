@@ -23,9 +23,11 @@ import io.github.jan.supabase.supabaseJson
 import io.ktor.client.statement.HttpResponse
 import io.ktor.http.URLProtocol
 import io.ktor.http.path
+import io.ktor.utils.io.CancellationException
 import io.ktor.websocket.Frame
 import io.ktor.websocket.readBytes
 import io.ktor.websocket.readText
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
@@ -55,14 +57,23 @@ import kotlin.time.Duration
     override val logger: SupabaseLogger = supabaseClient.createLogger(Realtime.LOGGING_TAG, config)
     private val websocketFactory = config.websocketFactory ?: KtorRealtimeWebsocketFactory(supabaseClient.httpClient.httpClient)
     private var _websocket: AtomicReference<RealtimeWebsocket?> = AtomicReference(null)
-    override val websocket: RealtimeWebsocket
-        get() = _websocket.load() ?: error("Websocket not yet initialized")
+    override val websocket: RealtimeWebsocket?
+        get() = _websocket.load()
     @Suppress("MagicNumber")
     private val _status = MutableStateFlow(Realtime.Status.DISCONNECTED)
     override val status: StateFlow<Realtime.Status> = _status.asStateFlow()
     private val _subscriptions = AtomicMutableMap<String, RealtimeChannel>()
     override val subscriptions: Map<String, RealtimeChannel> = _subscriptions
-    private val scope = config.coroutineScope ?: CoroutineScope(supabaseClient.coroutineDispatcher + SupervisorJob())
+    private val scope = config.coroutineScope ?: CoroutineScope(
+        supabaseClient.coroutineDispatcher +
+                SupervisorJob() +
+                CoroutineExceptionHandler { _, throwable ->
+                    if (throwable !is CancellationException) {
+                        logger.e(throwable) { "Unhandled exception in Realtime scope. Reconnecting..." }
+                        reconnect()
+                    }
+                }
+    )
     private val mutex = Mutex()
     private val isReconnecting = AtomicBoolean(false)
     private val _accessToken = AtomicReference<String?>(null)

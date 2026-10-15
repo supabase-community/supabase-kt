@@ -6,12 +6,14 @@ import io.github.jan.supabase.exceptions.RestException
 import io.github.jan.supabase.logging.SupabaseLogger
 import io.github.jan.supabase.logging.d
 import io.github.jan.supabase.logging.e
+import io.github.jan.supabase.logging.i
 import io.github.jan.supabase.logging.w
 import io.github.jan.supabase.putJsonObject
 import io.github.jan.supabase.realtime.broadcast.BroadcastPayload
 import io.github.jan.supabase.realtime.broadcast.RealtimeBroadcast
 import io.github.jan.supabase.realtime.broadcast.encodeBroadcast
 import io.github.jan.supabase.realtime.event.RealtimeEvent
+import io.github.jan.supabase.realtime.websocket.RealtimeWebsocket
 import io.github.jan.supabase.safeBody
 import io.ktor.client.plugins.timeout
 import io.ktor.client.request.parameter
@@ -41,6 +43,8 @@ import kotlinx.serialization.json.put
 import kotlinx.serialization.json.putJsonObject
 import kotlin.concurrent.atomics.AtomicInt
 import kotlin.concurrent.atomics.AtomicReference
+import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.contract
 import kotlin.reflect.KClass
 
 internal class RealtimeChannelImpl(
@@ -89,7 +93,9 @@ internal class RealtimeChannelImpl(
         if(!realtimeImpl.subscriptions.containsKey(topic)) {
             realtime.addChannel(this)
         }
-        joinRef.store(realtime.websocket.makeRef())
+        val initialWebsocket = realtime.websocket
+        if(checkWebsocket(initialWebsocket, "Not connected to websocket while trying to subscribe")) return
+        joinRef.store(initialWebsocket.makeRef())
         _status.value = RealtimeChannel.Status.SUBSCRIBING
         logger.d { "Subscribing to channel $topic" }
         val currentJwt = try {
@@ -113,12 +119,25 @@ internal class RealtimeChannelImpl(
             }
         }
         logger.d { "Subscribing to channel with body $joinConfigObject" }
+        val websocket = realtime.websocket
+        if(checkWebsocket(websocket, "Not connected to websocket while trying to subscribe")) return
         realtimeImpl.send(
-            RealtimeMessage(topic, RealtimeChannel.CHANNEL_EVENT_JOIN, joinConfigObject, realtime.websocket.makeRef(), joinRef.load())
+            RealtimeMessage(topic, RealtimeChannel.CHANNEL_EVENT_JOIN, joinConfigObject, websocket.makeRef(), joinRef.load())
         )
         if(blockUntilSubscribed) {
             status.first { it == RealtimeChannel.Status.SUBSCRIBED }
         }
+    }
+
+    @OptIn(ExperimentalContracts::class)
+    private fun checkWebsocket(websocket: RealtimeWebsocket?, message: String): Boolean {
+        contract { returns(false) implies (websocket != null) }
+        if(websocket == null) {
+            logger.i { "$message. Aborting and unsubscribing from channel $topic..." }
+            _status.value = RealtimeChannel.Status.UNSUBSCRIBED
+            return true
+        }
+        return false
     }
 
     @OptIn(SupabaseInternal::class)
@@ -193,14 +212,18 @@ internal class RealtimeChannelImpl(
     override suspend fun unsubscribe() {
         _status.value = RealtimeChannel.Status.UNSUBSCRIBING
         logger.d { "Unsubscribing from channel $topic" }
-        realtimeImpl.send(RealtimeMessage(topic, RealtimeChannel.CHANNEL_EVENT_LEAVE, buildJsonObject {}, realtime.websocket.makeRef(), joinRef.load()))
+        val websocket = realtime.websocket
+        if(checkWebsocket(websocket, "Failed to unsubscribe from channel $topic")) return
+        realtimeImpl.send(RealtimeMessage(topic, RealtimeChannel.CHANNEL_EVENT_LEAVE, buildJsonObject {}, websocket.makeRef(), joinRef.load()))
     }
 
     override suspend fun updateAuth(jwt: String?) {
         logger.d { "Updating auth token for channel $topic" }
+        val websocket = realtime.websocket
+        if(checkWebsocket(websocket, "Failed to update auth token for channel $topic")) return
         realtimeImpl.send(RealtimeMessage(topic, RealtimeChannel.CHANNEL_EVENT_ACCESS_TOKEN, buildJsonObject {
             put("access_token", jwt)
-        }, realtime.websocket.makeRef(), joinRef.load()))
+        }, websocket.makeRef(), joinRef.load()))
     }
 
     override suspend fun broadcast(event: String, payload: BroadcastPayload) {
@@ -212,6 +235,8 @@ internal class RealtimeChannelImpl(
             }
             httpSend(event, payload)
         } else {
+            val websocket = realtime.websocket
+            if(checkWebsocket(websocket, "Failed to broadcast message on channel $topic")) return
             when(realtime.config.vsn) {
                 RealtimeProtocolVersion.V1 -> when(payload) {
                     is BroadcastPayload.Binary -> error("Binary payloads are not supported in 1.0.0")
@@ -221,12 +246,12 @@ internal class RealtimeChannelImpl(
                                 put("type", "broadcast")
                                 put("event", event)
                                 put("payload", payload.value)
-                            }, realtime.websocket.makeRef(), joinRef.load())
+                            }, websocket.makeRef(), joinRef.load())
                         )
                     }
                 }
                 RealtimeProtocolVersion.V2 -> {
-                    val ref = realtime.websocket.makeRef()
+                    val ref = websocket.makeRef()
                     realtime.send(RealtimeBroadcast(topic, event, payload).encodeBroadcast(joinRef.load(), ref))
                 }
             }
@@ -254,17 +279,21 @@ internal class RealtimeChannelImpl(
                 putJsonObject(state)
             }
         }
+        val websocket = realtime.websocket
+        if(checkWebsocket(websocket, "Failed to track presence on channel $topic")) return
         realtimeImpl.send(
-            RealtimeMessage(topic, RealtimeChannel.CHANNEL_EVENT_PRESENCE, payload, realtime.websocket.makeRef(), joinRef.load())
+            RealtimeMessage(topic, RealtimeChannel.CHANNEL_EVENT_PRESENCE, payload, websocket.makeRef(), joinRef.load())
         )
     }
 
     override suspend fun untrack() {
+        val websocket = realtime.websocket
+        if(checkWebsocket(websocket, "Failed to untrack presence on channel $topic")) return
         realtimeImpl.send(
             RealtimeMessage(topic, RealtimeChannel.CHANNEL_EVENT_PRESENCE, buildJsonObject {
                 put("type", "presence")
                 put("event", "untrack")
-            }, realtime.websocket.makeRef(), joinRef.load())
+            }, websocket.makeRef(), joinRef.load())
         )
     }
 

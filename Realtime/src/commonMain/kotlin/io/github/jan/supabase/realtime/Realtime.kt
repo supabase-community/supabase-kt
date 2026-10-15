@@ -61,7 +61,7 @@ interface Realtime : MainPlugin<Realtime.Config>, CustomSerializationPlugin {
     val subscriptions: Map<String, RealtimeChannel>
 
     @SupabaseInternal
-    val websocket: RealtimeWebsocket
+    val websocket: RealtimeWebsocket?
 
     /**
      * Connects to the realtime websocket. The url will be taken from the custom provided [Realtime.Config.customUrl] or [SupabaseClient]
