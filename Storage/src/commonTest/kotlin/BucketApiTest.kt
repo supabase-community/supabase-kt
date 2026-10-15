@@ -528,7 +528,7 @@ class BucketApiTest {
         }
         val bucket = supabase.storage.from("photos")
 
-        // The ByteArray overload throws a RestException (NotFoundRestException on 3.6.0 and 3.8.0)
+        // The ByteArray overload throws a RestException
         val bytesFailure = runCatching { bucket.downloadAuthenticated("missing.jpg") {} }.exceptionOrNull()
         assertIs<RestException>(bytesFailure)
 
@@ -538,8 +538,8 @@ class BucketApiTest {
         runCatching { channel.flushAndClose() } // a failing download may leave the channel open
         val written = channel.readRemaining().readByteArray()
 
-        assertNotNull(channelFailure) // fails today: the call returned normally
-        assertEquals(0, written.size) // fails today: 67 bytes, {"statusCode":404,"error":"not_found","message":"Object not found"}
+        assertNotNull(channelFailure)
+        assertEquals(0, written.size)
     }
 
     @Test
