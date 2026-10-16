@@ -78,7 +78,7 @@ private fun encodeOverlapAsRange(range: Pair<*, *>): String =
     "[${range.first},${range.second}]"
 
 private fun encodeOverlapAsArray(values: List<*>): String =
-    values.joinToString(",", prefix = "{", postfix = "}")
+    values.joinToString(",", prefix = "{", postfix = "}") { escapeArrayLiteralElement(it) }
 
 private val quotedCharacters = listOf(",", ".", ":", "(", ")")
 
@@ -91,4 +91,18 @@ internal fun escapeValue(value: Any?): String {
     } else {
         asString
     }
+}
+
+internal fun escapeArrayLiteralElement(value: Any?): String {
+    if (value == null) return "NULL"
+    val asString = value.toString()
+    val needsQuoting = asString.isEmpty() ||
+        asString.equals("NULL", ignoreCase = true) ||
+        asString.first().isWhitespace() || asString.last().isWhitespace() ||
+        asString.any { it == ',' || it == '{' || it == '}' || it == '"' || it == '\\' }
+    if (!needsQuoting) return asString
+    val escaped = asString
+        .replace("\\", "\\\\")
+        .replace("\"", "\\\"")
+    return "\"$escaped\""
 }
