@@ -299,16 +299,16 @@ class VectorDataApiTest {
             put("vectors", buildJsonArray {
                 add(buildJsonObject {
                     put("key", "vec1")
-                    put("distance", 5)
+                    put("distance", 0.25)
                     put("metadata", buildJsonObject { put("source", "test") })
                 })
                 add(buildJsonObject {
                     put("key", "vec2")
-                    put("distance", 10)
+                    put("distance", 0.5)
                     put("metadata", buildJsonObject { put("source", "test2") })
                 })
             })
-            put("distanceMetric", "COSINE")
+            put("distanceMetric", "cosine")
         }
 
         var capturedBody: String? = null
@@ -340,9 +340,9 @@ class VectorDataApiTest {
 
         assertEquals(2, result.vectors.size)
         assertEquals("vec1", result.vectors[0].key)
-        assertEquals(5, result.vectors[0].distance)
+        assertEquals(0.25, result.vectors[0].distance)
         assertEquals("vec2", result.vectors[1].key)
-        assertEquals(10, result.vectors[1].distance)
+        assertEquals(0.5, result.vectors[1].distance)
         assertEquals(DistanceMetric.COSINE, result.distanceMetric)
     }
 

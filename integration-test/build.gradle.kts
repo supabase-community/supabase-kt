@@ -5,6 +5,9 @@ plugins {
 
 kotlin {
     jvmToolchain(17)
+    compilerOptions {
+        optIn.add("io.github.jan.supabase.annotations.SupabaseExperimental")
+    }
 }
 
 dependencies {

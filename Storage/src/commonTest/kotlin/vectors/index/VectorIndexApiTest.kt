@@ -176,9 +176,9 @@ class VectorIndexApiTest {
             put("index", buildJsonObject {
                 put("indexName", indexName)
                 put("vectorBucketName", bucketName)
-                put("dataType", "FLOAT32")
+                put("dataType", "float32")
                 put("dimension", 384)
-                put("distanceMetric", "COSINE")
+                put("distanceMetric", "cosine")
                 put("creationTime", 1234567890)
             })
         }

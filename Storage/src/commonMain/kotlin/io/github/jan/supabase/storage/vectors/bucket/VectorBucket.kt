@@ -10,6 +10,7 @@ import kotlin.time.Instant
  * @property creationTime Unix timestamp of when the bucket was created
  * @property encryptionConfiguration Optional encryption settings
  */
+@Serializable
 data class VectorBucket(
     val vectorBucketName: String,
     @Serializable(with = UnixTimestampSerializer::class) val creationTime: Instant? = null,
@@ -21,6 +22,7 @@ data class VectorBucket(
  * @property kmsKeyArn ARN of the KMS key used for encryption
  * @property sseType Server-side encryption type (e.g., 'KMS')
  */
+@Serializable
 data class EncryptionConfiguration(
     val kmsKeyArn: String? = null,
     val sseType: String? = null

@@ -15,5 +15,5 @@ data class VectorMatch(
     val key: String,
     val data: VectorData? = null,
     val metadata: JsonObject? = null,
-    val distance: Int? = null
+    val distance: Double? = null
 )
