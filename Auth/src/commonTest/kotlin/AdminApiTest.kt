@@ -119,7 +119,7 @@ class AdminApiTest {
                 put("type", "user")
             }
             val appMetadata = buildJsonObject {
-                put("type", "app")
+                put("type", "acpp")
             }
             val autoConfirm = true
             client = createMockedSupabaseClient(

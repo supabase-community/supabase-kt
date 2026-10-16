@@ -3,12 +3,12 @@ import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.SupabaseClientBuilder
 import io.github.jan.supabase.auth.Auth
 import io.github.jan.supabase.auth.MemorySessionManager
+import io.github.jan.supabase.auth.OAuthProviders
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.auth.event.AuthEvent
 import io.github.jan.supabase.auth.minimalConfig
-import io.github.jan.supabase.auth.providers.Github
 import io.github.jan.supabase.auth.status.RefreshFailureCause
-import io.github.jan.supabase.auth.status.SessionSource
+import io.github.jan.supabase.auth.status.SessionFlag
 import io.github.jan.supabase.auth.status.SessionStatus
 import io.github.jan.supabase.auth.user.Identity
 import io.github.jan.supabase.auth.user.UserInfo
@@ -21,6 +21,7 @@ import io.ktor.client.engine.mock.respondError
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.Url
 import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runCurrent
@@ -121,10 +122,10 @@ class AuthTest {
             val session = userSession(expiresIn = 0)
             client.auth.importSession(session)
             client.auth.sessionStatus
-                .filter { it is SessionStatus.Authenticated }
+                .filterIsInstance<SessionStatus.Authenticated>()
                 .test {
                     val item = awaitItem() as SessionStatus.Authenticated
-                    assertIs<SessionSource.Refresh>(item.source)
+                    assertEquals(SessionFlag.REFRESH, item.flag)
                     assertEquals(newSession.expiresIn, client.auth.currentSessionOrNull()?.expiresIn)
                 }
             client.auth.stopAutoRefreshForCurrentSession()
@@ -153,7 +154,7 @@ class AuthTest {
             assertEquals(session.expiresIn, client.auth.currentSessionOrNull()?.expiresIn) //The session shouldn't be refreshed automatically as alwaysAutoRefresh is false
             client.auth.startAutoRefreshForCurrentSession()
             client.auth.sessionStatus
-                .filter { it is SessionStatus.Authenticated && it.source is SessionSource.Refresh }
+                .filter { it is SessionStatus.Authenticated && it.flag == SessionFlag.REFRESH }
                 .test {
                     val item = awaitItem() as SessionStatus.Authenticated
                     assertEquals(newSession.expiresIn, item.session.expiresIn)
@@ -237,7 +238,7 @@ class AuthTest {
             launch {
                 client.auth.events.test(timeout = 1.seconds) { //event should be emitted regardless of the session status
                     val event = awaitItem()
-                    assertIs<SessionStatus.RefreshFailure>(client.auth.sessionStatus.value) // session expired and should be in refresh failure state
+                    assertIs<SessionStatus.SessionExpired>(client.auth.sessionStatus.value) // session expired and should be in refresh failure state
                     assertIs<AuthEvent.RefreshFailure>(event)
                 }
             }
@@ -248,24 +249,25 @@ class AuthTest {
     @Test
     fun testGetOAuthUrl() {
         runTest {
-            val expectedProvider = Github
+            val expectedProvider = OAuthProviders.GITHUB
             val expectedRedirectUrl = "https://example.com?someParama=true&another=one" // Test that url params aren't stripped away
             val encodedRedirectUrl = "https%3A%2F%2Fexample.com%3FsomeParama%3Dtrue%26another%3Done"
             val endpoint = "authorize/custom/endpoint"
             val supabaseUrl = "https://id.supabase.co"
             client = createMockedSupabaseClient(supabaseUrl = supabaseUrl, configuration = configuration)
             client.auth.awaitInitialization()
-            val url = Url(client.auth.getOAuthUrl(expectedProvider, expectedRedirectUrl, endpoint) {
+            val url = Url(client.auth.getOAuthUrl(expectedProvider, endpoint) {
                 queryParams["key"] = "value.!.,with?special"
                 scopes.add("scope1")
                 scopes.add("scope2")
+                redirectUrl = expectedRedirectUrl
             })
             assertEquals(
                 endpoint,
                 url.pathAfterVersion().substring(1)
             )
             assertEquals(
-                expectedProvider.name,
+                expectedProvider,
                 url.parameters["provider"]
             )
             assertContains(
