@@ -19,7 +19,7 @@ internal fun noDeeplinkError(arg: String): Nothing = error("""
 
 /**
  * Parses a session from a fragment.
- * @param fragment The fragment to parse the session from
+ * @param fragment The fragment to parse the session from, as it appears in the URL. Its values are decoded like query parameters, so pass it percent-encoded and not decoded already.
  * @return The parsed session. Note that the user will be null, but you can retrieve it using [Auth.retrieveUser]
  */
 fun Auth.parseSessionFromFragment(fragment: String): UserSession {

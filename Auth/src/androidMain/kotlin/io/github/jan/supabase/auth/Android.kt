@@ -45,7 +45,7 @@ fun SupabaseClient.handleDeeplinks(
     if(scheme != auth.config.scheme || host != auth.config.host) return
     when(this.auth.config.flowType) {
         FlowType.IMPLICIT -> {
-            val fragment = data.fragment ?: return
+            val fragment = data.encodedFragment ?: return
             auth.parseFragmentAndImportSession(fragment) {
                 it?.let(onSessionSuccess)
             }
