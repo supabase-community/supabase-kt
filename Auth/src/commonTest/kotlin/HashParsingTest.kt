@@ -1,6 +1,8 @@
+import app.cash.turbine.test
 import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.auth.Auth
 import io.github.jan.supabase.auth.auth
+import io.github.jan.supabase.auth.event.AuthEvent
 import io.github.jan.supabase.auth.minimalConfig
 import io.github.jan.supabase.auth.url.UrlValidationResult
 import io.github.jan.supabase.auth.url.consumeHashParameters
@@ -69,6 +71,50 @@ class HashParsingTest {
         val result = supabase.auth.validateHash(hash)
 
         assertIs<UrlValidationResult.ErrorFound>(result)
+    }
+
+    @Test
+    fun testValidateHashWithEncodedErrorEmitsDecodedDescription() = runTest {
+        supabase = createMockedSupabaseClient(
+            configuration = {
+                install(Auth) {
+                    minimalConfig()
+                }
+            }
+        )
+        supabase.auth.awaitInitialization()
+        val hash = "error=access_denied&error_code=otp_expired&error_description=Email+link+is+invalid+or+has+expired"
+        val result = supabase.auth.validateHash(hash)
+
+        assertIs<UrlValidationResult.ErrorFound>(result)
+        supabase.auth.events.test {
+            val event = expectMostRecentItem()
+            assertIs<AuthEvent.OtpError>(event)
+            assertEquals("otp_expired", event.error)
+            assertEquals("Email link is invalid or has expired (access_denied)", event.errorDescription)
+        }
+    }
+
+    @Test
+    fun testValidateHashWithErrorWithoutErrorCode() = runTest {
+        supabase = createMockedSupabaseClient(
+            configuration = {
+                install(Auth) {
+                    minimalConfig()
+                }
+            }
+        )
+        supabase.auth.awaitInitialization()
+        val hash = "error=access_denied&error_description=The+user+denied+the+request"
+        val result = supabase.auth.validateHash(hash)
+
+        assertIs<UrlValidationResult.ErrorFound>(result)
+        supabase.auth.events.test {
+            val event = expectMostRecentItem()
+            assertIs<AuthEvent.OtpError>(event)
+            assertEquals("access_denied", event.error)
+            assertEquals("The user denied the request (access_denied)", event.errorDescription)
+        }
     }
 
     @Test
@@ -215,7 +261,7 @@ class HashParsingTest {
         assertEquals(3, parts.size)
         assertEquals("invalid_request", parts["error"])
         assertEquals("otp_expired", parts["error_code"])
-        assertEquals("Invalid+request", parts["error_description"])
+        assertEquals("Invalid request", parts["error_description"])
     }
 
     @Test
@@ -224,9 +270,29 @@ class HashParsingTest {
         val parts = getFragmentParts(fragment)
 
         assertEquals(3, parts.size)
-        assertEquals("value%201", parts["param1"])
-        assertEquals("value%3D2", parts["param2"])
-        assertEquals("a%26b", parts["param3"])
+        assertEquals("value 1", parts["param1"])
+        assertEquals("value=2", parts["param2"])
+        assertEquals("a&b", parts["param3"])
+    }
+
+    @Test
+    fun testGetFragmentPartsWithMalformedEscapeKeepsRawValues() {
+        val fragment = "access_token=token%zz&refresh_token=refresh123"
+        val parts = getFragmentParts(fragment)
+
+        assertEquals(2, parts.size)
+        assertEquals("token%zz", parts["access_token"])
+        assertEquals("refresh123", parts["refresh_token"])
+    }
+
+    @Test
+    fun testGetFragmentPartsWithValuelessKey() {
+        val fragment = "param1&param2=value2"
+        val parts = getFragmentParts(fragment)
+
+        assertEquals(2, parts.size)
+        assertEquals("", parts["param1"])
+        assertEquals("value2", parts["param2"])
     }
 
     @Test
