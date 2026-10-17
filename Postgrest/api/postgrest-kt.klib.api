@@ -1,0 +1,512 @@
+// Klib ABI Dump
+// Targets: [iosArm64, iosSimulatorArm64, iosX64, js, linuxX64, macosArm64, macosX64, mingwX64, tvosArm64, tvosSimulatorArm64, tvosX64, wasmJs, watchosArm64, watchosSimulatorArm64, watchosX64]
+// Rendering settings:
+// - Signature version: 2
+// - Show manifest properties: true
+// - Show declarations: true
+
+// Library unique name: <io.github.jan-tennert.supabase:postgrest-kt>
+open annotation class io.github.jan.supabase.postgrest/PostgrestDsl : kotlin/Annotation { // io.github.jan.supabase.postgrest/PostgrestDsl|null[0]
+    constructor <init>() // io.github.jan.supabase.postgrest/PostgrestDsl.<init>|<init>(){}[0]
+}
+
+final enum class io.github.jan.supabase.postgrest.query.filter/FilterOperator : kotlin/Enum<io.github.jan.supabase.postgrest.query.filter/FilterOperator> { // io.github.jan.supabase.postgrest.query.filter/FilterOperator|null[0]
+    enum entry ADJ // io.github.jan.supabase.postgrest.query.filter/FilterOperator.ADJ|null[0]
+    enum entry CD // io.github.jan.supabase.postgrest.query.filter/FilterOperator.CD|null[0]
+    enum entry CS // io.github.jan.supabase.postgrest.query.filter/FilterOperator.CS|null[0]
+    enum entry EQ // io.github.jan.supabase.postgrest.query.filter/FilterOperator.EQ|null[0]
+    enum entry FTS // io.github.jan.supabase.postgrest.query.filter/FilterOperator.FTS|null[0]
+    enum entry GT // io.github.jan.supabase.postgrest.query.filter/FilterOperator.GT|null[0]
+    enum entry GTE // io.github.jan.supabase.postgrest.query.filter/FilterOperator.GTE|null[0]
+    enum entry ILIKE // io.github.jan.supabase.postgrest.query.filter/FilterOperator.ILIKE|null[0]
+    enum entry IMATCH // io.github.jan.supabase.postgrest.query.filter/FilterOperator.IMATCH|null[0]
+    enum entry IN // io.github.jan.supabase.postgrest.query.filter/FilterOperator.IN|null[0]
+    enum entry IS // io.github.jan.supabase.postgrest.query.filter/FilterOperator.IS|null[0]
+    enum entry ISDISTINCT // io.github.jan.supabase.postgrest.query.filter/FilterOperator.ISDISTINCT|null[0]
+    enum entry LIKE // io.github.jan.supabase.postgrest.query.filter/FilterOperator.LIKE|null[0]
+    enum entry LT // io.github.jan.supabase.postgrest.query.filter/FilterOperator.LT|null[0]
+    enum entry LTE // io.github.jan.supabase.postgrest.query.filter/FilterOperator.LTE|null[0]
+    enum entry MATCH // io.github.jan.supabase.postgrest.query.filter/FilterOperator.MATCH|null[0]
+    enum entry NEQ // io.github.jan.supabase.postgrest.query.filter/FilterOperator.NEQ|null[0]
+    enum entry NXL // io.github.jan.supabase.postgrest.query.filter/FilterOperator.NXL|null[0]
+    enum entry NXR // io.github.jan.supabase.postgrest.query.filter/FilterOperator.NXR|null[0]
+    enum entry OV // io.github.jan.supabase.postgrest.query.filter/FilterOperator.OV|null[0]
+    enum entry PHFTS // io.github.jan.supabase.postgrest.query.filter/FilterOperator.PHFTS|null[0]
+    enum entry PLFTS // io.github.jan.supabase.postgrest.query.filter/FilterOperator.PLFTS|null[0]
+    enum entry SL // io.github.jan.supabase.postgrest.query.filter/FilterOperator.SL|null[0]
+    enum entry SR // io.github.jan.supabase.postgrest.query.filter/FilterOperator.SR|null[0]
+    enum entry WFTS // io.github.jan.supabase.postgrest.query.filter/FilterOperator.WFTS|null[0]
+
+    final val entries // io.github.jan.supabase.postgrest.query.filter/FilterOperator.entries|#static{}entries[0]
+        final fun <get-entries>(): kotlin.enums/EnumEntries<io.github.jan.supabase.postgrest.query.filter/FilterOperator> // io.github.jan.supabase.postgrest.query.filter/FilterOperator.entries.<get-entries>|<get-entries>#static(){}[0]
+    final val identifier // io.github.jan.supabase.postgrest.query.filter/FilterOperator.identifier|{}identifier[0]
+        final fun <get-identifier>(): kotlin/String // io.github.jan.supabase.postgrest.query.filter/FilterOperator.identifier.<get-identifier>|<get-identifier>(){}[0]
+
+    final fun valueOf(kotlin/String): io.github.jan.supabase.postgrest.query.filter/FilterOperator // io.github.jan.supabase.postgrest.query.filter/FilterOperator.valueOf|valueOf#static(kotlin.String){}[0]
+    final fun values(): kotlin/Array<io.github.jan.supabase.postgrest.query.filter/FilterOperator> // io.github.jan.supabase.postgrest.query.filter/FilterOperator.values|values#static(){}[0]
+}
+
+final enum class io.github.jan.supabase.postgrest.query.filter/TextSearchType : kotlin/Enum<io.github.jan.supabase.postgrest.query.filter/TextSearchType> { // io.github.jan.supabase.postgrest.query.filter/TextSearchType|null[0]
+    enum entry NONE // io.github.jan.supabase.postgrest.query.filter/TextSearchType.NONE|null[0]
+    enum entry PHRASETO // io.github.jan.supabase.postgrest.query.filter/TextSearchType.PHRASETO|null[0]
+    enum entry PLAINTO // io.github.jan.supabase.postgrest.query.filter/TextSearchType.PLAINTO|null[0]
+    enum entry WEBSEARCH // io.github.jan.supabase.postgrest.query.filter/TextSearchType.WEBSEARCH|null[0]
+
+    final val entries // io.github.jan.supabase.postgrest.query.filter/TextSearchType.entries|#static{}entries[0]
+        final fun <get-entries>(): kotlin.enums/EnumEntries<io.github.jan.supabase.postgrest.query.filter/TextSearchType> // io.github.jan.supabase.postgrest.query.filter/TextSearchType.entries.<get-entries>|<get-entries>#static(){}[0]
+    final val identifier // io.github.jan.supabase.postgrest.query.filter/TextSearchType.identifier|{}identifier[0]
+        final fun <get-identifier>(): kotlin/String // io.github.jan.supabase.postgrest.query.filter/TextSearchType.identifier.<get-identifier>|<get-identifier>(){}[0]
+
+    final fun valueOf(kotlin/String): io.github.jan.supabase.postgrest.query.filter/TextSearchType // io.github.jan.supabase.postgrest.query.filter/TextSearchType.valueOf|valueOf#static(kotlin.String){}[0]
+    final fun values(): kotlin/Array<io.github.jan.supabase.postgrest.query.filter/TextSearchType> // io.github.jan.supabase.postgrest.query.filter/TextSearchType.values|values#static(){}[0]
+}
+
+final enum class io.github.jan.supabase.postgrest.query/Count : kotlin/Enum<io.github.jan.supabase.postgrest.query/Count> { // io.github.jan.supabase.postgrest.query/Count|null[0]
+    enum entry ESTIMATED // io.github.jan.supabase.postgrest.query/Count.ESTIMATED|null[0]
+    enum entry EXACT // io.github.jan.supabase.postgrest.query/Count.EXACT|null[0]
+    enum entry PLANNED // io.github.jan.supabase.postgrest.query/Count.PLANNED|null[0]
+
+    final val entries // io.github.jan.supabase.postgrest.query/Count.entries|#static{}entries[0]
+        final fun <get-entries>(): kotlin.enums/EnumEntries<io.github.jan.supabase.postgrest.query/Count> // io.github.jan.supabase.postgrest.query/Count.entries.<get-entries>|<get-entries>#static(){}[0]
+    final val identifier // io.github.jan.supabase.postgrest.query/Count.identifier|{}identifier[0]
+        final fun <get-identifier>(): kotlin/String // io.github.jan.supabase.postgrest.query/Count.identifier.<get-identifier>|<get-identifier>(){}[0]
+
+    final fun valueOf(kotlin/String): io.github.jan.supabase.postgrest.query/Count // io.github.jan.supabase.postgrest.query/Count.valueOf|valueOf#static(kotlin.String){}[0]
+    final fun values(): kotlin/Array<io.github.jan.supabase.postgrest.query/Count> // io.github.jan.supabase.postgrest.query/Count.values|values#static(){}[0]
+}
+
+final enum class io.github.jan.supabase.postgrest.query/Order : kotlin/Enum<io.github.jan.supabase.postgrest.query/Order> { // io.github.jan.supabase.postgrest.query/Order|null[0]
+    enum entry ASCENDING // io.github.jan.supabase.postgrest.query/Order.ASCENDING|null[0]
+    enum entry DESCENDING // io.github.jan.supabase.postgrest.query/Order.DESCENDING|null[0]
+
+    final val entries // io.github.jan.supabase.postgrest.query/Order.entries|#static{}entries[0]
+        final fun <get-entries>(): kotlin.enums/EnumEntries<io.github.jan.supabase.postgrest.query/Order> // io.github.jan.supabase.postgrest.query/Order.entries.<get-entries>|<get-entries>#static(){}[0]
+    final val value // io.github.jan.supabase.postgrest.query/Order.value|{}value[0]
+        final fun <get-value>(): kotlin/String // io.github.jan.supabase.postgrest.query/Order.value.<get-value>|<get-value>(){}[0]
+
+    final fun valueOf(kotlin/String): io.github.jan.supabase.postgrest.query/Order // io.github.jan.supabase.postgrest.query/Order.valueOf|valueOf#static(kotlin.String){}[0]
+    final fun values(): kotlin/Array<io.github.jan.supabase.postgrest.query/Order> // io.github.jan.supabase.postgrest.query/Order.values|values#static(){}[0]
+}
+
+final enum class io.github.jan.supabase.postgrest/RpcMethod : kotlin/Enum<io.github.jan.supabase.postgrest/RpcMethod> { // io.github.jan.supabase.postgrest/RpcMethod|null[0]
+    enum entry GET // io.github.jan.supabase.postgrest/RpcMethod.GET|null[0]
+    enum entry HEAD // io.github.jan.supabase.postgrest/RpcMethod.HEAD|null[0]
+    enum entry POST // io.github.jan.supabase.postgrest/RpcMethod.POST|null[0]
+
+    final val entries // io.github.jan.supabase.postgrest/RpcMethod.entries|#static{}entries[0]
+        final fun <get-entries>(): kotlin.enums/EnumEntries<io.github.jan.supabase.postgrest/RpcMethod> // io.github.jan.supabase.postgrest/RpcMethod.entries.<get-entries>|<get-entries>#static(){}[0]
+    final val httpMethod // io.github.jan.supabase.postgrest/RpcMethod.httpMethod|{}httpMethod[0]
+        final fun <get-httpMethod>(): io.ktor.http/HttpMethod // io.github.jan.supabase.postgrest/RpcMethod.httpMethod.<get-httpMethod>|<get-httpMethod>(){}[0]
+
+    final fun valueOf(kotlin/String): io.github.jan.supabase.postgrest/RpcMethod // io.github.jan.supabase.postgrest/RpcMethod.valueOf|valueOf#static(kotlin.String){}[0]
+    final fun values(): kotlin/Array<io.github.jan.supabase.postgrest/RpcMethod> // io.github.jan.supabase.postgrest/RpcMethod.values|values#static(){}[0]
+}
+
+abstract fun interface io.github.jan.supabase.postgrest/PropertyConversionMethod { // io.github.jan.supabase.postgrest/PropertyConversionMethod|null[0]
+    abstract fun invoke(kotlin.reflect/KProperty1<*, *>): kotlin/String // io.github.jan.supabase.postgrest/PropertyConversionMethod.invoke|invoke(kotlin.reflect.KProperty1<*,*>){}[0]
+
+    final object Companion { // io.github.jan.supabase.postgrest/PropertyConversionMethod.Companion|null[0]
+        final val CAMEL_CASE_TO_SNAKE_CASE // io.github.jan.supabase.postgrest/PropertyConversionMethod.Companion.CAMEL_CASE_TO_SNAKE_CASE|{}CAMEL_CASE_TO_SNAKE_CASE[0]
+            final fun <get-CAMEL_CASE_TO_SNAKE_CASE>(): io.github.jan.supabase.postgrest/PropertyConversionMethod // io.github.jan.supabase.postgrest/PropertyConversionMethod.Companion.CAMEL_CASE_TO_SNAKE_CASE.<get-CAMEL_CASE_TO_SNAKE_CASE>|<get-CAMEL_CASE_TO_SNAKE_CASE>(){}[0]
+        final val NONE // io.github.jan.supabase.postgrest/PropertyConversionMethod.Companion.NONE|{}NONE[0]
+            final fun <get-NONE>(): io.github.jan.supabase.postgrest/PropertyConversionMethod // io.github.jan.supabase.postgrest/PropertyConversionMethod.Companion.NONE.<get-NONE>|<get-NONE>(){}[0]
+        final val SERIAL_NAME // io.github.jan.supabase.postgrest/PropertyConversionMethod.Companion.SERIAL_NAME|{}SERIAL_NAME[0]
+            final fun <get-SERIAL_NAME>(): io.github.jan.supabase.postgrest/PropertyConversionMethod // io.github.jan.supabase.postgrest/PropertyConversionMethod.Companion.SERIAL_NAME.<get-SERIAL_NAME>|<get-SERIAL_NAME>(){}[0]
+    }
+}
+
+abstract interface io.github.jan.supabase.postgrest/Postgrest : io.github.jan.supabase.plugins/CustomSerializationPlugin, io.github.jan.supabase.plugins/MainPlugin<io.github.jan.supabase.postgrest/Postgrest.Config> { // io.github.jan.supabase.postgrest/Postgrest|null[0]
+    abstract fun from(kotlin/String): io.github.jan.supabase.postgrest.query/PostgrestQueryBuilder // io.github.jan.supabase.postgrest/Postgrest.from|from(kotlin.String){}[0]
+    abstract fun from(kotlin/String, kotlin/String): io.github.jan.supabase.postgrest.query/PostgrestQueryBuilder // io.github.jan.supabase.postgrest/Postgrest.from|from(kotlin.String;kotlin.String){}[0]
+    abstract suspend fun rpc(kotlin/String, kotlin/Function1<io.github.jan.supabase.postgrest.query.request/RpcRequestBuilder, kotlin/Unit> = ...): io.github.jan.supabase.postgrest.result/PostgrestResult // io.github.jan.supabase.postgrest/Postgrest.rpc|rpc(kotlin.String;kotlin.Function1<io.github.jan.supabase.postgrest.query.request.RpcRequestBuilder,kotlin.Unit>){}[0]
+    abstract suspend fun rpc(kotlin/String, kotlinx.serialization.json/JsonObject, kotlin/Function1<io.github.jan.supabase.postgrest.query.request/RpcRequestBuilder, kotlin/Unit> = ...): io.github.jan.supabase.postgrest.result/PostgrestResult // io.github.jan.supabase.postgrest/Postgrest.rpc|rpc(kotlin.String;kotlinx.serialization.json.JsonObject;kotlin.Function1<io.github.jan.supabase.postgrest.query.request.RpcRequestBuilder,kotlin.Unit>){}[0]
+    open fun get(kotlin/String): io.github.jan.supabase.postgrest.query/PostgrestQueryBuilder // io.github.jan.supabase.postgrest/Postgrest.get|get(kotlin.String){}[0]
+    open fun get(kotlin/String, kotlin/String): io.github.jan.supabase.postgrest.query/PostgrestQueryBuilder // io.github.jan.supabase.postgrest/Postgrest.get|get(kotlin.String;kotlin.String){}[0]
+
+    final class Config : io.github.jan.supabase.auth/AuthDependentPluginConfig, io.github.jan.supabase.plugins/CustomSerializationConfig, io.github.jan.supabase.plugins/MainConfig { // io.github.jan.supabase.postgrest/Postgrest.Config|null[0]
+        constructor <init>(kotlin/String = ..., io.github.jan.supabase.postgrest/PropertyConversionMethod = ..., kotlin/Boolean = ..., kotlin/Int = ..., kotlin.time/Duration = ..., kotlin/Int = ...) // io.github.jan.supabase.postgrest/Postgrest.Config.<init>|<init>(kotlin.String;io.github.jan.supabase.postgrest.PropertyConversionMethod;kotlin.Boolean;kotlin.Int;kotlin.time.Duration;kotlin.Int){}[0]
+
+        final var defaultSchema // io.github.jan.supabase.postgrest/Postgrest.Config.defaultSchema|{}defaultSchema[0]
+            final fun <get-defaultSchema>(): kotlin/String // io.github.jan.supabase.postgrest/Postgrest.Config.defaultSchema.<get-defaultSchema>|<get-defaultSchema>(){}[0]
+            final fun <set-defaultSchema>(kotlin/String) // io.github.jan.supabase.postgrest/Postgrest.Config.defaultSchema.<set-defaultSchema>|<set-defaultSchema>(kotlin.String){}[0]
+        final var maxRetries // io.github.jan.supabase.postgrest/Postgrest.Config.maxRetries|{}maxRetries[0]
+            final fun <get-maxRetries>(): kotlin/Int // io.github.jan.supabase.postgrest/Postgrest.Config.maxRetries.<get-maxRetries>|<get-maxRetries>(){}[0]
+            final fun <set-maxRetries>(kotlin/Int) // io.github.jan.supabase.postgrest/Postgrest.Config.maxRetries.<set-maxRetries>|<set-maxRetries>(kotlin.Int){}[0]
+        final var propertyConversionMethod // io.github.jan.supabase.postgrest/Postgrest.Config.propertyConversionMethod|{}propertyConversionMethod[0]
+            final fun <get-propertyConversionMethod>(): io.github.jan.supabase.postgrest/PropertyConversionMethod // io.github.jan.supabase.postgrest/Postgrest.Config.propertyConversionMethod.<get-propertyConversionMethod>|<get-propertyConversionMethod>(){}[0]
+            final fun <set-propertyConversionMethod>(io.github.jan.supabase.postgrest/PropertyConversionMethod) // io.github.jan.supabase.postgrest/Postgrest.Config.propertyConversionMethod.<set-propertyConversionMethod>|<set-propertyConversionMethod>(io.github.jan.supabase.postgrest.PropertyConversionMethod){}[0]
+        final var requireValidSession // io.github.jan.supabase.postgrest/Postgrest.Config.requireValidSession|{}requireValidSession[0]
+            final fun <get-requireValidSession>(): kotlin/Boolean // io.github.jan.supabase.postgrest/Postgrest.Config.requireValidSession.<get-requireValidSession>|<get-requireValidSession>(){}[0]
+            final fun <set-requireValidSession>(kotlin/Boolean) // io.github.jan.supabase.postgrest/Postgrest.Config.requireValidSession.<set-requireValidSession>|<set-requireValidSession>(kotlin.Boolean){}[0]
+        final var serializer // io.github.jan.supabase.postgrest/Postgrest.Config.serializer|{}serializer[0]
+            final fun <get-serializer>(): io.github.jan.supabase/SupabaseSerializer? // io.github.jan.supabase.postgrest/Postgrest.Config.serializer.<get-serializer>|<get-serializer>(){}[0]
+            final fun <set-serializer>(io.github.jan.supabase/SupabaseSerializer?) // io.github.jan.supabase.postgrest/Postgrest.Config.serializer.<set-serializer>|<set-serializer>(io.github.jan.supabase.SupabaseSerializer?){}[0]
+        final var timeout // io.github.jan.supabase.postgrest/Postgrest.Config.timeout|{}timeout[0]
+            final fun <get-timeout>(): kotlin.time/Duration // io.github.jan.supabase.postgrest/Postgrest.Config.timeout.<get-timeout>|<get-timeout>(){}[0]
+            final fun <set-timeout>(kotlin.time/Duration) // io.github.jan.supabase.postgrest/Postgrest.Config.timeout.<set-timeout>|<set-timeout>(kotlin.time.Duration){}[0]
+        final var urlLengthLimit // io.github.jan.supabase.postgrest/Postgrest.Config.urlLengthLimit|{}urlLengthLimit[0]
+            final fun <get-urlLengthLimit>(): kotlin/Int // io.github.jan.supabase.postgrest/Postgrest.Config.urlLengthLimit.<get-urlLengthLimit>|<get-urlLengthLimit>(){}[0]
+            final fun <set-urlLengthLimit>(kotlin/Int) // io.github.jan.supabase.postgrest/Postgrest.Config.urlLengthLimit.<set-urlLengthLimit>|<set-urlLengthLimit>(kotlin.Int){}[0]
+
+        final fun component1(): kotlin/String // io.github.jan.supabase.postgrest/Postgrest.Config.component1|component1(){}[0]
+        final fun component2(): io.github.jan.supabase.postgrest/PropertyConversionMethod // io.github.jan.supabase.postgrest/Postgrest.Config.component2|component2(){}[0]
+        final fun component3(): kotlin/Boolean // io.github.jan.supabase.postgrest/Postgrest.Config.component3|component3(){}[0]
+        final fun component4(): kotlin/Int // io.github.jan.supabase.postgrest/Postgrest.Config.component4|component4(){}[0]
+        final fun component5(): kotlin.time/Duration // io.github.jan.supabase.postgrest/Postgrest.Config.component5|component5(){}[0]
+        final fun component6(): kotlin/Int // io.github.jan.supabase.postgrest/Postgrest.Config.component6|component6(){}[0]
+        final fun copy(kotlin/String = ..., io.github.jan.supabase.postgrest/PropertyConversionMethod = ..., kotlin/Boolean = ..., kotlin/Int = ..., kotlin.time/Duration = ..., kotlin/Int = ...): io.github.jan.supabase.postgrest/Postgrest.Config // io.github.jan.supabase.postgrest/Postgrest.Config.copy|copy(kotlin.String;io.github.jan.supabase.postgrest.PropertyConversionMethod;kotlin.Boolean;kotlin.Int;kotlin.time.Duration;kotlin.Int){}[0]
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.jan.supabase.postgrest/Postgrest.Config.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.jan.supabase.postgrest/Postgrest.Config.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.jan.supabase.postgrest/Postgrest.Config.toString|toString(){}[0]
+    }
+
+    final object Companion : io.github.jan.supabase.plugins/SupabasePluginProvider<io.github.jan.supabase.postgrest/Postgrest.Config, io.github.jan.supabase.postgrest/Postgrest> { // io.github.jan.supabase.postgrest/Postgrest.Companion|null[0]
+        final const val API_VERSION // io.github.jan.supabase.postgrest/Postgrest.Companion.API_VERSION|{}API_VERSION[0]
+            final fun <get-API_VERSION>(): kotlin/Int // io.github.jan.supabase.postgrest/Postgrest.Companion.API_VERSION.<get-API_VERSION>|<get-API_VERSION>(){}[0]
+        final const val LOGGING_TAG // io.github.jan.supabase.postgrest/Postgrest.Companion.LOGGING_TAG|{}LOGGING_TAG[0]
+            final fun <get-LOGGING_TAG>(): kotlin/String // io.github.jan.supabase.postgrest/Postgrest.Companion.LOGGING_TAG.<get-LOGGING_TAG>|<get-LOGGING_TAG>(){}[0]
+
+        final val key // io.github.jan.supabase.postgrest/Postgrest.Companion.key|{}key[0]
+            final fun <get-key>(): kotlin/String // io.github.jan.supabase.postgrest/Postgrest.Companion.key.<get-key>|<get-key>(){}[0]
+
+        final fun create(io.github.jan.supabase/SupabaseClient, io.github.jan.supabase.postgrest/Postgrest.Config): io.github.jan.supabase.postgrest/Postgrest // io.github.jan.supabase.postgrest/Postgrest.Companion.create|create(io.github.jan.supabase.SupabaseClient;io.github.jan.supabase.postgrest.Postgrest.Config){}[0]
+        final fun createConfig(kotlin/Function1<io.github.jan.supabase.postgrest/Postgrest.Config, kotlin/Unit>): io.github.jan.supabase.postgrest/Postgrest.Config // io.github.jan.supabase.postgrest/Postgrest.Companion.createConfig|createConfig(kotlin.Function1<io.github.jan.supabase.postgrest.Postgrest.Config,kotlin.Unit>){}[0]
+    }
+}
+
+sealed interface io.github.jan.supabase.postgrest.executor/RequestExecutor { // io.github.jan.supabase.postgrest.executor/RequestExecutor|null[0]
+    abstract suspend fun execute(io.github.jan.supabase.postgrest/Postgrest, kotlin/String, io.github.jan.supabase.postgrest.query/PostgrestRequestBuilder): io.github.jan.supabase.postgrest.result/PostgrestResult // io.github.jan.supabase.postgrest.executor/RequestExecutor.execute|execute(io.github.jan.supabase.postgrest.Postgrest;kotlin.String;io.github.jan.supabase.postgrest.query.PostgrestRequestBuilder){}[0]
+}
+
+abstract class io.github.jan.supabase.postgrest.query/PostgrestRequestBuilder { // io.github.jan.supabase.postgrest.query/PostgrestRequestBuilder|null[0]
+    constructor <init>(kotlin/String, io.github.jan.supabase.postgrest/PropertyConversionMethod) // io.github.jan.supabase.postgrest.query/PostgrestRequestBuilder.<init>|<init>(kotlin.String;io.github.jan.supabase.postgrest.PropertyConversionMethod){}[0]
+
+    final val headers // io.github.jan.supabase.postgrest.query/PostgrestRequestBuilder.headers|{}headers[0]
+        final fun <get-headers>(): io.ktor.http/HeadersBuilder // io.github.jan.supabase.postgrest.query/PostgrestRequestBuilder.headers.<get-headers>|<get-headers>(){}[0]
+    final val params // io.github.jan.supabase.postgrest.query/PostgrestRequestBuilder.params|{}params[0]
+        final fun <get-params>(): kotlin.collections/MutableMap<kotlin/String, kotlin.collections/List<kotlin/String>> // io.github.jan.supabase.postgrest.query/PostgrestRequestBuilder.params.<get-params>|<get-params>(){}[0]
+    final val propertyConversionMethod // io.github.jan.supabase.postgrest.query/PostgrestRequestBuilder.propertyConversionMethod|{}propertyConversionMethod[0]
+        final fun <get-propertyConversionMethod>(): io.github.jan.supabase.postgrest/PropertyConversionMethod // io.github.jan.supabase.postgrest.query/PostgrestRequestBuilder.propertyConversionMethod.<get-propertyConversionMethod>|<get-propertyConversionMethod>(){}[0]
+
+    final var body // io.github.jan.supabase.postgrest.query/PostgrestRequestBuilder.body|{}body[0]
+        final fun <get-body>(): kotlinx.serialization.json/JsonElement? // io.github.jan.supabase.postgrest.query/PostgrestRequestBuilder.body.<get-body>|<get-body>(){}[0]
+        final fun <set-body>(kotlinx.serialization.json/JsonElement?) // io.github.jan.supabase.postgrest.query/PostgrestRequestBuilder.body.<set-body>|<set-body>(kotlinx.serialization.json.JsonElement?){}[0]
+    final var count // io.github.jan.supabase.postgrest.query/PostgrestRequestBuilder.count|{}count[0]
+        final fun <get-count>(): io.github.jan.supabase.postgrest.query/Count? // io.github.jan.supabase.postgrest.query/PostgrestRequestBuilder.count.<get-count>|<get-count>(){}[0]
+    final var retry // io.github.jan.supabase.postgrest.query/PostgrestRequestBuilder.retry|{}retry[0]
+        final fun <get-retry>(): kotlin/Boolean // io.github.jan.supabase.postgrest.query/PostgrestRequestBuilder.retry.<get-retry>|<get-retry>(){}[0]
+    final var returning // io.github.jan.supabase.postgrest.query/PostgrestRequestBuilder.returning|{}returning[0]
+        final fun <get-returning>(): io.github.jan.supabase.postgrest.query/Returning // io.github.jan.supabase.postgrest.query/PostgrestRequestBuilder.returning.<get-returning>|<get-returning>(){}[0]
+    final var schema // io.github.jan.supabase.postgrest.query/PostgrestRequestBuilder.schema|{}schema[0]
+        final fun <get-schema>(): kotlin/String // io.github.jan.supabase.postgrest.query/PostgrestRequestBuilder.schema.<get-schema>|<get-schema>(){}[0]
+        final fun <set-schema>(kotlin/String) // io.github.jan.supabase.postgrest.query/PostgrestRequestBuilder.schema.<set-schema>|<set-schema>(kotlin.String){}[0]
+
+    final fun count(io.github.jan.supabase.postgrest.query/Count) // io.github.jan.supabase.postgrest.query/PostgrestRequestBuilder.count|count(io.github.jan.supabase.postgrest.query.Count){}[0]
+    final fun csv() // io.github.jan.supabase.postgrest.query/PostgrestRequestBuilder.csv|csv(){}[0]
+    final fun dryRun() // io.github.jan.supabase.postgrest.query/PostgrestRequestBuilder.dryRun|dryRun(){}[0]
+    final fun explain(kotlin/Boolean = ..., kotlin/Boolean = ..., kotlin/Boolean = ..., kotlin/Boolean = ..., kotlin/Boolean = ..., kotlin/String = ...) // io.github.jan.supabase.postgrest.query/PostgrestRequestBuilder.explain|explain(kotlin.Boolean;kotlin.Boolean;kotlin.Boolean;kotlin.Boolean;kotlin.Boolean;kotlin.String){}[0]
+    final fun geojson() // io.github.jan.supabase.postgrest.query/PostgrestRequestBuilder.geojson|geojson(){}[0]
+    final fun limit(kotlin/Long, kotlin/String? = ...) // io.github.jan.supabase.postgrest.query/PostgrestRequestBuilder.limit|limit(kotlin.Long;kotlin.String?){}[0]
+    final fun maybeSingle() // io.github.jan.supabase.postgrest.query/PostgrestRequestBuilder.maybeSingle|maybeSingle(){}[0]
+    final fun noRetry() // io.github.jan.supabase.postgrest.query/PostgrestRequestBuilder.noRetry|noRetry(){}[0]
+    final fun order(kotlin/String, io.github.jan.supabase.postgrest.query/Order, kotlin/Boolean = ..., kotlin/String? = ...) // io.github.jan.supabase.postgrest.query/PostgrestRequestBuilder.order|order(kotlin.String;io.github.jan.supabase.postgrest.query.Order;kotlin.Boolean;kotlin.String?){}[0]
+    final fun range(kotlin.ranges/LongRange, kotlin/String? = ...) // io.github.jan.supabase.postgrest.query/PostgrestRequestBuilder.range|range(kotlin.ranges.LongRange;kotlin.String?){}[0]
+    final fun range(kotlin/Long, kotlin/Long, kotlin/String? = ...) // io.github.jan.supabase.postgrest.query/PostgrestRequestBuilder.range|range(kotlin.Long;kotlin.Long;kotlin.String?){}[0]
+    final fun select(io.github.jan.supabase.postgrest.query/Columns = ...) // io.github.jan.supabase.postgrest.query/PostgrestRequestBuilder.select|select(io.github.jan.supabase.postgrest.query.Columns){}[0]
+    final fun single() // io.github.jan.supabase.postgrest.query/PostgrestRequestBuilder.single|single(){}[0]
+    final fun stripNulls() // io.github.jan.supabase.postgrest.query/PostgrestRequestBuilder.stripNulls|stripNulls(){}[0]
+    final fun withReturning(): kotlin.collections/List<kotlin/String> // io.github.jan.supabase.postgrest.query/PostgrestRequestBuilder.withReturning|withReturning(){}[0]
+    final inline fun filter(kotlin/Function1<io.github.jan.supabase.postgrest.query.filter/PostgrestFilterBuilder, kotlin/Unit>) // io.github.jan.supabase.postgrest.query/PostgrestRequestBuilder.filter|filter(kotlin.Function1<io.github.jan.supabase.postgrest.query.filter.PostgrestFilterBuilder,kotlin.Unit>){}[0]
+}
+
+final class io.github.jan.supabase.postgrest.exception/PostgrestRestException : io.github.jan.supabase.exceptions/RestException { // io.github.jan.supabase.postgrest.exception/PostgrestRestException|null[0]
+    constructor <init>(kotlin/String, kotlin/String?, kotlinx.serialization.json/JsonElement?, kotlin/String?, io.ktor.client.statement/HttpResponse) // io.github.jan.supabase.postgrest.exception/PostgrestRestException.<init>|<init>(kotlin.String;kotlin.String?;kotlinx.serialization.json.JsonElement?;kotlin.String?;io.ktor.client.statement.HttpResponse){}[0]
+
+    final val code // io.github.jan.supabase.postgrest.exception/PostgrestRestException.code|{}code[0]
+        final fun <get-code>(): kotlin/String? // io.github.jan.supabase.postgrest.exception/PostgrestRestException.code.<get-code>|<get-code>(){}[0]
+    final val details // io.github.jan.supabase.postgrest.exception/PostgrestRestException.details|{}details[0]
+        final fun <get-details>(): kotlinx.serialization.json/JsonElement? // io.github.jan.supabase.postgrest.exception/PostgrestRestException.details.<get-details>|<get-details>(){}[0]
+    final val hint // io.github.jan.supabase.postgrest.exception/PostgrestRestException.hint|{}hint[0]
+        final fun <get-hint>(): kotlin/String? // io.github.jan.supabase.postgrest.exception/PostgrestRestException.hint.<get-hint>|<get-hint>(){}[0]
+}
+
+final class io.github.jan.supabase.postgrest.query.filter/FilterOperation { // io.github.jan.supabase.postgrest.query.filter/FilterOperation|null[0]
+    constructor <init>(kotlin/String, io.github.jan.supabase.postgrest.query.filter/FilterOperator, kotlin/Any?) // io.github.jan.supabase.postgrest.query.filter/FilterOperation.<init>|<init>(kotlin.String;io.github.jan.supabase.postgrest.query.filter.FilterOperator;kotlin.Any?){}[0]
+
+    final val column // io.github.jan.supabase.postgrest.query.filter/FilterOperation.column|{}column[0]
+        final fun <get-column>(): kotlin/String // io.github.jan.supabase.postgrest.query.filter/FilterOperation.column.<get-column>|<get-column>(){}[0]
+    final val operator // io.github.jan.supabase.postgrest.query.filter/FilterOperation.operator|{}operator[0]
+        final fun <get-operator>(): io.github.jan.supabase.postgrest.query.filter/FilterOperator // io.github.jan.supabase.postgrest.query.filter/FilterOperation.operator.<get-operator>|<get-operator>(){}[0]
+    final val value // io.github.jan.supabase.postgrest.query.filter/FilterOperation.value|{}value[0]
+        final fun <get-value>(): kotlin/Any? // io.github.jan.supabase.postgrest.query.filter/FilterOperation.value.<get-value>|<get-value>(){}[0]
+
+    final fun component1(): kotlin/String // io.github.jan.supabase.postgrest.query.filter/FilterOperation.component1|component1(){}[0]
+    final fun component2(): io.github.jan.supabase.postgrest.query.filter/FilterOperator // io.github.jan.supabase.postgrest.query.filter/FilterOperation.component2|component2(){}[0]
+    final fun component3(): kotlin/Any? // io.github.jan.supabase.postgrest.query.filter/FilterOperation.component3|component3(){}[0]
+    final fun copy(kotlin/String = ..., io.github.jan.supabase.postgrest.query.filter/FilterOperator = ..., kotlin/Any? = ...): io.github.jan.supabase.postgrest.query.filter/FilterOperation // io.github.jan.supabase.postgrest.query.filter/FilterOperation.copy|copy(kotlin.String;io.github.jan.supabase.postgrest.query.filter.FilterOperator;kotlin.Any?){}[0]
+    final fun equals(kotlin/Any?): kotlin/Boolean // io.github.jan.supabase.postgrest.query.filter/FilterOperation.equals|equals(kotlin.Any?){}[0]
+    final fun hashCode(): kotlin/Int // io.github.jan.supabase.postgrest.query.filter/FilterOperation.hashCode|hashCode(){}[0]
+    final fun toString(): kotlin/String // io.github.jan.supabase.postgrest.query.filter/FilterOperation.toString|toString(){}[0]
+}
+
+final class io.github.jan.supabase.postgrest.query.filter/PostgrestFilterBuilder { // io.github.jan.supabase.postgrest.query.filter/PostgrestFilterBuilder|null[0]
+    constructor <init>(io.github.jan.supabase.postgrest/PropertyConversionMethod, kotlin.collections/MutableMap<kotlin/String, kotlin.collections/List<kotlin/String>> = ..., kotlin/Boolean = ...) // io.github.jan.supabase.postgrest.query.filter/PostgrestFilterBuilder.<init>|<init>(io.github.jan.supabase.postgrest.PropertyConversionMethod;kotlin.collections.MutableMap<kotlin.String,kotlin.collections.List<kotlin.String>>;kotlin.Boolean){}[0]
+
+    final val _params // io.github.jan.supabase.postgrest.query.filter/PostgrestFilterBuilder._params|{}_params[0]
+        final fun <get-_params>(): kotlin.collections/MutableMap<kotlin/String, kotlin.collections/List<kotlin/String>> // io.github.jan.supabase.postgrest.query.filter/PostgrestFilterBuilder._params.<get-_params>|<get-_params>(){}[0]
+    final val isInLogicalExpression // io.github.jan.supabase.postgrest.query.filter/PostgrestFilterBuilder.isInLogicalExpression|{}isInLogicalExpression[0]
+        final fun <get-isInLogicalExpression>(): kotlin/Boolean // io.github.jan.supabase.postgrest.query.filter/PostgrestFilterBuilder.isInLogicalExpression.<get-isInLogicalExpression>|<get-isInLogicalExpression>(){}[0]
+    final val params // io.github.jan.supabase.postgrest.query.filter/PostgrestFilterBuilder.params|{}params[0]
+        final fun <get-params>(): kotlin.collections/Map<kotlin/String, kotlin.collections/List<kotlin/String>> // io.github.jan.supabase.postgrest.query.filter/PostgrestFilterBuilder.params.<get-params>|<get-params>(){}[0]
+    final val propertyConversionMethod // io.github.jan.supabase.postgrest.query.filter/PostgrestFilterBuilder.propertyConversionMethod|{}propertyConversionMethod[0]
+        final fun <get-propertyConversionMethod>(): io.github.jan.supabase.postgrest/PropertyConversionMethod // io.github.jan.supabase.postgrest.query.filter/PostgrestFilterBuilder.propertyConversionMethod.<get-propertyConversionMethod>|<get-propertyConversionMethod>(){}[0]
+
+    final fun <#A1: kotlin/Any?, #B1: kotlin/Any?> (kotlin.reflect/KProperty1<#A1, #B1>).adjacent(kotlin/Pair<kotlin/Any, kotlin/Any>) // io.github.jan.supabase.postgrest.query.filter/PostgrestFilterBuilder.adjacent|adjacent@kotlin.reflect.KProperty1<0:0,0:1>(kotlin.Pair<kotlin.Any,kotlin.Any>){0§<kotlin.Any?>;1§<kotlin.Any?>}[0]
+    final fun <#A1: kotlin/Any?, #B1: kotlin/Any?> (kotlin.reflect/KProperty1<#A1, #B1>).contained(kotlin.collections/List<kotlin/Any>) // io.github.jan.supabase.postgrest.query.filter/PostgrestFilterBuilder.contained|contained@kotlin.reflect.KProperty1<0:0,0:1>(kotlin.collections.List<kotlin.Any>){0§<kotlin.Any?>;1§<kotlin.Any?>}[0]
+    final fun <#A1: kotlin/Any?, #B1: kotlin/Any?> (kotlin.reflect/KProperty1<#A1, #B1>).contains(kotlin.collections/List<kotlin/Any>) // io.github.jan.supabase.postgrest.query.filter/PostgrestFilterBuilder.contains|contains@kotlin.reflect.KProperty1<0:0,0:1>(kotlin.collections.List<kotlin.Any>){0§<kotlin.Any?>;1§<kotlin.Any?>}[0]
+    final fun <#A1: kotlin/Any?, #B1: kotlin/Any?> (kotlin.reflect/KProperty1<#A1, #B1>).eq(#B1) // io.github.jan.supabase.postgrest.query.filter/PostgrestFilterBuilder.eq|eq@kotlin.reflect.KProperty1<0:0,0:1>(0:1){0§<kotlin.Any?>;1§<kotlin.Any?>}[0]
+    final fun <#A1: kotlin/Any?, #B1: kotlin/Any?> (kotlin.reflect/KProperty1<#A1, #B1>).gt(#B1) // io.github.jan.supabase.postgrest.query.filter/PostgrestFilterBuilder.gt|gt@kotlin.reflect.KProperty1<0:0,0:1>(0:1){0§<kotlin.Any?>;1§<kotlin.Any?>}[0]
+    final fun <#A1: kotlin/Any?, #B1: kotlin/Any?> (kotlin.reflect/KProperty1<#A1, #B1>).gte(#B1) // io.github.jan.supabase.postgrest.query.filter/PostgrestFilterBuilder.gte|gte@kotlin.reflect.KProperty1<0:0,0:1>(0:1){0§<kotlin.Any?>;1§<kotlin.Any?>}[0]
+    final fun <#A1: kotlin/Any?, #B1: kotlin/Any?> (kotlin.reflect/KProperty1<#A1, #B1>).ilike(kotlin/String) // io.github.jan.supabase.postgrest.query.filter/PostgrestFilterBuilder.ilike|ilike@kotlin.reflect.KProperty1<0:0,0:1>(kotlin.String){0§<kotlin.Any?>;1§<kotlin.Any?>}[0]
+    final fun <#A1: kotlin/Any?, #B1: kotlin/Any?> (kotlin.reflect/KProperty1<#A1, #B1>).imatch(kotlin/String) // io.github.jan.supabase.postgrest.query.filter/PostgrestFilterBuilder.imatch|imatch@kotlin.reflect.KProperty1<0:0,0:1>(kotlin.String){0§<kotlin.Any?>;1§<kotlin.Any?>}[0]
+    final fun <#A1: kotlin/Any?, #B1: kotlin/Any?> (kotlin.reflect/KProperty1<#A1, #B1>).isExact(kotlin/Boolean?) // io.github.jan.supabase.postgrest.query.filter/PostgrestFilterBuilder.isExact|isExact@kotlin.reflect.KProperty1<0:0,0:1>(kotlin.Boolean?){0§<kotlin.Any?>;1§<kotlin.Any?>}[0]
+    final fun <#A1: kotlin/Any?, #B1: kotlin/Any?> (kotlin.reflect/KProperty1<#A1, #B1>).isIn(kotlin.collections/List<#B1>) // io.github.jan.supabase.postgrest.query.filter/PostgrestFilterBuilder.isIn|isIn@kotlin.reflect.KProperty1<0:0,0:1>(kotlin.collections.List<0:1>){0§<kotlin.Any?>;1§<kotlin.Any?>}[0]
+    final fun <#A1: kotlin/Any?, #B1: kotlin/Any?> (kotlin.reflect/KProperty1<#A1, #B1>).like(kotlin/String) // io.github.jan.supabase.postgrest.query.filter/PostgrestFilterBuilder.like|like@kotlin.reflect.KProperty1<0:0,0:1>(kotlin.String){0§<kotlin.Any?>;1§<kotlin.Any?>}[0]
+    final fun <#A1: kotlin/Any?, #B1: kotlin/Any?> (kotlin.reflect/KProperty1<#A1, #B1>).lt(#B1) // io.github.jan.supabase.postgrest.query.filter/PostgrestFilterBuilder.lt|lt@kotlin.reflect.KProperty1<0:0,0:1>(0:1){0§<kotlin.Any?>;1§<kotlin.Any?>}[0]
+    final fun <#A1: kotlin/Any?, #B1: kotlin/Any?> (kotlin.reflect/KProperty1<#A1, #B1>).lte(#B1) // io.github.jan.supabase.postgrest.query.filter/PostgrestFilterBuilder.lte|lte@kotlin.reflect.KProperty1<0:0,0:1>(0:1){0§<kotlin.Any?>;1§<kotlin.Any?>}[0]
+    final fun <#A1: kotlin/Any?, #B1: kotlin/Any?> (kotlin.reflect/KProperty1<#A1, #B1>).match(kotlin/String) // io.github.jan.supabase.postgrest.query.filter/PostgrestFilterBuilder.match|match@kotlin.reflect.KProperty1<0:0,0:1>(kotlin.String){0§<kotlin.Any?>;1§<kotlin.Any?>}[0]
+    final fun <#A1: kotlin/Any?, #B1: kotlin/Any?> (kotlin.reflect/KProperty1<#A1, #B1>).neq(#B1) // io.github.jan.supabase.postgrest.query.filter/PostgrestFilterBuilder.neq|neq@kotlin.reflect.KProperty1<0:0,0:1>(0:1){0§<kotlin.Any?>;1§<kotlin.Any?>}[0]
+    final fun <#A1: kotlin/Any?, #B1: kotlin/Any?> (kotlin.reflect/KProperty1<#A1, #B1>).notIn(kotlin.collections/List<#B1>) // io.github.jan.supabase.postgrest.query.filter/PostgrestFilterBuilder.notIn|notIn@kotlin.reflect.KProperty1<0:0,0:1>(kotlin.collections.List<0:1>){0§<kotlin.Any?>;1§<kotlin.Any?>}[0]
+    final fun <#A1: kotlin/Any?, #B1: kotlin/Any?> (kotlin.reflect/KProperty1<#A1, #B1>).overlaps(kotlin.collections/List<kotlin/Any>) // io.github.jan.supabase.postgrest.query.filter/PostgrestFilterBuilder.overlaps|overlaps@kotlin.reflect.KProperty1<0:0,0:1>(kotlin.collections.List<kotlin.Any>){0§<kotlin.Any?>;1§<kotlin.Any?>}[0]
+    final fun <#A1: kotlin/Any?, #B1: kotlin/Any?> (kotlin.reflect/KProperty1<#A1, #B1>).rangeGt(kotlin/Pair<kotlin/Any, kotlin/Any>) // io.github.jan.supabase.postgrest.query.filter/PostgrestFilterBuilder.rangeGt|rangeGt@kotlin.reflect.KProperty1<0:0,0:1>(kotlin.Pair<kotlin.Any,kotlin.Any>){0§<kotlin.Any?>;1§<kotlin.Any?>}[0]
+    final fun <#A1: kotlin/Any?, #B1: kotlin/Any?> (kotlin.reflect/KProperty1<#A1, #B1>).rangeGte(kotlin/Pair<kotlin/Any, kotlin/Any>) // io.github.jan.supabase.postgrest.query.filter/PostgrestFilterBuilder.rangeGte|rangeGte@kotlin.reflect.KProperty1<0:0,0:1>(kotlin.Pair<kotlin.Any,kotlin.Any>){0§<kotlin.Any?>;1§<kotlin.Any?>}[0]
+    final fun <#A1: kotlin/Any?, #B1: kotlin/Any?> (kotlin.reflect/KProperty1<#A1, #B1>).rangeLt(kotlin/Pair<kotlin/Any, kotlin/Any>) // io.github.jan.supabase.postgrest.query.filter/PostgrestFilterBuilder.rangeLt|rangeLt@kotlin.reflect.KProperty1<0:0,0:1>(kotlin.Pair<kotlin.Any,kotlin.Any>){0§<kotlin.Any?>;1§<kotlin.Any?>}[0]
+    final fun <#A1: kotlin/Any?, #B1: kotlin/Any?> (kotlin.reflect/KProperty1<#A1, #B1>).rangeLte(kotlin/Pair<kotlin/Any, kotlin/Any>) // io.github.jan.supabase.postgrest.query.filter/PostgrestFilterBuilder.rangeLte|rangeLte@kotlin.reflect.KProperty1<0:0,0:1>(kotlin.Pair<kotlin.Any,kotlin.Any>){0§<kotlin.Any?>;1§<kotlin.Any?>}[0]
+    final fun adjacent(kotlin/String, kotlin/Pair<kotlin/Any, kotlin/Any>) // io.github.jan.supabase.postgrest.query.filter/PostgrestFilterBuilder.adjacent|adjacent(kotlin.String;kotlin.Pair<kotlin.Any,kotlin.Any>){}[0]
+    final fun cd(kotlin/String, kotlin.collections/List<kotlin/Any>) // io.github.jan.supabase.postgrest.query.filter/PostgrestFilterBuilder.cd|cd(kotlin.String;kotlin.collections.List<kotlin.Any>){}[0]
+    final fun contained(kotlin/String, kotlin.collections/List<kotlin/Any>) // io.github.jan.supabase.postgrest.query.filter/PostgrestFilterBuilder.contained|contained(kotlin.String;kotlin.collections.List<kotlin.Any>){}[0]
+    final fun contains(kotlin/String, kotlin.collections/List<kotlin/Any>) // io.github.jan.supabase.postgrest.query.filter/PostgrestFilterBuilder.contains|contains(kotlin.String;kotlin.collections.List<kotlin.Any>){}[0]
+    final fun cs(kotlin/String, kotlin.collections/List<kotlin/Any>) // io.github.jan.supabase.postgrest.query.filter/PostgrestFilterBuilder.cs|cs(kotlin.String;kotlin.collections.List<kotlin.Any>){}[0]
+    final fun eq(kotlin/String, kotlin/Any) // io.github.jan.supabase.postgrest.query.filter/PostgrestFilterBuilder.eq|eq(kotlin.String;kotlin.Any){}[0]
+    final fun exact(kotlin/String, kotlin/Boolean?) // io.github.jan.supabase.postgrest.query.filter/PostgrestFilterBuilder.exact|exact(kotlin.String;kotlin.Boolean?){}[0]
+    final fun filter(io.github.jan.supabase.postgrest.query.filter/FilterOperation) // io.github.jan.supabase.postgrest.query.filter/PostgrestFilterBuilder.filter|filter(io.github.jan.supabase.postgrest.query.filter.FilterOperation){}[0]
+    final fun filter(kotlin/String, io.github.jan.supabase.postgrest.query.filter/FilterOperator, kotlin/Any?) // io.github.jan.supabase.postgrest.query.filter/PostgrestFilterBuilder.filter|filter(kotlin.String;io.github.jan.supabase.postgrest.query.filter.FilterOperator;kotlin.Any?){}[0]
+    final fun filterNot(io.github.jan.supabase.postgrest.query.filter/FilterOperation) // io.github.jan.supabase.postgrest.query.filter/PostgrestFilterBuilder.filterNot|filterNot(io.github.jan.supabase.postgrest.query.filter.FilterOperation){}[0]
+    final fun filterNot(kotlin/String, io.github.jan.supabase.postgrest.query.filter/FilterOperator, kotlin/Any?) // io.github.jan.supabase.postgrest.query.filter/PostgrestFilterBuilder.filterNot|filterNot(kotlin.String;io.github.jan.supabase.postgrest.query.filter.FilterOperator;kotlin.Any?){}[0]
+    final fun gt(kotlin/String, kotlin/Any) // io.github.jan.supabase.postgrest.query.filter/PostgrestFilterBuilder.gt|gt(kotlin.String;kotlin.Any){}[0]
+    final fun gte(kotlin/String, kotlin/Any) // io.github.jan.supabase.postgrest.query.filter/PostgrestFilterBuilder.gte|gte(kotlin.String;kotlin.Any){}[0]
+    final fun ilike(kotlin/String, kotlin/String) // io.github.jan.supabase.postgrest.query.filter/PostgrestFilterBuilder.ilike|ilike(kotlin.String;kotlin.String){}[0]
+    final fun ilikeAll(kotlin/String, kotlin.collections/List<kotlin/String>) // io.github.jan.supabase.postgrest.query.filter/PostgrestFilterBuilder.ilikeAll|ilikeAll(kotlin.String;kotlin.collections.List<kotlin.String>){}[0]
+    final fun ilikeAny(kotlin/String, kotlin.collections/List<kotlin/String>) // io.github.jan.supabase.postgrest.query.filter/PostgrestFilterBuilder.ilikeAny|ilikeAny(kotlin.String;kotlin.collections.List<kotlin.String>){}[0]
+    final fun isIn(kotlin/String, kotlin.collections/List<kotlin/Any>) // io.github.jan.supabase.postgrest.query.filter/PostgrestFilterBuilder.isIn|isIn(kotlin.String;kotlin.collections.List<kotlin.Any>){}[0]
+    final fun like(kotlin/String, kotlin/String) // io.github.jan.supabase.postgrest.query.filter/PostgrestFilterBuilder.like|like(kotlin.String;kotlin.String){}[0]
+    final fun likeAll(kotlin/String, kotlin.collections/List<kotlin/String>) // io.github.jan.supabase.postgrest.query.filter/PostgrestFilterBuilder.likeAll|likeAll(kotlin.String;kotlin.collections.List<kotlin.String>){}[0]
+    final fun likeAny(kotlin/String, kotlin.collections/List<kotlin/String>) // io.github.jan.supabase.postgrest.query.filter/PostgrestFilterBuilder.likeAny|likeAny(kotlin.String;kotlin.collections.List<kotlin.String>){}[0]
+    final fun lt(kotlin/String, kotlin/Any) // io.github.jan.supabase.postgrest.query.filter/PostgrestFilterBuilder.lt|lt(kotlin.String;kotlin.Any){}[0]
+    final fun lte(kotlin/String, kotlin/Any) // io.github.jan.supabase.postgrest.query.filter/PostgrestFilterBuilder.lte|lte(kotlin.String;kotlin.Any){}[0]
+    final fun match(kotlin.collections/Map<kotlin/String, kotlin/Any>) // io.github.jan.supabase.postgrest.query.filter/PostgrestFilterBuilder.match|match(kotlin.collections.Map<kotlin.String,kotlin.Any>){}[0]
+    final fun neq(kotlin/String, kotlin/Any) // io.github.jan.supabase.postgrest.query.filter/PostgrestFilterBuilder.neq|neq(kotlin.String;kotlin.Any){}[0]
+    final fun notIn(kotlin/String, kotlin.collections/List<kotlin/Any>) // io.github.jan.supabase.postgrest.query.filter/PostgrestFilterBuilder.notIn|notIn(kotlin.String;kotlin.collections.List<kotlin.Any>){}[0]
+    final fun nxl(kotlin/String, kotlin/Pair<kotlin/Any, kotlin/Any>) // io.github.jan.supabase.postgrest.query.filter/PostgrestFilterBuilder.nxl|nxl(kotlin.String;kotlin.Pair<kotlin.Any,kotlin.Any>){}[0]
+    final fun nxr(kotlin/String, kotlin/Pair<kotlin/Any, kotlin/Any>) // io.github.jan.supabase.postgrest.query.filter/PostgrestFilterBuilder.nxr|nxr(kotlin.String;kotlin.Pair<kotlin.Any,kotlin.Any>){}[0]
+    final fun ov(kotlin/String, kotlin.collections/List<kotlin/Any>) // io.github.jan.supabase.postgrest.query.filter/PostgrestFilterBuilder.ov|ov(kotlin.String;kotlin.collections.List<kotlin.Any>){}[0]
+    final fun overlaps(kotlin/String, kotlin.collections/List<kotlin/Any>) // io.github.jan.supabase.postgrest.query.filter/PostgrestFilterBuilder.overlaps|overlaps(kotlin.String;kotlin.collections.List<kotlin.Any>){}[0]
+    final fun rangeGt(kotlin/String, kotlin/Pair<kotlin/Any, kotlin/Any>) // io.github.jan.supabase.postgrest.query.filter/PostgrestFilterBuilder.rangeGt|rangeGt(kotlin.String;kotlin.Pair<kotlin.Any,kotlin.Any>){}[0]
+    final fun rangeGte(kotlin/String, kotlin/Pair<kotlin/Any, kotlin/Any>) // io.github.jan.supabase.postgrest.query.filter/PostgrestFilterBuilder.rangeGte|rangeGte(kotlin.String;kotlin.Pair<kotlin.Any,kotlin.Any>){}[0]
+    final fun rangeLt(kotlin/String, kotlin/Pair<kotlin/Any, kotlin/Any>) // io.github.jan.supabase.postgrest.query.filter/PostgrestFilterBuilder.rangeLt|rangeLt(kotlin.String;kotlin.Pair<kotlin.Any,kotlin.Any>){}[0]
+    final fun rangeLte(kotlin/String, kotlin/Pair<kotlin/Any, kotlin/Any>) // io.github.jan.supabase.postgrest.query.filter/PostgrestFilterBuilder.rangeLte|rangeLte(kotlin.String;kotlin.Pair<kotlin.Any,kotlin.Any>){}[0]
+    final fun regexIMatch(kotlin/String, kotlin/String) // io.github.jan.supabase.postgrest.query.filter/PostgrestFilterBuilder.regexIMatch|regexIMatch(kotlin.String;kotlin.String){}[0]
+    final fun regexMatch(kotlin/String, kotlin/String) // io.github.jan.supabase.postgrest.query.filter/PostgrestFilterBuilder.regexMatch|regexMatch(kotlin.String;kotlin.String){}[0]
+    final fun sl(kotlin/String, kotlin/Pair<kotlin/Any, kotlin/Any>) // io.github.jan.supabase.postgrest.query.filter/PostgrestFilterBuilder.sl|sl(kotlin.String;kotlin.Pair<kotlin.Any,kotlin.Any>){}[0]
+    final fun sr(kotlin/String, kotlin/Pair<kotlin/Any, kotlin/Any>) // io.github.jan.supabase.postgrest.query.filter/PostgrestFilterBuilder.sr|sr(kotlin.String;kotlin.Pair<kotlin.Any,kotlin.Any>){}[0]
+    final fun textSearch(kotlin/String, kotlin/String, io.github.jan.supabase.postgrest.query.filter/TextSearchType, kotlin/String? = ...): io.github.jan.supabase.postgrest.query.filter/PostgrestFilterBuilder // io.github.jan.supabase.postgrest.query.filter/PostgrestFilterBuilder.textSearch|textSearch(kotlin.String;kotlin.String;io.github.jan.supabase.postgrest.query.filter.TextSearchType;kotlin.String?){}[0]
+    final inline fun and(kotlin/Boolean = ..., kotlin/String? = ..., kotlin/Function1<io.github.jan.supabase.postgrest.query.filter/PostgrestFilterBuilder, kotlin/Unit>) // io.github.jan.supabase.postgrest.query.filter/PostgrestFilterBuilder.and|and(kotlin.Boolean;kotlin.String?;kotlin.Function1<io.github.jan.supabase.postgrest.query.filter.PostgrestFilterBuilder,kotlin.Unit>){}[0]
+    final inline fun or(kotlin/Boolean = ..., kotlin/String? = ..., kotlin/Function1<io.github.jan.supabase.postgrest.query.filter/PostgrestFilterBuilder, kotlin/Unit>) // io.github.jan.supabase.postgrest.query.filter/PostgrestFilterBuilder.or|or(kotlin.Boolean;kotlin.String?;kotlin.Function1<io.github.jan.supabase.postgrest.query.filter.PostgrestFilterBuilder,kotlin.Unit>){}[0]
+}
+
+final class io.github.jan.supabase.postgrest.query.request/DeleteRequestBuilder : io.github.jan.supabase.postgrest.query/PostgrestRequestBuilder { // io.github.jan.supabase.postgrest.query.request/DeleteRequestBuilder|null[0]
+    constructor <init>(kotlin/String, io.github.jan.supabase.postgrest/PropertyConversionMethod) // io.github.jan.supabase.postgrest.query.request/DeleteRequestBuilder.<init>|<init>(kotlin.String;io.github.jan.supabase.postgrest.PropertyConversionMethod){}[0]
+}
+
+final class io.github.jan.supabase.postgrest.query.request/RpcRequestBuilder : io.github.jan.supabase.postgrest.query/PostgrestRequestBuilder { // io.github.jan.supabase.postgrest.query.request/RpcRequestBuilder|null[0]
+    constructor <init>(kotlin/String, io.github.jan.supabase.postgrest/PropertyConversionMethod) // io.github.jan.supabase.postgrest.query.request/RpcRequestBuilder.<init>|<init>(kotlin.String;io.github.jan.supabase.postgrest.PropertyConversionMethod){}[0]
+
+    final var method // io.github.jan.supabase.postgrest.query.request/RpcRequestBuilder.method|{}method[0]
+        final fun <get-method>(): io.github.jan.supabase.postgrest/RpcMethod // io.github.jan.supabase.postgrest.query.request/RpcRequestBuilder.method.<get-method>|<get-method>(){}[0]
+        final fun <set-method>(io.github.jan.supabase.postgrest/RpcMethod) // io.github.jan.supabase.postgrest.query.request/RpcRequestBuilder.method.<set-method>|<set-method>(io.github.jan.supabase.postgrest.RpcMethod){}[0]
+}
+
+final class io.github.jan.supabase.postgrest.query.request/SelectRequestBuilder : io.github.jan.supabase.postgrest.query/PostgrestRequestBuilder { // io.github.jan.supabase.postgrest.query.request/SelectRequestBuilder|null[0]
+    constructor <init>(kotlin/String, io.github.jan.supabase.postgrest/PropertyConversionMethod) // io.github.jan.supabase.postgrest.query.request/SelectRequestBuilder.<init>|<init>(kotlin.String;io.github.jan.supabase.postgrest.PropertyConversionMethod){}[0]
+
+    final var head // io.github.jan.supabase.postgrest.query.request/SelectRequestBuilder.head|{}head[0]
+        final fun <get-head>(): kotlin/Boolean // io.github.jan.supabase.postgrest.query.request/SelectRequestBuilder.head.<get-head>|<get-head>(){}[0]
+        final fun <set-head>(kotlin/Boolean) // io.github.jan.supabase.postgrest.query.request/SelectRequestBuilder.head.<set-head>|<set-head>(kotlin.Boolean){}[0]
+}
+
+final class io.github.jan.supabase.postgrest.query.request/UpdateRequestBuilder : io.github.jan.supabase.postgrest.query/PostgrestRequestBuilder { // io.github.jan.supabase.postgrest.query.request/UpdateRequestBuilder|null[0]
+    constructor <init>(kotlin/String, io.github.jan.supabase.postgrest/PropertyConversionMethod) // io.github.jan.supabase.postgrest.query.request/UpdateRequestBuilder.<init>|<init>(kotlin.String;io.github.jan.supabase.postgrest.PropertyConversionMethod){}[0]
+}
+
+final class io.github.jan.supabase.postgrest.query.request/UpsertRequestBuilder : io.github.jan.supabase.postgrest.query.request/InsertRequestBuilder { // io.github.jan.supabase.postgrest.query.request/UpsertRequestBuilder|null[0]
+    constructor <init>(kotlin/String, io.github.jan.supabase.postgrest/PropertyConversionMethod) // io.github.jan.supabase.postgrest.query.request/UpsertRequestBuilder.<init>|<init>(kotlin.String;io.github.jan.supabase.postgrest.PropertyConversionMethod){}[0]
+
+    final var ignoreDuplicates // io.github.jan.supabase.postgrest.query.request/UpsertRequestBuilder.ignoreDuplicates|{}ignoreDuplicates[0]
+        final fun <get-ignoreDuplicates>(): kotlin/Boolean // io.github.jan.supabase.postgrest.query.request/UpsertRequestBuilder.ignoreDuplicates.<get-ignoreDuplicates>|<get-ignoreDuplicates>(){}[0]
+        final fun <set-ignoreDuplicates>(kotlin/Boolean) // io.github.jan.supabase.postgrest.query.request/UpsertRequestBuilder.ignoreDuplicates.<set-ignoreDuplicates>|<set-ignoreDuplicates>(kotlin.Boolean){}[0]
+    final var onConflict // io.github.jan.supabase.postgrest.query.request/UpsertRequestBuilder.onConflict|{}onConflict[0]
+        final fun <get-onConflict>(): kotlin/String? // io.github.jan.supabase.postgrest.query.request/UpsertRequestBuilder.onConflict.<get-onConflict>|<get-onConflict>(){}[0]
+        final fun <set-onConflict>(kotlin/String?) // io.github.jan.supabase.postgrest.query.request/UpsertRequestBuilder.onConflict.<set-onConflict>|<set-onConflict>(kotlin.String?){}[0]
+}
+
+final class io.github.jan.supabase.postgrest.query/PostgrestQueryBuilder { // io.github.jan.supabase.postgrest.query/PostgrestQueryBuilder|null[0]
+    constructor <init>(io.github.jan.supabase.postgrest/Postgrest, kotlin/String, kotlin/String = ...) // io.github.jan.supabase.postgrest.query/PostgrestQueryBuilder.<init>|<init>(io.github.jan.supabase.postgrest.Postgrest;kotlin.String;kotlin.String){}[0]
+
+    final val postgrest // io.github.jan.supabase.postgrest.query/PostgrestQueryBuilder.postgrest|{}postgrest[0]
+        final fun <get-postgrest>(): io.github.jan.supabase.postgrest/Postgrest // io.github.jan.supabase.postgrest.query/PostgrestQueryBuilder.postgrest.<get-postgrest>|<get-postgrest>(){}[0]
+    final val schema // io.github.jan.supabase.postgrest.query/PostgrestQueryBuilder.schema|{}schema[0]
+        final fun <get-schema>(): kotlin/String // io.github.jan.supabase.postgrest.query/PostgrestQueryBuilder.schema.<get-schema>|<get-schema>(){}[0]
+    final val table // io.github.jan.supabase.postgrest.query/PostgrestQueryBuilder.table|{}table[0]
+        final fun <get-table>(): kotlin/String // io.github.jan.supabase.postgrest.query/PostgrestQueryBuilder.table.<get-table>|<get-table>(){}[0]
+
+    final suspend inline fun <#A1: reified kotlin/Any> insert(#A1, kotlin/Function1<io.github.jan.supabase.postgrest.query.request/InsertRequestBuilder, kotlin/Unit> = ...): io.github.jan.supabase.postgrest.result/PostgrestResult // io.github.jan.supabase.postgrest.query/PostgrestQueryBuilder.insert|insert(0:0;kotlin.Function1<io.github.jan.supabase.postgrest.query.request.InsertRequestBuilder,kotlin.Unit>){0§<kotlin.Any>}[0]
+    final suspend inline fun <#A1: reified kotlin/Any> insert(kotlin.collections/List<#A1>, kotlin/Function1<io.github.jan.supabase.postgrest.query.request/InsertRequestBuilder, kotlin/Unit> = ...): io.github.jan.supabase.postgrest.result/PostgrestResult // io.github.jan.supabase.postgrest.query/PostgrestQueryBuilder.insert|insert(kotlin.collections.List<0:0>;kotlin.Function1<io.github.jan.supabase.postgrest.query.request.InsertRequestBuilder,kotlin.Unit>){0§<kotlin.Any>}[0]
+    final suspend inline fun <#A1: reified kotlin/Any> update(#A1, kotlin/Function1<io.github.jan.supabase.postgrest.query/PostgrestRequestBuilder, kotlin/Unit> = ...): io.github.jan.supabase.postgrest.result/PostgrestResult // io.github.jan.supabase.postgrest.query/PostgrestQueryBuilder.update|update(0:0;kotlin.Function1<io.github.jan.supabase.postgrest.query.PostgrestRequestBuilder,kotlin.Unit>){0§<kotlin.Any>}[0]
+    final suspend inline fun <#A1: reified kotlin/Any> upsert(#A1, kotlin/Function1<io.github.jan.supabase.postgrest.query.request/UpsertRequestBuilder, kotlin/Unit> = ...): io.github.jan.supabase.postgrest.result/PostgrestResult // io.github.jan.supabase.postgrest.query/PostgrestQueryBuilder.upsert|upsert(0:0;kotlin.Function1<io.github.jan.supabase.postgrest.query.request.UpsertRequestBuilder,kotlin.Unit>){0§<kotlin.Any>}[0]
+    final suspend inline fun <#A1: reified kotlin/Any> upsert(kotlin.collections/List<#A1>, kotlin/Function1<io.github.jan.supabase.postgrest.query.request/UpsertRequestBuilder, kotlin/Unit> = ...): io.github.jan.supabase.postgrest.result/PostgrestResult // io.github.jan.supabase.postgrest.query/PostgrestQueryBuilder.upsert|upsert(kotlin.collections.List<0:0>;kotlin.Function1<io.github.jan.supabase.postgrest.query.request.UpsertRequestBuilder,kotlin.Unit>){0§<kotlin.Any>}[0]
+    final suspend inline fun delete(kotlin/Function1<io.github.jan.supabase.postgrest.query/PostgrestRequestBuilder, kotlin/Unit> = ...): io.github.jan.supabase.postgrest.result/PostgrestResult // io.github.jan.supabase.postgrest.query/PostgrestQueryBuilder.delete|delete(kotlin.Function1<io.github.jan.supabase.postgrest.query.PostgrestRequestBuilder,kotlin.Unit>){}[0]
+    final suspend inline fun insert(kotlinx.serialization.json/JsonArray, kotlin/Function1<io.github.jan.supabase.postgrest.query.request/InsertRequestBuilder, kotlin/Unit> = ...): io.github.jan.supabase.postgrest.result/PostgrestResult // io.github.jan.supabase.postgrest.query/PostgrestQueryBuilder.insert|insert(kotlinx.serialization.json.JsonArray;kotlin.Function1<io.github.jan.supabase.postgrest.query.request.InsertRequestBuilder,kotlin.Unit>){}[0]
+    final suspend inline fun select(io.github.jan.supabase.postgrest.query/Columns = ..., kotlin/Function1<io.github.jan.supabase.postgrest.query.request/SelectRequestBuilder, kotlin/Unit> = ...): io.github.jan.supabase.postgrest.result/PostgrestResult // io.github.jan.supabase.postgrest.query/PostgrestQueryBuilder.select|select(io.github.jan.supabase.postgrest.query.Columns;kotlin.Function1<io.github.jan.supabase.postgrest.query.request.SelectRequestBuilder,kotlin.Unit>){}[0]
+    final suspend inline fun update(crossinline kotlin/Function1<io.github.jan.supabase.postgrest.query/PostgrestUpdate, kotlin/Unit> = ..., kotlin/Function1<io.github.jan.supabase.postgrest.query/PostgrestRequestBuilder, kotlin/Unit> = ...): io.github.jan.supabase.postgrest.result/PostgrestResult // io.github.jan.supabase.postgrest.query/PostgrestQueryBuilder.update|update(kotlin.Function1<io.github.jan.supabase.postgrest.query.PostgrestUpdate,kotlin.Unit>;kotlin.Function1<io.github.jan.supabase.postgrest.query.PostgrestRequestBuilder,kotlin.Unit>){}[0]
+    final suspend inline fun update(kotlinx.serialization.json/JsonElement, kotlin/Function1<io.github.jan.supabase.postgrest.query/PostgrestRequestBuilder, kotlin/Unit> = ...): io.github.jan.supabase.postgrest.result/PostgrestResult // io.github.jan.supabase.postgrest.query/PostgrestQueryBuilder.update|update(kotlinx.serialization.json.JsonElement;kotlin.Function1<io.github.jan.supabase.postgrest.query.PostgrestRequestBuilder,kotlin.Unit>){}[0]
+    final suspend inline fun upsert(kotlinx.serialization.json/JsonArray, kotlin/Function1<io.github.jan.supabase.postgrest.query.request/UpsertRequestBuilder, kotlin/Unit> = ...): io.github.jan.supabase.postgrest.result/PostgrestResult // io.github.jan.supabase.postgrest.query/PostgrestQueryBuilder.upsert|upsert(kotlinx.serialization.json.JsonArray;kotlin.Function1<io.github.jan.supabase.postgrest.query.request.UpsertRequestBuilder,kotlin.Unit>){}[0]
+
+    final object Companion { // io.github.jan.supabase.postgrest.query/PostgrestQueryBuilder.Companion|null[0]
+        final const val HEADER_PREFER // io.github.jan.supabase.postgrest.query/PostgrestQueryBuilder.Companion.HEADER_PREFER|{}HEADER_PREFER[0]
+            final fun <get-HEADER_PREFER>(): kotlin/String // io.github.jan.supabase.postgrest.query/PostgrestQueryBuilder.Companion.HEADER_PREFER.<get-HEADER_PREFER>|<get-HEADER_PREFER>(){}[0]
+    }
+}
+
+final class io.github.jan.supabase.postgrest.query/PostgrestUpdate { // io.github.jan.supabase.postgrest.query/PostgrestUpdate|null[0]
+    constructor <init>(io.github.jan.supabase.postgrest/PropertyConversionMethod, io.github.jan.supabase/SupabaseSerializer) // io.github.jan.supabase.postgrest.query/PostgrestUpdate.<init>|<init>(io.github.jan.supabase.postgrest.PropertyConversionMethod;io.github.jan.supabase.SupabaseSerializer){}[0]
+
+    final val map // io.github.jan.supabase.postgrest.query/PostgrestUpdate.map|{}map[0]
+        final fun <get-map>(): kotlin.collections/MutableMap<kotlin/String, kotlinx.serialization.json/JsonElement> // io.github.jan.supabase.postgrest.query/PostgrestUpdate.map.<get-map>|<get-map>(){}[0]
+    final val propertyConversionMethod // io.github.jan.supabase.postgrest.query/PostgrestUpdate.propertyConversionMethod|{}propertyConversionMethod[0]
+        final fun <get-propertyConversionMethod>(): io.github.jan.supabase.postgrest/PropertyConversionMethod // io.github.jan.supabase.postgrest.query/PostgrestUpdate.propertyConversionMethod.<get-propertyConversionMethod>|<get-propertyConversionMethod>(){}[0]
+    final val serializer // io.github.jan.supabase.postgrest.query/PostgrestUpdate.serializer|{}serializer[0]
+        final fun <get-serializer>(): io.github.jan.supabase/SupabaseSerializer // io.github.jan.supabase.postgrest.query/PostgrestUpdate.serializer.<get-serializer>|<get-serializer>(){}[0]
+
+    final fun <#A1: kotlin/Any?> (kotlin.reflect/KProperty1<#A1, kotlin/Boolean>).setTo(kotlin/Boolean?) // io.github.jan.supabase.postgrest.query/PostgrestUpdate.setTo|setTo@kotlin.reflect.KProperty1<0:0,kotlin.Boolean>(kotlin.Boolean?){0§<kotlin.Any?>}[0]
+    final fun <#A1: kotlin/Any?> (kotlin.reflect/KProperty1<#A1, kotlin/Double>).setTo(kotlin/Double?) // io.github.jan.supabase.postgrest.query/PostgrestUpdate.setTo|setTo@kotlin.reflect.KProperty1<0:0,kotlin.Double>(kotlin.Double?){0§<kotlin.Any?>}[0]
+    final fun <#A1: kotlin/Any?> (kotlin.reflect/KProperty1<#A1, kotlin/Float>).setTo(kotlin/Float?) // io.github.jan.supabase.postgrest.query/PostgrestUpdate.setTo|setTo@kotlin.reflect.KProperty1<0:0,kotlin.Float>(kotlin.Float?){0§<kotlin.Any?>}[0]
+    final fun <#A1: kotlin/Any?> (kotlin.reflect/KProperty1<#A1, kotlin/Int>).setTo(kotlin/Int?) // io.github.jan.supabase.postgrest.query/PostgrestUpdate.setTo|setTo@kotlin.reflect.KProperty1<0:0,kotlin.Int>(kotlin.Int?){0§<kotlin.Any?>}[0]
+    final fun <#A1: kotlin/Any?> (kotlin.reflect/KProperty1<#A1, kotlin/Long>).setTo(kotlin/Long?) // io.github.jan.supabase.postgrest.query/PostgrestUpdate.setTo|setTo@kotlin.reflect.KProperty1<0:0,kotlin.Long>(kotlin.Long?){0§<kotlin.Any?>}[0]
+    final fun <#A1: kotlin/Any?> (kotlin.reflect/KProperty1<#A1, kotlin/String>).setTo(kotlin/String?) // io.github.jan.supabase.postgrest.query/PostgrestUpdate.setTo|setTo@kotlin.reflect.KProperty1<0:0,kotlin.String>(kotlin.String?){0§<kotlin.Any?>}[0]
+    final fun set(kotlin/String, kotlin/Boolean?) // io.github.jan.supabase.postgrest.query/PostgrestUpdate.set|set(kotlin.String;kotlin.Boolean?){}[0]
+    final fun set(kotlin/String, kotlin/Double?) // io.github.jan.supabase.postgrest.query/PostgrestUpdate.set|set(kotlin.String;kotlin.Double?){}[0]
+    final fun set(kotlin/String, kotlin/Float?) // io.github.jan.supabase.postgrest.query/PostgrestUpdate.set|set(kotlin.String;kotlin.Float?){}[0]
+    final fun set(kotlin/String, kotlin/Int?) // io.github.jan.supabase.postgrest.query/PostgrestUpdate.set|set(kotlin.String;kotlin.Int?){}[0]
+    final fun set(kotlin/String, kotlin/Long?) // io.github.jan.supabase.postgrest.query/PostgrestUpdate.set|set(kotlin.String;kotlin.Long?){}[0]
+    final fun set(kotlin/String, kotlin/String?) // io.github.jan.supabase.postgrest.query/PostgrestUpdate.set|set(kotlin.String;kotlin.String?){}[0]
+    final fun setToNull(kotlin/String) // io.github.jan.supabase.postgrest.query/PostgrestUpdate.setToNull|setToNull(kotlin.String){}[0]
+    final fun toJson(): kotlinx.serialization.json/JsonObject // io.github.jan.supabase.postgrest.query/PostgrestUpdate.toJson|toJson(){}[0]
+    final inline fun <#A1: kotlin/Any?, #B1: reified kotlin/Any?> (kotlin.reflect/KProperty1<#A1, #B1>).setTo(#B1?) // io.github.jan.supabase.postgrest.query/PostgrestUpdate.setTo|setTo@kotlin.reflect.KProperty1<0:0,0:1>(0:1?){0§<kotlin.Any?>;1§<kotlin.Any?>}[0]
+    final inline fun <#A1: reified kotlin/Any?> set(kotlin/String, #A1?) // io.github.jan.supabase.postgrest.query/PostgrestUpdate.set|set(kotlin.String;0:0?){0§<kotlin.Any?>}[0]
+}
+
+final class io.github.jan.supabase.postgrest.result/PostgrestResult { // io.github.jan.supabase.postgrest.result/PostgrestResult|null[0]
+    constructor <init>(kotlin/String, io.ktor.http/Headers, io.github.jan.supabase.postgrest/Postgrest) // io.github.jan.supabase.postgrest.result/PostgrestResult.<init>|<init>(kotlin.String;io.ktor.http.Headers;io.github.jan.supabase.postgrest.Postgrest){}[0]
+
+    final val data // io.github.jan.supabase.postgrest.result/PostgrestResult.data|{}data[0]
+        final fun <get-data>(): kotlin/String // io.github.jan.supabase.postgrest.result/PostgrestResult.data.<get-data>|<get-data>(){}[0]
+    final val headers // io.github.jan.supabase.postgrest.result/PostgrestResult.headers|{}headers[0]
+        final fun <get-headers>(): io.ktor.http/Headers // io.github.jan.supabase.postgrest.result/PostgrestResult.headers.<get-headers>|<get-headers>(){}[0]
+    final val postgrest // io.github.jan.supabase.postgrest.result/PostgrestResult.postgrest|{}postgrest[0]
+        final fun <get-postgrest>(): io.github.jan.supabase.postgrest/Postgrest // io.github.jan.supabase.postgrest.result/PostgrestResult.postgrest.<get-postgrest>|<get-postgrest>(){}[0]
+
+    final fun component1(): kotlin/String // io.github.jan.supabase.postgrest.result/PostgrestResult.component1|component1(){}[0]
+    final fun component2(): io.ktor.http/Headers // io.github.jan.supabase.postgrest.result/PostgrestResult.component2|component2(){}[0]
+    final fun countOrNull(): kotlin/Long? // io.github.jan.supabase.postgrest.result/PostgrestResult.countOrNull|countOrNull(){}[0]
+    final fun rangeOrNull(): kotlin.ranges/LongRange? // io.github.jan.supabase.postgrest.result/PostgrestResult.rangeOrNull|rangeOrNull(){}[0]
+    final inline fun <#A1: reified kotlin/Any?> decodeAs(): #A1 // io.github.jan.supabase.postgrest.result/PostgrestResult.decodeAs|decodeAs(){0§<kotlin.Any?>}[0]
+    final inline fun <#A1: reified kotlin/Any?> decodeAsOrNull(): #A1? // io.github.jan.supabase.postgrest.result/PostgrestResult.decodeAsOrNull|decodeAsOrNull(){0§<kotlin.Any?>}[0]
+    final inline fun <#A1: reified kotlin/Any?> decodeList(): kotlin.collections/List<#A1> // io.github.jan.supabase.postgrest.result/PostgrestResult.decodeList|decodeList(){0§<kotlin.Any?>}[0]
+    final inline fun <#A1: reified kotlin/Any?> decodeSingle(): #A1 // io.github.jan.supabase.postgrest.result/PostgrestResult.decodeSingle|decodeSingle(){0§<kotlin.Any?>}[0]
+    final inline fun <#A1: reified kotlin/Any?> decodeSingleOrNull(): #A1? // io.github.jan.supabase.postgrest.result/PostgrestResult.decodeSingleOrNull|decodeSingleOrNull(){0§<kotlin.Any?>}[0]
+}
+
+final value class io.github.jan.supabase.postgrest.query/Columns { // io.github.jan.supabase.postgrest.query/Columns|null[0]
+    constructor <init>(kotlin/String) // io.github.jan.supabase.postgrest.query/Columns.<init>|<init>(kotlin.String){}[0]
+
+    final val value // io.github.jan.supabase.postgrest.query/Columns.value|{}value[0]
+        final fun <get-value>(): kotlin/String // io.github.jan.supabase.postgrest.query/Columns.value.<get-value>|<get-value>(){}[0]
+
+    final fun equals(kotlin/Any?): kotlin/Boolean // io.github.jan.supabase.postgrest.query/Columns.equals|equals(kotlin.Any?){}[0]
+    final fun hashCode(): kotlin/Int // io.github.jan.supabase.postgrest.query/Columns.hashCode|hashCode(){}[0]
+    final fun toString(): kotlin/String // io.github.jan.supabase.postgrest.query/Columns.toString|toString(){}[0]
+
+    final object Companion { // io.github.jan.supabase.postgrest.query/Columns.Companion|null[0]
+        final val ALL // io.github.jan.supabase.postgrest.query/Columns.Companion.ALL|{}ALL[0]
+            final fun <get-ALL>(): io.github.jan.supabase.postgrest.query/Columns // io.github.jan.supabase.postgrest.query/Columns.Companion.ALL.<get-ALL>|<get-ALL>(){}[0]
+
+        final fun list(kotlin.collections/List<kotlin/String>): io.github.jan.supabase.postgrest.query/Columns // io.github.jan.supabase.postgrest.query/Columns.Companion.list|list(kotlin.collections.List<kotlin.String>){}[0]
+        final fun list(kotlin/Array<out kotlin/String>...): io.github.jan.supabase.postgrest.query/Columns // io.github.jan.supabase.postgrest.query/Columns.Companion.list|list(kotlin.Array<out|kotlin.String>...){}[0]
+        final fun raw(kotlin/String): io.github.jan.supabase.postgrest.query/Columns // io.github.jan.supabase.postgrest.query/Columns.Companion.raw|raw(kotlin.String){}[0]
+        final inline fun <#A2: reified kotlin/Any?> type(): io.github.jan.supabase.postgrest.query/Columns // io.github.jan.supabase.postgrest.query/Columns.Companion.type|type(){0§<kotlin.Any?>}[0]
+    }
+}
+
+open class io.github.jan.supabase.postgrest.query.request/InsertRequestBuilder : io.github.jan.supabase.postgrest.query/PostgrestRequestBuilder { // io.github.jan.supabase.postgrest.query.request/InsertRequestBuilder|null[0]
+    constructor <init>(kotlin/String, io.github.jan.supabase.postgrest/PropertyConversionMethod) // io.github.jan.supabase.postgrest.query.request/InsertRequestBuilder.<init>|<init>(kotlin.String;io.github.jan.supabase.postgrest.PropertyConversionMethod){}[0]
+
+    final var defaultToNull // io.github.jan.supabase.postgrest.query.request/InsertRequestBuilder.defaultToNull|{}defaultToNull[0]
+        final fun <get-defaultToNull>(): kotlin/Boolean // io.github.jan.supabase.postgrest.query.request/InsertRequestBuilder.defaultToNull.<get-defaultToNull>|<get-defaultToNull>(){}[0]
+        final fun <set-defaultToNull>(kotlin/Boolean) // io.github.jan.supabase.postgrest.query.request/InsertRequestBuilder.defaultToNull.<set-defaultToNull>|<set-defaultToNull>(kotlin.Boolean){}[0]
+
+    final fun buildPrefer(kotlin/Boolean, kotlin/Boolean): kotlin.collections/List<kotlin/String> // io.github.jan.supabase.postgrest.query.request/InsertRequestBuilder.buildPrefer|buildPrefer(kotlin.Boolean;kotlin.Boolean){}[0]
+}
+
+sealed class io.github.jan.supabase.postgrest.query/Returning { // io.github.jan.supabase.postgrest.query/Returning|null[0]
+    final val identifier // io.github.jan.supabase.postgrest.query/Returning.identifier|{}identifier[0]
+        final fun <get-identifier>(): kotlin/String // io.github.jan.supabase.postgrest.query/Returning.identifier.<get-identifier>|<get-identifier>(){}[0]
+
+    final class Representation : io.github.jan.supabase.postgrest.query/Returning { // io.github.jan.supabase.postgrest.query/Returning.Representation|null[0]
+        constructor <init>(io.github.jan.supabase.postgrest.query/Columns = ...) // io.github.jan.supabase.postgrest.query/Returning.Representation.<init>|<init>(io.github.jan.supabase.postgrest.query.Columns){}[0]
+
+        final val columns // io.github.jan.supabase.postgrest.query/Returning.Representation.columns|{}columns[0]
+            final fun <get-columns>(): io.github.jan.supabase.postgrest.query/Columns // io.github.jan.supabase.postgrest.query/Returning.Representation.columns.<get-columns>|<get-columns>(){}[0]
+
+        final fun component1(): io.github.jan.supabase.postgrest.query/Columns // io.github.jan.supabase.postgrest.query/Returning.Representation.component1|component1(){}[0]
+        final fun copy(io.github.jan.supabase.postgrest.query/Columns = ...): io.github.jan.supabase.postgrest.query/Returning.Representation // io.github.jan.supabase.postgrest.query/Returning.Representation.copy|copy(io.github.jan.supabase.postgrest.query.Columns){}[0]
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.jan.supabase.postgrest.query/Returning.Representation.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.jan.supabase.postgrest.query/Returning.Representation.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.jan.supabase.postgrest.query/Returning.Representation.toString|toString(){}[0]
+    }
+
+    final object Minimal : io.github.jan.supabase.postgrest.query/Returning { // io.github.jan.supabase.postgrest.query/Returning.Minimal|null[0]
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.jan.supabase.postgrest.query/Returning.Minimal.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.jan.supabase.postgrest.query/Returning.Minimal.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.jan.supabase.postgrest.query/Returning.Minimal.toString|toString(){}[0]
+    }
+}
+
+final object io.github.jan.supabase.postgrest.executor/RestRequestExecutor : io.github.jan.supabase.postgrest.executor/RequestExecutor { // io.github.jan.supabase.postgrest.executor/RestRequestExecutor|null[0]
+    final fun equals(kotlin/Any?): kotlin/Boolean // io.github.jan.supabase.postgrest.executor/RestRequestExecutor.equals|equals(kotlin.Any?){}[0]
+    final fun hashCode(): kotlin/Int // io.github.jan.supabase.postgrest.executor/RestRequestExecutor.hashCode|hashCode(){}[0]
+    final fun toString(): kotlin/String // io.github.jan.supabase.postgrest.executor/RestRequestExecutor.toString|toString(){}[0]
+    final suspend fun execute(io.github.jan.supabase.postgrest/Postgrest, kotlin/String, io.github.jan.supabase.postgrest.query/PostgrestRequestBuilder): io.github.jan.supabase.postgrest.result/PostgrestResult // io.github.jan.supabase.postgrest.executor/RestRequestExecutor.execute|execute(io.github.jan.supabase.postgrest.Postgrest;kotlin.String;io.github.jan.supabase.postgrest.query.PostgrestRequestBuilder){}[0]
+}
+
+final val io.github.jan.supabase.postgrest/postgrest // io.github.jan.supabase.postgrest/postgrest|@io.github.jan.supabase.SupabaseClient{}postgrest[0]
+    final fun (io.github.jan.supabase/SupabaseClient).<get-postgrest>(): io.github.jan.supabase.postgrest/Postgrest // io.github.jan.supabase.postgrest/postgrest.<get-postgrest>|<get-postgrest>@io.github.jan.supabase.SupabaseClient(){}[0]
+
+final fun (io.github.jan.supabase.postgrest.query.filter/FilterOperation).io.github.jan.supabase.postgrest.query.filter/escapedValue(kotlin/Boolean): kotlin/String // io.github.jan.supabase.postgrest.query.filter/escapedValue|escapedValue@io.github.jan.supabase.postgrest.query.filter.FilterOperation(kotlin.Boolean){}[0]
+final fun (io.github.jan.supabase/SupabaseClient).io.github.jan.supabase.postgrest/from(kotlin/String): io.github.jan.supabase.postgrest.query/PostgrestQueryBuilder // io.github.jan.supabase.postgrest/from|from@io.github.jan.supabase.SupabaseClient(kotlin.String){}[0]
+final fun (io.github.jan.supabase/SupabaseClient).io.github.jan.supabase.postgrest/from(kotlin/String, kotlin/String): io.github.jan.supabase.postgrest.query/PostgrestQueryBuilder // io.github.jan.supabase.postgrest/from|from@io.github.jan.supabase.SupabaseClient(kotlin.String;kotlin.String){}[0]
+final fun <#A: kotlin/Any?, #B: kotlin/Any?> io.github.jan.supabase.postgrest/getSerialName(kotlin.reflect/KProperty1<#A, #B>): kotlin/String // io.github.jan.supabase.postgrest/getSerialName|getSerialName(kotlin.reflect.KProperty1<0:0,0:1>){0§<kotlin.Any?>;1§<kotlin.Any?>}[0]
+final fun <#A: kotlin/Any?> (kotlin.collections/Map<#A, kotlin.collections/List<#A>>).io.github.jan.supabase.postgrest/mapToFirstValue(): kotlin.collections/Map<#A, #A> // io.github.jan.supabase.postgrest/mapToFirstValue|mapToFirstValue@kotlin.collections.Map<0:0,kotlin.collections.List<0:0>>(){0§<kotlin.Any?>}[0]
+final inline fun (io.github.jan.supabase.postgrest.query.filter/PostgrestFilterBuilder).io.github.jan.supabase.postgrest.query.filter/formatJoiningFilter(kotlin/Function1<io.github.jan.supabase.postgrest.query.filter/PostgrestFilterBuilder, kotlin/Unit>): kotlin/String // io.github.jan.supabase.postgrest.query.filter/formatJoiningFilter|formatJoiningFilter@io.github.jan.supabase.postgrest.query.filter.PostgrestFilterBuilder(kotlin.Function1<io.github.jan.supabase.postgrest.query.filter.PostgrestFilterBuilder,kotlin.Unit>){}[0]
+final inline fun <#A: reified kotlin/Any?> io.github.jan.supabase.postgrest/classPropertyNames(): kotlin.collections/List<kotlin/String> // io.github.jan.supabase.postgrest/classPropertyNames|classPropertyNames(){0§<kotlin.Any?>}[0]
+final inline fun io.github.jan.supabase.postgrest.query/buildPostgrestUpdate(io.github.jan.supabase.postgrest/PropertyConversionMethod = ..., io.github.jan.supabase/SupabaseSerializer, kotlin/Function1<io.github.jan.supabase.postgrest.query/PostgrestUpdate, kotlin/Unit>): kotlinx.serialization.json/JsonObject // io.github.jan.supabase.postgrest.query/buildPostgrestUpdate|buildPostgrestUpdate(io.github.jan.supabase.postgrest.PropertyConversionMethod;io.github.jan.supabase.SupabaseSerializer;kotlin.Function1<io.github.jan.supabase.postgrest.query.PostgrestUpdate,kotlin.Unit>){}[0]
+final suspend inline fun <#A: reified kotlin/Any> (io.github.jan.supabase.postgrest/Postgrest).io.github.jan.supabase.postgrest/rpc(kotlin/String, #A, noinline kotlin/Function1<io.github.jan.supabase.postgrest.query.request/RpcRequestBuilder, kotlin/Unit> = ...): io.github.jan.supabase.postgrest.result/PostgrestResult // io.github.jan.supabase.postgrest/rpc|rpc@io.github.jan.supabase.postgrest.Postgrest(kotlin.String;0:0;kotlin.Function1<io.github.jan.supabase.postgrest.query.request.RpcRequestBuilder,kotlin.Unit>){0§<kotlin.Any>}[0]

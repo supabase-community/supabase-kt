@@ -1,0 +1,8 @@
+public final class io/github/jan/supabase/serializer/MoshiSerializer : io/github/jan/supabase/SupabaseSerializer {
+	public fun <init> ()V
+	public fun <init> (Lcom/squareup/moshi/Moshi;)V
+	public synthetic fun <init> (Lcom/squareup/moshi/Moshi;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun decode (Lkotlin/reflect/KType;Ljava/lang/String;)Ljava/lang/Object;
+	public fun encode (Lkotlin/reflect/KType;Ljava/lang/Object;)Ljava/lang/String;
+}
+

@@ -1,0 +1,1432 @@
+public final class io/github/jan/supabase/storage/Bucket {
+	public static final field Companion Lio/github/jan/supabase/storage/Bucket$Companion;
+	public fun <init> (Lkotlin/time/Instant;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Lkotlin/time/Instant;ZLjava/util/List;Ljava/lang/Long;Lio/github/jan/supabase/storage/BucketType;)V
+	public synthetic fun <init> (Lkotlin/time/Instant;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Lkotlin/time/Instant;ZLjava/util/List;Ljava/lang/Long;Lio/github/jan/supabase/storage/BucketType;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1 ()Lkotlin/time/Instant;
+	public final fun component2 ()Ljava/lang/String;
+	public final fun component3 ()Ljava/lang/String;
+	public final fun component4 ()Ljava/lang/String;
+	public final fun component5 ()Lkotlin/time/Instant;
+	public final fun component6 ()Z
+	public final fun component7 ()Ljava/util/List;
+	public final fun component8 ()Ljava/lang/Long;
+	public final fun component9 ()Lio/github/jan/supabase/storage/BucketType;
+	public final fun copy (Lkotlin/time/Instant;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Lkotlin/time/Instant;ZLjava/util/List;Ljava/lang/Long;Lio/github/jan/supabase/storage/BucketType;)Lio/github/jan/supabase/storage/Bucket;
+	public static synthetic fun copy$default (Lio/github/jan/supabase/storage/Bucket;Lkotlin/time/Instant;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Lkotlin/time/Instant;ZLjava/util/List;Ljava/lang/Long;Lio/github/jan/supabase/storage/BucketType;ILjava/lang/Object;)Lio/github/jan/supabase/storage/Bucket;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getAllowedMimeTypes ()Ljava/util/List;
+	public final fun getCreatedAt ()Lkotlin/time/Instant;
+	public final fun getFileSizeLimit ()Ljava/lang/Long;
+	public final fun getId ()Ljava/lang/String;
+	public final fun getName ()Ljava/lang/String;
+	public final fun getOwner ()Ljava/lang/String;
+	public final fun getPublic ()Z
+	public final fun getType ()Lio/github/jan/supabase/storage/BucketType;
+	public final fun getUpdatedAt ()Lkotlin/time/Instant;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final synthetic class io/github/jan/supabase/storage/Bucket$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lio/github/jan/supabase/storage/Bucket$$serializer;
+	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public final fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lio/github/jan/supabase/storage/Bucket;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public final fun serialize (Lkotlinx/serialization/encoding/Encoder;Lio/github/jan/supabase/storage/Bucket;)V
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
+public final class io/github/jan/supabase/storage/Bucket$Companion {
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
+}
+
+public abstract interface class io/github/jan/supabase/storage/BucketApi {
+	public static final field Companion Lio/github/jan/supabase/storage/BucketApi$Companion;
+	public static final field METADATA_HEADER Ljava/lang/String;
+	public static final field UPSERT_HEADER Ljava/lang/String;
+	public abstract fun authenticatedRenderUrl (Ljava/lang/String;Lkotlin/jvm/functions/Function1;)Ljava/lang/String;
+	public static synthetic fun authenticatedRenderUrl$default (Lio/github/jan/supabase/storage/BucketApi;Ljava/lang/String;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Ljava/lang/String;
+	public abstract fun authenticatedUrl (Ljava/lang/String;)Ljava/lang/String;
+	public abstract fun changePublicStatusTo (ZLkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun copy (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static synthetic fun copy$default (Lio/github/jan/supabase/storage/BucketApi;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public abstract fun createSignedUploadUrl (Ljava/lang/String;ZLkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static synthetic fun createSignedUploadUrl$default (Lio/github/jan/supabase/storage/BucketApi;Ljava/lang/String;ZLkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public abstract fun createSignedUrl-dWUq8MI (Ljava/lang/String;JLkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static synthetic fun createSignedUrl-dWUq8MI$default (Lio/github/jan/supabase/storage/BucketApi;Ljava/lang/String;JLkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public abstract fun createSignedUrls-rnQQ1Ag (JLjava/util/Collection;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun createSignedUrls-rnQQ1Ag (J[Ljava/lang/String;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static synthetic fun createSignedUrls-rnQQ1Ag$default (Lio/github/jan/supabase/storage/BucketApi;JLjava/util/Collection;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public static synthetic fun createSignedUrls-rnQQ1Ag$default (Lio/github/jan/supabase/storage/BucketApi;J[Ljava/lang/String;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public abstract fun delete (Ljava/util/Collection;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun delete ([Ljava/lang/String;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun downloadAuthenticated (Ljava/lang/String;Lio/ktor/utils/io/ByteWriteChannel;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun downloadAuthenticated (Ljava/lang/String;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static synthetic fun downloadAuthenticated$default (Lio/github/jan/supabase/storage/BucketApi;Ljava/lang/String;Lio/ktor/utils/io/ByteWriteChannel;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public static synthetic fun downloadAuthenticated$default (Lio/github/jan/supabase/storage/BucketApi;Ljava/lang/String;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public abstract fun downloadPublic (Ljava/lang/String;Lio/ktor/utils/io/ByteWriteChannel;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun downloadPublic (Ljava/lang/String;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static synthetic fun downloadPublic$default (Lio/github/jan/supabase/storage/BucketApi;Ljava/lang/String;Lio/ktor/utils/io/ByteWriteChannel;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public static synthetic fun downloadPublic$default (Lio/github/jan/supabase/storage/BucketApi;Ljava/lang/String;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public abstract fun exists (Ljava/lang/String;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun getBucketId ()Ljava/lang/String;
+	public abstract fun getResumable ()Lio/github/jan/supabase/storage/resumable/ResumableClient;
+	public abstract fun getSupabaseClient ()Lio/github/jan/supabase/SupabaseClient;
+	public abstract fun info (Ljava/lang/String;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun list (Ljava/lang/String;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static synthetic fun list$default (Lio/github/jan/supabase/storage/BucketApi;Ljava/lang/String;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public abstract fun move (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static synthetic fun move$default (Lio/github/jan/supabase/storage/BucketApi;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public fun publicRenderUrl (Ljava/lang/String;Lkotlin/jvm/functions/Function1;)Ljava/lang/String;
+	public static synthetic fun publicRenderUrl$default (Lio/github/jan/supabase/storage/BucketApi;Ljava/lang/String;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Ljava/lang/String;
+	public abstract fun publicUrl (Ljava/lang/String;Lkotlin/jvm/functions/Function1;)Ljava/lang/String;
+	public static synthetic fun publicUrl$default (Lio/github/jan/supabase/storage/BucketApi;Ljava/lang/String;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Ljava/lang/String;
+	public abstract fun purgeCache (Ljava/lang/String;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static synthetic fun purgeCache$default (Lio/github/jan/supabase/storage/BucketApi;Ljava/lang/String;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public abstract fun setHeader (Ljava/lang/String;Ljava/lang/String;)Lio/github/jan/supabase/storage/BucketApi;
+	public abstract fun update (Ljava/lang/String;Lio/github/jan/supabase/storage/UploadData;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun update (Ljava/lang/String;[BLkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static synthetic fun update$default (Lio/github/jan/supabase/storage/BucketApi;Ljava/lang/String;Lio/github/jan/supabase/storage/UploadData;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public static synthetic fun update$default (Lio/github/jan/supabase/storage/BucketApi;Ljava/lang/String;[BLkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public abstract fun upload (Ljava/lang/String;Lio/github/jan/supabase/storage/UploadData;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun upload (Ljava/lang/String;[BLkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static synthetic fun upload$default (Lio/github/jan/supabase/storage/BucketApi;Ljava/lang/String;Lio/github/jan/supabase/storage/UploadData;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public static synthetic fun upload$default (Lio/github/jan/supabase/storage/BucketApi;Ljava/lang/String;[BLkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public abstract fun uploadToSignedUrl (Ljava/lang/String;Ljava/lang/String;Lio/github/jan/supabase/storage/UploadData;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun uploadToSignedUrl (Ljava/lang/String;Ljava/lang/String;[BLkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static synthetic fun uploadToSignedUrl$default (Lio/github/jan/supabase/storage/BucketApi;Ljava/lang/String;Ljava/lang/String;Lio/github/jan/supabase/storage/UploadData;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public static synthetic fun uploadToSignedUrl$default (Lio/github/jan/supabase/storage/BucketApi;Ljava/lang/String;Ljava/lang/String;[BLkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+}
+
+public final class io/github/jan/supabase/storage/BucketApi$Companion {
+	public static final field METADATA_HEADER Ljava/lang/String;
+	public static final field UPSERT_HEADER Ljava/lang/String;
+}
+
+public final class io/github/jan/supabase/storage/BucketApi$DefaultImpls {
+	public static synthetic fun authenticatedRenderUrl$default (Lio/github/jan/supabase/storage/BucketApi;Ljava/lang/String;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Ljava/lang/String;
+	public static synthetic fun copy$default (Lio/github/jan/supabase/storage/BucketApi;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public static synthetic fun createSignedUploadUrl$default (Lio/github/jan/supabase/storage/BucketApi;Ljava/lang/String;ZLkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public static synthetic fun createSignedUrl-dWUq8MI$default (Lio/github/jan/supabase/storage/BucketApi;Ljava/lang/String;JLkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public static fun createSignedUrls-rnQQ1Ag (Lio/github/jan/supabase/storage/BucketApi;J[Ljava/lang/String;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static synthetic fun createSignedUrls-rnQQ1Ag$default (Lio/github/jan/supabase/storage/BucketApi;JLjava/util/Collection;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public static synthetic fun createSignedUrls-rnQQ1Ag$default (Lio/github/jan/supabase/storage/BucketApi;J[Ljava/lang/String;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public static fun delete (Lio/github/jan/supabase/storage/BucketApi;[Ljava/lang/String;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static synthetic fun downloadAuthenticated$default (Lio/github/jan/supabase/storage/BucketApi;Ljava/lang/String;Lio/ktor/utils/io/ByteWriteChannel;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public static synthetic fun downloadAuthenticated$default (Lio/github/jan/supabase/storage/BucketApi;Ljava/lang/String;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public static synthetic fun downloadPublic$default (Lio/github/jan/supabase/storage/BucketApi;Ljava/lang/String;Lio/ktor/utils/io/ByteWriteChannel;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public static synthetic fun downloadPublic$default (Lio/github/jan/supabase/storage/BucketApi;Ljava/lang/String;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public static synthetic fun list$default (Lio/github/jan/supabase/storage/BucketApi;Ljava/lang/String;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public static synthetic fun move$default (Lio/github/jan/supabase/storage/BucketApi;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public static fun publicRenderUrl (Lio/github/jan/supabase/storage/BucketApi;Ljava/lang/String;Lkotlin/jvm/functions/Function1;)Ljava/lang/String;
+	public static synthetic fun publicRenderUrl$default (Lio/github/jan/supabase/storage/BucketApi;Ljava/lang/String;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Ljava/lang/String;
+	public static synthetic fun publicUrl$default (Lio/github/jan/supabase/storage/BucketApi;Ljava/lang/String;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Ljava/lang/String;
+	public static synthetic fun purgeCache$default (Lio/github/jan/supabase/storage/BucketApi;Ljava/lang/String;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public static fun update (Lio/github/jan/supabase/storage/BucketApi;Ljava/lang/String;[BLkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static synthetic fun update$default (Lio/github/jan/supabase/storage/BucketApi;Ljava/lang/String;Lio/github/jan/supabase/storage/UploadData;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public static synthetic fun update$default (Lio/github/jan/supabase/storage/BucketApi;Ljava/lang/String;[BLkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public static fun upload (Lio/github/jan/supabase/storage/BucketApi;Ljava/lang/String;[BLkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static synthetic fun upload$default (Lio/github/jan/supabase/storage/BucketApi;Ljava/lang/String;Lio/github/jan/supabase/storage/UploadData;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public static synthetic fun upload$default (Lio/github/jan/supabase/storage/BucketApi;Ljava/lang/String;[BLkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public static fun uploadToSignedUrl (Lio/github/jan/supabase/storage/BucketApi;Ljava/lang/String;Ljava/lang/String;[BLkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static synthetic fun uploadToSignedUrl$default (Lio/github/jan/supabase/storage/BucketApi;Ljava/lang/String;Ljava/lang/String;Lio/github/jan/supabase/storage/UploadData;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public static synthetic fun uploadToSignedUrl$default (Lio/github/jan/supabase/storage/BucketApi;Ljava/lang/String;Ljava/lang/String;[BLkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+}
+
+public final class io/github/jan/supabase/storage/BucketApiKt {
+	public static final fun authenticatedRequest (Lio/github/jan/supabase/storage/BucketApi;Ljava/lang/String;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
+public final class io/github/jan/supabase/storage/BucketBuilder {
+	public fun <init> ()V
+	public final fun allowedMimeTypes (Ljava/util/List;)V
+	public final fun allowedMimeTypes ([Lio/ktor/http/ContentType;)V
+	public final fun allowedMimeTypes ([Ljava/lang/String;)V
+	public final fun allowedMimeTypesContentType (Ljava/util/List;)V
+	public final fun getBytes-ueSVNNQ (I)Ljava/lang/String;
+	public final fun getBytes-ueSVNNQ (J)Ljava/lang/String;
+	public final fun getFileSizeLimit-cccgrl4 ()Ljava/lang/String;
+	public final fun getGigabytes-ueSVNNQ (I)Ljava/lang/String;
+	public final fun getGigabytes-ueSVNNQ (J)Ljava/lang/String;
+	public final fun getKilobytes-ueSVNNQ (I)Ljava/lang/String;
+	public final fun getKilobytes-ueSVNNQ (J)Ljava/lang/String;
+	public final fun getMegabytes-ueSVNNQ (I)Ljava/lang/String;
+	public final fun getMegabytes-ueSVNNQ (J)Ljava/lang/String;
+	public final fun getPublic ()Ljava/lang/Boolean;
+	public final fun setFileSizeLimit-saRlmmQ (Ljava/lang/String;)V
+	public final fun setPublic (Ljava/lang/Boolean;)V
+}
+
+public final class io/github/jan/supabase/storage/BucketSortColumn : java/lang/Enum {
+	public static final field CREATED_AT Lio/github/jan/supabase/storage/BucketSortColumn;
+	public static final field ID Lio/github/jan/supabase/storage/BucketSortColumn;
+	public static final field NAME Lio/github/jan/supabase/storage/BucketSortColumn;
+	public static final field UPDATED_AT Lio/github/jan/supabase/storage/BucketSortColumn;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public static fun valueOf (Ljava/lang/String;)Lio/github/jan/supabase/storage/BucketSortColumn;
+	public static fun values ()[Lio/github/jan/supabase/storage/BucketSortColumn;
+}
+
+public final class io/github/jan/supabase/storage/BucketType : java/lang/Enum {
+	public static final field ANALYTICS Lio/github/jan/supabase/storage/BucketType;
+	public static final field STANDARD Lio/github/jan/supabase/storage/BucketType;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public static fun valueOf (Ljava/lang/String;)Lio/github/jan/supabase/storage/BucketType;
+	public static fun values ()[Lio/github/jan/supabase/storage/BucketType;
+}
+
+public abstract interface class io/github/jan/supabase/storage/BucketUrlBuilder {
+	public abstract fun getCacheNonce ()Ljava/lang/String;
+	public abstract fun setCacheNonce (Ljava/lang/String;)V
+}
+
+public abstract interface class io/github/jan/supabase/storage/BucketUrlBuilder$WithForceDownload : io/github/jan/supabase/storage/BucketUrlBuilder {
+	public fun forceDownload (Ljava/lang/String;)V
+	public static synthetic fun forceDownload$default (Lio/github/jan/supabase/storage/BucketUrlBuilder$WithForceDownload;Ljava/lang/String;ILjava/lang/Object;)V
+	public abstract fun getDownload ()Lio/github/jan/supabase/storage/ForceDownload;
+	public abstract fun setDownload (Lio/github/jan/supabase/storage/ForceDownload;)V
+}
+
+public final class io/github/jan/supabase/storage/BucketUrlBuilder$WithForceDownload$DefaultImpls {
+	public static fun forceDownload (Lio/github/jan/supabase/storage/BucketUrlBuilder$WithForceDownload;Ljava/lang/String;)V
+	public static synthetic fun forceDownload$default (Lio/github/jan/supabase/storage/BucketUrlBuilder$WithForceDownload;Ljava/lang/String;ILjava/lang/Object;)V
+}
+
+public abstract interface class io/github/jan/supabase/storage/BucketUrlBuilder$WithTransformation : io/github/jan/supabase/storage/BucketUrlBuilder {
+	public abstract fun getTransformation ()Lio/github/jan/supabase/storage/ImageTransformation;
+	public abstract fun setTransformation (Lio/github/jan/supabase/storage/ImageTransformation;)V
+	public fun transform (Lkotlin/jvm/functions/Function1;)V
+}
+
+public final class io/github/jan/supabase/storage/BucketUrlBuilder$WithTransformation$DefaultImpls {
+	public static fun transform (Lio/github/jan/supabase/storage/BucketUrlBuilder$WithTransformation;Lkotlin/jvm/functions/Function1;)V
+}
+
+public final class io/github/jan/supabase/storage/DownloadOptionBuilder : io/github/jan/supabase/storage/BucketUrlBuilder {
+	public fun <init> ()V
+	public fun <init> (Lkotlin/jvm/functions/Function1;Ljava/util/List;)V
+	public synthetic fun <init> (Lkotlin/jvm/functions/Function1;Ljava/util/List;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun getCacheNonce ()Ljava/lang/String;
+	public final fun httpOverride (Lkotlin/jvm/functions/Function1;)V
+	public fun setCacheNonce (Ljava/lang/String;)V
+	public final fun transform (Lkotlin/jvm/functions/Function1;)V
+}
+
+public abstract interface class io/github/jan/supabase/storage/DownloadStatus {
+}
+
+public final class io/github/jan/supabase/storage/DownloadStatus$ByteData : io/github/jan/supabase/storage/DownloadStatus {
+	public static final synthetic fun box-impl ([B)Lio/github/jan/supabase/storage/DownloadStatus$ByteData;
+	public static fun constructor-impl ([B)[B
+	public fun equals (Ljava/lang/Object;)Z
+	public static fun equals-impl ([BLjava/lang/Object;)Z
+	public static final fun equals-impl0 ([B[B)Z
+	public final fun getData ()[B
+	public fun hashCode ()I
+	public static fun hashCode-impl ([B)I
+	public fun toString ()Ljava/lang/String;
+	public static fun toString-impl ([B)Ljava/lang/String;
+	public final synthetic fun unbox-impl ()[B
+}
+
+public final class io/github/jan/supabase/storage/DownloadStatus$Progress : io/github/jan/supabase/storage/DownloadStatus {
+	public fun <init> (JJ)V
+	public final fun component1 ()J
+	public final fun component2 ()J
+	public final fun copy (JJ)Lio/github/jan/supabase/storage/DownloadStatus$Progress;
+	public static synthetic fun copy$default (Lio/github/jan/supabase/storage/DownloadStatus$Progress;JJILjava/lang/Object;)Lio/github/jan/supabase/storage/DownloadStatus$Progress;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getContentLength ()J
+	public final fun getTotalBytesReceived ()J
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/jan/supabase/storage/DownloadStatus$Success : io/github/jan/supabase/storage/DownloadStatus {
+	public static final field INSTANCE Lio/github/jan/supabase/storage/DownloadStatus$Success;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/jan/supabase/storage/FileObject {
+	public static final field Companion Lio/github/jan/supabase/storage/FileObject$Companion;
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;Lkotlin/time/Instant;Lkotlin/time/Instant;Lkotlin/time/Instant;Lkotlinx/serialization/json/JsonObject;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Ljava/lang/String;
+	public final fun component3 ()Lkotlin/time/Instant;
+	public final fun component4 ()Lkotlin/time/Instant;
+	public final fun component5 ()Lkotlin/time/Instant;
+	public final fun component6 ()Lkotlinx/serialization/json/JsonObject;
+	public final fun copy (Ljava/lang/String;Ljava/lang/String;Lkotlin/time/Instant;Lkotlin/time/Instant;Lkotlin/time/Instant;Lkotlinx/serialization/json/JsonObject;)Lio/github/jan/supabase/storage/FileObject;
+	public static synthetic fun copy$default (Lio/github/jan/supabase/storage/FileObject;Ljava/lang/String;Ljava/lang/String;Lkotlin/time/Instant;Lkotlin/time/Instant;Lkotlin/time/Instant;Lkotlinx/serialization/json/JsonObject;ILjava/lang/Object;)Lio/github/jan/supabase/storage/FileObject;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getCreatedAt ()Lkotlin/time/Instant;
+	public final fun getId ()Ljava/lang/String;
+	public final fun getLastAccessedAt ()Lkotlin/time/Instant;
+	public final fun getMetadata ()Lkotlinx/serialization/json/JsonObject;
+	public final fun getName ()Ljava/lang/String;
+	public final fun getUpdatedAt ()Lkotlin/time/Instant;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final synthetic class io/github/jan/supabase/storage/FileObject$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lio/github/jan/supabase/storage/FileObject$$serializer;
+	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public final fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lio/github/jan/supabase/storage/FileObject;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public final fun serialize (Lkotlinx/serialization/encoding/Encoder;Lio/github/jan/supabase/storage/FileObject;)V
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
+public final class io/github/jan/supabase/storage/FileObject$Companion {
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
+}
+
+public final class io/github/jan/supabase/storage/FileObjectV2 {
+	public static final field Companion Lio/github/jan/supabase/storage/FileObjectV2$Companion;
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Lkotlin/time/Instant;Lkotlin/time/Instant;Lkotlin/time/Instant;Lkotlinx/serialization/json/JsonObject;JLjava/lang/String;Ljava/lang/String;Lkotlin/time/Instant;Ljava/lang/String;Lio/github/jan/supabase/SupabaseSerializer;)V
+	public synthetic fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Lkotlin/time/Instant;Lkotlin/time/Instant;Lkotlin/time/Instant;Lkotlinx/serialization/json/JsonObject;JLjava/lang/String;Ljava/lang/String;Lkotlin/time/Instant;Ljava/lang/String;Lio/github/jan/supabase/SupabaseSerializer;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component10 ()Ljava/lang/String;
+	public final fun component11 ()Ljava/lang/String;
+	public final fun component12 ()Lkotlin/time/Instant;
+	public final fun component13 ()Ljava/lang/String;
+	public final fun component2 ()Ljava/lang/String;
+	public final fun component3 ()Ljava/lang/String;
+	public final fun component4 ()Ljava/lang/String;
+	public final fun component5 ()Lkotlin/time/Instant;
+	public final fun component6 ()Lkotlin/time/Instant;
+	public final fun component7 ()Lkotlin/time/Instant;
+	public final fun component8 ()Lkotlinx/serialization/json/JsonObject;
+	public final fun component9 ()J
+	public final fun copy (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Lkotlin/time/Instant;Lkotlin/time/Instant;Lkotlin/time/Instant;Lkotlinx/serialization/json/JsonObject;JLjava/lang/String;Ljava/lang/String;Lkotlin/time/Instant;Ljava/lang/String;Lio/github/jan/supabase/SupabaseSerializer;)Lio/github/jan/supabase/storage/FileObjectV2;
+	public static synthetic fun copy$default (Lio/github/jan/supabase/storage/FileObjectV2;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Lkotlin/time/Instant;Lkotlin/time/Instant;Lkotlin/time/Instant;Lkotlinx/serialization/json/JsonObject;JLjava/lang/String;Ljava/lang/String;Lkotlin/time/Instant;Ljava/lang/String;Lio/github/jan/supabase/SupabaseSerializer;ILjava/lang/Object;)Lio/github/jan/supabase/storage/FileObjectV2;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getBucketId ()Ljava/lang/String;
+	public final fun getCacheControl ()Ljava/lang/String;
+	public final fun getContentType ()Lio/ktor/http/ContentType;
+	public final fun getCreatedAt ()Lkotlin/time/Instant;
+	public final fun getEtag ()Ljava/lang/String;
+	public final fun getId ()Ljava/lang/String;
+	public final fun getLastAccessedAt ()Lkotlin/time/Instant;
+	public final fun getLastModified ()Lkotlin/time/Instant;
+	public final fun getMetadata ()Lkotlinx/serialization/json/JsonObject;
+	public final fun getName ()Ljava/lang/String;
+	public final fun getRawContentType ()Ljava/lang/String;
+	public final fun getSerializer ()Lio/github/jan/supabase/SupabaseSerializer;
+	public final fun getSize ()J
+	public final fun getUpdatedAt ()Lkotlin/time/Instant;
+	public final fun getVersion ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final synthetic class io/github/jan/supabase/storage/FileObjectV2$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lio/github/jan/supabase/storage/FileObjectV2$$serializer;
+	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public final fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lio/github/jan/supabase/storage/FileObjectV2;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public final fun serialize (Lkotlinx/serialization/encoding/Encoder;Lio/github/jan/supabase/storage/FileObjectV2;)V
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
+public final class io/github/jan/supabase/storage/FileObjectV2$Companion {
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
+}
+
+public final class io/github/jan/supabase/storage/FileSizeLimit {
+	public static final synthetic fun box-impl (Ljava/lang/String;)Lio/github/jan/supabase/storage/FileSizeLimit;
+	public fun equals (Ljava/lang/Object;)Z
+	public static fun equals-impl (Ljava/lang/String;Ljava/lang/Object;)Z
+	public static final fun equals-impl0 (Ljava/lang/String;Ljava/lang/String;)Z
+	public final fun getValue ()Ljava/lang/String;
+	public fun hashCode ()I
+	public static fun hashCode-impl (Ljava/lang/String;)I
+	public fun toString ()Ljava/lang/String;
+	public static fun toString-impl (Ljava/lang/String;)Ljava/lang/String;
+	public final synthetic fun unbox-impl ()Ljava/lang/String;
+}
+
+public final class io/github/jan/supabase/storage/FileUploadResponse {
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V
+	public synthetic fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Ljava/lang/String;
+	public final fun component3 ()Ljava/lang/String;
+	public final fun copy (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Lio/github/jan/supabase/storage/FileUploadResponse;
+	public static synthetic fun copy$default (Lio/github/jan/supabase/storage/FileUploadResponse;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;ILjava/lang/Object;)Lio/github/jan/supabase/storage/FileUploadResponse;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getId ()Ljava/lang/String;
+	public final fun getKey ()Ljava/lang/String;
+	public final fun getPath ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/jan/supabase/storage/FlowExtensionKt {
+	public static final fun downloadAuthenticatedAsFlow (Lio/github/jan/supabase/storage/BucketApi;Ljava/lang/String;Lio/ktor/utils/io/ByteWriteChannel;Lkotlin/jvm/functions/Function1;)Lkotlinx/coroutines/flow/Flow;
+	public static final fun downloadAuthenticatedAsFlow (Lio/github/jan/supabase/storage/BucketApi;Ljava/lang/String;Lkotlin/jvm/functions/Function1;)Lkotlinx/coroutines/flow/Flow;
+	public static synthetic fun downloadAuthenticatedAsFlow$default (Lio/github/jan/supabase/storage/BucketApi;Ljava/lang/String;Lio/ktor/utils/io/ByteWriteChannel;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Lkotlinx/coroutines/flow/Flow;
+	public static synthetic fun downloadAuthenticatedAsFlow$default (Lio/github/jan/supabase/storage/BucketApi;Ljava/lang/String;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Lkotlinx/coroutines/flow/Flow;
+	public static final fun downloadPublicAsFlow (Lio/github/jan/supabase/storage/BucketApi;Ljava/lang/String;Lio/ktor/utils/io/ByteWriteChannel;Lkotlin/jvm/functions/Function1;)Lkotlinx/coroutines/flow/Flow;
+	public static final fun downloadPublicAsFlow (Lio/github/jan/supabase/storage/BucketApi;Ljava/lang/String;Lkotlin/jvm/functions/Function1;)Lkotlinx/coroutines/flow/Flow;
+	public static synthetic fun downloadPublicAsFlow$default (Lio/github/jan/supabase/storage/BucketApi;Ljava/lang/String;Lio/ktor/utils/io/ByteWriteChannel;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Lkotlinx/coroutines/flow/Flow;
+	public static synthetic fun downloadPublicAsFlow$default (Lio/github/jan/supabase/storage/BucketApi;Ljava/lang/String;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Lkotlinx/coroutines/flow/Flow;
+	public static final fun updateAsFlow (Lio/github/jan/supabase/storage/BucketApi;Ljava/lang/String;Lio/github/jan/supabase/storage/UploadData;Lkotlin/jvm/functions/Function1;)Lkotlinx/coroutines/flow/Flow;
+	public static final fun updateAsFlow (Lio/github/jan/supabase/storage/BucketApi;Ljava/lang/String;[BLkotlin/jvm/functions/Function1;)Lkotlinx/coroutines/flow/Flow;
+	public static synthetic fun updateAsFlow$default (Lio/github/jan/supabase/storage/BucketApi;Ljava/lang/String;Lio/github/jan/supabase/storage/UploadData;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Lkotlinx/coroutines/flow/Flow;
+	public static synthetic fun updateAsFlow$default (Lio/github/jan/supabase/storage/BucketApi;Ljava/lang/String;[BLkotlin/jvm/functions/Function1;ILjava/lang/Object;)Lkotlinx/coroutines/flow/Flow;
+	public static final fun uploadAsFlow (Lio/github/jan/supabase/storage/BucketApi;Ljava/lang/String;Lio/github/jan/supabase/storage/UploadData;Lkotlin/jvm/functions/Function1;)Lkotlinx/coroutines/flow/Flow;
+	public static final fun uploadAsFlow (Lio/github/jan/supabase/storage/BucketApi;Ljava/lang/String;[BLkotlin/jvm/functions/Function1;)Lkotlinx/coroutines/flow/Flow;
+	public static synthetic fun uploadAsFlow$default (Lio/github/jan/supabase/storage/BucketApi;Ljava/lang/String;Lio/github/jan/supabase/storage/UploadData;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Lkotlinx/coroutines/flow/Flow;
+	public static synthetic fun uploadAsFlow$default (Lio/github/jan/supabase/storage/BucketApi;Ljava/lang/String;[BLkotlin/jvm/functions/Function1;ILjava/lang/Object;)Lkotlinx/coroutines/flow/Flow;
+	public static final fun uploadToSignedUrlAsFlow (Lio/github/jan/supabase/storage/BucketApi;Ljava/lang/String;Ljava/lang/String;Lio/github/jan/supabase/storage/UploadData;Lkotlin/jvm/functions/Function1;)Lkotlinx/coroutines/flow/Flow;
+	public static final fun uploadToSignedUrlAsFlow (Lio/github/jan/supabase/storage/BucketApi;Ljava/lang/String;Ljava/lang/String;[BLkotlin/jvm/functions/Function1;)Lkotlinx/coroutines/flow/Flow;
+	public static synthetic fun uploadToSignedUrlAsFlow$default (Lio/github/jan/supabase/storage/BucketApi;Ljava/lang/String;Ljava/lang/String;Lio/github/jan/supabase/storage/UploadData;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Lkotlinx/coroutines/flow/Flow;
+	public static synthetic fun uploadToSignedUrlAsFlow$default (Lio/github/jan/supabase/storage/BucketApi;Ljava/lang/String;Ljava/lang/String;[BLkotlin/jvm/functions/Function1;ILjava/lang/Object;)Lkotlinx/coroutines/flow/Flow;
+}
+
+public final class io/github/jan/supabase/storage/ForceDownload {
+	public fun <init> ()V
+	public fun <init> (Ljava/lang/String;)V
+	public synthetic fun <init> (Ljava/lang/String;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun copy (Ljava/lang/String;)Lio/github/jan/supabase/storage/ForceDownload;
+	public static synthetic fun copy$default (Lio/github/jan/supabase/storage/ForceDownload;Ljava/lang/String;ILjava/lang/Object;)Lio/github/jan/supabase/storage/ForceDownload;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getFileName ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/jan/supabase/storage/ImageTransformation {
+	public static final field Companion Lio/github/jan/supabase/storage/ImageTransformation$Companion;
+	public fun <init> ()V
+	public final fun contain ()V
+	public final fun cover ()V
+	public final fun fill ()V
+	public final fun getFormat ()Ljava/lang/String;
+	public final fun getHeight ()Ljava/lang/Integer;
+	public final fun getQuality ()Ljava/lang/Integer;
+	public final fun getResize ()Lio/github/jan/supabase/storage/ImageTransformation$Resize;
+	public final fun getWidth ()Ljava/lang/Integer;
+	public final fun setFormat (Ljava/lang/String;)V
+	public final fun setHeight (Ljava/lang/Integer;)V
+	public final fun setQuality (Ljava/lang/Integer;)V
+	public final fun setResize (Lio/github/jan/supabase/storage/ImageTransformation$Resize;)V
+	public final fun setWidth (Ljava/lang/Integer;)V
+	public final fun size (II)V
+}
+
+public final class io/github/jan/supabase/storage/ImageTransformation$Companion {
+	public final fun getVALID_QUALITY_RANGE ()Lkotlin/ranges/IntRange;
+}
+
+public final class io/github/jan/supabase/storage/ImageTransformation$Resize : java/lang/Enum {
+	public static final field CONTAIN Lio/github/jan/supabase/storage/ImageTransformation$Resize;
+	public static final field COVER Lio/github/jan/supabase/storage/ImageTransformation$Resize;
+	public static final field FILL Lio/github/jan/supabase/storage/ImageTransformation$Resize;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public static fun valueOf (Ljava/lang/String;)Lio/github/jan/supabase/storage/ImageTransformation$Resize;
+	public static fun values ()[Lio/github/jan/supabase/storage/ImageTransformation$Resize;
+}
+
+public final class io/github/jan/supabase/storage/JvmUtilsKt {
+	public static final fun downloadAuthenticatedTo (Lio/github/jan/supabase/storage/BucketApi;Ljava/lang/String;Ljava/io/File;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static final fun downloadAuthenticatedTo (Lio/github/jan/supabase/storage/BucketApi;Ljava/lang/String;Ljava/nio/file/Path;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static synthetic fun downloadAuthenticatedTo$default (Lio/github/jan/supabase/storage/BucketApi;Ljava/lang/String;Ljava/io/File;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public static synthetic fun downloadAuthenticatedTo$default (Lio/github/jan/supabase/storage/BucketApi;Ljava/lang/String;Ljava/nio/file/Path;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public static final fun downloadAuthenticatedToAsFlow (Lio/github/jan/supabase/storage/BucketApi;Ljava/lang/String;Ljava/io/File;Lkotlin/jvm/functions/Function1;)Lkotlinx/coroutines/flow/Flow;
+	public static final fun downloadAuthenticatedToAsFlow (Lio/github/jan/supabase/storage/BucketApi;Ljava/lang/String;Ljava/nio/file/Path;Lkotlin/jvm/functions/Function1;)Lkotlinx/coroutines/flow/Flow;
+	public static synthetic fun downloadAuthenticatedToAsFlow$default (Lio/github/jan/supabase/storage/BucketApi;Ljava/lang/String;Ljava/io/File;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Lkotlinx/coroutines/flow/Flow;
+	public static synthetic fun downloadAuthenticatedToAsFlow$default (Lio/github/jan/supabase/storage/BucketApi;Ljava/lang/String;Ljava/nio/file/Path;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Lkotlinx/coroutines/flow/Flow;
+	public static final fun downloadPublicTo (Lio/github/jan/supabase/storage/BucketApi;Ljava/lang/String;Ljava/io/File;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static final fun downloadPublicTo (Lio/github/jan/supabase/storage/BucketApi;Ljava/lang/String;Ljava/nio/file/Path;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static synthetic fun downloadPublicTo$default (Lio/github/jan/supabase/storage/BucketApi;Ljava/lang/String;Ljava/io/File;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public static synthetic fun downloadPublicTo$default (Lio/github/jan/supabase/storage/BucketApi;Ljava/lang/String;Ljava/nio/file/Path;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public static final fun downloadPublicToAsFlow (Lio/github/jan/supabase/storage/BucketApi;Ljava/lang/String;Ljava/io/File;Lkotlin/jvm/functions/Function1;)Lkotlinx/coroutines/flow/Flow;
+	public static final fun downloadPublicToAsFlow (Lio/github/jan/supabase/storage/BucketApi;Ljava/lang/String;Ljava/nio/file/Path;Lkotlin/jvm/functions/Function1;)Lkotlinx/coroutines/flow/Flow;
+	public static synthetic fun downloadPublicToAsFlow$default (Lio/github/jan/supabase/storage/BucketApi;Ljava/lang/String;Ljava/io/File;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Lkotlinx/coroutines/flow/Flow;
+	public static synthetic fun downloadPublicToAsFlow$default (Lio/github/jan/supabase/storage/BucketApi;Ljava/lang/String;Ljava/nio/file/Path;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Lkotlinx/coroutines/flow/Flow;
+	public static final fun update (Lio/github/jan/supabase/storage/BucketApi;Ljava/lang/String;Ljava/io/File;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static final fun update (Lio/github/jan/supabase/storage/BucketApi;Ljava/lang/String;Ljava/nio/file/Path;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static synthetic fun update$default (Lio/github/jan/supabase/storage/BucketApi;Ljava/lang/String;Ljava/io/File;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public static synthetic fun update$default (Lio/github/jan/supabase/storage/BucketApi;Ljava/lang/String;Ljava/nio/file/Path;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public static final fun updateAsFlow (Lio/github/jan/supabase/storage/BucketApi;Ljava/lang/String;Ljava/io/File;Lkotlin/jvm/functions/Function1;)Lkotlinx/coroutines/flow/Flow;
+	public static final fun updateAsFlow (Lio/github/jan/supabase/storage/BucketApi;Ljava/lang/String;Ljava/nio/file/Path;Lkotlin/jvm/functions/Function1;)Lkotlinx/coroutines/flow/Flow;
+	public static synthetic fun updateAsFlow$default (Lio/github/jan/supabase/storage/BucketApi;Ljava/lang/String;Ljava/io/File;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Lkotlinx/coroutines/flow/Flow;
+	public static synthetic fun updateAsFlow$default (Lio/github/jan/supabase/storage/BucketApi;Ljava/lang/String;Ljava/nio/file/Path;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Lkotlinx/coroutines/flow/Flow;
+	public static final fun upload (Lio/github/jan/supabase/storage/BucketApi;Ljava/lang/String;Ljava/io/File;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static final fun upload (Lio/github/jan/supabase/storage/BucketApi;Ljava/lang/String;Ljava/nio/file/Path;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static synthetic fun upload$default (Lio/github/jan/supabase/storage/BucketApi;Ljava/lang/String;Ljava/io/File;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public static synthetic fun upload$default (Lio/github/jan/supabase/storage/BucketApi;Ljava/lang/String;Ljava/nio/file/Path;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public static final fun uploadAsFlow (Lio/github/jan/supabase/storage/BucketApi;Ljava/lang/String;Ljava/io/File;Lkotlin/jvm/functions/Function1;)Lkotlinx/coroutines/flow/Flow;
+	public static final fun uploadAsFlow (Lio/github/jan/supabase/storage/BucketApi;Ljava/lang/String;Ljava/nio/file/Path;Lkotlin/jvm/functions/Function1;)Lkotlinx/coroutines/flow/Flow;
+	public static synthetic fun uploadAsFlow$default (Lio/github/jan/supabase/storage/BucketApi;Ljava/lang/String;Ljava/io/File;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Lkotlinx/coroutines/flow/Flow;
+	public static synthetic fun uploadAsFlow$default (Lio/github/jan/supabase/storage/BucketApi;Ljava/lang/String;Ljava/nio/file/Path;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Lkotlinx/coroutines/flow/Flow;
+	public static final fun uploadToSignedUrl (Lio/github/jan/supabase/storage/BucketApi;Ljava/lang/String;Ljava/lang/String;Ljava/io/File;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static final fun uploadToSignedUrl (Lio/github/jan/supabase/storage/BucketApi;Ljava/lang/String;Ljava/lang/String;Ljava/nio/file/Path;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static synthetic fun uploadToSignedUrl$default (Lio/github/jan/supabase/storage/BucketApi;Ljava/lang/String;Ljava/lang/String;Ljava/io/File;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public static synthetic fun uploadToSignedUrl$default (Lio/github/jan/supabase/storage/BucketApi;Ljava/lang/String;Ljava/lang/String;Ljava/nio/file/Path;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public static final fun uploadToSignedUrlAsFlow (Lio/github/jan/supabase/storage/BucketApi;Ljava/lang/String;Ljava/lang/String;Ljava/io/File;Lkotlin/jvm/functions/Function1;)Lkotlinx/coroutines/flow/Flow;
+	public static final fun uploadToSignedUrlAsFlow (Lio/github/jan/supabase/storage/BucketApi;Ljava/lang/String;Ljava/lang/String;Ljava/nio/file/Path;Lkotlin/jvm/functions/Function1;)Lkotlinx/coroutines/flow/Flow;
+	public static synthetic fun uploadToSignedUrlAsFlow$default (Lio/github/jan/supabase/storage/BucketApi;Ljava/lang/String;Ljava/lang/String;Ljava/io/File;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Lkotlinx/coroutines/flow/Flow;
+	public static synthetic fun uploadToSignedUrlAsFlow$default (Lio/github/jan/supabase/storage/BucketApi;Ljava/lang/String;Ljava/lang/String;Ljava/nio/file/Path;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Lkotlinx/coroutines/flow/Flow;
+}
+
+public final class io/github/jan/supabase/storage/PublicUrlBuilder : io/github/jan/supabase/storage/BucketUrlBuilder$WithForceDownload, io/github/jan/supabase/storage/BucketUrlBuilder$WithTransformation {
+	public fun <init> ()V
+	public fun forceDownload (Ljava/lang/String;)V
+	public fun getCacheNonce ()Ljava/lang/String;
+	public fun getDownload ()Lio/github/jan/supabase/storage/ForceDownload;
+	public fun getTransformation ()Lio/github/jan/supabase/storage/ImageTransformation;
+	public fun setCacheNonce (Ljava/lang/String;)V
+	public fun setDownload (Lio/github/jan/supabase/storage/ForceDownload;)V
+	public fun setTransformation (Lio/github/jan/supabase/storage/ImageTransformation;)V
+	public fun transform (Lkotlin/jvm/functions/Function1;)V
+}
+
+public final class io/github/jan/supabase/storage/PurgeCacheOptions {
+	public fun <init> ()V
+	public final fun getTransformations ()Z
+	public final fun setTransformations (Z)V
+}
+
+public final class io/github/jan/supabase/storage/ResumableUtilsKt {
+	public static final fun continuePreviousFileUploads (Lio/github/jan/supabase/storage/resumable/ResumableClient;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static final fun createOrContinueUpload (Lio/github/jan/supabase/storage/resumable/ResumableClient;Ljava/lang/String;Ljava/io/File;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static final fun createOrContinueUpload (Lio/github/jan/supabase/storage/resumable/ResumableClient;Ljava/lang/String;Ljava/nio/file/Path;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static synthetic fun createOrContinueUpload$default (Lio/github/jan/supabase/storage/resumable/ResumableClient;Ljava/lang/String;Ljava/io/File;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public static synthetic fun createOrContinueUpload$default (Lio/github/jan/supabase/storage/resumable/ResumableClient;Ljava/lang/String;Ljava/nio/file/Path;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+}
+
+public final class io/github/jan/supabase/storage/SignedUrl {
+	public static final field Companion Lio/github/jan/supabase/storage/SignedUrl$Companion;
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V
+	public synthetic fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Ljava/lang/String;
+	public final fun component3 ()Ljava/lang/String;
+	public final fun copy (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Lio/github/jan/supabase/storage/SignedUrl;
+	public static synthetic fun copy$default (Lio/github/jan/supabase/storage/SignedUrl;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;ILjava/lang/Object;)Lio/github/jan/supabase/storage/SignedUrl;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getError ()Ljava/lang/String;
+	public final fun getPath ()Ljava/lang/String;
+	public final fun getSignedURL ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final synthetic class io/github/jan/supabase/storage/SignedUrl$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lio/github/jan/supabase/storage/SignedUrl$$serializer;
+	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public final fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lio/github/jan/supabase/storage/SignedUrl;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public final fun serialize (Lkotlinx/serialization/encoding/Encoder;Lio/github/jan/supabase/storage/SignedUrl;)V
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
+public final class io/github/jan/supabase/storage/SignedUrl$Companion {
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
+}
+
+public final class io/github/jan/supabase/storage/SignedUrlBuilder : io/github/jan/supabase/storage/BucketUrlBuilder$WithForceDownload, io/github/jan/supabase/storage/BucketUrlBuilder$WithTransformation {
+	public fun <init> ()V
+	public fun forceDownload (Ljava/lang/String;)V
+	public fun getCacheNonce ()Ljava/lang/String;
+	public fun getDownload ()Lio/github/jan/supabase/storage/ForceDownload;
+	public fun getTransformation ()Lio/github/jan/supabase/storage/ImageTransformation;
+	public fun setCacheNonce (Ljava/lang/String;)V
+	public fun setDownload (Lio/github/jan/supabase/storage/ForceDownload;)V
+	public fun setTransformation (Lio/github/jan/supabase/storage/ImageTransformation;)V
+	public fun transform (Lkotlin/jvm/functions/Function1;)V
+}
+
+public final class io/github/jan/supabase/storage/SignedUrlsBuilder : io/github/jan/supabase/storage/BucketUrlBuilder$WithForceDownload {
+	public fun <init> ()V
+	public fun forceDownload (Ljava/lang/String;)V
+	public fun getCacheNonce ()Ljava/lang/String;
+	public fun getDownload ()Lio/github/jan/supabase/storage/ForceDownload;
+	public fun setCacheNonce (Ljava/lang/String;)V
+	public fun setDownload (Lio/github/jan/supabase/storage/ForceDownload;)V
+}
+
+public final class io/github/jan/supabase/storage/SortOrder : java/lang/Enum {
+	public static final field ASC Lio/github/jan/supabase/storage/SortOrder;
+	public static final field DESC Lio/github/jan/supabase/storage/SortOrder;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public static fun valueOf (Ljava/lang/String;)Lio/github/jan/supabase/storage/SortOrder;
+	public static fun values ()[Lio/github/jan/supabase/storage/SortOrder;
+}
+
+public abstract interface class io/github/jan/supabase/storage/Storage : io/github/jan/supabase/plugins/CustomSerializationPlugin, io/github/jan/supabase/plugins/MainPlugin {
+	public static final field API_VERSION I
+	public static final field Companion Lio/github/jan/supabase/storage/Storage$Companion;
+	public static final field DEFAULT_CHUNK_SIZE J
+	public static final field LOGGING_TAG Ljava/lang/String;
+	public abstract fun createBucket (Ljava/lang/String;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static synthetic fun createBucket$default (Lio/github/jan/supabase/storage/Storage;Ljava/lang/String;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public abstract fun deleteBucket (Ljava/lang/String;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun emptyBucket (Ljava/lang/String;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun from (Ljava/lang/String;)Lio/github/jan/supabase/storage/BucketApi;
+	public abstract fun get (Ljava/lang/String;)Lio/github/jan/supabase/storage/BucketApi;
+	public abstract fun getAnalytics ()Lio/github/jan/supabase/storage/analytics/StorageAnalyticsClient;
+	public abstract fun getApi ()Lio/github/jan/supabase/auth/api/AuthenticatedSupabaseApi;
+	public abstract fun getBucket (Ljava/lang/String;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun getVectors ()Lio/github/jan/supabase/storage/vectors/StorageVectorsClient;
+	public abstract fun listBuckets (Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static synthetic fun listBuckets$default (Lio/github/jan/supabase/storage/Storage;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public abstract fun purgeBucketCache (Ljava/lang/String;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static synthetic fun purgeBucketCache$default (Lio/github/jan/supabase/storage/Storage;Ljava/lang/String;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public abstract fun updateBucket (Ljava/lang/String;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static synthetic fun updateBucket$default (Lio/github/jan/supabase/storage/Storage;Ljava/lang/String;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+}
+
+public final class io/github/jan/supabase/storage/Storage$Companion : io/github/jan/supabase/plugins/SupabasePluginProvider {
+	public static final field API_VERSION I
+	public static final field DEFAULT_CHUNK_SIZE J
+	public static final field LOGGING_TAG Ljava/lang/String;
+	public fun create (Lio/github/jan/supabase/SupabaseClient;Lio/github/jan/supabase/storage/Storage$Config;)Lio/github/jan/supabase/storage/Storage;
+	public synthetic fun create (Lio/github/jan/supabase/SupabaseClient;Ljava/lang/Object;)Lio/github/jan/supabase/plugins/SupabasePlugin;
+	public fun createConfig (Lkotlin/jvm/functions/Function1;)Lio/github/jan/supabase/storage/Storage$Config;
+	public synthetic fun createConfig (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
+	public fun getKey ()Ljava/lang/String;
+	public fun setup (Lio/github/jan/supabase/SupabaseClientBuilder;Lio/github/jan/supabase/storage/Storage$Config;)V
+	public synthetic fun setup (Lio/github/jan/supabase/SupabaseClientBuilder;Ljava/lang/Object;)V
+}
+
+public final class io/github/jan/supabase/storage/Storage$Config : io/github/jan/supabase/plugins/MainConfig, io/github/jan/supabase/auth/AuthDependentPluginConfig, io/github/jan/supabase/plugins/CustomSerializationConfig {
+	public synthetic fun <init> (JLio/github/jan/supabase/storage/Storage$Config$Resumable;Lio/github/jan/supabase/SupabaseSerializer;ZILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public synthetic fun <init> (JLio/github/jan/supabase/storage/Storage$Config$Resumable;Lio/github/jan/supabase/SupabaseSerializer;ZLkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1-UwyO8pc ()J
+	public final fun component3 ()Lio/github/jan/supabase/SupabaseSerializer;
+	public final fun component4 ()Z
+	public final fun copy-rnQQ1Ag (JLio/github/jan/supabase/storage/Storage$Config$Resumable;Lio/github/jan/supabase/SupabaseSerializer;Z)Lio/github/jan/supabase/storage/Storage$Config;
+	public static synthetic fun copy-rnQQ1Ag$default (Lio/github/jan/supabase/storage/Storage$Config;JLio/github/jan/supabase/storage/Storage$Config$Resumable;Lio/github/jan/supabase/SupabaseSerializer;ZILjava/lang/Object;)Lio/github/jan/supabase/storage/Storage$Config;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun getRequireValidSession ()Z
+	public final fun getResumable ()Lio/github/jan/supabase/storage/Storage$Config$Resumable;
+	public fun getSerializer ()Lio/github/jan/supabase/SupabaseSerializer;
+	public final fun getTransferTimeout-UwyO8pc ()J
+	public fun hashCode ()I
+	public final fun resumable (Lkotlin/jvm/functions/Function1;)V
+	public fun setRequireValidSession (Z)V
+	public final fun setResumable (Lio/github/jan/supabase/storage/Storage$Config$Resumable;)V
+	public fun setSerializer (Lio/github/jan/supabase/SupabaseSerializer;)V
+	public final fun setTransferTimeout-LRDsOJo (J)V
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/jan/supabase/storage/Storage$Config$Resumable {
+	public synthetic fun <init> (Lio/github/jan/supabase/storage/resumable/ResumableCache;JZILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public synthetic fun <init> (Lio/github/jan/supabase/storage/resumable/ResumableCache;JZLkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1 ()Lio/github/jan/supabase/storage/resumable/ResumableCache;
+	public final fun component2-UwyO8pc ()J
+	public final fun component3 ()Z
+	public final fun copy-8Mi8wO0 (Lio/github/jan/supabase/storage/resumable/ResumableCache;JZ)Lio/github/jan/supabase/storage/Storage$Config$Resumable;
+	public static synthetic fun copy-8Mi8wO0$default (Lio/github/jan/supabase/storage/Storage$Config$Resumable;Lio/github/jan/supabase/storage/resumable/ResumableCache;JZILjava/lang/Object;)Lio/github/jan/supabase/storage/Storage$Config$Resumable;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getCache ()Lio/github/jan/supabase/storage/resumable/ResumableCache;
+	public final fun getDefaultChunkSize ()J
+	public final fun getOnlyUpdateStateAfterChunk ()Z
+	public final fun getRetryTimeout-UwyO8pc ()J
+	public fun hashCode ()I
+	public final fun setCache (Lio/github/jan/supabase/storage/resumable/ResumableCache;)V
+	public final fun setDefaultChunkSize (J)V
+	public final fun setOnlyUpdateStateAfterChunk (Z)V
+	public final fun setRetryTimeout-LRDsOJo (J)V
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/jan/supabase/storage/Storage$DefaultImpls {
+	public static fun close (Lio/github/jan/supabase/storage/Storage;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static synthetic fun createBucket$default (Lio/github/jan/supabase/storage/Storage;Ljava/lang/String;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public static fun from (Lio/github/jan/supabase/storage/Storage;Ljava/lang/String;)Lio/github/jan/supabase/storage/BucketApi;
+	public static fun init (Lio/github/jan/supabase/storage/Storage;)V
+	public static synthetic fun listBuckets$default (Lio/github/jan/supabase/storage/Storage;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public static synthetic fun purgeBucketCache$default (Lio/github/jan/supabase/storage/Storage;Ljava/lang/String;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public static fun resolveUrl (Lio/github/jan/supabase/storage/Storage;Ljava/lang/String;)Ljava/lang/String;
+	public static synthetic fun updateBucket$default (Lio/github/jan/supabase/storage/Storage;Ljava/lang/String;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+}
+
+public final class io/github/jan/supabase/storage/StorageItem {
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;Z)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Ljava/lang/String;
+	public final fun component3 ()Z
+	public final fun copy (Ljava/lang/String;Ljava/lang/String;Z)Lio/github/jan/supabase/storage/StorageItem;
+	public static synthetic fun copy$default (Lio/github/jan/supabase/storage/StorageItem;Ljava/lang/String;Ljava/lang/String;ZILjava/lang/Object;)Lio/github/jan/supabase/storage/StorageItem;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getAuthenticated ()Z
+	public final fun getBucketId ()Ljava/lang/String;
+	public final fun getPath ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/jan/supabase/storage/StorageItemKt {
+	public static final fun authenticatedStorageItem (Ljava/lang/String;Ljava/lang/String;)Lio/github/jan/supabase/storage/StorageItem;
+	public static final fun publicStorageItem (Ljava/lang/String;Ljava/lang/String;)Lio/github/jan/supabase/storage/StorageItem;
+}
+
+public final class io/github/jan/supabase/storage/StorageKt {
+	public static final fun getStorage (Lio/github/jan/supabase/SupabaseClient;)Lio/github/jan/supabase/storage/Storage;
+}
+
+public class io/github/jan/supabase/storage/StorageListFilter {
+	public fun <init> ()V
+	public final fun getLimit ()Ljava/lang/Integer;
+	public final fun getOffset ()Ljava/lang/Integer;
+	public final fun getSearch ()Ljava/lang/String;
+	protected final fun getSortColumn ()Ljava/lang/String;
+	protected final fun getSortOrder ()Ljava/lang/String;
+	public final fun setLimit (Ljava/lang/Integer;)V
+	public final fun setOffset (Ljava/lang/Integer;)V
+	public final fun setSearch (Ljava/lang/String;)V
+	protected final fun setSortColumn (Ljava/lang/String;)V
+	protected final fun setSortOrder (Ljava/lang/String;)V
+}
+
+public final class io/github/jan/supabase/storage/StorageListFilter$Buckets : io/github/jan/supabase/storage/StorageListFilter {
+	public fun <init> ()V
+	public final fun sortBy (Lio/github/jan/supabase/storage/BucketSortColumn;Lio/github/jan/supabase/storage/SortOrder;)V
+}
+
+public final class io/github/jan/supabase/storage/StorageListFilter$Files : io/github/jan/supabase/storage/StorageListFilter {
+	public fun <init> ()V
+	public final fun sortBy (Ljava/lang/String;Lio/github/jan/supabase/storage/SortOrder;)V
+}
+
+public final class io/github/jan/supabase/storage/UploadData {
+	public fun <init> (Lio/ktor/utils/io/ByteReadChannel;J)V
+	public final fun component1 ()Lio/ktor/utils/io/ByteReadChannel;
+	public final fun component2 ()J
+	public final fun copy (Lio/ktor/utils/io/ByteReadChannel;J)Lio/github/jan/supabase/storage/UploadData;
+	public static synthetic fun copy$default (Lio/github/jan/supabase/storage/UploadData;Lio/ktor/utils/io/ByteReadChannel;JILjava/lang/Object;)Lio/github/jan/supabase/storage/UploadData;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getSize ()J
+	public final fun getStream ()Lio/ktor/utils/io/ByteReadChannel;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/jan/supabase/storage/UploadOptionBuilder {
+	public fun <init> (Lio/github/jan/supabase/SupabaseSerializer;ZLkotlinx/serialization/json/JsonObject;Lio/ktor/http/ContentType;Ljava/util/List;)V
+	public synthetic fun <init> (Lio/github/jan/supabase/SupabaseSerializer;ZLkotlinx/serialization/json/JsonObject;Lio/ktor/http/ContentType;Ljava/util/List;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun getContentType ()Lio/ktor/http/ContentType;
+	public final fun getSerializer ()Lio/github/jan/supabase/SupabaseSerializer;
+	public final fun getUpsert ()Z
+	public final fun getUserMetadata ()Lkotlinx/serialization/json/JsonObject;
+	public final fun httpOverride (Lkotlin/jvm/functions/Function1;)V
+	public final fun setContentType (Lio/ktor/http/ContentType;)V
+	public final fun setUpsert (Z)V
+	public final fun setUserMetadata (Lkotlinx/serialization/json/JsonObject;)V
+	public final fun userMetadata (Lkotlin/jvm/functions/Function1;)V
+}
+
+public final class io/github/jan/supabase/storage/UploadSignedUrl {
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Ljava/lang/String;
+	public final fun component3 ()Ljava/lang/String;
+	public final fun copy (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Lio/github/jan/supabase/storage/UploadSignedUrl;
+	public static synthetic fun copy$default (Lio/github/jan/supabase/storage/UploadSignedUrl;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;ILjava/lang/Object;)Lio/github/jan/supabase/storage/UploadSignedUrl;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getPath ()Ljava/lang/String;
+	public final fun getToken ()Ljava/lang/String;
+	public final fun getUrl ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public abstract interface class io/github/jan/supabase/storage/UploadStatus {
+}
+
+public final class io/github/jan/supabase/storage/UploadStatus$Progress : io/github/jan/supabase/storage/UploadStatus {
+	public fun <init> (JJ)V
+	public final fun component1 ()J
+	public final fun component2 ()J
+	public final fun copy (JJ)Lio/github/jan/supabase/storage/UploadStatus$Progress;
+	public static synthetic fun copy$default (Lio/github/jan/supabase/storage/UploadStatus$Progress;JJILjava/lang/Object;)Lio/github/jan/supabase/storage/UploadStatus$Progress;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getContentLength ()J
+	public final fun getTotalBytesSend ()J
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/jan/supabase/storage/UploadStatus$Success : io/github/jan/supabase/storage/UploadStatus {
+	public static final synthetic fun box-impl (Lio/github/jan/supabase/storage/FileUploadResponse;)Lio/github/jan/supabase/storage/UploadStatus$Success;
+	public static fun constructor-impl (Lio/github/jan/supabase/storage/FileUploadResponse;)Lio/github/jan/supabase/storage/FileUploadResponse;
+	public fun equals (Ljava/lang/Object;)Z
+	public static fun equals-impl (Lio/github/jan/supabase/storage/FileUploadResponse;Ljava/lang/Object;)Z
+	public static final fun equals-impl0 (Lio/github/jan/supabase/storage/FileUploadResponse;Lio/github/jan/supabase/storage/FileUploadResponse;)Z
+	public final fun getResponse ()Lio/github/jan/supabase/storage/FileUploadResponse;
+	public fun hashCode ()I
+	public static fun hashCode-impl (Lio/github/jan/supabase/storage/FileUploadResponse;)I
+	public fun toString ()Ljava/lang/String;
+	public static fun toString-impl (Lio/github/jan/supabase/storage/FileUploadResponse;)Ljava/lang/String;
+	public final synthetic fun unbox-impl ()Lio/github/jan/supabase/storage/FileUploadResponse;
+}
+
+public final class io/github/jan/supabase/storage/analytics/AnalyticBucket {
+	public static final field Companion Lio/github/jan/supabase/storage/analytics/AnalyticBucket$Companion;
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Lkotlin/time/Instant;Lkotlin/time/Instant;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Ljava/lang/String;
+	public final fun component3 ()Ljava/lang/String;
+	public final fun component4 ()Lkotlin/time/Instant;
+	public final fun component5 ()Lkotlin/time/Instant;
+	public final fun copy (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Lkotlin/time/Instant;Lkotlin/time/Instant;)Lio/github/jan/supabase/storage/analytics/AnalyticBucket;
+	public static synthetic fun copy$default (Lio/github/jan/supabase/storage/analytics/AnalyticBucket;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Lkotlin/time/Instant;Lkotlin/time/Instant;ILjava/lang/Object;)Lio/github/jan/supabase/storage/analytics/AnalyticBucket;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getCreatedAt ()Lkotlin/time/Instant;
+	public final fun getFormat ()Ljava/lang/String;
+	public final fun getName ()Ljava/lang/String;
+	public final fun getType ()Ljava/lang/String;
+	public final fun getUpdatedAt ()Lkotlin/time/Instant;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final synthetic class io/github/jan/supabase/storage/analytics/AnalyticBucket$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lio/github/jan/supabase/storage/analytics/AnalyticBucket$$serializer;
+	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public final fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lio/github/jan/supabase/storage/analytics/AnalyticBucket;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public final fun serialize (Lkotlinx/serialization/encoding/Encoder;Lio/github/jan/supabase/storage/analytics/AnalyticBucket;)V
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
+public final class io/github/jan/supabase/storage/analytics/AnalyticBucket$Companion {
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
+}
+
+public final class io/github/jan/supabase/storage/analytics/IcebergClientConfiguration {
+	public fun <init> (Ljava/lang/String;Lkotlin/jvm/functions/Function1;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Lkotlin/jvm/functions/Function1;
+	public final fun copy (Ljava/lang/String;Lkotlin/jvm/functions/Function1;)Lio/github/jan/supabase/storage/analytics/IcebergClientConfiguration;
+	public static synthetic fun copy$default (Lio/github/jan/supabase/storage/analytics/IcebergClientConfiguration;Ljava/lang/String;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Lio/github/jan/supabase/storage/analytics/IcebergClientConfiguration;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getBaseUrl ()Ljava/lang/String;
+	public final fun getDefaultHeaders ()Lkotlin/jvm/functions/Function1;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public abstract interface class io/github/jan/supabase/storage/analytics/StorageAnalyticsClient {
+	public abstract fun createBucket (Ljava/lang/String;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun deleteBucket (Ljava/lang/String;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun getIcebergClientConfiguration (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun listBuckets (Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static synthetic fun listBuckets$default (Lio/github/jan/supabase/storage/analytics/StorageAnalyticsClient;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+}
+
+public final class io/github/jan/supabase/storage/analytics/StorageAnalyticsClient$DefaultImpls {
+	public static synthetic fun listBuckets$default (Lio/github/jan/supabase/storage/analytics/StorageAnalyticsClient;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+}
+
+public final class io/github/jan/supabase/storage/resumable/Fingerprint {
+	public static final field Companion Lio/github/jan/supabase/storage/resumable/Fingerprint$Companion;
+	public static final field FINGERPRINT_PARTS I
+	public static final field FINGERPRINT_SEPARATOR Ljava/lang/String;
+	public static final synthetic fun box-impl (Ljava/lang/String;)Lio/github/jan/supabase/storage/resumable/Fingerprint;
+	public fun equals (Ljava/lang/Object;)Z
+	public static fun equals-impl (Ljava/lang/String;Ljava/lang/Object;)Z
+	public static final fun equals-impl0 (Ljava/lang/String;Ljava/lang/String;)Z
+	public static final fun getSize-impl (Ljava/lang/String;)J
+	public static final fun getSource-impl (Ljava/lang/String;)Ljava/lang/String;
+	public final fun getValue ()Ljava/lang/String;
+	public fun hashCode ()I
+	public static fun hashCode-impl (Ljava/lang/String;)I
+	public fun toString ()Ljava/lang/String;
+	public static fun toString-impl (Ljava/lang/String;)Ljava/lang/String;
+	public final synthetic fun unbox-impl ()Ljava/lang/String;
+}
+
+public final class io/github/jan/supabase/storage/resumable/Fingerprint$Companion {
+	public final fun invoke-3xapfgk (Ljava/lang/String;)Ljava/lang/String;
+	public final fun invoke-dc9EZ54 (Ljava/lang/String;J)Ljava/lang/String;
+}
+
+public final class io/github/jan/supabase/storage/resumable/MemoryResumableCache : io/github/jan/supabase/storage/resumable/ResumableCache {
+	public fun <init> ()V
+	public fun <init> (Ljava/util/Map;)V
+	public synthetic fun <init> (Ljava/util/Map;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun clear (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun entries (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun get-iiNwMIM (Ljava/lang/String;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun remove-iiNwMIM (Ljava/lang/String;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun set-zb63x2Q (Ljava/lang/String;Lio/github/jan/supabase/storage/resumable/ResumableCacheEntry;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
+public abstract interface class io/github/jan/supabase/storage/resumable/ResumableCache {
+	public abstract fun clear (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun entries (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun get-iiNwMIM (Ljava/lang/String;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun remove-iiNwMIM (Ljava/lang/String;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun set-zb63x2Q (Ljava/lang/String;Lio/github/jan/supabase/storage/resumable/ResumableCacheEntry;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
+public final class io/github/jan/supabase/storage/resumable/ResumableCacheEntry {
+	public static final field Companion Lio/github/jan/supabase/storage/resumable/ResumableCacheEntry$Companion;
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Lkotlin/time/Instant;ZLjava/lang/String;)V
+	public synthetic fun <init> (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Lkotlin/time/Instant;ZLjava/lang/String;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Ljava/lang/String;
+	public final fun component3 ()Ljava/lang/String;
+	public final fun component4 ()Lkotlin/time/Instant;
+	public final fun component5 ()Z
+	public final fun component6 ()Ljava/lang/String;
+	public final fun copy (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Lkotlin/time/Instant;ZLjava/lang/String;)Lio/github/jan/supabase/storage/resumable/ResumableCacheEntry;
+	public static synthetic fun copy$default (Lio/github/jan/supabase/storage/resumable/ResumableCacheEntry;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Lkotlin/time/Instant;ZLjava/lang/String;ILjava/lang/Object;)Lio/github/jan/supabase/storage/resumable/ResumableCacheEntry;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getBucketId ()Ljava/lang/String;
+	public final fun getContentType ()Ljava/lang/String;
+	public final fun getExpiresAt ()Lkotlin/time/Instant;
+	public final fun getPath ()Ljava/lang/String;
+	public final fun getUpsert ()Z
+	public final fun getUrl ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final synthetic class io/github/jan/supabase/storage/resumable/ResumableCacheEntry$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lio/github/jan/supabase/storage/resumable/ResumableCacheEntry$$serializer;
+	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public final fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lio/github/jan/supabase/storage/resumable/ResumableCacheEntry;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public final fun serialize (Lkotlinx/serialization/encoding/Encoder;Lio/github/jan/supabase/storage/resumable/ResumableCacheEntry;)V
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
+public final class io/github/jan/supabase/storage/resumable/ResumableCacheEntry$Companion {
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
+}
+
+public abstract interface class io/github/jan/supabase/storage/resumable/ResumableClient {
+	public static final field Companion Lio/github/jan/supabase/storage/resumable/ResumableClient$Companion;
+	public static final field TUS_VERSION Ljava/lang/String;
+	public abstract fun continuePreviousUploads (Lkotlin/jvm/functions/Function3;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun createOrContinueUpload (Lkotlin/jvm/functions/Function2;Ljava/lang/String;JLjava/lang/String;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun createOrContinueUpload ([BLjava/lang/String;Ljava/lang/String;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static synthetic fun createOrContinueUpload$default (Lio/github/jan/supabase/storage/resumable/ResumableClient;Lkotlin/jvm/functions/Function2;Ljava/lang/String;JLjava/lang/String;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public static synthetic fun createOrContinueUpload$default (Lio/github/jan/supabase/storage/resumable/ResumableClient;[BLjava/lang/String;Ljava/lang/String;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+}
+
+public final class io/github/jan/supabase/storage/resumable/ResumableClient$Companion {
+	public static final field TUS_VERSION Ljava/lang/String;
+}
+
+public final class io/github/jan/supabase/storage/resumable/ResumableClient$DefaultImpls {
+	public static fun createOrContinueUpload (Lio/github/jan/supabase/storage/resumable/ResumableClient;[BLjava/lang/String;Ljava/lang/String;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static synthetic fun createOrContinueUpload$default (Lio/github/jan/supabase/storage/resumable/ResumableClient;Lkotlin/jvm/functions/Function2;Ljava/lang/String;JLjava/lang/String;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public static synthetic fun createOrContinueUpload$default (Lio/github/jan/supabase/storage/resumable/ResumableClient;[BLjava/lang/String;Ljava/lang/String;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+}
+
+public abstract interface class io/github/jan/supabase/storage/resumable/ResumableUpload {
+	public abstract fun cancel (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun getFingerprint-h-pxtCA ()Ljava/lang/String;
+	public abstract fun getStateFlow ()Lkotlinx/coroutines/flow/StateFlow;
+	public abstract fun pause (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun startOrResumeUploading (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
+public final class io/github/jan/supabase/storage/resumable/ResumableUploadState {
+	public synthetic fun <init> (Ljava/lang/String;Lio/github/jan/supabase/storage/resumable/ResumableCacheEntry;Lio/github/jan/supabase/storage/UploadStatus;ZLkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1-h-pxtCA ()Ljava/lang/String;
+	public final fun component3 ()Lio/github/jan/supabase/storage/UploadStatus;
+	public final fun component4 ()Z
+	public final fun copy-8R7v4q0 (Ljava/lang/String;Lio/github/jan/supabase/storage/resumable/ResumableCacheEntry;Lio/github/jan/supabase/storage/UploadStatus;Z)Lio/github/jan/supabase/storage/resumable/ResumableUploadState;
+	public static synthetic fun copy-8R7v4q0$default (Lio/github/jan/supabase/storage/resumable/ResumableUploadState;Ljava/lang/String;Lio/github/jan/supabase/storage/resumable/ResumableCacheEntry;Lio/github/jan/supabase/storage/UploadStatus;ZILjava/lang/Object;)Lio/github/jan/supabase/storage/resumable/ResumableUploadState;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getBucketId ()Ljava/lang/String;
+	public final fun getFingerprint-h-pxtCA ()Ljava/lang/String;
+	public final fun getPath ()Ljava/lang/String;
+	public final fun getPaused ()Z
+	public final fun getProgress ()F
+	public final fun getStatus ()Lio/github/jan/supabase/storage/UploadStatus;
+	public fun hashCode ()I
+	public final fun isDone ()Z
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/jan/supabase/storage/resumable/SettingsResumableCache : io/github/jan/supabase/storage/resumable/ResumableCache {
+	public fun <init> ()V
+	public fun <init> (Lcom/russhwolf/settings/Settings;)V
+	public synthetic fun <init> (Lcom/russhwolf/settings/Settings;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun clear (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun entries (Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun get-iiNwMIM (Ljava/lang/String;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun remove-iiNwMIM (Ljava/lang/String;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun set-zb63x2Q (Ljava/lang/String;Lio/github/jan/supabase/storage/resumable/ResumableCacheEntry;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
+public final class io/github/jan/supabase/storage/resumable/SettingsResumableCacheKt {
+	public static final fun createDefaultResumableCache ()Lio/github/jan/supabase/storage/resumable/ResumableCache;
+}
+
+public final class io/github/jan/supabase/storage/vectors/DistanceMetric : java/lang/Enum {
+	public static final field COSINE Lio/github/jan/supabase/storage/vectors/DistanceMetric;
+	public static final field DOTPRODUCT Lio/github/jan/supabase/storage/vectors/DistanceMetric;
+	public static final field EUCLIDEAN Lio/github/jan/supabase/storage/vectors/DistanceMetric;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public final fun getValue ()Ljava/lang/String;
+	public static fun valueOf (Ljava/lang/String;)Lio/github/jan/supabase/storage/vectors/DistanceMetric;
+	public static fun values ()[Lio/github/jan/supabase/storage/vectors/DistanceMetric;
+}
+
+public abstract interface class io/github/jan/supabase/storage/vectors/StorageVectorsClient {
+	public abstract fun createBucket (Ljava/lang/String;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun deleteBucket (Ljava/lang/String;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun from (Ljava/lang/String;)Lio/github/jan/supabase/storage/vectors/index/VectorIndexApi;
+	public abstract fun getBucket (Ljava/lang/String;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun listBuckets (Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static synthetic fun listBuckets$default (Lio/github/jan/supabase/storage/vectors/StorageVectorsClient;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+}
+
+public final class io/github/jan/supabase/storage/vectors/StorageVectorsClient$DefaultImpls {
+	public static synthetic fun listBuckets$default (Lio/github/jan/supabase/storage/vectors/StorageVectorsClient;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+}
+
+public final class io/github/jan/supabase/storage/vectors/bucket/EncryptionConfiguration {
+	public fun <init> ()V
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;)V
+	public synthetic fun <init> (Ljava/lang/String;Ljava/lang/String;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Ljava/lang/String;
+	public final fun copy (Ljava/lang/String;Ljava/lang/String;)Lio/github/jan/supabase/storage/vectors/bucket/EncryptionConfiguration;
+	public static synthetic fun copy$default (Lio/github/jan/supabase/storage/vectors/bucket/EncryptionConfiguration;Ljava/lang/String;Ljava/lang/String;ILjava/lang/Object;)Lio/github/jan/supabase/storage/vectors/bucket/EncryptionConfiguration;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getKmsKeyArn ()Ljava/lang/String;
+	public final fun getSseType ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/jan/supabase/storage/vectors/bucket/ListVectorBucketsResponse {
+	public fun <init> (Lkotlinx/serialization/json/JsonArray;Ljava/lang/String;)V
+	public synthetic fun <init> (Lkotlinx/serialization/json/JsonArray;Ljava/lang/String;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component2 ()Ljava/lang/String;
+	public final fun copy (Lkotlinx/serialization/json/JsonArray;Ljava/lang/String;)Lio/github/jan/supabase/storage/vectors/bucket/ListVectorBucketsResponse;
+	public static synthetic fun copy$default (Lio/github/jan/supabase/storage/vectors/bucket/ListVectorBucketsResponse;Lkotlinx/serialization/json/JsonArray;Ljava/lang/String;ILjava/lang/Object;)Lio/github/jan/supabase/storage/vectors/bucket/ListVectorBucketsResponse;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getNextToken ()Ljava/lang/String;
+	public final fun getVectorBuckets ()Ljava/util/List;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/jan/supabase/storage/vectors/bucket/VectorBucket {
+	public fun <init> (Ljava/lang/String;Lkotlin/time/Instant;Lio/github/jan/supabase/storage/vectors/bucket/EncryptionConfiguration;)V
+	public synthetic fun <init> (Ljava/lang/String;Lkotlin/time/Instant;Lio/github/jan/supabase/storage/vectors/bucket/EncryptionConfiguration;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Lkotlin/time/Instant;
+	public final fun component3 ()Lio/github/jan/supabase/storage/vectors/bucket/EncryptionConfiguration;
+	public final fun copy (Ljava/lang/String;Lkotlin/time/Instant;Lio/github/jan/supabase/storage/vectors/bucket/EncryptionConfiguration;)Lio/github/jan/supabase/storage/vectors/bucket/VectorBucket;
+	public static synthetic fun copy$default (Lio/github/jan/supabase/storage/vectors/bucket/VectorBucket;Ljava/lang/String;Lkotlin/time/Instant;Lio/github/jan/supabase/storage/vectors/bucket/EncryptionConfiguration;ILjava/lang/Object;)Lio/github/jan/supabase/storage/vectors/bucket/VectorBucket;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getCreationTime ()Lkotlin/time/Instant;
+	public final fun getEncryptionConfiguration ()Lio/github/jan/supabase/storage/vectors/bucket/EncryptionConfiguration;
+	public final fun getVectorBucketName ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/jan/supabase/storage/vectors/bucket/VectorBucketFilter {
+	public fun <init> ()V
+	public final fun getMaxResults ()Ljava/lang/Integer;
+	public final fun getNextToken ()Ljava/lang/String;
+	public final fun getPrefix ()Ljava/lang/String;
+	public final fun setMaxResults (Ljava/lang/Integer;)V
+	public final fun setNextToken (Ljava/lang/String;)V
+	public final fun setPrefix (Ljava/lang/String;)V
+}
+
+public final class io/github/jan/supabase/storage/vectors/data/GetVectorOptions {
+	public static final field Companion Lio/github/jan/supabase/storage/vectors/data/GetVectorOptions$Companion;
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;)V
+	public final fun getIndexName ()Ljava/lang/String;
+	public final fun getKeys ()Ljava/util/List;
+	public final fun getReturnData ()Ljava/lang/Boolean;
+	public final fun getReturnMetadata ()Ljava/lang/Boolean;
+	public final fun getVectorBucketName ()Ljava/lang/String;
+	public final fun setReturnData (Ljava/lang/Boolean;)V
+	public final fun setReturnMetadata (Ljava/lang/Boolean;)V
+}
+
+public final synthetic class io/github/jan/supabase/storage/vectors/data/GetVectorOptions$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lio/github/jan/supabase/storage/vectors/data/GetVectorOptions$$serializer;
+	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public final fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lio/github/jan/supabase/storage/vectors/data/GetVectorOptions;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public final fun serialize (Lkotlinx/serialization/encoding/Encoder;Lio/github/jan/supabase/storage/vectors/data/GetVectorOptions;)V
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
+public final class io/github/jan/supabase/storage/vectors/data/GetVectorOptions$Companion {
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
+}
+
+public final class io/github/jan/supabase/storage/vectors/data/ListVectorsOptions {
+	public static final field Companion Lio/github/jan/supabase/storage/vectors/data/ListVectorsOptions$Companion;
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;)V
+	public final fun getIndexName ()Ljava/lang/String;
+	public final fun getMaxResults ()Ljava/lang/Integer;
+	public final fun getNextToken ()Ljava/lang/String;
+	public final fun getReturnData ()Ljava/lang/Boolean;
+	public final fun getReturnMetadata ()Ljava/lang/Boolean;
+	public final fun getSegmentCount ()Ljava/lang/Integer;
+	public final fun getSegmentIndex ()Ljava/lang/Integer;
+	public final fun getVectorBucketName ()Ljava/lang/String;
+	public final fun setMaxResults (Ljava/lang/Integer;)V
+	public final fun setNextToken (Ljava/lang/String;)V
+	public final fun setReturnData (Ljava/lang/Boolean;)V
+	public final fun setReturnMetadata (Ljava/lang/Boolean;)V
+	public final fun setSegmentCount (Ljava/lang/Integer;)V
+	public final fun setSegmentIndex (Ljava/lang/Integer;)V
+}
+
+public final synthetic class io/github/jan/supabase/storage/vectors/data/ListVectorsOptions$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lio/github/jan/supabase/storage/vectors/data/ListVectorsOptions$$serializer;
+	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public final fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lio/github/jan/supabase/storage/vectors/data/ListVectorsOptions;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public final fun serialize (Lkotlinx/serialization/encoding/Encoder;Lio/github/jan/supabase/storage/vectors/data/ListVectorsOptions;)V
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
+public final class io/github/jan/supabase/storage/vectors/data/ListVectorsOptions$Companion {
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
+}
+
+public final class io/github/jan/supabase/storage/vectors/data/ListVectorsResponse {
+	public static final field Companion Lio/github/jan/supabase/storage/vectors/data/ListVectorsResponse$Companion;
+	public fun <init> (Ljava/util/List;Ljava/lang/String;)V
+	public synthetic fun <init> (Ljava/util/List;Ljava/lang/String;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1 ()Ljava/util/List;
+	public final fun component2 ()Ljava/lang/String;
+	public final fun copy (Ljava/util/List;Ljava/lang/String;)Lio/github/jan/supabase/storage/vectors/data/ListVectorsResponse;
+	public static synthetic fun copy$default (Lio/github/jan/supabase/storage/vectors/data/ListVectorsResponse;Ljava/util/List;Ljava/lang/String;ILjava/lang/Object;)Lio/github/jan/supabase/storage/vectors/data/ListVectorsResponse;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getNextToken ()Ljava/lang/String;
+	public final fun getVectors ()Ljava/util/List;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final synthetic class io/github/jan/supabase/storage/vectors/data/ListVectorsResponse$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lio/github/jan/supabase/storage/vectors/data/ListVectorsResponse$$serializer;
+	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public final fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lio/github/jan/supabase/storage/vectors/data/ListVectorsResponse;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public final fun serialize (Lkotlinx/serialization/encoding/Encoder;Lio/github/jan/supabase/storage/vectors/data/ListVectorsResponse;)V
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
+public final class io/github/jan/supabase/storage/vectors/data/ListVectorsResponse$Companion {
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
+}
+
+public final class io/github/jan/supabase/storage/vectors/data/QueryVectorsOptions {
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;)V
+	public final fun getFilter ()Lkotlinx/serialization/json/JsonObject;
+	public final fun getIndexName ()Ljava/lang/String;
+	public final fun getQueryVector ()Lio/github/jan/supabase/storage/vectors/data/VectorData;
+	public final fun getReturnDistance ()Ljava/lang/Boolean;
+	public final fun getReturnMetadata ()Ljava/lang/Boolean;
+	public final fun getTopK ()Ljava/lang/Integer;
+	public final fun getVectorBucketName ()Ljava/lang/String;
+	public final fun setFilter (Lkotlinx/serialization/json/JsonObject;)V
+	public final fun setQueryVector (Lio/github/jan/supabase/storage/vectors/data/VectorData;)V
+	public final fun setReturnDistance (Ljava/lang/Boolean;)V
+	public final fun setReturnMetadata (Ljava/lang/Boolean;)V
+	public final fun setTopK (Ljava/lang/Integer;)V
+}
+
+public final class io/github/jan/supabase/storage/vectors/data/QueryVectorsResponse {
+	public static final field Companion Lio/github/jan/supabase/storage/vectors/data/QueryVectorsResponse$Companion;
+	public fun <init> (Ljava/util/List;Lio/github/jan/supabase/storage/vectors/DistanceMetric;)V
+	public synthetic fun <init> (Ljava/util/List;Lio/github/jan/supabase/storage/vectors/DistanceMetric;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun getDistanceMetric ()Lio/github/jan/supabase/storage/vectors/DistanceMetric;
+	public final fun getVectors ()Ljava/util/List;
+}
+
+public final synthetic class io/github/jan/supabase/storage/vectors/data/QueryVectorsResponse$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lio/github/jan/supabase/storage/vectors/data/QueryVectorsResponse$$serializer;
+	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public final fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lio/github/jan/supabase/storage/vectors/data/QueryVectorsResponse;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public final fun serialize (Lkotlinx/serialization/encoding/Encoder;Lio/github/jan/supabase/storage/vectors/data/QueryVectorsResponse;)V
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
+public final class io/github/jan/supabase/storage/vectors/data/QueryVectorsResponse$Companion {
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
+}
+
+public final class io/github/jan/supabase/storage/vectors/data/VectorData {
+	public static final field Companion Lio/github/jan/supabase/storage/vectors/data/VectorData$Companion;
+	public fun <init> ([F)V
+	public final fun getFloat32 ()[F
+}
+
+public final synthetic class io/github/jan/supabase/storage/vectors/data/VectorData$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lio/github/jan/supabase/storage/vectors/data/VectorData$$serializer;
+	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public final fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lio/github/jan/supabase/storage/vectors/data/VectorData;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public final fun serialize (Lkotlinx/serialization/encoding/Encoder;Lio/github/jan/supabase/storage/vectors/data/VectorData;)V
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
+public final class io/github/jan/supabase/storage/vectors/data/VectorData$Companion {
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
+}
+
+public abstract interface class io/github/jan/supabase/storage/vectors/data/VectorDataApi {
+	public static final field Companion Lio/github/jan/supabase/storage/vectors/data/VectorDataApi$Companion;
+	public abstract fun deleteVectors (Ljava/util/List;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun getVectors (Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun listVectors (Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static synthetic fun listVectors$default (Lio/github/jan/supabase/storage/vectors/data/VectorDataApi;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public abstract fun putVectors (Ljava/util/List;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun queryVectors (Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
+public final class io/github/jan/supabase/storage/vectors/data/VectorDataApi$Companion {
+	public final fun getSEGMENT_COUNT_RANGE ()Lkotlin/ranges/IntRange;
+	public final fun getVECTOR_RANGE ()Lkotlin/ranges/IntRange;
+}
+
+public final class io/github/jan/supabase/storage/vectors/data/VectorDataApi$DefaultImpls {
+	public static synthetic fun listVectors$default (Lio/github/jan/supabase/storage/vectors/data/VectorDataApi;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+}
+
+public final class io/github/jan/supabase/storage/vectors/data/VectorMatch {
+	public static final field Companion Lio/github/jan/supabase/storage/vectors/data/VectorMatch$Companion;
+	public fun <init> (Ljava/lang/String;Lio/github/jan/supabase/storage/vectors/data/VectorData;Lkotlinx/serialization/json/JsonObject;Ljava/lang/Integer;)V
+	public synthetic fun <init> (Ljava/lang/String;Lio/github/jan/supabase/storage/vectors/data/VectorData;Lkotlinx/serialization/json/JsonObject;Ljava/lang/Integer;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Lio/github/jan/supabase/storage/vectors/data/VectorData;
+	public final fun component3 ()Lkotlinx/serialization/json/JsonObject;
+	public final fun component4 ()Ljava/lang/Integer;
+	public final fun copy (Ljava/lang/String;Lio/github/jan/supabase/storage/vectors/data/VectorData;Lkotlinx/serialization/json/JsonObject;Ljava/lang/Integer;)Lio/github/jan/supabase/storage/vectors/data/VectorMatch;
+	public static synthetic fun copy$default (Lio/github/jan/supabase/storage/vectors/data/VectorMatch;Ljava/lang/String;Lio/github/jan/supabase/storage/vectors/data/VectorData;Lkotlinx/serialization/json/JsonObject;Ljava/lang/Integer;ILjava/lang/Object;)Lio/github/jan/supabase/storage/vectors/data/VectorMatch;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getData ()Lio/github/jan/supabase/storage/vectors/data/VectorData;
+	public final fun getDistance ()Ljava/lang/Integer;
+	public final fun getKey ()Ljava/lang/String;
+	public final fun getMetadata ()Lkotlinx/serialization/json/JsonObject;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final synthetic class io/github/jan/supabase/storage/vectors/data/VectorMatch$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lio/github/jan/supabase/storage/vectors/data/VectorMatch$$serializer;
+	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public final fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lio/github/jan/supabase/storage/vectors/data/VectorMatch;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public final fun serialize (Lkotlinx/serialization/encoding/Encoder;Lio/github/jan/supabase/storage/vectors/data/VectorMatch;)V
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
+public final class io/github/jan/supabase/storage/vectors/data/VectorMatch$Companion {
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
+}
+
+public final class io/github/jan/supabase/storage/vectors/data/VectorObject {
+	public static final field Companion Lio/github/jan/supabase/storage/vectors/data/VectorObject$Companion;
+	public fun <init> (Ljava/lang/String;Lio/github/jan/supabase/storage/vectors/data/VectorData;Lkotlinx/serialization/json/JsonObject;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Lio/github/jan/supabase/storage/vectors/data/VectorData;
+	public final fun component3 ()Lkotlinx/serialization/json/JsonObject;
+	public final fun copy (Ljava/lang/String;Lio/github/jan/supabase/storage/vectors/data/VectorData;Lkotlinx/serialization/json/JsonObject;)Lio/github/jan/supabase/storage/vectors/data/VectorObject;
+	public static synthetic fun copy$default (Lio/github/jan/supabase/storage/vectors/data/VectorObject;Ljava/lang/String;Lio/github/jan/supabase/storage/vectors/data/VectorData;Lkotlinx/serialization/json/JsonObject;ILjava/lang/Object;)Lio/github/jan/supabase/storage/vectors/data/VectorObject;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getData ()Lio/github/jan/supabase/storage/vectors/data/VectorData;
+	public final fun getKey ()Ljava/lang/String;
+	public final fun getMetadata ()Lkotlinx/serialization/json/JsonObject;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final synthetic class io/github/jan/supabase/storage/vectors/data/VectorObject$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lio/github/jan/supabase/storage/vectors/data/VectorObject$$serializer;
+	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public final fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lio/github/jan/supabase/storage/vectors/data/VectorObject;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public final fun serialize (Lkotlinx/serialization/encoding/Encoder;Lio/github/jan/supabase/storage/vectors/data/VectorObject;)V
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
+public final class io/github/jan/supabase/storage/vectors/data/VectorObject$Companion {
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
+}
+
+public final class io/github/jan/supabase/storage/vectors/index/CreateIndexOptions {
+	public fun <init> (Ljava/lang/String;)V
+	public final fun getDataType ()Lio/github/jan/supabase/storage/vectors/index/VectorDataType;
+	public final fun getDimension ()I
+	public final fun getDistanceMetric ()Lio/github/jan/supabase/storage/vectors/DistanceMetric;
+	public final fun getIndexName ()Ljava/lang/String;
+	public final fun getMetadataConfiguration ()Lio/github/jan/supabase/storage/vectors/index/MetadataConfiguration;
+	public final fun getVectorBucketName ()Ljava/lang/String;
+	public final fun setDataType (Lio/github/jan/supabase/storage/vectors/index/VectorDataType;)V
+	public final fun setDimension (I)V
+	public final fun setDistanceMetric (Lio/github/jan/supabase/storage/vectors/DistanceMetric;)V
+	public final fun setIndexName (Ljava/lang/String;)V
+	public final fun setMetadataConfiguration (Lio/github/jan/supabase/storage/vectors/index/MetadataConfiguration;)V
+}
+
+public final class io/github/jan/supabase/storage/vectors/index/ListIndexesOptions {
+	public fun <init> (Ljava/lang/String;)V
+	public final fun getMaxResults ()Ljava/lang/Integer;
+	public final fun getNextToken ()Ljava/lang/String;
+	public final fun getPrefix ()Ljava/lang/String;
+	public final fun getVectorBucketName ()Ljava/lang/String;
+	public final fun setMaxResults (Ljava/lang/Integer;)V
+	public final fun setNextToken (Ljava/lang/String;)V
+	public final fun setPrefix (Ljava/lang/String;)V
+}
+
+public final class io/github/jan/supabase/storage/vectors/index/ListIndexesResponse {
+	public static final field Companion Lio/github/jan/supabase/storage/vectors/index/ListIndexesResponse$Companion;
+	public fun <init> (Lkotlinx/serialization/json/JsonArray;Ljava/lang/String;)V
+	public synthetic fun <init> (Lkotlinx/serialization/json/JsonArray;Ljava/lang/String;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component2 ()Ljava/lang/String;
+	public final fun copy (Lkotlinx/serialization/json/JsonArray;Ljava/lang/String;)Lio/github/jan/supabase/storage/vectors/index/ListIndexesResponse;
+	public static synthetic fun copy$default (Lio/github/jan/supabase/storage/vectors/index/ListIndexesResponse;Lkotlinx/serialization/json/JsonArray;Ljava/lang/String;ILjava/lang/Object;)Lio/github/jan/supabase/storage/vectors/index/ListIndexesResponse;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getIndexes ()Ljava/util/List;
+	public final fun getNextToken ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final synthetic class io/github/jan/supabase/storage/vectors/index/ListIndexesResponse$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lio/github/jan/supabase/storage/vectors/index/ListIndexesResponse$$serializer;
+	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public final fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lio/github/jan/supabase/storage/vectors/index/ListIndexesResponse;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public final fun serialize (Lkotlinx/serialization/encoding/Encoder;Lio/github/jan/supabase/storage/vectors/index/ListIndexesResponse;)V
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
+public final class io/github/jan/supabase/storage/vectors/index/ListIndexesResponse$Companion {
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
+}
+
+public final class io/github/jan/supabase/storage/vectors/index/MetadataConfiguration {
+	public static final field Companion Lio/github/jan/supabase/storage/vectors/index/MetadataConfiguration$Companion;
+	public fun <init> ()V
+	public fun <init> (Ljava/util/List;)V
+	public synthetic fun <init> (Ljava/util/List;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun getNonFilterableMetadataKeys ()Ljava/util/List;
+}
+
+public final synthetic class io/github/jan/supabase/storage/vectors/index/MetadataConfiguration$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lio/github/jan/supabase/storage/vectors/index/MetadataConfiguration$$serializer;
+	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public final fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lio/github/jan/supabase/storage/vectors/index/MetadataConfiguration;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public final fun serialize (Lkotlinx/serialization/encoding/Encoder;Lio/github/jan/supabase/storage/vectors/index/MetadataConfiguration;)V
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
+public final class io/github/jan/supabase/storage/vectors/index/MetadataConfiguration$Companion {
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
+}
+
+public final class io/github/jan/supabase/storage/vectors/index/VectorDataType : java/lang/Enum {
+	public static final field FLOAT32 Lio/github/jan/supabase/storage/vectors/index/VectorDataType;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public final fun getValue ()Ljava/lang/String;
+	public static fun valueOf (Ljava/lang/String;)Lio/github/jan/supabase/storage/vectors/index/VectorDataType;
+	public static fun values ()[Lio/github/jan/supabase/storage/vectors/index/VectorDataType;
+}
+
+public final class io/github/jan/supabase/storage/vectors/index/VectorIndex {
+	public static final field Companion Lio/github/jan/supabase/storage/vectors/index/VectorIndex$Companion;
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;Lio/github/jan/supabase/storage/vectors/index/VectorDataType;ILio/github/jan/supabase/storage/vectors/DistanceMetric;Lio/github/jan/supabase/storage/vectors/index/MetadataConfiguration;Lkotlin/time/Instant;)V
+	public synthetic fun <init> (Ljava/lang/String;Ljava/lang/String;Lio/github/jan/supabase/storage/vectors/index/VectorDataType;ILio/github/jan/supabase/storage/vectors/DistanceMetric;Lio/github/jan/supabase/storage/vectors/index/MetadataConfiguration;Lkotlin/time/Instant;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Ljava/lang/String;
+	public final fun component3 ()Lio/github/jan/supabase/storage/vectors/index/VectorDataType;
+	public final fun component4 ()I
+	public final fun component5 ()Lio/github/jan/supabase/storage/vectors/DistanceMetric;
+	public final fun component6 ()Lio/github/jan/supabase/storage/vectors/index/MetadataConfiguration;
+	public final fun copy (Ljava/lang/String;Ljava/lang/String;Lio/github/jan/supabase/storage/vectors/index/VectorDataType;ILio/github/jan/supabase/storage/vectors/DistanceMetric;Lio/github/jan/supabase/storage/vectors/index/MetadataConfiguration;Lkotlin/time/Instant;)Lio/github/jan/supabase/storage/vectors/index/VectorIndex;
+	public static synthetic fun copy$default (Lio/github/jan/supabase/storage/vectors/index/VectorIndex;Ljava/lang/String;Ljava/lang/String;Lio/github/jan/supabase/storage/vectors/index/VectorDataType;ILio/github/jan/supabase/storage/vectors/DistanceMetric;Lio/github/jan/supabase/storage/vectors/index/MetadataConfiguration;Lkotlin/time/Instant;ILjava/lang/Object;)Lio/github/jan/supabase/storage/vectors/index/VectorIndex;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getDataType ()Lio/github/jan/supabase/storage/vectors/index/VectorDataType;
+	public final fun getDimension ()I
+	public final fun getDistanceMetric ()Lio/github/jan/supabase/storage/vectors/DistanceMetric;
+	public final fun getIndexName ()Ljava/lang/String;
+	public final fun getMetadataConfiguration ()Lio/github/jan/supabase/storage/vectors/index/MetadataConfiguration;
+	public final fun getVectorBucketName ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final synthetic class io/github/jan/supabase/storage/vectors/index/VectorIndex$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lio/github/jan/supabase/storage/vectors/index/VectorIndex$$serializer;
+	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public final fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lio/github/jan/supabase/storage/vectors/index/VectorIndex;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public final fun serialize (Lkotlinx/serialization/encoding/Encoder;Lio/github/jan/supabase/storage/vectors/index/VectorIndex;)V
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
+public final class io/github/jan/supabase/storage/vectors/index/VectorIndex$Companion {
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
+}
+
+public abstract interface class io/github/jan/supabase/storage/vectors/index/VectorIndexApi {
+	public abstract fun createIndex (Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun deleteIndex (Ljava/lang/String;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun getIndex (Ljava/lang/String;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun index (Ljava/lang/String;)Lio/github/jan/supabase/storage/vectors/data/VectorDataApi;
+	public abstract fun listIndexes (Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static synthetic fun listIndexes$default (Lio/github/jan/supabase/storage/vectors/index/VectorIndexApi;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+}
+
+public final class io/github/jan/supabase/storage/vectors/index/VectorIndexApi$DefaultImpls {
+	public static synthetic fun listIndexes$default (Lio/github/jan/supabase/storage/vectors/index/VectorIndexApi;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+}
+

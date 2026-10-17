@@ -1,0 +1,460 @@
+public final class io/github/jan/supabase/postgrest/GetColumnNameKt {
+	public static final fun getSerialName (Lkotlin/reflect/KProperty1;)Ljava/lang/String;
+}
+
+public abstract interface class io/github/jan/supabase/postgrest/Postgrest : io/github/jan/supabase/plugins/CustomSerializationPlugin, io/github/jan/supabase/plugins/MainPlugin {
+	public static final field API_VERSION I
+	public static final field Companion Lio/github/jan/supabase/postgrest/Postgrest$Companion;
+	public static final field LOGGING_TAG Ljava/lang/String;
+	public abstract fun from (Ljava/lang/String;)Lio/github/jan/supabase/postgrest/query/PostgrestQueryBuilder;
+	public abstract fun from (Ljava/lang/String;Ljava/lang/String;)Lio/github/jan/supabase/postgrest/query/PostgrestQueryBuilder;
+	public fun get (Ljava/lang/String;)Lio/github/jan/supabase/postgrest/query/PostgrestQueryBuilder;
+	public fun get (Ljava/lang/String;Ljava/lang/String;)Lio/github/jan/supabase/postgrest/query/PostgrestQueryBuilder;
+	public abstract fun rpc (Ljava/lang/String;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public abstract fun rpc (Ljava/lang/String;Lkotlinx/serialization/json/JsonObject;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static synthetic fun rpc$default (Lio/github/jan/supabase/postgrest/Postgrest;Ljava/lang/String;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public static synthetic fun rpc$default (Lio/github/jan/supabase/postgrest/Postgrest;Ljava/lang/String;Lkotlinx/serialization/json/JsonObject;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+}
+
+public final class io/github/jan/supabase/postgrest/Postgrest$Companion : io/github/jan/supabase/plugins/SupabasePluginProvider {
+	public static final field API_VERSION I
+	public static final field LOGGING_TAG Ljava/lang/String;
+	public fun create (Lio/github/jan/supabase/SupabaseClient;Lio/github/jan/supabase/postgrest/Postgrest$Config;)Lio/github/jan/supabase/postgrest/Postgrest;
+	public synthetic fun create (Lio/github/jan/supabase/SupabaseClient;Ljava/lang/Object;)Lio/github/jan/supabase/plugins/SupabasePlugin;
+	public fun createConfig (Lkotlin/jvm/functions/Function1;)Lio/github/jan/supabase/postgrest/Postgrest$Config;
+	public synthetic fun createConfig (Lkotlin/jvm/functions/Function1;)Ljava/lang/Object;
+	public fun getKey ()Ljava/lang/String;
+	public fun setup (Lio/github/jan/supabase/SupabaseClientBuilder;Lio/github/jan/supabase/postgrest/Postgrest$Config;)V
+	public synthetic fun setup (Lio/github/jan/supabase/SupabaseClientBuilder;Ljava/lang/Object;)V
+}
+
+public final class io/github/jan/supabase/postgrest/Postgrest$Config : io/github/jan/supabase/plugins/MainConfig, io/github/jan/supabase/auth/AuthDependentPluginConfig, io/github/jan/supabase/plugins/CustomSerializationConfig {
+	public synthetic fun <init> (Ljava/lang/String;Lio/github/jan/supabase/postgrest/PropertyConversionMethod;ZIJIILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public synthetic fun <init> (Ljava/lang/String;Lio/github/jan/supabase/postgrest/PropertyConversionMethod;ZIJILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Lio/github/jan/supabase/postgrest/PropertyConversionMethod;
+	public final fun component3 ()Z
+	public final fun component4 ()I
+	public final fun component5-UwyO8pc ()J
+	public final fun component6 ()I
+	public final fun copy-myKFqkg (Ljava/lang/String;Lio/github/jan/supabase/postgrest/PropertyConversionMethod;ZIJI)Lio/github/jan/supabase/postgrest/Postgrest$Config;
+	public static synthetic fun copy-myKFqkg$default (Lio/github/jan/supabase/postgrest/Postgrest$Config;Ljava/lang/String;Lio/github/jan/supabase/postgrest/PropertyConversionMethod;ZIJIILjava/lang/Object;)Lio/github/jan/supabase/postgrest/Postgrest$Config;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getDefaultSchema ()Ljava/lang/String;
+	public final fun getMaxRetries ()I
+	public final fun getPropertyConversionMethod ()Lio/github/jan/supabase/postgrest/PropertyConversionMethod;
+	public fun getRequireValidSession ()Z
+	public fun getSerializer ()Lio/github/jan/supabase/SupabaseSerializer;
+	public final fun getTimeout-UwyO8pc ()J
+	public final fun getUrlLengthLimit ()I
+	public fun hashCode ()I
+	public final fun setDefaultSchema (Ljava/lang/String;)V
+	public final fun setMaxRetries (I)V
+	public final fun setPropertyConversionMethod (Lio/github/jan/supabase/postgrest/PropertyConversionMethod;)V
+	public fun setRequireValidSession (Z)V
+	public fun setSerializer (Lio/github/jan/supabase/SupabaseSerializer;)V
+	public final fun setTimeout-LRDsOJo (J)V
+	public final fun setUrlLengthLimit (I)V
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/jan/supabase/postgrest/Postgrest$DefaultImpls {
+	public static fun close (Lio/github/jan/supabase/postgrest/Postgrest;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static fun get (Lio/github/jan/supabase/postgrest/Postgrest;Ljava/lang/String;)Lio/github/jan/supabase/postgrest/query/PostgrestQueryBuilder;
+	public static fun get (Lio/github/jan/supabase/postgrest/Postgrest;Ljava/lang/String;Ljava/lang/String;)Lio/github/jan/supabase/postgrest/query/PostgrestQueryBuilder;
+	public static fun init (Lio/github/jan/supabase/postgrest/Postgrest;)V
+	public static fun resolveUrl (Lio/github/jan/supabase/postgrest/Postgrest;Ljava/lang/String;)Ljava/lang/String;
+	public static synthetic fun rpc$default (Lio/github/jan/supabase/postgrest/Postgrest;Ljava/lang/String;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public static synthetic fun rpc$default (Lio/github/jan/supabase/postgrest/Postgrest;Ljava/lang/String;Lkotlinx/serialization/json/JsonObject;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+}
+
+public abstract interface annotation class io/github/jan/supabase/postgrest/PostgrestDsl : java/lang/annotation/Annotation {
+}
+
+public final class io/github/jan/supabase/postgrest/PostgrestKt {
+	public static final fun from (Lio/github/jan/supabase/SupabaseClient;Ljava/lang/String;)Lio/github/jan/supabase/postgrest/query/PostgrestQueryBuilder;
+	public static final fun from (Lio/github/jan/supabase/SupabaseClient;Ljava/lang/String;Ljava/lang/String;)Lio/github/jan/supabase/postgrest/query/PostgrestQueryBuilder;
+	public static final fun getPostgrest (Lio/github/jan/supabase/SupabaseClient;)Lio/github/jan/supabase/postgrest/Postgrest;
+}
+
+public abstract interface class io/github/jan/supabase/postgrest/PropertyConversionMethod {
+	public static final field Companion Lio/github/jan/supabase/postgrest/PropertyConversionMethod$Companion;
+	public abstract fun invoke (Lkotlin/reflect/KProperty1;)Ljava/lang/String;
+}
+
+public final class io/github/jan/supabase/postgrest/PropertyConversionMethod$Companion {
+	public final fun getCAMEL_CASE_TO_SNAKE_CASE ()Lio/github/jan/supabase/postgrest/PropertyConversionMethod;
+	public final fun getNONE ()Lio/github/jan/supabase/postgrest/PropertyConversionMethod;
+	public final fun getSERIAL_NAME ()Lio/github/jan/supabase/postgrest/PropertyConversionMethod;
+}
+
+public final class io/github/jan/supabase/postgrest/RpcMethod : java/lang/Enum {
+	public static final field GET Lio/github/jan/supabase/postgrest/RpcMethod;
+	public static final field HEAD Lio/github/jan/supabase/postgrest/RpcMethod;
+	public static final field POST Lio/github/jan/supabase/postgrest/RpcMethod;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public final fun getHttpMethod ()Lio/ktor/http/HttpMethod;
+	public static fun valueOf (Ljava/lang/String;)Lio/github/jan/supabase/postgrest/RpcMethod;
+	public static fun values ()[Lio/github/jan/supabase/postgrest/RpcMethod;
+}
+
+public final class io/github/jan/supabase/postgrest/UtilsKt {
+	public static final fun mapToFirstValue (Ljava/util/Map;)Ljava/util/Map;
+}
+
+public final class io/github/jan/supabase/postgrest/exception/PostgrestRestException : io/github/jan/supabase/exceptions/RestException {
+	public fun <init> (Ljava/lang/String;Ljava/lang/String;Lkotlinx/serialization/json/JsonElement;Ljava/lang/String;Lio/ktor/client/statement/HttpResponse;)V
+	public final fun getCode ()Ljava/lang/String;
+	public final fun getDetails ()Lkotlinx/serialization/json/JsonElement;
+	public final fun getHint ()Ljava/lang/String;
+}
+
+public abstract interface class io/github/jan/supabase/postgrest/executor/RequestExecutor {
+	public abstract fun execute (Lio/github/jan/supabase/postgrest/Postgrest;Ljava/lang/String;Lio/github/jan/supabase/postgrest/query/PostgrestRequestBuilder;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+}
+
+public final class io/github/jan/supabase/postgrest/executor/RestRequestExecutor : io/github/jan/supabase/postgrest/executor/RequestExecutor {
+	public static final field INSTANCE Lio/github/jan/supabase/postgrest/executor/RestRequestExecutor;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun execute (Lio/github/jan/supabase/postgrest/Postgrest;Ljava/lang/String;Lio/github/jan/supabase/postgrest/query/PostgrestRequestBuilder;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/jan/supabase/postgrest/query/Columns {
+	public static final field Companion Lio/github/jan/supabase/postgrest/query/Columns$Companion;
+	public static final synthetic fun box-impl (Ljava/lang/String;)Lio/github/jan/supabase/postgrest/query/Columns;
+	public static fun constructor-impl (Ljava/lang/String;)Ljava/lang/String;
+	public fun equals (Ljava/lang/Object;)Z
+	public static fun equals-impl (Ljava/lang/String;Ljava/lang/Object;)Z
+	public static final fun equals-impl0 (Ljava/lang/String;Ljava/lang/String;)Z
+	public final fun getValue ()Ljava/lang/String;
+	public fun hashCode ()I
+	public static fun hashCode-impl (Ljava/lang/String;)I
+	public fun toString ()Ljava/lang/String;
+	public static fun toString-impl (Ljava/lang/String;)Ljava/lang/String;
+	public final synthetic fun unbox-impl ()Ljava/lang/String;
+}
+
+public final class io/github/jan/supabase/postgrest/query/Columns$Companion {
+	public final fun getALL-U9NzzuM ()Ljava/lang/String;
+	public final fun list-Y7uY_Gg (Ljava/util/List;)Ljava/lang/String;
+	public final fun list-Y7uY_Gg ([Ljava/lang/String;)Ljava/lang/String;
+	public final fun raw-Y7uY_Gg (Ljava/lang/String;)Ljava/lang/String;
+}
+
+public final class io/github/jan/supabase/postgrest/query/Count : java/lang/Enum {
+	public static final field ESTIMATED Lio/github/jan/supabase/postgrest/query/Count;
+	public static final field EXACT Lio/github/jan/supabase/postgrest/query/Count;
+	public static final field PLANNED Lio/github/jan/supabase/postgrest/query/Count;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public final fun getIdentifier ()Ljava/lang/String;
+	public static fun valueOf (Ljava/lang/String;)Lio/github/jan/supabase/postgrest/query/Count;
+	public static fun values ()[Lio/github/jan/supabase/postgrest/query/Count;
+}
+
+public final class io/github/jan/supabase/postgrest/query/Order : java/lang/Enum {
+	public static final field ASCENDING Lio/github/jan/supabase/postgrest/query/Order;
+	public static final field DESCENDING Lio/github/jan/supabase/postgrest/query/Order;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public final fun getValue ()Ljava/lang/String;
+	public static fun valueOf (Ljava/lang/String;)Lio/github/jan/supabase/postgrest/query/Order;
+	public static fun values ()[Lio/github/jan/supabase/postgrest/query/Order;
+}
+
+public final class io/github/jan/supabase/postgrest/query/PostgrestQueryBuilder {
+	public static final field Companion Lio/github/jan/supabase/postgrest/query/PostgrestQueryBuilder$Companion;
+	public static final field HEADER_PREFER Ljava/lang/String;
+	public fun <init> (Lio/github/jan/supabase/postgrest/Postgrest;Ljava/lang/String;Ljava/lang/String;)V
+	public synthetic fun <init> (Lio/github/jan/supabase/postgrest/Postgrest;Ljava/lang/String;Ljava/lang/String;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun delete (Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static synthetic fun delete$default (Lio/github/jan/supabase/postgrest/query/PostgrestQueryBuilder;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public final fun getPostgrest ()Lio/github/jan/supabase/postgrest/Postgrest;
+	public final fun getSchema ()Ljava/lang/String;
+	public final fun getTable ()Ljava/lang/String;
+	public final fun insert (Lkotlinx/serialization/json/JsonArray;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static synthetic fun insert$default (Lio/github/jan/supabase/postgrest/query/PostgrestQueryBuilder;Lkotlinx/serialization/json/JsonArray;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public final fun select-Ao2T0zE (Ljava/lang/String;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static synthetic fun select-Ao2T0zE$default (Lio/github/jan/supabase/postgrest/query/PostgrestQueryBuilder;Ljava/lang/String;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public final fun update (Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public final fun update (Lkotlinx/serialization/json/JsonElement;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static synthetic fun update$default (Lio/github/jan/supabase/postgrest/query/PostgrestQueryBuilder;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public static synthetic fun update$default (Lio/github/jan/supabase/postgrest/query/PostgrestQueryBuilder;Lkotlinx/serialization/json/JsonElement;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+	public final fun upsert (Lkotlinx/serialization/json/JsonArray;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;)Ljava/lang/Object;
+	public static synthetic fun upsert$default (Lio/github/jan/supabase/postgrest/query/PostgrestQueryBuilder;Lkotlinx/serialization/json/JsonArray;Lkotlin/jvm/functions/Function1;Lkotlin/coroutines/Continuation;ILjava/lang/Object;)Ljava/lang/Object;
+}
+
+public final class io/github/jan/supabase/postgrest/query/PostgrestQueryBuilder$Companion {
+}
+
+public abstract class io/github/jan/supabase/postgrest/query/PostgrestRequestBuilder {
+	public fun <init> (Ljava/lang/String;Lio/github/jan/supabase/postgrest/PropertyConversionMethod;)V
+	public final fun count (Lio/github/jan/supabase/postgrest/query/Count;)V
+	public final fun csv ()V
+	public final fun dryRun ()V
+	public final fun explain (ZZZZZLjava/lang/String;)V
+	public static synthetic fun explain$default (Lio/github/jan/supabase/postgrest/query/PostgrestRequestBuilder;ZZZZZLjava/lang/String;ILjava/lang/Object;)V
+	public final fun filter (Lkotlin/jvm/functions/Function1;)V
+	public final fun geojson ()V
+	public final fun getBody ()Lkotlinx/serialization/json/JsonElement;
+	public final fun getCount ()Lio/github/jan/supabase/postgrest/query/Count;
+	public final fun getHeaders ()Lio/ktor/http/HeadersBuilder;
+	public final fun getParams ()Ljava/util/Map;
+	public final fun getPropertyConversionMethod ()Lio/github/jan/supabase/postgrest/PropertyConversionMethod;
+	public final fun getRetry ()Z
+	public final fun getReturning ()Lio/github/jan/supabase/postgrest/query/Returning;
+	public final fun getSchema ()Ljava/lang/String;
+	public final fun limit (JLjava/lang/String;)V
+	public static synthetic fun limit$default (Lio/github/jan/supabase/postgrest/query/PostgrestRequestBuilder;JLjava/lang/String;ILjava/lang/Object;)V
+	public final fun maybeSingle ()V
+	public final fun noRetry ()V
+	public final fun order (Ljava/lang/String;Lio/github/jan/supabase/postgrest/query/Order;ZLjava/lang/String;)V
+	public static synthetic fun order$default (Lio/github/jan/supabase/postgrest/query/PostgrestRequestBuilder;Ljava/lang/String;Lio/github/jan/supabase/postgrest/query/Order;ZLjava/lang/String;ILjava/lang/Object;)V
+	public final fun range (JJLjava/lang/String;)V
+	public final fun range (Lkotlin/ranges/LongRange;Ljava/lang/String;)V
+	public static synthetic fun range$default (Lio/github/jan/supabase/postgrest/query/PostgrestRequestBuilder;JJLjava/lang/String;ILjava/lang/Object;)V
+	public static synthetic fun range$default (Lio/github/jan/supabase/postgrest/query/PostgrestRequestBuilder;Lkotlin/ranges/LongRange;Ljava/lang/String;ILjava/lang/Object;)V
+	public final fun select-fYsiLaM (Ljava/lang/String;)V
+	public static synthetic fun select-fYsiLaM$default (Lio/github/jan/supabase/postgrest/query/PostgrestRequestBuilder;Ljava/lang/String;ILjava/lang/Object;)V
+	public final fun setBody (Lkotlinx/serialization/json/JsonElement;)V
+	public final fun setSchema (Ljava/lang/String;)V
+	public final fun single ()V
+	public final fun stripNulls ()V
+	protected final fun withReturning ()Ljava/util/List;
+}
+
+public final class io/github/jan/supabase/postgrest/query/PostgrestUpdate {
+	public fun <init> (Lio/github/jan/supabase/postgrest/PropertyConversionMethod;Lio/github/jan/supabase/SupabaseSerializer;)V
+	public final fun getMap ()Ljava/util/Map;
+	public final fun getPropertyConversionMethod ()Lio/github/jan/supabase/postgrest/PropertyConversionMethod;
+	public final fun getSerializer ()Lio/github/jan/supabase/SupabaseSerializer;
+	public final fun set (Ljava/lang/String;Ljava/lang/Boolean;)V
+	public final fun set (Ljava/lang/String;Ljava/lang/Double;)V
+	public final fun set (Ljava/lang/String;Ljava/lang/Float;)V
+	public final fun set (Ljava/lang/String;Ljava/lang/Integer;)V
+	public final fun set (Ljava/lang/String;Ljava/lang/Long;)V
+	public final fun set (Ljava/lang/String;Ljava/lang/String;)V
+	public final fun setTo (Lkotlin/reflect/KProperty1;Ljava/lang/Boolean;)V
+	public final fun setTo (Lkotlin/reflect/KProperty1;Ljava/lang/Double;)V
+	public final fun setTo (Lkotlin/reflect/KProperty1;Ljava/lang/Float;)V
+	public final fun setTo (Lkotlin/reflect/KProperty1;Ljava/lang/Integer;)V
+	public final fun setTo (Lkotlin/reflect/KProperty1;Ljava/lang/Long;)V
+	public final fun setTo (Lkotlin/reflect/KProperty1;Ljava/lang/String;)V
+	public final fun setToNull (Ljava/lang/String;)V
+	public final fun toJson ()Lkotlinx/serialization/json/JsonObject;
+}
+
+public final class io/github/jan/supabase/postgrest/query/PostgrestUpdateKt {
+	public static final fun buildPostgrestUpdate (Lio/github/jan/supabase/postgrest/PropertyConversionMethod;Lio/github/jan/supabase/SupabaseSerializer;Lkotlin/jvm/functions/Function1;)Lkotlinx/serialization/json/JsonObject;
+	public static synthetic fun buildPostgrestUpdate$default (Lio/github/jan/supabase/postgrest/PropertyConversionMethod;Lio/github/jan/supabase/SupabaseSerializer;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)Lkotlinx/serialization/json/JsonObject;
+}
+
+public abstract class io/github/jan/supabase/postgrest/query/Returning {
+	public synthetic fun <init> (Ljava/lang/String;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun getIdentifier ()Ljava/lang/String;
+}
+
+public final class io/github/jan/supabase/postgrest/query/Returning$Minimal : io/github/jan/supabase/postgrest/query/Returning {
+	public static final field INSTANCE Lio/github/jan/supabase/postgrest/query/Returning$Minimal;
+	public fun equals (Ljava/lang/Object;)Z
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/jan/supabase/postgrest/query/Returning$Representation : io/github/jan/supabase/postgrest/query/Returning {
+	public synthetic fun <init> (Ljava/lang/String;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public synthetic fun <init> (Ljava/lang/String;Lkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1-U9NzzuM ()Ljava/lang/String;
+	public final fun copy-fYsiLaM (Ljava/lang/String;)Lio/github/jan/supabase/postgrest/query/Returning$Representation;
+	public static synthetic fun copy-fYsiLaM$default (Lio/github/jan/supabase/postgrest/query/Returning$Representation;Ljava/lang/String;ILjava/lang/Object;)Lio/github/jan/supabase/postgrest/query/Returning$Representation;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getColumns-U9NzzuM ()Ljava/lang/String;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/jan/supabase/postgrest/query/filter/FilterOperation {
+	public fun <init> (Ljava/lang/String;Lio/github/jan/supabase/postgrest/query/filter/FilterOperator;Ljava/lang/Object;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Lio/github/jan/supabase/postgrest/query/filter/FilterOperator;
+	public final fun component3 ()Ljava/lang/Object;
+	public final fun copy (Ljava/lang/String;Lio/github/jan/supabase/postgrest/query/filter/FilterOperator;Ljava/lang/Object;)Lio/github/jan/supabase/postgrest/query/filter/FilterOperation;
+	public static synthetic fun copy$default (Lio/github/jan/supabase/postgrest/query/filter/FilterOperation;Ljava/lang/String;Lio/github/jan/supabase/postgrest/query/filter/FilterOperator;Ljava/lang/Object;ILjava/lang/Object;)Lio/github/jan/supabase/postgrest/query/filter/FilterOperation;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getColumn ()Ljava/lang/String;
+	public final fun getOperator ()Lio/github/jan/supabase/postgrest/query/filter/FilterOperator;
+	public final fun getValue ()Ljava/lang/Object;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final class io/github/jan/supabase/postgrest/query/filter/FilterOperationKt {
+	public static final fun escapedValue (Lio/github/jan/supabase/postgrest/query/filter/FilterOperation;Z)Ljava/lang/String;
+}
+
+public final class io/github/jan/supabase/postgrest/query/filter/FilterOperator : java/lang/Enum {
+	public static final field ADJ Lio/github/jan/supabase/postgrest/query/filter/FilterOperator;
+	public static final field CD Lio/github/jan/supabase/postgrest/query/filter/FilterOperator;
+	public static final field CS Lio/github/jan/supabase/postgrest/query/filter/FilterOperator;
+	public static final field EQ Lio/github/jan/supabase/postgrest/query/filter/FilterOperator;
+	public static final field FTS Lio/github/jan/supabase/postgrest/query/filter/FilterOperator;
+	public static final field GT Lio/github/jan/supabase/postgrest/query/filter/FilterOperator;
+	public static final field GTE Lio/github/jan/supabase/postgrest/query/filter/FilterOperator;
+	public static final field ILIKE Lio/github/jan/supabase/postgrest/query/filter/FilterOperator;
+	public static final field IMATCH Lio/github/jan/supabase/postgrest/query/filter/FilterOperator;
+	public static final field IN Lio/github/jan/supabase/postgrest/query/filter/FilterOperator;
+	public static final field IS Lio/github/jan/supabase/postgrest/query/filter/FilterOperator;
+	public static final field ISDISTINCT Lio/github/jan/supabase/postgrest/query/filter/FilterOperator;
+	public static final field LIKE Lio/github/jan/supabase/postgrest/query/filter/FilterOperator;
+	public static final field LT Lio/github/jan/supabase/postgrest/query/filter/FilterOperator;
+	public static final field LTE Lio/github/jan/supabase/postgrest/query/filter/FilterOperator;
+	public static final field MATCH Lio/github/jan/supabase/postgrest/query/filter/FilterOperator;
+	public static final field NEQ Lio/github/jan/supabase/postgrest/query/filter/FilterOperator;
+	public static final field NXL Lio/github/jan/supabase/postgrest/query/filter/FilterOperator;
+	public static final field NXR Lio/github/jan/supabase/postgrest/query/filter/FilterOperator;
+	public static final field OV Lio/github/jan/supabase/postgrest/query/filter/FilterOperator;
+	public static final field PHFTS Lio/github/jan/supabase/postgrest/query/filter/FilterOperator;
+	public static final field PLFTS Lio/github/jan/supabase/postgrest/query/filter/FilterOperator;
+	public static final field SL Lio/github/jan/supabase/postgrest/query/filter/FilterOperator;
+	public static final field SR Lio/github/jan/supabase/postgrest/query/filter/FilterOperator;
+	public static final field WFTS Lio/github/jan/supabase/postgrest/query/filter/FilterOperator;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public final fun getIdentifier ()Ljava/lang/String;
+	public static fun valueOf (Ljava/lang/String;)Lio/github/jan/supabase/postgrest/query/filter/FilterOperator;
+	public static fun values ()[Lio/github/jan/supabase/postgrest/query/filter/FilterOperator;
+}
+
+public final class io/github/jan/supabase/postgrest/query/filter/PostgrestFilterBuilder {
+	public fun <init> (Lio/github/jan/supabase/postgrest/PropertyConversionMethod;Ljava/util/Map;Z)V
+	public synthetic fun <init> (Lio/github/jan/supabase/postgrest/PropertyConversionMethod;Ljava/util/Map;ZILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun adjacent (Ljava/lang/String;Lkotlin/Pair;)V
+	public final fun adjacent (Lkotlin/reflect/KProperty1;Lkotlin/Pair;)V
+	public final fun and (ZLjava/lang/String;Lkotlin/jvm/functions/Function1;)V
+	public static synthetic fun and$default (Lio/github/jan/supabase/postgrest/query/filter/PostgrestFilterBuilder;ZLjava/lang/String;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)V
+	public final fun cd (Ljava/lang/String;Ljava/util/List;)V
+	public final fun contained (Ljava/lang/String;Ljava/util/List;)V
+	public final fun contained (Lkotlin/reflect/KProperty1;Ljava/util/List;)V
+	public final fun contains (Ljava/lang/String;Ljava/util/List;)V
+	public final fun contains (Lkotlin/reflect/KProperty1;Ljava/util/List;)V
+	public final fun cs (Ljava/lang/String;Ljava/util/List;)V
+	public final fun eq (Ljava/lang/String;Ljava/lang/Object;)V
+	public final fun eq (Lkotlin/reflect/KProperty1;Ljava/lang/Object;)V
+	public final fun exact (Ljava/lang/String;Ljava/lang/Boolean;)V
+	public final fun filter (Lio/github/jan/supabase/postgrest/query/filter/FilterOperation;)V
+	public final fun filter (Ljava/lang/String;Lio/github/jan/supabase/postgrest/query/filter/FilterOperator;Ljava/lang/Object;)V
+	public final fun filterNot (Lio/github/jan/supabase/postgrest/query/filter/FilterOperation;)V
+	public final fun filterNot (Ljava/lang/String;Lio/github/jan/supabase/postgrest/query/filter/FilterOperator;Ljava/lang/Object;)V
+	public final fun getParams ()Ljava/util/Map;
+	public final fun getPropertyConversionMethod ()Lio/github/jan/supabase/postgrest/PropertyConversionMethod;
+	public final fun get_params ()Ljava/util/Map;
+	public final fun gt (Ljava/lang/String;Ljava/lang/Object;)V
+	public final fun gt (Lkotlin/reflect/KProperty1;Ljava/lang/Object;)V
+	public final fun gte (Ljava/lang/String;Ljava/lang/Object;)V
+	public final fun gte (Lkotlin/reflect/KProperty1;Ljava/lang/Object;)V
+	public final fun ilike (Ljava/lang/String;Ljava/lang/String;)V
+	public final fun ilike (Lkotlin/reflect/KProperty1;Ljava/lang/String;)V
+	public final fun ilikeAll (Ljava/lang/String;Ljava/util/List;)V
+	public final fun ilikeAny (Ljava/lang/String;Ljava/util/List;)V
+	public final fun imatch (Lkotlin/reflect/KProperty1;Ljava/lang/String;)V
+	public final fun isExact (Lkotlin/reflect/KProperty1;Ljava/lang/Boolean;)V
+	public final fun isIn (Ljava/lang/String;Ljava/util/List;)V
+	public final fun isIn (Lkotlin/reflect/KProperty1;Ljava/util/List;)V
+	public final fun isInLogicalExpression ()Z
+	public final fun like (Ljava/lang/String;Ljava/lang/String;)V
+	public final fun like (Lkotlin/reflect/KProperty1;Ljava/lang/String;)V
+	public final fun likeAll (Ljava/lang/String;Ljava/util/List;)V
+	public final fun likeAny (Ljava/lang/String;Ljava/util/List;)V
+	public final fun lt (Ljava/lang/String;Ljava/lang/Object;)V
+	public final fun lt (Lkotlin/reflect/KProperty1;Ljava/lang/Object;)V
+	public final fun lte (Ljava/lang/String;Ljava/lang/Object;)V
+	public final fun lte (Lkotlin/reflect/KProperty1;Ljava/lang/Object;)V
+	public final fun match (Ljava/util/Map;)V
+	public final fun match (Lkotlin/reflect/KProperty1;Ljava/lang/String;)V
+	public final fun neq (Ljava/lang/String;Ljava/lang/Object;)V
+	public final fun neq (Lkotlin/reflect/KProperty1;Ljava/lang/Object;)V
+	public final fun notIn (Ljava/lang/String;Ljava/util/List;)V
+	public final fun notIn (Lkotlin/reflect/KProperty1;Ljava/util/List;)V
+	public final fun nxl (Ljava/lang/String;Lkotlin/Pair;)V
+	public final fun nxr (Ljava/lang/String;Lkotlin/Pair;)V
+	public final fun or (ZLjava/lang/String;Lkotlin/jvm/functions/Function1;)V
+	public static synthetic fun or$default (Lio/github/jan/supabase/postgrest/query/filter/PostgrestFilterBuilder;ZLjava/lang/String;Lkotlin/jvm/functions/Function1;ILjava/lang/Object;)V
+	public final fun ov (Ljava/lang/String;Ljava/util/List;)V
+	public final fun overlaps (Ljava/lang/String;Ljava/util/List;)V
+	public final fun overlaps (Lkotlin/reflect/KProperty1;Ljava/util/List;)V
+	public final fun rangeGt (Ljava/lang/String;Lkotlin/Pair;)V
+	public final fun rangeGt (Lkotlin/reflect/KProperty1;Lkotlin/Pair;)V
+	public final fun rangeGte (Ljava/lang/String;Lkotlin/Pair;)V
+	public final fun rangeGte (Lkotlin/reflect/KProperty1;Lkotlin/Pair;)V
+	public final fun rangeLt (Ljava/lang/String;Lkotlin/Pair;)V
+	public final fun rangeLt (Lkotlin/reflect/KProperty1;Lkotlin/Pair;)V
+	public final fun rangeLte (Ljava/lang/String;Lkotlin/Pair;)V
+	public final fun rangeLte (Lkotlin/reflect/KProperty1;Lkotlin/Pair;)V
+	public final fun regexIMatch (Ljava/lang/String;Ljava/lang/String;)V
+	public final fun regexMatch (Ljava/lang/String;Ljava/lang/String;)V
+	public final fun sl (Ljava/lang/String;Lkotlin/Pair;)V
+	public final fun sr (Ljava/lang/String;Lkotlin/Pair;)V
+	public final fun textSearch (Ljava/lang/String;Ljava/lang/String;Lio/github/jan/supabase/postgrest/query/filter/TextSearchType;Ljava/lang/String;)Lio/github/jan/supabase/postgrest/query/filter/PostgrestFilterBuilder;
+	public static synthetic fun textSearch$default (Lio/github/jan/supabase/postgrest/query/filter/PostgrestFilterBuilder;Ljava/lang/String;Ljava/lang/String;Lio/github/jan/supabase/postgrest/query/filter/TextSearchType;Ljava/lang/String;ILjava/lang/Object;)Lio/github/jan/supabase/postgrest/query/filter/PostgrestFilterBuilder;
+}
+
+public final class io/github/jan/supabase/postgrest/query/filter/PostgrestFilterBuilderKt {
+	public static final fun formatJoiningFilter (Lio/github/jan/supabase/postgrest/query/filter/PostgrestFilterBuilder;Lkotlin/jvm/functions/Function1;)Ljava/lang/String;
+}
+
+public final class io/github/jan/supabase/postgrest/query/filter/TextSearchType : java/lang/Enum {
+	public static final field NONE Lio/github/jan/supabase/postgrest/query/filter/TextSearchType;
+	public static final field PHRASETO Lio/github/jan/supabase/postgrest/query/filter/TextSearchType;
+	public static final field PLAINTO Lio/github/jan/supabase/postgrest/query/filter/TextSearchType;
+	public static final field WEBSEARCH Lio/github/jan/supabase/postgrest/query/filter/TextSearchType;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public final fun getIdentifier ()Ljava/lang/String;
+	public static fun valueOf (Ljava/lang/String;)Lio/github/jan/supabase/postgrest/query/filter/TextSearchType;
+	public static fun values ()[Lio/github/jan/supabase/postgrest/query/filter/TextSearchType;
+}
+
+public final class io/github/jan/supabase/postgrest/query/request/DeleteRequestBuilder : io/github/jan/supabase/postgrest/query/PostgrestRequestBuilder {
+	public fun <init> (Ljava/lang/String;Lio/github/jan/supabase/postgrest/PropertyConversionMethod;)V
+}
+
+public class io/github/jan/supabase/postgrest/query/request/InsertRequestBuilder : io/github/jan/supabase/postgrest/query/PostgrestRequestBuilder {
+	public fun <init> (Ljava/lang/String;Lio/github/jan/supabase/postgrest/PropertyConversionMethod;)V
+	protected final fun buildPrefer (ZZ)Ljava/util/List;
+	public final fun getDefaultToNull ()Z
+	public final fun setDefaultToNull (Z)V
+}
+
+public final class io/github/jan/supabase/postgrest/query/request/RpcRequestBuilder : io/github/jan/supabase/postgrest/query/PostgrestRequestBuilder {
+	public fun <init> (Ljava/lang/String;Lio/github/jan/supabase/postgrest/PropertyConversionMethod;)V
+	public final fun getMethod ()Lio/github/jan/supabase/postgrest/RpcMethod;
+	public final fun setMethod (Lio/github/jan/supabase/postgrest/RpcMethod;)V
+}
+
+public final class io/github/jan/supabase/postgrest/query/request/SelectRequestBuilder : io/github/jan/supabase/postgrest/query/PostgrestRequestBuilder {
+	public fun <init> (Ljava/lang/String;Lio/github/jan/supabase/postgrest/PropertyConversionMethod;)V
+	public final fun getHead ()Z
+	public final fun setHead (Z)V
+}
+
+public final class io/github/jan/supabase/postgrest/query/request/UpdateRequestBuilder : io/github/jan/supabase/postgrest/query/PostgrestRequestBuilder {
+	public fun <init> (Ljava/lang/String;Lio/github/jan/supabase/postgrest/PropertyConversionMethod;)V
+}
+
+public final class io/github/jan/supabase/postgrest/query/request/UpsertRequestBuilder : io/github/jan/supabase/postgrest/query/request/InsertRequestBuilder {
+	public fun <init> (Ljava/lang/String;Lio/github/jan/supabase/postgrest/PropertyConversionMethod;)V
+	public final fun getIgnoreDuplicates ()Z
+	public final fun getOnConflict ()Ljava/lang/String;
+	public final fun setIgnoreDuplicates (Z)V
+	public final fun setOnConflict (Ljava/lang/String;)V
+}
+
+public final class io/github/jan/supabase/postgrest/result/PostgrestResult {
+	public fun <init> (Ljava/lang/String;Lio/ktor/http/Headers;Lio/github/jan/supabase/postgrest/Postgrest;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Lio/ktor/http/Headers;
+	public final fun countOrNull ()Ljava/lang/Long;
+	public final fun getData ()Ljava/lang/String;
+	public final fun getHeaders ()Lio/ktor/http/Headers;
+	public final fun getPostgrest ()Lio/github/jan/supabase/postgrest/Postgrest;
+	public final fun rangeOrNull ()Lkotlin/ranges/LongRange;
+}
+

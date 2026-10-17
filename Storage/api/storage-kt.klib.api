@@ -1,0 +1,1448 @@
+// Klib ABI Dump
+// Targets: [iosArm64, iosSimulatorArm64, iosX64, js, linuxX64, macosArm64, macosX64, mingwX64, tvosArm64, tvosSimulatorArm64, tvosX64, wasmJs, watchosArm64, watchosSimulatorArm64, watchosX64]
+// Alias: apple => [iosArm64, iosSimulatorArm64, iosX64, macosArm64, macosX64, tvosArm64, tvosSimulatorArm64, tvosX64, watchosArm64, watchosSimulatorArm64, watchosX64]
+// Rendering settings:
+// - Signature version: 2
+// - Show manifest properties: true
+// - Show declarations: true
+
+// Library unique name: <io.github.jan-tennert.supabase:storage-kt>
+final enum class io.github.jan.supabase.storage.vectors.index/VectorDataType : kotlin/Enum<io.github.jan.supabase.storage.vectors.index/VectorDataType> { // io.github.jan.supabase.storage.vectors.index/VectorDataType|null[0]
+    enum entry FLOAT32 // io.github.jan.supabase.storage.vectors.index/VectorDataType.FLOAT32|null[0]
+
+    final val entries // io.github.jan.supabase.storage.vectors.index/VectorDataType.entries|#static{}entries[0]
+        final fun <get-entries>(): kotlin.enums/EnumEntries<io.github.jan.supabase.storage.vectors.index/VectorDataType> // io.github.jan.supabase.storage.vectors.index/VectorDataType.entries.<get-entries>|<get-entries>#static(){}[0]
+    final val value // io.github.jan.supabase.storage.vectors.index/VectorDataType.value|{}value[0]
+        final fun <get-value>(): kotlin/String // io.github.jan.supabase.storage.vectors.index/VectorDataType.value.<get-value>|<get-value>(){}[0]
+
+    final fun valueOf(kotlin/String): io.github.jan.supabase.storage.vectors.index/VectorDataType // io.github.jan.supabase.storage.vectors.index/VectorDataType.valueOf|valueOf#static(kotlin.String){}[0]
+    final fun values(): kotlin/Array<io.github.jan.supabase.storage.vectors.index/VectorDataType> // io.github.jan.supabase.storage.vectors.index/VectorDataType.values|values#static(){}[0]
+}
+
+final enum class io.github.jan.supabase.storage.vectors/DistanceMetric : kotlin/Enum<io.github.jan.supabase.storage.vectors/DistanceMetric> { // io.github.jan.supabase.storage.vectors/DistanceMetric|null[0]
+    enum entry COSINE // io.github.jan.supabase.storage.vectors/DistanceMetric.COSINE|null[0]
+    enum entry DOTPRODUCT // io.github.jan.supabase.storage.vectors/DistanceMetric.DOTPRODUCT|null[0]
+    enum entry EUCLIDEAN // io.github.jan.supabase.storage.vectors/DistanceMetric.EUCLIDEAN|null[0]
+
+    final val entries // io.github.jan.supabase.storage.vectors/DistanceMetric.entries|#static{}entries[0]
+        final fun <get-entries>(): kotlin.enums/EnumEntries<io.github.jan.supabase.storage.vectors/DistanceMetric> // io.github.jan.supabase.storage.vectors/DistanceMetric.entries.<get-entries>|<get-entries>#static(){}[0]
+    final val value // io.github.jan.supabase.storage.vectors/DistanceMetric.value|{}value[0]
+        final fun <get-value>(): kotlin/String // io.github.jan.supabase.storage.vectors/DistanceMetric.value.<get-value>|<get-value>(){}[0]
+
+    final fun valueOf(kotlin/String): io.github.jan.supabase.storage.vectors/DistanceMetric // io.github.jan.supabase.storage.vectors/DistanceMetric.valueOf|valueOf#static(kotlin.String){}[0]
+    final fun values(): kotlin/Array<io.github.jan.supabase.storage.vectors/DistanceMetric> // io.github.jan.supabase.storage.vectors/DistanceMetric.values|values#static(){}[0]
+}
+
+final enum class io.github.jan.supabase.storage/BucketSortColumn : kotlin/Enum<io.github.jan.supabase.storage/BucketSortColumn> { // io.github.jan.supabase.storage/BucketSortColumn|null[0]
+    enum entry CREATED_AT // io.github.jan.supabase.storage/BucketSortColumn.CREATED_AT|null[0]
+    enum entry ID // io.github.jan.supabase.storage/BucketSortColumn.ID|null[0]
+    enum entry NAME // io.github.jan.supabase.storage/BucketSortColumn.NAME|null[0]
+    enum entry UPDATED_AT // io.github.jan.supabase.storage/BucketSortColumn.UPDATED_AT|null[0]
+
+    final val entries // io.github.jan.supabase.storage/BucketSortColumn.entries|#static{}entries[0]
+        final fun <get-entries>(): kotlin.enums/EnumEntries<io.github.jan.supabase.storage/BucketSortColumn> // io.github.jan.supabase.storage/BucketSortColumn.entries.<get-entries>|<get-entries>#static(){}[0]
+
+    final fun valueOf(kotlin/String): io.github.jan.supabase.storage/BucketSortColumn // io.github.jan.supabase.storage/BucketSortColumn.valueOf|valueOf#static(kotlin.String){}[0]
+    final fun values(): kotlin/Array<io.github.jan.supabase.storage/BucketSortColumn> // io.github.jan.supabase.storage/BucketSortColumn.values|values#static(){}[0]
+}
+
+final enum class io.github.jan.supabase.storage/BucketType : kotlin/Enum<io.github.jan.supabase.storage/BucketType> { // io.github.jan.supabase.storage/BucketType|null[0]
+    enum entry ANALYTICS // io.github.jan.supabase.storage/BucketType.ANALYTICS|null[0]
+    enum entry STANDARD // io.github.jan.supabase.storage/BucketType.STANDARD|null[0]
+
+    final val entries // io.github.jan.supabase.storage/BucketType.entries|#static{}entries[0]
+        final fun <get-entries>(): kotlin.enums/EnumEntries<io.github.jan.supabase.storage/BucketType> // io.github.jan.supabase.storage/BucketType.entries.<get-entries>|<get-entries>#static(){}[0]
+
+    final fun valueOf(kotlin/String): io.github.jan.supabase.storage/BucketType // io.github.jan.supabase.storage/BucketType.valueOf|valueOf#static(kotlin.String){}[0]
+    final fun values(): kotlin/Array<io.github.jan.supabase.storage/BucketType> // io.github.jan.supabase.storage/BucketType.values|values#static(){}[0]
+}
+
+final enum class io.github.jan.supabase.storage/SortOrder : kotlin/Enum<io.github.jan.supabase.storage/SortOrder> { // io.github.jan.supabase.storage/SortOrder|null[0]
+    enum entry ASC // io.github.jan.supabase.storage/SortOrder.ASC|null[0]
+    enum entry DESC // io.github.jan.supabase.storage/SortOrder.DESC|null[0]
+
+    final val entries // io.github.jan.supabase.storage/SortOrder.entries|#static{}entries[0]
+        final fun <get-entries>(): kotlin.enums/EnumEntries<io.github.jan.supabase.storage/SortOrder> // io.github.jan.supabase.storage/SortOrder.entries.<get-entries>|<get-entries>#static(){}[0]
+
+    final fun valueOf(kotlin/String): io.github.jan.supabase.storage/SortOrder // io.github.jan.supabase.storage/SortOrder.valueOf|valueOf#static(kotlin.String){}[0]
+    final fun values(): kotlin/Array<io.github.jan.supabase.storage/SortOrder> // io.github.jan.supabase.storage/SortOrder.values|values#static(){}[0]
+}
+
+abstract interface io.github.jan.supabase.storage.analytics/StorageAnalyticsClient { // io.github.jan.supabase.storage.analytics/StorageAnalyticsClient|null[0]
+    abstract suspend fun createBucket(kotlin/String): io.github.jan.supabase.storage.analytics/AnalyticBucket // io.github.jan.supabase.storage.analytics/StorageAnalyticsClient.createBucket|createBucket(kotlin.String){}[0]
+    abstract suspend fun deleteBucket(kotlin/String): kotlin/String // io.github.jan.supabase.storage.analytics/StorageAnalyticsClient.deleteBucket|deleteBucket(kotlin.String){}[0]
+    abstract suspend fun getIcebergClientConfiguration(): io.github.jan.supabase.storage.analytics/IcebergClientConfiguration // io.github.jan.supabase.storage.analytics/StorageAnalyticsClient.getIcebergClientConfiguration|getIcebergClientConfiguration(){}[0]
+    abstract suspend fun listBuckets(kotlin/Function1<io.github.jan.supabase.storage/StorageListFilter.Buckets, kotlin/Unit> = ...): kotlin.collections/List<io.github.jan.supabase.storage.analytics/AnalyticBucket> // io.github.jan.supabase.storage.analytics/StorageAnalyticsClient.listBuckets|listBuckets(kotlin.Function1<io.github.jan.supabase.storage.StorageListFilter.Buckets,kotlin.Unit>){}[0]
+}
+
+abstract interface io.github.jan.supabase.storage.resumable/ResumableCache { // io.github.jan.supabase.storage.resumable/ResumableCache|null[0]
+    abstract suspend fun clear() // io.github.jan.supabase.storage.resumable/ResumableCache.clear|clear(){}[0]
+    abstract suspend fun entries(): kotlin.collections/List<kotlin/Pair<io.github.jan.supabase.storage.resumable/Fingerprint, io.github.jan.supabase.storage.resumable/ResumableCacheEntry>> // io.github.jan.supabase.storage.resumable/ResumableCache.entries|entries(){}[0]
+    abstract suspend fun get(io.github.jan.supabase.storage.resumable/Fingerprint): io.github.jan.supabase.storage.resumable/ResumableCacheEntry? // io.github.jan.supabase.storage.resumable/ResumableCache.get|get(io.github.jan.supabase.storage.resumable.Fingerprint){}[0]
+    abstract suspend fun remove(io.github.jan.supabase.storage.resumable/Fingerprint) // io.github.jan.supabase.storage.resumable/ResumableCache.remove|remove(io.github.jan.supabase.storage.resumable.Fingerprint){}[0]
+    abstract suspend fun set(io.github.jan.supabase.storage.resumable/Fingerprint, io.github.jan.supabase.storage.resumable/ResumableCacheEntry) // io.github.jan.supabase.storage.resumable/ResumableCache.set|set(io.github.jan.supabase.storage.resumable.Fingerprint;io.github.jan.supabase.storage.resumable.ResumableCacheEntry){}[0]
+}
+
+abstract interface io.github.jan.supabase.storage.resumable/ResumableClient { // io.github.jan.supabase.storage.resumable/ResumableClient|null[0]
+    abstract suspend fun continuePreviousUploads(kotlin.coroutines/SuspendFunction2<kotlin/String, kotlin/Long, io.ktor.utils.io/ByteReadChannel>): kotlin.collections/List<kotlinx.coroutines/Deferred<io.github.jan.supabase.storage.resumable/ResumableUpload>> // io.github.jan.supabase.storage.resumable/ResumableClient.continuePreviousUploads|continuePreviousUploads(kotlin.coroutines.SuspendFunction2<kotlin.String,kotlin.Long,io.ktor.utils.io.ByteReadChannel>){}[0]
+    abstract suspend fun createOrContinueUpload(kotlin.coroutines/SuspendFunction1<kotlin/Long, io.ktor.utils.io/ByteReadChannel>, kotlin/String, kotlin/Long, kotlin/String, kotlin/Function1<io.github.jan.supabase.storage/UploadOptionBuilder, kotlin/Unit> = ...): io.github.jan.supabase.storage.resumable/ResumableUpload // io.github.jan.supabase.storage.resumable/ResumableClient.createOrContinueUpload|createOrContinueUpload(kotlin.coroutines.SuspendFunction1<kotlin.Long,io.ktor.utils.io.ByteReadChannel>;kotlin.String;kotlin.Long;kotlin.String;kotlin.Function1<io.github.jan.supabase.storage.UploadOptionBuilder,kotlin.Unit>){}[0]
+    open suspend fun createOrContinueUpload(kotlin/ByteArray, kotlin/String, kotlin/String, kotlin/Function1<io.github.jan.supabase.storage/UploadOptionBuilder, kotlin/Unit> = ...): io.github.jan.supabase.storage.resumable/ResumableUpload // io.github.jan.supabase.storage.resumable/ResumableClient.createOrContinueUpload|createOrContinueUpload(kotlin.ByteArray;kotlin.String;kotlin.String;kotlin.Function1<io.github.jan.supabase.storage.UploadOptionBuilder,kotlin.Unit>){}[0]
+
+    final object Companion { // io.github.jan.supabase.storage.resumable/ResumableClient.Companion|null[0]
+        final const val TUS_VERSION // io.github.jan.supabase.storage.resumable/ResumableClient.Companion.TUS_VERSION|{}TUS_VERSION[0]
+            final fun <get-TUS_VERSION>(): kotlin/String // io.github.jan.supabase.storage.resumable/ResumableClient.Companion.TUS_VERSION.<get-TUS_VERSION>|<get-TUS_VERSION>(){}[0]
+    }
+}
+
+abstract interface io.github.jan.supabase.storage.vectors.data/VectorDataApi { // io.github.jan.supabase.storage.vectors.data/VectorDataApi|null[0]
+    abstract suspend fun deleteVectors(kotlin.collections/List<kotlin/String>) // io.github.jan.supabase.storage.vectors.data/VectorDataApi.deleteVectors|deleteVectors(kotlin.collections.List<kotlin.String>){}[0]
+    abstract suspend fun getVectors(kotlin/Function1<io.github.jan.supabase.storage.vectors.data/GetVectorOptions, kotlin/Unit>): kotlin.collections/List<io.github.jan.supabase.storage.vectors.data/VectorMatch> // io.github.jan.supabase.storage.vectors.data/VectorDataApi.getVectors|getVectors(kotlin.Function1<io.github.jan.supabase.storage.vectors.data.GetVectorOptions,kotlin.Unit>){}[0]
+    abstract suspend fun listVectors(kotlin/Function1<io.github.jan.supabase.storage.vectors.data/ListVectorsOptions, kotlin/Unit> = ...): io.github.jan.supabase.storage.vectors.data/ListVectorsResponse // io.github.jan.supabase.storage.vectors.data/VectorDataApi.listVectors|listVectors(kotlin.Function1<io.github.jan.supabase.storage.vectors.data.ListVectorsOptions,kotlin.Unit>){}[0]
+    abstract suspend fun putVectors(kotlin.collections/List<io.github.jan.supabase.storage.vectors.data/VectorObject>) // io.github.jan.supabase.storage.vectors.data/VectorDataApi.putVectors|putVectors(kotlin.collections.List<io.github.jan.supabase.storage.vectors.data.VectorObject>){}[0]
+    abstract suspend fun queryVectors(kotlin/Function1<io.github.jan.supabase.storage.vectors.data/QueryVectorsOptions, kotlin/Unit>): io.github.jan.supabase.storage.vectors.data/QueryVectorsResponse // io.github.jan.supabase.storage.vectors.data/VectorDataApi.queryVectors|queryVectors(kotlin.Function1<io.github.jan.supabase.storage.vectors.data.QueryVectorsOptions,kotlin.Unit>){}[0]
+
+    final object Companion { // io.github.jan.supabase.storage.vectors.data/VectorDataApi.Companion|null[0]
+        final val SEGMENT_COUNT_RANGE // io.github.jan.supabase.storage.vectors.data/VectorDataApi.Companion.SEGMENT_COUNT_RANGE|{}SEGMENT_COUNT_RANGE[0]
+            final fun <get-SEGMENT_COUNT_RANGE>(): kotlin.ranges/IntRange // io.github.jan.supabase.storage.vectors.data/VectorDataApi.Companion.SEGMENT_COUNT_RANGE.<get-SEGMENT_COUNT_RANGE>|<get-SEGMENT_COUNT_RANGE>(){}[0]
+        final val VECTOR_RANGE // io.github.jan.supabase.storage.vectors.data/VectorDataApi.Companion.VECTOR_RANGE|{}VECTOR_RANGE[0]
+            final fun <get-VECTOR_RANGE>(): kotlin.ranges/IntRange // io.github.jan.supabase.storage.vectors.data/VectorDataApi.Companion.VECTOR_RANGE.<get-VECTOR_RANGE>|<get-VECTOR_RANGE>(){}[0]
+    }
+}
+
+abstract interface io.github.jan.supabase.storage.vectors.index/VectorIndexApi { // io.github.jan.supabase.storage.vectors.index/VectorIndexApi|null[0]
+    abstract fun index(kotlin/String): io.github.jan.supabase.storage.vectors.data/VectorDataApi // io.github.jan.supabase.storage.vectors.index/VectorIndexApi.index|index(kotlin.String){}[0]
+    abstract suspend fun createIndex(kotlin/Function1<io.github.jan.supabase.storage.vectors.index/CreateIndexOptions, kotlin/Unit>) // io.github.jan.supabase.storage.vectors.index/VectorIndexApi.createIndex|createIndex(kotlin.Function1<io.github.jan.supabase.storage.vectors.index.CreateIndexOptions,kotlin.Unit>){}[0]
+    abstract suspend fun deleteIndex(kotlin/String) // io.github.jan.supabase.storage.vectors.index/VectorIndexApi.deleteIndex|deleteIndex(kotlin.String){}[0]
+    abstract suspend fun getIndex(kotlin/String): io.github.jan.supabase.storage.vectors.index/VectorIndex // io.github.jan.supabase.storage.vectors.index/VectorIndexApi.getIndex|getIndex(kotlin.String){}[0]
+    abstract suspend fun listIndexes(kotlin/Function1<io.github.jan.supabase.storage.vectors.index/ListIndexesOptions, kotlin/Unit> = ...): io.github.jan.supabase.storage.vectors.index/ListIndexesResponse // io.github.jan.supabase.storage.vectors.index/VectorIndexApi.listIndexes|listIndexes(kotlin.Function1<io.github.jan.supabase.storage.vectors.index.ListIndexesOptions,kotlin.Unit>){}[0]
+}
+
+abstract interface io.github.jan.supabase.storage.vectors/StorageVectorsClient { // io.github.jan.supabase.storage.vectors/StorageVectorsClient|null[0]
+    abstract fun from(kotlin/String): io.github.jan.supabase.storage.vectors.index/VectorIndexApi // io.github.jan.supabase.storage.vectors/StorageVectorsClient.from|from(kotlin.String){}[0]
+    abstract suspend fun createBucket(kotlin/String) // io.github.jan.supabase.storage.vectors/StorageVectorsClient.createBucket|createBucket(kotlin.String){}[0]
+    abstract suspend fun deleteBucket(kotlin/String) // io.github.jan.supabase.storage.vectors/StorageVectorsClient.deleteBucket|deleteBucket(kotlin.String){}[0]
+    abstract suspend fun getBucket(kotlin/String): io.github.jan.supabase.storage.vectors.bucket/VectorBucket // io.github.jan.supabase.storage.vectors/StorageVectorsClient.getBucket|getBucket(kotlin.String){}[0]
+    abstract suspend fun listBuckets(kotlin/Function1<io.github.jan.supabase.storage.vectors.bucket/VectorBucketFilter, kotlin/Unit> = ...): io.github.jan.supabase.storage.vectors.bucket/ListVectorBucketsResponse // io.github.jan.supabase.storage.vectors/StorageVectorsClient.listBuckets|listBuckets(kotlin.Function1<io.github.jan.supabase.storage.vectors.bucket.VectorBucketFilter,kotlin.Unit>){}[0]
+}
+
+abstract interface io.github.jan.supabase.storage/BucketApi { // io.github.jan.supabase.storage/BucketApi|null[0]
+    abstract val bucketId // io.github.jan.supabase.storage/BucketApi.bucketId|{}bucketId[0]
+        abstract fun <get-bucketId>(): kotlin/String // io.github.jan.supabase.storage/BucketApi.bucketId.<get-bucketId>|<get-bucketId>(){}[0]
+    abstract val resumable // io.github.jan.supabase.storage/BucketApi.resumable|{}resumable[0]
+        abstract fun <get-resumable>(): io.github.jan.supabase.storage.resumable/ResumableClient // io.github.jan.supabase.storage/BucketApi.resumable.<get-resumable>|<get-resumable>(){}[0]
+    abstract val supabaseClient // io.github.jan.supabase.storage/BucketApi.supabaseClient|{}supabaseClient[0]
+        abstract fun <get-supabaseClient>(): io.github.jan.supabase/SupabaseClient // io.github.jan.supabase.storage/BucketApi.supabaseClient.<get-supabaseClient>|<get-supabaseClient>(){}[0]
+
+    abstract fun authenticatedRenderUrl(kotlin/String, kotlin/Function1<io.github.jan.supabase.storage/ImageTransformation, kotlin/Unit> = ...): kotlin/String // io.github.jan.supabase.storage/BucketApi.authenticatedRenderUrl|authenticatedRenderUrl(kotlin.String;kotlin.Function1<io.github.jan.supabase.storage.ImageTransformation,kotlin.Unit>){}[0]
+    abstract fun authenticatedUrl(kotlin/String): kotlin/String // io.github.jan.supabase.storage/BucketApi.authenticatedUrl|authenticatedUrl(kotlin.String){}[0]
+    abstract fun publicUrl(kotlin/String, kotlin/Function1<io.github.jan.supabase.storage/PublicUrlBuilder, kotlin/Unit> = ...): kotlin/String // io.github.jan.supabase.storage/BucketApi.publicUrl|publicUrl(kotlin.String;kotlin.Function1<io.github.jan.supabase.storage.PublicUrlBuilder,kotlin.Unit>){}[0]
+    abstract fun setHeader(kotlin/String, kotlin/String): io.github.jan.supabase.storage/BucketApi // io.github.jan.supabase.storage/BucketApi.setHeader|setHeader(kotlin.String;kotlin.String){}[0]
+    abstract suspend fun changePublicStatusTo(kotlin/Boolean) // io.github.jan.supabase.storage/BucketApi.changePublicStatusTo|changePublicStatusTo(kotlin.Boolean){}[0]
+    abstract suspend fun copy(kotlin/String, kotlin/String, kotlin/String? = ...) // io.github.jan.supabase.storage/BucketApi.copy|copy(kotlin.String;kotlin.String;kotlin.String?){}[0]
+    abstract suspend fun createSignedUploadUrl(kotlin/String, kotlin/Boolean = ...): io.github.jan.supabase.storage/UploadSignedUrl // io.github.jan.supabase.storage/BucketApi.createSignedUploadUrl|createSignedUploadUrl(kotlin.String;kotlin.Boolean){}[0]
+    abstract suspend fun createSignedUrl(kotlin/String, kotlin.time/Duration, kotlin/Function1<io.github.jan.supabase.storage/SignedUrlBuilder, kotlin/Unit> = ...): kotlin/String // io.github.jan.supabase.storage/BucketApi.createSignedUrl|createSignedUrl(kotlin.String;kotlin.time.Duration;kotlin.Function1<io.github.jan.supabase.storage.SignedUrlBuilder,kotlin.Unit>){}[0]
+    abstract suspend fun createSignedUrls(kotlin.time/Duration, kotlin.collections/Collection<kotlin/String>, kotlin/Function1<io.github.jan.supabase.storage/SignedUrlsBuilder, kotlin/Unit> = ...): kotlin.collections/List<io.github.jan.supabase.storage/SignedUrl> // io.github.jan.supabase.storage/BucketApi.createSignedUrls|createSignedUrls(kotlin.time.Duration;kotlin.collections.Collection<kotlin.String>;kotlin.Function1<io.github.jan.supabase.storage.SignedUrlsBuilder,kotlin.Unit>){}[0]
+    abstract suspend fun delete(kotlin.collections/Collection<kotlin/String>) // io.github.jan.supabase.storage/BucketApi.delete|delete(kotlin.collections.Collection<kotlin.String>){}[0]
+    abstract suspend fun downloadAuthenticated(kotlin/String, io.ktor.utils.io/ByteWriteChannel, kotlin/Function1<io.github.jan.supabase.storage/DownloadOptionBuilder, kotlin/Unit> = ...) // io.github.jan.supabase.storage/BucketApi.downloadAuthenticated|downloadAuthenticated(kotlin.String;io.ktor.utils.io.ByteWriteChannel;kotlin.Function1<io.github.jan.supabase.storage.DownloadOptionBuilder,kotlin.Unit>){}[0]
+    abstract suspend fun downloadAuthenticated(kotlin/String, kotlin/Function1<io.github.jan.supabase.storage/DownloadOptionBuilder, kotlin/Unit> = ...): kotlin/ByteArray // io.github.jan.supabase.storage/BucketApi.downloadAuthenticated|downloadAuthenticated(kotlin.String;kotlin.Function1<io.github.jan.supabase.storage.DownloadOptionBuilder,kotlin.Unit>){}[0]
+    abstract suspend fun downloadPublic(kotlin/String, io.ktor.utils.io/ByteWriteChannel, kotlin/Function1<io.github.jan.supabase.storage/DownloadOptionBuilder, kotlin/Unit> = ...) // io.github.jan.supabase.storage/BucketApi.downloadPublic|downloadPublic(kotlin.String;io.ktor.utils.io.ByteWriteChannel;kotlin.Function1<io.github.jan.supabase.storage.DownloadOptionBuilder,kotlin.Unit>){}[0]
+    abstract suspend fun downloadPublic(kotlin/String, kotlin/Function1<io.github.jan.supabase.storage/DownloadOptionBuilder, kotlin/Unit> = ...): kotlin/ByteArray // io.github.jan.supabase.storage/BucketApi.downloadPublic|downloadPublic(kotlin.String;kotlin.Function1<io.github.jan.supabase.storage.DownloadOptionBuilder,kotlin.Unit>){}[0]
+    abstract suspend fun exists(kotlin/String): kotlin/Boolean // io.github.jan.supabase.storage/BucketApi.exists|exists(kotlin.String){}[0]
+    abstract suspend fun info(kotlin/String): io.github.jan.supabase.storage/FileObjectV2 // io.github.jan.supabase.storage/BucketApi.info|info(kotlin.String){}[0]
+    abstract suspend fun list(kotlin/String = ..., kotlin/Function1<io.github.jan.supabase.storage/StorageListFilter.Files, kotlin/Unit> = ...): kotlin.collections/List<io.github.jan.supabase.storage/FileObject> // io.github.jan.supabase.storage/BucketApi.list|list(kotlin.String;kotlin.Function1<io.github.jan.supabase.storage.StorageListFilter.Files,kotlin.Unit>){}[0]
+    abstract suspend fun move(kotlin/String, kotlin/String, kotlin/String? = ...) // io.github.jan.supabase.storage/BucketApi.move|move(kotlin.String;kotlin.String;kotlin.String?){}[0]
+    abstract suspend fun purgeCache(kotlin/String, kotlin/Function1<io.github.jan.supabase.storage/PurgeCacheOptions, kotlin/Unit> = ...) // io.github.jan.supabase.storage/BucketApi.purgeCache|purgeCache(kotlin.String;kotlin.Function1<io.github.jan.supabase.storage.PurgeCacheOptions,kotlin.Unit>){}[0]
+    abstract suspend fun update(kotlin/String, io.github.jan.supabase.storage/UploadData, kotlin/Function1<io.github.jan.supabase.storage/UploadOptionBuilder, kotlin/Unit> = ...): io.github.jan.supabase.storage/FileUploadResponse // io.github.jan.supabase.storage/BucketApi.update|update(kotlin.String;io.github.jan.supabase.storage.UploadData;kotlin.Function1<io.github.jan.supabase.storage.UploadOptionBuilder,kotlin.Unit>){}[0]
+    abstract suspend fun upload(kotlin/String, io.github.jan.supabase.storage/UploadData, kotlin/Function1<io.github.jan.supabase.storage/UploadOptionBuilder, kotlin/Unit> = ...): io.github.jan.supabase.storage/FileUploadResponse // io.github.jan.supabase.storage/BucketApi.upload|upload(kotlin.String;io.github.jan.supabase.storage.UploadData;kotlin.Function1<io.github.jan.supabase.storage.UploadOptionBuilder,kotlin.Unit>){}[0]
+    abstract suspend fun uploadToSignedUrl(kotlin/String, kotlin/String, io.github.jan.supabase.storage/UploadData, kotlin/Function1<io.github.jan.supabase.storage/UploadOptionBuilder, kotlin/Unit> = ...): io.github.jan.supabase.storage/FileUploadResponse // io.github.jan.supabase.storage/BucketApi.uploadToSignedUrl|uploadToSignedUrl(kotlin.String;kotlin.String;io.github.jan.supabase.storage.UploadData;kotlin.Function1<io.github.jan.supabase.storage.UploadOptionBuilder,kotlin.Unit>){}[0]
+    open fun publicRenderUrl(kotlin/String, kotlin/Function1<io.github.jan.supabase.storage/ImageTransformation, kotlin/Unit> = ...): kotlin/String // io.github.jan.supabase.storage/BucketApi.publicRenderUrl|publicRenderUrl(kotlin.String;kotlin.Function1<io.github.jan.supabase.storage.ImageTransformation,kotlin.Unit>){}[0]
+    open suspend fun createSignedUrls(kotlin.time/Duration, kotlin/Array<out kotlin/String>..., kotlin/Function1<io.github.jan.supabase.storage/SignedUrlsBuilder, kotlin/Unit> = ...): kotlin.collections/List<io.github.jan.supabase.storage/SignedUrl> // io.github.jan.supabase.storage/BucketApi.createSignedUrls|createSignedUrls(kotlin.time.Duration;kotlin.Array<out|kotlin.String>...;kotlin.Function1<io.github.jan.supabase.storage.SignedUrlsBuilder,kotlin.Unit>){}[0]
+    open suspend fun delete(kotlin/Array<out kotlin/String>...) // io.github.jan.supabase.storage/BucketApi.delete|delete(kotlin.Array<out|kotlin.String>...){}[0]
+    open suspend fun update(kotlin/String, kotlin/ByteArray, kotlin/Function1<io.github.jan.supabase.storage/UploadOptionBuilder, kotlin/Unit> = ...): io.github.jan.supabase.storage/FileUploadResponse // io.github.jan.supabase.storage/BucketApi.update|update(kotlin.String;kotlin.ByteArray;kotlin.Function1<io.github.jan.supabase.storage.UploadOptionBuilder,kotlin.Unit>){}[0]
+    open suspend fun upload(kotlin/String, kotlin/ByteArray, kotlin/Function1<io.github.jan.supabase.storage/UploadOptionBuilder, kotlin/Unit> = ...): io.github.jan.supabase.storage/FileUploadResponse // io.github.jan.supabase.storage/BucketApi.upload|upload(kotlin.String;kotlin.ByteArray;kotlin.Function1<io.github.jan.supabase.storage.UploadOptionBuilder,kotlin.Unit>){}[0]
+    open suspend fun uploadToSignedUrl(kotlin/String, kotlin/String, kotlin/ByteArray, kotlin/Function1<io.github.jan.supabase.storage/UploadOptionBuilder, kotlin/Unit> = ...): io.github.jan.supabase.storage/FileUploadResponse // io.github.jan.supabase.storage/BucketApi.uploadToSignedUrl|uploadToSignedUrl(kotlin.String;kotlin.String;kotlin.ByteArray;kotlin.Function1<io.github.jan.supabase.storage.UploadOptionBuilder,kotlin.Unit>){}[0]
+
+    final object Companion { // io.github.jan.supabase.storage/BucketApi.Companion|null[0]
+        final const val METADATA_HEADER // io.github.jan.supabase.storage/BucketApi.Companion.METADATA_HEADER|{}METADATA_HEADER[0]
+            final fun <get-METADATA_HEADER>(): kotlin/String // io.github.jan.supabase.storage/BucketApi.Companion.METADATA_HEADER.<get-METADATA_HEADER>|<get-METADATA_HEADER>(){}[0]
+        final const val UPSERT_HEADER // io.github.jan.supabase.storage/BucketApi.Companion.UPSERT_HEADER|{}UPSERT_HEADER[0]
+            final fun <get-UPSERT_HEADER>(): kotlin/String // io.github.jan.supabase.storage/BucketApi.Companion.UPSERT_HEADER.<get-UPSERT_HEADER>|<get-UPSERT_HEADER>(){}[0]
+    }
+}
+
+abstract interface io.github.jan.supabase.storage/BucketUrlBuilder { // io.github.jan.supabase.storage/BucketUrlBuilder|null[0]
+    abstract var cacheNonce // io.github.jan.supabase.storage/BucketUrlBuilder.cacheNonce|{}cacheNonce[0]
+        abstract fun <get-cacheNonce>(): kotlin/String? // io.github.jan.supabase.storage/BucketUrlBuilder.cacheNonce.<get-cacheNonce>|<get-cacheNonce>(){}[0]
+        abstract fun <set-cacheNonce>(kotlin/String?) // io.github.jan.supabase.storage/BucketUrlBuilder.cacheNonce.<set-cacheNonce>|<set-cacheNonce>(kotlin.String?){}[0]
+
+    abstract interface WithForceDownload : io.github.jan.supabase.storage/BucketUrlBuilder { // io.github.jan.supabase.storage/BucketUrlBuilder.WithForceDownload|null[0]
+        abstract var download // io.github.jan.supabase.storage/BucketUrlBuilder.WithForceDownload.download|{}download[0]
+            abstract fun <get-download>(): io.github.jan.supabase.storage/ForceDownload? // io.github.jan.supabase.storage/BucketUrlBuilder.WithForceDownload.download.<get-download>|<get-download>(){}[0]
+            abstract fun <set-download>(io.github.jan.supabase.storage/ForceDownload?) // io.github.jan.supabase.storage/BucketUrlBuilder.WithForceDownload.download.<set-download>|<set-download>(io.github.jan.supabase.storage.ForceDownload?){}[0]
+
+        open fun forceDownload(kotlin/String? = ...) // io.github.jan.supabase.storage/BucketUrlBuilder.WithForceDownload.forceDownload|forceDownload(kotlin.String?){}[0]
+    }
+
+    abstract interface WithTransformation : io.github.jan.supabase.storage/BucketUrlBuilder { // io.github.jan.supabase.storage/BucketUrlBuilder.WithTransformation|null[0]
+        abstract var transformation // io.github.jan.supabase.storage/BucketUrlBuilder.WithTransformation.transformation|{}transformation[0]
+            abstract fun <get-transformation>(): io.github.jan.supabase.storage/ImageTransformation? // io.github.jan.supabase.storage/BucketUrlBuilder.WithTransformation.transformation.<get-transformation>|<get-transformation>(){}[0]
+            abstract fun <set-transformation>(io.github.jan.supabase.storage/ImageTransformation?) // io.github.jan.supabase.storage/BucketUrlBuilder.WithTransformation.transformation.<set-transformation>|<set-transformation>(io.github.jan.supabase.storage.ImageTransformation?){}[0]
+
+        open fun transform(kotlin/Function1<io.github.jan.supabase.storage/ImageTransformation, kotlin/Unit>) // io.github.jan.supabase.storage/BucketUrlBuilder.WithTransformation.transform|transform(kotlin.Function1<io.github.jan.supabase.storage.ImageTransformation,kotlin.Unit>){}[0]
+    }
+}
+
+abstract interface io.github.jan.supabase.storage/Storage : io.github.jan.supabase.plugins/CustomSerializationPlugin, io.github.jan.supabase.plugins/MainPlugin<io.github.jan.supabase.storage/Storage.Config> { // io.github.jan.supabase.storage/Storage|null[0]
+    abstract val analytics // io.github.jan.supabase.storage/Storage.analytics|{}analytics[0]
+        abstract fun <get-analytics>(): io.github.jan.supabase.storage.analytics/StorageAnalyticsClient // io.github.jan.supabase.storage/Storage.analytics.<get-analytics>|<get-analytics>(){}[0]
+    abstract val api // io.github.jan.supabase.storage/Storage.api|{}api[0]
+        abstract fun <get-api>(): io.github.jan.supabase.auth.api/AuthenticatedSupabaseApi // io.github.jan.supabase.storage/Storage.api.<get-api>|<get-api>(){}[0]
+    abstract val vectors // io.github.jan.supabase.storage/Storage.vectors|{}vectors[0]
+        abstract fun <get-vectors>(): io.github.jan.supabase.storage.vectors/StorageVectorsClient // io.github.jan.supabase.storage/Storage.vectors.<get-vectors>|<get-vectors>(){}[0]
+
+    abstract fun get(kotlin/String): io.github.jan.supabase.storage/BucketApi // io.github.jan.supabase.storage/Storage.get|get(kotlin.String){}[0]
+    abstract suspend fun createBucket(kotlin/String, kotlin/Function1<io.github.jan.supabase.storage/BucketBuilder, kotlin/Unit> = ...) // io.github.jan.supabase.storage/Storage.createBucket|createBucket(kotlin.String;kotlin.Function1<io.github.jan.supabase.storage.BucketBuilder,kotlin.Unit>){}[0]
+    abstract suspend fun deleteBucket(kotlin/String) // io.github.jan.supabase.storage/Storage.deleteBucket|deleteBucket(kotlin.String){}[0]
+    abstract suspend fun emptyBucket(kotlin/String) // io.github.jan.supabase.storage/Storage.emptyBucket|emptyBucket(kotlin.String){}[0]
+    abstract suspend fun getBucket(kotlin/String): io.github.jan.supabase.storage/Bucket? // io.github.jan.supabase.storage/Storage.getBucket|getBucket(kotlin.String){}[0]
+    abstract suspend fun listBuckets(kotlin/Function1<io.github.jan.supabase.storage/StorageListFilter.Buckets, kotlin/Unit> = ...): kotlin.collections/List<io.github.jan.supabase.storage/Bucket> // io.github.jan.supabase.storage/Storage.listBuckets|listBuckets(kotlin.Function1<io.github.jan.supabase.storage.StorageListFilter.Buckets,kotlin.Unit>){}[0]
+    abstract suspend fun purgeBucketCache(kotlin/String, kotlin/Function1<io.github.jan.supabase.storage/PurgeCacheOptions, kotlin/Unit> = ...) // io.github.jan.supabase.storage/Storage.purgeBucketCache|purgeBucketCache(kotlin.String;kotlin.Function1<io.github.jan.supabase.storage.PurgeCacheOptions,kotlin.Unit>){}[0]
+    abstract suspend fun updateBucket(kotlin/String, kotlin/Function1<io.github.jan.supabase.storage/BucketBuilder, kotlin/Unit> = ...) // io.github.jan.supabase.storage/Storage.updateBucket|updateBucket(kotlin.String;kotlin.Function1<io.github.jan.supabase.storage.BucketBuilder,kotlin.Unit>){}[0]
+    open fun from(kotlin/String): io.github.jan.supabase.storage/BucketApi // io.github.jan.supabase.storage/Storage.from|from(kotlin.String){}[0]
+
+    final class Config : io.github.jan.supabase.auth/AuthDependentPluginConfig, io.github.jan.supabase.plugins/CustomSerializationConfig, io.github.jan.supabase.plugins/MainConfig { // io.github.jan.supabase.storage/Storage.Config|null[0]
+        constructor <init>(kotlin.time/Duration = ..., io.github.jan.supabase.storage/Storage.Config.Resumable = ..., io.github.jan.supabase/SupabaseSerializer? = ..., kotlin/Boolean = ...) // io.github.jan.supabase.storage/Storage.Config.<init>|<init>(kotlin.time.Duration;io.github.jan.supabase.storage.Storage.Config.Resumable;io.github.jan.supabase.SupabaseSerializer?;kotlin.Boolean){}[0]
+
+        final var requireValidSession // io.github.jan.supabase.storage/Storage.Config.requireValidSession|{}requireValidSession[0]
+            final fun <get-requireValidSession>(): kotlin/Boolean // io.github.jan.supabase.storage/Storage.Config.requireValidSession.<get-requireValidSession>|<get-requireValidSession>(){}[0]
+            final fun <set-requireValidSession>(kotlin/Boolean) // io.github.jan.supabase.storage/Storage.Config.requireValidSession.<set-requireValidSession>|<set-requireValidSession>(kotlin.Boolean){}[0]
+        final var resumable // io.github.jan.supabase.storage/Storage.Config.resumable|{}resumable[0]
+            final fun <get-resumable>(): io.github.jan.supabase.storage/Storage.Config.Resumable // io.github.jan.supabase.storage/Storage.Config.resumable.<get-resumable>|<get-resumable>(){}[0]
+            final fun <set-resumable>(io.github.jan.supabase.storage/Storage.Config.Resumable) // io.github.jan.supabase.storage/Storage.Config.resumable.<set-resumable>|<set-resumable>(io.github.jan.supabase.storage.Storage.Config.Resumable){}[0]
+        final var serializer // io.github.jan.supabase.storage/Storage.Config.serializer|{}serializer[0]
+            final fun <get-serializer>(): io.github.jan.supabase/SupabaseSerializer? // io.github.jan.supabase.storage/Storage.Config.serializer.<get-serializer>|<get-serializer>(){}[0]
+            final fun <set-serializer>(io.github.jan.supabase/SupabaseSerializer?) // io.github.jan.supabase.storage/Storage.Config.serializer.<set-serializer>|<set-serializer>(io.github.jan.supabase.SupabaseSerializer?){}[0]
+        final var transferTimeout // io.github.jan.supabase.storage/Storage.Config.transferTimeout|{}transferTimeout[0]
+            final fun <get-transferTimeout>(): kotlin.time/Duration // io.github.jan.supabase.storage/Storage.Config.transferTimeout.<get-transferTimeout>|<get-transferTimeout>(){}[0]
+            final fun <set-transferTimeout>(kotlin.time/Duration) // io.github.jan.supabase.storage/Storage.Config.transferTimeout.<set-transferTimeout>|<set-transferTimeout>(kotlin.time.Duration){}[0]
+
+        final fun component1(): kotlin.time/Duration // io.github.jan.supabase.storage/Storage.Config.component1|component1(){}[0]
+        final fun component3(): io.github.jan.supabase/SupabaseSerializer? // io.github.jan.supabase.storage/Storage.Config.component3|component3(){}[0]
+        final fun component4(): kotlin/Boolean // io.github.jan.supabase.storage/Storage.Config.component4|component4(){}[0]
+        final fun copy(kotlin.time/Duration = ..., io.github.jan.supabase.storage/Storage.Config.Resumable = ..., io.github.jan.supabase/SupabaseSerializer? = ..., kotlin/Boolean = ...): io.github.jan.supabase.storage/Storage.Config // io.github.jan.supabase.storage/Storage.Config.copy|copy(kotlin.time.Duration;io.github.jan.supabase.storage.Storage.Config.Resumable;io.github.jan.supabase.SupabaseSerializer?;kotlin.Boolean){}[0]
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.jan.supabase.storage/Storage.Config.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.jan.supabase.storage/Storage.Config.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.jan.supabase.storage/Storage.Config.toString|toString(){}[0]
+        final inline fun resumable(kotlin/Function1<io.github.jan.supabase.storage/Storage.Config.Resumable, kotlin/Unit>) // io.github.jan.supabase.storage/Storage.Config.resumable|resumable(kotlin.Function1<io.github.jan.supabase.storage.Storage.Config.Resumable,kotlin.Unit>){}[0]
+
+        final class Resumable { // io.github.jan.supabase.storage/Storage.Config.Resumable|null[0]
+            constructor <init>(io.github.jan.supabase.storage.resumable/ResumableCache? = ..., kotlin.time/Duration = ..., kotlin/Boolean = ...) // io.github.jan.supabase.storage/Storage.Config.Resumable.<init>|<init>(io.github.jan.supabase.storage.resumable.ResumableCache?;kotlin.time.Duration;kotlin.Boolean){}[0]
+
+            final var cache // io.github.jan.supabase.storage/Storage.Config.Resumable.cache|{}cache[0]
+                final fun <get-cache>(): io.github.jan.supabase.storage.resumable/ResumableCache? // io.github.jan.supabase.storage/Storage.Config.Resumable.cache.<get-cache>|<get-cache>(){}[0]
+                final fun <set-cache>(io.github.jan.supabase.storage.resumable/ResumableCache?) // io.github.jan.supabase.storage/Storage.Config.Resumable.cache.<set-cache>|<set-cache>(io.github.jan.supabase.storage.resumable.ResumableCache?){}[0]
+            final var defaultChunkSize // io.github.jan.supabase.storage/Storage.Config.Resumable.defaultChunkSize|{}defaultChunkSize[0]
+                final fun <get-defaultChunkSize>(): kotlin/Long // io.github.jan.supabase.storage/Storage.Config.Resumable.defaultChunkSize.<get-defaultChunkSize>|<get-defaultChunkSize>(){}[0]
+                final fun <set-defaultChunkSize>(kotlin/Long) // io.github.jan.supabase.storage/Storage.Config.Resumable.defaultChunkSize.<set-defaultChunkSize>|<set-defaultChunkSize>(kotlin.Long){}[0]
+            final var onlyUpdateStateAfterChunk // io.github.jan.supabase.storage/Storage.Config.Resumable.onlyUpdateStateAfterChunk|{}onlyUpdateStateAfterChunk[0]
+                final fun <get-onlyUpdateStateAfterChunk>(): kotlin/Boolean // io.github.jan.supabase.storage/Storage.Config.Resumable.onlyUpdateStateAfterChunk.<get-onlyUpdateStateAfterChunk>|<get-onlyUpdateStateAfterChunk>(){}[0]
+                final fun <set-onlyUpdateStateAfterChunk>(kotlin/Boolean) // io.github.jan.supabase.storage/Storage.Config.Resumable.onlyUpdateStateAfterChunk.<set-onlyUpdateStateAfterChunk>|<set-onlyUpdateStateAfterChunk>(kotlin.Boolean){}[0]
+            final var retryTimeout // io.github.jan.supabase.storage/Storage.Config.Resumable.retryTimeout|{}retryTimeout[0]
+                final fun <get-retryTimeout>(): kotlin.time/Duration // io.github.jan.supabase.storage/Storage.Config.Resumable.retryTimeout.<get-retryTimeout>|<get-retryTimeout>(){}[0]
+                final fun <set-retryTimeout>(kotlin.time/Duration) // io.github.jan.supabase.storage/Storage.Config.Resumable.retryTimeout.<set-retryTimeout>|<set-retryTimeout>(kotlin.time.Duration){}[0]
+
+            final fun component1(): io.github.jan.supabase.storage.resumable/ResumableCache? // io.github.jan.supabase.storage/Storage.Config.Resumable.component1|component1(){}[0]
+            final fun component2(): kotlin.time/Duration // io.github.jan.supabase.storage/Storage.Config.Resumable.component2|component2(){}[0]
+            final fun component3(): kotlin/Boolean // io.github.jan.supabase.storage/Storage.Config.Resumable.component3|component3(){}[0]
+            final fun copy(io.github.jan.supabase.storage.resumable/ResumableCache? = ..., kotlin.time/Duration = ..., kotlin/Boolean = ...): io.github.jan.supabase.storage/Storage.Config.Resumable // io.github.jan.supabase.storage/Storage.Config.Resumable.copy|copy(io.github.jan.supabase.storage.resumable.ResumableCache?;kotlin.time.Duration;kotlin.Boolean){}[0]
+            final fun equals(kotlin/Any?): kotlin/Boolean // io.github.jan.supabase.storage/Storage.Config.Resumable.equals|equals(kotlin.Any?){}[0]
+            final fun hashCode(): kotlin/Int // io.github.jan.supabase.storage/Storage.Config.Resumable.hashCode|hashCode(){}[0]
+            final fun toString(): kotlin/String // io.github.jan.supabase.storage/Storage.Config.Resumable.toString|toString(){}[0]
+        }
+    }
+
+    final object Companion : io.github.jan.supabase.plugins/SupabasePluginProvider<io.github.jan.supabase.storage/Storage.Config, io.github.jan.supabase.storage/Storage> { // io.github.jan.supabase.storage/Storage.Companion|null[0]
+        final const val API_VERSION // io.github.jan.supabase.storage/Storage.Companion.API_VERSION|{}API_VERSION[0]
+            final fun <get-API_VERSION>(): kotlin/Int // io.github.jan.supabase.storage/Storage.Companion.API_VERSION.<get-API_VERSION>|<get-API_VERSION>(){}[0]
+        final const val DEFAULT_CHUNK_SIZE // io.github.jan.supabase.storage/Storage.Companion.DEFAULT_CHUNK_SIZE|{}DEFAULT_CHUNK_SIZE[0]
+            final fun <get-DEFAULT_CHUNK_SIZE>(): kotlin/Long // io.github.jan.supabase.storage/Storage.Companion.DEFAULT_CHUNK_SIZE.<get-DEFAULT_CHUNK_SIZE>|<get-DEFAULT_CHUNK_SIZE>(){}[0]
+        final const val LOGGING_TAG // io.github.jan.supabase.storage/Storage.Companion.LOGGING_TAG|{}LOGGING_TAG[0]
+            final fun <get-LOGGING_TAG>(): kotlin/String // io.github.jan.supabase.storage/Storage.Companion.LOGGING_TAG.<get-LOGGING_TAG>|<get-LOGGING_TAG>(){}[0]
+
+        final val key // io.github.jan.supabase.storage/Storage.Companion.key|{}key[0]
+            final fun <get-key>(): kotlin/String // io.github.jan.supabase.storage/Storage.Companion.key.<get-key>|<get-key>(){}[0]
+
+        final fun create(io.github.jan.supabase/SupabaseClient, io.github.jan.supabase.storage/Storage.Config): io.github.jan.supabase.storage/Storage // io.github.jan.supabase.storage/Storage.Companion.create|create(io.github.jan.supabase.SupabaseClient;io.github.jan.supabase.storage.Storage.Config){}[0]
+        final fun createConfig(kotlin/Function1<io.github.jan.supabase.storage/Storage.Config, kotlin/Unit>): io.github.jan.supabase.storage/Storage.Config // io.github.jan.supabase.storage/Storage.Companion.createConfig|createConfig(kotlin.Function1<io.github.jan.supabase.storage.Storage.Config,kotlin.Unit>){}[0]
+    }
+}
+
+sealed interface io.github.jan.supabase.storage.resumable/ResumableUpload { // io.github.jan.supabase.storage.resumable/ResumableUpload|null[0]
+    abstract val fingerprint // io.github.jan.supabase.storage.resumable/ResumableUpload.fingerprint|{}fingerprint[0]
+        abstract fun <get-fingerprint>(): io.github.jan.supabase.storage.resumable/Fingerprint // io.github.jan.supabase.storage.resumable/ResumableUpload.fingerprint.<get-fingerprint>|<get-fingerprint>(){}[0]
+    abstract val stateFlow // io.github.jan.supabase.storage.resumable/ResumableUpload.stateFlow|{}stateFlow[0]
+        abstract fun <get-stateFlow>(): kotlinx.coroutines.flow/StateFlow<io.github.jan.supabase.storage.resumable/ResumableUploadState> // io.github.jan.supabase.storage.resumable/ResumableUpload.stateFlow.<get-stateFlow>|<get-stateFlow>(){}[0]
+
+    abstract suspend fun cancel() // io.github.jan.supabase.storage.resumable/ResumableUpload.cancel|cancel(){}[0]
+    abstract suspend fun pause() // io.github.jan.supabase.storage.resumable/ResumableUpload.pause|pause(){}[0]
+    abstract suspend fun startOrResumeUploading() // io.github.jan.supabase.storage.resumable/ResumableUpload.startOrResumeUploading|startOrResumeUploading(){}[0]
+}
+
+sealed interface io.github.jan.supabase.storage/DownloadStatus { // io.github.jan.supabase.storage/DownloadStatus|null[0]
+    final class Progress : io.github.jan.supabase.storage/DownloadStatus { // io.github.jan.supabase.storage/DownloadStatus.Progress|null[0]
+        constructor <init>(kotlin/Long, kotlin/Long) // io.github.jan.supabase.storage/DownloadStatus.Progress.<init>|<init>(kotlin.Long;kotlin.Long){}[0]
+
+        final val contentLength // io.github.jan.supabase.storage/DownloadStatus.Progress.contentLength|{}contentLength[0]
+            final fun <get-contentLength>(): kotlin/Long // io.github.jan.supabase.storage/DownloadStatus.Progress.contentLength.<get-contentLength>|<get-contentLength>(){}[0]
+        final val totalBytesReceived // io.github.jan.supabase.storage/DownloadStatus.Progress.totalBytesReceived|{}totalBytesReceived[0]
+            final fun <get-totalBytesReceived>(): kotlin/Long // io.github.jan.supabase.storage/DownloadStatus.Progress.totalBytesReceived.<get-totalBytesReceived>|<get-totalBytesReceived>(){}[0]
+
+        final fun component1(): kotlin/Long // io.github.jan.supabase.storage/DownloadStatus.Progress.component1|component1(){}[0]
+        final fun component2(): kotlin/Long // io.github.jan.supabase.storage/DownloadStatus.Progress.component2|component2(){}[0]
+        final fun copy(kotlin/Long = ..., kotlin/Long = ...): io.github.jan.supabase.storage/DownloadStatus.Progress // io.github.jan.supabase.storage/DownloadStatus.Progress.copy|copy(kotlin.Long;kotlin.Long){}[0]
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.jan.supabase.storage/DownloadStatus.Progress.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.jan.supabase.storage/DownloadStatus.Progress.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.jan.supabase.storage/DownloadStatus.Progress.toString|toString(){}[0]
+    }
+
+    final value class ByteData : io.github.jan.supabase.storage/DownloadStatus { // io.github.jan.supabase.storage/DownloadStatus.ByteData|null[0]
+        constructor <init>(kotlin/ByteArray) // io.github.jan.supabase.storage/DownloadStatus.ByteData.<init>|<init>(kotlin.ByteArray){}[0]
+
+        final val data // io.github.jan.supabase.storage/DownloadStatus.ByteData.data|{}data[0]
+            final fun <get-data>(): kotlin/ByteArray // io.github.jan.supabase.storage/DownloadStatus.ByteData.data.<get-data>|<get-data>(){}[0]
+
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.jan.supabase.storage/DownloadStatus.ByteData.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.jan.supabase.storage/DownloadStatus.ByteData.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.jan.supabase.storage/DownloadStatus.ByteData.toString|toString(){}[0]
+    }
+
+    final object Success : io.github.jan.supabase.storage/DownloadStatus { // io.github.jan.supabase.storage/DownloadStatus.Success|null[0]
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.jan.supabase.storage/DownloadStatus.Success.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.jan.supabase.storage/DownloadStatus.Success.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.jan.supabase.storage/DownloadStatus.Success.toString|toString(){}[0]
+    }
+}
+
+sealed interface io.github.jan.supabase.storage/UploadStatus { // io.github.jan.supabase.storage/UploadStatus|null[0]
+    final class Progress : io.github.jan.supabase.storage/UploadStatus { // io.github.jan.supabase.storage/UploadStatus.Progress|null[0]
+        constructor <init>(kotlin/Long, kotlin/Long) // io.github.jan.supabase.storage/UploadStatus.Progress.<init>|<init>(kotlin.Long;kotlin.Long){}[0]
+
+        final val contentLength // io.github.jan.supabase.storage/UploadStatus.Progress.contentLength|{}contentLength[0]
+            final fun <get-contentLength>(): kotlin/Long // io.github.jan.supabase.storage/UploadStatus.Progress.contentLength.<get-contentLength>|<get-contentLength>(){}[0]
+        final val totalBytesSend // io.github.jan.supabase.storage/UploadStatus.Progress.totalBytesSend|{}totalBytesSend[0]
+            final fun <get-totalBytesSend>(): kotlin/Long // io.github.jan.supabase.storage/UploadStatus.Progress.totalBytesSend.<get-totalBytesSend>|<get-totalBytesSend>(){}[0]
+
+        final fun component1(): kotlin/Long // io.github.jan.supabase.storage/UploadStatus.Progress.component1|component1(){}[0]
+        final fun component2(): kotlin/Long // io.github.jan.supabase.storage/UploadStatus.Progress.component2|component2(){}[0]
+        final fun copy(kotlin/Long = ..., kotlin/Long = ...): io.github.jan.supabase.storage/UploadStatus.Progress // io.github.jan.supabase.storage/UploadStatus.Progress.copy|copy(kotlin.Long;kotlin.Long){}[0]
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.jan.supabase.storage/UploadStatus.Progress.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.jan.supabase.storage/UploadStatus.Progress.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.jan.supabase.storage/UploadStatus.Progress.toString|toString(){}[0]
+    }
+
+    final value class Success : io.github.jan.supabase.storage/UploadStatus { // io.github.jan.supabase.storage/UploadStatus.Success|null[0]
+        constructor <init>(io.github.jan.supabase.storage/FileUploadResponse) // io.github.jan.supabase.storage/UploadStatus.Success.<init>|<init>(io.github.jan.supabase.storage.FileUploadResponse){}[0]
+
+        final val response // io.github.jan.supabase.storage/UploadStatus.Success.response|{}response[0]
+            final fun <get-response>(): io.github.jan.supabase.storage/FileUploadResponse // io.github.jan.supabase.storage/UploadStatus.Success.response.<get-response>|<get-response>(){}[0]
+
+        final fun equals(kotlin/Any?): kotlin/Boolean // io.github.jan.supabase.storage/UploadStatus.Success.equals|equals(kotlin.Any?){}[0]
+        final fun hashCode(): kotlin/Int // io.github.jan.supabase.storage/UploadStatus.Success.hashCode|hashCode(){}[0]
+        final fun toString(): kotlin/String // io.github.jan.supabase.storage/UploadStatus.Success.toString|toString(){}[0]
+    }
+}
+
+final class io.github.jan.supabase.storage.analytics/AnalyticBucket { // io.github.jan.supabase.storage.analytics/AnalyticBucket|null[0]
+    constructor <init>(kotlin/String, kotlin/String, kotlin/String, kotlin.time/Instant, kotlin.time/Instant) // io.github.jan.supabase.storage.analytics/AnalyticBucket.<init>|<init>(kotlin.String;kotlin.String;kotlin.String;kotlin.time.Instant;kotlin.time.Instant){}[0]
+
+    final val createdAt // io.github.jan.supabase.storage.analytics/AnalyticBucket.createdAt|{}createdAt[0]
+        final fun <get-createdAt>(): kotlin.time/Instant // io.github.jan.supabase.storage.analytics/AnalyticBucket.createdAt.<get-createdAt>|<get-createdAt>(){}[0]
+    final val format // io.github.jan.supabase.storage.analytics/AnalyticBucket.format|{}format[0]
+        final fun <get-format>(): kotlin/String // io.github.jan.supabase.storage.analytics/AnalyticBucket.format.<get-format>|<get-format>(){}[0]
+    final val name // io.github.jan.supabase.storage.analytics/AnalyticBucket.name|{}name[0]
+        final fun <get-name>(): kotlin/String // io.github.jan.supabase.storage.analytics/AnalyticBucket.name.<get-name>|<get-name>(){}[0]
+    final val type // io.github.jan.supabase.storage.analytics/AnalyticBucket.type|{}type[0]
+        final fun <get-type>(): kotlin/String // io.github.jan.supabase.storage.analytics/AnalyticBucket.type.<get-type>|<get-type>(){}[0]
+    final val updatedAt // io.github.jan.supabase.storage.analytics/AnalyticBucket.updatedAt|{}updatedAt[0]
+        final fun <get-updatedAt>(): kotlin.time/Instant // io.github.jan.supabase.storage.analytics/AnalyticBucket.updatedAt.<get-updatedAt>|<get-updatedAt>(){}[0]
+
+    final fun component1(): kotlin/String // io.github.jan.supabase.storage.analytics/AnalyticBucket.component1|component1(){}[0]
+    final fun component2(): kotlin/String // io.github.jan.supabase.storage.analytics/AnalyticBucket.component2|component2(){}[0]
+    final fun component3(): kotlin/String // io.github.jan.supabase.storage.analytics/AnalyticBucket.component3|component3(){}[0]
+    final fun component4(): kotlin.time/Instant // io.github.jan.supabase.storage.analytics/AnalyticBucket.component4|component4(){}[0]
+    final fun component5(): kotlin.time/Instant // io.github.jan.supabase.storage.analytics/AnalyticBucket.component5|component5(){}[0]
+    final fun copy(kotlin/String = ..., kotlin/String = ..., kotlin/String = ..., kotlin.time/Instant = ..., kotlin.time/Instant = ...): io.github.jan.supabase.storage.analytics/AnalyticBucket // io.github.jan.supabase.storage.analytics/AnalyticBucket.copy|copy(kotlin.String;kotlin.String;kotlin.String;kotlin.time.Instant;kotlin.time.Instant){}[0]
+    final fun equals(kotlin/Any?): kotlin/Boolean // io.github.jan.supabase.storage.analytics/AnalyticBucket.equals|equals(kotlin.Any?){}[0]
+    final fun hashCode(): kotlin/Int // io.github.jan.supabase.storage.analytics/AnalyticBucket.hashCode|hashCode(){}[0]
+    final fun toString(): kotlin/String // io.github.jan.supabase.storage.analytics/AnalyticBucket.toString|toString(){}[0]
+
+    final object $serializer : kotlinx.serialization.internal/GeneratedSerializer<io.github.jan.supabase.storage.analytics/AnalyticBucket> { // io.github.jan.supabase.storage.analytics/AnalyticBucket.$serializer|null[0]
+        final val descriptor // io.github.jan.supabase.storage.analytics/AnalyticBucket.$serializer.descriptor|{}descriptor[0]
+            final fun <get-descriptor>(): kotlinx.serialization.descriptors/SerialDescriptor // io.github.jan.supabase.storage.analytics/AnalyticBucket.$serializer.descriptor.<get-descriptor>|<get-descriptor>(){}[0]
+
+        final fun childSerializers(): kotlin/Array<kotlinx.serialization/KSerializer<*>> // io.github.jan.supabase.storage.analytics/AnalyticBucket.$serializer.childSerializers|childSerializers(){}[0]
+        final fun deserialize(kotlinx.serialization.encoding/Decoder): io.github.jan.supabase.storage.analytics/AnalyticBucket // io.github.jan.supabase.storage.analytics/AnalyticBucket.$serializer.deserialize|deserialize(kotlinx.serialization.encoding.Decoder){}[0]
+        final fun serialize(kotlinx.serialization.encoding/Encoder, io.github.jan.supabase.storage.analytics/AnalyticBucket) // io.github.jan.supabase.storage.analytics/AnalyticBucket.$serializer.serialize|serialize(kotlinx.serialization.encoding.Encoder;io.github.jan.supabase.storage.analytics.AnalyticBucket){}[0]
+    }
+
+    final object Companion { // io.github.jan.supabase.storage.analytics/AnalyticBucket.Companion|null[0]
+        final fun serializer(): kotlinx.serialization/KSerializer<io.github.jan.supabase.storage.analytics/AnalyticBucket> // io.github.jan.supabase.storage.analytics/AnalyticBucket.Companion.serializer|serializer(){}[0]
+    }
+}
+
+final class io.github.jan.supabase.storage.analytics/IcebergClientConfiguration { // io.github.jan.supabase.storage.analytics/IcebergClientConfiguration|null[0]
+    constructor <init>(kotlin/String, kotlin.coroutines/SuspendFunction0<io.ktor.http/Headers>) // io.github.jan.supabase.storage.analytics/IcebergClientConfiguration.<init>|<init>(kotlin.String;kotlin.coroutines.SuspendFunction0<io.ktor.http.Headers>){}[0]
+
+    final val baseUrl // io.github.jan.supabase.storage.analytics/IcebergClientConfiguration.baseUrl|{}baseUrl[0]
+        final fun <get-baseUrl>(): kotlin/String // io.github.jan.supabase.storage.analytics/IcebergClientConfiguration.baseUrl.<get-baseUrl>|<get-baseUrl>(){}[0]
+    final val defaultHeaders // io.github.jan.supabase.storage.analytics/IcebergClientConfiguration.defaultHeaders|{}defaultHeaders[0]
+        final fun <get-defaultHeaders>(): kotlin.coroutines/SuspendFunction0<io.ktor.http/Headers> // io.github.jan.supabase.storage.analytics/IcebergClientConfiguration.defaultHeaders.<get-defaultHeaders>|<get-defaultHeaders>(){}[0]
+
+    final fun component1(): kotlin/String // io.github.jan.supabase.storage.analytics/IcebergClientConfiguration.component1|component1(){}[0]
+    final fun component2(): kotlin.coroutines/SuspendFunction0<io.ktor.http/Headers> // io.github.jan.supabase.storage.analytics/IcebergClientConfiguration.component2|component2(){}[0]
+    final fun copy(kotlin/String = ..., kotlin.coroutines/SuspendFunction0<io.ktor.http/Headers> = ...): io.github.jan.supabase.storage.analytics/IcebergClientConfiguration // io.github.jan.supabase.storage.analytics/IcebergClientConfiguration.copy|copy(kotlin.String;kotlin.coroutines.SuspendFunction0<io.ktor.http.Headers>){}[0]
+    final fun equals(kotlin/Any?): kotlin/Boolean // io.github.jan.supabase.storage.analytics/IcebergClientConfiguration.equals|equals(kotlin.Any?){}[0]
+    final fun hashCode(): kotlin/Int // io.github.jan.supabase.storage.analytics/IcebergClientConfiguration.hashCode|hashCode(){}[0]
+    final fun toString(): kotlin/String // io.github.jan.supabase.storage.analytics/IcebergClientConfiguration.toString|toString(){}[0]
+}
+
+final class io.github.jan.supabase.storage.resumable/MemoryResumableCache : io.github.jan.supabase.storage.resumable/ResumableCache { // io.github.jan.supabase.storage.resumable/MemoryResumableCache|null[0]
+    constructor <init>(kotlin.collections/MutableMap<kotlin/String, kotlin/String> = ...) // io.github.jan.supabase.storage.resumable/MemoryResumableCache.<init>|<init>(kotlin.collections.MutableMap<kotlin.String,kotlin.String>){}[0]
+
+    final suspend fun clear() // io.github.jan.supabase.storage.resumable/MemoryResumableCache.clear|clear(){}[0]
+    final suspend fun entries(): kotlin.collections/List<kotlin/Pair<io.github.jan.supabase.storage.resumable/Fingerprint, io.github.jan.supabase.storage.resumable/ResumableCacheEntry>> // io.github.jan.supabase.storage.resumable/MemoryResumableCache.entries|entries(){}[0]
+    final suspend fun get(io.github.jan.supabase.storage.resumable/Fingerprint): io.github.jan.supabase.storage.resumable/ResumableCacheEntry? // io.github.jan.supabase.storage.resumable/MemoryResumableCache.get|get(io.github.jan.supabase.storage.resumable.Fingerprint){}[0]
+    final suspend fun remove(io.github.jan.supabase.storage.resumable/Fingerprint) // io.github.jan.supabase.storage.resumable/MemoryResumableCache.remove|remove(io.github.jan.supabase.storage.resumable.Fingerprint){}[0]
+    final suspend fun set(io.github.jan.supabase.storage.resumable/Fingerprint, io.github.jan.supabase.storage.resumable/ResumableCacheEntry) // io.github.jan.supabase.storage.resumable/MemoryResumableCache.set|set(io.github.jan.supabase.storage.resumable.Fingerprint;io.github.jan.supabase.storage.resumable.ResumableCacheEntry){}[0]
+}
+
+final class io.github.jan.supabase.storage.resumable/ResumableCacheEntry { // io.github.jan.supabase.storage.resumable/ResumableCacheEntry|null[0]
+    constructor <init>(kotlin/String, kotlin/String, kotlin/String, kotlin.time/Instant, kotlin/Boolean = ..., kotlin/String = ...) // io.github.jan.supabase.storage.resumable/ResumableCacheEntry.<init>|<init>(kotlin.String;kotlin.String;kotlin.String;kotlin.time.Instant;kotlin.Boolean;kotlin.String){}[0]
+
+    final val bucketId // io.github.jan.supabase.storage.resumable/ResumableCacheEntry.bucketId|{}bucketId[0]
+        final fun <get-bucketId>(): kotlin/String // io.github.jan.supabase.storage.resumable/ResumableCacheEntry.bucketId.<get-bucketId>|<get-bucketId>(){}[0]
+    final val contentType // io.github.jan.supabase.storage.resumable/ResumableCacheEntry.contentType|{}contentType[0]
+        final fun <get-contentType>(): kotlin/String // io.github.jan.supabase.storage.resumable/ResumableCacheEntry.contentType.<get-contentType>|<get-contentType>(){}[0]
+    final val expiresAt // io.github.jan.supabase.storage.resumable/ResumableCacheEntry.expiresAt|{}expiresAt[0]
+        final fun <get-expiresAt>(): kotlin.time/Instant // io.github.jan.supabase.storage.resumable/ResumableCacheEntry.expiresAt.<get-expiresAt>|<get-expiresAt>(){}[0]
+    final val path // io.github.jan.supabase.storage.resumable/ResumableCacheEntry.path|{}path[0]
+        final fun <get-path>(): kotlin/String // io.github.jan.supabase.storage.resumable/ResumableCacheEntry.path.<get-path>|<get-path>(){}[0]
+    final val upsert // io.github.jan.supabase.storage.resumable/ResumableCacheEntry.upsert|{}upsert[0]
+        final fun <get-upsert>(): kotlin/Boolean // io.github.jan.supabase.storage.resumable/ResumableCacheEntry.upsert.<get-upsert>|<get-upsert>(){}[0]
+    final val url // io.github.jan.supabase.storage.resumable/ResumableCacheEntry.url|{}url[0]
+        final fun <get-url>(): kotlin/String // io.github.jan.supabase.storage.resumable/ResumableCacheEntry.url.<get-url>|<get-url>(){}[0]
+
+    final fun component1(): kotlin/String // io.github.jan.supabase.storage.resumable/ResumableCacheEntry.component1|component1(){}[0]
+    final fun component2(): kotlin/String // io.github.jan.supabase.storage.resumable/ResumableCacheEntry.component2|component2(){}[0]
+    final fun component3(): kotlin/String // io.github.jan.supabase.storage.resumable/ResumableCacheEntry.component3|component3(){}[0]
+    final fun component4(): kotlin.time/Instant // io.github.jan.supabase.storage.resumable/ResumableCacheEntry.component4|component4(){}[0]
+    final fun component5(): kotlin/Boolean // io.github.jan.supabase.storage.resumable/ResumableCacheEntry.component5|component5(){}[0]
+    final fun component6(): kotlin/String // io.github.jan.supabase.storage.resumable/ResumableCacheEntry.component6|component6(){}[0]
+    final fun copy(kotlin/String = ..., kotlin/String = ..., kotlin/String = ..., kotlin.time/Instant = ..., kotlin/Boolean = ..., kotlin/String = ...): io.github.jan.supabase.storage.resumable/ResumableCacheEntry // io.github.jan.supabase.storage.resumable/ResumableCacheEntry.copy|copy(kotlin.String;kotlin.String;kotlin.String;kotlin.time.Instant;kotlin.Boolean;kotlin.String){}[0]
+    final fun equals(kotlin/Any?): kotlin/Boolean // io.github.jan.supabase.storage.resumable/ResumableCacheEntry.equals|equals(kotlin.Any?){}[0]
+    final fun hashCode(): kotlin/Int // io.github.jan.supabase.storage.resumable/ResumableCacheEntry.hashCode|hashCode(){}[0]
+    final fun toString(): kotlin/String // io.github.jan.supabase.storage.resumable/ResumableCacheEntry.toString|toString(){}[0]
+
+    final object $serializer : kotlinx.serialization.internal/GeneratedSerializer<io.github.jan.supabase.storage.resumable/ResumableCacheEntry> { // io.github.jan.supabase.storage.resumable/ResumableCacheEntry.$serializer|null[0]
+        final val descriptor // io.github.jan.supabase.storage.resumable/ResumableCacheEntry.$serializer.descriptor|{}descriptor[0]
+            final fun <get-descriptor>(): kotlinx.serialization.descriptors/SerialDescriptor // io.github.jan.supabase.storage.resumable/ResumableCacheEntry.$serializer.descriptor.<get-descriptor>|<get-descriptor>(){}[0]
+
+        final fun childSerializers(): kotlin/Array<kotlinx.serialization/KSerializer<*>> // io.github.jan.supabase.storage.resumable/ResumableCacheEntry.$serializer.childSerializers|childSerializers(){}[0]
+        final fun deserialize(kotlinx.serialization.encoding/Decoder): io.github.jan.supabase.storage.resumable/ResumableCacheEntry // io.github.jan.supabase.storage.resumable/ResumableCacheEntry.$serializer.deserialize|deserialize(kotlinx.serialization.encoding.Decoder){}[0]
+        final fun serialize(kotlinx.serialization.encoding/Encoder, io.github.jan.supabase.storage.resumable/ResumableCacheEntry) // io.github.jan.supabase.storage.resumable/ResumableCacheEntry.$serializer.serialize|serialize(kotlinx.serialization.encoding.Encoder;io.github.jan.supabase.storage.resumable.ResumableCacheEntry){}[0]
+    }
+
+    final object Companion { // io.github.jan.supabase.storage.resumable/ResumableCacheEntry.Companion|null[0]
+        final fun serializer(): kotlinx.serialization/KSerializer<io.github.jan.supabase.storage.resumable/ResumableCacheEntry> // io.github.jan.supabase.storage.resumable/ResumableCacheEntry.Companion.serializer|serializer(){}[0]
+    }
+}
+
+final class io.github.jan.supabase.storage.resumable/ResumableUploadState { // io.github.jan.supabase.storage.resumable/ResumableUploadState|null[0]
+    constructor <init>(io.github.jan.supabase.storage.resumable/Fingerprint, io.github.jan.supabase.storage.resumable/ResumableCacheEntry, io.github.jan.supabase.storage/UploadStatus, kotlin/Boolean) // io.github.jan.supabase.storage.resumable/ResumableUploadState.<init>|<init>(io.github.jan.supabase.storage.resumable.Fingerprint;io.github.jan.supabase.storage.resumable.ResumableCacheEntry;io.github.jan.supabase.storage.UploadStatus;kotlin.Boolean){}[0]
+
+    final val bucketId // io.github.jan.supabase.storage.resumable/ResumableUploadState.bucketId|{}bucketId[0]
+        final fun <get-bucketId>(): kotlin/String // io.github.jan.supabase.storage.resumable/ResumableUploadState.bucketId.<get-bucketId>|<get-bucketId>(){}[0]
+    final val fingerprint // io.github.jan.supabase.storage.resumable/ResumableUploadState.fingerprint|{}fingerprint[0]
+        final fun <get-fingerprint>(): io.github.jan.supabase.storage.resumable/Fingerprint // io.github.jan.supabase.storage.resumable/ResumableUploadState.fingerprint.<get-fingerprint>|<get-fingerprint>(){}[0]
+    final val isDone // io.github.jan.supabase.storage.resumable/ResumableUploadState.isDone|{}isDone[0]
+        final fun <get-isDone>(): kotlin/Boolean // io.github.jan.supabase.storage.resumable/ResumableUploadState.isDone.<get-isDone>|<get-isDone>(){}[0]
+    final val path // io.github.jan.supabase.storage.resumable/ResumableUploadState.path|{}path[0]
+        final fun <get-path>(): kotlin/String // io.github.jan.supabase.storage.resumable/ResumableUploadState.path.<get-path>|<get-path>(){}[0]
+    final val paused // io.github.jan.supabase.storage.resumable/ResumableUploadState.paused|{}paused[0]
+        final fun <get-paused>(): kotlin/Boolean // io.github.jan.supabase.storage.resumable/ResumableUploadState.paused.<get-paused>|<get-paused>(){}[0]
+    final val progress // io.github.jan.supabase.storage.resumable/ResumableUploadState.progress|{}progress[0]
+        final fun <get-progress>(): kotlin/Float // io.github.jan.supabase.storage.resumable/ResumableUploadState.progress.<get-progress>|<get-progress>(){}[0]
+    final val status // io.github.jan.supabase.storage.resumable/ResumableUploadState.status|{}status[0]
+        final fun <get-status>(): io.github.jan.supabase.storage/UploadStatus // io.github.jan.supabase.storage.resumable/ResumableUploadState.status.<get-status>|<get-status>(){}[0]
+
+    final fun component1(): io.github.jan.supabase.storage.resumable/Fingerprint // io.github.jan.supabase.storage.resumable/ResumableUploadState.component1|component1(){}[0]
+    final fun component3(): io.github.jan.supabase.storage/UploadStatus // io.github.jan.supabase.storage.resumable/ResumableUploadState.component3|component3(){}[0]
+    final fun component4(): kotlin/Boolean // io.github.jan.supabase.storage.resumable/ResumableUploadState.component4|component4(){}[0]
+    final fun copy(io.github.jan.supabase.storage.resumable/Fingerprint = ..., io.github.jan.supabase.storage.resumable/ResumableCacheEntry = ..., io.github.jan.supabase.storage/UploadStatus = ..., kotlin/Boolean = ...): io.github.jan.supabase.storage.resumable/ResumableUploadState // io.github.jan.supabase.storage.resumable/ResumableUploadState.copy|copy(io.github.jan.supabase.storage.resumable.Fingerprint;io.github.jan.supabase.storage.resumable.ResumableCacheEntry;io.github.jan.supabase.storage.UploadStatus;kotlin.Boolean){}[0]
+    final fun equals(kotlin/Any?): kotlin/Boolean // io.github.jan.supabase.storage.resumable/ResumableUploadState.equals|equals(kotlin.Any?){}[0]
+    final fun hashCode(): kotlin/Int // io.github.jan.supabase.storage.resumable/ResumableUploadState.hashCode|hashCode(){}[0]
+    final fun toString(): kotlin/String // io.github.jan.supabase.storage.resumable/ResumableUploadState.toString|toString(){}[0]
+}
+
+final class io.github.jan.supabase.storage.vectors.bucket/EncryptionConfiguration { // io.github.jan.supabase.storage.vectors.bucket/EncryptionConfiguration|null[0]
+    constructor <init>(kotlin/String? = ..., kotlin/String? = ...) // io.github.jan.supabase.storage.vectors.bucket/EncryptionConfiguration.<init>|<init>(kotlin.String?;kotlin.String?){}[0]
+
+    final val kmsKeyArn // io.github.jan.supabase.storage.vectors.bucket/EncryptionConfiguration.kmsKeyArn|{}kmsKeyArn[0]
+        final fun <get-kmsKeyArn>(): kotlin/String? // io.github.jan.supabase.storage.vectors.bucket/EncryptionConfiguration.kmsKeyArn.<get-kmsKeyArn>|<get-kmsKeyArn>(){}[0]
+    final val sseType // io.github.jan.supabase.storage.vectors.bucket/EncryptionConfiguration.sseType|{}sseType[0]
+        final fun <get-sseType>(): kotlin/String? // io.github.jan.supabase.storage.vectors.bucket/EncryptionConfiguration.sseType.<get-sseType>|<get-sseType>(){}[0]
+
+    final fun component1(): kotlin/String? // io.github.jan.supabase.storage.vectors.bucket/EncryptionConfiguration.component1|component1(){}[0]
+    final fun component2(): kotlin/String? // io.github.jan.supabase.storage.vectors.bucket/EncryptionConfiguration.component2|component2(){}[0]
+    final fun copy(kotlin/String? = ..., kotlin/String? = ...): io.github.jan.supabase.storage.vectors.bucket/EncryptionConfiguration // io.github.jan.supabase.storage.vectors.bucket/EncryptionConfiguration.copy|copy(kotlin.String?;kotlin.String?){}[0]
+    final fun equals(kotlin/Any?): kotlin/Boolean // io.github.jan.supabase.storage.vectors.bucket/EncryptionConfiguration.equals|equals(kotlin.Any?){}[0]
+    final fun hashCode(): kotlin/Int // io.github.jan.supabase.storage.vectors.bucket/EncryptionConfiguration.hashCode|hashCode(){}[0]
+    final fun toString(): kotlin/String // io.github.jan.supabase.storage.vectors.bucket/EncryptionConfiguration.toString|toString(){}[0]
+}
+
+final class io.github.jan.supabase.storage.vectors.bucket/ListVectorBucketsResponse { // io.github.jan.supabase.storage.vectors.bucket/ListVectorBucketsResponse|null[0]
+    constructor <init>(kotlinx.serialization.json/JsonArray, kotlin/String? = ...) // io.github.jan.supabase.storage.vectors.bucket/ListVectorBucketsResponse.<init>|<init>(kotlinx.serialization.json.JsonArray;kotlin.String?){}[0]
+
+    final val nextToken // io.github.jan.supabase.storage.vectors.bucket/ListVectorBucketsResponse.nextToken|{}nextToken[0]
+        final fun <get-nextToken>(): kotlin/String? // io.github.jan.supabase.storage.vectors.bucket/ListVectorBucketsResponse.nextToken.<get-nextToken>|<get-nextToken>(){}[0]
+    final val vectorBuckets // io.github.jan.supabase.storage.vectors.bucket/ListVectorBucketsResponse.vectorBuckets|{}vectorBuckets[0]
+        final fun <get-vectorBuckets>(): kotlin.collections/List<kotlin/String> // io.github.jan.supabase.storage.vectors.bucket/ListVectorBucketsResponse.vectorBuckets.<get-vectorBuckets>|<get-vectorBuckets>(){}[0]
+
+    final fun component2(): kotlin/String? // io.github.jan.supabase.storage.vectors.bucket/ListVectorBucketsResponse.component2|component2(){}[0]
+    final fun copy(kotlinx.serialization.json/JsonArray = ..., kotlin/String? = ...): io.github.jan.supabase.storage.vectors.bucket/ListVectorBucketsResponse // io.github.jan.supabase.storage.vectors.bucket/ListVectorBucketsResponse.copy|copy(kotlinx.serialization.json.JsonArray;kotlin.String?){}[0]
+    final fun equals(kotlin/Any?): kotlin/Boolean // io.github.jan.supabase.storage.vectors.bucket/ListVectorBucketsResponse.equals|equals(kotlin.Any?){}[0]
+    final fun hashCode(): kotlin/Int // io.github.jan.supabase.storage.vectors.bucket/ListVectorBucketsResponse.hashCode|hashCode(){}[0]
+    final fun toString(): kotlin/String // io.github.jan.supabase.storage.vectors.bucket/ListVectorBucketsResponse.toString|toString(){}[0]
+}
+
+final class io.github.jan.supabase.storage.vectors.bucket/VectorBucket { // io.github.jan.supabase.storage.vectors.bucket/VectorBucket|null[0]
+    constructor <init>(kotlin/String, kotlin.time/Instant? = ..., io.github.jan.supabase.storage.vectors.bucket/EncryptionConfiguration? = ...) // io.github.jan.supabase.storage.vectors.bucket/VectorBucket.<init>|<init>(kotlin.String;kotlin.time.Instant?;io.github.jan.supabase.storage.vectors.bucket.EncryptionConfiguration?){}[0]
+
+    final val creationTime // io.github.jan.supabase.storage.vectors.bucket/VectorBucket.creationTime|{}creationTime[0]
+        final fun <get-creationTime>(): kotlin.time/Instant? // io.github.jan.supabase.storage.vectors.bucket/VectorBucket.creationTime.<get-creationTime>|<get-creationTime>(){}[0]
+    final val encryptionConfiguration // io.github.jan.supabase.storage.vectors.bucket/VectorBucket.encryptionConfiguration|{}encryptionConfiguration[0]
+        final fun <get-encryptionConfiguration>(): io.github.jan.supabase.storage.vectors.bucket/EncryptionConfiguration? // io.github.jan.supabase.storage.vectors.bucket/VectorBucket.encryptionConfiguration.<get-encryptionConfiguration>|<get-encryptionConfiguration>(){}[0]
+    final val vectorBucketName // io.github.jan.supabase.storage.vectors.bucket/VectorBucket.vectorBucketName|{}vectorBucketName[0]
+        final fun <get-vectorBucketName>(): kotlin/String // io.github.jan.supabase.storage.vectors.bucket/VectorBucket.vectorBucketName.<get-vectorBucketName>|<get-vectorBucketName>(){}[0]
+
+    final fun component1(): kotlin/String // io.github.jan.supabase.storage.vectors.bucket/VectorBucket.component1|component1(){}[0]
+    final fun component2(): kotlin.time/Instant? // io.github.jan.supabase.storage.vectors.bucket/VectorBucket.component2|component2(){}[0]
+    final fun component3(): io.github.jan.supabase.storage.vectors.bucket/EncryptionConfiguration? // io.github.jan.supabase.storage.vectors.bucket/VectorBucket.component3|component3(){}[0]
+    final fun copy(kotlin/String = ..., kotlin.time/Instant? = ..., io.github.jan.supabase.storage.vectors.bucket/EncryptionConfiguration? = ...): io.github.jan.supabase.storage.vectors.bucket/VectorBucket // io.github.jan.supabase.storage.vectors.bucket/VectorBucket.copy|copy(kotlin.String;kotlin.time.Instant?;io.github.jan.supabase.storage.vectors.bucket.EncryptionConfiguration?){}[0]
+    final fun equals(kotlin/Any?): kotlin/Boolean // io.github.jan.supabase.storage.vectors.bucket/VectorBucket.equals|equals(kotlin.Any?){}[0]
+    final fun hashCode(): kotlin/Int // io.github.jan.supabase.storage.vectors.bucket/VectorBucket.hashCode|hashCode(){}[0]
+    final fun toString(): kotlin/String // io.github.jan.supabase.storage.vectors.bucket/VectorBucket.toString|toString(){}[0]
+}
+
+final class io.github.jan.supabase.storage.vectors.bucket/VectorBucketFilter { // io.github.jan.supabase.storage.vectors.bucket/VectorBucketFilter|null[0]
+    constructor <init>() // io.github.jan.supabase.storage.vectors.bucket/VectorBucketFilter.<init>|<init>(){}[0]
+
+    final var maxResults // io.github.jan.supabase.storage.vectors.bucket/VectorBucketFilter.maxResults|{}maxResults[0]
+        final fun <get-maxResults>(): kotlin/Int? // io.github.jan.supabase.storage.vectors.bucket/VectorBucketFilter.maxResults.<get-maxResults>|<get-maxResults>(){}[0]
+        final fun <set-maxResults>(kotlin/Int?) // io.github.jan.supabase.storage.vectors.bucket/VectorBucketFilter.maxResults.<set-maxResults>|<set-maxResults>(kotlin.Int?){}[0]
+    final var nextToken // io.github.jan.supabase.storage.vectors.bucket/VectorBucketFilter.nextToken|{}nextToken[0]
+        final fun <get-nextToken>(): kotlin/String? // io.github.jan.supabase.storage.vectors.bucket/VectorBucketFilter.nextToken.<get-nextToken>|<get-nextToken>(){}[0]
+        final fun <set-nextToken>(kotlin/String?) // io.github.jan.supabase.storage.vectors.bucket/VectorBucketFilter.nextToken.<set-nextToken>|<set-nextToken>(kotlin.String?){}[0]
+    final var prefix // io.github.jan.supabase.storage.vectors.bucket/VectorBucketFilter.prefix|{}prefix[0]
+        final fun <get-prefix>(): kotlin/String? // io.github.jan.supabase.storage.vectors.bucket/VectorBucketFilter.prefix.<get-prefix>|<get-prefix>(){}[0]
+        final fun <set-prefix>(kotlin/String?) // io.github.jan.supabase.storage.vectors.bucket/VectorBucketFilter.prefix.<set-prefix>|<set-prefix>(kotlin.String?){}[0]
+}
+
+final class io.github.jan.supabase.storage.vectors.data/GetVectorOptions { // io.github.jan.supabase.storage.vectors.data/GetVectorOptions|null[0]
+    constructor <init>(kotlin/String, kotlin/String) // io.github.jan.supabase.storage.vectors.data/GetVectorOptions.<init>|<init>(kotlin.String;kotlin.String){}[0]
+
+    final val indexName // io.github.jan.supabase.storage.vectors.data/GetVectorOptions.indexName|{}indexName[0]
+        final fun <get-indexName>(): kotlin/String // io.github.jan.supabase.storage.vectors.data/GetVectorOptions.indexName.<get-indexName>|<get-indexName>(){}[0]
+    final val keys // io.github.jan.supabase.storage.vectors.data/GetVectorOptions.keys|{}keys[0]
+        final fun <get-keys>(): kotlin.collections/MutableList<kotlin/String> // io.github.jan.supabase.storage.vectors.data/GetVectorOptions.keys.<get-keys>|<get-keys>(){}[0]
+    final val vectorBucketName // io.github.jan.supabase.storage.vectors.data/GetVectorOptions.vectorBucketName|{}vectorBucketName[0]
+        final fun <get-vectorBucketName>(): kotlin/String // io.github.jan.supabase.storage.vectors.data/GetVectorOptions.vectorBucketName.<get-vectorBucketName>|<get-vectorBucketName>(){}[0]
+
+    final var returnData // io.github.jan.supabase.storage.vectors.data/GetVectorOptions.returnData|{}returnData[0]
+        final fun <get-returnData>(): kotlin/Boolean? // io.github.jan.supabase.storage.vectors.data/GetVectorOptions.returnData.<get-returnData>|<get-returnData>(){}[0]
+        final fun <set-returnData>(kotlin/Boolean?) // io.github.jan.supabase.storage.vectors.data/GetVectorOptions.returnData.<set-returnData>|<set-returnData>(kotlin.Boolean?){}[0]
+    final var returnMetadata // io.github.jan.supabase.storage.vectors.data/GetVectorOptions.returnMetadata|{}returnMetadata[0]
+        final fun <get-returnMetadata>(): kotlin/Boolean? // io.github.jan.supabase.storage.vectors.data/GetVectorOptions.returnMetadata.<get-returnMetadata>|<get-returnMetadata>(){}[0]
+        final fun <set-returnMetadata>(kotlin/Boolean?) // io.github.jan.supabase.storage.vectors.data/GetVectorOptions.returnMetadata.<set-returnMetadata>|<set-returnMetadata>(kotlin.Boolean?){}[0]
+
+    final object $serializer : kotlinx.serialization.internal/GeneratedSerializer<io.github.jan.supabase.storage.vectors.data/GetVectorOptions> { // io.github.jan.supabase.storage.vectors.data/GetVectorOptions.$serializer|null[0]
+        final val descriptor // io.github.jan.supabase.storage.vectors.data/GetVectorOptions.$serializer.descriptor|{}descriptor[0]
+            final fun <get-descriptor>(): kotlinx.serialization.descriptors/SerialDescriptor // io.github.jan.supabase.storage.vectors.data/GetVectorOptions.$serializer.descriptor.<get-descriptor>|<get-descriptor>(){}[0]
+
+        final fun childSerializers(): kotlin/Array<kotlinx.serialization/KSerializer<*>> // io.github.jan.supabase.storage.vectors.data/GetVectorOptions.$serializer.childSerializers|childSerializers(){}[0]
+        final fun deserialize(kotlinx.serialization.encoding/Decoder): io.github.jan.supabase.storage.vectors.data/GetVectorOptions // io.github.jan.supabase.storage.vectors.data/GetVectorOptions.$serializer.deserialize|deserialize(kotlinx.serialization.encoding.Decoder){}[0]
+        final fun serialize(kotlinx.serialization.encoding/Encoder, io.github.jan.supabase.storage.vectors.data/GetVectorOptions) // io.github.jan.supabase.storage.vectors.data/GetVectorOptions.$serializer.serialize|serialize(kotlinx.serialization.encoding.Encoder;io.github.jan.supabase.storage.vectors.data.GetVectorOptions){}[0]
+    }
+
+    final object Companion { // io.github.jan.supabase.storage.vectors.data/GetVectorOptions.Companion|null[0]
+        final val $childSerializers // io.github.jan.supabase.storage.vectors.data/GetVectorOptions.Companion.$childSerializers|{}$childSerializers[0]
+
+        final fun serializer(): kotlinx.serialization/KSerializer<io.github.jan.supabase.storage.vectors.data/GetVectorOptions> // io.github.jan.supabase.storage.vectors.data/GetVectorOptions.Companion.serializer|serializer(){}[0]
+    }
+}
+
+final class io.github.jan.supabase.storage.vectors.data/ListVectorsOptions { // io.github.jan.supabase.storage.vectors.data/ListVectorsOptions|null[0]
+    constructor <init>(kotlin/String, kotlin/String) // io.github.jan.supabase.storage.vectors.data/ListVectorsOptions.<init>|<init>(kotlin.String;kotlin.String){}[0]
+
+    final val indexName // io.github.jan.supabase.storage.vectors.data/ListVectorsOptions.indexName|{}indexName[0]
+        final fun <get-indexName>(): kotlin/String // io.github.jan.supabase.storage.vectors.data/ListVectorsOptions.indexName.<get-indexName>|<get-indexName>(){}[0]
+    final val vectorBucketName // io.github.jan.supabase.storage.vectors.data/ListVectorsOptions.vectorBucketName|{}vectorBucketName[0]
+        final fun <get-vectorBucketName>(): kotlin/String // io.github.jan.supabase.storage.vectors.data/ListVectorsOptions.vectorBucketName.<get-vectorBucketName>|<get-vectorBucketName>(){}[0]
+
+    final var maxResults // io.github.jan.supabase.storage.vectors.data/ListVectorsOptions.maxResults|{}maxResults[0]
+        final fun <get-maxResults>(): kotlin/Int? // io.github.jan.supabase.storage.vectors.data/ListVectorsOptions.maxResults.<get-maxResults>|<get-maxResults>(){}[0]
+        final fun <set-maxResults>(kotlin/Int?) // io.github.jan.supabase.storage.vectors.data/ListVectorsOptions.maxResults.<set-maxResults>|<set-maxResults>(kotlin.Int?){}[0]
+    final var nextToken // io.github.jan.supabase.storage.vectors.data/ListVectorsOptions.nextToken|{}nextToken[0]
+        final fun <get-nextToken>(): kotlin/String? // io.github.jan.supabase.storage.vectors.data/ListVectorsOptions.nextToken.<get-nextToken>|<get-nextToken>(){}[0]
+        final fun <set-nextToken>(kotlin/String?) // io.github.jan.supabase.storage.vectors.data/ListVectorsOptions.nextToken.<set-nextToken>|<set-nextToken>(kotlin.String?){}[0]
+    final var returnData // io.github.jan.supabase.storage.vectors.data/ListVectorsOptions.returnData|{}returnData[0]
+        final fun <get-returnData>(): kotlin/Boolean? // io.github.jan.supabase.storage.vectors.data/ListVectorsOptions.returnData.<get-returnData>|<get-returnData>(){}[0]
+        final fun <set-returnData>(kotlin/Boolean?) // io.github.jan.supabase.storage.vectors.data/ListVectorsOptions.returnData.<set-returnData>|<set-returnData>(kotlin.Boolean?){}[0]
+    final var returnMetadata // io.github.jan.supabase.storage.vectors.data/ListVectorsOptions.returnMetadata|{}returnMetadata[0]
+        final fun <get-returnMetadata>(): kotlin/Boolean? // io.github.jan.supabase.storage.vectors.data/ListVectorsOptions.returnMetadata.<get-returnMetadata>|<get-returnMetadata>(){}[0]
+        final fun <set-returnMetadata>(kotlin/Boolean?) // io.github.jan.supabase.storage.vectors.data/ListVectorsOptions.returnMetadata.<set-returnMetadata>|<set-returnMetadata>(kotlin.Boolean?){}[0]
+    final var segmentCount // io.github.jan.supabase.storage.vectors.data/ListVectorsOptions.segmentCount|{}segmentCount[0]
+        final fun <get-segmentCount>(): kotlin/Int? // io.github.jan.supabase.storage.vectors.data/ListVectorsOptions.segmentCount.<get-segmentCount>|<get-segmentCount>(){}[0]
+        final fun <set-segmentCount>(kotlin/Int?) // io.github.jan.supabase.storage.vectors.data/ListVectorsOptions.segmentCount.<set-segmentCount>|<set-segmentCount>(kotlin.Int?){}[0]
+    final var segmentIndex // io.github.jan.supabase.storage.vectors.data/ListVectorsOptions.segmentIndex|{}segmentIndex[0]
+        final fun <get-segmentIndex>(): kotlin/Int? // io.github.jan.supabase.storage.vectors.data/ListVectorsOptions.segmentIndex.<get-segmentIndex>|<get-segmentIndex>(){}[0]
+        final fun <set-segmentIndex>(kotlin/Int?) // io.github.jan.supabase.storage.vectors.data/ListVectorsOptions.segmentIndex.<set-segmentIndex>|<set-segmentIndex>(kotlin.Int?){}[0]
+
+    final object $serializer : kotlinx.serialization.internal/GeneratedSerializer<io.github.jan.supabase.storage.vectors.data/ListVectorsOptions> { // io.github.jan.supabase.storage.vectors.data/ListVectorsOptions.$serializer|null[0]
+        final val descriptor // io.github.jan.supabase.storage.vectors.data/ListVectorsOptions.$serializer.descriptor|{}descriptor[0]
+            final fun <get-descriptor>(): kotlinx.serialization.descriptors/SerialDescriptor // io.github.jan.supabase.storage.vectors.data/ListVectorsOptions.$serializer.descriptor.<get-descriptor>|<get-descriptor>(){}[0]
+
+        final fun childSerializers(): kotlin/Array<kotlinx.serialization/KSerializer<*>> // io.github.jan.supabase.storage.vectors.data/ListVectorsOptions.$serializer.childSerializers|childSerializers(){}[0]
+        final fun deserialize(kotlinx.serialization.encoding/Decoder): io.github.jan.supabase.storage.vectors.data/ListVectorsOptions // io.github.jan.supabase.storage.vectors.data/ListVectorsOptions.$serializer.deserialize|deserialize(kotlinx.serialization.encoding.Decoder){}[0]
+        final fun serialize(kotlinx.serialization.encoding/Encoder, io.github.jan.supabase.storage.vectors.data/ListVectorsOptions) // io.github.jan.supabase.storage.vectors.data/ListVectorsOptions.$serializer.serialize|serialize(kotlinx.serialization.encoding.Encoder;io.github.jan.supabase.storage.vectors.data.ListVectorsOptions){}[0]
+    }
+
+    final object Companion { // io.github.jan.supabase.storage.vectors.data/ListVectorsOptions.Companion|null[0]
+        final fun serializer(): kotlinx.serialization/KSerializer<io.github.jan.supabase.storage.vectors.data/ListVectorsOptions> // io.github.jan.supabase.storage.vectors.data/ListVectorsOptions.Companion.serializer|serializer(){}[0]
+    }
+}
+
+final class io.github.jan.supabase.storage.vectors.data/ListVectorsResponse { // io.github.jan.supabase.storage.vectors.data/ListVectorsResponse|null[0]
+    constructor <init>(kotlin.collections/List<io.github.jan.supabase.storage.vectors.data/VectorMatch>, kotlin/String? = ...) // io.github.jan.supabase.storage.vectors.data/ListVectorsResponse.<init>|<init>(kotlin.collections.List<io.github.jan.supabase.storage.vectors.data.VectorMatch>;kotlin.String?){}[0]
+
+    final val nextToken // io.github.jan.supabase.storage.vectors.data/ListVectorsResponse.nextToken|{}nextToken[0]
+        final fun <get-nextToken>(): kotlin/String? // io.github.jan.supabase.storage.vectors.data/ListVectorsResponse.nextToken.<get-nextToken>|<get-nextToken>(){}[0]
+    final val vectors // io.github.jan.supabase.storage.vectors.data/ListVectorsResponse.vectors|{}vectors[0]
+        final fun <get-vectors>(): kotlin.collections/List<io.github.jan.supabase.storage.vectors.data/VectorMatch> // io.github.jan.supabase.storage.vectors.data/ListVectorsResponse.vectors.<get-vectors>|<get-vectors>(){}[0]
+
+    final fun component1(): kotlin.collections/List<io.github.jan.supabase.storage.vectors.data/VectorMatch> // io.github.jan.supabase.storage.vectors.data/ListVectorsResponse.component1|component1(){}[0]
+    final fun component2(): kotlin/String? // io.github.jan.supabase.storage.vectors.data/ListVectorsResponse.component2|component2(){}[0]
+    final fun copy(kotlin.collections/List<io.github.jan.supabase.storage.vectors.data/VectorMatch> = ..., kotlin/String? = ...): io.github.jan.supabase.storage.vectors.data/ListVectorsResponse // io.github.jan.supabase.storage.vectors.data/ListVectorsResponse.copy|copy(kotlin.collections.List<io.github.jan.supabase.storage.vectors.data.VectorMatch>;kotlin.String?){}[0]
+    final fun equals(kotlin/Any?): kotlin/Boolean // io.github.jan.supabase.storage.vectors.data/ListVectorsResponse.equals|equals(kotlin.Any?){}[0]
+    final fun hashCode(): kotlin/Int // io.github.jan.supabase.storage.vectors.data/ListVectorsResponse.hashCode|hashCode(){}[0]
+    final fun toString(): kotlin/String // io.github.jan.supabase.storage.vectors.data/ListVectorsResponse.toString|toString(){}[0]
+
+    final object $serializer : kotlinx.serialization.internal/GeneratedSerializer<io.github.jan.supabase.storage.vectors.data/ListVectorsResponse> { // io.github.jan.supabase.storage.vectors.data/ListVectorsResponse.$serializer|null[0]
+        final val descriptor // io.github.jan.supabase.storage.vectors.data/ListVectorsResponse.$serializer.descriptor|{}descriptor[0]
+            final fun <get-descriptor>(): kotlinx.serialization.descriptors/SerialDescriptor // io.github.jan.supabase.storage.vectors.data/ListVectorsResponse.$serializer.descriptor.<get-descriptor>|<get-descriptor>(){}[0]
+
+        final fun childSerializers(): kotlin/Array<kotlinx.serialization/KSerializer<*>> // io.github.jan.supabase.storage.vectors.data/ListVectorsResponse.$serializer.childSerializers|childSerializers(){}[0]
+        final fun deserialize(kotlinx.serialization.encoding/Decoder): io.github.jan.supabase.storage.vectors.data/ListVectorsResponse // io.github.jan.supabase.storage.vectors.data/ListVectorsResponse.$serializer.deserialize|deserialize(kotlinx.serialization.encoding.Decoder){}[0]
+        final fun serialize(kotlinx.serialization.encoding/Encoder, io.github.jan.supabase.storage.vectors.data/ListVectorsResponse) // io.github.jan.supabase.storage.vectors.data/ListVectorsResponse.$serializer.serialize|serialize(kotlinx.serialization.encoding.Encoder;io.github.jan.supabase.storage.vectors.data.ListVectorsResponse){}[0]
+    }
+
+    final object Companion { // io.github.jan.supabase.storage.vectors.data/ListVectorsResponse.Companion|null[0]
+        final val $childSerializers // io.github.jan.supabase.storage.vectors.data/ListVectorsResponse.Companion.$childSerializers|{}$childSerializers[0]
+
+        final fun serializer(): kotlinx.serialization/KSerializer<io.github.jan.supabase.storage.vectors.data/ListVectorsResponse> // io.github.jan.supabase.storage.vectors.data/ListVectorsResponse.Companion.serializer|serializer(){}[0]
+    }
+}
+
+final class io.github.jan.supabase.storage.vectors.data/QueryVectorsOptions { // io.github.jan.supabase.storage.vectors.data/QueryVectorsOptions|null[0]
+    constructor <init>(kotlin/String, kotlin/String) // io.github.jan.supabase.storage.vectors.data/QueryVectorsOptions.<init>|<init>(kotlin.String;kotlin.String){}[0]
+
+    final val indexName // io.github.jan.supabase.storage.vectors.data/QueryVectorsOptions.indexName|{}indexName[0]
+        final fun <get-indexName>(): kotlin/String // io.github.jan.supabase.storage.vectors.data/QueryVectorsOptions.indexName.<get-indexName>|<get-indexName>(){}[0]
+    final val vectorBucketName // io.github.jan.supabase.storage.vectors.data/QueryVectorsOptions.vectorBucketName|{}vectorBucketName[0]
+        final fun <get-vectorBucketName>(): kotlin/String // io.github.jan.supabase.storage.vectors.data/QueryVectorsOptions.vectorBucketName.<get-vectorBucketName>|<get-vectorBucketName>(){}[0]
+
+    final var filter // io.github.jan.supabase.storage.vectors.data/QueryVectorsOptions.filter|{}filter[0]
+        final fun <get-filter>(): kotlinx.serialization.json/JsonObject? // io.github.jan.supabase.storage.vectors.data/QueryVectorsOptions.filter.<get-filter>|<get-filter>(){}[0]
+        final fun <set-filter>(kotlinx.serialization.json/JsonObject?) // io.github.jan.supabase.storage.vectors.data/QueryVectorsOptions.filter.<set-filter>|<set-filter>(kotlinx.serialization.json.JsonObject?){}[0]
+    final var queryVector // io.github.jan.supabase.storage.vectors.data/QueryVectorsOptions.queryVector|{}queryVector[0]
+        final fun <get-queryVector>(): io.github.jan.supabase.storage.vectors.data/VectorData // io.github.jan.supabase.storage.vectors.data/QueryVectorsOptions.queryVector.<get-queryVector>|<get-queryVector>(){}[0]
+        final fun <set-queryVector>(io.github.jan.supabase.storage.vectors.data/VectorData) // io.github.jan.supabase.storage.vectors.data/QueryVectorsOptions.queryVector.<set-queryVector>|<set-queryVector>(io.github.jan.supabase.storage.vectors.data.VectorData){}[0]
+    final var returnDistance // io.github.jan.supabase.storage.vectors.data/QueryVectorsOptions.returnDistance|{}returnDistance[0]
+        final fun <get-returnDistance>(): kotlin/Boolean? // io.github.jan.supabase.storage.vectors.data/QueryVectorsOptions.returnDistance.<get-returnDistance>|<get-returnDistance>(){}[0]
+        final fun <set-returnDistance>(kotlin/Boolean?) // io.github.jan.supabase.storage.vectors.data/QueryVectorsOptions.returnDistance.<set-returnDistance>|<set-returnDistance>(kotlin.Boolean?){}[0]
+    final var returnMetadata // io.github.jan.supabase.storage.vectors.data/QueryVectorsOptions.returnMetadata|{}returnMetadata[0]
+        final fun <get-returnMetadata>(): kotlin/Boolean? // io.github.jan.supabase.storage.vectors.data/QueryVectorsOptions.returnMetadata.<get-returnMetadata>|<get-returnMetadata>(){}[0]
+        final fun <set-returnMetadata>(kotlin/Boolean?) // io.github.jan.supabase.storage.vectors.data/QueryVectorsOptions.returnMetadata.<set-returnMetadata>|<set-returnMetadata>(kotlin.Boolean?){}[0]
+    final var topK // io.github.jan.supabase.storage.vectors.data/QueryVectorsOptions.topK|{}topK[0]
+        final fun <get-topK>(): kotlin/Int? // io.github.jan.supabase.storage.vectors.data/QueryVectorsOptions.topK.<get-topK>|<get-topK>(){}[0]
+        final fun <set-topK>(kotlin/Int?) // io.github.jan.supabase.storage.vectors.data/QueryVectorsOptions.topK.<set-topK>|<set-topK>(kotlin.Int?){}[0]
+}
+
+final class io.github.jan.supabase.storage.vectors.data/QueryVectorsResponse { // io.github.jan.supabase.storage.vectors.data/QueryVectorsResponse|null[0]
+    constructor <init>(kotlin.collections/List<io.github.jan.supabase.storage.vectors.data/VectorMatch>, io.github.jan.supabase.storage.vectors/DistanceMetric? = ...) // io.github.jan.supabase.storage.vectors.data/QueryVectorsResponse.<init>|<init>(kotlin.collections.List<io.github.jan.supabase.storage.vectors.data.VectorMatch>;io.github.jan.supabase.storage.vectors.DistanceMetric?){}[0]
+
+    final val distanceMetric // io.github.jan.supabase.storage.vectors.data/QueryVectorsResponse.distanceMetric|{}distanceMetric[0]
+        final fun <get-distanceMetric>(): io.github.jan.supabase.storage.vectors/DistanceMetric? // io.github.jan.supabase.storage.vectors.data/QueryVectorsResponse.distanceMetric.<get-distanceMetric>|<get-distanceMetric>(){}[0]
+    final val vectors // io.github.jan.supabase.storage.vectors.data/QueryVectorsResponse.vectors|{}vectors[0]
+        final fun <get-vectors>(): kotlin.collections/List<io.github.jan.supabase.storage.vectors.data/VectorMatch> // io.github.jan.supabase.storage.vectors.data/QueryVectorsResponse.vectors.<get-vectors>|<get-vectors>(){}[0]
+
+    final object $serializer : kotlinx.serialization.internal/GeneratedSerializer<io.github.jan.supabase.storage.vectors.data/QueryVectorsResponse> { // io.github.jan.supabase.storage.vectors.data/QueryVectorsResponse.$serializer|null[0]
+        final val descriptor // io.github.jan.supabase.storage.vectors.data/QueryVectorsResponse.$serializer.descriptor|{}descriptor[0]
+            final fun <get-descriptor>(): kotlinx.serialization.descriptors/SerialDescriptor // io.github.jan.supabase.storage.vectors.data/QueryVectorsResponse.$serializer.descriptor.<get-descriptor>|<get-descriptor>(){}[0]
+
+        final fun childSerializers(): kotlin/Array<kotlinx.serialization/KSerializer<*>> // io.github.jan.supabase.storage.vectors.data/QueryVectorsResponse.$serializer.childSerializers|childSerializers(){}[0]
+        final fun deserialize(kotlinx.serialization.encoding/Decoder): io.github.jan.supabase.storage.vectors.data/QueryVectorsResponse // io.github.jan.supabase.storage.vectors.data/QueryVectorsResponse.$serializer.deserialize|deserialize(kotlinx.serialization.encoding.Decoder){}[0]
+        final fun serialize(kotlinx.serialization.encoding/Encoder, io.github.jan.supabase.storage.vectors.data/QueryVectorsResponse) // io.github.jan.supabase.storage.vectors.data/QueryVectorsResponse.$serializer.serialize|serialize(kotlinx.serialization.encoding.Encoder;io.github.jan.supabase.storage.vectors.data.QueryVectorsResponse){}[0]
+    }
+
+    final object Companion { // io.github.jan.supabase.storage.vectors.data/QueryVectorsResponse.Companion|null[0]
+        final val $childSerializers // io.github.jan.supabase.storage.vectors.data/QueryVectorsResponse.Companion.$childSerializers|{}$childSerializers[0]
+
+        final fun serializer(): kotlinx.serialization/KSerializer<io.github.jan.supabase.storage.vectors.data/QueryVectorsResponse> // io.github.jan.supabase.storage.vectors.data/QueryVectorsResponse.Companion.serializer|serializer(){}[0]
+    }
+}
+
+final class io.github.jan.supabase.storage.vectors.data/VectorData { // io.github.jan.supabase.storage.vectors.data/VectorData|null[0]
+    constructor <init>(kotlin/FloatArray) // io.github.jan.supabase.storage.vectors.data/VectorData.<init>|<init>(kotlin.FloatArray){}[0]
+
+    final val float32 // io.github.jan.supabase.storage.vectors.data/VectorData.float32|{}float32[0]
+        final fun <get-float32>(): kotlin/FloatArray // io.github.jan.supabase.storage.vectors.data/VectorData.float32.<get-float32>|<get-float32>(){}[0]
+
+    final object $serializer : kotlinx.serialization.internal/GeneratedSerializer<io.github.jan.supabase.storage.vectors.data/VectorData> { // io.github.jan.supabase.storage.vectors.data/VectorData.$serializer|null[0]
+        final val descriptor // io.github.jan.supabase.storage.vectors.data/VectorData.$serializer.descriptor|{}descriptor[0]
+            final fun <get-descriptor>(): kotlinx.serialization.descriptors/SerialDescriptor // io.github.jan.supabase.storage.vectors.data/VectorData.$serializer.descriptor.<get-descriptor>|<get-descriptor>(){}[0]
+
+        final fun childSerializers(): kotlin/Array<kotlinx.serialization/KSerializer<*>> // io.github.jan.supabase.storage.vectors.data/VectorData.$serializer.childSerializers|childSerializers(){}[0]
+        final fun deserialize(kotlinx.serialization.encoding/Decoder): io.github.jan.supabase.storage.vectors.data/VectorData // io.github.jan.supabase.storage.vectors.data/VectorData.$serializer.deserialize|deserialize(kotlinx.serialization.encoding.Decoder){}[0]
+        final fun serialize(kotlinx.serialization.encoding/Encoder, io.github.jan.supabase.storage.vectors.data/VectorData) // io.github.jan.supabase.storage.vectors.data/VectorData.$serializer.serialize|serialize(kotlinx.serialization.encoding.Encoder;io.github.jan.supabase.storage.vectors.data.VectorData){}[0]
+    }
+
+    final object Companion { // io.github.jan.supabase.storage.vectors.data/VectorData.Companion|null[0]
+        final fun serializer(): kotlinx.serialization/KSerializer<io.github.jan.supabase.storage.vectors.data/VectorData> // io.github.jan.supabase.storage.vectors.data/VectorData.Companion.serializer|serializer(){}[0]
+    }
+}
+
+final class io.github.jan.supabase.storage.vectors.data/VectorMatch { // io.github.jan.supabase.storage.vectors.data/VectorMatch|null[0]
+    constructor <init>(kotlin/String, io.github.jan.supabase.storage.vectors.data/VectorData? = ..., kotlinx.serialization.json/JsonObject? = ..., kotlin/Int? = ...) // io.github.jan.supabase.storage.vectors.data/VectorMatch.<init>|<init>(kotlin.String;io.github.jan.supabase.storage.vectors.data.VectorData?;kotlinx.serialization.json.JsonObject?;kotlin.Int?){}[0]
+
+    final val data // io.github.jan.supabase.storage.vectors.data/VectorMatch.data|{}data[0]
+        final fun <get-data>(): io.github.jan.supabase.storage.vectors.data/VectorData? // io.github.jan.supabase.storage.vectors.data/VectorMatch.data.<get-data>|<get-data>(){}[0]
+    final val distance // io.github.jan.supabase.storage.vectors.data/VectorMatch.distance|{}distance[0]
+        final fun <get-distance>(): kotlin/Int? // io.github.jan.supabase.storage.vectors.data/VectorMatch.distance.<get-distance>|<get-distance>(){}[0]
+    final val key // io.github.jan.supabase.storage.vectors.data/VectorMatch.key|{}key[0]
+        final fun <get-key>(): kotlin/String // io.github.jan.supabase.storage.vectors.data/VectorMatch.key.<get-key>|<get-key>(){}[0]
+    final val metadata // io.github.jan.supabase.storage.vectors.data/VectorMatch.metadata|{}metadata[0]
+        final fun <get-metadata>(): kotlinx.serialization.json/JsonObject? // io.github.jan.supabase.storage.vectors.data/VectorMatch.metadata.<get-metadata>|<get-metadata>(){}[0]
+
+    final fun component1(): kotlin/String // io.github.jan.supabase.storage.vectors.data/VectorMatch.component1|component1(){}[0]
+    final fun component2(): io.github.jan.supabase.storage.vectors.data/VectorData? // io.github.jan.supabase.storage.vectors.data/VectorMatch.component2|component2(){}[0]
+    final fun component3(): kotlinx.serialization.json/JsonObject? // io.github.jan.supabase.storage.vectors.data/VectorMatch.component3|component3(){}[0]
+    final fun component4(): kotlin/Int? // io.github.jan.supabase.storage.vectors.data/VectorMatch.component4|component4(){}[0]
+    final fun copy(kotlin/String = ..., io.github.jan.supabase.storage.vectors.data/VectorData? = ..., kotlinx.serialization.json/JsonObject? = ..., kotlin/Int? = ...): io.github.jan.supabase.storage.vectors.data/VectorMatch // io.github.jan.supabase.storage.vectors.data/VectorMatch.copy|copy(kotlin.String;io.github.jan.supabase.storage.vectors.data.VectorData?;kotlinx.serialization.json.JsonObject?;kotlin.Int?){}[0]
+    final fun equals(kotlin/Any?): kotlin/Boolean // io.github.jan.supabase.storage.vectors.data/VectorMatch.equals|equals(kotlin.Any?){}[0]
+    final fun hashCode(): kotlin/Int // io.github.jan.supabase.storage.vectors.data/VectorMatch.hashCode|hashCode(){}[0]
+    final fun toString(): kotlin/String // io.github.jan.supabase.storage.vectors.data/VectorMatch.toString|toString(){}[0]
+
+    final object $serializer : kotlinx.serialization.internal/GeneratedSerializer<io.github.jan.supabase.storage.vectors.data/VectorMatch> { // io.github.jan.supabase.storage.vectors.data/VectorMatch.$serializer|null[0]
+        final val descriptor // io.github.jan.supabase.storage.vectors.data/VectorMatch.$serializer.descriptor|{}descriptor[0]
+            final fun <get-descriptor>(): kotlinx.serialization.descriptors/SerialDescriptor // io.github.jan.supabase.storage.vectors.data/VectorMatch.$serializer.descriptor.<get-descriptor>|<get-descriptor>(){}[0]
+
+        final fun childSerializers(): kotlin/Array<kotlinx.serialization/KSerializer<*>> // io.github.jan.supabase.storage.vectors.data/VectorMatch.$serializer.childSerializers|childSerializers(){}[0]
+        final fun deserialize(kotlinx.serialization.encoding/Decoder): io.github.jan.supabase.storage.vectors.data/VectorMatch // io.github.jan.supabase.storage.vectors.data/VectorMatch.$serializer.deserialize|deserialize(kotlinx.serialization.encoding.Decoder){}[0]
+        final fun serialize(kotlinx.serialization.encoding/Encoder, io.github.jan.supabase.storage.vectors.data/VectorMatch) // io.github.jan.supabase.storage.vectors.data/VectorMatch.$serializer.serialize|serialize(kotlinx.serialization.encoding.Encoder;io.github.jan.supabase.storage.vectors.data.VectorMatch){}[0]
+    }
+
+    final object Companion { // io.github.jan.supabase.storage.vectors.data/VectorMatch.Companion|null[0]
+        final fun serializer(): kotlinx.serialization/KSerializer<io.github.jan.supabase.storage.vectors.data/VectorMatch> // io.github.jan.supabase.storage.vectors.data/VectorMatch.Companion.serializer|serializer(){}[0]
+    }
+}
+
+final class io.github.jan.supabase.storage.vectors.data/VectorObject { // io.github.jan.supabase.storage.vectors.data/VectorObject|null[0]
+    constructor <init>(kotlin/String, io.github.jan.supabase.storage.vectors.data/VectorData, kotlinx.serialization.json/JsonObject) // io.github.jan.supabase.storage.vectors.data/VectorObject.<init>|<init>(kotlin.String;io.github.jan.supabase.storage.vectors.data.VectorData;kotlinx.serialization.json.JsonObject){}[0]
+
+    final val data // io.github.jan.supabase.storage.vectors.data/VectorObject.data|{}data[0]
+        final fun <get-data>(): io.github.jan.supabase.storage.vectors.data/VectorData // io.github.jan.supabase.storage.vectors.data/VectorObject.data.<get-data>|<get-data>(){}[0]
+    final val key // io.github.jan.supabase.storage.vectors.data/VectorObject.key|{}key[0]
+        final fun <get-key>(): kotlin/String // io.github.jan.supabase.storage.vectors.data/VectorObject.key.<get-key>|<get-key>(){}[0]
+    final val metadata // io.github.jan.supabase.storage.vectors.data/VectorObject.metadata|{}metadata[0]
+        final fun <get-metadata>(): kotlinx.serialization.json/JsonObject // io.github.jan.supabase.storage.vectors.data/VectorObject.metadata.<get-metadata>|<get-metadata>(){}[0]
+
+    final fun component1(): kotlin/String // io.github.jan.supabase.storage.vectors.data/VectorObject.component1|component1(){}[0]
+    final fun component2(): io.github.jan.supabase.storage.vectors.data/VectorData // io.github.jan.supabase.storage.vectors.data/VectorObject.component2|component2(){}[0]
+    final fun component3(): kotlinx.serialization.json/JsonObject // io.github.jan.supabase.storage.vectors.data/VectorObject.component3|component3(){}[0]
+    final fun copy(kotlin/String = ..., io.github.jan.supabase.storage.vectors.data/VectorData = ..., kotlinx.serialization.json/JsonObject = ...): io.github.jan.supabase.storage.vectors.data/VectorObject // io.github.jan.supabase.storage.vectors.data/VectorObject.copy|copy(kotlin.String;io.github.jan.supabase.storage.vectors.data.VectorData;kotlinx.serialization.json.JsonObject){}[0]
+    final fun equals(kotlin/Any?): kotlin/Boolean // io.github.jan.supabase.storage.vectors.data/VectorObject.equals|equals(kotlin.Any?){}[0]
+    final fun hashCode(): kotlin/Int // io.github.jan.supabase.storage.vectors.data/VectorObject.hashCode|hashCode(){}[0]
+    final fun toString(): kotlin/String // io.github.jan.supabase.storage.vectors.data/VectorObject.toString|toString(){}[0]
+
+    final object $serializer : kotlinx.serialization.internal/GeneratedSerializer<io.github.jan.supabase.storage.vectors.data/VectorObject> { // io.github.jan.supabase.storage.vectors.data/VectorObject.$serializer|null[0]
+        final val descriptor // io.github.jan.supabase.storage.vectors.data/VectorObject.$serializer.descriptor|{}descriptor[0]
+            final fun <get-descriptor>(): kotlinx.serialization.descriptors/SerialDescriptor // io.github.jan.supabase.storage.vectors.data/VectorObject.$serializer.descriptor.<get-descriptor>|<get-descriptor>(){}[0]
+
+        final fun childSerializers(): kotlin/Array<kotlinx.serialization/KSerializer<*>> // io.github.jan.supabase.storage.vectors.data/VectorObject.$serializer.childSerializers|childSerializers(){}[0]
+        final fun deserialize(kotlinx.serialization.encoding/Decoder): io.github.jan.supabase.storage.vectors.data/VectorObject // io.github.jan.supabase.storage.vectors.data/VectorObject.$serializer.deserialize|deserialize(kotlinx.serialization.encoding.Decoder){}[0]
+        final fun serialize(kotlinx.serialization.encoding/Encoder, io.github.jan.supabase.storage.vectors.data/VectorObject) // io.github.jan.supabase.storage.vectors.data/VectorObject.$serializer.serialize|serialize(kotlinx.serialization.encoding.Encoder;io.github.jan.supabase.storage.vectors.data.VectorObject){}[0]
+    }
+
+    final object Companion { // io.github.jan.supabase.storage.vectors.data/VectorObject.Companion|null[0]
+        final fun serializer(): kotlinx.serialization/KSerializer<io.github.jan.supabase.storage.vectors.data/VectorObject> // io.github.jan.supabase.storage.vectors.data/VectorObject.Companion.serializer|serializer(){}[0]
+    }
+}
+
+final class io.github.jan.supabase.storage.vectors.index/CreateIndexOptions { // io.github.jan.supabase.storage.vectors.index/CreateIndexOptions|null[0]
+    constructor <init>(kotlin/String) // io.github.jan.supabase.storage.vectors.index/CreateIndexOptions.<init>|<init>(kotlin.String){}[0]
+
+    final val vectorBucketName // io.github.jan.supabase.storage.vectors.index/CreateIndexOptions.vectorBucketName|{}vectorBucketName[0]
+        final fun <get-vectorBucketName>(): kotlin/String // io.github.jan.supabase.storage.vectors.index/CreateIndexOptions.vectorBucketName.<get-vectorBucketName>|<get-vectorBucketName>(){}[0]
+
+    final var dataType // io.github.jan.supabase.storage.vectors.index/CreateIndexOptions.dataType|{}dataType[0]
+        final fun <get-dataType>(): io.github.jan.supabase.storage.vectors.index/VectorDataType // io.github.jan.supabase.storage.vectors.index/CreateIndexOptions.dataType.<get-dataType>|<get-dataType>(){}[0]
+        final fun <set-dataType>(io.github.jan.supabase.storage.vectors.index/VectorDataType) // io.github.jan.supabase.storage.vectors.index/CreateIndexOptions.dataType.<set-dataType>|<set-dataType>(io.github.jan.supabase.storage.vectors.index.VectorDataType){}[0]
+    final var dimension // io.github.jan.supabase.storage.vectors.index/CreateIndexOptions.dimension|{}dimension[0]
+        final fun <get-dimension>(): kotlin/Int // io.github.jan.supabase.storage.vectors.index/CreateIndexOptions.dimension.<get-dimension>|<get-dimension>(){}[0]
+        final fun <set-dimension>(kotlin/Int) // io.github.jan.supabase.storage.vectors.index/CreateIndexOptions.dimension.<set-dimension>|<set-dimension>(kotlin.Int){}[0]
+    final var distanceMetric // io.github.jan.supabase.storage.vectors.index/CreateIndexOptions.distanceMetric|{}distanceMetric[0]
+        final fun <get-distanceMetric>(): io.github.jan.supabase.storage.vectors/DistanceMetric // io.github.jan.supabase.storage.vectors.index/CreateIndexOptions.distanceMetric.<get-distanceMetric>|<get-distanceMetric>(){}[0]
+        final fun <set-distanceMetric>(io.github.jan.supabase.storage.vectors/DistanceMetric) // io.github.jan.supabase.storage.vectors.index/CreateIndexOptions.distanceMetric.<set-distanceMetric>|<set-distanceMetric>(io.github.jan.supabase.storage.vectors.DistanceMetric){}[0]
+    final var indexName // io.github.jan.supabase.storage.vectors.index/CreateIndexOptions.indexName|{}indexName[0]
+        final fun <get-indexName>(): kotlin/String // io.github.jan.supabase.storage.vectors.index/CreateIndexOptions.indexName.<get-indexName>|<get-indexName>(){}[0]
+        final fun <set-indexName>(kotlin/String) // io.github.jan.supabase.storage.vectors.index/CreateIndexOptions.indexName.<set-indexName>|<set-indexName>(kotlin.String){}[0]
+    final var metadataConfiguration // io.github.jan.supabase.storage.vectors.index/CreateIndexOptions.metadataConfiguration|{}metadataConfiguration[0]
+        final fun <get-metadataConfiguration>(): io.github.jan.supabase.storage.vectors.index/MetadataConfiguration? // io.github.jan.supabase.storage.vectors.index/CreateIndexOptions.metadataConfiguration.<get-metadataConfiguration>|<get-metadataConfiguration>(){}[0]
+        final fun <set-metadataConfiguration>(io.github.jan.supabase.storage.vectors.index/MetadataConfiguration?) // io.github.jan.supabase.storage.vectors.index/CreateIndexOptions.metadataConfiguration.<set-metadataConfiguration>|<set-metadataConfiguration>(io.github.jan.supabase.storage.vectors.index.MetadataConfiguration?){}[0]
+}
+
+final class io.github.jan.supabase.storage.vectors.index/ListIndexesOptions { // io.github.jan.supabase.storage.vectors.index/ListIndexesOptions|null[0]
+    constructor <init>(kotlin/String) // io.github.jan.supabase.storage.vectors.index/ListIndexesOptions.<init>|<init>(kotlin.String){}[0]
+
+    final val vectorBucketName // io.github.jan.supabase.storage.vectors.index/ListIndexesOptions.vectorBucketName|{}vectorBucketName[0]
+        final fun <get-vectorBucketName>(): kotlin/String // io.github.jan.supabase.storage.vectors.index/ListIndexesOptions.vectorBucketName.<get-vectorBucketName>|<get-vectorBucketName>(){}[0]
+
+    final var maxResults // io.github.jan.supabase.storage.vectors.index/ListIndexesOptions.maxResults|{}maxResults[0]
+        final fun <get-maxResults>(): kotlin/Int? // io.github.jan.supabase.storage.vectors.index/ListIndexesOptions.maxResults.<get-maxResults>|<get-maxResults>(){}[0]
+        final fun <set-maxResults>(kotlin/Int?) // io.github.jan.supabase.storage.vectors.index/ListIndexesOptions.maxResults.<set-maxResults>|<set-maxResults>(kotlin.Int?){}[0]
+    final var nextToken // io.github.jan.supabase.storage.vectors.index/ListIndexesOptions.nextToken|{}nextToken[0]
+        final fun <get-nextToken>(): kotlin/String? // io.github.jan.supabase.storage.vectors.index/ListIndexesOptions.nextToken.<get-nextToken>|<get-nextToken>(){}[0]
+        final fun <set-nextToken>(kotlin/String?) // io.github.jan.supabase.storage.vectors.index/ListIndexesOptions.nextToken.<set-nextToken>|<set-nextToken>(kotlin.String?){}[0]
+    final var prefix // io.github.jan.supabase.storage.vectors.index/ListIndexesOptions.prefix|{}prefix[0]
+        final fun <get-prefix>(): kotlin/String? // io.github.jan.supabase.storage.vectors.index/ListIndexesOptions.prefix.<get-prefix>|<get-prefix>(){}[0]
+        final fun <set-prefix>(kotlin/String?) // io.github.jan.supabase.storage.vectors.index/ListIndexesOptions.prefix.<set-prefix>|<set-prefix>(kotlin.String?){}[0]
+}
+
+final class io.github.jan.supabase.storage.vectors.index/ListIndexesResponse { // io.github.jan.supabase.storage.vectors.index/ListIndexesResponse|null[0]
+    constructor <init>(kotlinx.serialization.json/JsonArray, kotlin/String? = ...) // io.github.jan.supabase.storage.vectors.index/ListIndexesResponse.<init>|<init>(kotlinx.serialization.json.JsonArray;kotlin.String?){}[0]
+
+    final val indexes // io.github.jan.supabase.storage.vectors.index/ListIndexesResponse.indexes|{}indexes[0]
+        final fun <get-indexes>(): kotlin.collections/List<kotlin/String> // io.github.jan.supabase.storage.vectors.index/ListIndexesResponse.indexes.<get-indexes>|<get-indexes>(){}[0]
+    final val nextToken // io.github.jan.supabase.storage.vectors.index/ListIndexesResponse.nextToken|{}nextToken[0]
+        final fun <get-nextToken>(): kotlin/String? // io.github.jan.supabase.storage.vectors.index/ListIndexesResponse.nextToken.<get-nextToken>|<get-nextToken>(){}[0]
+
+    final fun component2(): kotlin/String? // io.github.jan.supabase.storage.vectors.index/ListIndexesResponse.component2|component2(){}[0]
+    final fun copy(kotlinx.serialization.json/JsonArray = ..., kotlin/String? = ...): io.github.jan.supabase.storage.vectors.index/ListIndexesResponse // io.github.jan.supabase.storage.vectors.index/ListIndexesResponse.copy|copy(kotlinx.serialization.json.JsonArray;kotlin.String?){}[0]
+    final fun equals(kotlin/Any?): kotlin/Boolean // io.github.jan.supabase.storage.vectors.index/ListIndexesResponse.equals|equals(kotlin.Any?){}[0]
+    final fun hashCode(): kotlin/Int // io.github.jan.supabase.storage.vectors.index/ListIndexesResponse.hashCode|hashCode(){}[0]
+    final fun toString(): kotlin/String // io.github.jan.supabase.storage.vectors.index/ListIndexesResponse.toString|toString(){}[0]
+
+    final object $serializer : kotlinx.serialization.internal/GeneratedSerializer<io.github.jan.supabase.storage.vectors.index/ListIndexesResponse> { // io.github.jan.supabase.storage.vectors.index/ListIndexesResponse.$serializer|null[0]
+        final val descriptor // io.github.jan.supabase.storage.vectors.index/ListIndexesResponse.$serializer.descriptor|{}descriptor[0]
+            final fun <get-descriptor>(): kotlinx.serialization.descriptors/SerialDescriptor // io.github.jan.supabase.storage.vectors.index/ListIndexesResponse.$serializer.descriptor.<get-descriptor>|<get-descriptor>(){}[0]
+
+        final fun childSerializers(): kotlin/Array<kotlinx.serialization/KSerializer<*>> // io.github.jan.supabase.storage.vectors.index/ListIndexesResponse.$serializer.childSerializers|childSerializers(){}[0]
+        final fun deserialize(kotlinx.serialization.encoding/Decoder): io.github.jan.supabase.storage.vectors.index/ListIndexesResponse // io.github.jan.supabase.storage.vectors.index/ListIndexesResponse.$serializer.deserialize|deserialize(kotlinx.serialization.encoding.Decoder){}[0]
+        final fun serialize(kotlinx.serialization.encoding/Encoder, io.github.jan.supabase.storage.vectors.index/ListIndexesResponse) // io.github.jan.supabase.storage.vectors.index/ListIndexesResponse.$serializer.serialize|serialize(kotlinx.serialization.encoding.Encoder;io.github.jan.supabase.storage.vectors.index.ListIndexesResponse){}[0]
+    }
+
+    final object Companion { // io.github.jan.supabase.storage.vectors.index/ListIndexesResponse.Companion|null[0]
+        final fun serializer(): kotlinx.serialization/KSerializer<io.github.jan.supabase.storage.vectors.index/ListIndexesResponse> // io.github.jan.supabase.storage.vectors.index/ListIndexesResponse.Companion.serializer|serializer(){}[0]
+    }
+}
+
+final class io.github.jan.supabase.storage.vectors.index/MetadataConfiguration { // io.github.jan.supabase.storage.vectors.index/MetadataConfiguration|null[0]
+    constructor <init>(kotlin.collections/List<kotlin/String>? = ...) // io.github.jan.supabase.storage.vectors.index/MetadataConfiguration.<init>|<init>(kotlin.collections.List<kotlin.String>?){}[0]
+
+    final val nonFilterableMetadataKeys // io.github.jan.supabase.storage.vectors.index/MetadataConfiguration.nonFilterableMetadataKeys|{}nonFilterableMetadataKeys[0]
+        final fun <get-nonFilterableMetadataKeys>(): kotlin.collections/List<kotlin/String>? // io.github.jan.supabase.storage.vectors.index/MetadataConfiguration.nonFilterableMetadataKeys.<get-nonFilterableMetadataKeys>|<get-nonFilterableMetadataKeys>(){}[0]
+
+    final object $serializer : kotlinx.serialization.internal/GeneratedSerializer<io.github.jan.supabase.storage.vectors.index/MetadataConfiguration> { // io.github.jan.supabase.storage.vectors.index/MetadataConfiguration.$serializer|null[0]
+        final val descriptor // io.github.jan.supabase.storage.vectors.index/MetadataConfiguration.$serializer.descriptor|{}descriptor[0]
+            final fun <get-descriptor>(): kotlinx.serialization.descriptors/SerialDescriptor // io.github.jan.supabase.storage.vectors.index/MetadataConfiguration.$serializer.descriptor.<get-descriptor>|<get-descriptor>(){}[0]
+
+        final fun childSerializers(): kotlin/Array<kotlinx.serialization/KSerializer<*>> // io.github.jan.supabase.storage.vectors.index/MetadataConfiguration.$serializer.childSerializers|childSerializers(){}[0]
+        final fun deserialize(kotlinx.serialization.encoding/Decoder): io.github.jan.supabase.storage.vectors.index/MetadataConfiguration // io.github.jan.supabase.storage.vectors.index/MetadataConfiguration.$serializer.deserialize|deserialize(kotlinx.serialization.encoding.Decoder){}[0]
+        final fun serialize(kotlinx.serialization.encoding/Encoder, io.github.jan.supabase.storage.vectors.index/MetadataConfiguration) // io.github.jan.supabase.storage.vectors.index/MetadataConfiguration.$serializer.serialize|serialize(kotlinx.serialization.encoding.Encoder;io.github.jan.supabase.storage.vectors.index.MetadataConfiguration){}[0]
+    }
+
+    final object Companion { // io.github.jan.supabase.storage.vectors.index/MetadataConfiguration.Companion|null[0]
+        final val $childSerializers // io.github.jan.supabase.storage.vectors.index/MetadataConfiguration.Companion.$childSerializers|{}$childSerializers[0]
+
+        final fun serializer(): kotlinx.serialization/KSerializer<io.github.jan.supabase.storage.vectors.index/MetadataConfiguration> // io.github.jan.supabase.storage.vectors.index/MetadataConfiguration.Companion.serializer|serializer(){}[0]
+    }
+}
+
+final class io.github.jan.supabase.storage.vectors.index/VectorIndex { // io.github.jan.supabase.storage.vectors.index/VectorIndex|null[0]
+    constructor <init>(kotlin/String, kotlin/String, io.github.jan.supabase.storage.vectors.index/VectorDataType, kotlin/Int, io.github.jan.supabase.storage.vectors/DistanceMetric, io.github.jan.supabase.storage.vectors.index/MetadataConfiguration? = ..., kotlin.time/Instant? = ...) // io.github.jan.supabase.storage.vectors.index/VectorIndex.<init>|<init>(kotlin.String;kotlin.String;io.github.jan.supabase.storage.vectors.index.VectorDataType;kotlin.Int;io.github.jan.supabase.storage.vectors.DistanceMetric;io.github.jan.supabase.storage.vectors.index.MetadataConfiguration?;kotlin.time.Instant?){}[0]
+
+    final val dataType // io.github.jan.supabase.storage.vectors.index/VectorIndex.dataType|{}dataType[0]
+        final fun <get-dataType>(): io.github.jan.supabase.storage.vectors.index/VectorDataType // io.github.jan.supabase.storage.vectors.index/VectorIndex.dataType.<get-dataType>|<get-dataType>(){}[0]
+    final val dimension // io.github.jan.supabase.storage.vectors.index/VectorIndex.dimension|{}dimension[0]
+        final fun <get-dimension>(): kotlin/Int // io.github.jan.supabase.storage.vectors.index/VectorIndex.dimension.<get-dimension>|<get-dimension>(){}[0]
+    final val distanceMetric // io.github.jan.supabase.storage.vectors.index/VectorIndex.distanceMetric|{}distanceMetric[0]
+        final fun <get-distanceMetric>(): io.github.jan.supabase.storage.vectors/DistanceMetric // io.github.jan.supabase.storage.vectors.index/VectorIndex.distanceMetric.<get-distanceMetric>|<get-distanceMetric>(){}[0]
+    final val indexName // io.github.jan.supabase.storage.vectors.index/VectorIndex.indexName|{}indexName[0]
+        final fun <get-indexName>(): kotlin/String // io.github.jan.supabase.storage.vectors.index/VectorIndex.indexName.<get-indexName>|<get-indexName>(){}[0]
+    final val metadataConfiguration // io.github.jan.supabase.storage.vectors.index/VectorIndex.metadataConfiguration|{}metadataConfiguration[0]
+        final fun <get-metadataConfiguration>(): io.github.jan.supabase.storage.vectors.index/MetadataConfiguration? // io.github.jan.supabase.storage.vectors.index/VectorIndex.metadataConfiguration.<get-metadataConfiguration>|<get-metadataConfiguration>(){}[0]
+    final val vectorBucketName // io.github.jan.supabase.storage.vectors.index/VectorIndex.vectorBucketName|{}vectorBucketName[0]
+        final fun <get-vectorBucketName>(): kotlin/String // io.github.jan.supabase.storage.vectors.index/VectorIndex.vectorBucketName.<get-vectorBucketName>|<get-vectorBucketName>(){}[0]
+
+    final fun component1(): kotlin/String // io.github.jan.supabase.storage.vectors.index/VectorIndex.component1|component1(){}[0]
+    final fun component2(): kotlin/String // io.github.jan.supabase.storage.vectors.index/VectorIndex.component2|component2(){}[0]
+    final fun component3(): io.github.jan.supabase.storage.vectors.index/VectorDataType // io.github.jan.supabase.storage.vectors.index/VectorIndex.component3|component3(){}[0]
+    final fun component4(): kotlin/Int // io.github.jan.supabase.storage.vectors.index/VectorIndex.component4|component4(){}[0]
+    final fun component5(): io.github.jan.supabase.storage.vectors/DistanceMetric // io.github.jan.supabase.storage.vectors.index/VectorIndex.component5|component5(){}[0]
+    final fun component6(): io.github.jan.supabase.storage.vectors.index/MetadataConfiguration? // io.github.jan.supabase.storage.vectors.index/VectorIndex.component6|component6(){}[0]
+    final fun copy(kotlin/String = ..., kotlin/String = ..., io.github.jan.supabase.storage.vectors.index/VectorDataType = ..., kotlin/Int = ..., io.github.jan.supabase.storage.vectors/DistanceMetric = ..., io.github.jan.supabase.storage.vectors.index/MetadataConfiguration? = ..., kotlin.time/Instant? = ...): io.github.jan.supabase.storage.vectors.index/VectorIndex // io.github.jan.supabase.storage.vectors.index/VectorIndex.copy|copy(kotlin.String;kotlin.String;io.github.jan.supabase.storage.vectors.index.VectorDataType;kotlin.Int;io.github.jan.supabase.storage.vectors.DistanceMetric;io.github.jan.supabase.storage.vectors.index.MetadataConfiguration?;kotlin.time.Instant?){}[0]
+    final fun equals(kotlin/Any?): kotlin/Boolean // io.github.jan.supabase.storage.vectors.index/VectorIndex.equals|equals(kotlin.Any?){}[0]
+    final fun hashCode(): kotlin/Int // io.github.jan.supabase.storage.vectors.index/VectorIndex.hashCode|hashCode(){}[0]
+    final fun toString(): kotlin/String // io.github.jan.supabase.storage.vectors.index/VectorIndex.toString|toString(){}[0]
+
+    final object $serializer : kotlinx.serialization.internal/GeneratedSerializer<io.github.jan.supabase.storage.vectors.index/VectorIndex> { // io.github.jan.supabase.storage.vectors.index/VectorIndex.$serializer|null[0]
+        final val descriptor // io.github.jan.supabase.storage.vectors.index/VectorIndex.$serializer.descriptor|{}descriptor[0]
+            final fun <get-descriptor>(): kotlinx.serialization.descriptors/SerialDescriptor // io.github.jan.supabase.storage.vectors.index/VectorIndex.$serializer.descriptor.<get-descriptor>|<get-descriptor>(){}[0]
+
+        final fun childSerializers(): kotlin/Array<kotlinx.serialization/KSerializer<*>> // io.github.jan.supabase.storage.vectors.index/VectorIndex.$serializer.childSerializers|childSerializers(){}[0]
+        final fun deserialize(kotlinx.serialization.encoding/Decoder): io.github.jan.supabase.storage.vectors.index/VectorIndex // io.github.jan.supabase.storage.vectors.index/VectorIndex.$serializer.deserialize|deserialize(kotlinx.serialization.encoding.Decoder){}[0]
+        final fun serialize(kotlinx.serialization.encoding/Encoder, io.github.jan.supabase.storage.vectors.index/VectorIndex) // io.github.jan.supabase.storage.vectors.index/VectorIndex.$serializer.serialize|serialize(kotlinx.serialization.encoding.Encoder;io.github.jan.supabase.storage.vectors.index.VectorIndex){}[0]
+    }
+
+    final object Companion { // io.github.jan.supabase.storage.vectors.index/VectorIndex.Companion|null[0]
+        final val $childSerializers // io.github.jan.supabase.storage.vectors.index/VectorIndex.Companion.$childSerializers|{}$childSerializers[0]
+
+        final fun serializer(): kotlinx.serialization/KSerializer<io.github.jan.supabase.storage.vectors.index/VectorIndex> // io.github.jan.supabase.storage.vectors.index/VectorIndex.Companion.serializer|serializer(){}[0]
+    }
+}
+
+final class io.github.jan.supabase.storage/Bucket { // io.github.jan.supabase.storage/Bucket|null[0]
+    constructor <init>(kotlin.time/Instant, kotlin/String, kotlin/String, kotlin/String, kotlin.time/Instant, kotlin/Boolean, kotlin.collections/List<kotlin/String>? = ..., kotlin/Long? = ..., io.github.jan.supabase.storage/BucketType? = ...) // io.github.jan.supabase.storage/Bucket.<init>|<init>(kotlin.time.Instant;kotlin.String;kotlin.String;kotlin.String;kotlin.time.Instant;kotlin.Boolean;kotlin.collections.List<kotlin.String>?;kotlin.Long?;io.github.jan.supabase.storage.BucketType?){}[0]
+
+    final val allowedMimeTypes // io.github.jan.supabase.storage/Bucket.allowedMimeTypes|{}allowedMimeTypes[0]
+        final fun <get-allowedMimeTypes>(): kotlin.collections/List<kotlin/String>? // io.github.jan.supabase.storage/Bucket.allowedMimeTypes.<get-allowedMimeTypes>|<get-allowedMimeTypes>(){}[0]
+    final val createdAt // io.github.jan.supabase.storage/Bucket.createdAt|{}createdAt[0]
+        final fun <get-createdAt>(): kotlin.time/Instant // io.github.jan.supabase.storage/Bucket.createdAt.<get-createdAt>|<get-createdAt>(){}[0]
+    final val fileSizeLimit // io.github.jan.supabase.storage/Bucket.fileSizeLimit|{}fileSizeLimit[0]
+        final fun <get-fileSizeLimit>(): kotlin/Long? // io.github.jan.supabase.storage/Bucket.fileSizeLimit.<get-fileSizeLimit>|<get-fileSizeLimit>(){}[0]
+    final val id // io.github.jan.supabase.storage/Bucket.id|{}id[0]
+        final fun <get-id>(): kotlin/String // io.github.jan.supabase.storage/Bucket.id.<get-id>|<get-id>(){}[0]
+    final val name // io.github.jan.supabase.storage/Bucket.name|{}name[0]
+        final fun <get-name>(): kotlin/String // io.github.jan.supabase.storage/Bucket.name.<get-name>|<get-name>(){}[0]
+    final val owner // io.github.jan.supabase.storage/Bucket.owner|{}owner[0]
+        final fun <get-owner>(): kotlin/String // io.github.jan.supabase.storage/Bucket.owner.<get-owner>|<get-owner>(){}[0]
+    final val public // io.github.jan.supabase.storage/Bucket.public|{}public[0]
+        final fun <get-public>(): kotlin/Boolean // io.github.jan.supabase.storage/Bucket.public.<get-public>|<get-public>(){}[0]
+    final val type // io.github.jan.supabase.storage/Bucket.type|{}type[0]
+        final fun <get-type>(): io.github.jan.supabase.storage/BucketType? // io.github.jan.supabase.storage/Bucket.type.<get-type>|<get-type>(){}[0]
+    final val updatedAt // io.github.jan.supabase.storage/Bucket.updatedAt|{}updatedAt[0]
+        final fun <get-updatedAt>(): kotlin.time/Instant // io.github.jan.supabase.storage/Bucket.updatedAt.<get-updatedAt>|<get-updatedAt>(){}[0]
+
+    final fun component1(): kotlin.time/Instant // io.github.jan.supabase.storage/Bucket.component1|component1(){}[0]
+    final fun component2(): kotlin/String // io.github.jan.supabase.storage/Bucket.component2|component2(){}[0]
+    final fun component3(): kotlin/String // io.github.jan.supabase.storage/Bucket.component3|component3(){}[0]
+    final fun component4(): kotlin/String // io.github.jan.supabase.storage/Bucket.component4|component4(){}[0]
+    final fun component5(): kotlin.time/Instant // io.github.jan.supabase.storage/Bucket.component5|component5(){}[0]
+    final fun component6(): kotlin/Boolean // io.github.jan.supabase.storage/Bucket.component6|component6(){}[0]
+    final fun component7(): kotlin.collections/List<kotlin/String>? // io.github.jan.supabase.storage/Bucket.component7|component7(){}[0]
+    final fun component8(): kotlin/Long? // io.github.jan.supabase.storage/Bucket.component8|component8(){}[0]
+    final fun component9(): io.github.jan.supabase.storage/BucketType? // io.github.jan.supabase.storage/Bucket.component9|component9(){}[0]
+    final fun copy(kotlin.time/Instant = ..., kotlin/String = ..., kotlin/String = ..., kotlin/String = ..., kotlin.time/Instant = ..., kotlin/Boolean = ..., kotlin.collections/List<kotlin/String>? = ..., kotlin/Long? = ..., io.github.jan.supabase.storage/BucketType? = ...): io.github.jan.supabase.storage/Bucket // io.github.jan.supabase.storage/Bucket.copy|copy(kotlin.time.Instant;kotlin.String;kotlin.String;kotlin.String;kotlin.time.Instant;kotlin.Boolean;kotlin.collections.List<kotlin.String>?;kotlin.Long?;io.github.jan.supabase.storage.BucketType?){}[0]
+    final fun equals(kotlin/Any?): kotlin/Boolean // io.github.jan.supabase.storage/Bucket.equals|equals(kotlin.Any?){}[0]
+    final fun hashCode(): kotlin/Int // io.github.jan.supabase.storage/Bucket.hashCode|hashCode(){}[0]
+    final fun toString(): kotlin/String // io.github.jan.supabase.storage/Bucket.toString|toString(){}[0]
+
+    final object $serializer : kotlinx.serialization.internal/GeneratedSerializer<io.github.jan.supabase.storage/Bucket> { // io.github.jan.supabase.storage/Bucket.$serializer|null[0]
+        final val descriptor // io.github.jan.supabase.storage/Bucket.$serializer.descriptor|{}descriptor[0]
+            final fun <get-descriptor>(): kotlinx.serialization.descriptors/SerialDescriptor // io.github.jan.supabase.storage/Bucket.$serializer.descriptor.<get-descriptor>|<get-descriptor>(){}[0]
+
+        final fun childSerializers(): kotlin/Array<kotlinx.serialization/KSerializer<*>> // io.github.jan.supabase.storage/Bucket.$serializer.childSerializers|childSerializers(){}[0]
+        final fun deserialize(kotlinx.serialization.encoding/Decoder): io.github.jan.supabase.storage/Bucket // io.github.jan.supabase.storage/Bucket.$serializer.deserialize|deserialize(kotlinx.serialization.encoding.Decoder){}[0]
+        final fun serialize(kotlinx.serialization.encoding/Encoder, io.github.jan.supabase.storage/Bucket) // io.github.jan.supabase.storage/Bucket.$serializer.serialize|serialize(kotlinx.serialization.encoding.Encoder;io.github.jan.supabase.storage.Bucket){}[0]
+    }
+
+    final object Companion { // io.github.jan.supabase.storage/Bucket.Companion|null[0]
+        final val $childSerializers // io.github.jan.supabase.storage/Bucket.Companion.$childSerializers|{}$childSerializers[0]
+
+        final fun serializer(): kotlinx.serialization/KSerializer<io.github.jan.supabase.storage/Bucket> // io.github.jan.supabase.storage/Bucket.Companion.serializer|serializer(){}[0]
+    }
+}
+
+final class io.github.jan.supabase.storage/BucketBuilder { // io.github.jan.supabase.storage/BucketBuilder|null[0]
+    constructor <init>() // io.github.jan.supabase.storage/BucketBuilder.<init>|<init>(){}[0]
+
+    final val bytes // io.github.jan.supabase.storage/BucketBuilder.bytes|@kotlin.Int{}bytes[0]
+        final fun (kotlin/Int).<get-bytes>(): io.github.jan.supabase.storage/FileSizeLimit // io.github.jan.supabase.storage/BucketBuilder.bytes.<get-bytes>|<get-bytes>@kotlin.Int(){}[0]
+    final val bytes // io.github.jan.supabase.storage/BucketBuilder.bytes|@kotlin.Long{}bytes[0]
+        final fun (kotlin/Long).<get-bytes>(): io.github.jan.supabase.storage/FileSizeLimit // io.github.jan.supabase.storage/BucketBuilder.bytes.<get-bytes>|<get-bytes>@kotlin.Long(){}[0]
+    final val gigabytes // io.github.jan.supabase.storage/BucketBuilder.gigabytes|@kotlin.Int{}gigabytes[0]
+        final fun (kotlin/Int).<get-gigabytes>(): io.github.jan.supabase.storage/FileSizeLimit // io.github.jan.supabase.storage/BucketBuilder.gigabytes.<get-gigabytes>|<get-gigabytes>@kotlin.Int(){}[0]
+    final val gigabytes // io.github.jan.supabase.storage/BucketBuilder.gigabytes|@kotlin.Long{}gigabytes[0]
+        final fun (kotlin/Long).<get-gigabytes>(): io.github.jan.supabase.storage/FileSizeLimit // io.github.jan.supabase.storage/BucketBuilder.gigabytes.<get-gigabytes>|<get-gigabytes>@kotlin.Long(){}[0]
+    final val kilobytes // io.github.jan.supabase.storage/BucketBuilder.kilobytes|@kotlin.Int{}kilobytes[0]
+        final fun (kotlin/Int).<get-kilobytes>(): io.github.jan.supabase.storage/FileSizeLimit // io.github.jan.supabase.storage/BucketBuilder.kilobytes.<get-kilobytes>|<get-kilobytes>@kotlin.Int(){}[0]
+    final val kilobytes // io.github.jan.supabase.storage/BucketBuilder.kilobytes|@kotlin.Long{}kilobytes[0]
+        final fun (kotlin/Long).<get-kilobytes>(): io.github.jan.supabase.storage/FileSizeLimit // io.github.jan.supabase.storage/BucketBuilder.kilobytes.<get-kilobytes>|<get-kilobytes>@kotlin.Long(){}[0]
+    final val megabytes // io.github.jan.supabase.storage/BucketBuilder.megabytes|@kotlin.Int{}megabytes[0]
+        final fun (kotlin/Int).<get-megabytes>(): io.github.jan.supabase.storage/FileSizeLimit // io.github.jan.supabase.storage/BucketBuilder.megabytes.<get-megabytes>|<get-megabytes>@kotlin.Int(){}[0]
+    final val megabytes // io.github.jan.supabase.storage/BucketBuilder.megabytes|@kotlin.Long{}megabytes[0]
+        final fun (kotlin/Long).<get-megabytes>(): io.github.jan.supabase.storage/FileSizeLimit // io.github.jan.supabase.storage/BucketBuilder.megabytes.<get-megabytes>|<get-megabytes>@kotlin.Long(){}[0]
+
+    final var fileSizeLimit // io.github.jan.supabase.storage/BucketBuilder.fileSizeLimit|{}fileSizeLimit[0]
+        final fun <get-fileSizeLimit>(): io.github.jan.supabase.storage/FileSizeLimit? // io.github.jan.supabase.storage/BucketBuilder.fileSizeLimit.<get-fileSizeLimit>|<get-fileSizeLimit>(){}[0]
+        final fun <set-fileSizeLimit>(io.github.jan.supabase.storage/FileSizeLimit?) // io.github.jan.supabase.storage/BucketBuilder.fileSizeLimit.<set-fileSizeLimit>|<set-fileSizeLimit>(io.github.jan.supabase.storage.FileSizeLimit?){}[0]
+    final var public // io.github.jan.supabase.storage/BucketBuilder.public|{}public[0]
+        final fun <get-public>(): kotlin/Boolean? // io.github.jan.supabase.storage/BucketBuilder.public.<get-public>|<get-public>(){}[0]
+        final fun <set-public>(kotlin/Boolean?) // io.github.jan.supabase.storage/BucketBuilder.public.<set-public>|<set-public>(kotlin.Boolean?){}[0]
+
+    final fun allowedMimeTypes(kotlin.collections/List<io.ktor.http/ContentType>) // io.github.jan.supabase.storage/BucketBuilder.allowedMimeTypes|allowedMimeTypes(kotlin.collections.List<io.ktor.http.ContentType>){}[0]
+    final fun allowedMimeTypes(kotlin.collections/List<kotlin/String>) // io.github.jan.supabase.storage/BucketBuilder.allowedMimeTypes|allowedMimeTypes(kotlin.collections.List<kotlin.String>){}[0]
+    final fun allowedMimeTypes(kotlin/Array<out io.ktor.http/ContentType>...) // io.github.jan.supabase.storage/BucketBuilder.allowedMimeTypes|allowedMimeTypes(kotlin.Array<out|io.ktor.http.ContentType>...){}[0]
+    final fun allowedMimeTypes(kotlin/Array<out kotlin/String>...) // io.github.jan.supabase.storage/BucketBuilder.allowedMimeTypes|allowedMimeTypes(kotlin.Array<out|kotlin.String>...){}[0]
+}
+
+final class io.github.jan.supabase.storage/DownloadOptionBuilder : io.github.jan.supabase.storage/BucketUrlBuilder { // io.github.jan.supabase.storage/DownloadOptionBuilder|null[0]
+    constructor <init>(kotlin/Function1<io.github.jan.supabase.storage/ImageTransformation, kotlin/Unit> = ..., kotlin.collections/MutableList<kotlin/Function1<io.ktor.client.request/HttpRequestBuilder, kotlin/Unit>> = ...) // io.github.jan.supabase.storage/DownloadOptionBuilder.<init>|<init>(kotlin.Function1<io.github.jan.supabase.storage.ImageTransformation,kotlin.Unit>;kotlin.collections.MutableList<kotlin.Function1<io.ktor.client.request.HttpRequestBuilder,kotlin.Unit>>){}[0]
+
+    final var cacheNonce // io.github.jan.supabase.storage/DownloadOptionBuilder.cacheNonce|{}cacheNonce[0]
+        final fun <get-cacheNonce>(): kotlin/String? // io.github.jan.supabase.storage/DownloadOptionBuilder.cacheNonce.<get-cacheNonce>|<get-cacheNonce>(){}[0]
+        final fun <set-cacheNonce>(kotlin/String?) // io.github.jan.supabase.storage/DownloadOptionBuilder.cacheNonce.<set-cacheNonce>|<set-cacheNonce>(kotlin.String?){}[0]
+
+    final fun httpOverride(kotlin/Function1<io.ktor.client.request/HttpRequestBuilder, kotlin/Unit>) // io.github.jan.supabase.storage/DownloadOptionBuilder.httpOverride|httpOverride(kotlin.Function1<io.ktor.client.request.HttpRequestBuilder,kotlin.Unit>){}[0]
+    final fun transform(kotlin/Function1<io.github.jan.supabase.storage/ImageTransformation, kotlin/Unit>) // io.github.jan.supabase.storage/DownloadOptionBuilder.transform|transform(kotlin.Function1<io.github.jan.supabase.storage.ImageTransformation,kotlin.Unit>){}[0]
+}
+
+final class io.github.jan.supabase.storage/FileObject { // io.github.jan.supabase.storage/FileObject|null[0]
+    constructor <init>(kotlin/String, kotlin/String?, kotlin.time/Instant?, kotlin.time/Instant?, kotlin.time/Instant?, kotlinx.serialization.json/JsonObject?) // io.github.jan.supabase.storage/FileObject.<init>|<init>(kotlin.String;kotlin.String?;kotlin.time.Instant?;kotlin.time.Instant?;kotlin.time.Instant?;kotlinx.serialization.json.JsonObject?){}[0]
+
+    final val createdAt // io.github.jan.supabase.storage/FileObject.createdAt|{}createdAt[0]
+        final fun <get-createdAt>(): kotlin.time/Instant? // io.github.jan.supabase.storage/FileObject.createdAt.<get-createdAt>|<get-createdAt>(){}[0]
+    final val id // io.github.jan.supabase.storage/FileObject.id|{}id[0]
+        final fun <get-id>(): kotlin/String? // io.github.jan.supabase.storage/FileObject.id.<get-id>|<get-id>(){}[0]
+    final val lastAccessedAt // io.github.jan.supabase.storage/FileObject.lastAccessedAt|{}lastAccessedAt[0]
+        final fun <get-lastAccessedAt>(): kotlin.time/Instant? // io.github.jan.supabase.storage/FileObject.lastAccessedAt.<get-lastAccessedAt>|<get-lastAccessedAt>(){}[0]
+    final val metadata // io.github.jan.supabase.storage/FileObject.metadata|{}metadata[0]
+        final fun <get-metadata>(): kotlinx.serialization.json/JsonObject? // io.github.jan.supabase.storage/FileObject.metadata.<get-metadata>|<get-metadata>(){}[0]
+    final val name // io.github.jan.supabase.storage/FileObject.name|{}name[0]
+        final fun <get-name>(): kotlin/String // io.github.jan.supabase.storage/FileObject.name.<get-name>|<get-name>(){}[0]
+    final val updatedAt // io.github.jan.supabase.storage/FileObject.updatedAt|{}updatedAt[0]
+        final fun <get-updatedAt>(): kotlin.time/Instant? // io.github.jan.supabase.storage/FileObject.updatedAt.<get-updatedAt>|<get-updatedAt>(){}[0]
+
+    final fun component1(): kotlin/String // io.github.jan.supabase.storage/FileObject.component1|component1(){}[0]
+    final fun component2(): kotlin/String? // io.github.jan.supabase.storage/FileObject.component2|component2(){}[0]
+    final fun component3(): kotlin.time/Instant? // io.github.jan.supabase.storage/FileObject.component3|component3(){}[0]
+    final fun component4(): kotlin.time/Instant? // io.github.jan.supabase.storage/FileObject.component4|component4(){}[0]
+    final fun component5(): kotlin.time/Instant? // io.github.jan.supabase.storage/FileObject.component5|component5(){}[0]
+    final fun component6(): kotlinx.serialization.json/JsonObject? // io.github.jan.supabase.storage/FileObject.component6|component6(){}[0]
+    final fun copy(kotlin/String = ..., kotlin/String? = ..., kotlin.time/Instant? = ..., kotlin.time/Instant? = ..., kotlin.time/Instant? = ..., kotlinx.serialization.json/JsonObject? = ...): io.github.jan.supabase.storage/FileObject // io.github.jan.supabase.storage/FileObject.copy|copy(kotlin.String;kotlin.String?;kotlin.time.Instant?;kotlin.time.Instant?;kotlin.time.Instant?;kotlinx.serialization.json.JsonObject?){}[0]
+    final fun equals(kotlin/Any?): kotlin/Boolean // io.github.jan.supabase.storage/FileObject.equals|equals(kotlin.Any?){}[0]
+    final fun hashCode(): kotlin/Int // io.github.jan.supabase.storage/FileObject.hashCode|hashCode(){}[0]
+    final fun toString(): kotlin/String // io.github.jan.supabase.storage/FileObject.toString|toString(){}[0]
+
+    final object $serializer : kotlinx.serialization.internal/GeneratedSerializer<io.github.jan.supabase.storage/FileObject> { // io.github.jan.supabase.storage/FileObject.$serializer|null[0]
+        final val descriptor // io.github.jan.supabase.storage/FileObject.$serializer.descriptor|{}descriptor[0]
+            final fun <get-descriptor>(): kotlinx.serialization.descriptors/SerialDescriptor // io.github.jan.supabase.storage/FileObject.$serializer.descriptor.<get-descriptor>|<get-descriptor>(){}[0]
+
+        final fun childSerializers(): kotlin/Array<kotlinx.serialization/KSerializer<*>> // io.github.jan.supabase.storage/FileObject.$serializer.childSerializers|childSerializers(){}[0]
+        final fun deserialize(kotlinx.serialization.encoding/Decoder): io.github.jan.supabase.storage/FileObject // io.github.jan.supabase.storage/FileObject.$serializer.deserialize|deserialize(kotlinx.serialization.encoding.Decoder){}[0]
+        final fun serialize(kotlinx.serialization.encoding/Encoder, io.github.jan.supabase.storage/FileObject) // io.github.jan.supabase.storage/FileObject.$serializer.serialize|serialize(kotlinx.serialization.encoding.Encoder;io.github.jan.supabase.storage.FileObject){}[0]
+    }
+
+    final object Companion { // io.github.jan.supabase.storage/FileObject.Companion|null[0]
+        final fun serializer(): kotlinx.serialization/KSerializer<io.github.jan.supabase.storage/FileObject> // io.github.jan.supabase.storage/FileObject.Companion.serializer|serializer(){}[0]
+    }
+}
+
+final class io.github.jan.supabase.storage/FileObjectV2 { // io.github.jan.supabase.storage/FileObjectV2|null[0]
+    constructor <init>(kotlin/String, kotlin/String?, kotlin/String, kotlin/String? = ..., kotlin.time/Instant? = ..., kotlin.time/Instant, kotlin.time/Instant? = ..., kotlinx.serialization.json/JsonObject? = ..., kotlin/Long, kotlin/String, kotlin/String? = ..., kotlin.time/Instant? = ..., kotlin/String? = ..., io.github.jan.supabase/SupabaseSerializer = ...) // io.github.jan.supabase.storage/FileObjectV2.<init>|<init>(kotlin.String;kotlin.String?;kotlin.String;kotlin.String?;kotlin.time.Instant?;kotlin.time.Instant;kotlin.time.Instant?;kotlinx.serialization.json.JsonObject?;kotlin.Long;kotlin.String;kotlin.String?;kotlin.time.Instant?;kotlin.String?;io.github.jan.supabase.SupabaseSerializer){}[0]
+
+    final val bucketId // io.github.jan.supabase.storage/FileObjectV2.bucketId|{}bucketId[0]
+        final fun <get-bucketId>(): kotlin/String? // io.github.jan.supabase.storage/FileObjectV2.bucketId.<get-bucketId>|<get-bucketId>(){}[0]
+    final val cacheControl // io.github.jan.supabase.storage/FileObjectV2.cacheControl|{}cacheControl[0]
+        final fun <get-cacheControl>(): kotlin/String? // io.github.jan.supabase.storage/FileObjectV2.cacheControl.<get-cacheControl>|<get-cacheControl>(){}[0]
+    final val contentType // io.github.jan.supabase.storage/FileObjectV2.contentType|{}contentType[0]
+        final fun <get-contentType>(): io.ktor.http/ContentType // io.github.jan.supabase.storage/FileObjectV2.contentType.<get-contentType>|<get-contentType>(){}[0]
+    final val createdAt // io.github.jan.supabase.storage/FileObjectV2.createdAt|{}createdAt[0]
+        final fun <get-createdAt>(): kotlin.time/Instant // io.github.jan.supabase.storage/FileObjectV2.createdAt.<get-createdAt>|<get-createdAt>(){}[0]
+    final val etag // io.github.jan.supabase.storage/FileObjectV2.etag|{}etag[0]
+        final fun <get-etag>(): kotlin/String? // io.github.jan.supabase.storage/FileObjectV2.etag.<get-etag>|<get-etag>(){}[0]
+    final val id // io.github.jan.supabase.storage/FileObjectV2.id|{}id[0]
+        final fun <get-id>(): kotlin/String? // io.github.jan.supabase.storage/FileObjectV2.id.<get-id>|<get-id>(){}[0]
+    final val lastAccessedAt // io.github.jan.supabase.storage/FileObjectV2.lastAccessedAt|{}lastAccessedAt[0]
+        final fun <get-lastAccessedAt>(): kotlin.time/Instant? // io.github.jan.supabase.storage/FileObjectV2.lastAccessedAt.<get-lastAccessedAt>|<get-lastAccessedAt>(){}[0]
+    final val lastModified // io.github.jan.supabase.storage/FileObjectV2.lastModified|{}lastModified[0]
+        final fun <get-lastModified>(): kotlin.time/Instant? // io.github.jan.supabase.storage/FileObjectV2.lastModified.<get-lastModified>|<get-lastModified>(){}[0]
+    final val metadata // io.github.jan.supabase.storage/FileObjectV2.metadata|{}metadata[0]
+        final fun <get-metadata>(): kotlinx.serialization.json/JsonObject? // io.github.jan.supabase.storage/FileObjectV2.metadata.<get-metadata>|<get-metadata>(){}[0]
+    final val name // io.github.jan.supabase.storage/FileObjectV2.name|{}name[0]
+        final fun <get-name>(): kotlin/String // io.github.jan.supabase.storage/FileObjectV2.name.<get-name>|<get-name>(){}[0]
+    final val rawContentType // io.github.jan.supabase.storage/FileObjectV2.rawContentType|{}rawContentType[0]
+        final fun <get-rawContentType>(): kotlin/String // io.github.jan.supabase.storage/FileObjectV2.rawContentType.<get-rawContentType>|<get-rawContentType>(){}[0]
+    final val serializer // io.github.jan.supabase.storage/FileObjectV2.serializer|{}serializer[0]
+        final fun <get-serializer>(): io.github.jan.supabase/SupabaseSerializer // io.github.jan.supabase.storage/FileObjectV2.serializer.<get-serializer>|<get-serializer>(){}[0]
+    final val size // io.github.jan.supabase.storage/FileObjectV2.size|{}size[0]
+        final fun <get-size>(): kotlin/Long // io.github.jan.supabase.storage/FileObjectV2.size.<get-size>|<get-size>(){}[0]
+    final val updatedAt // io.github.jan.supabase.storage/FileObjectV2.updatedAt|{}updatedAt[0]
+        final fun <get-updatedAt>(): kotlin.time/Instant? // io.github.jan.supabase.storage/FileObjectV2.updatedAt.<get-updatedAt>|<get-updatedAt>(){}[0]
+    final val version // io.github.jan.supabase.storage/FileObjectV2.version|{}version[0]
+        final fun <get-version>(): kotlin/String // io.github.jan.supabase.storage/FileObjectV2.version.<get-version>|<get-version>(){}[0]
+
+    final fun component1(): kotlin/String // io.github.jan.supabase.storage/FileObjectV2.component1|component1(){}[0]
+    final fun component10(): kotlin/String // io.github.jan.supabase.storage/FileObjectV2.component10|component10(){}[0]
+    final fun component11(): kotlin/String? // io.github.jan.supabase.storage/FileObjectV2.component11|component11(){}[0]
+    final fun component12(): kotlin.time/Instant? // io.github.jan.supabase.storage/FileObjectV2.component12|component12(){}[0]
+    final fun component13(): kotlin/String? // io.github.jan.supabase.storage/FileObjectV2.component13|component13(){}[0]
+    final fun component2(): kotlin/String? // io.github.jan.supabase.storage/FileObjectV2.component2|component2(){}[0]
+    final fun component3(): kotlin/String // io.github.jan.supabase.storage/FileObjectV2.component3|component3(){}[0]
+    final fun component4(): kotlin/String? // io.github.jan.supabase.storage/FileObjectV2.component4|component4(){}[0]
+    final fun component5(): kotlin.time/Instant? // io.github.jan.supabase.storage/FileObjectV2.component5|component5(){}[0]
+    final fun component6(): kotlin.time/Instant // io.github.jan.supabase.storage/FileObjectV2.component6|component6(){}[0]
+    final fun component7(): kotlin.time/Instant? // io.github.jan.supabase.storage/FileObjectV2.component7|component7(){}[0]
+    final fun component8(): kotlinx.serialization.json/JsonObject? // io.github.jan.supabase.storage/FileObjectV2.component8|component8(){}[0]
+    final fun component9(): kotlin/Long // io.github.jan.supabase.storage/FileObjectV2.component9|component9(){}[0]
+    final fun copy(kotlin/String = ..., kotlin/String? = ..., kotlin/String = ..., kotlin/String? = ..., kotlin.time/Instant? = ..., kotlin.time/Instant = ..., kotlin.time/Instant? = ..., kotlinx.serialization.json/JsonObject? = ..., kotlin/Long = ..., kotlin/String = ..., kotlin/String? = ..., kotlin.time/Instant? = ..., kotlin/String? = ..., io.github.jan.supabase/SupabaseSerializer = ...): io.github.jan.supabase.storage/FileObjectV2 // io.github.jan.supabase.storage/FileObjectV2.copy|copy(kotlin.String;kotlin.String?;kotlin.String;kotlin.String?;kotlin.time.Instant?;kotlin.time.Instant;kotlin.time.Instant?;kotlinx.serialization.json.JsonObject?;kotlin.Long;kotlin.String;kotlin.String?;kotlin.time.Instant?;kotlin.String?;io.github.jan.supabase.SupabaseSerializer){}[0]
+    final fun equals(kotlin/Any?): kotlin/Boolean // io.github.jan.supabase.storage/FileObjectV2.equals|equals(kotlin.Any?){}[0]
+    final fun hashCode(): kotlin/Int // io.github.jan.supabase.storage/FileObjectV2.hashCode|hashCode(){}[0]
+    final fun toString(): kotlin/String // io.github.jan.supabase.storage/FileObjectV2.toString|toString(){}[0]
+    final inline fun <#A1: reified kotlin/Any?> decodeMetadata(): #A1? // io.github.jan.supabase.storage/FileObjectV2.decodeMetadata|decodeMetadata(){0§<kotlin.Any?>}[0]
+
+    final object $serializer : kotlinx.serialization.internal/GeneratedSerializer<io.github.jan.supabase.storage/FileObjectV2> { // io.github.jan.supabase.storage/FileObjectV2.$serializer|null[0]
+        final val descriptor // io.github.jan.supabase.storage/FileObjectV2.$serializer.descriptor|{}descriptor[0]
+            final fun <get-descriptor>(): kotlinx.serialization.descriptors/SerialDescriptor // io.github.jan.supabase.storage/FileObjectV2.$serializer.descriptor.<get-descriptor>|<get-descriptor>(){}[0]
+
+        final fun childSerializers(): kotlin/Array<kotlinx.serialization/KSerializer<*>> // io.github.jan.supabase.storage/FileObjectV2.$serializer.childSerializers|childSerializers(){}[0]
+        final fun deserialize(kotlinx.serialization.encoding/Decoder): io.github.jan.supabase.storage/FileObjectV2 // io.github.jan.supabase.storage/FileObjectV2.$serializer.deserialize|deserialize(kotlinx.serialization.encoding.Decoder){}[0]
+        final fun serialize(kotlinx.serialization.encoding/Encoder, io.github.jan.supabase.storage/FileObjectV2) // io.github.jan.supabase.storage/FileObjectV2.$serializer.serialize|serialize(kotlinx.serialization.encoding.Encoder;io.github.jan.supabase.storage.FileObjectV2){}[0]
+    }
+
+    final object Companion { // io.github.jan.supabase.storage/FileObjectV2.Companion|null[0]
+        final fun serializer(): kotlinx.serialization/KSerializer<io.github.jan.supabase.storage/FileObjectV2> // io.github.jan.supabase.storage/FileObjectV2.Companion.serializer|serializer(){}[0]
+    }
+}
+
+final class io.github.jan.supabase.storage/FileUploadResponse { // io.github.jan.supabase.storage/FileUploadResponse|null[0]
+    constructor <init>(kotlin/String? = ..., kotlin/String, kotlin/String? = ...) // io.github.jan.supabase.storage/FileUploadResponse.<init>|<init>(kotlin.String?;kotlin.String;kotlin.String?){}[0]
+
+    final val id // io.github.jan.supabase.storage/FileUploadResponse.id|{}id[0]
+        final fun <get-id>(): kotlin/String? // io.github.jan.supabase.storage/FileUploadResponse.id.<get-id>|<get-id>(){}[0]
+    final val key // io.github.jan.supabase.storage/FileUploadResponse.key|{}key[0]
+        final fun <get-key>(): kotlin/String? // io.github.jan.supabase.storage/FileUploadResponse.key.<get-key>|<get-key>(){}[0]
+    final val path // io.github.jan.supabase.storage/FileUploadResponse.path|{}path[0]
+        final fun <get-path>(): kotlin/String // io.github.jan.supabase.storage/FileUploadResponse.path.<get-path>|<get-path>(){}[0]
+
+    final fun component1(): kotlin/String? // io.github.jan.supabase.storage/FileUploadResponse.component1|component1(){}[0]
+    final fun component2(): kotlin/String // io.github.jan.supabase.storage/FileUploadResponse.component2|component2(){}[0]
+    final fun component3(): kotlin/String? // io.github.jan.supabase.storage/FileUploadResponse.component3|component3(){}[0]
+    final fun copy(kotlin/String? = ..., kotlin/String = ..., kotlin/String? = ...): io.github.jan.supabase.storage/FileUploadResponse // io.github.jan.supabase.storage/FileUploadResponse.copy|copy(kotlin.String?;kotlin.String;kotlin.String?){}[0]
+    final fun equals(kotlin/Any?): kotlin/Boolean // io.github.jan.supabase.storage/FileUploadResponse.equals|equals(kotlin.Any?){}[0]
+    final fun hashCode(): kotlin/Int // io.github.jan.supabase.storage/FileUploadResponse.hashCode|hashCode(){}[0]
+    final fun toString(): kotlin/String // io.github.jan.supabase.storage/FileUploadResponse.toString|toString(){}[0]
+}
+
+final class io.github.jan.supabase.storage/ForceDownload { // io.github.jan.supabase.storage/ForceDownload|null[0]
+    constructor <init>(kotlin/String? = ...) // io.github.jan.supabase.storage/ForceDownload.<init>|<init>(kotlin.String?){}[0]
+
+    final val fileName // io.github.jan.supabase.storage/ForceDownload.fileName|{}fileName[0]
+        final fun <get-fileName>(): kotlin/String? // io.github.jan.supabase.storage/ForceDownload.fileName.<get-fileName>|<get-fileName>(){}[0]
+
+    final fun component1(): kotlin/String? // io.github.jan.supabase.storage/ForceDownload.component1|component1(){}[0]
+    final fun copy(kotlin/String? = ...): io.github.jan.supabase.storage/ForceDownload // io.github.jan.supabase.storage/ForceDownload.copy|copy(kotlin.String?){}[0]
+    final fun equals(kotlin/Any?): kotlin/Boolean // io.github.jan.supabase.storage/ForceDownload.equals|equals(kotlin.Any?){}[0]
+    final fun hashCode(): kotlin/Int // io.github.jan.supabase.storage/ForceDownload.hashCode|hashCode(){}[0]
+    final fun toString(): kotlin/String // io.github.jan.supabase.storage/ForceDownload.toString|toString(){}[0]
+}
+
+final class io.github.jan.supabase.storage/ImageTransformation { // io.github.jan.supabase.storage/ImageTransformation|null[0]
+    constructor <init>() // io.github.jan.supabase.storage/ImageTransformation.<init>|<init>(){}[0]
+
+    final var format // io.github.jan.supabase.storage/ImageTransformation.format|{}format[0]
+        final fun <get-format>(): kotlin/String? // io.github.jan.supabase.storage/ImageTransformation.format.<get-format>|<get-format>(){}[0]
+        final fun <set-format>(kotlin/String?) // io.github.jan.supabase.storage/ImageTransformation.format.<set-format>|<set-format>(kotlin.String?){}[0]
+    final var height // io.github.jan.supabase.storage/ImageTransformation.height|{}height[0]
+        final fun <get-height>(): kotlin/Int? // io.github.jan.supabase.storage/ImageTransformation.height.<get-height>|<get-height>(){}[0]
+        final fun <set-height>(kotlin/Int?) // io.github.jan.supabase.storage/ImageTransformation.height.<set-height>|<set-height>(kotlin.Int?){}[0]
+    final var quality // io.github.jan.supabase.storage/ImageTransformation.quality|{}quality[0]
+        final fun <get-quality>(): kotlin/Int? // io.github.jan.supabase.storage/ImageTransformation.quality.<get-quality>|<get-quality>(){}[0]
+        final fun <set-quality>(kotlin/Int?) // io.github.jan.supabase.storage/ImageTransformation.quality.<set-quality>|<set-quality>(kotlin.Int?){}[0]
+    final var resize // io.github.jan.supabase.storage/ImageTransformation.resize|{}resize[0]
+        final fun <get-resize>(): io.github.jan.supabase.storage/ImageTransformation.Resize? // io.github.jan.supabase.storage/ImageTransformation.resize.<get-resize>|<get-resize>(){}[0]
+        final fun <set-resize>(io.github.jan.supabase.storage/ImageTransformation.Resize?) // io.github.jan.supabase.storage/ImageTransformation.resize.<set-resize>|<set-resize>(io.github.jan.supabase.storage.ImageTransformation.Resize?){}[0]
+    final var width // io.github.jan.supabase.storage/ImageTransformation.width|{}width[0]
+        final fun <get-width>(): kotlin/Int? // io.github.jan.supabase.storage/ImageTransformation.width.<get-width>|<get-width>(){}[0]
+        final fun <set-width>(kotlin/Int?) // io.github.jan.supabase.storage/ImageTransformation.width.<set-width>|<set-width>(kotlin.Int?){}[0]
+
+    final fun contain() // io.github.jan.supabase.storage/ImageTransformation.contain|contain(){}[0]
+    final fun cover() // io.github.jan.supabase.storage/ImageTransformation.cover|cover(){}[0]
+    final fun fill() // io.github.jan.supabase.storage/ImageTransformation.fill|fill(){}[0]
+    final fun size(kotlin/Int, kotlin/Int) // io.github.jan.supabase.storage/ImageTransformation.size|size(kotlin.Int;kotlin.Int){}[0]
+
+    final enum class Resize : kotlin/Enum<io.github.jan.supabase.storage/ImageTransformation.Resize> { // io.github.jan.supabase.storage/ImageTransformation.Resize|null[0]
+        enum entry CONTAIN // io.github.jan.supabase.storage/ImageTransformation.Resize.CONTAIN|null[0]
+        enum entry COVER // io.github.jan.supabase.storage/ImageTransformation.Resize.COVER|null[0]
+        enum entry FILL // io.github.jan.supabase.storage/ImageTransformation.Resize.FILL|null[0]
+
+        final val entries // io.github.jan.supabase.storage/ImageTransformation.Resize.entries|#static{}entries[0]
+            final fun <get-entries>(): kotlin.enums/EnumEntries<io.github.jan.supabase.storage/ImageTransformation.Resize> // io.github.jan.supabase.storage/ImageTransformation.Resize.entries.<get-entries>|<get-entries>#static(){}[0]
+
+        final fun valueOf(kotlin/String): io.github.jan.supabase.storage/ImageTransformation.Resize // io.github.jan.supabase.storage/ImageTransformation.Resize.valueOf|valueOf#static(kotlin.String){}[0]
+        final fun values(): kotlin/Array<io.github.jan.supabase.storage/ImageTransformation.Resize> // io.github.jan.supabase.storage/ImageTransformation.Resize.values|values#static(){}[0]
+    }
+
+    final object Companion { // io.github.jan.supabase.storage/ImageTransformation.Companion|null[0]
+        final val VALID_QUALITY_RANGE // io.github.jan.supabase.storage/ImageTransformation.Companion.VALID_QUALITY_RANGE|{}VALID_QUALITY_RANGE[0]
+            final fun <get-VALID_QUALITY_RANGE>(): kotlin.ranges/IntRange // io.github.jan.supabase.storage/ImageTransformation.Companion.VALID_QUALITY_RANGE.<get-VALID_QUALITY_RANGE>|<get-VALID_QUALITY_RANGE>(){}[0]
+    }
+}
+
+final class io.github.jan.supabase.storage/PublicUrlBuilder : io.github.jan.supabase.storage/BucketUrlBuilder.WithForceDownload, io.github.jan.supabase.storage/BucketUrlBuilder.WithTransformation { // io.github.jan.supabase.storage/PublicUrlBuilder|null[0]
+    constructor <init>() // io.github.jan.supabase.storage/PublicUrlBuilder.<init>|<init>(){}[0]
+
+    final var cacheNonce // io.github.jan.supabase.storage/PublicUrlBuilder.cacheNonce|{}cacheNonce[0]
+        final fun <get-cacheNonce>(): kotlin/String? // io.github.jan.supabase.storage/PublicUrlBuilder.cacheNonce.<get-cacheNonce>|<get-cacheNonce>(){}[0]
+        final fun <set-cacheNonce>(kotlin/String?) // io.github.jan.supabase.storage/PublicUrlBuilder.cacheNonce.<set-cacheNonce>|<set-cacheNonce>(kotlin.String?){}[0]
+    final var download // io.github.jan.supabase.storage/PublicUrlBuilder.download|{}download[0]
+        final fun <get-download>(): io.github.jan.supabase.storage/ForceDownload? // io.github.jan.supabase.storage/PublicUrlBuilder.download.<get-download>|<get-download>(){}[0]
+        final fun <set-download>(io.github.jan.supabase.storage/ForceDownload?) // io.github.jan.supabase.storage/PublicUrlBuilder.download.<set-download>|<set-download>(io.github.jan.supabase.storage.ForceDownload?){}[0]
+    final var transformation // io.github.jan.supabase.storage/PublicUrlBuilder.transformation|{}transformation[0]
+        final fun <get-transformation>(): io.github.jan.supabase.storage/ImageTransformation? // io.github.jan.supabase.storage/PublicUrlBuilder.transformation.<get-transformation>|<get-transformation>(){}[0]
+        final fun <set-transformation>(io.github.jan.supabase.storage/ImageTransformation?) // io.github.jan.supabase.storage/PublicUrlBuilder.transformation.<set-transformation>|<set-transformation>(io.github.jan.supabase.storage.ImageTransformation?){}[0]
+}
+
+final class io.github.jan.supabase.storage/PurgeCacheOptions { // io.github.jan.supabase.storage/PurgeCacheOptions|null[0]
+    constructor <init>() // io.github.jan.supabase.storage/PurgeCacheOptions.<init>|<init>(){}[0]
+
+    final var transformations // io.github.jan.supabase.storage/PurgeCacheOptions.transformations|{}transformations[0]
+        final fun <get-transformations>(): kotlin/Boolean // io.github.jan.supabase.storage/PurgeCacheOptions.transformations.<get-transformations>|<get-transformations>(){}[0]
+        final fun <set-transformations>(kotlin/Boolean) // io.github.jan.supabase.storage/PurgeCacheOptions.transformations.<set-transformations>|<set-transformations>(kotlin.Boolean){}[0]
+}
+
+final class io.github.jan.supabase.storage/SignedUrl { // io.github.jan.supabase.storage/SignedUrl|null[0]
+    constructor <init>(kotlin/String? = ..., kotlin/String, kotlin/String) // io.github.jan.supabase.storage/SignedUrl.<init>|<init>(kotlin.String?;kotlin.String;kotlin.String){}[0]
+
+    final val error // io.github.jan.supabase.storage/SignedUrl.error|{}error[0]
+        final fun <get-error>(): kotlin/String? // io.github.jan.supabase.storage/SignedUrl.error.<get-error>|<get-error>(){}[0]
+    final val path // io.github.jan.supabase.storage/SignedUrl.path|{}path[0]
+        final fun <get-path>(): kotlin/String // io.github.jan.supabase.storage/SignedUrl.path.<get-path>|<get-path>(){}[0]
+    final val signedURL // io.github.jan.supabase.storage/SignedUrl.signedURL|{}signedURL[0]
+        final fun <get-signedURL>(): kotlin/String // io.github.jan.supabase.storage/SignedUrl.signedURL.<get-signedURL>|<get-signedURL>(){}[0]
+
+    final fun component1(): kotlin/String? // io.github.jan.supabase.storage/SignedUrl.component1|component1(){}[0]
+    final fun component2(): kotlin/String // io.github.jan.supabase.storage/SignedUrl.component2|component2(){}[0]
+    final fun component3(): kotlin/String // io.github.jan.supabase.storage/SignedUrl.component3|component3(){}[0]
+    final fun copy(kotlin/String? = ..., kotlin/String = ..., kotlin/String = ...): io.github.jan.supabase.storage/SignedUrl // io.github.jan.supabase.storage/SignedUrl.copy|copy(kotlin.String?;kotlin.String;kotlin.String){}[0]
+    final fun equals(kotlin/Any?): kotlin/Boolean // io.github.jan.supabase.storage/SignedUrl.equals|equals(kotlin.Any?){}[0]
+    final fun hashCode(): kotlin/Int // io.github.jan.supabase.storage/SignedUrl.hashCode|hashCode(){}[0]
+    final fun toString(): kotlin/String // io.github.jan.supabase.storage/SignedUrl.toString|toString(){}[0]
+
+    final object $serializer : kotlinx.serialization.internal/GeneratedSerializer<io.github.jan.supabase.storage/SignedUrl> { // io.github.jan.supabase.storage/SignedUrl.$serializer|null[0]
+        final val descriptor // io.github.jan.supabase.storage/SignedUrl.$serializer.descriptor|{}descriptor[0]
+            final fun <get-descriptor>(): kotlinx.serialization.descriptors/SerialDescriptor // io.github.jan.supabase.storage/SignedUrl.$serializer.descriptor.<get-descriptor>|<get-descriptor>(){}[0]
+
+        final fun childSerializers(): kotlin/Array<kotlinx.serialization/KSerializer<*>> // io.github.jan.supabase.storage/SignedUrl.$serializer.childSerializers|childSerializers(){}[0]
+        final fun deserialize(kotlinx.serialization.encoding/Decoder): io.github.jan.supabase.storage/SignedUrl // io.github.jan.supabase.storage/SignedUrl.$serializer.deserialize|deserialize(kotlinx.serialization.encoding.Decoder){}[0]
+        final fun serialize(kotlinx.serialization.encoding/Encoder, io.github.jan.supabase.storage/SignedUrl) // io.github.jan.supabase.storage/SignedUrl.$serializer.serialize|serialize(kotlinx.serialization.encoding.Encoder;io.github.jan.supabase.storage.SignedUrl){}[0]
+    }
+
+    final object Companion { // io.github.jan.supabase.storage/SignedUrl.Companion|null[0]
+        final fun serializer(): kotlinx.serialization/KSerializer<io.github.jan.supabase.storage/SignedUrl> // io.github.jan.supabase.storage/SignedUrl.Companion.serializer|serializer(){}[0]
+    }
+}
+
+final class io.github.jan.supabase.storage/SignedUrlBuilder : io.github.jan.supabase.storage/BucketUrlBuilder.WithForceDownload, io.github.jan.supabase.storage/BucketUrlBuilder.WithTransformation { // io.github.jan.supabase.storage/SignedUrlBuilder|null[0]
+    constructor <init>() // io.github.jan.supabase.storage/SignedUrlBuilder.<init>|<init>(){}[0]
+
+    final var cacheNonce // io.github.jan.supabase.storage/SignedUrlBuilder.cacheNonce|{}cacheNonce[0]
+        final fun <get-cacheNonce>(): kotlin/String? // io.github.jan.supabase.storage/SignedUrlBuilder.cacheNonce.<get-cacheNonce>|<get-cacheNonce>(){}[0]
+        final fun <set-cacheNonce>(kotlin/String?) // io.github.jan.supabase.storage/SignedUrlBuilder.cacheNonce.<set-cacheNonce>|<set-cacheNonce>(kotlin.String?){}[0]
+    final var download // io.github.jan.supabase.storage/SignedUrlBuilder.download|{}download[0]
+        final fun <get-download>(): io.github.jan.supabase.storage/ForceDownload? // io.github.jan.supabase.storage/SignedUrlBuilder.download.<get-download>|<get-download>(){}[0]
+        final fun <set-download>(io.github.jan.supabase.storage/ForceDownload?) // io.github.jan.supabase.storage/SignedUrlBuilder.download.<set-download>|<set-download>(io.github.jan.supabase.storage.ForceDownload?){}[0]
+    final var transformation // io.github.jan.supabase.storage/SignedUrlBuilder.transformation|{}transformation[0]
+        final fun <get-transformation>(): io.github.jan.supabase.storage/ImageTransformation? // io.github.jan.supabase.storage/SignedUrlBuilder.transformation.<get-transformation>|<get-transformation>(){}[0]
+        final fun <set-transformation>(io.github.jan.supabase.storage/ImageTransformation?) // io.github.jan.supabase.storage/SignedUrlBuilder.transformation.<set-transformation>|<set-transformation>(io.github.jan.supabase.storage.ImageTransformation?){}[0]
+}
+
+final class io.github.jan.supabase.storage/SignedUrlsBuilder : io.github.jan.supabase.storage/BucketUrlBuilder.WithForceDownload { // io.github.jan.supabase.storage/SignedUrlsBuilder|null[0]
+    constructor <init>() // io.github.jan.supabase.storage/SignedUrlsBuilder.<init>|<init>(){}[0]
+
+    final var cacheNonce // io.github.jan.supabase.storage/SignedUrlsBuilder.cacheNonce|{}cacheNonce[0]
+        final fun <get-cacheNonce>(): kotlin/String? // io.github.jan.supabase.storage/SignedUrlsBuilder.cacheNonce.<get-cacheNonce>|<get-cacheNonce>(){}[0]
+        final fun <set-cacheNonce>(kotlin/String?) // io.github.jan.supabase.storage/SignedUrlsBuilder.cacheNonce.<set-cacheNonce>|<set-cacheNonce>(kotlin.String?){}[0]
+    final var download // io.github.jan.supabase.storage/SignedUrlsBuilder.download|{}download[0]
+        final fun <get-download>(): io.github.jan.supabase.storage/ForceDownload? // io.github.jan.supabase.storage/SignedUrlsBuilder.download.<get-download>|<get-download>(){}[0]
+        final fun <set-download>(io.github.jan.supabase.storage/ForceDownload?) // io.github.jan.supabase.storage/SignedUrlsBuilder.download.<set-download>|<set-download>(io.github.jan.supabase.storage.ForceDownload?){}[0]
+}
+
+final class io.github.jan.supabase.storage/StorageItem { // io.github.jan.supabase.storage/StorageItem|null[0]
+    constructor <init>(kotlin/String, kotlin/String, kotlin/Boolean) // io.github.jan.supabase.storage/StorageItem.<init>|<init>(kotlin.String;kotlin.String;kotlin.Boolean){}[0]
+
+    final val authenticated // io.github.jan.supabase.storage/StorageItem.authenticated|{}authenticated[0]
+        final fun <get-authenticated>(): kotlin/Boolean // io.github.jan.supabase.storage/StorageItem.authenticated.<get-authenticated>|<get-authenticated>(){}[0]
+    final val bucketId // io.github.jan.supabase.storage/StorageItem.bucketId|{}bucketId[0]
+        final fun <get-bucketId>(): kotlin/String // io.github.jan.supabase.storage/StorageItem.bucketId.<get-bucketId>|<get-bucketId>(){}[0]
+    final val path // io.github.jan.supabase.storage/StorageItem.path|{}path[0]
+        final fun <get-path>(): kotlin/String // io.github.jan.supabase.storage/StorageItem.path.<get-path>|<get-path>(){}[0]
+
+    final fun component1(): kotlin/String // io.github.jan.supabase.storage/StorageItem.component1|component1(){}[0]
+    final fun component2(): kotlin/String // io.github.jan.supabase.storage/StorageItem.component2|component2(){}[0]
+    final fun component3(): kotlin/Boolean // io.github.jan.supabase.storage/StorageItem.component3|component3(){}[0]
+    final fun copy(kotlin/String = ..., kotlin/String = ..., kotlin/Boolean = ...): io.github.jan.supabase.storage/StorageItem // io.github.jan.supabase.storage/StorageItem.copy|copy(kotlin.String;kotlin.String;kotlin.Boolean){}[0]
+    final fun equals(kotlin/Any?): kotlin/Boolean // io.github.jan.supabase.storage/StorageItem.equals|equals(kotlin.Any?){}[0]
+    final fun hashCode(): kotlin/Int // io.github.jan.supabase.storage/StorageItem.hashCode|hashCode(){}[0]
+    final fun toString(): kotlin/String // io.github.jan.supabase.storage/StorageItem.toString|toString(){}[0]
+}
+
+final class io.github.jan.supabase.storage/UploadData { // io.github.jan.supabase.storage/UploadData|null[0]
+    constructor <init>(io.ktor.utils.io/ByteReadChannel, kotlin/Long) // io.github.jan.supabase.storage/UploadData.<init>|<init>(io.ktor.utils.io.ByteReadChannel;kotlin.Long){}[0]
+
+    final val size // io.github.jan.supabase.storage/UploadData.size|{}size[0]
+        final fun <get-size>(): kotlin/Long // io.github.jan.supabase.storage/UploadData.size.<get-size>|<get-size>(){}[0]
+    final val stream // io.github.jan.supabase.storage/UploadData.stream|{}stream[0]
+        final fun <get-stream>(): io.ktor.utils.io/ByteReadChannel // io.github.jan.supabase.storage/UploadData.stream.<get-stream>|<get-stream>(){}[0]
+
+    final fun component1(): io.ktor.utils.io/ByteReadChannel // io.github.jan.supabase.storage/UploadData.component1|component1(){}[0]
+    final fun component2(): kotlin/Long // io.github.jan.supabase.storage/UploadData.component2|component2(){}[0]
+    final fun copy(io.ktor.utils.io/ByteReadChannel = ..., kotlin/Long = ...): io.github.jan.supabase.storage/UploadData // io.github.jan.supabase.storage/UploadData.copy|copy(io.ktor.utils.io.ByteReadChannel;kotlin.Long){}[0]
+    final fun equals(kotlin/Any?): kotlin/Boolean // io.github.jan.supabase.storage/UploadData.equals|equals(kotlin.Any?){}[0]
+    final fun hashCode(): kotlin/Int // io.github.jan.supabase.storage/UploadData.hashCode|hashCode(){}[0]
+    final fun toString(): kotlin/String // io.github.jan.supabase.storage/UploadData.toString|toString(){}[0]
+}
+
+final class io.github.jan.supabase.storage/UploadOptionBuilder { // io.github.jan.supabase.storage/UploadOptionBuilder|null[0]
+    constructor <init>(io.github.jan.supabase/SupabaseSerializer, kotlin/Boolean = ..., kotlinx.serialization.json/JsonObject? = ..., io.ktor.http/ContentType? = ..., kotlin.collections/MutableList<kotlin/Function1<io.ktor.client.request/HttpRequestBuilder, kotlin/Unit>> = ...) // io.github.jan.supabase.storage/UploadOptionBuilder.<init>|<init>(io.github.jan.supabase.SupabaseSerializer;kotlin.Boolean;kotlinx.serialization.json.JsonObject?;io.ktor.http.ContentType?;kotlin.collections.MutableList<kotlin.Function1<io.ktor.client.request.HttpRequestBuilder,kotlin.Unit>>){}[0]
+
+    final val serializer // io.github.jan.supabase.storage/UploadOptionBuilder.serializer|{}serializer[0]
+        final fun <get-serializer>(): io.github.jan.supabase/SupabaseSerializer // io.github.jan.supabase.storage/UploadOptionBuilder.serializer.<get-serializer>|<get-serializer>(){}[0]
+
+    final var contentType // io.github.jan.supabase.storage/UploadOptionBuilder.contentType|{}contentType[0]
+        final fun <get-contentType>(): io.ktor.http/ContentType? // io.github.jan.supabase.storage/UploadOptionBuilder.contentType.<get-contentType>|<get-contentType>(){}[0]
+        final fun <set-contentType>(io.ktor.http/ContentType?) // io.github.jan.supabase.storage/UploadOptionBuilder.contentType.<set-contentType>|<set-contentType>(io.ktor.http.ContentType?){}[0]
+    final var upsert // io.github.jan.supabase.storage/UploadOptionBuilder.upsert|{}upsert[0]
+        final fun <get-upsert>(): kotlin/Boolean // io.github.jan.supabase.storage/UploadOptionBuilder.upsert.<get-upsert>|<get-upsert>(){}[0]
+        final fun <set-upsert>(kotlin/Boolean) // io.github.jan.supabase.storage/UploadOptionBuilder.upsert.<set-upsert>|<set-upsert>(kotlin.Boolean){}[0]
+    final var userMetadata // io.github.jan.supabase.storage/UploadOptionBuilder.userMetadata|{}userMetadata[0]
+        final fun <get-userMetadata>(): kotlinx.serialization.json/JsonObject? // io.github.jan.supabase.storage/UploadOptionBuilder.userMetadata.<get-userMetadata>|<get-userMetadata>(){}[0]
+        final fun <set-userMetadata>(kotlinx.serialization.json/JsonObject?) // io.github.jan.supabase.storage/UploadOptionBuilder.userMetadata.<set-userMetadata>|<set-userMetadata>(kotlinx.serialization.json.JsonObject?){}[0]
+
+    final fun httpOverride(kotlin/Function1<io.ktor.client.request/HttpRequestBuilder, kotlin/Unit>) // io.github.jan.supabase.storage/UploadOptionBuilder.httpOverride|httpOverride(kotlin.Function1<io.ktor.client.request.HttpRequestBuilder,kotlin.Unit>){}[0]
+    final inline fun <#A1: reified kotlin/Any> userMetadata(#A1) // io.github.jan.supabase.storage/UploadOptionBuilder.userMetadata|userMetadata(0:0){0§<kotlin.Any>}[0]
+    final inline fun userMetadata(kotlin/Function1<kotlinx.serialization.json/JsonObjectBuilder, kotlin/Unit>) // io.github.jan.supabase.storage/UploadOptionBuilder.userMetadata|userMetadata(kotlin.Function1<kotlinx.serialization.json.JsonObjectBuilder,kotlin.Unit>){}[0]
+}
+
+final class io.github.jan.supabase.storage/UploadSignedUrl { // io.github.jan.supabase.storage/UploadSignedUrl|null[0]
+    constructor <init>(kotlin/String, kotlin/String, kotlin/String) // io.github.jan.supabase.storage/UploadSignedUrl.<init>|<init>(kotlin.String;kotlin.String;kotlin.String){}[0]
+
+    final val path // io.github.jan.supabase.storage/UploadSignedUrl.path|{}path[0]
+        final fun <get-path>(): kotlin/String // io.github.jan.supabase.storage/UploadSignedUrl.path.<get-path>|<get-path>(){}[0]
+    final val token // io.github.jan.supabase.storage/UploadSignedUrl.token|{}token[0]
+        final fun <get-token>(): kotlin/String // io.github.jan.supabase.storage/UploadSignedUrl.token.<get-token>|<get-token>(){}[0]
+    final val url // io.github.jan.supabase.storage/UploadSignedUrl.url|{}url[0]
+        final fun <get-url>(): kotlin/String // io.github.jan.supabase.storage/UploadSignedUrl.url.<get-url>|<get-url>(){}[0]
+
+    final fun component1(): kotlin/String // io.github.jan.supabase.storage/UploadSignedUrl.component1|component1(){}[0]
+    final fun component2(): kotlin/String // io.github.jan.supabase.storage/UploadSignedUrl.component2|component2(){}[0]
+    final fun component3(): kotlin/String // io.github.jan.supabase.storage/UploadSignedUrl.component3|component3(){}[0]
+    final fun copy(kotlin/String = ..., kotlin/String = ..., kotlin/String = ...): io.github.jan.supabase.storage/UploadSignedUrl // io.github.jan.supabase.storage/UploadSignedUrl.copy|copy(kotlin.String;kotlin.String;kotlin.String){}[0]
+    final fun equals(kotlin/Any?): kotlin/Boolean // io.github.jan.supabase.storage/UploadSignedUrl.equals|equals(kotlin.Any?){}[0]
+    final fun hashCode(): kotlin/Int // io.github.jan.supabase.storage/UploadSignedUrl.hashCode|hashCode(){}[0]
+    final fun toString(): kotlin/String // io.github.jan.supabase.storage/UploadSignedUrl.toString|toString(){}[0]
+}
+
+final value class io.github.jan.supabase.storage.resumable/Fingerprint { // io.github.jan.supabase.storage.resumable/Fingerprint|null[0]
+    final val size // io.github.jan.supabase.storage.resumable/Fingerprint.size|{}size[0]
+        final fun <get-size>(): kotlin/Long // io.github.jan.supabase.storage.resumable/Fingerprint.size.<get-size>|<get-size>(){}[0]
+    final val source // io.github.jan.supabase.storage.resumable/Fingerprint.source|{}source[0]
+        final fun <get-source>(): kotlin/String // io.github.jan.supabase.storage.resumable/Fingerprint.source.<get-source>|<get-source>(){}[0]
+    final val value // io.github.jan.supabase.storage.resumable/Fingerprint.value|{}value[0]
+        final fun <get-value>(): kotlin/String // io.github.jan.supabase.storage.resumable/Fingerprint.value.<get-value>|<get-value>(){}[0]
+
+    final fun equals(kotlin/Any?): kotlin/Boolean // io.github.jan.supabase.storage.resumable/Fingerprint.equals|equals(kotlin.Any?){}[0]
+    final fun hashCode(): kotlin/Int // io.github.jan.supabase.storage.resumable/Fingerprint.hashCode|hashCode(){}[0]
+    final fun toString(): kotlin/String // io.github.jan.supabase.storage.resumable/Fingerprint.toString|toString(){}[0]
+
+    final object Companion { // io.github.jan.supabase.storage.resumable/Fingerprint.Companion|null[0]
+        final const val FINGERPRINT_PARTS // io.github.jan.supabase.storage.resumable/Fingerprint.Companion.FINGERPRINT_PARTS|{}FINGERPRINT_PARTS[0]
+            final fun <get-FINGERPRINT_PARTS>(): kotlin/Int // io.github.jan.supabase.storage.resumable/Fingerprint.Companion.FINGERPRINT_PARTS.<get-FINGERPRINT_PARTS>|<get-FINGERPRINT_PARTS>(){}[0]
+        final const val FINGERPRINT_SEPARATOR // io.github.jan.supabase.storage.resumable/Fingerprint.Companion.FINGERPRINT_SEPARATOR|{}FINGERPRINT_SEPARATOR[0]
+            final fun <get-FINGERPRINT_SEPARATOR>(): kotlin/String // io.github.jan.supabase.storage.resumable/Fingerprint.Companion.FINGERPRINT_SEPARATOR.<get-FINGERPRINT_SEPARATOR>|<get-FINGERPRINT_SEPARATOR>(){}[0]
+
+        final fun invoke(kotlin/String): io.github.jan.supabase.storage.resumable/Fingerprint? // io.github.jan.supabase.storage.resumable/Fingerprint.Companion.invoke|invoke(kotlin.String){}[0]
+        final fun invoke(kotlin/String, kotlin/Long): io.github.jan.supabase.storage.resumable/Fingerprint // io.github.jan.supabase.storage.resumable/Fingerprint.Companion.invoke|invoke(kotlin.String;kotlin.Long){}[0]
+    }
+}
+
+final value class io.github.jan.supabase.storage/FileSizeLimit { // io.github.jan.supabase.storage/FileSizeLimit|null[0]
+    final val value // io.github.jan.supabase.storage/FileSizeLimit.value|{}value[0]
+        final fun <get-value>(): kotlin/String // io.github.jan.supabase.storage/FileSizeLimit.value.<get-value>|<get-value>(){}[0]
+
+    final fun equals(kotlin/Any?): kotlin/Boolean // io.github.jan.supabase.storage/FileSizeLimit.equals|equals(kotlin.Any?){}[0]
+    final fun hashCode(): kotlin/Int // io.github.jan.supabase.storage/FileSizeLimit.hashCode|hashCode(){}[0]
+    final fun toString(): kotlin/String // io.github.jan.supabase.storage/FileSizeLimit.toString|toString(){}[0]
+}
+
+open class io.github.jan.supabase.storage/StorageListFilter { // io.github.jan.supabase.storage/StorageListFilter|null[0]
+    constructor <init>() // io.github.jan.supabase.storage/StorageListFilter.<init>|<init>(){}[0]
+
+    final var limit // io.github.jan.supabase.storage/StorageListFilter.limit|{}limit[0]
+        final fun <get-limit>(): kotlin/Int? // io.github.jan.supabase.storage/StorageListFilter.limit.<get-limit>|<get-limit>(){}[0]
+        final fun <set-limit>(kotlin/Int?) // io.github.jan.supabase.storage/StorageListFilter.limit.<set-limit>|<set-limit>(kotlin.Int?){}[0]
+    final var offset // io.github.jan.supabase.storage/StorageListFilter.offset|{}offset[0]
+        final fun <get-offset>(): kotlin/Int? // io.github.jan.supabase.storage/StorageListFilter.offset.<get-offset>|<get-offset>(){}[0]
+        final fun <set-offset>(kotlin/Int?) // io.github.jan.supabase.storage/StorageListFilter.offset.<set-offset>|<set-offset>(kotlin.Int?){}[0]
+    final var search // io.github.jan.supabase.storage/StorageListFilter.search|{}search[0]
+        final fun <get-search>(): kotlin/String? // io.github.jan.supabase.storage/StorageListFilter.search.<get-search>|<get-search>(){}[0]
+        final fun <set-search>(kotlin/String?) // io.github.jan.supabase.storage/StorageListFilter.search.<set-search>|<set-search>(kotlin.String?){}[0]
+    final var sortColumn // io.github.jan.supabase.storage/StorageListFilter.sortColumn|{}sortColumn[0]
+        final fun <get-sortColumn>(): kotlin/String? // io.github.jan.supabase.storage/StorageListFilter.sortColumn.<get-sortColumn>|<get-sortColumn>(){}[0]
+        final fun <set-sortColumn>(kotlin/String?) // io.github.jan.supabase.storage/StorageListFilter.sortColumn.<set-sortColumn>|<set-sortColumn>(kotlin.String?){}[0]
+    final var sortOrder // io.github.jan.supabase.storage/StorageListFilter.sortOrder|{}sortOrder[0]
+        final fun <get-sortOrder>(): kotlin/String? // io.github.jan.supabase.storage/StorageListFilter.sortOrder.<get-sortOrder>|<get-sortOrder>(){}[0]
+        final fun <set-sortOrder>(kotlin/String?) // io.github.jan.supabase.storage/StorageListFilter.sortOrder.<set-sortOrder>|<set-sortOrder>(kotlin.String?){}[0]
+
+    final class Buckets : io.github.jan.supabase.storage/StorageListFilter { // io.github.jan.supabase.storage/StorageListFilter.Buckets|null[0]
+        constructor <init>() // io.github.jan.supabase.storage/StorageListFilter.Buckets.<init>|<init>(){}[0]
+
+        final fun sortBy(io.github.jan.supabase.storage/BucketSortColumn, io.github.jan.supabase.storage/SortOrder) // io.github.jan.supabase.storage/StorageListFilter.Buckets.sortBy|sortBy(io.github.jan.supabase.storage.BucketSortColumn;io.github.jan.supabase.storage.SortOrder){}[0]
+    }
+
+    final class Files : io.github.jan.supabase.storage/StorageListFilter { // io.github.jan.supabase.storage/StorageListFilter.Files|null[0]
+        constructor <init>() // io.github.jan.supabase.storage/StorageListFilter.Files.<init>|<init>(){}[0]
+
+        final fun sortBy(kotlin/String, io.github.jan.supabase.storage/SortOrder) // io.github.jan.supabase.storage/StorageListFilter.Files.sortBy|sortBy(kotlin.String;io.github.jan.supabase.storage.SortOrder){}[0]
+    }
+}
+
+final val io.github.jan.supabase.storage/storage // io.github.jan.supabase.storage/storage|@io.github.jan.supabase.SupabaseClient{}storage[0]
+    final fun (io.github.jan.supabase/SupabaseClient).<get-storage>(): io.github.jan.supabase.storage/Storage // io.github.jan.supabase.storage/storage.<get-storage>|<get-storage>@io.github.jan.supabase.SupabaseClient(){}[0]
+
+final fun (io.github.jan.supabase.storage/BucketApi).io.github.jan.supabase.storage/downloadAuthenticatedAsFlow(kotlin/String, io.ktor.utils.io/ByteWriteChannel, kotlin/Function1<io.github.jan.supabase.storage/DownloadOptionBuilder, kotlin/Unit> = ...): kotlinx.coroutines.flow/Flow<io.github.jan.supabase.storage/DownloadStatus> // io.github.jan.supabase.storage/downloadAuthenticatedAsFlow|downloadAuthenticatedAsFlow@io.github.jan.supabase.storage.BucketApi(kotlin.String;io.ktor.utils.io.ByteWriteChannel;kotlin.Function1<io.github.jan.supabase.storage.DownloadOptionBuilder,kotlin.Unit>){}[0]
+final fun (io.github.jan.supabase.storage/BucketApi).io.github.jan.supabase.storage/downloadAuthenticatedAsFlow(kotlin/String, kotlin/Function1<io.github.jan.supabase.storage/DownloadOptionBuilder, kotlin/Unit> = ...): kotlinx.coroutines.flow/Flow<io.github.jan.supabase.storage/DownloadStatus> // io.github.jan.supabase.storage/downloadAuthenticatedAsFlow|downloadAuthenticatedAsFlow@io.github.jan.supabase.storage.BucketApi(kotlin.String;kotlin.Function1<io.github.jan.supabase.storage.DownloadOptionBuilder,kotlin.Unit>){}[0]
+final fun (io.github.jan.supabase.storage/BucketApi).io.github.jan.supabase.storage/downloadPublicAsFlow(kotlin/String, io.ktor.utils.io/ByteWriteChannel, kotlin/Function1<io.github.jan.supabase.storage/DownloadOptionBuilder, kotlin/Unit> = ...): kotlinx.coroutines.flow/Flow<io.github.jan.supabase.storage/DownloadStatus> // io.github.jan.supabase.storage/downloadPublicAsFlow|downloadPublicAsFlow@io.github.jan.supabase.storage.BucketApi(kotlin.String;io.ktor.utils.io.ByteWriteChannel;kotlin.Function1<io.github.jan.supabase.storage.DownloadOptionBuilder,kotlin.Unit>){}[0]
+final fun (io.github.jan.supabase.storage/BucketApi).io.github.jan.supabase.storage/downloadPublicAsFlow(kotlin/String, kotlin/Function1<io.github.jan.supabase.storage/DownloadOptionBuilder, kotlin/Unit> = ...): kotlinx.coroutines.flow/Flow<io.github.jan.supabase.storage/DownloadStatus> // io.github.jan.supabase.storage/downloadPublicAsFlow|downloadPublicAsFlow@io.github.jan.supabase.storage.BucketApi(kotlin.String;kotlin.Function1<io.github.jan.supabase.storage.DownloadOptionBuilder,kotlin.Unit>){}[0]
+final fun (io.github.jan.supabase.storage/BucketApi).io.github.jan.supabase.storage/updateAsFlow(kotlin/String, io.github.jan.supabase.storage/UploadData, kotlin/Function1<io.github.jan.supabase.storage/UploadOptionBuilder, kotlin/Unit> = ...): kotlinx.coroutines.flow/Flow<io.github.jan.supabase.storage/UploadStatus> // io.github.jan.supabase.storage/updateAsFlow|updateAsFlow@io.github.jan.supabase.storage.BucketApi(kotlin.String;io.github.jan.supabase.storage.UploadData;kotlin.Function1<io.github.jan.supabase.storage.UploadOptionBuilder,kotlin.Unit>){}[0]
+final fun (io.github.jan.supabase.storage/BucketApi).io.github.jan.supabase.storage/updateAsFlow(kotlin/String, kotlin/ByteArray, kotlin/Function1<io.github.jan.supabase.storage/UploadOptionBuilder, kotlin/Unit> = ...): kotlinx.coroutines.flow/Flow<io.github.jan.supabase.storage/UploadStatus> // io.github.jan.supabase.storage/updateAsFlow|updateAsFlow@io.github.jan.supabase.storage.BucketApi(kotlin.String;kotlin.ByteArray;kotlin.Function1<io.github.jan.supabase.storage.UploadOptionBuilder,kotlin.Unit>){}[0]
+final fun (io.github.jan.supabase.storage/BucketApi).io.github.jan.supabase.storage/uploadAsFlow(kotlin/String, io.github.jan.supabase.storage/UploadData, kotlin/Function1<io.github.jan.supabase.storage/UploadOptionBuilder, kotlin/Unit> = ...): kotlinx.coroutines.flow/Flow<io.github.jan.supabase.storage/UploadStatus> // io.github.jan.supabase.storage/uploadAsFlow|uploadAsFlow@io.github.jan.supabase.storage.BucketApi(kotlin.String;io.github.jan.supabase.storage.UploadData;kotlin.Function1<io.github.jan.supabase.storage.UploadOptionBuilder,kotlin.Unit>){}[0]
+final fun (io.github.jan.supabase.storage/BucketApi).io.github.jan.supabase.storage/uploadAsFlow(kotlin/String, kotlin/ByteArray, kotlin/Function1<io.github.jan.supabase.storage/UploadOptionBuilder, kotlin/Unit> = ...): kotlinx.coroutines.flow/Flow<io.github.jan.supabase.storage/UploadStatus> // io.github.jan.supabase.storage/uploadAsFlow|uploadAsFlow@io.github.jan.supabase.storage.BucketApi(kotlin.String;kotlin.ByteArray;kotlin.Function1<io.github.jan.supabase.storage.UploadOptionBuilder,kotlin.Unit>){}[0]
+final fun (io.github.jan.supabase.storage/BucketApi).io.github.jan.supabase.storage/uploadToSignedUrlAsFlow(kotlin/String, kotlin/String, io.github.jan.supabase.storage/UploadData, kotlin/Function1<io.github.jan.supabase.storage/UploadOptionBuilder, kotlin/Unit> = ...): kotlinx.coroutines.flow/Flow<io.github.jan.supabase.storage/UploadStatus> // io.github.jan.supabase.storage/uploadToSignedUrlAsFlow|uploadToSignedUrlAsFlow@io.github.jan.supabase.storage.BucketApi(kotlin.String;kotlin.String;io.github.jan.supabase.storage.UploadData;kotlin.Function1<io.github.jan.supabase.storage.UploadOptionBuilder,kotlin.Unit>){}[0]
+final fun (io.github.jan.supabase.storage/BucketApi).io.github.jan.supabase.storage/uploadToSignedUrlAsFlow(kotlin/String, kotlin/String, kotlin/ByteArray, kotlin/Function1<io.github.jan.supabase.storage/UploadOptionBuilder, kotlin/Unit> = ...): kotlinx.coroutines.flow/Flow<io.github.jan.supabase.storage/UploadStatus> // io.github.jan.supabase.storage/uploadToSignedUrlAsFlow|uploadToSignedUrlAsFlow@io.github.jan.supabase.storage.BucketApi(kotlin.String;kotlin.String;kotlin.ByteArray;kotlin.Function1<io.github.jan.supabase.storage.UploadOptionBuilder,kotlin.Unit>){}[0]
+final fun io.github.jan.supabase.storage.resumable/createDefaultResumableCache(): io.github.jan.supabase.storage.resumable/ResumableCache // io.github.jan.supabase.storage.resumable/createDefaultResumableCache|createDefaultResumableCache(){}[0]
+final fun io.github.jan.supabase.storage/authenticatedStorageItem(kotlin/String, kotlin/String): io.github.jan.supabase.storage/StorageItem // io.github.jan.supabase.storage/authenticatedStorageItem|authenticatedStorageItem(kotlin.String;kotlin.String){}[0]
+final fun io.github.jan.supabase.storage/publicStorageItem(kotlin/String, kotlin/String): io.github.jan.supabase.storage/StorageItem // io.github.jan.supabase.storage/publicStorageItem|publicStorageItem(kotlin.String;kotlin.String){}[0]
+final suspend fun (io.github.jan.supabase.storage/BucketApi).io.github.jan.supabase.storage/authenticatedRequest(kotlin/String): kotlin/Pair<kotlin/String, kotlin/String> // io.github.jan.supabase.storage/authenticatedRequest|authenticatedRequest@io.github.jan.supabase.storage.BucketApi(kotlin.String){}[0]
+
+// Targets: [apple, js, mingwX64, wasmJs]
+final class io.github.jan.supabase.storage.resumable/SettingsResumableCache : io.github.jan.supabase.storage.resumable/ResumableCache { // io.github.jan.supabase.storage.resumable/SettingsResumableCache|null[0]
+    constructor <init>(com.russhwolf.settings/Settings = ...) // io.github.jan.supabase.storage.resumable/SettingsResumableCache.<init>|<init>(com.russhwolf.settings.Settings){}[0]
+
+    final suspend fun clear() // io.github.jan.supabase.storage.resumable/SettingsResumableCache.clear|clear(){}[0]
+    final suspend fun entries(): kotlin.collections/List<kotlin/Pair<io.github.jan.supabase.storage.resumable/Fingerprint, io.github.jan.supabase.storage.resumable/ResumableCacheEntry>> // io.github.jan.supabase.storage.resumable/SettingsResumableCache.entries|entries(){}[0]
+    final suspend fun get(io.github.jan.supabase.storage.resumable/Fingerprint): io.github.jan.supabase.storage.resumable/ResumableCacheEntry? // io.github.jan.supabase.storage.resumable/SettingsResumableCache.get|get(io.github.jan.supabase.storage.resumable.Fingerprint){}[0]
+    final suspend fun remove(io.github.jan.supabase.storage.resumable/Fingerprint) // io.github.jan.supabase.storage.resumable/SettingsResumableCache.remove|remove(io.github.jan.supabase.storage.resumable.Fingerprint){}[0]
+    final suspend fun set(io.github.jan.supabase.storage.resumable/Fingerprint, io.github.jan.supabase.storage.resumable/ResumableCacheEntry) // io.github.jan.supabase.storage.resumable/SettingsResumableCache.set|set(io.github.jan.supabase.storage.resumable.Fingerprint;io.github.jan.supabase.storage.resumable.ResumableCacheEntry){}[0]
+}

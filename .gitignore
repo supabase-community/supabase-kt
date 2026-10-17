@@ -8,3 +8,7 @@ local.properties
 kotlin-js-store
 integration-test/supabase/.temp/
 integration-test/supabase/.branches/
+
+# macOS / Xcode user state
+.DS_Store
+xcuserdata/
