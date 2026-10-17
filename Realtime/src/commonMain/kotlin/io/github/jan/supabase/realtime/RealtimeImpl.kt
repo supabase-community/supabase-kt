@@ -109,6 +109,9 @@ import kotlin.time.Duration
         _status.value = Realtime.Status.CONNECTING
         try {
             _websocket.store(websocketFactory.create(websocketUrl))
+            // A new socket has no heartbeat in flight. A reply the previous socket never received
+            // must not time out this socket, and no frame on it may be taken for that reply.
+            heartbeatRef.store(0)
             _status.value = Realtime.Status.CONNECTED
             logger.i { "Connected to realtime websocket!" }
             listenForMessages()
