@@ -27,6 +27,11 @@ fun SupabaseClient.handleDeeplinks(
     }
     when (auth.config.flowType) {
         FlowType.IMPLICIT -> {
+            // OAuth errors can come back as query parameters (?error=...) even when using the implicit flow
+            val components = NSURLComponents(url, false)
+            if (auth.handledUrlParameterError { key -> getQueryItem(components, key) }) {
+                return
+            }
             val fragment = url.fragment
             if (fragment == null) {
                 auth.logger.d { "No fragment for deeplink" }

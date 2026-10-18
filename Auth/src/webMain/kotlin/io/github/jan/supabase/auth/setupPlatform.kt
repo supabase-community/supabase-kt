@@ -37,6 +37,17 @@ private fun Auth.checkForHash(bridge: BrowserBridge): UserSession? {
     }
 }
 
+/**
+ * OAuth errors can come back as query parameters (?error=...) even when using the implicit flow.
+ * @return true if an error was found and handled
+ */
+private fun Auth.checkForQueryError(bridge: BrowserBridge): Boolean {
+    val url = URL(bridge.href)
+    if (!handledUrlParameterError { url.searchParams.get(it) }) return false
+    cleanQueryParams(bridge)
+    return true
+}
+
 private fun Auth.checkForPKCECode(bridge: BrowserBridge): String? {
     val url = URL(bridge.href)
     if (handledUrlParameterError { url.searchParams.get(it) }) {
@@ -76,6 +87,7 @@ actual suspend fun Auth.setupPlatform() {
             }
             FlowType.IMPLICIT -> {
                 logger.d { "Using IMPLICIT flow type, checking for hash..." }
+                if (checkForQueryError(config.browserBridge!!)) return initDone()
                 val sessionInHash = checkForHash(config.browserBridge!!) ?: return initDone()
                 handleHashSession(sessionInHash)
             }

@@ -45,6 +45,10 @@ fun SupabaseClient.handleDeeplinks(
     if(scheme != auth.config.scheme || host != auth.config.host) return
     when(this.auth.config.flowType) {
         FlowType.IMPLICIT -> {
+            // OAuth errors can come back as query parameters (?error=...) even when using the implicit flow
+            if(auth.handledUrlParameterError { data.getQueryParameter(it) }) {
+                return
+            }
             val fragment = data.encodedFragment ?: return
             auth.parseFragmentAndImportSession(fragment) {
                 it?.let(onSessionSuccess)
