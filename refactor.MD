@@ -195,6 +195,13 @@ when(result) {
 }
 ```
 
+### Revisit event system
+
+Currently, auth-kt has `sessionStatus` and `events`. The former is a flow representing the state of the session (NotAuthenticated, Authentication, SessionExpired, Initializing), 
+while the latter represents events outside the session lifecycle (e.g. error during OTP verification, refresh error).
+This approach is confusing and a unified way might be better (also e.g. sign-outs are hard to detect). Though: We have to consider how to represent the session lifecycle, which is crucial e.g. for distinguishing 
+expired session vs non-existing vs not yet loaded session.
+
 ### Android / iOS OAuth related changes
 
 **Android**
