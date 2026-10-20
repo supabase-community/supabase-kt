@@ -27,6 +27,10 @@ fun SupabaseClient.handleDeeplinks(
     }
     when (auth.config.flowType) {
         FlowType.IMPLICIT -> {
+            val components = NSURLComponents(url, false)
+            if (auth.handledUrlParameterError { key -> getQueryItem(components, key) }) {
+                return
+            }
             val fragment = url.fragment
             if (fragment == null) {
                 auth.logger.d { "No fragment for deeplink" }

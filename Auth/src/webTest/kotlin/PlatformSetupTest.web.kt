@@ -116,6 +116,29 @@ class PlatformSetupTest {
     }
 
     @Test
+    fun testPlatformSetupWithErrorQueryImplicit() = runTestOnBrowser {
+        var changedUrl = false
+        val bridge = BrowserBridgeMock(
+            href = "$EXAMPLE_URL?error_code=myCode&error_description=Description&error=Error&other=parameter",
+            changeUrl = {
+                assertEquals("$EXAMPLE_URL?other=parameter", it) //Unrelated query parameters are kept
+                changedUrl = true
+            }
+        )
+        val auth = createAuthClient(autoSetup = false, bridge, FlowType.IMPLICIT)
+        assertEquals(SessionStatus.Initializing, auth.sessionStatus.value)
+        auth.setupPlatform()
+        auth.events.test {
+            val errorEvent = awaitItem()
+            assertIs<AuthEvent.OtpError>(errorEvent)
+            assertEquals("myCode", errorEvent.error)
+            assertEquals("Description (Error)", errorEvent.errorDescription)
+        }
+        assertIs<SessionStatus.NotAuthenticated>(auth.sessionStatus.value)
+        assertTrue { changedUrl }
+    }
+
+    @Test
     fun testPlatformSetupWithValidPKCECode() = runTestOnBrowser {
         val session = userSession(user = UserInfo(
             id = "id",
