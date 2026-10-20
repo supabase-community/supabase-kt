@@ -227,6 +227,51 @@ class BucketApiTest {
     }
 
     @Test
+    fun testUploadWithPathNeedingEncoding() {
+        testUploadMethod(
+            method = HttpMethod.Post,
+            urlPath = "/object/$bucketId/folder/my%20f%C3%BCle.png",
+            expectedPath = "folder/my füle.png",
+            request = { client, expectedPath, data, meta ->
+                client.storage[bucketId].upload(expectedPath, data) {
+                    userMetadata = meta
+                }
+            },
+            extra = {}
+        )
+    }
+
+    @Test
+    fun testUpdateWithPathNeedingEncoding() {
+        testUploadMethod(
+            method = HttpMethod.Put,
+            urlPath = "/object/$bucketId/folder/my%20f%C3%BCle.png",
+            expectedPath = "folder/my füle.png",
+            request = { client, expectedPath, data, meta ->
+                client.storage[bucketId].update(expectedPath, data) {
+                    userMetadata = meta
+                }
+            },
+            extra = {}
+        )
+    }
+
+    @Test
+    fun testUploadToSignedUrlWithPathNeedingEncoding() {
+        testUploadMethod(
+            method = HttpMethod.Put,
+            urlPath = "/object/upload/sign/$bucketId/folder/my%20f%C3%BCle.png",
+            expectedPath = "folder/my füle.png",
+            request = { client, expectedPath, data, meta ->
+                client.storage[bucketId].uploadToSignedUrl(path = expectedPath, token = "12345", data = data) {
+                    userMetadata = meta
+                }
+            },
+            extra = {}
+        )
+    }
+
+    @Test
     fun testDelete() {
         runTest {
             val expectedPrefixes = listOf("data.png", "data2.png", "data3.png")

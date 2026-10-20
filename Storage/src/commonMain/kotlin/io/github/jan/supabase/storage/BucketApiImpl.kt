@@ -78,7 +78,7 @@ internal class BucketApiImpl(
         options: UploadOptionBuilder.() -> Unit
     ): FileUploadResponse =
         uploadOrUpdate(
-            HttpMethod.Put, defaultUploadUrl(path), data, options
+            HttpMethod.Put, defaultUploadUrl(path), path, data, options
         )
 
     override suspend fun uploadToSignedUrl(
@@ -88,7 +88,7 @@ internal class BucketApiImpl(
         options: UploadOptionBuilder.() -> Unit
     ): FileUploadResponse {
         return uploadOrUpdate(
-            HttpMethod.Put, uploadToSignedUrlUrl(path, token), data, options
+            HttpMethod.Put, uploadToSignedUrlUrl(path, token), path, data, options
         )
     }
 
@@ -113,7 +113,7 @@ internal class BucketApiImpl(
         options: UploadOptionBuilder.() -> Unit
     ): FileUploadResponse =
         uploadOrUpdate(
-            HttpMethod.Post, defaultUploadUrl(path), data, options
+            HttpMethod.Post, defaultUploadUrl(path), path, data, options
         )
 
     override suspend fun delete(paths: Collection<String>) {
@@ -308,10 +308,10 @@ internal class BucketApiImpl(
     internal suspend fun uploadOrUpdate(
         method: HttpMethod,
         url: String,
+        path: String,
         data: UploadData,
         options: UploadOptionBuilder.() -> Unit,
     ): FileUploadResponse {
-        val path = url.substringAfter("${storagePath(bucketId)}/").substringBeforeLast("?")
         val optionBuilder = UploadOptionBuilder(storage.serializer).apply(options)
         val response = api.request(url) {
             this.method = method
