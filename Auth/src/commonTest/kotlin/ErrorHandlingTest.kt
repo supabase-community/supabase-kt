@@ -54,7 +54,38 @@ class ErrorHandlingTest {
 
         assertNotNull(error)
         assertEquals("otp_expired", error.error)
-        assertEquals("null (null)", error.errorDescription)
+        assertEquals("otp_expired", error.errorDescription)
+    }
+
+    @Test
+    fun testCheckForUrlParameterErrorWithOnlyError() {
+        val url = Url("https://example.com/?error=access_denied")
+        val error = checkForUrlParameterError { url.parameters[it] }
+
+        assertNotNull(error)
+        assertEquals("access_denied", error.error)
+        assertEquals("access_denied", error.errorDescription)
+        assertNull(error.errorCode)
+    }
+
+    @Test
+    fun testCheckForUrlParameterErrorWithOnlyErrorDescription() {
+        val url = Url("https://example.com/?error_description=Something+went+wrong")
+        val error = checkForUrlParameterError { url.parameters[it] }
+
+        assertNotNull(error)
+        assertEquals("Something went wrong", error.error)
+        assertEquals("Something went wrong", error.errorDescription)
+    }
+
+    @Test
+    fun testCheckForUrlParameterErrorWithErrorCodeAndDescription() {
+        val url = Url("https://example.com/?error_code=otp_expired&error_description=Invalid+request")
+        val error = checkForUrlParameterError { url.parameters[it] }
+
+        assertNotNull(error)
+        assertEquals("otp_expired", error.error)
+        assertEquals("Invalid request", error.errorDescription)
     }
 
     @Test
@@ -62,7 +93,10 @@ class ErrorHandlingTest {
         val url = Url("https://example.com/?error=invalid_request&error_description=Something+went+wrong")
         val error = checkForUrlParameterError { url.parameters[it] }
 
-        assertNull(error)
+        assertNotNull(error)
+        assertEquals("invalid_request", error.error)
+        assertEquals("Something went wrong (invalid_request)", error.errorDescription)
+        assertNull(error.errorCode)
     }
 
     @Test

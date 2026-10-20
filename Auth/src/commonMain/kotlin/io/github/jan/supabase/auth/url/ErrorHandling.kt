@@ -9,12 +9,16 @@ internal fun checkForUrlParameterError(parameters: (String) -> String?): AuthEve
     val error = parameters("error")
     val errorCode = parameters("error_code")
     val errorDescription = parameters("error_description")
-    return if(errorCode != null) {
-        AuthEvent.OtpError(
-            error = errorCode,
-            errorDescription = "$errorDescription ($error)",
-        )
-    } else null
+    val code = errorCode ?: error ?: errorDescription ?: return null
+    val description = if(errorDescription != null && error != null) {
+        "$errorDescription ($error)"
+    } else {
+        errorDescription ?: error ?: code
+    }
+    return AuthEvent.OtpError(
+        error = code,
+        errorDescription = description,
+    )
 }
 
 internal fun Auth.handledUrlParameterError(parameters: (String) -> String?): Boolean {

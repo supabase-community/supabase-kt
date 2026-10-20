@@ -5,6 +5,8 @@ import io.github.jan.supabase.auth.Auth
 import io.github.jan.supabase.auth.parseSessionFromFragment
 import io.github.jan.supabase.buildUrl
 import io.github.jan.supabase.logging.d
+import io.ktor.http.URLDecodeException
+import io.ktor.http.parseQueryString
 
 internal fun Auth.validateHash(hash: String): UrlValidationResult {
     logger.d { "Parsing fragment/hash ${StringMasking.maskParameterString(hash)}" }
@@ -21,17 +23,22 @@ internal fun Auth.validateHash(hash: String): UrlValidationResult {
     return UrlValidationResult.SessionFound(session)
 }
 
+/**
+ * Splits a URL fragment into its parameters.
+ *
+ * The fragment is expected as it appears in the URL, so keys and values are decoded like query parameters:
+ * percent escapes are resolved and a plus sign becomes a space. A fragment that cannot be decoded is split as is.
+ */
 internal fun getFragmentParts(fragment: String): Map<String, String> {
-    val pairs = fragment.split("&")
-    if(pairs.isEmpty()) return emptyMap()
-    return pairs.mapNotNull {
-        val keyAndValue = it.split("=")
-        keyAndValue.getOrNull(0)?.let { key ->
-            keyAndValue.getOrNull(1)?.let { value ->
-                key to value
-            }
-        }
-    }.toMap()
+    if(fragment.isEmpty()) return emptyMap()
+    val parameters = try {
+        parseQueryString(fragment)
+    } catch(e: URLDecodeException) {
+        parseQueryString(fragment, decode = false)
+    }
+    return parameters.entries().associate { (key, values) ->
+        key to (values.firstOrNull() ?: "")
+    }
 }
 
 internal fun consumeHashParameters(parameters: List<String>, url: String): String {
