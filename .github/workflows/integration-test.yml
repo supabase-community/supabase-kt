@@ -29,6 +29,9 @@ jobs:
       - name: Start Supabase
         run: supabase start --workdir integration-test
 
+      - name: Enable analytics buckets
+        run: ./script/enable-analytics.sh
+
       - name: Export Supabase env vars
         run: |
           echo "SUPABASE_URL=$(supabase status --workdir integration-test --output json | jq -r '.API_URL')" >> $GITHUB_ENV
@@ -37,6 +40,13 @@ jobs:
 
       - name: Run integration tests
         run: ./gradlew :integration-test:test -Pintegration --stacktrace --configuration-cache
+
+      - name: Upload test report
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: integration-test-report
+          path: integration-test/build/reports/tests/test
 
       - name: Stop Supabase
         if: always()

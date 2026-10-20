@@ -62,3 +62,19 @@ Some test targets have special requirements:
 - `ios`/`watchos`/`tvos` tests only work on Mac and require that the relevant SDK is installed in Xcode.
 - Android does not have specific tests, but are tested implicitly through the `jvmTest` task.
 
+### Integration Tests
+
+The [integration-test](/integration-test) module runs the JVM client against a local Supabase stack started with the [Supabase CLI](https://supabase.com/docs/guides/local-development/cli/getting-started). It requires Docker and is skipped unless `-Pintegration` is passed:
+
+```bash
+supabase start --workdir integration-test
+./script/enable-analytics.sh
+export SUPABASE_URL=$(supabase status --workdir integration-test --output json | jq -r '.API_URL')
+export SUPABASE_ANON_KEY=$(supabase status --workdir integration-test --output json | jq -r '.ANON_KEY')
+export SUPABASE_SERVICE_ROLE_KEY=$(supabase status --workdir integration-test --output json | jq -r '.SERVICE_ROLE_KEY')
+./gradlew :integration-test:test -Pintegration
+supabase stop --workdir integration-test
+```
+
+- Vector bucket tests run against the local pgvector backend enabled by `[storage.vector]` in [config.toml](/integration-test/supabase/config.toml).
+- Analytics (Iceberg) bucket tests need [`script/enable-analytics.sh`](/script/enable-analytics.sh). The CLI never enables the analytics bucket API locally, so the script recreates the storage container with `ICEBERG_ENABLED=true` (requires `jq`). Without it, these tests are skipped. They also run against a hosted project with analytics buckets enabled.

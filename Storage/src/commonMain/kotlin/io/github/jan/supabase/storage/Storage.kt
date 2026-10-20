@@ -56,21 +56,21 @@ import kotlin.time.Duration.Companion.seconds
 interface Storage : MainPlugin<Storage.Config>, CustomSerializationPlugin {
 
     /**
-     * Access vector storage operations.
-     *
-     * **Public alpha:** This API is part of a public alpha release and may not be available to your account type.
-     *
-     * @returns A [StorageVectorsClient] instance configured with the current storage settings.
-     */
-    @SupabaseExperimental
-    val analytics: StorageAnalyticsClient
-
-    /**
      * Access analytics storage operations using Iceberg tables.
      *
      * **Public alpha:** This API is part of a public alpha release and may not be available to your account type.
      *
      * @returns A [StorageAnalyticsClient] instance configured with the current storage settings.
+     */
+    @SupabaseExperimental
+    val analytics: StorageAnalyticsClient
+
+    /**
+     * Access vector storage operations.
+     *
+     * **Public alpha:** This API is part of a public alpha release and may not be available to your account type.
+     *
+     * @returns A [StorageVectorsClient] instance configured with the current storage settings.
      */
     @SupabaseExperimental
     val vectors: StorageVectorsClient
