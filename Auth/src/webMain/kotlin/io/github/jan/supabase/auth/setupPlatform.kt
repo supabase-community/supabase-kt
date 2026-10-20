@@ -37,10 +37,6 @@ private fun Auth.checkForHash(bridge: BrowserBridge): UserSession? {
     }
 }
 
-/**
- * OAuth errors can come back as query parameters (?error=...) even when using the implicit flow.
- * @return true if an error was found and handled
- */
 private fun Auth.checkForQueryError(bridge: BrowserBridge): Boolean {
     val url = URL(bridge.href)
     if (!handledUrlParameterError { url.searchParams.get(it) }) return false
