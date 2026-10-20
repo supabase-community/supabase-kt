@@ -55,7 +55,6 @@ fun KotlinMultiplatformExtension.configuredAndroidTarget(
         compilerOptions {
             this.jvmTarget.set(JvmTarget.JVM_11)
         }
-        withHostTest {  }
         compileSdk = 37
         minSdk = 23
         this.namespace = namespace ?: "${project.extra["base-group"].toString().replace("-", ".")}.${project.name.replace("-", "")}.library"
