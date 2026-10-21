@@ -109,6 +109,7 @@ import kotlin.time.Duration
         _status.value = Realtime.Status.CONNECTING
         try {
             _websocket.store(websocketFactory.create(websocketUrl))
+            heartbeatRef.store(0)
             _status.value = Realtime.Status.CONNECTED
             logger.i { "Connected to realtime websocket!" }
             listenForMessages()
