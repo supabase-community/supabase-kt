@@ -1,3 +1,8 @@
+> [!IMPORTANT]
+> **Update, October 2026:**  
+> We are working towards making supabase-kt official. Your PRs may wait longer than usual until we migrate the namespace and transfer the repository.
+> Check out [this discussion](https://github.com/orgs/supabase/discussions/52063) for more information.
+
 # supabase-kt
 
 A Kotlin Multiplatform Client for Supabase.
