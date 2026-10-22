@@ -159,6 +159,22 @@ class PostgrestFilterBuilderTest {
     }
 
     @Test
+    fun likeAll_emptyList() {
+        val filter = filterToString {
+            likeAll("name", emptyList())
+        }
+        assertEquals("name=like(all).{}", filter)
+    }
+
+    @Test
+    fun likeAny_emptyList() {
+        val filter = filterToString {
+            likeAny("name", emptyList())
+        }
+        assertEquals("name=like(any).{}", filter)
+    }
+
+    @Test
     fun rangeLte() {
         val filter = filterToString {
             rangeLte("id", 1L to 10L)

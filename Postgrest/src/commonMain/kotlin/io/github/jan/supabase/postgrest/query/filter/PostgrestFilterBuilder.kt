@@ -83,6 +83,9 @@ class PostgrestFilterBuilder(
 
     /**
      * Finds all rows where the value of the [column] matches all of the specified [patterns]
+     *
+     * An empty [patterns] list matches every row, because PostgreSQL evaluates `ALL` over an empty array as true.
+     * Check the list before using this filter in a `delete` or `update`.
      */
     fun likeAll(column: String, patterns: List<String>) {
         val columnValue = params[column] ?: emptyList()
@@ -91,6 +94,8 @@ class PostgrestFilterBuilder(
 
     /**
      * Finds all rows where the value of the [column] matches any of the specified [patterns]
+     *
+     * An empty [patterns] list matches no rows, because PostgreSQL evaluates `ANY` over an empty array as false.
      */
     fun likeAny(column: String, patterns: List<String>) {
         val columnValue = params[column] ?: emptyList()
@@ -98,7 +103,10 @@ class PostgrestFilterBuilder(
     }
 
     /**
-     * Finds all rows where the value of the [column] matches all of the specified [patterns]
+     * Finds all rows where the value of the [column] matches all of the specified [patterns] (case-insensitive)
+     *
+     * An empty [patterns] list matches every row, because PostgreSQL evaluates `ALL` over an empty array as true.
+     * Check the list before using this filter in a `delete` or `update`.
      */
     fun ilikeAll(column: String, patterns: List<String>) {
         val columnValue = params[column] ?: emptyList()
@@ -107,6 +115,8 @@ class PostgrestFilterBuilder(
 
     /**
      * Finds all rows where the value of the [column] matches any of the specified [patterns] (case-insensitive)
+     *
+     * An empty [patterns] list matches no rows, because PostgreSQL evaluates `ANY` over an empty array as false.
      */
     fun ilikeAny(column: String, patterns: List<String>) {
         val columnValue = params[column] ?: emptyList()
