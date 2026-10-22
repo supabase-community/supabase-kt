@@ -184,9 +184,9 @@ class RealtimeChannelRejoinTest {
         put("response", buildJsonObject { put("reason", "RealtimeDisabledForConfiguration: Unable to subscribe to changes") })
     }, join.ref, join.joinRef)
 
-    // No ref on these: the server sends the join_ref, but "0" would be taken for a heartbeat reply
-    private fun channelError(joinRef: String?) = RealtimeMessage(topic, RealtimeChannel.CHANNEL_EVENT_ERROR, buildJsonObject { }, null, joinRef)
+    // The server sends the join_ref as the ref of these too
+    private fun channelError(joinRef: String?) = RealtimeMessage(topic, RealtimeChannel.CHANNEL_EVENT_ERROR, buildJsonObject { }, joinRef, joinRef)
 
-    private fun close(joinRef: String?) = RealtimeMessage(topic, RealtimeChannel.CHANNEL_EVENT_CLOSE, buildJsonObject { }, null, joinRef)
+    private fun close(joinRef: String?) = RealtimeMessage(topic, RealtimeChannel.CHANNEL_EVENT_CLOSE, buildJsonObject { }, joinRef, joinRef)
 
 }

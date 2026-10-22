@@ -81,7 +81,7 @@ import kotlin.time.Duration
     private var heartbeatJob: Job? = null
     private var messageJob: Job? = null
     private var disconnectJob: Job? = null
-    private val heartbeatRef = AtomicInt(0)
+    private val heartbeatRef = AtomicInt(NO_HEARTBEAT)
     override val apiVersion: Int
         get() = Realtime.API_VERSION
 
@@ -225,6 +225,8 @@ import kotlin.time.Duration
         heartbeatJob?.cancel()
         _websocket.load()?.disconnect()
         _websocket.store(null)
+        // The next socket can't answer a heartbeat sent on this one
+        heartbeatRef.store(NO_HEARTBEAT)
         for ((_, channel) in subscriptions) {
             (channel as? RealtimeChannelImpl)?.cancelRejoin()
             channel.updateStatus(RealtimeChannel.Status.UNSUBSCRIBED)
@@ -244,7 +246,7 @@ import kotlin.time.Duration
         logger.d { "Received message $message" }
         val channel = subscriptions[message.topic] as? RealtimeChannelImpl
         val ref = message.ref?.toIntOrNull()
-        if(ref != null && heartbeatRef.compareAndSet(ref, 0)) {
+        if(ref != null && heartbeatRef.compareAndSet(ref, NO_HEARTBEAT)) {
             logger.d { "Heartbeat received" }
         } else {
             logger.d { "Received event ${message.event} for channel ${channel?.topic}" }
@@ -273,8 +275,8 @@ import kotlin.time.Duration
     }
 
     private suspend fun sendHeartbeat() {
-        if (heartbeatRef.load() != 0) {
-            heartbeatRef.store(0)
+        if (heartbeatRef.load() != NO_HEARTBEAT) {
+            heartbeatRef.store(NO_HEARTBEAT)
             logger.w { "Heartbeat timeout. Trying to reconnect in ${config.reconnectDelay}" }
             reconnect()
             return
@@ -406,6 +408,11 @@ import kotlin.time.Duration
                 connect(true)
             }
         }
+    }
+
+    private companion object {
+        // Not 0: refs start at 0, so the close for a socket's first join looked like a heartbeat reply
+        const val NO_HEARTBEAT = -1
     }
 
 }
