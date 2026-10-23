@@ -14,6 +14,11 @@ data object RErrorEvent : RealtimeEvent {
 
     override suspend fun handle(channel: RealtimeChannel, message: RealtimeMessage) {
         channel as RealtimeChannelImpl
+        // Like Phoenix's client, only a rejected join rejoins: another push failing leaves the channel as it is
+        if(message.event == RealtimeChannel.CHANNEL_EVENT_REPLY && channel.status.value != RealtimeChannel.Status.SUBSCRIBING) {
+            channel.logger.e { "Push to channel ${message.topic} failed: ${message.payload}" }
+            return
+        }
         val currentAttempt = channel.joinAttempt.incrementAndFetch()
         if(currentAttempt >= channel.realtime.config.maxAttempts) {
             channel.logger.e { "Failed to rejoin channel ${message.topic} after $currentAttempt attempts. Giving up. ${message.payload}" }
@@ -25,7 +30,8 @@ data object RErrorEvent : RealtimeEvent {
     }
 
     override fun appliesTo(message: RealtimeMessage): Boolean {
-        return message.event == RealtimeChannel.CHANNEL_EVENT_ERROR || message.payload["status"]?.jsonPrimitive?.content == "error"
+        return message.event == RealtimeChannel.CHANNEL_EVENT_ERROR ||
+            message.event == RealtimeChannel.CHANNEL_EVENT_REPLY && message.payload["status"]?.jsonPrimitive?.content == "error"
     }
 
 }

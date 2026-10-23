@@ -24,9 +24,8 @@ data object RPostgresServerChangesEvent : RealtimeEvent {
     }
 
     override fun appliesTo(message: RealtimeMessage): Boolean {
-        return message.event == RealtimeChannel.CHANNEL_EVENT_REPLY && message.payload["response"]?.jsonObject?.containsKey(
-            RealtimeChannel.CHANNEL_EVENT_POSTGRES_CHANGES
-        ) ?: false
+        val hasPostgresChanges = message.payload["response"]?.jsonObject?.containsKey(RealtimeChannel.CHANNEL_EVENT_POSTGRES_CHANGES) ?: false
+        return message.event == RealtimeChannel.CHANNEL_EVENT_REPLY && hasPostgresChanges && !RErrorEvent.appliesTo(message)
     }
 
 }
