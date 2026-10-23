@@ -19,7 +19,8 @@ data object RSystemReplyEvent : RealtimeEvent {
     }
 
     override fun appliesTo(message: RealtimeMessage): Boolean {
-        return message.event == RealtimeChannel.CHANNEL_EVENT_REPLY && message.payload["status"]?.jsonPrimitive?.content == "ok"
+        return message.event == RealtimeChannel.CHANNEL_EVENT_REPLY && message.payload["status"]?.jsonPrimitive?.content == "ok" &&
+            !RPostgresServerChangesEvent.appliesTo(message)
     }
 
 }

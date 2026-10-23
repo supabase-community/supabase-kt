@@ -27,7 +27,8 @@ data object RSystemEvent : RealtimeEvent {
     }
 
     override fun appliesTo(message: RealtimeMessage): Boolean {
-        return message.event == RealtimeChannel.CHANNEL_EVENT_SYSTEM && message.payload["status"]?.jsonPrimitive?.content in setOf("ok", "error")
+        return message.event == RealtimeChannel.CHANNEL_EVENT_SYSTEM && message.payload["status"]?.jsonPrimitive?.content in setOf("ok", "error") &&
+            !RTokenExpiredEvent.appliesTo(message)
     }
 
 }
