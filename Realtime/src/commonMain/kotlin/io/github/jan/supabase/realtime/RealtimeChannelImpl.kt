@@ -23,6 +23,8 @@ import io.ktor.http.HttpStatusCode
 import io.ktor.http.appendPathSegments
 import io.ktor.http.contentType
 import io.ktor.http.headers
+import kotlinx.coroutines.CoroutineStart
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.delay
@@ -32,6 +34,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.buildJsonObject
@@ -71,6 +74,7 @@ internal class RealtimeChannelImpl(
 
     internal val joinAttempt = AtomicInt(0)
     private val joinRef = AtomicReference<String?>(null)
+    private val rejoinJob = AtomicReference<Job?>(null)
 
     private suspend fun accessToken() = realtimeImpl.config.accessToken(supabaseClient) ?: realtimeImpl.accessToken
 
@@ -78,12 +82,18 @@ internal class RealtimeChannelImpl(
         userPresenceEnabled || callbackManager.hasPresenceCallback()
 
     override fun teardown() {
+        cancelRejoin()
         updateStatus(RealtimeChannel.Status.UNSUBSCRIBED)
         callbackManager.reset()
     }
 
-    @OptIn(SupabaseInternal::class)
     override suspend fun subscribe(blockUntilSubscribed: Boolean) {
+        cancelRejoin()
+        join(blockUntilSubscribed)
+    }
+
+    @OptIn(SupabaseInternal::class)
+    private suspend fun join(blockUntilSubscribed: Boolean) {
         if(realtimeImpl.status.value != Realtime.Status.CONNECTED) {
             if(!realtimeImpl.config.connectOnSubscribe) error("You can't subscribe to a channel while the realtime client is not connected. Did you forget to call `realtime.connect()`?")
             realtimeImpl.connect()
@@ -142,6 +152,11 @@ internal class RealtimeChannelImpl(
 
     @OptIn(SupabaseInternal::class)
     suspend fun onMessage(message: RealtimeMessage) {
+        // Like Phoenix's client: a message for an earlier join, e.g. the server's close for the join a rejoin replaced
+        if(message.joinRef != null && message.joinRef != joinRef.load()) {
+            logger.d { "Dropping ${message.event} for earlier join ${message.joinRef} of channel $topic" }
+            return
+        }
         val event = RealtimeEvent.resolveEvent(message)
         if(event == null) {
             logger.e { "Received message without event: $message" }
@@ -203,13 +218,23 @@ internal class RealtimeChannelImpl(
         throw RestException(errorMessage, null, response)
     }
 
-    override suspend fun scheduleRejoin() {
-        logger.d { "Rejoining channel $topic in" }
-        delay(realtime.config.rejoinDelay)
-        resubscribe()
+    // Not in the caller's coroutine: event handlers call this from the message loop. Replaces a pending rejoin.
+    override fun scheduleRejoin() {
+        logger.d { "Rejoining channel $topic in ${realtime.config.rejoinDelay}" }
+        val job = realtimeImpl.scope.launch(start = CoroutineStart.LAZY) {
+            delay(realtime.config.rejoinDelay)
+            resubscribe()
+        }
+        rejoinJob.exchange(job)?.cancel()
+        job.start()
+    }
+
+    internal fun cancelRejoin() {
+        rejoinJob.exchange(null)?.cancel()
     }
 
     override suspend fun unsubscribe() {
+        cancelRejoin()
         _status.value = RealtimeChannel.Status.UNSUBSCRIBING
         logger.d { "Unsubscribing from channel $topic" }
         val websocket = realtime.websocket
@@ -381,10 +406,9 @@ internal class RealtimeChannelImpl(
         _status.value = status
     }
 
+    // Like Phoenix's rejoin: send the join again, and the server replaces the channel's current join
     private suspend fun resubscribe() {
-        unsubscribe()
-        _status.first { it == RealtimeChannel.Status.UNSUBSCRIBED }
-        subscribe()
+        join(blockUntilSubscribed = false)
     }
 
 }

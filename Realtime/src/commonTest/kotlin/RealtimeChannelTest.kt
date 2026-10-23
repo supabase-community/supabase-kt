@@ -383,7 +383,7 @@ class RealtimeChannelTest {
                     handleSubscribe(i, o, channelId) {
                         assertFalse { it.config.presence.enabled }
                     }
-                    handleUnsubscribe(i, o, channelId)
+                    // Joins again without leaving: the server replaces the join
                     handleSubscribe(i, o, channelId) {
                         assertTrue { it.config.presence.enabled }
                     }
@@ -399,8 +399,6 @@ class RealtimeChannelTest {
                         assertEquals(RealtimeChannel.Status.SUBSCRIBING, awaitItem())
                         assertEquals(RealtimeChannel.Status.SUBSCRIBED, awaitItem())
                         val job = channel.presenceChangeFlow().launchIn(this@runTest)
-                        assertEquals(RealtimeChannel.Status.UNSUBSCRIBING, awaitItem())
-                        assertEquals(RealtimeChannel.Status.UNSUBSCRIBED, awaitItem())
                         assertEquals(RealtimeChannel.Status.SUBSCRIBING, awaitItem())
                         assertEquals(RealtimeChannel.Status.SUBSCRIBED, awaitItem())
                         job.cancel()

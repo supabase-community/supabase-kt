@@ -11,6 +11,7 @@ import io.github.jan.supabase.realtime.event.RSystemEvent
 import io.github.jan.supabase.realtime.event.RSystemReplyEvent
 import io.github.jan.supabase.realtime.event.RTokenExpiredEvent
 import io.github.jan.supabase.realtime.event.RealtimeEvent
+import kotlinx.serialization.json.buildJsonArray
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
 import kotlin.test.Test
@@ -30,6 +31,104 @@ class RealtimeEventTest {
         )
         assertEquals(RSystemEvent, RealtimeEvent.resolveEvent(message))
     }
+
+    @Test
+    fun testSystemErrorType() {
+        val message = RealtimeMessage(
+            topic = "",
+            event = RealtimeChannel.CHANNEL_EVENT_SYSTEM,
+            payload = buildJsonObject {
+                put("status", "error")
+            },
+            ref = ""
+        )
+        assertEquals(RSystemEvent, RealtimeEvent.resolveEvent(message))
+    }
+
+    @Test
+    fun testRejectedReplyType() {
+        val message = RealtimeMessage(
+            topic = "",
+            event = RealtimeChannel.CHANNEL_EVENT_REPLY,
+            payload = buildJsonObject {
+                put("status", "error")
+            },
+            ref = ""
+        )
+        assertEquals(RErrorEvent, RealtimeEvent.resolveEvent(message))
+    }
+
+    @Test
+    fun testJoinReplyWithPostgresChangesType() {
+        assertEquals(RPostgresServerChangesEvent, RealtimeEvent.resolveEvent(joinReply("ok")))
+    }
+
+    @Test
+    fun testRejectedJoinReplyWithPostgresChangesType() {
+        assertEquals(RErrorEvent, RealtimeEvent.resolveEvent(joinReply("error")))
+    }
+
+    @Test
+    fun testTokenExpiredSystemErrorType() {
+        val message = RealtimeMessage(
+            topic = "",
+            event = RealtimeChannel.CHANNEL_EVENT_SYSTEM,
+            payload = buildJsonObject {
+                put("status", "error")
+                put("message", "access token has expired")
+            },
+            ref = ""
+        )
+        assertEquals(RTokenExpiredEvent, RealtimeEvent.resolveEvent(message))
+    }
+
+    // resolveEvent relies on this, not on the events' order
+    @Test
+    fun testEachMessageHasOneEvent() {
+        val messages = listOf(
+            message(RealtimeChannel.CHANNEL_EVENT_BROADCAST),
+            message(RealtimeChannel.CHANNEL_EVENT_CLOSE),
+            message(RealtimeChannel.CHANNEL_EVENT_ERROR),
+            message(RealtimeChannel.CHANNEL_EVENT_POSTGRES_CHANGES),
+            message(RealtimeChannel.CHANNEL_EVENT_PRESENCE_STATE),
+            message(RealtimeChannel.CHANNEL_EVENT_PRESENCE_DIFF),
+            message(RealtimeChannel.CHANNEL_EVENT_SYSTEM, "ok"),
+            message(RealtimeChannel.CHANNEL_EVENT_SYSTEM, "error"),
+            message(RealtimeChannel.CHANNEL_EVENT_SYSTEM, "error", "access token has expired"),
+            message(RealtimeChannel.CHANNEL_EVENT_SYSTEM, null, "access token has expired"),
+            message(RealtimeChannel.CHANNEL_EVENT_REPLY, "ok"),
+            message(RealtimeChannel.CHANNEL_EVENT_REPLY, "error"),
+            joinReply("ok"),
+            joinReply("error"),
+            joinReply(null),
+        )
+        for(message in messages) {
+            val events = RealtimeEvent.EVENTS.filter { it.appliesTo(message) }
+            assertEquals(1, events.size, "$message matches $events")
+        }
+    }
+
+    private fun message(event: String, status: String? = null, text: String? = null) = RealtimeMessage(
+        topic = "",
+        event = event,
+        payload = buildJsonObject {
+            status?.let { put("status", it) }
+            text?.let { put("message", it) }
+        },
+        ref = ""
+    )
+
+    private fun joinReply(status: String?) = RealtimeMessage(
+        topic = "",
+        event = RealtimeChannel.CHANNEL_EVENT_REPLY,
+        payload = buildJsonObject {
+            status?.let { put("status", it) }
+            put("response", buildJsonObject {
+                put(RealtimeChannel.CHANNEL_EVENT_POSTGRES_CHANGES, buildJsonArray { })
+            })
+        },
+        ref = ""
+    )
 
     @Test
     fun testSystemReplyType() {
