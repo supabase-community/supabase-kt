@@ -32,6 +32,32 @@ class RealtimeEventTest {
     }
 
     @Test
+    fun testSystemErrorType() {
+        val message = RealtimeMessage(
+            topic = "",
+            event = RealtimeChannel.CHANNEL_EVENT_SYSTEM,
+            payload = buildJsonObject {
+                put("status", "error")
+            },
+            ref = ""
+        )
+        assertEquals(RSystemEvent, RealtimeEvent.resolveEvent(message))
+    }
+
+    @Test
+    fun testRejectedReplyType() {
+        val message = RealtimeMessage(
+            topic = "",
+            event = RealtimeChannel.CHANNEL_EVENT_REPLY,
+            payload = buildJsonObject {
+                put("status", "error")
+            },
+            ref = ""
+        )
+        assertEquals(RErrorEvent, RealtimeEvent.resolveEvent(message))
+    }
+
+    @Test
     fun testSystemReplyType() {
         val message = RealtimeMessage(
             topic = "",

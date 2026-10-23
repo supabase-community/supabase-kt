@@ -30,8 +30,8 @@ internal sealed interface RealtimeEvent {
             RPostgresServerChangesEvent,
             RPresenceStateEvent,
             RPresenceDiffEvent,
-            RSystemEvent,
             RTokenExpiredEvent,
+            RSystemEvent,
             RSystemReplyEvent
         )
 

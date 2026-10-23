@@ -64,7 +64,7 @@ import kotlin.time.Duration
     override val status: StateFlow<Realtime.Status> = _status.asStateFlow()
     private val _subscriptions = AtomicMutableMap<String, RealtimeChannel>()
     override val subscriptions: Map<String, RealtimeChannel> = _subscriptions
-    private val scope = config.coroutineScope ?: CoroutineScope(
+    internal val scope = config.coroutineScope ?: CoroutineScope(
         supabaseClient.coroutineDispatcher +
                 SupervisorJob() +
                 CoroutineExceptionHandler { _, throwable ->
@@ -226,6 +226,7 @@ import kotlin.time.Duration
         _websocket.load()?.disconnect()
         _websocket.store(null)
         for ((_, channel) in subscriptions) {
+            (channel as? RealtimeChannelImpl)?.cancelRejoin()
             channel.updateStatus(RealtimeChannel.Status.UNSUBSCRIBED)
         }
         _status.value = Realtime.Status.DISCONNECTED
